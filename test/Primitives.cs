@@ -4,50 +4,9 @@ namespace DefTest
     using System;
 
     [TestFixture]
-    public class Core : Base
+    public class Primitives : Base
     {
-        [Test]
-	    public void TrivialParse()
-	    {
-            var parser = new Def.Parser();
-            parser.ParseFromString(@"
-                <Defs>
-                    <StubDef defName=""TestDef"">
-                    </StubDef>
-                </Defs>",
-                new Type[]{ typeof(StubDef) });
-
-            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
-	    }
-
-        [Test]
-	    public void TrivialEmptyParse()
-	    {
-            var parser = new Def.Parser();
-            parser.ParseFromString(@"
-                <Defs>
-                    <StubDef defName=""TestDef"" />
-                </Defs>",
-                new Type[]{ typeof(StubDef) });
-
-            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
-	    }
-
-        [Test]
-	    public void DTDParse()
-	    {
-            var parser = new Def.Parser();
-            parser.ParseFromString(@"<?xml version=""1.0"" encoding=""UTF-8"" ?>
-                <Defs>
-                    <StubDef defName=""TestDef"">
-                    </StubDef>
-                </Defs>",
-                new Type[]{ typeof(StubDef) });
-
-            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
-	    }
-
-        public class BasicParseDef : Def.Def
+                public class BasicParseDef : Def.Def
         {
             public int testIntA = 1;
             public int testIntB = 2;
