@@ -14,7 +14,7 @@ namespace DefTest
 	    [Test]
 	    public void ClearTest()
 	    {
-            Assert.AreEqual(null, Def.Database<ClearTestDef>.Get("TestDef"));
+            Assert.IsNull(Def.Database<ClearTestDef>.Get("TestDef"));
 
             var parser = new Def.Parser();
             parser.ParseFromString(
@@ -23,11 +23,11 @@ namespace DefTest
                 </ClearTestDef>
                 ", new Type[]{ typeof(ClearTestDef) });
 
-            Assert.AreNotEqual(null, Def.Database<ClearTestDef>.Get("TestDef"));
+            Assert.IsNotNull(Def.Database<ClearTestDef>.Get("TestDef"));
 
             Def.Database.Clear();
 
-            Assert.AreEqual(null, Def.Database<ClearTestDef>.Get("TestDef"));
+            Assert.IsNull(Def.Database<ClearTestDef>.Get("TestDef"));
 
             parser.ParseFromString(
                 @"
@@ -35,11 +35,11 @@ namespace DefTest
                 </ClearTestDef>
                 ", new Type[]{ typeof(ClearTestDef) });
 
-            Assert.AreNotEqual(null, Def.Database<ClearTestDef>.Get("TestDef"));
+            Assert.IsNotNull(Def.Database<ClearTestDef>.Get("TestDef"));
 
             Def.Database.Clear();
 
-            Assert.AreEqual(null, Def.Database<ClearTestDef>.Get("TestDef"));
+            Assert.IsNull(Def.Database<ClearTestDef>.Get("TestDef"));
 	    }
     }
 }

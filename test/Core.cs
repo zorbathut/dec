@@ -43,7 +43,7 @@ namespace DefTest
                 ", new Type[]{ typeof(BasicParseTestDef) });
 
             var result = Def.Database<BasicParseTestDef>.Get("TestDef");
-            Assert.AreNotEqual(null, result);
+            Assert.IsNotNull(result);
 
             Assert.AreEqual(35, result.testIntA);
             Assert.AreEqual(-20, result.testIntB);
@@ -78,7 +78,7 @@ namespace DefTest
                 ", new Type[]{ typeof(EmptyStringParseTestDef) });
 
             var result = Def.Database<EmptyStringParseTestDef>.Get("TestDef");
-            Assert.AreNotEqual(null, result);
+            Assert.IsNotNull(result);
 
             Assert.AreEqual("one", result.testStringA);
             Assert.AreEqual("", result.testStringB);
