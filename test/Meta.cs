@@ -14,8 +14,7 @@ namespace DefTest
             var parser = new Def.Parser();
             parser.ParseFromString(@"
                 <Defs>
-                    <StubDef defName=""TestDef"">
-                    </StubDef>
+                    <StubDef defName=""TestDef"" />
                 </Defs>",
                 new Type[]{ typeof(StubDef) });
 
@@ -27,8 +26,7 @@ namespace DefTest
 
             parser.ParseFromString(@"
                 <Defs>
-                    <StubDef defName=""TestDef"">
-                    </StubDef>
+                    <StubDef defName=""TestDef"" />
                 </Defs>",
                 new Type[]{ typeof(StubDef) });
 

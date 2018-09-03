@@ -35,9 +35,7 @@ namespace DefTest
             var parser = new Def.Parser();
             ExpectWarnings(() => parser.ParseFromString(@"
                 <NotDefs>
-                    <StubDef defName=""TestDef"">
-                        
-                    </StubDef>
+                    <StubDef defName=""TestDef"" />
                 </NotDefs>",
                 new Type[]{ typeof(StubDef) }));
 
@@ -50,14 +48,10 @@ namespace DefTest
             var parser = new Def.Parser();
             ExpectErrors(() => parser.ParseFromString(@"
                 <Defs>
-                    <StubDef defName=""TestDefA"">
-                        
-                    </StubDef>
+                    <StubDef defName=""TestDefA"" />
                 </Defs>
                 <Defs>
-                    <StubDef defName=""TestDefB"">
-                        
-                    </StubDef>
+                    <StubDef defName=""TestDefB"" />
                 </Defs>",
                 new Type[]{ typeof(StubDef) }));
 
@@ -70,9 +64,7 @@ namespace DefTest
             var parser = new Def.Parser();
             ExpectErrors(() => parser.ParseFromString(@"
                 <Defs>
-                    <StubDef defName=""TestDef"">
-                        
-                    </StubDef>
+                    <StubDef defName=""TestDef"" />
                 </Defs>",
                 new Type[]{ typeof(bool), typeof(StubDef) }));
 
@@ -85,12 +77,8 @@ namespace DefTest
             var parser = new Def.Parser();
             ExpectErrors(() => parser.ParseFromString(@"
                 <Defs>
-                    <NonexistentDef defName=""TestDefA"">
-                        
-                    </NonexistentDef>
-                    <StubDef defName=""TestDefB"">
-                        
-                    </StubDef>
+                    <NonexistentDef defName=""TestDefA"" />
+                    <StubDef defName=""TestDefB"" />
                 </Defs>",
                 new Type[]{ typeof(StubDef) }));
 
@@ -104,9 +92,7 @@ namespace DefTest
             var parser = new Def.Parser();
             ExpectErrors(() => parser.ParseFromString(@"
                 <Defs>
-                    <StubDef>
-                        
-                    </StubDef>
+                    <StubDef />
                 </Defs>",
                 new Type[]{ typeof(StubDef) }));
 	    }
