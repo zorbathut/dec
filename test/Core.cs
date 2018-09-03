@@ -21,6 +21,19 @@ namespace DefTest
 	    }
 
         [Test]
+	    public void TrivialEmptyParse()
+	    {
+            var parser = new Def.Parser();
+            parser.ParseFromString(@"
+                <Defs>
+                    <StubDef defName=""TestDef"" />
+                </Defs>",
+                new Type[]{ typeof(StubDef) });
+
+            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
+	    }
+
+        [Test]
 	    public void DTDParse()
 	    {
             var parser = new Def.Parser();
