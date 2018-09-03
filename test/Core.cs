@@ -20,6 +20,20 @@ namespace DefTest
             Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
 	    }
 
+        [Test]
+	    public void DTDParse()
+	    {
+            var parser = new Def.Parser();
+            parser.ParseFromString(@"<?xml version=""1.0"" encoding=""UTF-8"" ?>
+                <Defs>
+                    <StubDef defName=""TestDef"">
+                    </StubDef>
+                </Defs>",
+                new Type[]{ typeof(StubDef) });
+
+            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
+	    }
+
         public class BasicParseDef : Def.Def
         {
             public int testIntA = 1;
