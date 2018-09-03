@@ -1,5 +1,7 @@
 namespace Def
 {
+    using System;
+
     internal static class Dbg
     {
         internal static void Inf(string format, params object[] args)
@@ -15,6 +17,11 @@ namespace Def
         internal static void Err(string format, params object[] args)
         {
             Config.ErrorHandler(string.Format(format, args));
+        }
+
+        internal static void Ex(Exception e)
+        {
+            Config.ExceptionHandler(e);
         }
     }
 }
