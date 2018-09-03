@@ -6,44 +6,39 @@ namespace DefTest
     [TestFixture]
     public class Meta : Base
     {
-        public class ClearTestDef : Def.Def
-        {
-
-        }
-
 	    [Test]
 	    public void ClearTest()
 	    {
-            Assert.IsNull(Def.Database<ClearTestDef>.Get("TestDef"));
+            Assert.IsNull(Def.Database<StubDef>.Get("TestDef"));
 
             var parser = new Def.Parser();
             parser.ParseFromString(
                 @"
                 <Defs>
-                    <ClearTestDef defName=""TestDef"">
-                    </ClearTestDef>
+                    <StubDef defName=""TestDef"">
+                    </StubDef>
                 </Defs>
-                ", new Type[]{ typeof(ClearTestDef) });
+                ", new Type[]{ typeof(StubDef) });
 
-            Assert.IsNotNull(Def.Database<ClearTestDef>.Get("TestDef"));
+            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
 
             Def.Database.Clear();
 
-            Assert.IsNull(Def.Database<ClearTestDef>.Get("TestDef"));
+            Assert.IsNull(Def.Database<StubDef>.Get("TestDef"));
 
             parser.ParseFromString(
                 @"
                 <Defs>
-                    <ClearTestDef defName=""TestDef"">
-                    </ClearTestDef>
+                    <StubDef defName=""TestDef"">
+                    </StubDef>
                 </Defs>
-                ", new Type[]{ typeof(ClearTestDef) });
+                ", new Type[]{ typeof(StubDef) });
 
-            Assert.IsNotNull(Def.Database<ClearTestDef>.Get("TestDef"));
+            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
 
             Def.Database.Clear();
 
-            Assert.IsNull(Def.Database<ClearTestDef>.Get("TestDef"));
+            Assert.IsNull(Def.Database<StubDef>.Get("TestDef"));
 	    }
     }
 }
