@@ -10,7 +10,17 @@ namespace Def
     {
         public void ParseFromString(string input, Type[] types)
         {
-            var doc = XDocument.Parse(input);
+            XDocument doc;
+
+            try
+            {
+                doc = XDocument.Parse(input);
+            }
+            catch (System.Xml.XmlException e)
+            {
+                Dbg.Ex(e);
+                return;
+            }
 
             var typeLookup = new Dictionary<string, Type>();
             foreach (var type in types)
@@ -20,20 +30,33 @@ namespace Def
                 typeLookup[type.Name] = type;
             }
 
-            foreach (var defElement in doc.Elements())
+            if (doc.Elements().Count() > 1)
             {
-                string typeName = defElement.Name.LocalName;
+                Dbg.Err($"Found {doc.Elements().Count()} root elements instead of the expected 1");
+            }
 
-                // TODO: check attributes for class override
+            foreach (var rootElement in doc.Elements())
+            {
+                if (rootElement.Name.LocalName != "Defs")
+                {
+                    Dbg.Wrn($"Found root element with name \"{rootElement.Name.LocalName}\" when it should be \"Defs\"");
+                }
 
-                Type typeHandle = typeLookup[typeName];
+                foreach (var defElement in rootElement.Elements())
+                {
+                    string typeName = defElement.Name.LocalName;
 
-                // TODO: make sure this derives from defElement.Name.LocalName
+                    // TODO: check attributes for class override
 
-                var defInstance = (Def)ParseThing(defElement, typeHandle, null);
-                defInstance.defName = defElement.Attribute("defName").Value;    // TODO: validate this
+                    Type typeHandle = typeLookup[typeName];
 
-                Database.Register(defInstance);
+                    // TODO: make sure this derives from defElement.Name.LocalName
+
+                    var defInstance = (Def)ParseThing(defElement, typeHandle, null);
+                    defInstance.defName = defElement.Attribute("defName").Value;    // TODO: validate this
+
+                    Database.Register(defInstance);
+                }
             }
         }
 

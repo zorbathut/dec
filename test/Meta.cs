@@ -19,8 +19,10 @@ namespace DefTest
             var parser = new Def.Parser();
             parser.ParseFromString(
                 @"
-                <ClearTestDef defName=""TestDef"">
-                </ClearTestDef>
+                <Defs>
+                    <ClearTestDef defName=""TestDef"">
+                    </ClearTestDef>
+                </Defs>
                 ", new Type[]{ typeof(ClearTestDef) });
 
             Assert.IsNotNull(Def.Database<ClearTestDef>.Get("TestDef"));
@@ -31,8 +33,10 @@ namespace DefTest
 
             parser.ParseFromString(
                 @"
-                <ClearTestDef defName=""TestDef"">
-                </ClearTestDef>
+                <Defs>
+                    <ClearTestDef defName=""TestDef"">
+                    </ClearTestDef>
+                </Defs>
                 ", new Type[]{ typeof(ClearTestDef) });
 
             Assert.IsNotNull(Def.Database<ClearTestDef>.Get("TestDef"));

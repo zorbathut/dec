@@ -29,17 +29,19 @@ namespace DefTest
             var parser = new Def.Parser();
             parser.ParseFromString(
                 @"
-                <BasicParseTestDef defName=""TestDef"">
-                    <testIntA>35</testIntA>
-                    <testIntB>-20</testIntB>
-                    <testFloatA>0.1234</testFloatA>
-                    <testFloatB>-8000000000000000</testFloatB>
-                    <testStringA>Hello</testStringA>
-                    <testStringB>Data, data, data</testStringB>
-                    <testStringC>Forsooth</testStringC>
-                    <testBoolA>true</testBoolA>
-                    <testBoolB>false</testBoolB>
-                </BasicParseTestDef>
+                <Defs>
+                    <BasicParseTestDef defName=""TestDef"">
+                        <testIntA>35</testIntA>
+                        <testIntB>-20</testIntB>
+                        <testFloatA>0.1234</testFloatA>
+                        <testFloatB>-8000000000000000</testFloatB>
+                        <testStringA>Hello</testStringA>
+                        <testStringB>Data, data, data</testStringB>
+                        <testStringC>Forsooth</testStringC>
+                        <testBoolA>true</testBoolA>
+                        <testBoolB>false</testBoolB>
+                    </BasicParseTestDef>
+                </Defs>
                 ", new Type[]{ typeof(BasicParseTestDef) });
 
             var result = Def.Database<BasicParseTestDef>.Get("TestDef");
@@ -72,9 +74,11 @@ namespace DefTest
             var parser = new Def.Parser();
             parser.ParseFromString(
                 @"
-                <EmptyStringParseTestDef defName=""TestDef"">
-                    <testStringB></testStringB>
-                </EmptyStringParseTestDef>
+                <Defs>
+                    <EmptyStringParseTestDef defName=""TestDef"">
+                        <testStringB></testStringB>
+                    </EmptyStringParseTestDef>
+                </Defs>
                 ", new Type[]{ typeof(EmptyStringParseTestDef) });
 
             var result = Def.Database<EmptyStringParseTestDef>.Get("TestDef");
