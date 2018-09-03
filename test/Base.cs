@@ -32,7 +32,7 @@ namespace DefTest
             };
         }
 
-        protected void ExpectError(Action action)
+        protected void ExpectErrors(Action action)
         {
             Assert.IsFalse(handlingErrors);
             handlingErrors = true;

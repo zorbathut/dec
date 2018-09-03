@@ -11,7 +11,7 @@ namespace DefTest
         {
             Assert.Throws(typeof(ArgumentException), () => Def.Config.ErrorHandler("Test"));
 
-            ExpectError(() => Def.Config.ErrorHandler("Test"));
+            ExpectErrors(() => Def.Config.ErrorHandler("Test"));
 
             // Make sure things are deinited properly
             Assert.Throws(typeof(ArgumentException), () => Def.Config.ErrorHandler("Test"));
