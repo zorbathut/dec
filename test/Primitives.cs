@@ -65,7 +65,6 @@ namespace DefTest
         {
             public string testStringA = "one";
             public string testStringB = "two";
-            public string testStringC = "three";
         }
 
 	    [Test]
@@ -75,8 +74,8 @@ namespace DefTest
             parser.ParseFromString(@"
                 <Defs>
                     <EmptyStringParseDef defName=""TestDef"">
-                        <testStringB></testStringB>
-                        <testStringC />
+                        <testStringA></testStringA>
+                        <testStringB />
                     </EmptyStringParseDef>
                 </Defs>",
                 new Type[]{ typeof(EmptyStringParseDef) });
@@ -84,9 +83,8 @@ namespace DefTest
             var result = Def.Database<EmptyStringParseDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
-            Assert.AreEqual("one", result.testStringA);
+            Assert.AreEqual("", result.testStringA);
             Assert.AreEqual("", result.testStringB);
-            Assert.AreEqual("", result.testStringC);
 	    }
     }
 }
