@@ -15,7 +15,7 @@ namespace DefTest
         private bool handlingErrors = false;
         private bool handledError = false;
         [OneTimeSetUp]
-        public void PrepErrorHook()
+        public void PrepHooks()
         {
             Def.Config.ErrorHandler = str => {
                 System.Diagnostics.Debug.Print(str);
