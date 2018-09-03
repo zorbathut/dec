@@ -6,6 +6,21 @@ namespace DefTest
     [TestFixture]
     public class Core : Base
     {
+        [Test]
+	    public void TrivialParseTest()
+	    {
+            var parser = new Def.Parser();
+            parser.ParseFromString(
+                @"
+                <Defs>
+                    <StubDef defName=""TestDef"">
+                    </StubDef>
+                </Defs>
+                ", new Type[]{ typeof(StubDef) });
+
+            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
+	    }
+
         public class BasicParseTestDef : Def.Def
         {
             public int testIntA = 1;

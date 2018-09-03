@@ -81,6 +81,8 @@ namespace DefTest
             handledError = false;
         }
 
-
+        protected class StubDef : Def.Def
+        {
+        }
     }
 }
