@@ -7,7 +7,7 @@ namespace DefTest
     public class Meta : Base
     {
 	    [Test]
-	    public void ClearTest()
+	    public void Clear()
 	    {
             Assert.IsNull(Def.Database<StubDef>.Get("TestDef"));
 

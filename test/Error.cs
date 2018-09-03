@@ -7,7 +7,7 @@ namespace DefTest
     public class Error : Base
     {
         [Test]
-        public void WarningTest()
+        public void WarningTesting()
         {
             // This doesn't happen normally, but does in our test framework
             Assert.Throws(typeof(ArgumentException), () => Def.Config.WarningHandler("Test"));
@@ -19,7 +19,7 @@ namespace DefTest
         }
 
         [Test]
-        public void ErrorTest()
+        public void ErrorTesting()
         {
             Assert.Throws(typeof(ArgumentException), () => Def.Config.ErrorHandler("Test"));
 
@@ -30,7 +30,7 @@ namespace DefTest
         }
 
         [Test]
-	    public void IncorrectRootTest()
+	    public void IncorrectRoot()
 	    {
             var parser = new Def.Parser();
             ExpectWarnings(() => parser.ParseFromString(
@@ -46,7 +46,7 @@ namespace DefTest
 	    }
 
         [Test]
-	    public void MultipleRootTest()
+	    public void MultipleRoot()
 	    {
             var parser = new Def.Parser();
             ExpectErrors(() => parser.ParseFromString(

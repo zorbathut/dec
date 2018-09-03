@@ -7,7 +7,7 @@ namespace DefTest
     public class Core : Base
     {
         [Test]
-	    public void TrivialParseTest()
+	    public void TrivialParse()
 	    {
             var parser = new Def.Parser();
             parser.ParseFromString(
@@ -21,7 +21,7 @@ namespace DefTest
             Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
 	    }
 
-        public class BasicParseTestDef : Def.Def
+        public class BasicParseDef : Def.Def
         {
             public int testIntA = 1;
             public int testIntB = 2;
@@ -39,13 +39,13 @@ namespace DefTest
         }
 
 	    [Test]
-	    public void BasicParseTest()
+	    public void BasicParse()
 	    {
             var parser = new Def.Parser();
             parser.ParseFromString(
                 @"
                 <Defs>
-                    <BasicParseTestDef defName=""TestDef"">
+                    <BasicParseDef defName=""TestDef"">
                         <testIntA>35</testIntA>
                         <testIntB>-20</testIntB>
                         <testFloatA>0.1234</testFloatA>
@@ -55,11 +55,11 @@ namespace DefTest
                         <testStringC>Forsooth</testStringC>
                         <testBoolA>true</testBoolA>
                         <testBoolB>false</testBoolB>
-                    </BasicParseTestDef>
+                    </BasicParseDef>
                 </Defs>
-                ", new Type[]{ typeof(BasicParseTestDef) });
+                ", new Type[]{ typeof(BasicParseDef) });
 
-            var result = Def.Database<BasicParseTestDef>.Get("TestDef");
+            var result = Def.Database<BasicParseDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(35, result.testIntA);
@@ -77,26 +77,26 @@ namespace DefTest
             Assert.AreEqual(false, result.testBoolC);
 	    }
 
-        public class EmptyStringParseTestDef : Def.Def
+        public class EmptyStringParseDef : Def.Def
         {
             public string testStringA = "one";
             public string testStringB = "two";
         }
 
 	    [Test]
-	    public void EmptyStringParseTest()
+	    public void EmptyStringParse()
 	    {
             var parser = new Def.Parser();
             parser.ParseFromString(
                 @"
                 <Defs>
-                    <EmptyStringParseTestDef defName=""TestDef"">
+                    <EmptyStringParseDef defName=""TestDef"">
                         <testStringB></testStringB>
-                    </EmptyStringParseTestDef>
+                    </EmptyStringParseDef>
                 </Defs>
-                ", new Type[]{ typeof(EmptyStringParseTestDef) });
+                ", new Type[]{ typeof(EmptyStringParseDef) });
 
-            var result = Def.Database<EmptyStringParseTestDef>.Get("TestDef");
+            var result = Def.Database<EmptyStringParseDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
             Assert.AreEqual("one", result.testStringA);
