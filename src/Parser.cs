@@ -25,9 +25,14 @@ namespace Def
             var typeLookup = new Dictionary<string, Type>();
             foreach (var type in types)
             {
-                // TODO: test to make sure it inherits from Def
-
-                typeLookup[type.Name] = type;
+                if (type.IsSubclassOf(typeof(Def)))
+                {
+                    typeLookup[type.Name] = type;
+                }
+                else
+                {
+                    Dbg.Err($"{type} is not a subclass of Def");
+                }
             }
 
             if (doc.Elements().Count() > 1)

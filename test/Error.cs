@@ -63,5 +63,20 @@ namespace DefTest
 
             // Currently not providing any guarantees on whether these get parsed; I'd actually like for them to get parsed, but doing so is tricky
 	    }
+
+        [Test]
+	    public void NonDefType()
+	    {
+            var parser = new Def.Parser();
+            ExpectErrors(() => parser.ParseFromString(@"
+                <Defs>
+                    <StubDef defName=""TestDef"">
+                        
+                    </StubDef>
+                </Defs>",
+                new Type[]{ typeof(bool), typeof(StubDef) }));
+
+            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
+	    }
     }
 }
