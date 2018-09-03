@@ -5,9 +5,12 @@ namespace Def
     using System.ComponentModel;
     using System.Linq;
     using System.Xml.Linq;
+    using System.Text.RegularExpressions;
 
     public class Parser
     {
+        private static readonly Regex DefNameValidator = new Regex(@"^[A-Za-z_][A-Za-z0-9_]*$", RegexOptions.Compiled);
+
         public void ParseFromString(string input, Type[] types)
         {
             XDocument doc;
@@ -64,8 +67,15 @@ namespace Def
                         continue;
                     }
 
+                    string defName = defElement.Attribute("defName").Value;
+                    if (!DefNameValidator.IsMatch(defName))
+                    {
+                        Dbg.Err($"{defElement.LineNumber()}: Def name \"{defName}\" doesn't match regex pattern \"{DefNameValidator}\"");
+                        continue;
+                    }
+
                     var defInstance = (Def)ParseThing(defElement, typeHandle, null);
-                    defInstance.defName = defElement.Attribute("defName").Value;
+                    defInstance.defName = defName;
 
                     Database.Register(defInstance);
                 }
