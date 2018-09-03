@@ -53,7 +53,12 @@ namespace Def
 
                     // TODO: check attributes for class override
 
-                    Type typeHandle = typeLookup[typeName];
+                    Type typeHandle = typeLookup.TryGetValue(typeName);
+                    if (typeHandle == null)
+                    {
+                        Dbg.Err($"{typeName} is not a valid root Def type");
+                        continue;
+                    }
 
                     // TODO: make sure this derives from defElement.Name.LocalName
 
