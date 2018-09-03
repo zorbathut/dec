@@ -106,6 +106,7 @@ namespace DefTest
         {
             public string testStringA = "one";
             public string testStringB = "two";
+            public string testStringC = "three";
         }
 
 	    [Test]
@@ -116,6 +117,7 @@ namespace DefTest
                 <Defs>
                     <EmptyStringParseDef defName=""TestDef"">
                         <testStringB></testStringB>
+                        <testStringC />
                     </EmptyStringParseDef>
                 </Defs>",
                 new Type[]{ typeof(EmptyStringParseDef) });
@@ -125,6 +127,7 @@ namespace DefTest
 
             Assert.AreEqual("one", result.testStringA);
             Assert.AreEqual("", result.testStringB);
+            Assert.AreEqual("", result.testStringC);
 	    }
     }
 }
