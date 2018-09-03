@@ -14,7 +14,7 @@ namespace Def
 
             try
             {
-                doc = XDocument.Parse(input);
+                doc = XDocument.Parse(input, LoadOptions.SetLineInfo);
             }
             catch (System.Xml.XmlException e)
             {
@@ -44,26 +44,28 @@ namespace Def
             {
                 if (rootElement.Name.LocalName != "Defs")
                 {
-                    Dbg.Wrn($"Found root element with name \"{rootElement.Name.LocalName}\" when it should be \"Defs\"");
+                    Dbg.Wrn($"{rootElement.LineNumber()}: Found root element with name \"{rootElement.Name.LocalName}\" when it should be \"Defs\"");
                 }
 
                 foreach (var defElement in rootElement.Elements())
                 {
                     string typeName = defElement.Name.LocalName;
 
-                    // TODO: check attributes for class override
-
                     Type typeHandle = typeLookup.TryGetValue(typeName);
                     if (typeHandle == null)
                     {
-                        Dbg.Err($"{typeName} is not a valid root Def type");
+                        Dbg.Err($"{defElement.LineNumber()}: {typeName} is not a valid root Def type");
                         continue;
                     }
 
-                    // TODO: make sure this derives from defElement.Name.LocalName
+                    if (defElement.Attribute("defName") == null)
+                    {
+                        Dbg.Err($"{defElement.LineNumber()}: No def name provided");
+                        continue;
+                    }
 
                     var defInstance = (Def)ParseThing(defElement, typeHandle, null);
-                    defInstance.defName = defElement.Attribute("defName").Value;    // TODO: validate this
+                    defInstance.defName = defElement.Attribute("defName").Value;
 
                     Database.Register(defInstance);
                 }

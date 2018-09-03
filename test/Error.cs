@@ -97,5 +97,18 @@ namespace DefTest
             Assert.IsNull(Def.Database<StubDef>.Get("TestDefA"));
             Assert.IsNotNull(Def.Database<StubDef>.Get("TestDefB"));
 	    }
+
+        [Test]
+	    public void MissingDefName()
+	    {
+            var parser = new Def.Parser();
+            ExpectErrors(() => parser.ParseFromString(@"
+                <Defs>
+                    <StubDef>
+                        
+                    </StubDef>
+                </Defs>",
+                new Type[]{ typeof(StubDef) }));
+	    }
     }
 }
