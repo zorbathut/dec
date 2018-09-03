@@ -12,13 +12,12 @@ namespace DefTest
             Assert.IsNull(Def.Database<StubDef>.Get("TestDef"));
 
             var parser = new Def.Parser();
-            parser.ParseFromString(
-                @"
+            parser.ParseFromString(@"
                 <Defs>
                     <StubDef defName=""TestDef"">
                     </StubDef>
-                </Defs>
-                ", new Type[]{ typeof(StubDef) });
+                </Defs>",
+                new Type[]{ typeof(StubDef) });
 
             Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
 
@@ -26,13 +25,12 @@ namespace DefTest
 
             Assert.IsNull(Def.Database<StubDef>.Get("TestDef"));
 
-            parser.ParseFromString(
-                @"
+            parser.ParseFromString(@"
                 <Defs>
                     <StubDef defName=""TestDef"">
                     </StubDef>
-                </Defs>
-                ", new Type[]{ typeof(StubDef) });
+                </Defs>",
+                new Type[]{ typeof(StubDef) });
 
             Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
 

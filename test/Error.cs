@@ -33,14 +33,13 @@ namespace DefTest
 	    public void IncorrectRoot()
 	    {
             var parser = new Def.Parser();
-            ExpectWarnings(() => parser.ParseFromString(
-                @"
+            ExpectWarnings(() => parser.ParseFromString(@"
                 <NotDefs>
                     <StubDef defName=""TestDef"">
                         
                     </StubDef>
-                </NotDefs>
-                ", new Type[]{ typeof(StubDef) }));
+                </NotDefs>",
+                new Type[]{ typeof(StubDef) }));
 
             Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
 	    }
@@ -49,8 +48,7 @@ namespace DefTest
 	    public void MultipleRoot()
 	    {
             var parser = new Def.Parser();
-            ExpectErrors(() => parser.ParseFromString(
-                @"
+            ExpectErrors(() => parser.ParseFromString(@"
                 <Defs>
                     <StubDef defName=""TestDefA"">
                         
@@ -60,8 +58,8 @@ namespace DefTest
                     <StubDef defName=""TestDefB"">
                         
                     </StubDef>
-                </Defs>
-                ", new Type[]{ typeof(StubDef) }));
+                </Defs>",
+                new Type[]{ typeof(StubDef) }));
 
             // Currently not providing any guarantees on whether these get parsed; I'd actually like for them to get parsed, but doing so is tricky
 	    }

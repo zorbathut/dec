@@ -10,13 +10,12 @@ namespace DefTest
 	    public void TrivialParse()
 	    {
             var parser = new Def.Parser();
-            parser.ParseFromString(
-                @"
+            parser.ParseFromString(@"
                 <Defs>
                     <StubDef defName=""TestDef"">
                     </StubDef>
-                </Defs>
-                ", new Type[]{ typeof(StubDef) });
+                </Defs>",
+                new Type[]{ typeof(StubDef) });
 
             Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
 	    }
@@ -42,8 +41,7 @@ namespace DefTest
 	    public void BasicParse()
 	    {
             var parser = new Def.Parser();
-            parser.ParseFromString(
-                @"
+            parser.ParseFromString(@"
                 <Defs>
                     <BasicParseDef defName=""TestDef"">
                         <testIntA>35</testIntA>
@@ -56,8 +54,8 @@ namespace DefTest
                         <testBoolA>true</testBoolA>
                         <testBoolB>false</testBoolB>
                     </BasicParseDef>
-                </Defs>
-                ", new Type[]{ typeof(BasicParseDef) });
+                </Defs>",
+                new Type[]{ typeof(BasicParseDef) });
 
             var result = Def.Database<BasicParseDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -87,14 +85,13 @@ namespace DefTest
 	    public void EmptyStringParse()
 	    {
             var parser = new Def.Parser();
-            parser.ParseFromString(
-                @"
+            parser.ParseFromString(@"
                 <Defs>
                     <EmptyStringParseDef defName=""TestDef"">
                         <testStringB></testStringB>
                     </EmptyStringParseDef>
-                </Defs>
-                ", new Type[]{ typeof(EmptyStringParseDef) });
+                </Defs>",
+                new Type[]{ typeof(EmptyStringParseDef) });
 
             var result = Def.Database<EmptyStringParseDef>.Get("TestDef");
             Assert.IsNotNull(result);
