@@ -4,14 +4,8 @@ namespace DefTest
     using System;
 
     [TestFixture]
-    public class Core
+    public class Core : Base
     {
-        [SetUp] [TearDown]
-        public void Clean()
-        {
-            Def.Database.Clear();
-        }
-
         public class BasicParseTestDef : Def.Def
         {
             public int testIntA = 1;

@@ -4,14 +4,8 @@ namespace DefTest
     using System;
 
     [TestFixture]
-    public class Meta
+    public class Meta : Base
     {
-        [SetUp] [TearDown]
-        public void Clean()
-        {
-            Def.Database.Clear();
-        }
-
         public class ClearTestDef : Def.Def
         {
 
