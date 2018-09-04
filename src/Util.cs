@@ -1,6 +1,8 @@
 namespace Def
 {
+    using System;
     using System.Collections.Generic;
+    using System.Reflection;
     using System.Xml;
     using System.Xml.Linq;
 
@@ -22,6 +24,33 @@ namespace Def
             {
                 return 0;
             }
+        }
+
+        internal static FieldInfo GetFieldFromHierarchy(this Type type, string name)
+        {
+            FieldInfo result = null;
+            Type resultType = null;
+
+            Type curType = type;
+            while (curType != null)
+            {
+                FieldInfo typeField = curType.GetField(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+                if (typeField != null)
+                {
+                    if (result == null)
+                    {
+                        result = typeField;
+                        resultType = curType;
+                    }
+                    else
+                    {
+                        Dbg.Err($"Found multiple examples of field named {name} in type hierarchy {type}; found in {resultType} and {curType}");
+                    }
+                }
+
+                curType = curType.BaseType;
+            }
+            return result;
         }
     }
 }

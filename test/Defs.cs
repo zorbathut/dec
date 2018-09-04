@@ -32,7 +32,6 @@ namespace DefTest
 
             Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
 	    }
-
         
         [Test]
 	    public void NonDefType()
@@ -112,6 +111,63 @@ namespace DefTest
             Assert.IsNotNull(result);
 
             Assert.AreEqual(6, result.value);
+	    }
+
+        public class DeepParentDef : Def.Def
+        {
+            public int value = 4;
+        }
+
+        public class DeepChildDef : DeepParentDef
+        {
+            
+        }
+
+        [Test]
+	    public void HierarchyDeepField()
+	    {
+            var parser = new Def.Parser();
+            parser.ParseFromString(@"
+                <Defs>
+                    <DeepChildDef defName=""TestDef"">
+                        <value>12</value>
+                    </DeepChildDef>
+                </Defs>",
+                new Type[]{ typeof(DeepChildDef) });
+
+            var result = Def.Database<DeepChildDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(12, result.value);
+	    }
+
+        public class DupeParentDef : Def.Def
+        {
+            public int value = 4;
+        }
+
+        public class DupeChildDef : DupeParentDef
+        {
+            new public int value = 8;
+        }
+
+        [Test]
+	    public void HierarchyDuplicateField()
+	    {
+            var parser = new Def.Parser();
+            ExpectErrors(() => parser.ParseFromString(@"
+                <Defs>
+                    <DupeChildDef defName=""TestDef"">
+                        <value>12</value>
+                    </DupeChildDef>
+                </Defs>",
+                new Type[]{ typeof(DupeChildDef) }));
+
+            var result = Def.Database<DupeChildDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(12, result.value);
+            Assert.AreEqual(4, ((DupeParentDef)result).value);
 	    }
     }
 }

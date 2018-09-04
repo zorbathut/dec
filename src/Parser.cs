@@ -133,7 +133,7 @@ namespace Def
                 fields.Add(fieldName);
 
                 // TODO: handle private members of parent classes
-                var fieldInfo = type.GetField(fieldElement.Name.LocalName, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                var fieldInfo = type.GetFieldFromHierarchy(fieldElement.Name.LocalName);
 
                 // TODO: verify it exists
 
