@@ -114,6 +114,7 @@ namespace Def
 
             // We either have elements, or we're a composite type of some sort and can pretend we do
 
+            // If we haven't been given a template class from our parent, go ahead and init to defaults
             if (model == null)
             {
                 model = Activator.CreateInstance(type);
