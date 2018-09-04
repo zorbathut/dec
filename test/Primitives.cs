@@ -86,5 +86,51 @@ namespace DefTest
             Assert.AreEqual("", result.testStringA);
             Assert.AreEqual("", result.testStringB);
 	    }
+
+        public class EmptyIntParseDef : Def.Def
+        {
+            public int testInt = 4;
+        }
+
+	    [Test]
+	    public void EmptyIntParse()
+	    {
+            var parser = new Def.Parser();
+            ExpectErrors(() => parser.ParseFromString(@"
+                <Defs>
+                    <EmptyIntParseDef defName=""TestDef"">
+                        <testInt />
+                    </EmptyIntParseDef>
+                </Defs>",
+                new Type[]{ typeof(EmptyIntParseDef) }));
+
+            var result = Def.Database<EmptyIntParseDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(0, result.testInt);
+	    }
+
+        public class EmptyBoolParseDef : Def.Def
+        {
+            public bool testBool = true;
+        }
+
+	    [Test]
+	    public void EmptyBoolParse()
+	    {
+            var parser = new Def.Parser();
+            ExpectErrors(() => parser.ParseFromString(@"
+                <Defs>
+                    <EmptyBoolParseDef defName=""TestDef"">
+                        <testBool />
+                    </EmptyBoolParseDef>
+                </Defs>",
+                new Type[]{ typeof(EmptyBoolParseDef) }));
+
+            var result = Def.Database<EmptyBoolParseDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(false, result.testBool);
+	    }
     }
 }

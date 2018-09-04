@@ -91,15 +91,22 @@ namespace Def
 
             if (!hasElements && hasText)
             {
+                // If we've got text, treat us as an object of appropriate type
                 return TypeDescriptor.GetConverter(type).ConvertFromString((element.FirstNode as XText).Value);
             }
             else if (!hasElements && !hasText && type == typeof(string))
             {
-                // TODO: Error on types where we don't accept "empty"
-                return TypeDescriptor.GetConverter(type).ConvertFromString("");
+                // If we don't have text, and we're a string, return ""
+                return "";
+            }
+            else if (!hasElements && !hasText && type.IsPrimitive)
+            {
+                // If we don't have text, and we're any primitive type, that's an error (and return default values I guess)
+                Dbg.Err($"{element.LineNumber()}: Empty field provided for type {type}");
+                return Activator.CreateInstance(type);
             }
 
-            // We definitely have elements; treat this like a composite
+            // We either have elements, or we're a composite type of some sort
 
             if (model == null)
             {
