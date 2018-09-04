@@ -119,9 +119,17 @@ namespace Def
                 model = Activator.CreateInstance(type);
             }
 
+            var fields = new HashSet<string>();
             foreach (var fieldElement in element.Elements())
             {
-                // TODO: verify we don't have duplicates
+                // Check for fields that have been set multiple times
+                string fieldName = fieldElement.Name.LocalName;
+                if (fields.Contains(fieldName))
+                {
+                    Dbg.Err($"{element.LineNumber()}: Duplicate field {fieldName}");
+                    // Just allow us to fall through; it's an error, but one with a reasonably obvious handling mechanism
+                }
+                fields.Add(fieldName);
 
                 // TODO: handle private members of parent classes
                 var fieldInfo = type.GetField(fieldElement.Name.LocalName, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);

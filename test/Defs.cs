@@ -89,5 +89,29 @@ namespace DefTest
             Assert.IsNull(Def.Database<StubDef>.Get("Contains Spaces"));
             Assert.IsNull(Def.Database<StubDef>.Get("HasPunctuation!"));
 	    }
+
+        public class IntDef : Def.Def
+        {
+            public int value = 4;
+        }
+
+        [Test]
+	    public void DuplicateField()
+	    {
+            var parser = new Def.Parser();
+            ExpectErrors(() => parser.ParseFromString(@"
+                <Defs>
+                    <IntDef defName=""TestDef"">
+                        <value>3</value>
+                        <value>6</value>
+                    </IntDef>
+                </Defs>",
+                new Type[]{ typeof(IntDef) }));
+
+            var result = Def.Database<IntDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(6, result.value);
+	    }
     }
 }
