@@ -84,15 +84,21 @@ namespace Def
 
         private object ParseThing(XElement element, Type type, object model)
         {
-            // TODO: verify we don't have both text and elements
-
             bool hasElements = element.Elements().Any();
             bool hasText = element.Nodes().OfType<XText>().Any();
 
             if (!hasElements && hasText)
             {
                 // If we've got text, treat us as an object of appropriate type
-                return TypeDescriptor.GetConverter(type).ConvertFromString((element.FirstNode as XText).Value);
+                try
+                {
+                    return TypeDescriptor.GetConverter(type).ConvertFromString((element.FirstNode as XText).Value);
+                }
+                catch (System.Exception e)  // I would normally not catch System.Exception, but TypeConverter is wrapping FormatException in an Exception for some reason
+                {
+                    Dbg.Ex(e);
+                    return Activator.CreateInstance(type);
+                }
             }
             else if (!hasElements && !hasText && type == typeof(string))
             {
@@ -106,7 +112,7 @@ namespace Def
                 return Activator.CreateInstance(type);
             }
 
-            // We either have elements, or we're a composite type of some sort
+            // We either have elements, or we're a composite type of some sort and can pretend we do
 
             if (model == null)
             {

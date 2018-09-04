@@ -39,6 +39,42 @@ namespace DefTest
             Assert.AreEqual(0, result.value);
 	    }
 
+        [Test]
+	    public void FailingIntParse()
+	    {
+            var parser = new Def.Parser();
+            ExpectErrors(() => parser.ParseFromString(@"
+                <Defs>
+                    <IntDef defName=""TestDef"">
+                        <value>NotAnInt</value>
+                    </IntDef>
+                </Defs>",
+                new Type[]{ typeof(IntDef) }));
+
+            var result = Def.Database<IntDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(0, result.value);
+	    }
+
+        [Test]
+	    public void FailingIntParse2()
+	    {
+            var parser = new Def.Parser();
+            ExpectErrors(() => parser.ParseFromString(@"
+                <Defs>
+                    <IntDef defName=""TestDef"">
+                        <value>10NotAnInt</value>
+                    </IntDef>
+                </Defs>",
+                new Type[]{ typeof(IntDef) }));
+
+            var result = Def.Database<IntDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(0, result.value);
+	    }
+
 	    [Test]
 	    public void EmptyBoolParse()
 	    {
@@ -47,6 +83,24 @@ namespace DefTest
                 <Defs>
                     <BoolDef defName=""TestDef"">
                         <value />
+                    </BoolDef>
+                </Defs>",
+                new Type[]{ typeof(BoolDef) }));
+
+            var result = Def.Database<BoolDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(false, result.value);
+	    }
+
+	    [Test]
+	    public void FailingBoolParse()
+	    {
+            var parser = new Def.Parser();
+            ExpectErrors(() => parser.ParseFromString(@"
+                <Defs>
+                    <BoolDef defName=""TestDef"">
+                        <value>NotABool</value>
                     </BoolDef>
                 </Defs>",
                 new Type[]{ typeof(BoolDef) }));
