@@ -10,6 +10,12 @@ namespace DefTest
         public void Clean()
         {
             Def.Database.Clear();
+
+            handlingWarnings = false;
+            handledWarning = false;
+
+            handlingErrors = false;
+            handledError = false;
         }
 
         private bool handlingWarnings = false;
