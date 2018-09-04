@@ -6,7 +6,76 @@ namespace DefTest
     [TestFixture]
     public class Primitives : Base
     {
-                public class BasicParseDef : Def.Def
+        public class IntDef : Def.Def
+        {
+            public int value = 4;
+        }
+
+        public class BoolDef : Def.Def
+        {
+            public bool value = true;
+        }
+
+        public class StringDef : Def.Def
+        {
+            public string value = "one";
+        }
+
+	    [Test]
+	    public void EmptyIntParse()
+	    {
+            var parser = new Def.Parser();
+            ExpectErrors(() => parser.ParseFromString(@"
+                <Defs>
+                    <IntDef defName=""TestDef"">
+                        <value />
+                    </IntDef>
+                </Defs>",
+                new Type[]{ typeof(IntDef) }));
+
+            var result = Def.Database<IntDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(0, result.value);
+	    }
+
+	    [Test]
+	    public void EmptyBoolParse()
+	    {
+            var parser = new Def.Parser();
+            ExpectErrors(() => parser.ParseFromString(@"
+                <Defs>
+                    <BoolDef defName=""TestDef"">
+                        <value />
+                    </BoolDef>
+                </Defs>",
+                new Type[]{ typeof(BoolDef) }));
+
+            var result = Def.Database<BoolDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(false, result.value);
+	    }
+
+        [Test]
+	    public void EmptyStringParse()
+	    {
+            var parser = new Def.Parser();
+            parser.ParseFromString(@"
+                <Defs>
+                    <StringDef defName=""TestDef"">
+                        <value />
+                    </StringDef>
+                </Defs>",
+                new Type[]{ typeof(StringDef) });
+
+            var result = Def.Database<StringDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual("", result.value);
+	    }
+
+        public class BulkParseDef : Def.Def
         {
             public int testIntA = 1;
             public int testIntB = 2;
@@ -24,12 +93,12 @@ namespace DefTest
         }
 
 	    [Test]
-	    public void BasicParse()
+	    public void BulkParse()
 	    {
             var parser = new Def.Parser();
             parser.ParseFromString(@"
                 <Defs>
-                    <BasicParseDef defName=""TestDef"">
+                    <BulkParseDef defName=""TestDef"">
                         <testIntA>35</testIntA>
                         <testIntB>-20</testIntB>
                         <testFloatA>0.1234</testFloatA>
@@ -39,11 +108,11 @@ namespace DefTest
                         <testStringC>Forsooth</testStringC>
                         <testBoolA>true</testBoolA>
                         <testBoolB>false</testBoolB>
-                    </BasicParseDef>
+                    </BulkParseDef>
                 </Defs>",
-                new Type[]{ typeof(BasicParseDef) });
+                new Type[]{ typeof(BulkParseDef) });
 
-            var result = Def.Database<BasicParseDef>.Get("TestDef");
+            var result = Def.Database<BulkParseDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(35, result.testIntA);
@@ -59,78 +128,6 @@ namespace DefTest
             Assert.AreEqual(true, result.testBoolA);
             Assert.AreEqual(false, result.testBoolB);
             Assert.AreEqual(false, result.testBoolC);
-	    }
-
-        public class EmptyStringParseDef : Def.Def
-        {
-            public string testStringA = "one";
-            public string testStringB = "two";
-        }
-
-	    [Test]
-	    public void EmptyStringParse()
-	    {
-            var parser = new Def.Parser();
-            parser.ParseFromString(@"
-                <Defs>
-                    <EmptyStringParseDef defName=""TestDef"">
-                        <testStringA></testStringA>
-                        <testStringB />
-                    </EmptyStringParseDef>
-                </Defs>",
-                new Type[]{ typeof(EmptyStringParseDef) });
-
-            var result = Def.Database<EmptyStringParseDef>.Get("TestDef");
-            Assert.IsNotNull(result);
-
-            Assert.AreEqual("", result.testStringA);
-            Assert.AreEqual("", result.testStringB);
-	    }
-
-        public class EmptyIntParseDef : Def.Def
-        {
-            public int testInt = 4;
-        }
-
-	    [Test]
-	    public void EmptyIntParse()
-	    {
-            var parser = new Def.Parser();
-            ExpectErrors(() => parser.ParseFromString(@"
-                <Defs>
-                    <EmptyIntParseDef defName=""TestDef"">
-                        <testInt />
-                    </EmptyIntParseDef>
-                </Defs>",
-                new Type[]{ typeof(EmptyIntParseDef) }));
-
-            var result = Def.Database<EmptyIntParseDef>.Get("TestDef");
-            Assert.IsNotNull(result);
-
-            Assert.AreEqual(0, result.testInt);
-	    }
-
-        public class EmptyBoolParseDef : Def.Def
-        {
-            public bool testBool = true;
-        }
-
-	    [Test]
-	    public void EmptyBoolParse()
-	    {
-            var parser = new Def.Parser();
-            ExpectErrors(() => parser.ParseFromString(@"
-                <Defs>
-                    <EmptyBoolParseDef defName=""TestDef"">
-                        <testBool />
-                    </EmptyBoolParseDef>
-                </Defs>",
-                new Type[]{ typeof(EmptyBoolParseDef) }));
-
-            var result = Def.Database<EmptyBoolParseDef>.Get("TestDef");
-            Assert.IsNotNull(result);
-
-            Assert.AreEqual(false, result.testBool);
 	    }
     }
 }
