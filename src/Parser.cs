@@ -178,8 +178,11 @@ namespace Def
                 fields.Add(fieldName);
 
                 var fieldInfo = type.GetFieldFromHierarchy(fieldElement.Name.LocalName);
-
-                // TODO: verify it exists
+                if (fieldInfo == null)
+                {
+                    Dbg.Err($"{element.LineNumber()}: Field {fieldElement.Name.LocalName} does not exist in type {type}");
+                    continue;
+                }
 
                 fieldInfo.SetValue(model, ParseThing(fieldElement, fieldInfo.FieldType, fieldInfo.GetValue(model)));
             }

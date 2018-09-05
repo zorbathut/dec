@@ -183,5 +183,32 @@ namespace DefTest
             Assert.AreEqual(false, result.testBoolB);
             Assert.AreEqual(false, result.testBoolC);
 	    }
+
+        public class MissingMemberDef : Def.Def
+        {
+            public int value1;
+            public int value3;
+        }
+
+        [Test]
+	    public void Private()
+	    {
+            var parser = new Def.Parser();
+            ExpectErrors(() => parser.ParseFromString(@"
+                <Defs>
+                    <MissingMemberDef defName=""TestDef"">
+                        <value1>9</value1>
+                        <value2>99</value2>
+                        <value3>999</value3>
+                    </MissingMemberDef>
+                </Defs>",
+                new Type[]{ typeof(MissingMemberDef) }));
+
+            var result = Def.Database<MissingMemberDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(result.value1, 9);
+            Assert.AreEqual(result.value3, 999);
+	    }
     }
 }
