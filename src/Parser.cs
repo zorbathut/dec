@@ -1,6 +1,7 @@
 namespace Def
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Linq;
@@ -113,6 +114,50 @@ namespace Def
             }
 
             // We either have elements, or we're a composite type of some sort and can pretend we do
+
+            // Special-case type testing here!
+
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
+            {
+                // List<> handling
+                Type referencedType = type.GetGenericArguments()[0];
+
+                var list = (IList)Activator.CreateInstance(type);
+                foreach (var fieldElement in element.Elements())
+                {
+                    if (fieldElement.Name.LocalName != "li")
+                    {
+                        Dbg.Err($"{fieldElement.LineNumber()}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
+                    }
+
+                    list.Add(ParseThing(fieldElement, referencedType, null));
+                }
+
+                return list;
+            }
+
+            if (type.IsArray)
+            {
+                // [] handling
+                Type referencedType = type.GetElementType();
+
+                var elements = element.Elements().ToArray();
+                var array = (Array)Activator.CreateInstance(type, new object[] { elements.Length });
+                for (int i = 0; i < elements.Length; ++i)
+                {
+                    var fieldElement = elements[i];
+                    if (fieldElement.Name.LocalName != "li")
+                    {
+                        Dbg.Err($"{fieldElement.LineNumber()}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
+                    }
+
+                    array.SetValue(ParseThing(fieldElement, referencedType, null), i);
+                }
+
+                return array;
+            }
+
+            // End special-case testing; we're a generic class or a struct
 
             // If we haven't been given a template class from our parent, go ahead and init to defaults
             if (model == null)
