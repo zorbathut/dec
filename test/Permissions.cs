@@ -9,7 +9,9 @@ namespace DefTest
     {
         public class PrivateDef : Def.Def
         {
+            #pragma warning disable CS0649
             private int value;
+            #pragma warning restore CS0649
 
             public int Value()
             {
@@ -37,7 +39,9 @@ namespace DefTest
 
         public class InternalDef : Def.Def
         {
+            #pragma warning disable CS0649
             internal int value;
+            #pragma warning restore CS0649
 
             public int Value()
             {
@@ -93,7 +97,9 @@ namespace DefTest
 
         public class PrivateParentDef : Def.Def
         {
+            #pragma warning disable CS0649
             private int value;
+            #pragma warning restore CS0649
 
             public int Value()
             {
