@@ -48,5 +48,23 @@ namespace DefTest
 
             // Currently not providing any guarantees on whether these get parsed; I'd actually like for them to get parsed, but doing so is tricky
 	    }
+
+        [Test]
+	    public void MultiXML()
+	    {
+            var parser = new Def.Parser(new Type[]{ typeof(StubDef) });
+            parser.AddString(@"
+                <Defs>
+                    <StubDef defName=""TestDefA"" />
+                </Defs>");
+            parser.AddString(@"
+                <Defs>
+                    <StubDef defName=""TestDefB"" />
+                </Defs>");
+            parser.Finish();
+
+            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDefA"));
+            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDefB"));
+	    }
     }
 }
