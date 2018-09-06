@@ -191,7 +191,7 @@ namespace DefTest
         }
 
         [Test]
-	    public void Private()
+	    public void MissingMember()
 	    {
             var parser = new Def.Parser(new Type[]{ typeof(MissingMemberDef) });
             parser.AddString(@"
