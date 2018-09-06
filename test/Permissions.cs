@@ -20,14 +20,14 @@ namespace DefTest
         [Test]
 	    public void Private()
 	    {
-            var parser = new Def.Parser();
-            parser.ParseFromString(@"
+            var parser = new Def.Parser(new Type[]{ typeof(PrivateDef) });
+            parser.AddString(@"
                 <Defs>
                     <PrivateDef defName=""TestDef"">
                         <value>20</value>
                     </PrivateDef>
-                </Defs>",
-                new Type[]{ typeof(PrivateDef) });
+                </Defs>");
+            parser.Finish();
 
             var result = Def.Database<PrivateDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -48,14 +48,14 @@ namespace DefTest
         [Test]
 	    public void Internal()
 	    {
-            var parser = new Def.Parser();
-            parser.ParseFromString(@"
+            var parser = new Def.Parser(new Type[]{ typeof(InternalDef) });
+            parser.AddString(@"
                 <Defs>
                     <InternalDef defName=""TestDef"">
                         <value>20</value>
                     </InternalDef>
-                </Defs>",
-                new Type[]{ typeof(InternalDef) });
+                </Defs>");
+            parser.Finish();
 
             var result = Def.Database<InternalDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -76,14 +76,14 @@ namespace DefTest
         [Test]
 	    public void Protected()
 	    {
-            var parser = new Def.Parser();
-            parser.ParseFromString(@"
+            var parser = new Def.Parser(new Type[]{ typeof(ProtectedDef) });
+            parser.AddString(@"
                 <Defs>
                     <ProtectedDef defName=""TestDef"">
                         <value>20</value>
                     </ProtectedDef>
-                </Defs>",
-                new Type[]{ typeof(ProtectedDef) });
+                </Defs>");
+            parser.Finish();
 
             var result = Def.Database<ProtectedDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -109,14 +109,14 @@ namespace DefTest
         [Test]
 	    public void PrivateParent()
 	    {
-            var parser = new Def.Parser();
-            parser.ParseFromString(@"
+            var parser = new Def.Parser(new Type[]{ typeof(PrivateChildDef) });
+            parser.AddString(@"
                 <Defs>
                     <PrivateChildDef defName=""TestDef"">
                         <value>20</value>
                     </PrivateChildDef>
-                </Defs>",
-                new Type[]{ typeof(PrivateChildDef) });
+                </Defs>");
+            parser.Finish();
 
             var result = Def.Database<PrivateChildDef>.Get("TestDef");
             Assert.IsNotNull(result);

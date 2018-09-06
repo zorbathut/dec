@@ -20,16 +20,16 @@ namespace DefTest
         [Test]
 	    public void ChildClass()
 	    {
-            var parser = new Def.Parser();
-            parser.ParseFromString(@"
+            var parser = new Def.Parser(new Type[]{ typeof(CCRoot) });
+            parser.AddString(@"
                 <Defs>
                     <CCRoot defName=""TestDef"">
                         <child>
                             <value>5</value>
                         </child>
                     </CCRoot>
-                </Defs>",
-                new Type[]{ typeof(CCRoot) });
+                </Defs>");
+            parser.Finish();
 
             var result = Def.Database<CCRoot>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -52,16 +52,16 @@ namespace DefTest
         [Test]
 	    public void ChildClassDefaults()
 	    {
-            var parser = new Def.Parser();
-            parser.ParseFromString(@"
+            var parser = new Def.Parser(new Type[]{ typeof(CCDRoot) });
+            parser.AddString(@"
                 <Defs>
                     <CCDRoot defName=""TestDef"">
                         <child>
                             <value>5</value>
                         </child>
                     </CCDRoot>
-                </Defs>",
-                new Type[]{ typeof(CCDRoot) });
+                </Defs>");
+            parser.Finish();
 
             var result = Def.Database<CCDRoot>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -91,8 +91,8 @@ namespace DefTest
         [Test]
 	    public void ChildStruct()
 	    {
-            var parser = new Def.Parser();
-            parser.ParseFromString(@"
+            var parser = new Def.Parser(new Type[]{ typeof(CSRoot) });
+            parser.AddString(@"
                 <Defs>
                     <CSRoot defName=""TestDef"">
                         <child>
@@ -102,8 +102,8 @@ namespace DefTest
                             </child>
                         </child>
                     </CSRoot>
-                </Defs>",
-                new Type[]{ typeof(CSRoot) });
+                </Defs>");
+            parser.Finish();
 
             var result = Def.Database<CSRoot>.Get("TestDef");
             Assert.IsNotNull(result);

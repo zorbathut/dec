@@ -9,6 +9,9 @@ namespace DefTest
         [SetUp] [TearDown]
         public void Clean()
         {
+            // we turn on error handling so that Clear can work even if we're in the wrong mode
+            handlingErrors = true;
+
             Def.Database.Clear();
 
             handlingWarnings = false;

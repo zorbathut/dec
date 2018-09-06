@@ -9,13 +9,13 @@ namespace DefTest
         [Test]
 	    public void TrivialParse()
 	    {
-            var parser = new Def.Parser();
-            parser.ParseFromString(@"
+            var parser = new Def.Parser(new Type[]{ typeof(StubDef) });
+            parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDef"">
                     </StubDef>
-                </Defs>",
-                new Type[]{ typeof(StubDef) });
+                </Defs>");
+            parser.Finish();
 
             Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
 	    }
@@ -23,12 +23,12 @@ namespace DefTest
         [Test]
 	    public void TrivialEmptyParse()
 	    {
-            var parser = new Def.Parser();
-            parser.ParseFromString(@"
+            var parser = new Def.Parser(new Type[]{ typeof(StubDef) });
+            parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDef"" />
-                </Defs>",
-                new Type[]{ typeof(StubDef) });
+                </Defs>");
+            parser.Finish();
 
             Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
 	    }
@@ -36,12 +36,13 @@ namespace DefTest
         [Test]
 	    public void NonDefType()
 	    {
-            var parser = new Def.Parser();
-            ExpectErrors(() => parser.ParseFromString(@"
+            Def.Parser parser = null;
+            ExpectErrors(() => parser = new Def.Parser(new Type[]{ typeof(bool), typeof(StubDef) }));
+            parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDef"" />
-                </Defs>",
-                new Type[]{ typeof(bool), typeof(StubDef) }));
+                </Defs>");
+            parser.Finish();
 
             Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
 	    }
@@ -49,13 +50,13 @@ namespace DefTest
         [Test]
 	    public void MissingDefType()
 	    {
-            var parser = new Def.Parser();
-            ExpectErrors(() => parser.ParseFromString(@"
+            var parser = new Def.Parser(new Type[]{ typeof(StubDef) });
+            ExpectErrors(() => parser.AddString(@"
                 <Defs>
                     <NonexistentDef defName=""TestDefA"" />
                     <StubDef defName=""TestDefB"" />
-                </Defs>",
-                new Type[]{ typeof(StubDef) }));
+                </Defs>"));
+            parser.Finish();
 
             Assert.IsNull(Def.Database<StubDef>.Get("TestDefA"));
             Assert.IsNotNull(Def.Database<StubDef>.Get("TestDefB"));
@@ -64,25 +65,25 @@ namespace DefTest
         [Test]
 	    public void MissingDefName()
 	    {
-            var parser = new Def.Parser();
-            ExpectErrors(() => parser.ParseFromString(@"
+            var parser = new Def.Parser(new Type[]{ typeof(StubDef) });
+            ExpectErrors(() => parser.AddString(@"
                 <Defs>
                     <StubDef />
-                </Defs>",
-                new Type[]{ typeof(StubDef) }));
+                </Defs>"));
+            parser.Finish();
 	    }
 
         [Test]
 	    public void InvalidDefName()
 	    {
-            var parser = new Def.Parser();
-            ExpectErrors(() => parser.ParseFromString(@"
+            var parser = new Def.Parser(new Type[]{ typeof(StubDef) });
+            ExpectErrors(() => parser.AddString(@"
                 <Defs>
                     <StubDef defName=""1NumberPrefix"" />
                     <StubDef defName=""Contains Spaces"" />
                     <StubDef defName=""HasPunctuation!"" />
-                </Defs>",
-                new Type[]{ typeof(StubDef) }));
+                </Defs>"));
+            parser.Finish();
 
             Assert.IsNull(Def.Database<StubDef>.Get("1NumberPrefix"));
             Assert.IsNull(Def.Database<StubDef>.Get("Contains Spaces"));
@@ -97,15 +98,15 @@ namespace DefTest
         [Test]
 	    public void DuplicateField()
 	    {
-            var parser = new Def.Parser();
-            ExpectErrors(() => parser.ParseFromString(@"
+            var parser = new Def.Parser(new Type[]{ typeof(IntDef) });
+            ExpectErrors(() => parser.AddString(@"
                 <Defs>
                     <IntDef defName=""TestDef"">
                         <value>3</value>
                         <value>6</value>
                     </IntDef>
-                </Defs>",
-                new Type[]{ typeof(IntDef) }));
+                </Defs>"));
+            parser.Finish();
 
             var result = Def.Database<IntDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -126,14 +127,14 @@ namespace DefTest
         [Test]
 	    public void HierarchyDeepField()
 	    {
-            var parser = new Def.Parser();
-            parser.ParseFromString(@"
+            var parser = new Def.Parser(new Type[]{ typeof(DeepChildDef) });
+            parser.AddString(@"
                 <Defs>
                     <DeepChildDef defName=""TestDef"">
                         <value>12</value>
                     </DeepChildDef>
-                </Defs>",
-                new Type[]{ typeof(DeepChildDef) });
+                </Defs>");
+            parser.Finish();
 
             var result = Def.Database<DeepChildDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -154,14 +155,14 @@ namespace DefTest
         [Test]
 	    public void HierarchyDuplicateField()
 	    {
-            var parser = new Def.Parser();
-            ExpectErrors(() => parser.ParseFromString(@"
+            var parser = new Def.Parser(new Type[]{ typeof(DupeChildDef) });
+            ExpectErrors(() => parser.AddString(@"
                 <Defs>
                     <DupeChildDef defName=""TestDef"">
                         <value>12</value>
                     </DupeChildDef>
-                </Defs>",
-                new Type[]{ typeof(DupeChildDef) }));
+                </Defs>"));
+            parser.Finish();
 
             var result = Def.Database<DupeChildDef>.Get("TestDef");
             Assert.IsNotNull(result);

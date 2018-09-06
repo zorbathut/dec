@@ -10,23 +10,25 @@ namespace Def
 
     public class Parser
     {
-        private static readonly Regex DefNameValidator = new Regex(@"^[A-Za-z_][A-Za-z0-9_]*$", RegexOptions.Compiled);
-
-        public void ParseFromString(string input, Type[] types)
+        private enum Status
         {
-            XDocument doc;
+            Uninitialized,
+            Accumulating,
+            Processing,
+            Finished,
+        }
+        private static Status s_Status = Status.Uninitialized;
 
-            try
-            {
-                doc = XDocument.Parse(input, LoadOptions.SetLineInfo);
-            }
-            catch (System.Xml.XmlException e)
-            {
-                Dbg.Ex(e);
-                return;
-            }
+        private Dictionary<string, Type> typeLookup = new Dictionary<string, Type>();
 
-            var typeLookup = new Dictionary<string, Type>();
+        public Parser(Type[] types)
+        {
+            if (s_Status != Status.Uninitialized)
+            {
+                Dbg.Err($"Parser created while the world is in {s_Status} state; should be {Status.Uninitialized} state");
+            }
+            s_Status = Status.Accumulating;
+
             foreach (var type in types)
             {
                 if (type.IsSubclassOf(typeof(Def)))
@@ -37,6 +39,28 @@ namespace Def
                 {
                     Dbg.Err($"{type} is not a subclass of Def");
                 }
+            }
+        }
+
+        private static readonly Regex DefNameValidator = new Regex(@"^[A-Za-z_][A-Za-z0-9_]*$", RegexOptions.Compiled);
+
+        public void AddString(string input)
+        {
+            if (s_Status != Status.Accumulating)
+            {
+                Dbg.Err($"Adding data while while the world is in {s_Status} state; should be {Status.Accumulating} state");
+            }
+
+            XDocument doc;
+
+            try
+            {
+                doc = XDocument.Parse(input, LoadOptions.SetLineInfo);
+            }
+            catch (System.Xml.XmlException e)
+            {
+                Dbg.Ex(e);
+                return;
             }
 
             if (doc.Elements().Count() > 1)
@@ -81,6 +105,31 @@ namespace Def
                     Database.Register(defInstance);
                 }
             }
+        }
+
+        public void Finish()
+        {
+            if (s_Status != Status.Accumulating)
+            {
+                Dbg.Err($"Finishing while the world is in {s_Status} state; should be {Status.Accumulating} state");
+            }
+            s_Status = Status.Processing;
+
+
+            if (s_Status != Status.Processing)
+            {
+                Dbg.Err($"Completing while the world is in {s_Status} state; should be {Status.Processing} state");
+            }
+            s_Status = Status.Finished;
+        }
+
+        internal static void Clear()
+        {
+            if (s_Status != Status.Finished && s_Status != Status.Uninitialized)
+            {
+                Dbg.Err($"Clearing while the world is in {s_Status} state; should be {Status.Uninitialized} state or {Status.Finished} state");
+            }
+            s_Status = Status.Uninitialized;
         }
 
         private object ParseThing(XElement element, Type type, object model)

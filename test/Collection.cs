@@ -15,8 +15,8 @@ namespace DefTest
         [Test]
 	    public void Array()
 	    {
-            var parser = new Def.Parser();
-            parser.ParseFromString(@"
+            var parser = new Def.Parser(new Type[]{ typeof(ArrayDef) });
+            parser.AddString(@"
                 <Defs>
                     <ArrayDef defName=""TestDef"">
                         <data>
@@ -27,8 +27,8 @@ namespace DefTest
                             <li>6</li>
                         </data>
                     </ArrayDef>
-                </Defs>",
-                new Type[]{ typeof(ArrayDef) });
+                </Defs>");
+            parser.Finish();
 
             var result = Def.Database<ArrayDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -44,8 +44,8 @@ namespace DefTest
         [Test]
 	    public void List()
 	    {
-            var parser = new Def.Parser();
-            parser.ParseFromString(@"
+            var parser = new Def.Parser(new Type[]{ typeof(ListDef) });
+            parser.AddString(@"
                 <Defs>
                     <ListDef defName=""TestDef"">
                         <data>
@@ -56,8 +56,8 @@ namespace DefTest
                             <li>6</li>
                         </data>
                     </ListDef>
-                </Defs>",
-                new Type[]{ typeof(ListDef) });
+                </Defs>");
+            parser.Finish();
 
             var result = Def.Database<ListDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -73,8 +73,8 @@ namespace DefTest
         [Test]
 	    public void Nested()
 	    {
-            var parser = new Def.Parser();
-            parser.ParseFromString(@"
+            var parser = new Def.Parser(new Type[]{ typeof(NestedDef) });
+            parser.AddString(@"
                 <Defs>
                     <NestedDef defName=""TestDef"">
                         <data>
@@ -88,8 +88,8 @@ namespace DefTest
                             </li>
                         </data>
                     </NestedDef>
-                </Defs>",
-                new Type[]{ typeof(NestedDef) });
+                </Defs>");
+            parser.Finish();
 
             var result = Def.Database<NestedDef>.Get("TestDef");
             Assert.IsNotNull(result);
