@@ -42,7 +42,13 @@ namespace Def
 
         internal static void Register(T instance)
         {
-            // TODO: look for conflicts, replace
+            if (DefLookup.ContainsKey(instance.defName))
+            {
+                Dbg.Err($"Found repeated def ${typeof(T)}.${instance.defName}");
+
+                // I . . . guess?
+                DefList.Remove(DefLookup[instance.defName]);
+            }
 
             DefList.Add(instance);
             DefLookup[instance.defName] = instance;

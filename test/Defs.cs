@@ -114,6 +114,27 @@ namespace DefTest
             Assert.AreEqual(6, result.value);
 	    }
 
+        [Test]
+	    public void DuplicateDef()
+	    {
+            var parser = new Def.Parser(new Type[]{ typeof(IntDef) });
+            ExpectErrors(() => parser.AddString(@"
+                <Defs>
+                    <IntDef defName=""TestDef"">
+                        <value>10</value>
+                    </IntDef>
+                    <IntDef defName=""TestDef"">
+                        <value>20</value>
+                    </IntDef>
+                </Defs>"));
+            parser.Finish();
+
+            var result = Def.Database<IntDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(20, result.value);
+	    }
+
         public class DeepParentDef : Def.Def
         {
             public int value = 4;
