@@ -42,8 +42,9 @@ namespace Def
             }
         }
 
-        private static readonly Regex DefNameValidator = new Regex(@"^[A-Za-z_][A-Za-z0-9_]*$", RegexOptions.Compiled);
+        private List<Action> finishWork = new List<Action>();
 
+        private static readonly Regex DefNameValidator = new Regex(@"^[A-Za-z_][A-Za-z0-9_]*$", RegexOptions.Compiled);
         public void AddString(string input)
         {
             if (s_Status != Status.Accumulating)
@@ -99,10 +100,13 @@ namespace Def
                         continue;
                     }
 
-                    var defInstance = (Def)ParseThing(defElement, typeHandle, null);
+                    // Create our instance
+                    var defInstance = (Def)Activator.CreateInstance(typeHandle);
                     defInstance.defName = defName;
 
                     Database.Register(defInstance);
+
+                    finishWork.Add(() => ParseThing(defElement, typeHandle, defInstance));
                 }
             }
         }
@@ -115,6 +119,10 @@ namespace Def
             }
             s_Status = Status.Processing;
 
+            foreach (var work in finishWork)
+            {
+                work();
+            }
 
             if (s_Status != Status.Processing)
             {

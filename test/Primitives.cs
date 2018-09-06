@@ -25,13 +25,13 @@ namespace DefTest
 	    public void EmptyIntParse()
 	    {
             var parser = new Def.Parser(new Type[]{ typeof(IntDef) });
-            ExpectErrors(() => parser.AddString(@"
+            parser.AddString(@"
                 <Defs>
                     <IntDef defName=""TestDef"">
                         <value />
                     </IntDef>
-                </Defs>"));
-            parser.Finish();
+                </Defs>");
+            ExpectErrors(() => parser.Finish());
 
             var result = Def.Database<IntDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -43,13 +43,13 @@ namespace DefTest
 	    public void FailingIntParse()
 	    {
             var parser = new Def.Parser(new Type[]{ typeof(IntDef) });
-            ExpectErrors(() => parser.AddString(@"
+            parser.AddString(@"
                 <Defs>
                     <IntDef defName=""TestDef"">
                         <value>NotAnInt</value>
                     </IntDef>
-                </Defs>"));
-            parser.Finish();
+                </Defs>");
+            ExpectErrors(() => parser.Finish());
 
             var result = Def.Database<IntDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -61,13 +61,13 @@ namespace DefTest
 	    public void FailingIntParse2()
 	    {
             var parser = new Def.Parser(new Type[]{ typeof(IntDef) });
-            ExpectErrors(() => parser.AddString(@"
+            parser.AddString(@"
                 <Defs>
                     <IntDef defName=""TestDef"">
                         <value>10NotAnInt</value>
                     </IntDef>
-                </Defs>"));
-            parser.Finish();
+                </Defs>");
+            ExpectErrors(() => parser.Finish());
 
             var result = Def.Database<IntDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -79,13 +79,13 @@ namespace DefTest
 	    public void EmptyBoolParse()
 	    {
             var parser = new Def.Parser(new Type[]{ typeof(BoolDef) });
-            ExpectErrors(() => parser.AddString(@"
+            parser.AddString(@"
                 <Defs>
                     <BoolDef defName=""TestDef"">
                         <value />
                     </BoolDef>
-                </Defs>"));
-            parser.Finish();
+                </Defs>");
+            ExpectErrors(() => parser.Finish());
 
             var result = Def.Database<BoolDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -97,13 +97,13 @@ namespace DefTest
 	    public void FailingBoolParse()
 	    {
             var parser = new Def.Parser(new Type[]{ typeof(BoolDef) });
-            ExpectErrors(() => parser.AddString(@"
+            parser.AddString(@"
                 <Defs>
                     <BoolDef defName=""TestDef"">
                         <value>NotABool</value>
                     </BoolDef>
-                </Defs>"));
-            parser.Finish();
+                </Defs>");
+            ExpectErrors(() => parser.Finish());
 
             var result = Def.Database<BoolDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -194,15 +194,15 @@ namespace DefTest
 	    public void Private()
 	    {
             var parser = new Def.Parser(new Type[]{ typeof(MissingMemberDef) });
-            ExpectErrors(() => parser.AddString(@"
+            parser.AddString(@"
                 <Defs>
                     <MissingMemberDef defName=""TestDef"">
                         <value1>9</value1>
                         <value2>99</value2>
                         <value3>999</value3>
                     </MissingMemberDef>
-                </Defs>"));
-            parser.Finish();
+                </Defs>");
+            ExpectErrors(() => parser.Finish());
 
             var result = Def.Database<MissingMemberDef>.Get("TestDef");
             Assert.IsNotNull(result);

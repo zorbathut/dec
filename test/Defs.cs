@@ -99,14 +99,14 @@ namespace DefTest
 	    public void DuplicateField()
 	    {
             var parser = new Def.Parser(new Type[]{ typeof(IntDef) });
-            ExpectErrors(() => parser.AddString(@"
+            parser.AddString(@"
                 <Defs>
                     <IntDef defName=""TestDef"">
                         <value>3</value>
                         <value>6</value>
                     </IntDef>
-                </Defs>"));
-            parser.Finish();
+                </Defs>");
+            ExpectErrors(() => parser.Finish());
 
             var result = Def.Database<IntDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -156,13 +156,13 @@ namespace DefTest
 	    public void HierarchyDuplicateField()
 	    {
             var parser = new Def.Parser(new Type[]{ typeof(DupeChildDef) });
-            ExpectErrors(() => parser.AddString(@"
+            parser.AddString(@"
                 <Defs>
                     <DupeChildDef defName=""TestDef"">
                         <value>12</value>
                     </DupeChildDef>
-                </Defs>"));
-            parser.Finish();
+                </Defs>");
+            ExpectErrors(() => parser.Finish());
 
             var result = Def.Database<DupeChildDef>.Get("TestDef");
             Assert.IsNotNull(result);
