@@ -52,5 +52,31 @@ namespace Def
             }
             return result;
         }
+
+        internal static Type GetDefHierarchyType(Type type)
+        {
+            Type origType = type;
+            if (type == typeof(Def))
+            {
+                Dbg.Err("Def objects cannot be created on their own");
+                return type;
+            }
+
+            while (true)
+            {
+                if (type.BaseType == typeof(Def))
+                {
+                    return type;
+                }
+
+                type = type.BaseType;
+
+                if (type == null)
+                {
+                    Dbg.Err($"Type {origType} does not inherit from Def");
+                    return null;
+                }
+            }
+        }
     }
 }

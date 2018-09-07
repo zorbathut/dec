@@ -9,8 +9,8 @@ namespace Def
 
         internal static void Register(Def instance)
         {
-            var dbType = typeof(Database<>).MakeGenericType(new[] { instance.GetType() });
-            // TODO: figure out appropriate base type
+            var defType = Util.GetDefHierarchyType(instance.GetType());
+            var dbType = typeof(Database<>).MakeGenericType(new[] { defType });
             Databases.Add(dbType);
 
             var regFunction = dbType.GetMethod("Register", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);

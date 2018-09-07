@@ -124,7 +124,7 @@ namespace DefTest
                 </Defs>");
             parser.Finish();
 
-            var result = Def.Database<PrivateChildDef>.Get("TestDef");
+            var result = Def.Database<PrivateParentDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(result.Value(), 20);

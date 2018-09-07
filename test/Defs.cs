@@ -157,7 +157,7 @@ namespace DefTest
                 </Defs>");
             parser.Finish();
 
-            var result = Def.Database<DeepChildDef>.Get("TestDef");
+            var result = Def.Database<DeepParentDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(12, result.value);
@@ -185,7 +185,7 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
-            var result = Def.Database<DupeChildDef>.Get("TestDef");
+            var result = (DupeChildDef)Def.Database<DupeParentDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(12, result.value);
