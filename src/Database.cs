@@ -25,6 +25,7 @@ namespace Def
             {
                 db.GetMethod("Clear", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic).Invoke(null, null);
             }
+            Databases.Clear();
 
             Parser.Clear();
         }
