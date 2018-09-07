@@ -240,5 +240,23 @@ namespace DefTest
 
             Assert.AreEqual(result.value, ExampleEnum.Two);
 	    }
+
+        [Test]
+	    public void InvalidAttribute()
+	    {
+            var parser = new Def.Parser(new Type[]{ typeof(IntDef) });
+            parser.AddString(@"
+                <Defs>
+                    <IntDef defName=""TestDef"">
+                        <value invalid=""yes"">5</value>
+                    </IntDef>
+                </Defs>");
+            ExpectErrors(() => parser.Finish());
+
+            var result = Def.Database<IntDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(result.value, 5);
+	    }
     }
 }

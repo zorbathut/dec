@@ -100,6 +100,9 @@ namespace Def
                         continue;
                     }
 
+                    // Consume defName so we know it's not hanging around
+                    defElement.Attribute("defName").Remove();
+
                     // Create our instance
                     var defInstance = (Def)Activator.CreateInstance(typeHandle);
                     defInstance.defName = defName;
@@ -142,6 +145,12 @@ namespace Def
 
         private object ParseThing(XElement element, Type type, object model, bool rootNode = false)
         {
+            // No attributes are allowed
+            if (element.HasAttributes)
+            {
+                Dbg.Err($"{element.LineNumber()}: Has unconsumed attributes");
+            }
+
             bool hasElements = element.Elements().Any();
             bool hasText = element.Nodes().OfType<XText>().Any();
 

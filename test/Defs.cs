@@ -191,5 +191,18 @@ namespace DefTest
             Assert.AreEqual(12, result.value);
             Assert.AreEqual(4, ((DupeParentDef)result).value);
 	    }
+
+        [Test]
+	    public void ExtraAttribute()
+	    {
+            var parser = new Def.Parser(new Type[]{ typeof(StubDef) });
+            parser.AddString(@"
+                <Defs>
+                    <StubDef defName=""TestDef"" invalidAttribute=""hello"" />
+                </Defs>");
+            ExpectErrors(() => parser.Finish());
+
+            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
+	    }
     }
 }
