@@ -7,6 +7,9 @@ namespace Def
     {
         private static readonly HashSet<Type> Databases = new HashSet<Type>();
 
+        // This is redundant with Database<T>, but it's a lot faster than using reflection
+        private static readonly Dictionary<Type, Dictionary<string, Def>> Lookup = new Dictionary<Type, Dictionary<string, Def>>();
+
         internal static void Register(Def instance)
         {
             var defType = Util.GetDefHierarchyType(instance.GetType());
@@ -16,7 +19,26 @@ namespace Def
             var regFunction = dbType.GetMethod("Register", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
             regFunction.Invoke(null, new[] { instance });
 
-            // TODO: register in a central DB?
+            var typedict = Lookup.TryGetValue(defType);
+            if (typedict == null)
+            {
+                typedict = new Dictionary<string, Def>();
+                Lookup[defType] = typedict;
+            }
+
+            // We'll just rely on Database<T> to generate the relevant errors if we're overwriting something
+            typedict[instance.defName] = instance;
+        }
+
+        public static Def Get(Type type, string name)
+        {
+            var typedict = Lookup.TryGetValue(Util.GetDefHierarchyType(type));
+            if (typedict == null)
+            {
+                return null;
+            }
+
+            return typedict.TryGetValue(name);
         }
 
         public static void Clear()

@@ -106,7 +106,7 @@ namespace Def
 
                     Database.Register(defInstance);
 
-                    finishWork.Add(() => ParseThing(defElement, typeHandle, defInstance));
+                    finishWork.Add(() => ParseThing(defElement, typeHandle, defInstance, true));
                 }
             }
         }
@@ -140,11 +140,43 @@ namespace Def
             s_Status = Status.Uninitialized;
         }
 
-        private object ParseThing(XElement element, Type type, object model)
+        private object ParseThing(XElement element, Type type, object model, bool rootNode = false)
         {
             bool hasElements = element.Elements().Any();
             bool hasText = element.Nodes().OfType<XText>().Any();
 
+            if (hasElements && hasText)
+            {
+                Dbg.Err($"{element.LineNumber()}: Elements and text are never valid together");
+            }
+
+            // Special case: defs
+            if (typeof(Def).IsAssignableFrom(type) && !rootNode)
+            {
+                if (hasElements)
+                {
+                    Dbg.Err($"{element.LineNumber()}: Inline def definitions are not currently supported");
+                    return null;
+                }
+
+                if (!hasText)
+                {
+                    // you reference nothing, you get the null
+                    return null;
+                }
+                else
+                {
+                    var defName = (element.FirstNode as XText).Value;
+                    Def result = Database.Get(type, defName);
+                    if (result == null)
+                    {
+                        Dbg.Err($"{element.LineNumber()}: Couldn't find {type} named {defName}");
+                    }
+                    return result;
+                }
+            }
+
+            // Various non-composite-type special-cases
             if (!hasElements && hasText)
             {
                 // If we've got text, treat us as an object of appropriate type
@@ -172,8 +204,7 @@ namespace Def
 
             // We either have elements, or we're a composite type of some sort and can pretend we do
 
-            // Special-case type testing here!
-
+            // Special case: Lists
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
             {
                 // List<> handling
@@ -193,9 +224,9 @@ namespace Def
                 return list;
             }
 
+            // Special case: Arrays
             if (type.IsArray)
             {
-                // [] handling
                 Type referencedType = type.GetElementType();
 
                 var elements = element.Elements().ToArray();
@@ -214,7 +245,7 @@ namespace Def
                 return array;
             }
 
-            // End special-case testing; we're a generic class or a struct
+            // At this point, we're either a class or a struct
 
             // If we haven't been given a template class from our parent, go ahead and init to defaults
             if (model == null)
