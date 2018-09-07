@@ -51,6 +51,15 @@ namespace Def
             }
             Databases.Clear();
 
+            foreach (var stat in StaticReferences.StaticReferencesFilled)
+            {
+                foreach (var field in stat.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static))
+                {
+                    field.SetValue(null, null);
+                }
+            }
+            StaticReferences.StaticReferencesFilled.Clear();
+
             Parser.Clear();
         }
     }

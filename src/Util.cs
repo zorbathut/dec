@@ -2,6 +2,7 @@ namespace Def
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reflection;
     using System.Xml;
     using System.Xml.Linq;
@@ -77,6 +78,11 @@ namespace Def
                     return null;
                 }
             }
+        }
+
+        internal static bool HasAttribute(this Type type, Type attribute)
+        {
+            return type.GetCustomAttributes(attribute).Any();
         }
     }
 }

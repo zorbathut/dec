@@ -4,9 +4,12 @@ namespace Def
     using System.Collections;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Diagnostics;
     using System.Linq;
-    using System.Xml.Linq;
+    using System.Runtime.CompilerServices;
     using System.Text.RegularExpressions;
+    using System.Xml.Linq;
+    
 
     public class Parser
     {
@@ -15,13 +18,17 @@ namespace Def
             Uninitialized,
             Accumulating,
             Processing,
+            Distributing,
             Finished,
         }
         private static Status s_Status = Status.Uninitialized;
 
         private Dictionary<string, Type> typeLookup = new Dictionary<string, Type>();
+        private List<Type> staticReferences = new List<Type>();
+        private static HashSet<Type> staticReferencesRegistered = new HashSet<Type>();
+        private static HashSet<Type> staticReferencesRegistering = new HashSet<Type>();
 
-        public Parser(Type[] types)
+        public Parser(Type[] types, Type[] staticRefs = null)
         {
             if (s_Status != Status.Uninitialized)
             {
@@ -38,6 +45,24 @@ namespace Def
                 else
                 {
                     Dbg.Err($"{type} is not a subclass of Def");
+                }
+            }
+
+            if (staticRefs != null)
+            {
+                foreach (var type in staticRefs)
+                {
+                    if (!type.HasAttribute(typeof(StaticReferences)))
+                    {
+                        Dbg.Err($"{type} is not tagged as StaticReferences");
+                    }
+
+                    if (!type.IsAbstract || !type.IsSealed)
+                    {
+                        Dbg.Err($"{type} is not static");
+                    }
+
+                    staticReferences.Add(type);
                 }
             }
         }
@@ -129,7 +154,43 @@ namespace Def
 
             if (s_Status != Status.Processing)
             {
-                Dbg.Err($"Completing while the world is in {s_Status} state; should be {Status.Processing} state");
+                Dbg.Err($"Distributing while the world is in {s_Status} state; should be {Status.Processing} state");
+            }
+            s_Status = Status.Distributing;
+
+            staticReferencesRegistering.Clear();
+            staticReferencesRegistering.UnionWith(staticReferences);
+            foreach (var stat in staticReferences)
+            {
+                StaticReferences.StaticReferencesFilled.Add(stat);
+
+                foreach (var field in stat.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static))
+                {
+                    var def = Database.Get(field.FieldType, field.Name);
+                    if (def == null)
+                    {
+                        Dbg.Err($"Failed to find {field.FieldType} named {field.Name}");
+                    }
+                    else if (!field.FieldType.IsAssignableFrom(def.GetType()))
+                    {
+                        Dbg.Err($"Static reference {field.FieldType} {stat}.{field.Name} is not compatible with {def.GetType()} {def}");
+                        field.SetValue(null, null); // this is unnecessary, but it does kick the static constructor just in case we wouldn't do it otherwise
+                    }
+                    else
+                    {
+                        field.SetValue(null, def);
+                    }
+                }
+
+                if (!staticReferencesRegistered.Contains(stat))
+                {
+                    Dbg.Err($"Failed to properly register {stat}; you may be missing a call to Def.StaticReferences.Initialized() in its static constructor");
+                }
+            }
+
+            if (s_Status != Status.Distributing)
+            {
+                Dbg.Err($"Completing while the world is in {s_Status} state; should be {Status.Distributing} state");
             }
             s_Status = Status.Finished;
         }
@@ -285,6 +346,25 @@ namespace Def
             }
 
             return model;
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        internal static void StaticReferencesInitialized()
+        {
+            var frame = new StackFrame(2);
+            var method = frame.GetMethod();
+            var type = method.DeclaringType;
+
+            if (s_Status != Status.Distributing)
+            {
+                Dbg.Err($"Initializing static reference class {type} while the world is in {s_Status} state; should be {Status.Distributing} state - this probably means you accessed a static reference class before it was ready");
+            }
+            else if (!staticReferencesRegistering.Contains(type))
+            {
+                Dbg.Err($"Initializing static reference class {type} which was not originally detected as a static reference class");
+            }
+
+            staticReferencesRegistered.Add(type);
         }
     }
 }
