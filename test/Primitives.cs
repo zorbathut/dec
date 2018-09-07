@@ -210,5 +210,35 @@ namespace DefTest
             Assert.AreEqual(result.value1, 9);
             Assert.AreEqual(result.value3, 999);
 	    }
+
+        public enum ExampleEnum
+        {
+            One,
+            Two,
+            Three,
+        }
+
+        public class EnumDef : Def.Def
+        {
+            public ExampleEnum value;
+        }
+
+        [Test]
+	    public void Enum()
+	    {
+            var parser = new Def.Parser(new Type[]{ typeof(EnumDef) });
+            parser.AddString(@"
+                <Defs>
+                    <EnumDef defName=""TestDef"">
+                        <value>Two</value>
+                    </EnumDef>
+                </Defs>");
+            parser.Finish();
+
+            var result = Def.Database<EnumDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(result.value, ExampleEnum.Two);
+	    }
     }
 }
