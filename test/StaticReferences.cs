@@ -296,5 +296,25 @@ namespace DefTest
             Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
 	    }
 
+        [Def.StaticReferences]
+        public static class InternalDefs
+        {
+            static InternalDefs() { Def.StaticReferences.Initialized(); }
+
+            internal static StubDef TestDef;
+        }
+
+        [Test]
+	    public void Internal()
+	    {
+            var parser = new Def.Parser(new Type[]{ typeof(StubDef) }, new Type[]{ typeof(InternalDefs) });
+            parser.AddString(@"
+                <Defs>
+                    <StubDef defName=""TestDef"" />
+                </Defs>");
+            parser.Finish();
+
+            Assert.IsNotNull(InternalDefs.TestDef);
+	    }
     }
 }
