@@ -6,13 +6,22 @@ namespace DefTest
     [TestFixture]
     public class Meta : Base
     {
+        [Def.StaticReferences]
+        public static class StubDefs
+        {
+            static StubDefs() { Def.StaticReferences.Initialized(); }
+
+            public static StubDef TestDef;
+        }
+
 	    [Test]
 	    public void Clear()
 	    {
             Assert.IsNull(Def.Database<StubDef>.Get("TestDef"));
+            // we don't test StubDefs.TestDef here because if we do, we'll kick off the detection
 
             {
-                var parser = new Def.Parser(new Type[]{ typeof(StubDef) });
+                var parser = new Def.Parser(new Type[]{ typeof(StubDef) }, new Type[]{ typeof(StubDefs) });
                 parser.AddString(@"
                     <Defs>
                         <StubDef defName=""TestDef"" />
@@ -21,13 +30,15 @@ namespace DefTest
             }
 
             Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
+            Assert.AreEqual(StubDefs.TestDef, Def.Database<StubDef>.Get("TestDef"));
 
             Def.Database.Clear();
 
             Assert.IsNull(Def.Database<StubDef>.Get("TestDef"));
+            Assert.IsNull(StubDefs.TestDef);
 
             {
-                var parser = new Def.Parser(new Type[]{ typeof(StubDef) });
+                var parser = new Def.Parser(new Type[]{ typeof(StubDef) }, new Type[]{ typeof(StubDefs) });
                 parser.AddString(@"
                     <Defs>
                         <StubDef defName=""TestDef"" />
@@ -36,10 +47,72 @@ namespace DefTest
             }
 
             Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
+            Assert.AreEqual(StubDefs.TestDef, Def.Database<StubDef>.Get("TestDef"));
 
             Def.Database.Clear();
 
             Assert.IsNull(Def.Database<StubDef>.Get("TestDef"));
+            Assert.IsNull(StubDefs.TestDef);
+	    }
+
+        public class RefTargetDef : Def.Def
+        {
+
+        }
+
+        public class RefSourceDef : Def.Def
+        {
+            public RefTargetDef target;
+        }
+
+        [Test]
+	    public void ClearRef()
+	    {
+            // Had a bug where Def.Database.Clear() wasn't properly clearing the lookup table used for references
+            // This double-checks it
+
+            {
+                var parser = new Def.Parser(new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) });
+                parser.AddString(@"
+                    <Defs>
+                        <RefTargetDef defName=""Target"" />
+                        <RefSourceDef defName=""Source"">
+                            <target>Target</target>
+                        </RefSourceDef>
+                    </Defs>");
+                parser.Finish();
+            }
+
+            {
+                var target = Def.Database<RefTargetDef>.Get("Target");
+                var source = Def.Database<RefSourceDef>.Get("Source");
+                Assert.IsNotNull(target);
+                Assert.IsNotNull(source);
+
+                Assert.AreEqual(source.target, target);
+            }
+
+            Def.Database.Clear();
+
+            {
+                var parser = new Def.Parser(new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) });
+                parser.AddString(@"
+                    <Defs>
+                        <RefSourceDef defName=""Source"">
+                            <target>Target</target>
+                        </RefSourceDef>
+                    </Defs>");
+                ExpectErrors(() => parser.Finish());
+            }
+
+            {
+                var target = Def.Database<RefTargetDef>.Get("Target");
+                var source = Def.Database<RefSourceDef>.Get("Source");
+                Assert.IsNull(target);
+                Assert.IsNotNull(source);
+
+                Assert.IsNull(source.target);
+            }
 	    }
     }
 }

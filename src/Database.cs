@@ -43,6 +43,8 @@ namespace Def
 
         public static void Clear()
         {
+            Lookup.Clear();
+
             foreach (var db in Databases)
             {
                 db.GetMethod("Clear", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic).Invoke(null, null);
