@@ -1,5 +1,7 @@
 namespace Def
 {
+    using System.Collections.Generic;
+
     public class Def
     {
         public string defName;
@@ -9,6 +11,11 @@ namespace Def
         public override string ToString()
         {
             return defName;
+        }
+
+        public virtual IEnumerable<string> ConfigErrors()
+        {
+            yield break;
         }
     }
 }

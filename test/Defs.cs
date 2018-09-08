@@ -2,6 +2,8 @@ namespace DefTest
 {
     using NUnit.Framework;
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
 
     [TestFixture]
     public class Defs : Base
@@ -237,6 +239,8 @@ namespace DefTest
 
             Assert.AreEqual(Def.Database<StubDef>.DefCount, 2);
             Assert.AreEqual(Def.Database<StubBetaDef>.DefCount, 1);
+
+            Assert.AreEqual(Def.Database.List.Count(), 3);
         }
 
         [Test]
@@ -252,6 +256,32 @@ namespace DefTest
             Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
 
             Assert.AreEqual(Def.Database<StubDef>.Get("TestDef").ToString(), "TestDef");
+        }
+
+        public class ErrorDef : Def.Def
+        {
+            public override IEnumerable<string> ConfigErrors()
+            {
+                foreach (var err in base.ConfigErrors())
+                {
+                    yield return err;
+                }
+
+                yield return "I am never valid";
+            }
+        }
+
+        [Test]
+	    public void ConfigErrors()
+        {
+            var parser = new Def.Parser(new Type[]{ typeof(ErrorDef) });
+            parser.AddString(@"
+                <Defs>
+                    <ErrorDef defName=""TestDef"" />
+                </Defs>");
+            ExpectErrors(() => parser.Finish());
+
+            Assert.IsNotNull(Def.Database<ErrorDef>.Get("TestDef"));
         }
     }
 }

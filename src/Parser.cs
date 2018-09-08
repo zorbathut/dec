@@ -19,6 +19,7 @@ namespace Def
             Accumulating,
             Processing,
             Distributing,
+            Finalizing,
             Finished,
         }
         private static Status s_Status = Status.Uninitialized;
@@ -190,7 +191,21 @@ namespace Def
 
             if (s_Status != Status.Distributing)
             {
-                Dbg.Err($"Completing while the world is in {s_Status} state; should be {Status.Distributing} state");
+                Dbg.Err($"Finalizing while the world is in {s_Status} state; should be {Status.Distributing} state");
+            }
+            s_Status = Status.Finalizing;
+
+            foreach (var def in Database.List)
+            {
+                foreach (var err in def.ConfigErrors())
+                {
+                    Dbg.Err($"{def.GetType()} {def}: {err}");
+                }
+            }
+
+            if (s_Status != Status.Finalizing)
+            {
+                Dbg.Err($"Completing while the world is in {s_Status} state; should be {Status.Finalizing} state");
             }
             s_Status = Status.Finished;
         }

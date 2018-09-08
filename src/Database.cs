@@ -2,6 +2,7 @@ namespace Def
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     public static class Database
     {
@@ -9,6 +10,14 @@ namespace Def
 
         // This is redundant with Database<T>, but it's a lot faster than using reflection
         private static readonly Dictionary<Type, Dictionary<string, Def>> Lookup = new Dictionary<Type, Dictionary<string, Def>>();
+
+        public static IEnumerable<Def> List
+        {
+            get
+            {
+                return Lookup.Values.SelectMany(v => v.Values);
+            }
+        }
 
         internal static void Register(Def instance)
         {
@@ -74,6 +83,14 @@ namespace Def
             get
             {
                 return DefList.Count;
+            }
+        }
+
+        public static IEnumerable<T> List
+        {
+            get
+            {
+                return DefList;
             }
         }
         
