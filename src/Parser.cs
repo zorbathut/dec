@@ -13,6 +13,7 @@ namespace Def
 
     public class Parser
     {
+        // Global status
         private enum Status
         {
             Uninitialized,
@@ -24,8 +25,14 @@ namespace Def
         }
         private static Status s_Status = Status.Uninitialized;
 
+        // Data stored from Parser
         private Dictionary<string, Type> typeLookup = new Dictionary<string, Type>();
         private List<Type> staticReferences = new List<Type>();
+        
+        // List of work to be run during the Finish stage
+        private List<Action> finishWork = new List<Action>();
+
+        // Used to deal with static reference validation
         private static HashSet<Type> staticReferencesRegistered = new HashSet<Type>();
         private static HashSet<Type> staticReferencesRegistering = new HashSet<Type>();
 
@@ -67,8 +74,6 @@ namespace Def
                 }
             }
         }
-
-        private List<Action> finishWork = new List<Action>();
 
         private static readonly Regex DefNameValidator = new Regex(@"^[A-Za-z_][A-Za-z0-9_]*$", RegexOptions.Compiled);
         public void AddString(string input)
