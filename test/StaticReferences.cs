@@ -301,7 +301,9 @@ namespace DefTest
         {
             static InternalDefs() { Def.StaticReferences.Initialized(); }
 
+            #pragma warning disable CS0649
             internal static StubDef TestDef;
+            #pragma warning restore CS0649
         }
 
         [Test]
