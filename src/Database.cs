@@ -11,32 +11,20 @@ namespace Def
         // This is redundant with Database<T>, but it's a lot faster than using reflection
         private static readonly Dictionary<Type, Dictionary<string, Def>> Lookup = new Dictionary<Type, Dictionary<string, Def>>();
 
+        public static int Count
+        {
+            get
+            {
+                return Lookup.Values.Select(x => x.Count).Sum();
+            }
+        }
+
         public static IEnumerable<Def> List
         {
             get
             {
                 return Lookup.Values.SelectMany(v => v.Values);
             }
-        }
-
-        internal static void Register(Def instance)
-        {
-            var defType = Util.GetDefHierarchyType(instance.GetType());
-            var dbType = typeof(Database<>).MakeGenericType(new[] { defType });
-            Databases.Add(dbType);
-
-            var regFunction = dbType.GetMethod("Register", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
-            regFunction.Invoke(null, new[] { instance });
-
-            var typedict = Lookup.TryGetValue(defType);
-            if (typedict == null)
-            {
-                typedict = new Dictionary<string, Def>();
-                Lookup[defType] = typedict;
-            }
-
-            // We'll just rely on Database<T> to generate the relevant errors if we're overwriting something
-            typedict[instance.defName] = instance;
         }
 
         public static Def Get(Type type, string name)
@@ -71,6 +59,26 @@ namespace Def
 
             Parser.Clear();
         }
+        
+        internal static void Register(Def instance)
+        {
+            var defType = Util.GetDefHierarchyType(instance.GetType());
+            var dbType = typeof(Database<>).MakeGenericType(new[] { defType });
+            Databases.Add(dbType);
+
+            var regFunction = dbType.GetMethod("Register", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+            regFunction.Invoke(null, new[] { instance });
+
+            var typedict = Lookup.TryGetValue(defType);
+            if (typedict == null)
+            {
+                typedict = new Dictionary<string, Def>();
+                Lookup[defType] = typedict;
+            }
+
+            // We'll just rely on Database<T> to generate the relevant errors if we're overwriting something
+            typedict[instance.defName] = instance;
+        }
     }
 
     public static class Database<T> where T : Def
@@ -78,7 +86,7 @@ namespace Def
         private static readonly List<T> DefList = new List<T>();
         private static readonly Dictionary<string, T> DefLookup = new Dictionary<string, T>();
 
-        public static int DefCount
+        public static int Count
         {
             get
             {

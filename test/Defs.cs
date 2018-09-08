@@ -237,8 +237,10 @@ namespace DefTest
             Assert.AreEqual(Def.Database<StubBetaDef>.Get("TestDefB").index, 0);
             Assert.AreEqual(Def.Database<StubDef>.Get("TestDefC").index, 1);
 
-            Assert.AreEqual(Def.Database<StubDef>.DefCount, 2);
-            Assert.AreEqual(Def.Database<StubBetaDef>.DefCount, 1);
+            Assert.AreEqual(Def.Database<StubDef>.Count, 2);
+            Assert.AreEqual(Def.Database<StubBetaDef>.Count, 1);
+
+            Assert.AreEqual(Def.Database.Count, 3);
 
             Assert.AreEqual(Def.Database.List.Count(), 3);
         }
