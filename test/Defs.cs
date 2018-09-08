@@ -204,5 +204,39 @@ namespace DefTest
 
             Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
 	    }
+
+        public class StubBetaDef : Def.Def
+        {
+
+        }
+
+        public class StubChildDef : StubDef
+        {
+
+        }
+
+        [Test]
+	    public void Index()
+        {
+            var parser = new Def.Parser(new Type[]{ typeof(StubDef), typeof(StubBetaDef), typeof(StubChildDef) });
+            parser.AddString(@"
+                <Defs>
+                    <StubChildDef defName=""TestDefA"" />
+                    <StubBetaDef defName=""TestDefB"" />
+                    <StubDef defName=""TestDefC"" />
+                </Defs>");
+            parser.Finish();
+
+            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDefA"));
+            Assert.IsNotNull(Def.Database<StubBetaDef>.Get("TestDefB"));
+            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDefC"));
+
+            Assert.AreEqual(Def.Database<StubDef>.Get("TestDefA").index, 0);
+            Assert.AreEqual(Def.Database<StubBetaDef>.Get("TestDefB").index, 0);
+            Assert.AreEqual(Def.Database<StubDef>.Get("TestDefC").index, 1);
+
+            Assert.AreEqual(Def.Database<StubDef>.DefCount, 2);
+            Assert.AreEqual(Def.Database<StubBetaDef>.DefCount, 1);
+        }
     }
 }

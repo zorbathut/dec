@@ -68,6 +68,14 @@ namespace Def
     {
         private static readonly List<T> DefList = new List<T>();
         private static readonly Dictionary<string, T> DefLookup = new Dictionary<string, T>();
+
+        public static int DefCount
+        {
+            get
+            {
+                return DefList.Count;
+            }
+        }
         
         public static T Get(string name)
         {
@@ -81,9 +89,16 @@ namespace Def
                 Dbg.Err($"Found repeated def ${typeof(T)}.${instance.defName}");
 
                 // I . . . guess?
-                DefList.Remove(DefLookup[instance.defName]);
+                int index = DefList.FindIndex(def => def == DefLookup[instance.defName]);
+
+                instance.index = index;
+                DefList[index] = instance;
+                DefLookup[instance.defName] = instance;
+
+                return;
             }
 
+            instance.index = DefList.Count;
             DefList.Add(instance);
             DefLookup[instance.defName] = instance;
         }
