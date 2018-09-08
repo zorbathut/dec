@@ -238,5 +238,20 @@ namespace DefTest
             Assert.AreEqual(Def.Database<StubDef>.DefCount, 2);
             Assert.AreEqual(Def.Database<StubBetaDef>.DefCount, 1);
         }
+
+        [Test]
+	    public void DebugPrint()
+        {
+            var parser = new Def.Parser(new Type[]{ typeof(StubDef) });
+            parser.AddString(@"
+                <Defs>
+                    <StubDef defName=""TestDef"" />
+                </Defs>");
+            parser.Finish();
+
+            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
+
+            Assert.AreEqual(Def.Database<StubDef>.Get("TestDef").ToString(), "TestDef");
+        }
     }
 }
