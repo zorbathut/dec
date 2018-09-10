@@ -36,7 +36,7 @@ namespace Def
         private static HashSet<Type> staticReferencesRegistered = new HashSet<Type>();
         private static HashSet<Type> staticReferencesRegistering = new HashSet<Type>();
 
-        public Parser(Type[] types, Type[] staticRefs = null)
+        public Parser(Type[] explicitTypes = null, Type[] explicitStaticRefs = null)
         {
             if (s_Status != Status.Uninitialized)
             {
@@ -44,7 +44,7 @@ namespace Def
             }
             s_Status = Status.Accumulating;
 
-            foreach (var type in types)
+            foreach (var type in explicitTypes)
             {
                 if (type.IsSubclassOf(typeof(Def)))
                 {
@@ -56,9 +56,9 @@ namespace Def
                 }
             }
 
-            if (staticRefs != null)
+            if (explicitStaticRefs != null)
             {
-                foreach (var type in staticRefs)
+                foreach (var type in explicitStaticRefs)
                 {
                     if (!type.HasAttribute(typeof(StaticReferences)))
                     {

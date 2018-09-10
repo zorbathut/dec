@@ -20,7 +20,7 @@ namespace DefTest
         [Test]
 	    public void ChildClass()
 	    {
-            var parser = new Def.Parser(new Type[]{ typeof(CCRoot) });
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(CCRoot) });
             parser.AddString(@"
                 <Defs>
                     <CCRoot defName=""TestDef"">
@@ -52,7 +52,7 @@ namespace DefTest
         [Test]
 	    public void ChildClassDefaults()
 	    {
-            var parser = new Def.Parser(new Type[]{ typeof(CCDRoot) });
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(CCDRoot) });
             parser.AddString(@"
                 <Defs>
                     <CCDRoot defName=""TestDef"">
@@ -91,7 +91,7 @@ namespace DefTest
         [Test]
 	    public void ChildStruct()
 	    {
-            var parser = new Def.Parser(new Type[]{ typeof(CSRoot) });
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(CSRoot) });
             parser.AddString(@"
                 <Defs>
                     <CSRoot defName=""TestDef"">
