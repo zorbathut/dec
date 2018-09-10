@@ -15,7 +15,7 @@ namespace DefTest
         [Test]
 	    public void Array()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(ArrayDef) });
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(ArrayDef) }, explicitStaticRefs: new Type[]{ });
             parser.AddString(@"
                 <Defs>
                     <ArrayDef defName=""TestDef"">
@@ -44,7 +44,7 @@ namespace DefTest
         [Test]
 	    public void List()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(ListDef) });
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(ListDef) }, explicitStaticRefs: new Type[]{ });
             parser.AddString(@"
                 <Defs>
                     <ListDef defName=""TestDef"">
@@ -73,7 +73,7 @@ namespace DefTest
         [Test]
 	    public void Nested()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(NestedDef) });
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(NestedDef) }, explicitStaticRefs: new Type[]{ });
             parser.AddString(@"
                 <Defs>
                     <NestedDef defName=""TestDef"">

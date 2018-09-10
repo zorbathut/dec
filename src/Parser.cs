@@ -44,7 +44,17 @@ namespace Def
             }
             s_Status = Status.Accumulating;
 
-            foreach (var type in explicitTypes)
+            IEnumerable<Type> types;
+            if (explicitTypes != null)
+            {
+                types = explicitTypes;
+            }
+            else
+            {
+                types = Util.GetAllTypes().Where(t => typeof(Def).IsAssignableFrom(t));
+            }
+
+            foreach (var type in types)
             {
                 if (type.IsSubclassOf(typeof(Def)))
                 {
@@ -56,22 +66,29 @@ namespace Def
                 }
             }
 
+            IEnumerable<Type> staticRefs;
             if (explicitStaticRefs != null)
             {
-                foreach (var type in explicitStaticRefs)
+                staticRefs = explicitStaticRefs;
+            }
+            else
+            {
+                staticRefs = Util.GetAllTypes().Where(t => t.HasAttribute(typeof(StaticReferences)));
+            }
+
+            foreach (var type in staticRefs)
+            {
+                if (!type.HasAttribute(typeof(StaticReferences)))
                 {
-                    if (!type.HasAttribute(typeof(StaticReferences)))
-                    {
-                        Dbg.Err($"{type} is not tagged as StaticReferences");
-                    }
-
-                    if (!type.IsAbstract || !type.IsSealed)
-                    {
-                        Dbg.Err($"{type} is not static");
-                    }
-
-                    staticReferences.Add(type);
+                    Dbg.Err($"{type} is not tagged as StaticReferences");
                 }
+
+                if (!type.IsAbstract || !type.IsSealed)
+                {
+                    Dbg.Err($"{type} is not static");
+                }
+
+                staticReferences.Add(type);
             }
         }
 

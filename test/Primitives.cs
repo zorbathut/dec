@@ -24,7 +24,7 @@ namespace DefTest
 	    [Test]
 	    public void EmptyIntParse()
 	    {
-            var parser = new Def.Parser(new Type[]{ typeof(IntDef) });
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(IntDef) }, explicitStaticRefs: new Type[]{ });
             parser.AddString(@"
                 <Defs>
                     <IntDef defName=""TestDef"">
@@ -42,7 +42,7 @@ namespace DefTest
         [Test]
 	    public void FailingIntParse()
 	    {
-            var parser = new Def.Parser(new Type[]{ typeof(IntDef) });
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(IntDef) }, explicitStaticRefs: new Type[]{ });
             parser.AddString(@"
                 <Defs>
                     <IntDef defName=""TestDef"">
@@ -60,7 +60,7 @@ namespace DefTest
         [Test]
 	    public void FailingIntParse2()
 	    {
-            var parser = new Def.Parser(new Type[]{ typeof(IntDef) });
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(IntDef) }, explicitStaticRefs: new Type[]{ });
             parser.AddString(@"
                 <Defs>
                     <IntDef defName=""TestDef"">
@@ -78,7 +78,7 @@ namespace DefTest
 	    [Test]
 	    public void EmptyBoolParse()
 	    {
-            var parser = new Def.Parser(new Type[]{ typeof(BoolDef) });
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(BoolDef) }, explicitStaticRefs: new Type[]{ });
             parser.AddString(@"
                 <Defs>
                     <BoolDef defName=""TestDef"">
@@ -96,7 +96,7 @@ namespace DefTest
 	    [Test]
 	    public void FailingBoolParse()
 	    {
-            var parser = new Def.Parser(new Type[]{ typeof(BoolDef) });
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(BoolDef) }, explicitStaticRefs: new Type[]{ });
             parser.AddString(@"
                 <Defs>
                     <BoolDef defName=""TestDef"">
@@ -114,7 +114,7 @@ namespace DefTest
         [Test]
 	    public void EmptyStringParse()
 	    {
-            var parser = new Def.Parser(new Type[]{ typeof(StringDef) });
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(StringDef) }, explicitStaticRefs: new Type[]{ });
             parser.AddString(@"
                 <Defs>
                     <StringDef defName=""TestDef"">
@@ -149,7 +149,7 @@ namespace DefTest
 	    [Test]
 	    public void BulkParse()
 	    {
-            var parser = new Def.Parser(new Type[]{ typeof(BulkParseDef) });
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(BulkParseDef) }, explicitStaticRefs: new Type[]{ });
             parser.AddString(@"
                 <Defs>
                     <BulkParseDef defName=""TestDef"">
@@ -193,7 +193,7 @@ namespace DefTest
         [Test]
 	    public void MissingMember()
 	    {
-            var parser = new Def.Parser(new Type[]{ typeof(MissingMemberDef) });
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(MissingMemberDef) }, explicitStaticRefs: new Type[]{ });
             parser.AddString(@"
                 <Defs>
                     <MissingMemberDef defName=""TestDef"">
@@ -226,7 +226,7 @@ namespace DefTest
         [Test]
 	    public void Enum()
 	    {
-            var parser = new Def.Parser(new Type[]{ typeof(EnumDef) });
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(EnumDef) }, explicitStaticRefs: new Type[]{ });
             parser.AddString(@"
                 <Defs>
                     <EnumDef defName=""TestDef"">
@@ -244,7 +244,7 @@ namespace DefTest
         [Test]
 	    public void InvalidAttribute()
 	    {
-            var parser = new Def.Parser(new Type[]{ typeof(IntDef) });
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(IntDef) }, explicitStaticRefs: new Type[]{ });
             parser.AddString(@"
                 <Defs>
                     <IntDef defName=""TestDef"">

@@ -227,7 +227,7 @@ namespace DefTest
         [Test]
 	    public void LateTouch()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(StubDef) });
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ });
             parser.AddString(@"
                 <Defs>
                 </Defs>");
@@ -255,7 +255,7 @@ namespace DefTest
         [Test]
 	    public void UnexpectedTouch()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(UnexpectedTouchDef) });
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(UnexpectedTouchDef) }, explicitStaticRefs: new Type[]{ });
             ExpectErrors(() => parser.AddString(@"
                 <Defs>
                     <UnexpectedTouchDef defName=""TestDef"" />

@@ -84,5 +84,10 @@ namespace Def
         {
             return type.GetCustomAttributes(attribute).Any();
         }
+
+        internal static IEnumerable<Type> GetAllTypes()
+        {
+            return AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes());
+        }
     }
 }

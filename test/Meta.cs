@@ -72,7 +72,7 @@ namespace DefTest
             // This double-checks it
 
             {
-                var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) });
+                var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) }, explicitStaticRefs: new Type[]{ });
                 parser.AddString(@"
                     <Defs>
                         <RefTargetDef defName=""Target"" />
@@ -95,7 +95,7 @@ namespace DefTest
             Def.Database.Clear();
 
             {
-                var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) });
+                var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) }, explicitStaticRefs: new Type[]{ });
                 parser.AddString(@"
                     <Defs>
                         <RefSourceDef defName=""Source"">
