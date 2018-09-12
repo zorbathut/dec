@@ -251,6 +251,7 @@ namespace Def
 
             bool hasElements = element.Elements().Any();
             bool hasText = element.Nodes().OfType<XText>().Any();
+            var text = hasText ? element.Nodes().OfType<XText>().First().Value : null;
 
             if (hasElements && hasText)
             {
@@ -279,11 +280,10 @@ namespace Def
                 }
                 else
                 {
-                    var defName = (element.FirstNode as XText).Value;
-                    Def result = Database.Get(type, defName);
+                    Def result = Database.Get(type, text);
                     if (result == null)
                     {
-                        Dbg.Err($"{element.LineNumber()}: Couldn't find {type} named {defName}");
+                        Dbg.Err($"{element.LineNumber()}: Couldn't find {type} named {text}");
                     }
                     return result;
                 }
@@ -295,7 +295,7 @@ namespace Def
                 // If we've got text, treat us as an object of appropriate type
                 try
                 {
-                    return TypeDescriptor.GetConverter(type).ConvertFromString((element.FirstNode as XText).Value);
+                    return TypeDescriptor.GetConverter(type).ConvertFromString(text);
                 }
                 catch (System.Exception e)  // I would normally not catch System.Exception, but TypeConverter is wrapping FormatException in an Exception for some reason
                 {
