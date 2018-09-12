@@ -89,5 +89,22 @@ namespace Def
         {
             return AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes());
         }
+
+        internal static string ToCommaString(this IEnumerable<string> list)
+        {
+            string result = "";
+            bool first = true;
+            foreach (var str in list)
+            {
+                if (!first)
+                {
+                    result += ", ";
+                }
+                first = false;
+
+                result += str;
+            }
+            return result;
+        }
     }
 }

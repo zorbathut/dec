@@ -258,5 +258,179 @@ namespace DefTest
 
             Assert.AreEqual(result.value, 5);
 	    }
+
+        public class TypeDef : Def.Def
+        {
+            public Type type;
+        }
+
+        public class Example { }
+        public class ContainerA { public class Overridden { } }
+        public class ContainerB { public class Overridden { } public class NotOverridden { } }
+        public static class Static { }
+        public abstract class Abstract { }
+        public class Generic<T> { }
+
+        [Test]
+	    public void TypeBasic()
+	    {
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(TypeDef) }, explicitStaticRefs: new Type[]{ });
+            parser.AddString(@"
+                <Defs>
+                    <TypeDef defName=""TestDef"">
+                        <type>Example</type>
+                    </TypeDef>
+                </Defs>");
+            parser.Finish();
+
+            var result = Def.Database<TypeDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(result.type, typeof(Example));
+	    }
+
+        [Test]
+	    public void TypeNested()
+	    {
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(TypeDef) }, explicitStaticRefs: new Type[]{ });
+            parser.AddString(@"
+                <Defs>
+                    <TypeDef defName=""TestDef"">
+                        <type>NotOverridden</type>
+                    </TypeDef>
+                </Defs>");
+            parser.Finish();
+
+            var result = Def.Database<TypeDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(result.type, typeof(ContainerB.NotOverridden));
+	    }
+
+        [Test]
+	    public void TypeStatic()
+	    {
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(TypeDef) }, explicitStaticRefs: new Type[]{ });
+            parser.AddString(@"
+                <Defs>
+                    <TypeDef defName=""TestDef"">
+                        <type>Static</type>
+                    </TypeDef>
+                </Defs>");
+            parser.Finish();
+
+            var result = Def.Database<TypeDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(result.type, typeof(Static));
+	    }
+
+        [Test]
+	    public void TypeAbstract()
+	    {
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(TypeDef) }, explicitStaticRefs: new Type[]{ });
+            parser.AddString(@"
+                <Defs>
+                    <TypeDef defName=""TestDef"">
+                        <type>Abstract</type>
+                    </TypeDef>
+                </Defs>");
+            parser.Finish();
+
+            var result = Def.Database<TypeDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(result.type, typeof(Abstract));
+	    }
+
+        [Test]
+	    public void TypeDefRef()
+	    {
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(TypeDef) }, explicitStaticRefs: new Type[]{ });
+            parser.AddString(@"
+                <Defs>
+                    <TypeDef defName=""TestDef"">
+                        <type>TypeDef</type>
+                    </TypeDef>
+                </Defs>");
+            parser.Finish();
+
+            var result = Def.Database<TypeDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(result.type, typeof(TypeDef));
+	    }
+
+        [Test]
+	    public void TypeGenericA()
+	    {
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(TypeDef) }, explicitStaticRefs: new Type[]{ });
+            parser.AddString(@"
+                <Defs>
+                    <TypeDef defName=""TestDef"">
+                        <type>Generic</type>
+                    </TypeDef>
+                </Defs>");
+            ExpectErrors(() => parser.Finish());
+
+            var result = Def.Database<TypeDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.IsNull(result.type);
+	    }
+
+        [Test]
+	    public void TypeGenericB()
+	    {
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(TypeDef) }, explicitStaticRefs: new Type[]{ });
+            parser.AddString(@"
+                <Defs>
+                    <TypeDef defName=""TestDef"">
+                        <type>Generic&lt;&gt;</type>
+                    </TypeDef>
+                </Defs>");
+            ExpectErrors(() => parser.Finish());
+
+            var result = Def.Database<TypeDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.IsNull(result.type);
+	    }
+
+        [Test]
+	    public void TypeGenericC()
+	    {
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(TypeDef) }, explicitStaticRefs: new Type[]{ });
+            parser.AddString(@"
+                <Defs>
+                    <TypeDef defName=""TestDef"">
+                        <type>Generic&lt;int&gt;</type>
+                    </TypeDef>
+                </Defs>");
+            ExpectErrors(() => parser.Finish());
+
+            var result = Def.Database<TypeDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.IsNull(result.type);
+	    }
+
+        [Test]
+	    public void TypeOverridden()
+	    {
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(TypeDef) }, explicitStaticRefs: new Type[]{ });
+            parser.AddString(@"
+                <Defs>
+                    <TypeDef defName=""TestDef"">
+                        <type>Overridden</type>
+                    </TypeDef>
+                </Defs>");
+            ExpectErrors(() => parser.Finish());
+
+            var result = Def.Database<TypeDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.IsNotNull(result.type);
+	    }
     }
 }

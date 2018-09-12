@@ -289,6 +289,36 @@ namespace Def
                 }
             }
 
+            // Special case: types
+            if (type == typeof(Type))
+            {
+                if (hasElements)
+                {
+                    Dbg.Err($"{element.LineNumber()}: Elements included in type");
+                }
+
+                if (!hasText)
+                {
+                    return null;
+                }
+
+                var possibleTypes = Util.GetAllTypes().Where(t => t.Name == text).ToArray();
+                if (possibleTypes.Length == 0)
+                {
+                    Dbg.Err($"{element.LineNumber()}: Couldn't find type named {text}");
+                    return null;
+                }
+                else if (possibleTypes.Length > 1)
+                {
+                    Dbg.Err($"{element.LineNumber()}: Found too many types named {text} ({possibleTypes.Select(t => t.FullName).ToCommaString()})");
+                    return possibleTypes[0];
+                }
+                else
+                {
+                    return possibleTypes[0];
+                }
+            }
+
             // Various non-composite-type special-cases
             if (!hasElements && hasText)
             {
