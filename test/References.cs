@@ -168,7 +168,6 @@ namespace DefTest
         [Test]
 	    public void FailedLookup()
 	    {
-            // This is a little wonky; we have to test it by duplicating a tag, which is technically an error
             var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(RefSourceDef) }, explicitStaticRefs: new Type[]{ });
             parser.AddString(@"
                 <Defs>
