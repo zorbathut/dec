@@ -51,7 +51,7 @@ namespace Def
             }
             else
             {
-                types = Util.GetAllTypes().Where(t => typeof(Def).IsAssignableFrom(t));
+                types = Util.GetAllTypes().Where(t => t.IsSubclassOf(typeof(Def)));
             }
 
             foreach (var type in types)
