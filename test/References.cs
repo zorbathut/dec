@@ -182,5 +182,28 @@ namespace DefTest
 
             Assert.IsNull(result.target);
 	    }
+
+        public class BareDefDef : Def.Def
+        {
+            public Def.Def target;
+        }
+
+        [Test]
+	    public void BareDef()
+	    {
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(BareDefDef) }, explicitStaticRefs: new Type[]{ });
+            parser.AddString(@"
+                <Defs>
+                    <BareDefDef defName=""TestDef"">
+                        <target>TestDef</target>
+                    </BareDefDef>
+                </Defs>");
+            ExpectErrors(() => parser.Finish());
+
+            var result = Def.Database<BareDefDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.IsNull(result.target);
+	    }
     }
 }

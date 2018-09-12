@@ -266,6 +266,12 @@ namespace Def
                     return null;
                 }
 
+                if (Util.GetDefHierarchyType(type) == null)
+                {
+                    Dbg.Err($"{element.LineNumber()}: Non-hierarchy defs cannot be used as references");
+                    return null;
+                }
+
                 if (!hasText)
                 {
                     // you reference nothing, you get the null

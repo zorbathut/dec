@@ -59,7 +59,7 @@ namespace Def
             Type origType = type;
             if (type == typeof(Def))
             {
-                Dbg.Err("Def objects cannot be created on their own");
+                Dbg.Err("Def objects do not exist in a standalone hierarchy");
                 return type;
             }
 
