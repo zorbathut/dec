@@ -251,98 +251,31 @@ namespace Def
 
             bool hasElements = element.Elements().Any();
             bool hasText = element.Nodes().OfType<XText>().Any();
-            var text = hasText ? element.Nodes().OfType<XText>().First().Value : null;
+            var text = hasText ? element.Nodes().OfType<XText>().First().Value : "";
 
             if (hasElements && hasText)
             {
                 Dbg.Err($"{element.LineNumber()}: Elements and text are never valid together");
             }
 
-            // Special case: defs
-            if (typeof(Def).IsAssignableFrom(type) && !rootNode)
+            if (typeof(Def).IsAssignableFrom(type) && hasElements && !rootNode)
             {
-                if (hasElements)
-                {
-                    Dbg.Err($"{element.LineNumber()}: Inline def definitions are not currently supported");
-                    return null;
-                }
-
-                if (Util.GetDefHierarchyType(type) == null)
-                {
-                    Dbg.Err($"{element.LineNumber()}: Non-hierarchy defs cannot be used as references");
-                    return null;
-                }
-
-                if (!hasText)
-                {
-                    // you reference nothing, you get the null
-                    return null;
-                }
-                else
-                {
-                    Def result = Database.Get(type, text);
-                    if (result == null)
-                    {
-                        Dbg.Err($"{element.LineNumber()}: Couldn't find {type} named {text}");
-                    }
-                    return result;
-                }
+                Dbg.Err($"{element.LineNumber()}: Inline def definitions are not currently supported");
+                return null;
             }
 
-            // Special case: types
-            if (type == typeof(Type))
+            if (hasText ||
+                (typeof(Def).IsAssignableFrom(type) && !rootNode) ||
+                type == typeof(Type) ||
+                type == typeof(string) ||
+                type.IsPrimitive)
             {
-                if (hasElements)
+                if (hasElements && !hasText)
                 {
-                    Dbg.Err($"{element.LineNumber()}: Elements included in type");
+                    Dbg.Err($"{element.LineNumber()}: Elements are not valid when parsing {type}");
                 }
 
-                if (!hasText)
-                {
-                    return null;
-                }
-
-                var possibleTypes = Util.GetAllTypes().Where(t => t.Name == text).ToArray();
-                if (possibleTypes.Length == 0)
-                {
-                    Dbg.Err($"{element.LineNumber()}: Couldn't find type named {text}");
-                    return null;
-                }
-                else if (possibleTypes.Length > 1)
-                {
-                    Dbg.Err($"{element.LineNumber()}: Found too many types named {text} ({possibleTypes.Select(t => t.FullName).ToCommaString()})");
-                    return possibleTypes[0];
-                }
-                else
-                {
-                    return possibleTypes[0];
-                }
-            }
-
-            // Various non-composite-type special-cases
-            if (!hasElements && hasText)
-            {
-                // If we've got text, treat us as an object of appropriate type
-                try
-                {
-                    return TypeDescriptor.GetConverter(type).ConvertFromString(text);
-                }
-                catch (System.Exception e)  // I would normally not catch System.Exception, but TypeConverter is wrapping FormatException in an Exception for some reason
-                {
-                    Dbg.Ex(e);
-                    return Activator.CreateInstance(type);
-                }
-            }
-            else if (!hasElements && !hasText && type == typeof(string))
-            {
-                // If we don't have text, and we're a string, return ""
-                return "";
-            }
-            else if (!hasElements && !hasText && type.IsPrimitive)
-            {
-                // If we don't have text, and we're any primitive type, that's an error (and return default values I guess)
-                Dbg.Err($"{element.LineNumber()}: Empty field provided for type {type}");
-                return Activator.CreateInstance(type);
+                return ParseString(text, type, element.LineNumber());
             }
 
             // We either have elements, or we're a composite type of some sort and can pretend we do
@@ -419,6 +352,91 @@ namespace Def
             }
 
             return model;
+        }
+
+        private object ParseString(string text, Type type, int lineNumber)
+        {
+            // Special case: defs
+            if (typeof(Def).IsAssignableFrom(type))
+            {
+                if (Util.GetDefHierarchyType(type) == null)
+                {
+                    Dbg.Err($"{lineNumber}: Non-hierarchy defs cannot be used as references");
+                    return null;
+                }
+
+                if (text == "")
+                {
+                    // you reference nothing, you get the null
+                    return null;
+                }
+                else
+                {
+                    Def result = Database.Get(type, text);
+                    if (result == null)
+                    {
+                        Dbg.Err($"{lineNumber}: Couldn't find {type} named {text}");
+                    }
+                    return result;
+                }
+            }
+
+            // Special case: types
+            if (type == typeof(Type))
+            {
+                if (text == "")
+                {
+                    return null;
+                }
+
+                var possibleTypes = Util.GetAllTypes().Where(t => t.Name == text).ToArray();
+                if (possibleTypes.Length == 0)
+                {
+                    Dbg.Err($"{lineNumber}: Couldn't find type named {text}");
+                    return null;
+                }
+                else if (possibleTypes.Length > 1)
+                {
+                    Dbg.Err($"{lineNumber}: Found too many types named {text} ({possibleTypes.Select(t => t.FullName).ToCommaString()})");
+                    return possibleTypes[0];
+                }
+                else
+                {
+                    return possibleTypes[0];
+                }
+            }
+
+            // Various non-composite-type special-cases
+            if (text != "")
+            {
+                // If we've got text, treat us as an object of appropriate type
+                try
+                {
+                    return TypeDescriptor.GetConverter(type).ConvertFromString(text);
+                }
+                catch (System.Exception e)  // I would normally not catch System.Exception, but TypeConverter is wrapping FormatException in an Exception for some reason
+                {
+                    Dbg.Ex(e);
+                    return Activator.CreateInstance(type);
+                }
+            }
+            else if (type == typeof(string))
+            {
+                // If we don't have text, and we're a string, return ""
+                return "";
+            }
+            else if (type.IsPrimitive)
+            {
+                // If we don't have text, and we're any primitive type, that's an error (and return default values I guess)
+                Dbg.Err($"{lineNumber}: Empty field provided for type {type}");
+                return Activator.CreateInstance(type);
+            }
+            else
+            {
+                // If we don't have text, and we're not a primitive type, then I'm not sure how we got here, but return null
+                Dbg.Err($"{lineNumber}: Empty field provided for type {type}");
+                return null;
+            }
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
