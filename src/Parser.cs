@@ -321,6 +321,29 @@ namespace Def
                 return array;
             }
 
+            // Special case: Dictionaries
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+            {
+                // Dictionary<> handling
+                Type keyType = type.GetGenericArguments()[0];
+                Type valueType = type.GetGenericArguments()[1];
+
+                var list = (IDictionary)Activator.CreateInstance(type);
+                foreach (var fieldElement in element.Elements())
+                {
+                    var key = ParseString(fieldElement.Name.LocalName, keyType, fieldElement.LineNumber());
+
+                    if (list.Contains(key))
+                    {
+                        Dbg.Err($"{fieldElement.LineNumber()}: Dictionary includes duplicate key {fieldElement.Name.LocalName}");
+                    }
+
+                    list[key] = ParseElement(fieldElement, valueType, null);
+                }
+
+                return list;
+            }
+
             // At this point, we're either a class or a struct
 
             // If we haven't been given a template class from our parent, go ahead and init to defaults

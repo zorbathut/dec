@@ -96,5 +96,52 @@ namespace DefTest
 
             Assert.AreEqual(result.data, new[] { new[] { 8, 16 }, new[] { 9, 81 } });
 	    }
+
+        public class DictionaryStringDef : Def.Def
+        {
+            public Dictionary<string, string> data;
+        }
+
+        [Test]
+	    public void DictionaryString()
+	    {
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(DictionaryStringDef) }, explicitStaticRefs: new Type[]{ });
+            parser.AddString(@"
+                <Defs>
+                    <DictionaryStringDef defName=""TestDef"">
+                        <data>
+                            <hello>goodbye</hello>
+                            <Nothing/>
+                        </data>
+                    </DictionaryStringDef>
+                </Defs>");
+            parser.Finish();
+
+            var result = Def.Database<DictionaryStringDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(result.data, new Dictionary<string, string> { { "hello", "goodbye" }, { "Nothing", "" } });
+	    }
+
+        [Test]
+	    public void DictionaryDuplicate()
+	    {
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(DictionaryStringDef) }, explicitStaticRefs: new Type[]{ });
+            parser.AddString(@"
+                <Defs>
+                    <DictionaryStringDef defName=""TestDef"">
+                        <data>
+                            <dupe>5</dupe>
+                            <dupe>10</dupe>
+                        </data>
+                    </DictionaryStringDef>
+                </Defs>");
+            ExpectErrors(() => parser.Finish());
+
+            var result = Def.Database<DictionaryStringDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(result.data, new Dictionary<string, string> { { "dupe", "10" } });
+	    }
     }
 }
