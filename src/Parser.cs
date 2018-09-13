@@ -157,7 +157,7 @@ namespace Def
 
                     Database.Register(defInstance);
 
-                    finishWork.Add(() => ParseThing(defElement, typeHandle, defInstance, true));
+                    finishWork.Add(() => ParseElement(defElement, typeHandle, defInstance, true));
                 }
             }
         }
@@ -241,7 +241,7 @@ namespace Def
             s_Status = Status.Uninitialized;
         }
 
-        private object ParseThing(XElement element, Type type, object model, bool rootNode = false)
+        private object ParseElement(XElement element, Type type, object model, bool rootNode = false)
         {
             // No attributes are allowed
             if (element.HasAttributes)
@@ -361,7 +361,7 @@ namespace Def
                         Dbg.Err($"{fieldElement.LineNumber()}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                     }
 
-                    list.Add(ParseThing(fieldElement, referencedType, null));
+                    list.Add(ParseElement(fieldElement, referencedType, null));
                 }
 
                 return list;
@@ -382,7 +382,7 @@ namespace Def
                         Dbg.Err($"{fieldElement.LineNumber()}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                     }
 
-                    array.SetValue(ParseThing(fieldElement, referencedType, null), i);
+                    array.SetValue(ParseElement(fieldElement, referencedType, null), i);
                 }
 
                 return array;
@@ -415,7 +415,7 @@ namespace Def
                     continue;
                 }
 
-                fieldInfo.SetValue(model, ParseThing(fieldElement, fieldInfo.FieldType, fieldInfo.GetValue(model)));
+                fieldInfo.SetValue(model, ParseElement(fieldElement, fieldInfo.FieldType, fieldInfo.GetValue(model)));
             }
 
             return model;
