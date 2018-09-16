@@ -13,12 +13,12 @@ namespace Def
             return defName;
         }
 
-        public virtual void PostLoad()
+        public virtual IEnumerable<string> ConfigErrors()
         {
-
+            yield break;
         }
 
-        public virtual IEnumerable<string> ConfigErrors()
+        public virtual IEnumerable<string> PostLoad()
         {
             yield break;
         }

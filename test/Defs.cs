@@ -290,8 +290,13 @@ namespace DefTest
         {
             public bool initted = false;
 
-            public override void PostLoad()
+            public override IEnumerable<string> PostLoad()
             {
+                foreach (var err in base.PostLoad())
+                {
+                    yield return err;
+                }
+
                 initted = true;
             }
         }
