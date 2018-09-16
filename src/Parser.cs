@@ -219,17 +219,31 @@ namespace Def
 
             foreach (var def in Database.List)
             {
-                foreach (var err in def.ConfigErrors())
+                try
                 {
-                    Dbg.Err($"{def.GetType()} {def}: {err}");
+                    foreach (var err in def.ConfigErrors())
+                    {
+                        Dbg.Err($"{def.GetType()} {def}: {err}");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Dbg.Ex(e);
                 }
             }
 
             foreach (var def in Database.List)
             {
-                foreach (var err in def.PostLoad())
+                try
                 {
-                    Dbg.Err($"{def.GetType()} {def}: {err}");
+                    foreach (var err in def.PostLoad())
+                    {
+                        Dbg.Err($"{def.GetType()} {def}: {err}");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Dbg.Ex(e);
                 }
             }
 
