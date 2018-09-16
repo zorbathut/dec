@@ -285,5 +285,29 @@ namespace DefTest
 
             Assert.IsNotNull(Def.Database<ErrorDef>.Get("TestDef"));
         }
+
+        public class PostLoadDef : Def.Def
+        {
+            public bool initted = false;
+
+            public override void PostLoad()
+            {
+                initted = true;
+            }
+        }
+
+        [Test]
+	    public void PostLoad()
+        {
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(PostLoadDef) }, explicitStaticRefs: new Type[]{ });
+            parser.AddString(@"
+                <Defs>
+                    <PostLoadDef defName=""TestDef"" />
+                </Defs>");
+            parser.Finish();
+
+            Assert.IsNotNull(Def.Database<PostLoadDef>.Get("TestDef"));
+            Assert.IsTrue(Def.Database<PostLoadDef>.Get("TestDef").initted);
+        }
     }
 }
