@@ -432,5 +432,23 @@ namespace DefTest
 
             Assert.IsNotNull(result.type);
 	    }
+
+        [Test]
+	    public void TypeComplete()
+	    {
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(TypeDef) }, explicitStaticRefs: new Type[]{ });
+            parser.AddString(@"
+                <Defs>
+                    <TypeDef defName=""TestDef"">
+                        <type>DefTest.Primitives+Example</type> <!-- conveniently tests both namespaces and classes at the same time -->
+                    </TypeDef>
+                </Defs>");
+            parser.Finish();
+
+            var result = Def.Database<TypeDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(typeof(Example), result.type);
+	    }
     }
 }

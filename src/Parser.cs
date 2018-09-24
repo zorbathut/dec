@@ -434,7 +434,7 @@ namespace Def
                     return null;
                 }
 
-                var possibleTypes = Util.GetAllTypes().Where(t => t.Name == text).ToArray();
+                var possibleTypes = Util.GetAllTypes().Where(t => t.Name == text || t.FullName == text).ToArray();
                 if (possibleTypes.Length == 0)
                 {
                     Dbg.Err($"{lineNumber}: Couldn't find type named {text}");
