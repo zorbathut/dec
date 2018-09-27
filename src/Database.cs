@@ -111,7 +111,7 @@ namespace Def
         {
             if (DefLookup.ContainsKey(instance.defName))
             {
-                Dbg.Err($"Found repeated def ${typeof(T)}.${instance.defName}");
+                Dbg.Err($"Found repeated def {typeof(T)}.{instance.defName}");
 
                 // I . . . guess?
                 int index = DefList.FindIndex(def => def == DefLookup[instance.defName]);
