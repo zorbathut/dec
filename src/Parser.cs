@@ -93,7 +93,7 @@ namespace Def
         }
 
         private static readonly Regex DefNameValidator = new Regex(@"^[A-Za-z_][A-Za-z0-9_]*$", RegexOptions.Compiled);
-        public void AddString(string input)
+        public void AddString(string input, string stringName = "(unnamed)")
         {
             if (s_Status != Status.Accumulating)
             {
@@ -114,14 +114,14 @@ namespace Def
 
             if (doc.Elements().Count() > 1)
             {
-                Dbg.Err($"Found {doc.Elements().Count()} root elements instead of the expected 1");
+                Dbg.Err($"{stringName}: Found {doc.Elements().Count()} root elements instead of the expected 1");
             }
 
             foreach (var rootElement in doc.Elements())
             {
                 if (rootElement.Name.LocalName != "Defs")
                 {
-                    Dbg.Wrn($"{rootElement.LineNumber()}: Found root element with name \"{rootElement.Name.LocalName}\" when it should be \"Defs\"");
+                    Dbg.Wrn($"{stringName}:{rootElement.LineNumber()}: Found root element with name \"{rootElement.Name.LocalName}\" when it should be \"Defs\"");
                 }
 
                 foreach (var defElement in rootElement.Elements())
@@ -131,20 +131,20 @@ namespace Def
                     Type typeHandle = typeLookup.TryGetValue(typeName);
                     if (typeHandle == null)
                     {
-                        Dbg.Err($"{defElement.LineNumber()}: {typeName} is not a valid root Def type");
+                        Dbg.Err($"{stringName}:{defElement.LineNumber()}: {typeName} is not a valid root Def type");
                         continue;
                     }
 
                     if (defElement.Attribute("defName") == null)
                     {
-                        Dbg.Err($"{defElement.LineNumber()}: No def name provided");
+                        Dbg.Err($"{stringName}:{defElement.LineNumber()}: No def name provided");
                         continue;
                     }
 
                     string defName = defElement.Attribute("defName").Value;
                     if (!DefNameValidator.IsMatch(defName))
                     {
-                        Dbg.Err($"{defElement.LineNumber()}: Def name \"{defName}\" doesn't match regex pattern \"{DefNameValidator}\"");
+                        Dbg.Err($"{stringName}:{defElement.LineNumber()}: Def name \"{defName}\" doesn't match regex pattern \"{DefNameValidator}\"");
                         continue;
                     }
 
@@ -157,7 +157,7 @@ namespace Def
 
                     Database.Register(defInstance);
 
-                    finishWork.Add(() => ParseElement(defElement, typeHandle, defInstance, true));
+                    finishWork.Add(() => ParseElement(defElement, typeHandle, defInstance, true, stringName));
                 }
             }
         }
@@ -263,12 +263,12 @@ namespace Def
             s_Status = Status.Uninitialized;
         }
 
-        private object ParseElement(XElement element, Type type, object model, bool rootNode = false)
+        private object ParseElement(XElement element, Type type, object model, bool rootNode, string inputName)
         {
             // No attributes are allowed
             if (element.HasAttributes)
             {
-                Dbg.Err($"{element.LineNumber()}: Has unconsumed attributes");
+                Dbg.Err($"{inputName}:{element.LineNumber()}: Has unconsumed attributes");
             }
 
             bool hasElements = element.Elements().Any();
@@ -277,12 +277,12 @@ namespace Def
 
             if (hasElements && hasText)
             {
-                Dbg.Err($"{element.LineNumber()}: Elements and text are never valid together");
+                Dbg.Err($"{inputName}:{element.LineNumber()}: Elements and text are never valid together");
             }
 
             if (typeof(Def).IsAssignableFrom(type) && hasElements && !rootNode)
             {
-                Dbg.Err($"{element.LineNumber()}: Inline def definitions are not currently supported");
+                Dbg.Err($"{inputName}:{element.LineNumber()}: Inline def definitions are not currently supported");
                 return null;
             }
 
@@ -294,10 +294,10 @@ namespace Def
             {
                 if (hasElements && !hasText)
                 {
-                    Dbg.Err($"{element.LineNumber()}: Elements are not valid when parsing {type}");
+                    Dbg.Err($"{inputName}:{element.LineNumber()}: Elements are not valid when parsing {type}");
                 }
 
-                return ParseString(text, type, element.LineNumber());
+                return ParseString(text, type, element.LineNumber(), inputName);
             }
 
             // We either have elements, or we're a composite type of some sort and can pretend we do
@@ -313,10 +313,10 @@ namespace Def
                 {
                     if (fieldElement.Name.LocalName != "li")
                     {
-                        Dbg.Err($"{fieldElement.LineNumber()}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
+                        Dbg.Err($"{inputName}:{fieldElement.LineNumber()}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                     }
 
-                    list.Add(ParseElement(fieldElement, referencedType, null));
+                    list.Add(ParseElement(fieldElement, referencedType, null, false, inputName));
                 }
 
                 return list;
@@ -334,10 +334,10 @@ namespace Def
                     var fieldElement = elements[i];
                     if (fieldElement.Name.LocalName != "li")
                     {
-                        Dbg.Err($"{fieldElement.LineNumber()}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
+                        Dbg.Err($"{inputName}:{fieldElement.LineNumber()}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                     }
 
-                    array.SetValue(ParseElement(fieldElement, referencedType, null), i);
+                    array.SetValue(ParseElement(fieldElement, referencedType, null, false, inputName), i);
                 }
 
                 return array;
@@ -353,14 +353,14 @@ namespace Def
                 var list = (IDictionary)Activator.CreateInstance(type);
                 foreach (var fieldElement in element.Elements())
                 {
-                    var key = ParseString(fieldElement.Name.LocalName, keyType, fieldElement.LineNumber());
+                    var key = ParseString(fieldElement.Name.LocalName, keyType, fieldElement.LineNumber(), inputName);
 
                     if (list.Contains(key))
                     {
-                        Dbg.Err($"{fieldElement.LineNumber()}: Dictionary includes duplicate key {fieldElement.Name.LocalName}");
+                        Dbg.Err($"{inputName}:{fieldElement.LineNumber()}: Dictionary includes duplicate key {fieldElement.Name.LocalName}");
                     }
 
-                    list[key] = ParseElement(fieldElement, valueType, null);
+                    list[key] = ParseElement(fieldElement, valueType, null, false, inputName);
                 }
 
                 return list;
@@ -381,7 +381,7 @@ namespace Def
                 string fieldName = fieldElement.Name.LocalName;
                 if (fields.Contains(fieldName))
                 {
-                    Dbg.Err($"{element.LineNumber()}: Duplicate field {fieldName}");
+                    Dbg.Err($"{inputName}:{element.LineNumber()}: Duplicate field {fieldName}");
                     // Just allow us to fall through; it's an error, but one with a reasonably obvious handling mechanism
                 }
                 fields.Add(fieldName);
@@ -389,24 +389,24 @@ namespace Def
                 var fieldInfo = type.GetFieldFromHierarchy(fieldElement.Name.LocalName);
                 if (fieldInfo == null)
                 {
-                    Dbg.Err($"{element.LineNumber()}: Field {fieldElement.Name.LocalName} does not exist in type {type}");
+                    Dbg.Err($"{inputName}:{element.LineNumber()}: Field {fieldElement.Name.LocalName} does not exist in type {type}");
                     continue;
                 }
 
-                fieldInfo.SetValue(model, ParseElement(fieldElement, fieldInfo.FieldType, fieldInfo.GetValue(model)));
+                fieldInfo.SetValue(model, ParseElement(fieldElement, fieldInfo.FieldType, fieldInfo.GetValue(model), false, inputName));
             }
 
             return model;
         }
 
-        private object ParseString(string text, Type type, int lineNumber)
+        private object ParseString(string text, Type type, int lineNumber, string inputName)
         {
             // Special case: defs
             if (typeof(Def).IsAssignableFrom(type))
             {
                 if (Util.GetDefHierarchyType(type) == null)
                 {
-                    Dbg.Err($"{lineNumber}: Non-hierarchy defs cannot be used as references");
+                    Dbg.Err($"{inputName}:{lineNumber}: Non-hierarchy defs cannot be used as references");
                     return null;
                 }
 
@@ -420,7 +420,7 @@ namespace Def
                     Def result = Database.Get(type, text);
                     if (result == null)
                     {
-                        Dbg.Err($"{lineNumber}: Couldn't find {type} named {text}");
+                        Dbg.Err($"{inputName}:{lineNumber}: Couldn't find {type} named {text}");
                     }
                     return result;
                 }
@@ -437,12 +437,12 @@ namespace Def
                 var possibleTypes = Util.GetAllTypes().Where(t => t.Name == text || t.FullName == text).ToArray();
                 if (possibleTypes.Length == 0)
                 {
-                    Dbg.Err($"{lineNumber}: Couldn't find type named {text}");
+                    Dbg.Err($"{inputName}:{lineNumber}: Couldn't find type named {text}");
                     return null;
                 }
                 else if (possibleTypes.Length > 1)
                 {
-                    Dbg.Err($"{lineNumber}: Found too many types named {text} ({possibleTypes.Select(t => t.FullName).ToCommaString()})");
+                    Dbg.Err($"{inputName}:{lineNumber}: Found too many types named {text} ({possibleTypes.Select(t => t.FullName).ToCommaString()})");
                     return possibleTypes[0];
                 }
                 else
@@ -473,13 +473,13 @@ namespace Def
             else if (type.IsPrimitive)
             {
                 // If we don't have text, and we're any primitive type, that's an error (and return default values I guess)
-                Dbg.Err($"{lineNumber}: Empty field provided for type {type}");
+                Dbg.Err($"{inputName}:{lineNumber}: Empty field provided for type {type}");
                 return Activator.CreateInstance(type);
             }
             else
             {
                 // If we don't have text, and we're not a primitive type, then I'm not sure how we got here, but return null
-                Dbg.Err($"{lineNumber}: Empty field provided for type {type}");
+                Dbg.Err($"{inputName}:{lineNumber}: Empty field provided for type {type}");
                 return null;
             }
         }
