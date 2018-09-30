@@ -112,5 +112,94 @@ namespace DefTest
             Assert.AreEqual(8, result.child.child.value);
             Assert.AreEqual(0, result.child.valueZero);
 	    }
+
+        public class ExplicitTypeDef : Def.Def
+        {
+            public ETBase child;
+        }
+
+        public class ExplicitTypeDerivedDef : Def.Def
+        {
+            public ETDerived child;
+        }
+
+        public class ETBase
+        {
+            
+        }
+
+        public class ETDerived : ETBase
+        {
+            public int value;
+        }
+
+        public class ETNotDerived
+        {
+            
+        }
+
+        [Test]
+	    public void ExplicitType()
+	    {
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(ExplicitTypeDef) }, explicitStaticRefs: new Type[]{ });
+            parser.AddString(@"
+                <Defs>
+                    <ExplicitTypeDef defName=""TestDef"">
+                        <child class=""ETDerived"">
+                            <value>5</value>
+                        </child>
+                    </ExplicitTypeDef>
+                </Defs>");
+            parser.Finish();
+
+            var result = Def.Database<ExplicitTypeDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.IsNotNull(result.child);
+            Assert.AreEqual(typeof(ETDerived), result.child.GetType());
+            Assert.AreEqual(5, (result.child as ETDerived).value);
+	    }
+
+        [Test]
+	    public void ExplicitTypeOverspecify()
+	    {
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(ExplicitTypeDef) }, explicitStaticRefs: new Type[]{ });
+            parser.AddString(@"
+                <Defs>
+                    <ExplicitTypeDef defName=""TestDef"">
+                        <child class=""ETBase"">
+                            
+                        </child>
+                    </ExplicitTypeDef>
+                </Defs>");
+            parser.Finish();
+
+            var result = Def.Database<ExplicitTypeDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.IsNotNull(result.child);
+            Assert.AreEqual(typeof(ETBase), result.child.GetType());
+	    }
+
+        [Test]
+	    public void ExplicitTypeBackwards()
+	    {
+            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(ExplicitTypeDerivedDef) }, explicitStaticRefs: new Type[]{ });
+            parser.AddString(@"
+                <Defs>
+                    <ExplicitTypeDerivedDef defName=""TestDef"">
+                        <child class=""ETBase"">
+                            
+                        </child>
+                    </ExplicitTypeDerivedDef>
+                </Defs>");
+            ExpectErrors(() => parser.Finish());
+
+            var result = Def.Database<ExplicitTypeDerivedDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.IsNotNull(result.child);
+            Assert.AreEqual(typeof(ETDerived), result.child.GetType());
+	    }
     }
 }

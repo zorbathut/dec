@@ -265,7 +265,28 @@ namespace Def
 
         private object ParseElement(XElement element, Type type, object model, bool rootNode, string inputName)
         {
-            // No attributes are allowed
+            // Figure out our intended type
+            if (element.Attribute("class") != null)
+            {
+                var className = element.Attribute("class").Value;
+                var possibleType = (Type)ParseString(className, typeof(Type), element.LineNumber(), inputName);
+                if (!type.IsAssignableFrom(possibleType))
+                {
+                    Dbg.Err($"{inputName}:{element.LineNumber()}: Explicit type {className} cannot be assigned to expected type {type}");
+                }
+                else if (model != null && model.GetType() != possibleType)
+                {
+                    Dbg.Err($"{inputName}:{element.LineNumber()}: Explicit type {className} does not match already-provided instance {type}");
+                }
+                else
+                {
+                    type = possibleType;
+                }
+
+                element.Attribute("class").Remove();
+            }
+
+            // No remaining attributes are allowed
             if (element.HasAttributes)
             {
                 Dbg.Err($"{inputName}:{element.LineNumber()}: Has unconsumed attributes");
