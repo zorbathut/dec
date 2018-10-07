@@ -84,6 +84,7 @@ namespace Def
     public static class Database<T> where T : Def
     {
         private static readonly List<T> DefList = new List<T>();
+        private static T[] DefArray = null;
         private static readonly Dictionary<string, T> DefLookup = new Dictionary<string, T>();
 
         public static int Count
@@ -94,11 +95,16 @@ namespace Def
             }
         }
 
-        public static IEnumerable<T> List
+        public static T[] List
         {
             get
             {
-                return DefList;
+                if (DefArray == null)
+                {
+                    DefArray = DefList.ToArray();
+                }
+
+                return DefArray;
             }
         }
         
@@ -126,12 +132,15 @@ namespace Def
             instance.index = DefList.Count;
             DefList.Add(instance);
             DefLookup[instance.defName] = instance;
+
+            DefArray = null;
         }
 
         internal static void Clear()
         {
             DefList.Clear();
             DefLookup.Clear();
+            DefArray = null;
         }
     }
 }
