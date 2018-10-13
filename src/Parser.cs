@@ -10,7 +10,9 @@ namespace Def
     using System.Text.RegularExpressions;
     using System.Xml.Linq;
     
-
+    /// <summary>
+    /// Handles all parsing and initialization of def structures.
+    /// </summary>
     public class Parser
     {
         // Global status
@@ -36,6 +38,12 @@ namespace Def
         private static HashSet<Type> staticReferencesRegistered = new HashSet<Type>();
         private static HashSet<Type> staticReferencesRegistering = new HashSet<Type>();
 
+        /// <summary>
+        /// Creates a Parser.
+        /// </summary>
+        /// <remarks>
+        /// Parameters are provided mostly for the sake of unit tests. Using them is unnecessary and currently not recommended.
+        /// </remarks>
         public Parser(Type[] explicitTypes = null, Type[] explicitStaticRefs = null)
         {
             if (s_Status != Status.Uninitialized)
@@ -93,6 +101,11 @@ namespace Def
         }
 
         private static readonly Regex DefNameValidator = new Regex(@"^[A-Za-z_][A-Za-z0-9_]*$", RegexOptions.Compiled);
+
+        /// <summary>
+        /// Pass an XML document string in for processing.
+        /// </summary>
+        /// <param name="stringName">A human-readable identifier useful for debugging. Generally, the name of the file that the string was read from. Not required (but very useful.)</param>
         public void AddString(string input, string stringName = "(unnamed)")
         {
             if (s_Status != Status.Accumulating)
@@ -162,6 +175,9 @@ namespace Def
             }
         }
 
+        /// <summary>
+        /// Finish all parsing.
+        /// </summary>
         public void Finish()
         {
             if (s_Status != Status.Accumulating)

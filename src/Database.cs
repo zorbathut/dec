@@ -4,6 +4,12 @@ namespace Def
     using System.Collections.Generic;
     using System.Linq;
 
+    /// <summary>
+    /// Contains information on all defs that exist.
+    /// </summary>
+    /// <remarks>
+    /// This is generally not useful for anything except debug functionality.
+    /// </remarks>
     public static class Database
     {
         private static readonly HashSet<Type> Databases = new HashSet<Type>();
@@ -11,6 +17,9 @@ namespace Def
         // This is redundant with Database<T>, but it's a lot faster than using reflection
         private static readonly Dictionary<Type, Dictionary<string, Def>> Lookup = new Dictionary<Type, Dictionary<string, Def>>();
 
+        /// <summary>
+        /// The total number of defs that exist.
+        /// </summary>
         public static int Count
         {
             get
@@ -19,6 +28,12 @@ namespace Def
             }
         }
 
+        /// <summary>
+        /// All defs.
+        /// </summary>
+        /// <remarks>
+        /// Defs are listed in no guaranteed or stable order.
+        /// </remarks>
         public static IEnumerable<Def> List
         {
             get
@@ -27,6 +42,12 @@ namespace Def
             }
         }
 
+        /// <summary>
+        /// Retrieves a def by base def type and name.
+        /// </summary>
+        /// <remarks>
+        /// Returns null if no such def exists.
+        /// </remarks>
         public static Def Get(Type type, string name)
         {
             var typedict = Lookup.TryGetValue(Util.GetDefHierarchyType(type));
@@ -38,6 +59,12 @@ namespace Def
             return typedict.TryGetValue(name);
         }
 
+        /// <summary>
+        /// Clears all global def state, preparing the environment for a new Parser run.
+        /// </summary>
+        /// <remarks>
+        /// This exists mostly for the sake of unit tests, but can be used in production as well. Be aware that re-parsing XML files will create an entire new set of Def objects, it will not replace data in existing objects.
+        /// </remarks>
         public static void Clear()
         {
             Lookup.Clear();
@@ -81,12 +108,21 @@ namespace Def
         }
     }
 
+    /// <summary>
+    /// Contains information on a single type of Def.
+    /// </summary>
+    /// <remarks>
+    /// This is often used for object types that should function without being explicitly referenced. As an example, a roguelike might have ArtifactWeaponDef, then - when spawning an artifact weapon - simply choose one out of the full database.
+    /// </remarks>
     public static class Database<T> where T : Def
     {
         private static readonly List<T> DefList = new List<T>();
         private static T[] DefArray = null;
         private static readonly Dictionary<string, T> DefLookup = new Dictionary<string, T>();
 
+        /// <summary>
+        /// The number of defs of this type that exist.
+        /// </summary>
         public static int Count
         {
             get
@@ -95,6 +131,9 @@ namespace Def
             }
         }
 
+        /// <summary>
+        /// All defs of this type.
+        /// </summary>
         public static T[] List
         {
             get
@@ -107,7 +146,13 @@ namespace Def
                 return DefArray;
             }
         }
-        
+
+        /// <summary>
+        /// Returns a def of this type by name.
+        /// </summary>
+        /// <remarks>
+        /// Returns null if no such def exists.
+        /// </remarks>
         public static T Get(string name)
         {
             return DefLookup.TryGetValue(name);
