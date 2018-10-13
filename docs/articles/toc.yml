@@ -1,2 +1,24 @@
 - name: Quick Start
   href: quickstart.md
+- name: Future Plans
+  items:
+    - name: Nonserialized fields
+      href: fp_nonserialized.md
+    - name: Def inheritance
+      href: fp_inheritance.md
+    - name: Custom deserialization
+      href: fp_custom.md
+    - name: Translation
+      href: fp_translation.md
+    - name: In-place data updating
+      href: fp_inplace.md
+    - name: Dynamic def creation
+      href: fp_dynamic.md
+    - name: Performance
+      href: fp_performance.md
+    - name: Mod functionality
+      href: fp_mods.md
+    - name: Serialization
+      href: fp_serialization.md
+- name: Justifications
+  href: justifications.md

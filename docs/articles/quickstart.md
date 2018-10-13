@@ -48,7 +48,7 @@ Write XML to define the actual things.
 
 ```xml
 <!-- Here's a basic goblin. We've overridden the defaults we want changed and ignored the rest. -->
-<!-- Every def must be named via the defName attribute. These names must be unique within def type, but can overlap across different types. -->
+<!-- Every def must be named via the defName attribute. These names must be unique within def type, but can overlap across different types. They are intended to be human-readable for debug and development purposes, but not user-visible. They must match the regexp [A-Za-z][A-Za-z0-9_]*. -->
 <MonsterDef defName="Goblin">
   <maxHP>20</maxHP>
   
