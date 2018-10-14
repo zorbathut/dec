@@ -5,7 +5,7 @@
 
 def is a C# library intended for defining concepts and templates for game engines. It does not tie itself to any particular engine and works within Godot, Unity, MonoGame, or any other C# environment.
 
-defs are intended to represent classes of thing rather than instances of things. You may have `ObjectDef.Chair` and `MonsterDef.Goblin`. Individual chairs or goblins in your level would link to that Def, in whatever way is easiest for your level editor or generator.
+Defs are intended to represent classes of thing rather than instances of things. You might have `ObjectDef.Chair` and `MonsterDef.Goblin`. Individual chairs or goblins in your level would link to those Defs, in whatever way is easiest for your level editor or generator.
 
 
 ## Why should I use def?
@@ -46,7 +46,7 @@ I plan to use this tool in all of my upcoming projects; it remains to be seen if
 
 * Secret items, transmitted at runtime from a server, are not practical because def requires all data to be available at startup. This may present problems for always-online games that are intended to have live-but-undiscovered secrets.
 
-* def's design relies heavily on static typing and reflection, which limits the number of languages it could easily be ported to. At the moment, its sole implementation is in C#, and there are no plans for other implementations.
+* def's design relies heavily on static typing and reflection, which limits the number of languages it could easily be ported to. At the moment, its sole implementation is in C#, and there are no plans for other implementations. If your game logic is not written in C# you probably shouldn't be using def.
 
 ----
 
