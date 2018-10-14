@@ -288,22 +288,22 @@ references:
   isSpec: "True"
   fullName: Def.Parser.Finish
   nameWithType: Parser.Finish
-- uid: Def.StaticReferences
-  name: StaticReferences
-  href: api/Def.StaticReferences.html
-  commentId: T:Def.StaticReferences
-  fullName: Def.StaticReferences
-  nameWithType: StaticReferences
-- uid: Def.StaticReferences.Initialized
+- uid: Def.StaticReferencesAttribute
+  name: StaticReferencesAttribute
+  href: api/Def.StaticReferencesAttribute.html
+  commentId: T:Def.StaticReferencesAttribute
+  fullName: Def.StaticReferencesAttribute
+  nameWithType: StaticReferencesAttribute
+- uid: Def.StaticReferencesAttribute.Initialized
   name: Initialized()
-  href: api/Def.StaticReferences.html#Def_StaticReferences_Initialized
-  commentId: M:Def.StaticReferences.Initialized
-  fullName: Def.StaticReferences.Initialized()
-  nameWithType: StaticReferences.Initialized()
-- uid: Def.StaticReferences.Initialized*
+  href: api/Def.StaticReferencesAttribute.html#Def_StaticReferencesAttribute_Initialized
+  commentId: M:Def.StaticReferencesAttribute.Initialized
+  fullName: Def.StaticReferencesAttribute.Initialized()
+  nameWithType: StaticReferencesAttribute.Initialized()
+- uid: Def.StaticReferencesAttribute.Initialized*
   name: Initialized
-  href: api/Def.StaticReferences.html#Def_StaticReferences_Initialized_
-  commentId: Overload:Def.StaticReferences.Initialized
+  href: api/Def.StaticReferencesAttribute.html#Def_StaticReferencesAttribute_Initialized_
+  commentId: Overload:Def.StaticReferencesAttribute.Initialized
   isSpec: "True"
-  fullName: Def.StaticReferences.Initialized
-  nameWithType: StaticReferences.Initialized
+  fullName: Def.StaticReferencesAttribute.Initialized
+  nameWithType: StaticReferencesAttribute.Initialized

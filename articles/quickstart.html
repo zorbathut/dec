@@ -174,7 +174,7 @@ public static class MonsterDefs
 {
   // This bit of copy-pasted code is required to automatically detect some errors.
   // def will also detect if you haven't included this code and warn you about it.
-  static MonsterDefs() { Def.StaticReferences.Initialized(); }
+  static MonsterDefs() { Def.StaticReferencesAttribute.Initialized(); }
 
   // Include static members for any defs you want to reference directly.
   public static MonsterDef Goblin;
