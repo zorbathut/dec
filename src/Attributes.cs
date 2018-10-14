@@ -11,7 +11,7 @@ namespace Def
     /// In addition, the class's static constructor should call StaticReferences.Initialized().
     /// </remarks>
     [AttributeUsage(AttributeTargets.Class)]  
-    public class StaticReferences : Attribute
+    public class StaticReferencesAttribute : Attribute
     {
         internal static List<Type> StaticReferencesFilled = new List<Type>();
 

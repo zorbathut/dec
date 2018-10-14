@@ -9,7 +9,7 @@ namespace DefTest
         [Def.StaticReferences]
         public static class StaticReferenceDefs
         {
-            static StaticReferenceDefs() { Def.StaticReferences.Initialized(); }
+            static StaticReferenceDefs() { Def.StaticReferencesAttribute.Initialized(); }
 
             public static StubDef TestDefA;
             public static StubDef TestDefB;
@@ -43,7 +43,7 @@ namespace DefTest
         [Def.StaticReferences]
         public static class PreciseClassDefs
         {
-            static PreciseClassDefs() { Def.StaticReferences.Initialized(); }
+            static PreciseClassDefs() { Def.StaticReferencesAttribute.Initialized(); }
 
             public static StubDerivedDef TestDef;
         }
@@ -67,7 +67,7 @@ namespace DefTest
         [Def.StaticReferences]
         public static class SuperClassDefs
         {
-            static SuperClassDefs() { Def.StaticReferences.Initialized(); }
+            static SuperClassDefs() { Def.StaticReferencesAttribute.Initialized(); }
 
             public static StubDef TestDef;
         }
@@ -91,7 +91,7 @@ namespace DefTest
         [Def.StaticReferences]
         public static class SubClassDefs
         {
-            static SubClassDefs() { Def.StaticReferences.Initialized(); }
+            static SubClassDefs() { Def.StaticReferencesAttribute.Initialized(); }
 
             public static StubDerivedDef TestDef;
         }
@@ -114,7 +114,7 @@ namespace DefTest
 
         public static class NoAttributeDefs
         {
-            static NoAttributeDefs() { Def.StaticReferences.Initialized(); }
+            static NoAttributeDefs() { Def.StaticReferencesAttribute.Initialized(); }
 
             public static StubDef TestDef;
         }
@@ -161,7 +161,7 @@ namespace DefTest
         [Def.StaticReferences]
         public class NoStaticDefs
         {
-            static NoStaticDefs() { Def.StaticReferences.Initialized(); }
+            static NoStaticDefs() { Def.StaticReferencesAttribute.Initialized(); }
 
             public static StubDef TestDef;
         }
@@ -187,7 +187,7 @@ namespace DefTest
         [Def.StaticReferences]
         public static class MissingDefs
         {
-            static MissingDefs() { Def.StaticReferences.Initialized(); }
+            static MissingDefs() { Def.StaticReferencesAttribute.Initialized(); }
 
             public static StubDef TestDef;
         }
@@ -205,7 +205,7 @@ namespace DefTest
         [Def.StaticReferences]
         public static class EarlyTouchDefs
         {
-            static EarlyTouchDefs() { Def.StaticReferences.Initialized(); }
+            static EarlyTouchDefs() { Def.StaticReferencesAttribute.Initialized(); }
 
             public static StubDef TestDef;
         }
@@ -219,7 +219,7 @@ namespace DefTest
         [Def.StaticReferences]
         public static class LateTouchDefs
         {
-            static LateTouchDefs() { Def.StaticReferences.Initialized(); }
+            static LateTouchDefs() { Def.StaticReferencesAttribute.Initialized(); }
 
             public static StubDef TestDef;
         }
@@ -239,7 +239,7 @@ namespace DefTest
         [Def.StaticReferences]
         public static class UnexpectedTouchDefs
         {
-            static UnexpectedTouchDefs() { Def.StaticReferences.Initialized(); }
+            static UnexpectedTouchDefs() { Def.StaticReferencesAttribute.Initialized(); }
 
             public static StubDef TestDef;
         }
@@ -268,7 +268,7 @@ namespace DefTest
         [Def.StaticReferences]
         public static class ConstructorTouchDefs
         {
-            static ConstructorTouchDefs() { Def.StaticReferences.Initialized(); }
+            static ConstructorTouchDefs() { Def.StaticReferencesAttribute.Initialized(); }
 
             public static ConstructorTouchDef TestDef;
         }
@@ -299,7 +299,7 @@ namespace DefTest
         [Def.StaticReferences]
         public static class InternalDefs
         {
-            static InternalDefs() { Def.StaticReferences.Initialized(); }
+            static InternalDefs() { Def.StaticReferencesAttribute.Initialized(); }
 
             #pragma warning disable CS0649
             internal static StubDef TestDef;

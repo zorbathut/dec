@@ -81,12 +81,12 @@ namespace Def
             }
             else
             {
-                staticRefs = Util.GetAllTypes().Where(t => t.HasAttribute(typeof(StaticReferences)));
+                staticRefs = Util.GetAllTypes().Where(t => t.HasAttribute(typeof(StaticReferencesAttribute)));
             }
 
             foreach (var type in staticRefs)
             {
-                if (!type.HasAttribute(typeof(StaticReferences)))
+                if (!type.HasAttribute(typeof(StaticReferencesAttribute)))
                 {
                     Dbg.Err($"{type} is not tagged as StaticReferences");
                 }
@@ -201,7 +201,7 @@ namespace Def
             staticReferencesRegistering.UnionWith(staticReferences);
             foreach (var stat in staticReferences)
             {
-                StaticReferences.StaticReferencesFilled.Add(stat);
+                StaticReferencesAttribute.StaticReferencesFilled.Add(stat);
 
                 foreach (var field in stat.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static))
                 {

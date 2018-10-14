@@ -9,7 +9,7 @@ namespace DefTest
         [Def.StaticReferences]
         public static class StubDefs
         {
-            static StubDefs() { Def.StaticReferences.Initialized(); }
+            static StubDefs() { Def.StaticReferencesAttribute.Initialized(); }
 
             public static StubDef TestDef;
         }
