@@ -1,5 +1,13 @@
 - name: Quick Start
   href: quickstart.md
+- name: Documentation
+  items:
+    - name: Member parsing
+      href: doc_parsing.md
+    - name: Explicit type specification
+      href: doc_type.md
+    - name: Def hierarchy roots
+      href: doc_hierarchy.md
 - name: Future Plans
   items:
     - name: Nonserialized fields
@@ -14,6 +22,10 @@
       href: fp_inplace.md
     - name: Dynamic def creation
       href: fp_dynamic.md
+    - name: Def hierarchy control
+      href: fp_hierarchy.md
+    - name: Invalid database warnings
+      href: fp_invdatabase.md
     - name: Performance
       href: fp_performance.md
     - name: Mod functionality
