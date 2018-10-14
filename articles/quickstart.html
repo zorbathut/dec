@@ -1,0 +1,257 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Quick Start </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Quick Start ">
+    <meta name="generator" content="docfx 2.40.0.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="quick-start">Quick Start</h1>
+
+<p>Define some classes derived from <a class="xref" href="../api/Def.Def.html"><code>Def.Def</code></a>.</p>
+<pre><code class="lang-cs">// The starting point for all defs is a class derived from Def.Def.
+// Here, we're defining a general template for monsters.
+class MonsterDef : Def.Def
+{
+  // Most types can be defined as simple fields.
+  public float maxHP;
+  
+  // Fields can have default values.
+  public float renderScale = 1;
+  
+  // Classes and structs can be defined inline.
+  public Color tint = Color.White;
+  
+  // Defs can reference other defs.
+  public SpriteSheetDef spriteSheet;
+  
+  // Def references are not limited to a tree structures. Defs can reference other defs in circles, reference other defs of the same type, and even reference themselves.
+  public MonsterDef evolvedVariant = null;
+}
+
+// Classes that aren't derived from Def.Def will be recursively parsed.
+// There's nothing magic about either these classes or `Def.Def`-derived classes. You can have functions, static members, or anything else you'd normally want in a class.
+class Color
+{
+  public Color() { }
+  public Color(float r, float g, float b) { this.r = r; this.g = g; this.b = b; }
+  
+  public readonly static Color White = new Color(1, 1, 1);
+  
+  public float r = 1;
+  public float g = 1;
+  public float b = 1;
+}
+
+// Don't hesitate to make simple defs. Defs are lightweight and it's easy to add to them later.
+class SpriteSheetDef : Def.Def
+{
+  public string filename;
+}
+</code></pre>
+<p>Write XML to define the actual things.</p>
+<pre><code class="lang-xml">&lt;!-- Here's a basic goblin. We've overridden the defaults we want changed and ignored the rest. --&gt;
+&lt;!-- Every def must be named via the defName attribute. These names must be unique within def type, but can overlap across different types. They are intended to be human-readable for debug and development purposes, but not user-visible. They must match the regexp [A-Za-z][A-Za-z0-9_]*. --&gt;
+&lt;MonsterDef defName=&quot;Goblin&quot;&gt;
+  &lt;maxHP&gt;20&lt;/maxHP&gt;
+  
+  &lt;!-- This connects MonsterDef.Goblin's spriteSheet to SpriteSheetDef.Goblin. --&gt;
+  &lt;spriteSheet&gt;Goblin&lt;/spriteSheet&gt;
+&lt;/MonsterDef&gt;
+
+&lt;!-- This is a larger goblin. We've given it a new name, a larger render scale, and more health. --&gt;
+&lt;MonsterDef defName=&quot;MegaGoblin&quot;&gt;
+  &lt;maxHP&gt;100&lt;/maxHP&gt;
+  &lt;renderScale&gt;3&lt;/renderScale&gt;
+  &lt;spriteSheet&gt;Goblin&lt;/spriteSheet&gt;
+&lt;/MonsterDef&gt;
+
+&lt;!-- Here, we've defined a new tint for the DarkGoblin. Modifying members of included classes works like you'd expect XML to. --&gt;
+&lt;MonsterDef defName=&quot;DarkGoblin&quot;&gt;
+  &lt;maxHP&gt;40&lt;/maxHP&gt;
+  &lt;tint&gt;
+    &lt;r&gt;0.3&lt;/r&gt;
+    &lt;g&gt;0.3&lt;/g&gt;
+    &lt;b&gt;0.4&lt;/b&gt;
+  &lt;/tint&gt;
+  &lt;spriteSheet&gt;Goblin&lt;/spriteSheet&gt;
+&lt;/MonsterDef&gt;
+
+&lt;!-- Referencing other defs is as simple as typing their defName. All def references are validated at load time. --&gt;
+&lt;MonsterDef defName=&quot;AlchemyGoblin&quot;&gt;
+  &lt;maxHP&gt;10&lt;/maxHP&gt;
+  &lt;spriteSheet&gt;Goblin&lt;/spriteSheet&gt;
+  &lt;evolvedVariant&gt;MegaGoblin&lt;/evolvedVariant&gt;
+&lt;/MonsterDef&gt;
+
+&lt;!-- Defs can be referenced before they're defined. XML order is irrelevant. --&gt;
+&lt;SpriteSheetDef defName=&quot;Goblin&quot;&gt;
+  &lt;filename&gt;goblin.png&lt;/filename&gt;
+&lt;/SpriteSheetDef&gt;
+</code></pre>
+<p>Initialize the def framework via <a class="xref" href="../api/Def.Parser.html"><code>Parser</code></a>.</p>
+<pre><code class="lang-cs">// The Parser class handles all def initialization.
+var parser = new Parser();
+
+// Add individual XML documents through .AddString().
+// The second parameter is a file identifier to use for debugging. Use whatever is most convenient for you.
+// It's common to read from on-disk files, but you can get the data from any source you want.
+parser.AddString(File.ReadAllText(&quot;goblinData.xml&quot;), &quot;goblinData.xml&quot;);
+
+// Keep adding files until you've added everything.
+parser.AddString(File.ReadAllText(&quot;elfData.xml&quot;), &quot;elfData.xml&quot;);
+
+// Call when you've added everything. This finishes all parsing.
+parser.Finish();
+
+// You don't need to keep the Parser object around after this point.
+</code></pre>
+<p>Define some static references.</p>
+<pre><code class="lang-cs">// The attribute lets def know that it should fill this static class with data.
+[Def.StaticReferences]
+public static class MonsterDefs
+{
+  // This bit of copy-pasted code is required to automatically detect some errors.
+  // def will also detect if you haven't included this code and warn you about it.
+  static MonsterDefs() { Def.StaticReferences.Initialized(); }
+
+  // Include static members for any defs you want to reference directly.
+  public static MonsterDef Goblin;
+  public static MonsterDef DarkGoblin;
+  
+  // You don't have to include all defs here - in fact, it's recommended that you only include defs that you plan to reference by name.
+}
+
+// You don't have to include reference classes for def types you don't intend to reference by name.
+// In this design, `SpriteSheetDef`s are referenced only through `MonsterDef`s.
+// Therefore there is no need for a `SpriteSheetDefs` class.
+</code></pre>
+<p>Use defs in code.</p>
+<pre><code class="lang-cs">// This is an example of an actual monster. There's no requirement that it be named &quot;Monster&quot;; def does not care what you do with the data it's generated.
+public class Monster
+{
+  public Monster(MonsterDef def)
+  {
+    // It's common for objects to keep a reference to the def that they're created from.
+    this.def = def;
+    
+    // defs are just classes; using things from them is simple.
+    hp = def.maxHP;
+  }
+  
+  private MonsterDef def;
+  
+  private float hp;
+}
+
+public class GoblinGenerator
+{
+  public Generate()
+  {
+    // If you need to use a static reference, just pull it out of the static reference class.
+    // (We're assuming that you have an Entity system in this project already. The details are up to you; def doesn't specify anything about entities.)
+    Entity.Spawn(MonsterDefs.Goblin);
+  }
+}
+</code></pre>
+<p>And those are the basics.</p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/zorbathut/def/blob/master/docs/articles/quickstart.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

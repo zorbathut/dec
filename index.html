@@ -1,0 +1,147 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>def </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="def ">
+    <meta name="generator" content="docfx 2.40.0.0">
+    
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="stylesheet" href="styles/docfx.vendor.css">
+    <link rel="stylesheet" href="styles/docfx.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <meta property="docfx:navrel" content="toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="index.html">
+                <img id="logo" class="svg" src="logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        <div class="article row grid">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="def">def</h1>
+
+<h2 id="summary">Summary</h2>
+<p>def is a C# library intended for defining concepts and templates for game engines. It does not tie itself to any particular engine and works within Godot, Unity, MonoGame, or any other C# environment.</p>
+<p>defs are intended to represent classes of thing rather than instances of things. You may have <code>ObjectDef.Chair</code> and <code>MonsterDef.Goblin</code>. Individual chairs or goblins in your level would link to that Def, in whatever way is easiest for your level editor or generator.</p>
+<h2 id="why-should-i-use-def">Why should I use def?</h2>
+<p>Defining types of things is a common thing to do in game engines, and def is intended as a one-stop-shop to allow defining anything which may need to be defined, from in-game objects like monsters or weapons to conceptual things like actor behaviors.</p>
+<ul>
+<li><p>Reflection-based parsing makes defining new types extremely easy, usually requiring nothing more than a class definition.</p>
+</li>
+<li><p>Full support for cross-referenced objects, preventing the consistency-check issues involved in string references.</p>
+</li>
+<li><p>Your data is stored in human-readable XML and can be organized in whatever manner best suits your project.</p>
+</li>
+<li><p>Extensive internal validation testing reports on anything that's disallowed, with full filename and line number information.</p>
+</li>
+<li><p>Recovery code capable of continuing after almost any data error, if configured to do so.</p>
+</li>
+<li><p>Unit test suite to guard against unexpected regressions.</p>
+</li>
+<li><p>Zero CPU use at runtime; most uses of def are simple class member accesses.</p>
+</li>
+<li><p>Full open source package, available under both MIT license and the Unlicense.</p>
+</li>
+</ul>
+<h2 id="why-shouldnt-i-use-def-yet">Why shouldn't I use def yet?</h2>
+<ul>
+<li><p>While def takes design cues from several well-tested production libraries, def itself has not yet been used in any released commercial product.</p>
+</li>
+<li><p>Many desired features are planned, but few are currently implemented.</p>
+</li>
+<li><p>No development community yet except for the author.</p>
+</li>
+</ul>
+<p>I plan to use this tool in all of my upcoming projects; it remains to be seen if it will gain traction outside of that.</p>
+<h2 id="why-shouldnt-i-use-def-ever">Why shouldn't I use def ever?</h2>
+<ul>
+<li><p>If your project has hundreds of thousands of templates, def may experience scaling issues due to keeping all template types in memory at all times. This is not likely to be an issue for any game except MMOs.</p>
+</li>
+<li><p>Secret items, transmitted at runtime from a server, are not practical because def requires all data to be available at startup. This may present problems for always-online games that are intended to have live-but-undiscovered secrets.</p>
+</li>
+<li><p>def's design relies heavily on static typing and reflection, which limits the number of languages it could easily be ported to. At the moment, its sole implementation is in C#, and there are no plans for other implementations.</p>
+</li>
+</ul>
+<hr>
+<p>If you'd like to delve more deeply, I recommend starting at <a href="articles/quickstart.html">Quick Start</a>.</p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/zorbathut/def/blob/master/docs/index.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="styles/docfx.js"></script>
+    <script type="text/javascript" src="styles/main.js"></script>
+  </body>
+</html>
