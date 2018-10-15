@@ -12,7 +12,7 @@ Defs are intended to represent classes of thing rather than instances of things.
 
 Defining types of things is a common thing to do in game engines, and def is intended as a one-stop-shop to allow defining anything which may need to be defined, from in-game objects like monsters or weapons to conceptual things like actor behaviors.
 
-* Reflection-based parsing makes defining new types extremely easy, usually requiring nothing more than a class definition.
+* Defining new types is easy thanks to reflection-based parsing
 
 * Full support for cross-referenced objects, preventing the consistency-check issues involved in string references.
 
