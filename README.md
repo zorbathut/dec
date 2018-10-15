@@ -9,6 +9,8 @@ Dual-licensed under MIT or the [Unlicense](http://unlicense.org).
 
 ### Documentation
 
-To the best of my knowledge, nobody but me has looked at this codebase with any intent on use. I haven't yet written documentation; if this looks like a useful library to you, get in contact with me and I'll put together some docs for you.
+* [Frontpage](https://zorbathut.github.io/def/)
 
-Otherwise I'll probably do so once I've used it in an experimental project or two.
+* [Quick start](https://zorbathut.github.io/def/articles/quickstart.html)
+
+* [API reference](https://zorbathut.github.io/def/api/index.html)
