@@ -69,7 +69,7 @@
             <article class="content wrap" id="_content" data-uid="">
 <h1 id="def-hierarchy-roots">Def hierarchy roots</h1>
 
-<p>Every def type is registered in exactly one category. This is necessary because each def contains an index, and the index is intended to work as an array offset when listing only defs of that category. One def, one category; this rule is immutable.</p>
+<p>Every def type is registered in exactly one category. This is necessary because each def contains an <code>int index</code>, and the index is intended to work as an array offset when listing only defs of that category. One def, one category; this rule is immutable.</p>
 <pre><code>Def.Def
   - MineralDef
   - RenderPassDef
