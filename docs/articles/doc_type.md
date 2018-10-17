@@ -31,4 +31,4 @@ class ExampleDef : Def.Def
 </ExampleDef>
 ```
 
-Types are described using the same format listed under [type member parsing](doc_parsing.md).
+Types are described using the same conventions listed under [type member parsing](doc_parsing.md).

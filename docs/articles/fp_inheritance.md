@@ -30,8 +30,8 @@
 </ObjectDef>
 ```
 
-When you need many things that are in some way similar, it can be useful create a set of default values that can be applied on demand. The base types must not be included in the actual def databases, as they don't represent real defs. In addition, a standard single-inheritance structure is not always sufficient; this should allow arbitrary numbers of mixins.
+When you need many things that are in some way similar, it can be useful create a set of default values that can be applied on demand. The base types must not be included in the actual def databases, as they don't represent real defs. In addition, a standard single-inheritance structure is not always sufficient; this should allow arbitrary numbers of mixins with an arbitrary amount of depth.
 
-Once [dynamic def creation](fp_dynamic.md) is supported, this must also provide the necessary hooks to instantiate defs with code-defined lists of parents.
+Once [dynamic def creation](fp_dynamic.md) is supported, this must also provide the necessary hooks to instantiate runtime defs with code-defined lists of parents.
 
 Some functionality required for inheritance to work properly is shared by [the mod features Splicing and Patching](fp_mods.md).

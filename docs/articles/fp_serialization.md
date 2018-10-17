@@ -1,6 +1,6 @@
 # Serialization
 
-The def system is basically a big deserialization library. It makes sense to also support serialization, and non-def deserialization, so it can be used to make savegames. This is definitely less work than writing a separate serialization/deserialization system, but it does require a few new features.
+The def system is basically a big deserialization library. It makes sense to also support serialization, and non-def deserialization, so it can be used to write savegames. This is definitely less work than writing a separate serialization/deserialization system, but it does require a few new features.
 
 ## Versioning
 

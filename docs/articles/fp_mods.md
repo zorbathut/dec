@@ -61,6 +61,6 @@ but others may require a heavier-weight approach.
 
 ## Patching
 
-No matter how many features we add, someone will always want to modify existing data in a way that we don't understand. A good solution to this is unclear. Both Rimworld and Starbound have solutions, but both of these solutions have proven flawed, both from a power perspective and a performance perspective.
+No matter how many features we add, someone will always want to modify existing data in a way that we haven't foreseen. A good solution to this is unclear. Both Rimworld and Starbound have solutions, but both of these solutions have proven flawed, both from a power perspective and a performance perspective.
 
 I currently have no better ideas here.

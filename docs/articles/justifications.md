@@ -8,7 +8,7 @@ XML is definitely not perfect, but it has a set of features which I want that ot
 
 ### JSON
 
-JSON is designed as a computer-to-computer descriptive language, not a human-facing written language. The big dealbreaker here is a lack of comments, which are near-crucial for large human-authored files, but there's other human-antifeatures like a lack of trailing commas.
+JSON is designed as a computer-to-computer descriptive language, not a human-facing written language. The big dealbreaker here is a lack of comments, which are near-crucial for large human-authored files, but there's other human-antifeatures like a lack of trailing commas in lists.
 
 On top of that, it's more typed than I prefer; I'd like to keep typing data in exactly one place, and that's the C# class definitions. JSON understands strings, integers, booleans, lists, and dictionaries, and that's about three more things than I want it to know about.
 

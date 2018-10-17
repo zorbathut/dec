@@ -5,20 +5,20 @@
 
 def is a C# library intended for defining concepts and templates for game engines. It does not tie itself to any particular engine and works within Godot, Unity, MonoGame, or any other C# environment.
 
-Defs are intended to represent classes of thing rather than instances of things. You might have `ObjectDef.Chair` and `MonsterDef.Goblin`. Individual chairs or goblins in your level would link to those Defs, in whatever way is easiest for your level editor or generator.
+Defs are intended to represent classes of thing rather than instances of things. As an example, you might have `ObjectDef.Chair` and `MonsterDef.Goblin`. Individual chairs or goblins in your level would link to those Defs, in whatever way is easiest for your level editor or generator.
 
 
 ## Why should I use def?
 
 Defining types of things is a common thing to do in game engines, and def is intended as a one-stop-shop to allow defining anything which may need to be defined, from in-game objects like monsters or weapons to conceptual things like actor behaviors.
 
-* Defining new types is easy thanks to reflection-based parsing
+* Defining new types is easy thanks to reflection-based parsing.
 
-* Full support for cross-referenced objects, preventing the consistency-check issues involved in string references.
+* Full support for cross-referenced objects, preventing consistency-check issues involved in string references.
 
 * Your data is stored in human-readable XML and can be organized in whatever manner best suits your project.
 
-* Extensive internal validation testing reports on anything that's disallowed, with full filename and line number information.
+* Extensive internal validation tests for anything that's disallowed, with full filename and line number information.
 
 * Recovery code capable of continuing after almost any data error, if configured to do so.
 

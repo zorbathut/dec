@@ -14,4 +14,4 @@
 
 There are plenty of situations where a specific deserialization solution would come in handy. `tintA` in the above code is readable, but ugly; in most cases, tintB or tintC would likely be better.
 
-A general framework for registering custom deserializers would solve a lot of problems.
+A general framework for registering custom deserializers would solve a lot of problems, but has not yet been implemented.

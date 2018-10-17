@@ -1,6 +1,6 @@
 # Def hierarchy roots
 
-Every def type is registered in exactly one category. This is necessary because each def contains an index, and the index is intended to work as an array offset when listing only defs of that category. One def, one category; this rule is immutable.
+Every def type is registered in exactly one category. This is necessary because each def contains an `int index`, and the index is intended to work as an array offset when listing only defs of that category. One def, one category; this rule is immutable.
 
 ```
 Def.Def

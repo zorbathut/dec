@@ -2,7 +2,7 @@
 
 Many types can be parsed natively by def. This page lists them all.
 
-Note that more types and formats may work than this page lists. If there's a format that the library currently supports, which you'd like added to unit tests and official documentation, please submit a pull request.
+Note that more types and formats may work than this page lists, but if it's not listed here, it's not officially supported.
 
 ## Numeric types
 
