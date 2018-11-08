@@ -334,7 +334,7 @@ namespace Def
             if (element.Attribute("class") != null)
             {
                 var className = element.Attribute("class").Value;
-                var possibleType = (Type)ParseString(className, typeof(Type), element.LineNumber(), inputName);
+                var possibleType = (Type)ParseString(className, typeof(Type), inputName, element.LineNumber());
                 if (!type.IsAssignableFrom(possibleType))
                 {
                     Dbg.Err($"{inputName}:{element.LineNumber()}: Explicit type {className} cannot be assigned to expected type {type}");
@@ -384,7 +384,7 @@ namespace Def
                     Dbg.Err($"{inputName}:{element.LineNumber()}: Elements are not valid when parsing {type}");
                 }
 
-                return ParseString(text, type, element.LineNumber(), inputName);
+                return ParseString(text, type, inputName, element.LineNumber());
             }
 
             // We either have elements, or we're a composite type of some sort and can pretend we do
@@ -453,7 +453,7 @@ namespace Def
                 var list = (IDictionary)Activator.CreateInstance(type);
                 foreach (var fieldElement in element.Elements())
                 {
-                    var key = ParseString(fieldElement.Name.LocalName, keyType, fieldElement.LineNumber(), inputName);
+                    var key = ParseString(fieldElement.Name.LocalName, keyType, inputName, fieldElement.LineNumber());
 
                     if (list.Contains(key))
                     {
@@ -499,7 +499,7 @@ namespace Def
             return model;
         }
 
-        private object ParseString(string text, Type type, int lineNumber, string inputName)
+        private object ParseString(string text, Type type, string inputName, int lineNumber)
         {
             // Special case: Converter override
             if (converters.ContainsKey(type))
