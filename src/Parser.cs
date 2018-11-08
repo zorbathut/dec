@@ -42,7 +42,7 @@ namespace Def
         /// Creates a Parser.
         /// </summary>
         /// <remarks>
-        /// Parameters are provided mostly for the sake of unit tests. Using them is unnecessary and currently not recommended.
+        /// Parameters are provided for the sake of unit tests. Using them is unnecessary and generally not recommended.
         /// </remarks>
         public Parser(Type[] explicitTypes = null, Type[] explicitStaticRefs = null)
         {
