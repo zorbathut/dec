@@ -393,7 +393,7 @@ namespace Def
             if (converters.ContainsKey(type))
             {
                 var result = converters[type].FromXml(element, type, inputName);
-                if (!type.IsAssignableFrom(result.GetType()))
+                if (result != null && !type.IsAssignableFrom(result.GetType()))
                 {
                     Dbg.Err($"{inputName}:{element.LineNumber()}: Converter {converters[type].GetType()} for {type} returned unexpected type {result.GetType()}");
                     return null;
@@ -505,7 +505,7 @@ namespace Def
             if (converters.ContainsKey(type))
             {
                 var result = converters[type].FromString(text, type, inputName, lineNumber);
-                if (!type.IsAssignableFrom(result.GetType()))
+                if (result != null && !type.IsAssignableFrom(result.GetType()))
                 {
                     Dbg.Err($"{inputName}:{lineNumber}: Converter {converters[type].GetType()} for {type} returned unexpected type {result.GetType()}");
                     return null;
