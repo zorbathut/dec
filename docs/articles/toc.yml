@@ -10,6 +10,8 @@
       href: doc_hierarchy.md
     - name: Custom deserialization
       href: doc_custom.md
+    - name: Security
+      href: doc_security.md
 - name: Future Plans
   items:
     - name: Nonserialized fields
@@ -26,11 +28,15 @@
       href: fp_hierarchy.md
     - name: Invalid database warnings
       href: fp_invdatabase.md
+    - name: Type constraints
+      href: fp_typeconstraints.md
     - name: Performance
       href: fp_performance.md
     - name: Mod functionality
       href: fp_mods.md
     - name: Serialization
+      href: fp_serialization.md
+    - name: Factories
       href: fp_serialization.md
 - name: Justifications
   href: justifications.md
