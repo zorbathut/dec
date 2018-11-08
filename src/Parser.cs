@@ -27,9 +27,10 @@ namespace Def
         }
         private static Status s_Status = Status.Uninitialized;
 
-        // Data stored from Parser
+        // Data stored from initialization parameters
         private Dictionary<string, Type> typeLookup = new Dictionary<string, Type>();
         private List<Type> staticReferences = new List<Type>();
+        private Dictionary<Type, Converter> converters = new Dictionary<Type, Converter>();
         
         // List of work to be run during the Finish stage
         private List<Action> finishWork = new List<Action>();
@@ -44,7 +45,7 @@ namespace Def
         /// <remarks>
         /// Parameters are provided for the sake of unit tests. Using them is unnecessary and generally not recommended.
         /// </remarks>
-        public Parser(Type[] explicitTypes = null, Type[] explicitStaticRefs = null)
+        public Parser(Type[] explicitTypes = null, Type[] explicitStaticRefs = null, Type[] explicitConversionTypes = null)
         {
             if (s_Status != Status.Uninitialized)
             {
@@ -100,6 +101,38 @@ namespace Def
                     }
 
                     staticReferences.Add(type);
+                }
+            }
+
+            {
+                IEnumerable<Type> conversionTypes;
+                if (explicitConversionTypes != null)
+                {
+                    conversionTypes = explicitConversionTypes;
+                }
+                else
+                {
+                    conversionTypes = Util.GetAllTypes().Where(t => t.IsSubclassOf(typeof(Converter)) && !t.IsAbstract);
+                }
+
+                foreach (var type in conversionTypes)
+                {
+                    var converter = (Converter)System.Activator.CreateInstance(type);
+                    var convertedTypes = converter.GeneratedTypes();
+                    if (convertedTypes.Count == 0)
+                    {
+                        Dbg.Err($"{type} is a Def.Converter, but doesn't convert anything");
+                    }
+
+                    foreach (var convertedType in convertedTypes)
+                    {
+                        if (converters.ContainsKey(convertedType))
+                        {
+                            Dbg.Err($"Converters {converters[convertedType].GetType()} and {type} both generate result {convertedType}");
+                        }
+
+                        converters[convertedType] = converter;
+                    }
                 }
             }
         }
@@ -331,7 +364,8 @@ namespace Def
                 (typeof(Def).IsAssignableFrom(type) && !rootNode) ||
                 type == typeof(Type) ||
                 type == typeof(string) ||
-                type.IsPrimitive)
+                type.IsPrimitive ||
+                (!hasElements && converters.ContainsKey(type)))
             {
                 if (hasElements && !hasText)
                 {
@@ -342,6 +376,19 @@ namespace Def
             }
 
             // We either have elements, or we're a composite type of some sort and can pretend we do
+
+            // Special case: Converter override
+            if (converters.ContainsKey(type))
+            {
+                var result = converters[type].FromXml(element, type, inputName);
+                if (!type.IsAssignableFrom(result.GetType()))
+                {
+                    Dbg.Err($"{inputName}:{element.LineNumber()}: Converter {converters[type].GetType()} for {type} returned unexpected type {result.GetType()}");
+                    return null;
+                }
+
+                return result;
+            }
 
             // Special case: Lists
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
@@ -442,6 +489,19 @@ namespace Def
 
         private object ParseString(string text, Type type, int lineNumber, string inputName)
         {
+            // Special case: Converter override
+            if (converters.ContainsKey(type))
+            {
+                var result = converters[type].FromString(text, type, inputName, lineNumber);
+                if (!type.IsAssignableFrom(result.GetType()))
+                {
+                    Dbg.Err($"{inputName}:{lineNumber}: Converter {converters[type].GetType()} for {type} returned unexpected type {result.GetType()}");
+                    return null;
+                }
+
+                return result;
+            }
+
             // Special case: defs
             if (typeof(Def).IsAssignableFrom(type))
             {
