@@ -11,7 +11,7 @@ namespace DefTest
         [Test]
 	    public void TrivialParse()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) });
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDef"">
@@ -25,7 +25,7 @@ namespace DefTest
         [Test]
 	    public void TrivialEmptyParse()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) });
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDef"" />
@@ -39,7 +39,7 @@ namespace DefTest
 	    public void NonDefType()
 	    {
             Def.Parser parser = null;
-            ExpectErrors(() => parser = new Def.Parser(explicitTypes: new Type[]{ typeof(bool), typeof(StubDef) }, explicitStaticRefs: new Type[]{ }));
+            ExpectErrors(() => parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(bool), typeof(StubDef) }));
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDef"" />
@@ -52,7 +52,7 @@ namespace DefTest
         [Test]
 	    public void MissingDefType()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) });
             ExpectErrors(() => parser.AddString(@"
                 <Defs>
                     <NonexistentDef defName=""TestDefA"" />
@@ -67,7 +67,7 @@ namespace DefTest
         [Test]
 	    public void MissingDefName()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) });
             ExpectErrors(() => parser.AddString(@"
                 <Defs>
                     <StubDef />
@@ -78,7 +78,7 @@ namespace DefTest
         [Test]
 	    public void InvalidDefName()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) });
             ExpectErrors(() => parser.AddString(@"
                 <Defs>
                     <StubDef defName=""1NumberPrefix"" />
@@ -100,7 +100,7 @@ namespace DefTest
         [Test]
 	    public void DuplicateField()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(IntDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(IntDef) });
             parser.AddString(@"
                 <Defs>
                     <IntDef defName=""TestDef"">
@@ -119,7 +119,7 @@ namespace DefTest
         [Test]
 	    public void DuplicateDef()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(IntDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(IntDef) });
             ExpectErrors(() => parser.AddString(@"
                 <Defs>
                     <IntDef defName=""TestDef"">
@@ -150,7 +150,7 @@ namespace DefTest
         [Test]
 	    public void HierarchyDeepField()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(DeepChildDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(DeepChildDef) });
             parser.AddString(@"
                 <Defs>
                     <DeepChildDef defName=""TestDef"">
@@ -178,7 +178,7 @@ namespace DefTest
         [Test]
 	    public void HierarchyDuplicateField()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(DupeChildDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(DupeChildDef) });
             parser.AddString(@"
                 <Defs>
                     <DupeChildDef defName=""TestDef"">
@@ -197,7 +197,7 @@ namespace DefTest
         [Test]
 	    public void ExtraAttribute()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) });
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDef"" invalidAttribute=""hello"" />
@@ -220,7 +220,7 @@ namespace DefTest
         [Test]
 	    public void Index()
         {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(StubDef), typeof(StubBetaDef), typeof(StubChildDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef), typeof(StubBetaDef), typeof(StubChildDef) });
             parser.AddString(@"
                 <Defs>
                     <StubChildDef defName=""TestDefA"" />
@@ -248,7 +248,7 @@ namespace DefTest
         [Test]
 	    public void DebugPrint()
         {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) });
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDef"" />
@@ -276,7 +276,7 @@ namespace DefTest
         [Test]
 	    public void ConfigErrors()
         {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(ErrorDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(ErrorDef) });
             parser.AddString(@"
                 <Defs>
                     <ErrorDef defName=""TestDef"" />
@@ -304,7 +304,7 @@ namespace DefTest
         [Test]
 	    public void PostLoad()
         {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(PostLoadDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(PostLoadDef) });
             parser.AddString(@"
                 <Defs>
                     <PostLoadDef defName=""TestDef"" />

@@ -15,7 +15,7 @@ namespace DefTest
         [Test]
 	    public void Array()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(ArrayDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(ArrayDef) });
             parser.AddString(@"
                 <Defs>
                     <ArrayDef defName=""TestDef"">
@@ -44,7 +44,7 @@ namespace DefTest
         [Test]
 	    public void List()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(ListDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(ListDef) });
             parser.AddString(@"
                 <Defs>
                     <ListDef defName=""TestDef"">
@@ -73,7 +73,7 @@ namespace DefTest
         [Test]
 	    public void Nested()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(NestedDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(NestedDef) });
             parser.AddString(@"
                 <Defs>
                     <NestedDef defName=""TestDef"">
@@ -105,7 +105,7 @@ namespace DefTest
         [Test]
 	    public void DictionaryString()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(DictionaryStringDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(DictionaryStringDef) });
             parser.AddString(@"
                 <Defs>
                     <DictionaryStringDef defName=""TestDef"">
@@ -126,7 +126,7 @@ namespace DefTest
         [Test]
 	    public void DictionaryDuplicate()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(DictionaryStringDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(DictionaryStringDef) });
             parser.AddString(@"
                 <Defs>
                     <DictionaryStringDef defName=""TestDef"">

@@ -40,7 +40,7 @@ namespace DefTest
         [Test]
 	    public void BasicFunctionality()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(ConverterDef) }, explicitStaticRefs: new Type[]{ }, explicitConversionTypes: new Type[]{ typeof(ConverterBasicTest) });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(ConverterDef) }, explicitConversionTypes: new Type[]{ typeof(ConverterBasicTest) });
             parser.AddString(@"
                 <Defs>
                     <ConverterDef defName=""TestDefA"">

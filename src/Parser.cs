@@ -45,7 +45,7 @@ namespace Def
         /// <remarks>
         /// Parameters are provided for the sake of unit tests. Using them is unnecessary and generally not recommended.
         /// </remarks>
-        public Parser(Type[] explicitTypes = null, Type[] explicitStaticRefs = null, Type[] explicitConversionTypes = null)
+        public Parser(bool explicitOnly = false, Type[] explicitTypes = null, Type[] explicitStaticRefs = null, Type[] explicitConversionTypes = null)
         {
             if (s_Status != Status.Uninitialized)
             {
@@ -58,6 +58,10 @@ namespace Def
                 if (explicitTypes != null)
                 {
                     defTypes = explicitTypes;
+                }
+                else if (explicitOnly)
+                {
+                    defTypes = Enumerable.Empty<Type>();
                 }
                 else
                 {
@@ -82,6 +86,10 @@ namespace Def
                 if (explicitStaticRefs != null)
                 {
                     staticRefs = explicitStaticRefs;
+                }
+                else if (explicitOnly)
+                {
+                    staticRefs = Enumerable.Empty<Type>();
                 }
                 else
                 {
@@ -109,6 +117,10 @@ namespace Def
                 if (explicitConversionTypes != null)
                 {
                     conversionTypes = explicitConversionTypes;
+                }
+                else if (explicitOnly)
+                {
+                    conversionTypes = Enumerable.Empty<Type>();
                 }
                 else
                 {

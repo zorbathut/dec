@@ -18,7 +18,7 @@ namespace DefTest
         [Test]
 	    public void StaticReference()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ typeof(StaticReferenceDefs) });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ typeof(StaticReferenceDefs) });
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDefA"" />
@@ -51,7 +51,7 @@ namespace DefTest
         [Test]
 	    public void PreciseClass()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(StubDerivedDef) }, explicitStaticRefs: new Type[]{ typeof(PreciseClassDefs) });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDerivedDef) }, explicitStaticRefs: new Type[]{ typeof(PreciseClassDefs) });
             parser.AddString(@"
                 <Defs>
                     <StubDerivedDef defName=""TestDef"" />
@@ -75,7 +75,7 @@ namespace DefTest
         [Test]
 	    public void SuperClass()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(StubDerivedDef) }, explicitStaticRefs: new Type[]{ typeof(SuperClassDefs) });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDerivedDef) }, explicitStaticRefs: new Type[]{ typeof(SuperClassDefs) });
             parser.AddString(@"
                 <Defs>
                     <StubDerivedDef defName=""TestDef"" />
@@ -99,7 +99,7 @@ namespace DefTest
         [Test]
 	    public void SubClass()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ typeof(SubClassDefs) });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ typeof(SubClassDefs) });
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDef"" />
@@ -123,7 +123,7 @@ namespace DefTest
 	    public void NoAttribute()
 	    {
             Def.Parser parser = null;
-            ExpectErrors(() => parser = new Def.Parser(explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ typeof(NoAttributeDefs) }));
+            ExpectErrors(() => parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ typeof(NoAttributeDefs) }));
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDef"" />
@@ -145,7 +145,7 @@ namespace DefTest
         [Test]
 	    public void NoInitializer()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ typeof(NoInitializerDefs) });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ typeof(NoInitializerDefs) });
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDef"" />
@@ -170,7 +170,7 @@ namespace DefTest
 	    public void NoStatic()
 	    {
             Def.Parser parser = null;
-            ExpectErrors(() => parser = new Def.Parser(explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ typeof(NoStaticDefs) }));
+            ExpectErrors(() => parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ typeof(NoStaticDefs) }));
 
             parser.AddString(@"
                 <Defs>
@@ -195,7 +195,7 @@ namespace DefTest
         [Test]
 	    public void Missing()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ typeof(MissingDefs) });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ typeof(MissingDefs) });
             parser.AddString(@"
                 <Defs>
                 </Defs>");
@@ -227,7 +227,7 @@ namespace DefTest
         [Test]
 	    public void LateTouch()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) });
             parser.AddString(@"
                 <Defs>
                 </Defs>");
@@ -255,7 +255,7 @@ namespace DefTest
         [Test]
 	    public void UnexpectedTouch()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(UnexpectedTouchDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(UnexpectedTouchDef) });
             ExpectErrors(() => parser.AddString(@"
                 <Defs>
                     <UnexpectedTouchDef defName=""TestDef"" />
@@ -286,7 +286,7 @@ namespace DefTest
         [Test]
 	    public void ConstructorTouch()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(ConstructorTouchDef) }, explicitStaticRefs: new Type[]{ typeof(ConstructorTouchDefs) });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(ConstructorTouchDef) }, explicitStaticRefs: new Type[]{ typeof(ConstructorTouchDefs) });
             ExpectErrors(() => parser.AddString(@"
                 <Defs>
                     <ConstructorTouchDef defName=""TestDef"" />
@@ -309,7 +309,7 @@ namespace DefTest
         [Test]
 	    public void Internal()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ typeof(InternalDefs) });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ typeof(InternalDefs) });
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDef"" />

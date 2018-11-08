@@ -24,7 +24,7 @@ namespace DefTest
         [Test]
 	    public void Basic()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) });
             parser.AddString(@"
                 <Defs>
                     <RefTargetDef defName=""Target"" />
@@ -45,7 +45,7 @@ namespace DefTest
         [Test]
 	    public void Reversed()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) });
             parser.AddString(@"
                 <Defs>
                     <RefSourceDef defName=""Source"">
@@ -66,7 +66,7 @@ namespace DefTest
         [Test]
 	    public void Multistring()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) });
             parser.AddString(@"
                 <Defs>
                     <RefSourceDef defName=""Source"">
@@ -90,7 +90,7 @@ namespace DefTest
         [Test]
 	    public void Refdef()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(RefSourceDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefSourceDef) });
             parser.AddString(@"
                 <Defs>
                     <RefSourceDef defName=""Source"">
@@ -106,7 +106,7 @@ namespace DefTest
         [Test]
 	    public void Circular()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(RefCircularDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefCircularDef) });
             parser.AddString(@"
                 <Defs>
                     <RefCircularDef defName=""Alpha"">
@@ -130,7 +130,7 @@ namespace DefTest
         [Test]
 	    public void CircularTight()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(RefCircularDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefCircularDef) });
             parser.AddString(@"
                 <Defs>
                     <RefCircularDef defName=""TestDef"">
@@ -149,7 +149,7 @@ namespace DefTest
 	    public void NullRef()
 	    {
             // This is a little wonky; we have to test it by duplicating a tag, which is technically an error
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(RefCircularDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefCircularDef) });
             parser.AddString(@"
                 <Defs>
                     <RefCircularDef defName=""TestDef"">
@@ -168,7 +168,7 @@ namespace DefTest
         [Test]
 	    public void FailedLookup()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(RefSourceDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefSourceDef) });
             parser.AddString(@"
                 <Defs>
                     <RefSourceDef defName=""TestDef"">
@@ -191,7 +191,7 @@ namespace DefTest
         [Test]
 	    public void BareDef()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(BareDefDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(BareDefDef) });
             parser.AddString(@"
                 <Defs>
                     <BareDefDef defName=""TestDef"">

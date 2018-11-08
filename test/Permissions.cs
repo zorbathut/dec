@@ -22,7 +22,7 @@ namespace DefTest
         [Test]
 	    public void Private()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(PrivateDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(PrivateDef) });
             parser.AddString(@"
                 <Defs>
                     <PrivateDef defName=""TestDef"">
@@ -52,7 +52,7 @@ namespace DefTest
         [Test]
 	    public void Internal()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(InternalDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(InternalDef) });
             parser.AddString(@"
                 <Defs>
                     <InternalDef defName=""TestDef"">
@@ -80,7 +80,7 @@ namespace DefTest
         [Test]
 	    public void Protected()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(ProtectedDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(ProtectedDef) });
             parser.AddString(@"
                 <Defs>
                     <ProtectedDef defName=""TestDef"">
@@ -115,7 +115,7 @@ namespace DefTest
         [Test]
 	    public void PrivateParent()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(PrivateChildDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(PrivateChildDef) });
             parser.AddString(@"
                 <Defs>
                     <PrivateChildDef defName=""TestDef"">

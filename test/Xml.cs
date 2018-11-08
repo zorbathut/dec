@@ -9,7 +9,7 @@ namespace DefTest
         [Test]
 	    public void DTDParse()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) });
             parser.AddString(@"<?xml version=""1.0"" encoding=""UTF-8"" ?>
                 <Defs>
                     <StubDef defName=""TestDef"">
@@ -23,7 +23,7 @@ namespace DefTest
         [Test]
 	    public void IncorrectRoot()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) });
             ExpectWarnings(() => parser.AddString(@"
                 <NotDefs>
                     <StubDef defName=""TestDef"" />
@@ -36,7 +36,7 @@ namespace DefTest
         [Test]
 	    public void MultipleRoot()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) });
             ExpectErrors(() => parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDefA"" />
@@ -52,7 +52,7 @@ namespace DefTest
         [Test]
 	    public void MultiXML()
 	    {
-            var parser = new Def.Parser(explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) });
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDefA"" />
