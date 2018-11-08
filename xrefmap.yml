@@ -65,6 +65,51 @@ references:
   isSpec: "True"
   fullName: Def.Config.WarningHandler
   nameWithType: Config.WarningHandler
+- uid: Def.Converter
+  name: Converter
+  href: api/Def.Converter.html
+  commentId: T:Def.Converter
+  fullName: Def.Converter
+  nameWithType: Converter
+- uid: Def.Converter.FromString(System.String,System.Type,System.String,System.Int32)
+  name: FromString(String, Type, String, Int32)
+  href: api/Def.Converter.html#Def_Converter_FromString_System_String_System_Type_System_String_System_Int32_
+  commentId: M:Def.Converter.FromString(System.String,System.Type,System.String,System.Int32)
+  fullName: Def.Converter.FromString(System.String, System.Type, System.String, System.Int32)
+  nameWithType: Converter.FromString(String, Type, String, Int32)
+- uid: Def.Converter.FromString*
+  name: FromString
+  href: api/Def.Converter.html#Def_Converter_FromString_
+  commentId: Overload:Def.Converter.FromString
+  isSpec: "True"
+  fullName: Def.Converter.FromString
+  nameWithType: Converter.FromString
+- uid: Def.Converter.FromXml(System.Xml.Linq.XElement,System.Type,System.String)
+  name: FromXml(XElement, Type, String)
+  href: api/Def.Converter.html#Def_Converter_FromXml_System_Xml_Linq_XElement_System_Type_System_String_
+  commentId: M:Def.Converter.FromXml(System.Xml.Linq.XElement,System.Type,System.String)
+  fullName: Def.Converter.FromXml(System.Xml.Linq.XElement, System.Type, System.String)
+  nameWithType: Converter.FromXml(XElement, Type, String)
+- uid: Def.Converter.FromXml*
+  name: FromXml
+  href: api/Def.Converter.html#Def_Converter_FromXml_
+  commentId: Overload:Def.Converter.FromXml
+  isSpec: "True"
+  fullName: Def.Converter.FromXml
+  nameWithType: Converter.FromXml
+- uid: Def.Converter.GeneratedTypes
+  name: GeneratedTypes()
+  href: api/Def.Converter.html#Def_Converter_GeneratedTypes
+  commentId: M:Def.Converter.GeneratedTypes
+  fullName: Def.Converter.GeneratedTypes()
+  nameWithType: Converter.GeneratedTypes()
+- uid: Def.Converter.GeneratedTypes*
+  name: GeneratedTypes
+  href: api/Def.Converter.html#Def_Converter_GeneratedTypes_
+  commentId: Overload:Def.Converter.GeneratedTypes
+  isSpec: "True"
+  fullName: Def.Converter.GeneratedTypes
+  nameWithType: Converter.GeneratedTypes
 - uid: Def.Database
   name: Database
   href: api/Def.Database.html
@@ -246,15 +291,15 @@ references:
   commentId: T:Def.Parser
   fullName: Def.Parser
   nameWithType: Parser
-- uid: Def.Parser.#ctor(System.Type[],System.Type[])
-  name: Parser(Type[], Type[])
-  href: api/Def.Parser.html#Def_Parser__ctor_System_Type___System_Type___
-  commentId: M:Def.Parser.#ctor(System.Type[],System.Type[])
-  name.vb: Parser(Type(), Type())
-  fullName: Def.Parser.Parser(System.Type[], System.Type[])
-  fullName.vb: Def.Parser.Parser(System.Type(), System.Type())
-  nameWithType: Parser.Parser(Type[], Type[])
-  nameWithType.vb: Parser.Parser(Type(), Type())
+- uid: Def.Parser.#ctor(System.Boolean,System.Type[],System.Type[],System.Type[])
+  name: Parser(Boolean, Type[], Type[], Type[])
+  href: api/Def.Parser.html#Def_Parser__ctor_System_Boolean_System_Type___System_Type___System_Type___
+  commentId: M:Def.Parser.#ctor(System.Boolean,System.Type[],System.Type[],System.Type[])
+  name.vb: Parser(Boolean, Type(), Type(), Type())
+  fullName: Def.Parser.Parser(System.Boolean, System.Type[], System.Type[], System.Type[])
+  fullName.vb: Def.Parser.Parser(System.Boolean, System.Type(), System.Type(), System.Type())
+  nameWithType: Parser.Parser(Boolean, Type[], Type[], Type[])
+  nameWithType.vb: Parser.Parser(Boolean, Type(), Type(), Type())
 - uid: Def.Parser.#ctor*
   name: Parser
   href: api/Def.Parser.html#Def_Parser__ctor_

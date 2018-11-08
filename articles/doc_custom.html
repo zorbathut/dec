@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title> </title>
+    <title>Custom deserialization </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content=" ">
+    <meta name="title" content="Custom deserialization ">
     <meta name="generator" content="docfx 2.40.0.0">
     
     <link rel="shortcut icon" href="../favicon.ico">
@@ -67,7 +67,37 @@
         <div class="article row grid-right">
           <div class="col-md-10">
             <article class="content wrap" id="_content" data-uid="">
+<h1 id="custom-deserialization">Custom deserialization</h1>
 
+<pre><code class="lang-cs">public class ColorConverter : Def.Converter
+{
+    public override HashSet&lt;Type&gt; GeneratedTypes()
+    {
+        return new HashSet&lt;Type&gt;() { typeof(Color32) };
+    }
+
+    public override object FromString(string input, Type type, string inputName, int lineNumber)
+    {
+        return Util.ParseColorFromString(input);
+    }
+
+    public override object FromXml(XElement input, Type type, string inputName)
+    {
+        return Util.ParseColorFromXml(input);
+    }
+}
+</code></pre>
+<pre><code class="lang-xml">&lt;ExampleDef defName=&quot;Example&quot;&gt;
+  &lt;tintA&gt;
+    &lt;r&gt;0.3&lt;/r&gt;
+    &lt;g&gt;0.5&lt;/g&gt;
+    &lt;b&gt;0.8&lt;/b&gt;
+  &lt;/tintA&gt;
+  &lt;tintB&gt;(0.3, 0.5, 0.8)&lt;/tintB&gt;
+  &lt;tintC&gt;#4C7FCC&lt;/tintC&gt;
+&lt;/ExampleDef&gt;
+</code></pre>
+<p>Providing custom deserializers for your own classes, or third-party classes, is as easy as defining classes that derive from <a class="xref" href="../api/Def.Converter.html"><code>Def.Converter</code></a>. <a class="xref" href="../api/Def.Parser.html"><code>Def.Parser</code></a> will automatically find them during startup and register them. Please check <a class="xref" href="../api/Def.Converter.html"><code>Def.Converter</code></a> documentation for more details.</p>
 </article>
           </div>
           
@@ -76,7 +106,7 @@
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/zorbathut/def/blob/master/docs/api/index.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/zorbathut/def/blob/master/docs/articles/doc_custom.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>
