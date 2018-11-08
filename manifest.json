@@ -161,6 +161,18 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "articles/doc_security.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/doc_security.html",
+          "hash": "FDLPkAkKfg/0rd2mz4ckrg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "articles/doc_type.md",
       "output": {
         ".html": {
@@ -178,6 +190,18 @@
         ".html": {
           "relative_path": "articles/fp_dynamic.html",
           "hash": "ZGJqlSjG9NO7h1yV/TO5Ww=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/fp_factories.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/fp_factories.html",
+          "hash": "A7/XJ00byMeg8XhKxfAuTw=="
         }
       },
       "is_incremental": false,
@@ -293,6 +317,18 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "articles/fp_typeconstraints.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/fp_typeconstraints.html",
+          "hash": "i+7SS95pggTg/s8VL0SRLA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "articles/justifications.md",
       "output": {
         ".html": {
@@ -321,7 +357,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/toc.html",
-          "hash": "CBNDR/8q+wwGCs/ZuxWF3A=="
+          "hash": "bdLVDhu0UFBrOBhdV9qYnA=="
         }
       },
       "is_incremental": false,
