@@ -8,14 +8,14 @@
       href: doc_type.md
     - name: Def hierarchy roots
       href: doc_hierarchy.md
+    - name: Custom deserialization
+      href: doc_custom.md
 - name: Future Plans
   items:
     - name: Nonserialized fields
       href: fp_nonserialized.md
     - name: Def inheritance
       href: fp_inheritance.md
-    - name: Custom deserialization
-      href: fp_custom.md
     - name: Translation
       href: fp_translation.md
     - name: In-place data updating

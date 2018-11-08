@@ -30,6 +30,8 @@ namespace Def
         /// Converts a string to a suitable object type.
         /// </summary>
         /// <remarks>
+        /// `type` is set to the expected return type; you can return null, or anything that can be implicitly converted to that type.
+        /// 
         /// In case of error, call Def.Dbg.Err with some appropriately useful message and return null. Message should be formatted as $"{inputName}:{lineNumber}: Something went wrong".
         ///
         /// Note: In the case of empty input (i.e. &lt;member&gt;&lt;/member&gt; or &lt;member /&gt;) this function will be called.
@@ -44,6 +46,8 @@ namespace Def
         /// Converts an XML element to a suitable object type.
         /// </summary>
         /// <remarks>
+        /// `type` is set to the expected return type; you can return null, or anything that can be implicitly converted to that type.
+        /// 
         /// In case of error, call Def.Dbg.Err with some appropriately useful message and return null. Message should be formatted as $"{inputName}:{(input as IXmlLineInfo).LineNumber}: Something went wrong".
         ///
         /// In case of error, call Def.Dbg.Err with some appropriately useful message and return null.
