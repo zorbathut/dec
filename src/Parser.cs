@@ -52,51 +52,55 @@ namespace Def
             }
             s_Status = Status.Accumulating;
 
-            IEnumerable<Type> types;
-            if (explicitTypes != null)
             {
-                types = explicitTypes;
-            }
-            else
-            {
-                types = Util.GetAllTypes().Where(t => t.IsSubclassOf(typeof(Def)));
-            }
-
-            foreach (var type in types)
-            {
-                if (type.IsSubclassOf(typeof(Def)))
+                IEnumerable<Type> defTypes;
+                if (explicitTypes != null)
                 {
-                    typeLookup[type.Name] = type;
+                    defTypes = explicitTypes;
                 }
                 else
                 {
-                    Dbg.Err($"{type} is not a subclass of Def");
+                    defTypes = Util.GetAllTypes().Where(t => t.IsSubclassOf(typeof(Def)));
                 }
-            }
 
-            IEnumerable<Type> staticRefs;
-            if (explicitStaticRefs != null)
-            {
-                staticRefs = explicitStaticRefs;
-            }
-            else
-            {
-                staticRefs = Util.GetAllTypes().Where(t => t.HasAttribute(typeof(StaticReferencesAttribute)));
-            }
-
-            foreach (var type in staticRefs)
-            {
-                if (!type.HasAttribute(typeof(StaticReferencesAttribute)))
+                foreach (var type in defTypes)
                 {
-                    Dbg.Err($"{type} is not tagged as StaticReferences");
+                    if (type.IsSubclassOf(typeof(Def)))
+                    {
+                        typeLookup[type.Name] = type;
+                    }
+                    else
+                    {
+                        Dbg.Err($"{type} is not a subclass of Def");
+                    }
                 }
+            }
 
-                if (!type.IsAbstract || !type.IsSealed)
+            {
+                IEnumerable<Type> staticRefs;
+                if (explicitStaticRefs != null)
                 {
-                    Dbg.Err($"{type} is not static");
+                    staticRefs = explicitStaticRefs;
+                }
+                else
+                {
+                    staticRefs = Util.GetAllTypes().Where(t => t.HasAttribute(typeof(StaticReferencesAttribute)));
                 }
 
-                staticReferences.Add(type);
+                foreach (var type in staticRefs)
+                {
+                    if (!type.HasAttribute(typeof(StaticReferencesAttribute)))
+                    {
+                        Dbg.Err($"{type} is not tagged as StaticReferences");
+                    }
+
+                    if (!type.IsAbstract || !type.IsSealed)
+                    {
+                        Dbg.Err($"{type} is not static");
+                    }
+
+                    staticReferences.Add(type);
+                }
             }
         }
 
