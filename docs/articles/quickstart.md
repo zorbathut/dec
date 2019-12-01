@@ -1,6 +1,6 @@
 # Quick Start
 
-Define some classes derived from [`Def.Def`](xref:Def.Def).
+## Define some classes derived from [`Def.Def`](xref:Def.Def).
 
 ```cs
 // The starting point for all defs is a class derived from Def.Def.
@@ -44,50 +44,52 @@ class SpriteSheetDef : Def.Def
 }
 ```
 
-Write XML to define the actual things.
+## Write XML to define our actual objects.
 
 ```xml
-<!-- Here's a basic goblin. We've overridden the defaults we want changed and ignored the rest. -->
-<!-- Every def must be named via the defName attribute. These names must be unique within def type, but can overlap across different types. They are intended to be human-readable for debug and development purposes, but not user-visible. They must match the regexp [A-Za-z][A-Za-z0-9_]*. -->
-<MonsterDef defName="Goblin">
-  <maxHP>20</maxHP>
-  
-  <!-- This connects MonsterDef.Goblin's spriteSheet to SpriteSheetDef.Goblin. -->
-  <spriteSheet>Goblin</spriteSheet>
-</MonsterDef>
+<Defs>
+  <!-- Here's a basic goblin. We've overridden the defaults we want changed and ignored the rest. -->
+  <!-- Every def must be named via the defName attribute. These names must be unique within def type, but can overlap across different types. They are intended to be human-readable for debug and development purposes, but not user-visible. They must match the regexp [A-Za-z][A-Za-z0-9_]*. -->
+  <MonsterDef defName="Goblin">
+    <maxHP>20</maxHP>
+    
+    <!-- This connects MonsterDef.Goblin's spriteSheet to SpriteSheetDef.Goblin. -->
+    <spriteSheet>Goblin</spriteSheet>
+  </MonsterDef>
 
-<!-- This is a larger goblin. We've given it a new name, a larger render scale, and more health. -->
-<MonsterDef defName="MegaGoblin">
-  <maxHP>100</maxHP>
-  <renderScale>3</renderScale>
-  <spriteSheet>Goblin</spriteSheet>
-</MonsterDef>
+  <!-- This is a larger goblin. We've given it a new name, a larger render scale, and more health. -->
+  <MonsterDef defName="MegaGoblin">
+    <maxHP>100</maxHP>
+    <renderScale>3</renderScale>
+    <spriteSheet>Goblin</spriteSheet>
+  </MonsterDef>
 
-<!-- Here, we've defined a new tint for the DarkGoblin. Modifying members of included classes works like you'd expect XML to. -->
-<MonsterDef defName="DarkGoblin">
-  <maxHP>40</maxHP>
-  <tint>
-    <r>0.3</r>
-    <g>0.3</g>
-    <b>0.4</b>
-  </tint>
-  <spriteSheet>Goblin</spriteSheet>
-</MonsterDef>
+  <!-- Here, we've defined a new tint for the DarkGoblin. Modifying members of included classes works like you'd expect XML to. -->
+  <MonsterDef defName="DarkGoblin">
+    <maxHP>40</maxHP>
+    <tint>
+      <r>0.3</r>
+      <g>0.3</g>
+      <b>0.4</b>
+    </tint>
+    <spriteSheet>Goblin</spriteSheet>
+  </MonsterDef>
 
-<!-- Referencing other defs is as simple as typing their defName. All def references are validated at load time. -->
-<MonsterDef defName="AlchemyGoblin">
-  <maxHP>10</maxHP>
-  <spriteSheet>Goblin</spriteSheet>
-  <evolvedVariant>MegaGoblin</evolvedVariant>
-</MonsterDef>
+  <!-- Referencing other defs is as simple as typing their defName. All def references are validated at load time. -->
+  <MonsterDef defName="AlchemyGoblin">
+    <maxHP>10</maxHP>
+    <spriteSheet>Goblin</spriteSheet>
+    <evolvedVariant>MegaGoblin</evolvedVariant>
+  </MonsterDef>
 
-<!-- Defs can be referenced before they're defined. XML order is irrelevant. -->
-<SpriteSheetDef defName="Goblin">
-  <filename>goblin.png</filename>
-</SpriteSheetDef>
+  <!-- Defs can be referenced before they're defined. XML order is irrelevant. -->
+  <SpriteSheetDef defName="Goblin">
+    <filename>goblin.png</filename>
+  </SpriteSheetDef>
+</Defs>
 ```
 
-Initialize the def framework via [`Parser`](xref:Def.Parser).
+## Initialize the def framework via [`Parser`](xref:Def.Parser).
 
 ```cs
 // The Parser class handles all def initialization.
@@ -107,7 +109,7 @@ parser.Finish();
 // You don't need to keep the Parser object around after this point.
 ```
 
-Define some static references.
+## Define some static references.
 
 ```cs
 // The attribute lets def know that it should fill this static class with data.
@@ -130,7 +132,7 @@ public static class MonsterDefs
 // Therefore there is no need for a `SpriteSheetDefs` class.
 ```
 
-Use defs in code.
+## Use defs in code.
 
 ```cs
 // This is an example of an actual monster. There's no requirement that it be named "Monster"; def does not care what you do with the data it's generated.
