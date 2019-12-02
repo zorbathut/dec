@@ -28,9 +28,6 @@ namespace DefTest
 	    public void Primitives()
 	    {
             var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ });
-            parser.AddString(@"
-                <Defs>
-                </Defs>");
             parser.Finish();
 
             var primitives = new PrimitivesRecordable();
@@ -87,9 +84,6 @@ namespace DefTest
         public void Converter()
         {
             var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { }, explicitConversionTypes: new Type[] { typeof(ConvertedConverter) });
-            parser.AddString(@"
-                <Defs>
-                </Defs>");
             parser.Finish();
 
             var converted = new ConverterRecordable();
@@ -180,9 +174,6 @@ namespace DefTest
         public void Refs()
         {
             var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { }, explicitConversionTypes: new Type[] { typeof(ConvertedConverter) });
-            parser.AddString(@"
-                <Defs>
-                </Defs>");
             parser.Finish();
 
             var refs = new RefsRootRecordable();
