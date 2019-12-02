@@ -16,6 +16,7 @@ namespace Def
         public abstract void Record(ref float value, string label);
         public abstract void Record(ref bool value, string label);
         public abstract void Record(ref string value, string label);
+        public abstract void Record<T>(ref T value, string label);
 
         public static string Write(IRecordable recordable, bool pretty = true)
         {
@@ -96,6 +97,30 @@ namespace Def
             WriteField(label, value);
         }
 
+        public override void Record<T>(ref T value, string label)
+        {
+            if (fields.Contains(label))
+            {
+                Dbg.Err($"Field '{label}' written multiple times");
+                return;
+            }
+
+            fields.Add(label);
+
+            // Look for a converter; that's the only way we're going to handle this one!
+            var converter = Serialization.Converters.TryGetValue(typeof(T));
+            if (converter == null)
+            {
+                Dbg.Err($"Couldn't find a converter for type {typeof(T)}");
+                return;
+            }
+
+            var recorded = new XElement(label);
+            element.Add(recorded);
+
+            converter.ToXml(value, recorded);
+        }
+
         private void WriteField(string label, string value)
         {
             if (fields.Contains(label))
@@ -136,6 +161,11 @@ namespace Def
         }
 
         public override void Record(ref string value, string label)
+        {
+            value = ReadField(label, value);
+        }
+
+        public override void Record<T>(ref T value, string label)
         {
             value = ReadField(label, value);
         }

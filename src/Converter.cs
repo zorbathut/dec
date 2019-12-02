@@ -15,10 +15,10 @@ namespace Def
     public abstract class Converter
     {
         /// <summary>
-        /// Returns a set of types that it can convert.
+        /// Returns a set of types that it can convert to and from.
         /// </summary>
         /// <remarks>
-        /// Conversion functions are not called for subclasses; that is, if a BaseClass is requested, only a converter that promises to return a BaseClass will be called.
+        /// When deserializing, conversion functions are not called for subclasses; that is, if a BaseClass is requested, only a converter that promises to return a BaseClass will be called.
         /// 
         /// It is an error if any two Conversion-derived non-abstract classes report that they can generate the same type.
         ///
@@ -54,6 +54,18 @@ namespace Def
         {
             Dbg.Err($"{inputName}:{input.LineNumber()}: Failed to parse XML when attempting to parse {type}");
             return null;
+        }
+
+        public virtual string ToString(object input)
+        {
+            Dbg.Err($"Failed to generate a string when attempting to record {input.GetType()}");
+            return null;
+        }
+
+        public virtual bool ToXml(object input, XElement context)
+        {
+            context.Add(new XText(ToString(input)));
+            return true;
         }
     }
 }
