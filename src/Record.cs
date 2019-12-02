@@ -16,6 +16,9 @@ namespace Def
         public abstract void Record(ref float value, string label);
         public abstract void Record(ref bool value, string label);
         public abstract void Record(ref string value, string label);
+
+        // This handles conversions, defs, and IRecordables.
+        // I am not happy with this, but I can't think of a better way to handle it.
         public abstract void Record<T>(ref T value, string label);
 
         public static string Write(IRecordable recordable, bool pretty = true)
@@ -107,18 +110,32 @@ namespace Def
 
             fields.Add(label);
 
-            // Look for a converter; that's the only way we're going to handle this one!
-            var converter = Serialization.Converters.TryGetValue(typeof(T));
-            if (converter == null)
-            {
-                Dbg.Err($"Couldn't find a converter for type {typeof(T)}");
-                return;
-            }
-
             var recorded = new XElement(label);
             element.Add(recorded);
 
-            converter.ToXml(value, recorded);
+            // See if this is a def
+            if (typeof(T).IsSubclassOf(typeof(Def)))
+            {
+                // It is! Let's just get the def name and be done with it.
+                if (value != null)
+                {
+                    var valueDef = value as Def;
+
+                    recorded.Add(new XText(valueDef.defName));
+                }
+            }
+            else
+            {
+                // Look for a converter; that's the only way we're going to handle this one!
+                var converter = Serialization.Converters.TryGetValue(typeof(T));
+                if (converter == null)
+                {
+                    Dbg.Err($"Couldn't find a converter for type {typeof(T)}");
+                    return;
+                }
+
+                converter.ToXml(value, recorded);
+            }
         }
 
         private void WriteField(string label, string value)

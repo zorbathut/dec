@@ -105,5 +105,51 @@ namespace DefTest
             Assert.AreEqual(converted.convertable.b, deserialized.convertable.b);
             Assert.AreEqual(converted.convertable.c, deserialized.convertable.c);
         }
+
+        [Def.StaticReferences]
+        public static class StaticReferenceDefs
+        {
+            static StaticReferenceDefs() { Def.StaticReferencesAttribute.Initialized(); }
+
+            public static StubDef TestDefA;
+            public static StubDef TestDefB;
+        }
+        public class DefRecordable : Def.IRecordable
+        {
+            public StubDef a;
+            public StubDef b;
+            public StubDef empty;
+
+            public void Record(Def.Recorder record)
+            {
+                record.Record(ref a, "a");
+                record.Record(ref b, "b");
+                record.Record(ref empty, "empty");
+            }
+        }
+
+        [Test]
+        public void Defs()
+        {
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(StubDef) }, explicitStaticRefs: new Type[] { typeof(StaticReferenceDefs) });
+            parser.AddString(@"
+                <Defs>
+                    <StubDef defName=""TestDefA"" />
+                    <StubDef defName=""TestDefB"" />
+                </Defs>");
+            parser.Finish();
+
+            var defs = new DefRecordable();
+            defs.a = StaticReferenceDefs.TestDefA;
+            defs.b = StaticReferenceDefs.TestDefB;
+            // leave empty empty, of course
+
+            string serialized = Def.Recorder.Write(defs, pretty: true);
+            var deserialized = Def.Recorder.Read<DefRecordable>(serialized);
+
+            Assert.AreEqual(defs.a, deserialized.a);
+            Assert.AreEqual(defs.b, deserialized.b);
+            Assert.AreEqual(defs.empty, deserialized.empty);
+        }
     }
 }
