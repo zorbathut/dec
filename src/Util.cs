@@ -106,5 +106,47 @@ namespace Def
             }
             return result;
         }
+
+        internal static XElement ElementNamed(this XElement root, string name)
+        {
+            return root.Elements().Where(child => child.Name.LocalName == name).SingleOrDefaultChecked();
+        }
+
+        internal static T SingleOrDefaultChecked<T>(this IEnumerable<T> elements)
+        {
+            T result = default(T);
+            bool first = true;
+
+            foreach (var element in elements)
+            {
+                if (first)
+                {
+                    result = element;
+                    first = false;
+                }
+                else
+                {
+                    // maybe we need a better error message here.
+                    Dbg.Err("Multiple items found when only one is expected");
+                }
+            }
+
+            return result;
+        }
+
+        internal static string GetText(this XElement element)
+        {
+            bool hasElements = element.Elements().Any();
+            bool hasText = element.Nodes().OfType<XText>().Any();
+            var text = hasText ? element.Nodes().OfType<XText>().First().Value : null;
+
+            if (hasElements && hasText)
+            {
+                Dbg.Err($"{element.LineNumber()}: Elements and text are never valid together");
+                return null;
+            }
+
+            return text;
+        }
     }
 }
