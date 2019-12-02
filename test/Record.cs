@@ -151,5 +151,58 @@ namespace DefTest
             Assert.AreEqual(defs.b, deserialized.b);
             Assert.AreEqual(defs.empty, deserialized.empty);
         }
+
+        public class RefsChildRecordable : Def.IRecordable
+        {
+            public void Record(Def.Recorder record)
+            {
+                // lol
+            }
+        }
+
+        public class RefsRootRecordable : Def.IRecordable
+        {
+            public RefsChildRecordable childAone;
+            public RefsChildRecordable childAtwo;
+            public RefsChildRecordable childB;
+            public RefsChildRecordable childEmpty;
+
+            public void Record(Def.Recorder record)
+            {
+                record.Record(ref childAone, "childAone");
+                record.Record(ref childAtwo, "childAtwo");
+                record.Record(ref childB, "childB");
+                record.Record(ref childEmpty, "childEmpty");
+            }
+        }
+        
+        [Test]
+        public void Refs()
+        {
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { }, explicitConversionTypes: new Type[] { typeof(ConvertedConverter) });
+            parser.AddString(@"
+                <Defs>
+                </Defs>");
+            parser.Finish();
+
+            var refs = new RefsRootRecordable();
+            refs.childAone = new RefsChildRecordable();
+            refs.childAtwo = refs.childAone;
+            refs.childB = new RefsChildRecordable();
+            refs.childEmpty = null;
+
+            string serialized = Def.Recorder.Write(refs, pretty: true);
+            var deserialized = Def.Recorder.Read<RefsRootRecordable>(serialized);
+
+            Assert.IsNotNull(deserialized.childAone);
+            Assert.IsNotNull(deserialized.childAtwo);
+            Assert.IsNotNull(deserialized.childB);
+            Assert.IsNull(deserialized.childEmpty);
+
+            Assert.AreEqual(deserialized.childAone, deserialized.childAtwo);
+            Assert.AreNotEqual(deserialized.childAone, deserialized.childB);
+        }
+
+        // hierarchy
     }
 }
