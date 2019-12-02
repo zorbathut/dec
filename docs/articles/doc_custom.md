@@ -3,7 +3,7 @@
 ```cs
 public class ColorConverter : Def.Converter
 {
-    public override HashSet<Type> GeneratedTypes()
+    public override HashSet<Type> HandledTypes()
     {
         return new HashSet<Type>() { typeof(Color32) };
     }

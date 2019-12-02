@@ -10,12 +10,12 @@ namespace Def
     /// <remarks>
     /// This is a standalone class to allow implementation of converters of third-party types.
     ///
-    /// Inherit from this, fill out an appropriate GeneratedTypes() function, then implement at least one of FromString() or FromXml().
+    /// Inherit from this, fill out an appropriate HandledTypes() function, then implement at least one of FromString() or FromXml().
     /// </remarks>
     public abstract class Converter
     {
         /// <summary>
-        /// Returns a set of types that it can convert to.
+        /// Returns a set of types that it can convert.
         /// </summary>
         /// <remarks>
         /// Conversion functions are not called for subclasses; that is, if a BaseClass is requested, only a converter that promises to return a BaseClass will be called.
@@ -24,7 +24,7 @@ namespace Def
         ///
         /// This behavior may change someday; please read patch notes if you're relying on it.
         /// </remarks>
-        public abstract HashSet<Type> GeneratedTypes();
+        public abstract HashSet<Type> HandledTypes();
 
         /// <summary>
         /// Converts a string to a suitable object type.

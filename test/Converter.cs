@@ -21,7 +21,7 @@ namespace DefTest
 
         public class ConverterBasicTest : Def.Converter
         {
-            public override HashSet<Type> GeneratedTypes()
+            public override HashSet<Type> HandledTypes()
             {
                 return new HashSet<Type>() { typeof(ConverterTestPayload) };
             }
@@ -58,7 +58,7 @@ namespace DefTest
 
         public class EmptyConverter : Def.Converter
         {
-            public override HashSet<Type> GeneratedTypes()
+            public override HashSet<Type> HandledTypes()
             {
                 return new HashSet<Type>() { };
             }
@@ -74,7 +74,7 @@ namespace DefTest
 
         public class StrConv1 : Def.Converter
         {
-            public override HashSet<Type> GeneratedTypes()
+            public override HashSet<Type> HandledTypes()
             {
                 return new HashSet<Type>() { typeof(string) };
             }
@@ -82,7 +82,7 @@ namespace DefTest
 
         public class StrConv2 : Def.Converter
         {
-            public override HashSet<Type> GeneratedTypes()
+            public override HashSet<Type> HandledTypes()
             {
                 return new HashSet<Type>() { typeof(string) };
             }
@@ -103,7 +103,7 @@ namespace DefTest
 
         public class ConverterDictTest : Def.Converter
         {
-            public override HashSet<Type> GeneratedTypes()
+            public override HashSet<Type> HandledTypes()
             {
                 return new HashSet<Type>() { typeof(ConverterStringPayload) };
             }
@@ -166,7 +166,7 @@ namespace DefTest
 
         public class DefaultFailureConverter : Def.Converter
         {
-            public override HashSet<Type> GeneratedTypes()
+            public override HashSet<Type> HandledTypes()
             {
                 return new HashSet<Type>() { typeof(ConverterStringPayload) };
             }
@@ -211,7 +211,7 @@ namespace DefTest
 
         public class DefaultNullConverter : Def.Converter
         {
-            public override HashSet<Type> GeneratedTypes()
+            public override HashSet<Type> HandledTypes()
             {
                 return new HashSet<Type>() { typeof(ConverterStringPayload) };
             }

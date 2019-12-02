@@ -35,7 +35,7 @@ namespace Def
             foreach (var type in conversionTypes)
             {
                 var converter = (Converter)System.Activator.CreateInstance(type);
-                var convertedTypes = converter.GeneratedTypes();
+                var convertedTypes = converter.HandledTypes();
                 if (convertedTypes.Count == 0)
                 {
                     Dbg.Err($"{type} is a Def.Converter, but doesn't convert anything");
