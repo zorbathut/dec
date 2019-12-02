@@ -49,8 +49,6 @@ namespace Def
         /// `type` is set to the expected return type; you can return null, or anything that can be implicitly converted to that type.
         /// 
         /// In case of error, call Def.Dbg.Err with some appropriately useful message and return null. Message should be formatted as $"{inputName}:{(input as IXmlLineInfo).LineNumber}: Something went wrong".
-        ///
-        /// In case of error, call Def.Dbg.Err with some appropriately useful message and return null.
         /// </remarks>
         public virtual object FromXml(XElement input, Type type, string inputName)
         {
