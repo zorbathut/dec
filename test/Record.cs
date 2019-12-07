@@ -194,6 +194,39 @@ namespace DefTest
             Assert.AreNotEqual(deserialized.childAone, deserialized.childB);
         }
 
+        public class ContainersRecordable : Def.IRecordable
+        {
+            public List<int> intList = new List<int>();
+            public Dictionary<string, string> stringDict = new Dictionary<string, string>();
+
+            public void Record(Def.Recorder record)
+            {
+                record.Record(ref intList, "intList");
+                record.Record(ref stringDict, "stringDict");
+            }
+        }
+
+        [Test]
+        public void Containers()
+        {
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { });
+            parser.Finish();
+
+            var containers = new ContainersRecordable();
+            containers.intList.Add(42);
+            containers.intList.Add(1234);
+            containers.intList.Add(-105);
+
+            containers.stringDict["Key"] = "Value";
+            containers.stringDict["Info"] = "Data";
+
+            string serialized = Def.Recorder.Write(containers, pretty: true);
+            var deserialized = Def.Recorder.Read<ContainersRecordable>(serialized);
+
+            Assert.AreEqual(containers.intList, deserialized.intList);
+            Assert.AreEqual(containers.stringDict, deserialized.stringDict);
+        }
+
         // hierarchy
     }
 }

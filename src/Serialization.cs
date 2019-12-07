@@ -352,7 +352,7 @@ namespace Def
             }
         }
 
-        internal static XElement ComposeElement(object value, Type fieldType, string label, WriterContext refs)
+        internal static XElement ComposeElement(object value, Type fieldType, string label, WriterContext context)
         {
             var result = new XElement(label);
 
@@ -366,6 +366,56 @@ namespace Def
             if (value is string)
             {
                 result.Add(new XText(value as string));
+
+                return result;
+            }
+
+            if (fieldType.IsGenericType && fieldType.GetGenericTypeDefinition() == typeof(List<>))
+            {
+                if (value is IList list)
+                {
+                    Type referencedType = fieldType.GetGenericArguments()[0];
+
+                    for (int i = 0; i < list.Count; ++i)
+                    {
+                        result.Add(ComposeElement(list[i], referencedType, "li", context));
+                    }
+                }
+                else
+                {
+                    // Need an explicit null to distinguish from empty list
+                    result.SetAttributeValue("null", "true");
+                }
+
+                return result;
+            }
+
+            if (fieldType.IsGenericType && fieldType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+            {
+                if (value is IDictionary dict)
+                {
+                    Type keyType = fieldType.GetGenericArguments()[0];
+                    Type valueType = fieldType.GetGenericArguments()[1];
+
+                    // I really want some way to canonicalize this ordering
+                    IDictionaryEnumerator iterator = dict.GetEnumerator();
+                    while (iterator.MoveNext())
+                    {
+                        // In theory, some dicts support inline format, not li format. Inline format is cleaner and smaller and we should be using it when possible.
+                        // In practice, it's hard and I'm lazy and this always works, and we're not providing any guarantees about cleanliness of serialized output.
+                        // Revisit this later when someone (possibly myself) really wants it improved.
+                        var element = new XElement("li");
+                        result.Add(element);
+
+                        element.Add(ComposeElement(iterator.Key, keyType, "key", context));
+                        element.Add(ComposeElement(iterator.Value, valueType, "value", context));
+                    }
+                }
+                else
+                {
+                    // Need an explicit null to distinguish from empty list
+                    result.SetAttributeValue("null", "true");
+                }
 
                 return result;
             }
@@ -390,7 +440,7 @@ namespace Def
                 // It's a recordable, so we're going to store a reference
                 if (value != null)
                 {
-                    result.SetAttributeValue("ref", refs.GetRef(value as IRecordable));
+                    result.SetAttributeValue("ref", context.GetRef(value as IRecordable));
                 }
                 else
                 {
@@ -412,9 +462,9 @@ namespace Def
                 {
                     converter.ToXml(value, result);
                 }
-            }
 
-            return result;
+                return result;
+            }
         }
     }
 }
