@@ -227,6 +227,37 @@ namespace DefTest
             Assert.AreEqual(containers.stringDict, deserialized.stringDict);
         }
 
+        public class ContainersNestedRecordable : Def.IRecordable
+        {
+            public List<List<int>> intLL = new List<List<int>>();
+
+            public void Record(Def.Recorder record)
+            {
+                record.Record(ref intLL, "intLL");
+            }
+        }
+
+        [Test]
+        public void ContainersNested()
+        {
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { });
+            parser.Finish();
+
+            var nested = new ContainersNestedRecordable();
+            nested.intLL.Add(new List<int>());
+            nested.intLL.Add(null);
+            nested.intLL.Add(new List<int>());
+            nested.intLL.Add(new List<int>());
+            nested.intLL[0].Add(42);
+            nested.intLL[0].Add(95);
+            nested.intLL[2].Add(203);
+
+            string serialized = Def.Recorder.Write(nested, pretty: true);
+            var deserialized = Def.Recorder.Read<ContainersNestedRecordable>(serialized);
+
+            Assert.AreEqual(nested.intLL, deserialized.intLL);
+        }
+
         // hierarchy
     }
 }
