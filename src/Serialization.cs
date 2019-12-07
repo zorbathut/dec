@@ -76,10 +76,25 @@ namespace Def
                 element.Attribute("class").Remove();
             }
 
+            bool shouldBeNull = false;
+            if (element.Attribute("null") is var nullElement && nullElement != null)
+            {
+                shouldBeNull = bool.Parse(nullElement.Value);
+
+                nullElement.Remove();
+            }
+
             // No remaining attributes are allowed
             if (element.HasAttributes)
             {
                 Dbg.Err($"{inputName}:{element.LineNumber()}: Has unconsumed attributes");
+            }
+
+            // See if we just want to return null
+            if (shouldBeNull)
+            {
+                // okay
+                return null;
             }
 
             bool hasElements = element.Elements().Any();
