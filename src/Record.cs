@@ -12,13 +12,7 @@ namespace Def
 
     public abstract class Recorder
     {
-        public abstract void Record(ref int value, string label);
-        public abstract void Record(ref float value, string label);
-        public abstract void Record(ref bool value, string label);
-        public abstract void Record(ref string value, string label);
-
-        // This handles conversions, defs, and IRecordables.
-        // I am not happy with this, but I can't think of a better way to handle it.
+        // This handles literally everything. I wish I could do more validation at compiletime, but the existence of Converters makes that impossible.
         public abstract void Record<T>(ref T value, string label);
 
         public static string Write(IRecordable recordable, bool pretty = true)
@@ -43,19 +37,18 @@ namespace Def
             // We have a bunch of refs that need to be written and we're going to deal with them here
             // However, this is iffy because we may actually have *more* refs to output once we're done with the first batch.
             // Keep repeating until we run out of new refs.
-            while (writerContext.refsToWrite.Any())
+            while (writerContext.HasRefsToWrite())
             {
                 // Clear out our list so we won't lose any while we're iterating over our current list.
-                var refsToWrite = writerContext.refsToWrite;
-                writerContext.refsToWrite = new HashSet<IRecordable>();
+                var refsToWrite = writerContext.ConsumeRefsToWrite();
 
                 // Canonical ordering to provide some stability and ease-of-reading.
-                foreach (var reference in refsToWrite.OrderBy(reference => writerContext.refs[reference]))
+                foreach (var reference in refsToWrite.OrderBy(reference => writerContext.GetRef(reference)))
                 {
                     var element = new XElement("Ref");
                     refs.Add(element);
 
-                    element.SetAttributeValue("id", writerContext.refs[reference]);
+                    element.SetAttributeValue("id", writerContext.GetRef(reference));
                     element.SetAttributeValue("class", reference.GetType().ToString());
 
                     // This may fill out more refsToWrite; if so, we'll get to them later.
@@ -157,16 +150,38 @@ namespace Def
         }
     }
 
-    public class WriterContext
+    internal class WriterContext
     {
-        // This is a full lookup of all references that have been encountered.
-        public Dictionary<IRecordable, string> refs = new Dictionary<IRecordable, string>();
+        private Dictionary<IRecordable, string> refs = new Dictionary<IRecordable, string>();
+        private List<IRecordable> refsToWrite = new List<IRecordable>();
 
-        // This is a partial list of just the references that have been added since the last clear.
-        public HashSet<IRecordable> refsToWrite = new HashSet<IRecordable>();
+        public string GetRef(IRecordable recordable)
+        {
+            var refid = refs.TryGetValue(recordable);
+            if (refid == null)
+            {
+                refid = $"ref{refs.Count:D5}";
+                refs[recordable] = refid;
+                refsToWrite.Add(recordable);
+            }
+
+            return refid;
+        }
+
+        public bool HasRefsToWrite()
+        {
+            return refsToWrite.Any();
+        }
+
+        public List<IRecordable> ConsumeRefsToWrite()
+        {
+            var result = refsToWrite;
+            refsToWrite = new List<IRecordable>();
+            return result;
+        }
     }
 
-    public class RecorderWriter : Recorder
+    internal class RecorderWriter : Recorder
     {
         private readonly XElement element;
         private readonly HashSet<string> fields = new HashSet<string>();
@@ -176,26 +191,6 @@ namespace Def
         {
             this.element = element;
             this.context = context;
-        }
-
-        public override void Record(ref int value, string label)
-        {
-            WriteField(label, value.ToString());
-        }
-
-        public override void Record(ref float value, string label)
-        {
-            WriteField(label, value.ToString());
-        }
-
-        public override void Record(ref bool value, string label)
-        {
-            WriteField(label, value.ToString());
-        }
-
-        public override void Record(ref string value, string label)
-        {
-            WriteField(label, value);
         }
 
         public override void Record<T>(ref T value, string label)
@@ -208,65 +203,7 @@ namespace Def
 
             fields.Add(label);
 
-            var recorded = new XElement(label);
-            element.Add(recorded);
-
-            // See if this is a def
-            if (typeof(T).IsSubclassOf(typeof(Def)))
-            {
-                // It is! Let's just get the def name and be done with it.
-                if (value != null)
-                {
-                    var valueDef = value as Def;
-
-                    recorded.Add(new XText(valueDef.defName));
-                }
-            }
-            else if (typeof(IRecordable).IsAssignableFrom(typeof(T)))
-            {
-                // It's a recordable, so we're going to store a reference
-                if (value != null)
-                {
-                    var recordable = value as IRecordable;
-                    var refid = context.refs.TryGetValue(recordable);
-                    if (refid == null)
-                    {
-                        refid = $"ref{context.refs.Count:D5}";
-                        context.refs[recordable] = refid;
-                        context.refsToWrite.Add(recordable);
-                    }
-
-                    recorded.SetAttributeValue("ref", refid);
-                }
-                else
-                {
-                    recorded.SetAttributeValue("null", "true");
-                }
-            }
-            else
-            {
-                // Look for a converter; that's the only way we're going to handle this one!
-                var converter = Serialization.Converters.TryGetValue(typeof(T));
-                if (converter == null)
-                {
-                    Dbg.Err($"Couldn't find a converter for type {typeof(T)}");
-                    return;
-                }
-
-                converter.ToXml(value, recorded);
-            }
-        }
-
-        private void WriteField(string label, string value)
-        {
-            if (fields.Contains(label))
-            {
-                Dbg.Err($"Field '{label}' written multiple times");
-                return;
-            }
-
-            fields.Add(label);
-            element.Add(new XElement(label, value));
+            element.Add(Serialization.ComposeElement(value, typeof(T), label, context));
         }
     }
 
@@ -287,26 +224,6 @@ namespace Def
             this.context = context;
         }
 
-        public override void Record(ref int value, string label)
-        {
-            value = ReadField(label, value);
-        }
-
-        public override void Record(ref float value, string label)
-        {
-            value = ReadField(label, value);
-        }
-
-        public override void Record(ref bool value, string label)
-        {
-            value = ReadField(label, value);
-        }
-
-        public override void Record(ref string value, string label)
-        {
-            value = ReadField(label, value);
-        }
-
         public override void Record<T>(ref T value, string label)
         {
             var recorded = element.ElementNamed(label);
@@ -314,6 +231,8 @@ namespace Def
             {
                 return;
             }
+
+            // TODO MOVE THIS INTO PARSER
 
             if (typeof(IRecordable).IsAssignableFrom(typeof(T)))
             {
@@ -355,25 +274,9 @@ namespace Def
             else
             {
                 // Def or convertable, we hope
-                value = ReadField(label, value);
+                // Explicit cast here because we want an error if we have the wrong type!
+                value = (T)Serialization.ParseElement(recorded, typeof(T), null, false, context.docName);
             }
-        }
-
-        private T ReadField<T>(string label, T def)
-        {
-            var recorded = element.ElementNamed(label);
-            if (recorded == null)
-            {
-                return def;
-            }
-
-            var result = Serialization.ParseElement(recorded, typeof(T), null, false, context.docName);
-            if (result == null)
-            {
-                return def;
-            }
-
-            return (T)result;
         }
     }
 }

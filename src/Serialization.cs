@@ -351,5 +351,70 @@ namespace Def
                 return null;
             }
         }
+
+        internal static XElement ComposeElement(object value, Type fieldType, string label, WriterContext refs)
+        {
+            var result = new XElement(label);
+
+            if (fieldType.IsPrimitive)
+            {
+                result.Add(new XText(value.ToString()));
+
+                return result;
+            }
+            
+            if (value is string)
+            {
+                result.Add(new XText(value as string));
+
+                return result;
+            }
+
+            if (typeof(Def).IsAssignableFrom(fieldType))
+            {
+                // It is! Let's just get the def name and be done with it.
+                if (value != null)
+                {
+                    var valueDef = value as Def;
+
+                    result.Add(new XText(valueDef.defName));
+                }
+
+                // "No data" is defined as null for defs, so we just do that
+
+                return result;
+            }
+
+            if (typeof(IRecordable).IsAssignableFrom(fieldType))
+            {
+                // It's a recordable, so we're going to store a reference
+                if (value != null)
+                {
+                    result.SetAttributeValue("ref", refs.GetRef(value as IRecordable));
+                }
+                else
+                {
+                    // Need an explicit null here, otherwise (once we support inline references) we'll have no way to distinguish "empty" from "null"
+                    result.SetAttributeValue("null", "true");
+                }
+
+                return result;
+            }
+
+            {
+                // Look for a converter; that's the only way we're going to handle this one!
+                var converter = Serialization.Converters.TryGetValue(fieldType);
+                if (converter == null)
+                {
+                    Dbg.Err($"Couldn't find a converter for type {fieldType}");
+                }
+                else
+                {
+                    converter.ToXml(value, result);
+                }
+            }
+
+            return result;
+        }
     }
 }
