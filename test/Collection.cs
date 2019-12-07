@@ -124,6 +124,57 @@ namespace DefTest
 	    }
 
         [Test]
+        public void DictionaryLi()
+        {
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(DictionaryStringDef) });
+            parser.AddString(@"
+                <Defs>
+                    <DictionaryStringDef defName=""TestDef"">
+                        <data>
+                            <li>
+                                <key>hello</key>
+                                <value>goodbye</value>
+                            </li>
+                            <li>
+                                <key>Nothing</key>
+                                <value></value>
+                            </li>
+                        </data>
+                    </DictionaryStringDef>
+                </Defs>");
+            parser.Finish();
+
+            var result = Def.Database<DictionaryStringDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(result.data, new Dictionary<string, string> { { "hello", "goodbye" }, { "Nothing", "" } });
+        }
+
+        [Test]
+        public void DictionaryHybrid()
+        {
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(DictionaryStringDef) });
+            parser.AddString(@"
+                <Defs>
+                    <DictionaryStringDef defName=""TestDef"">
+                        <data>
+                            <hello>goodbye</hello>
+                            <li>
+                                <key>one</key>
+                                <value>two</value>
+                            </li>
+                        </data>
+                    </DictionaryStringDef>
+                </Defs>");
+            parser.Finish();
+
+            var result = Def.Database<DictionaryStringDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(result.data, new Dictionary<string, string> { { "hello", "goodbye" }, { "one", "two" } });
+        }
+
+        [Test]
 	    public void DictionaryDuplicate()
 	    {
             var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(DictionaryStringDef) });

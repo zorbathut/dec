@@ -54,7 +54,7 @@ Lists are entered with &lt;li&gt; sequences.
 
 ## Dictionaries
 
-Dictionaries are defined using XML tags as keys. This means that you can make dictionaries only with key types that conform to the XML tag requirements; practically, this currently means `string`, `enum`, `bool`, or `Def`-derived types.
+Dictionaries are normally defined using XML tags as keys.
 
 ```xml
 <MaterialValueDef defName="Medieval">
@@ -63,6 +63,33 @@ Dictionaries are defined using XML tags as keys. This means that you can make di
     <Steel>3</Steel>
     <Uranium>0.1</Uranium>
     <Aluminum>20</Aluminum>
+  </materials>
+</MaterialValueDef>
+```
+
+ Using this format, you can make dictionaries only with key types that conform to the XML tag requirements; practically, this currently means `enum`, `bool`, `Def`-derived types, and most (but not all) `string`s.
+
+ If you need to make a dictionary with looser requirements, you can use &lt;li&gt; sequences and &lt;key&gt;/&lt;value&gt; tags. This allows keys of any type that def can parse.
+
+```xml
+<MaterialValueDef defName="Medieval">
+  <materials>
+    <li>
+      <key>Iron</key>
+      <value>1</value>
+    </li>
+    <li>
+      <key>Steel</key>
+      <value>3</value>
+    </li>
+    <li>
+      <key>Uranium</key>
+      <value>0.1</value>
+    </li>
+    <li>
+      <key>Aluminum</key>
+      <value>20</value>
+    </li>
   </materials>
 </MaterialValueDef>
 ```

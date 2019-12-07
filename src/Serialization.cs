@@ -175,20 +175,50 @@ namespace Def
                 Type keyType = type.GetGenericArguments()[0];
                 Type valueType = type.GetGenericArguments()[1];
 
-                var list = (IDictionary)Activator.CreateInstance(type);
+                var dict = (IDictionary)Activator.CreateInstance(type);
                 foreach (var fieldElement in element.Elements())
                 {
-                    var key = ParseString(fieldElement.Name.LocalName, keyType, inputName, fieldElement.LineNumber());
-
-                    if (list.Contains(key))
+                    if (fieldElement.Name.LocalName == "li")
                     {
-                        Dbg.Err($"{inputName}:{fieldElement.LineNumber()}: Dictionary includes duplicate key {fieldElement.Name.LocalName}");
-                    }
+                        // Treat this like a key/value pair
+                        var keyNode = fieldElement.ElementNamed("key");
+                        var valueNode = fieldElement.ElementNamed("value");
 
-                    list[key] = ParseElement(fieldElement, valueType, null, false, inputName);
+                        if (keyNode == null)
+                        {
+                            Dbg.Err($"{inputName}:{fieldElement.LineNumber()}: Dictionary includes li tag without a key");
+                            continue;
+                        }
+
+                        if (valueNode == null)
+                        {
+                            Dbg.Err($"{inputName}:{fieldElement.LineNumber()}: Dictionary includes li tag without a value");
+                            continue;
+                        }
+
+                        var key = ParseElement(keyNode, keyType, null, false, inputName);
+
+                        if (dict.Contains(key))
+                        {
+                            Dbg.Err($"{inputName}:{fieldElement.LineNumber()}: Dictionary includes duplicate key {key.ToString()}");
+                        }
+
+                        dict[key] = ParseElement(valueNode, valueType, null, false, inputName);
+                    }
+                    else
+                    {
+                        var key = ParseString(fieldElement.Name.LocalName, keyType, inputName, fieldElement.LineNumber());
+
+                        if (dict.Contains(key))
+                        {
+                            Dbg.Err($"{inputName}:{fieldElement.LineNumber()}: Dictionary includes duplicate key {fieldElement.Name.LocalName}");
+                        }
+
+                        dict[key] = ParseElement(fieldElement, valueType, null, false, inputName);
+                    }
                 }
 
-                return list;
+                return dict;
             }
 
             // At this point, we're either a class or a struct
