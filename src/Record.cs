@@ -45,14 +45,11 @@ namespace Def
                 // Canonical ordering to provide some stability and ease-of-reading.
                 foreach (var reference in refsToWrite.OrderBy(reference => writerContext.GetRef(reference)))
                 {
-                    var element = new XElement("Ref");
+                    var element = Serialization.ComposeElement(reference, reference.GetType(), "Ref", writerContext, true);
                     refs.Add(element);
 
                     element.SetAttributeValue("id", writerContext.GetRef(reference));
                     element.SetAttributeValue("class", reference.GetType().ToString());
-
-                    // This may fill out more refsToWrite; if so, we'll get to them later.
-                    reference.Record(new RecorderWriter(element, writerContext));
                 }
             }
 
@@ -108,17 +105,36 @@ namespace Def
                 }
 
                 var possibleType = (Type)Serialization.ParseString(className, typeof(Type), stringName, reference.LineNumber());
-                if (!typeof(IRecordable).IsAssignableFrom(possibleType))
+                if (possibleType.IsValueType)
                 {
-                    Dbg.Err($"{stringName}:{reference.LineNumber()}: Reference assigned type {possibleType}, which is not recordable");
+                    Dbg.Err($"{stringName}:{reference.LineNumber()}: Reference assigned type {possibleType}, which is a value type");
                     continue;
                 }
 
-                readerContext.refs[id] = (IRecordable)Activator.CreateInstance(possibleType);
-                if (readerContext.refs[id] == null)
+                if (Serialization.Converters.ContainsKey(possibleType))
                 {
-                    Dbg.Err($"{stringName}:{reference.LineNumber()}: Reference of type {possibleType} was not properly created; this will cause issues");
-                    continue;
+                    // We have a converter, so we just go ahead and make it instead of bothering with the two-pass method.
+                    // This is because converters actually can't reference other things, so it's safe. However, they also can return unpredictable data types, so we can't make a placeholder.
+
+                    // Remove the id so ParseElement doesn't choke.
+                    reference.Attribute("id").Remove();
+
+                    // I'm not totally sure why I'm using ParseElement here instead of calling the converter directly, except for a deep feeling that I'll regret it if I go through a nonstandard pathway.
+                    readerContext.refs[id] = Serialization.ParseElement(reference, possibleType, null, false, stringName);
+                    if (readerContext.refs[id].GetType() != possibleType)
+                    {
+                        Dbg.Wrn($"{stringName}:{reference.LineNumber()}: Converter for type {possibleType} returned an unexpected {readerContext.refs[id].GetType()} instead");
+                    }
+                }
+                else
+                {
+                    // We don't have a converter, so we create a stub so other things can reference it later
+                    readerContext.refs[id] = Activator.CreateInstance(possibleType);
+                    if (readerContext.refs[id] == null)
+                    {
+                        Dbg.Err($"{stringName}:{reference.LineNumber()}: Reference of type {possibleType} was not properly created; this will cause issues");
+                        continue;
+                    }
                 }
             }
 
@@ -127,13 +143,19 @@ namespace Def
             {
                 var id = reference.Attribute("id")?.Value;
 
-                // The serialization routines don't know how to deal with this, so we'll just remove it
+                // If we don't have an ID, then we've already eaten it due to using a converter. And that means we're done, just move on.
+                if (id == null)
+                {
+                    continue;
+                }
+
+                // The serialization routines don't know how to deal with this, so we'll remove it now
                 reference.Attribute("id").Remove();
 
                 var refInstance = readerContext.refs[id];
-
+                
                 // Do our actual parsing
-                var refInstanceOutput = Serialization.ParseElement(reference, refInstance.GetType(), refInstance, false, stringName);
+                var refInstanceOutput = Serialization.ParseElement(reference, refInstance.GetType(), refInstance, false, stringName, context: readerContext);
 
                 if (refInstance != refInstanceOutput)
                 {
@@ -152,17 +174,17 @@ namespace Def
 
     internal class WriterContext
     {
-        private Dictionary<IRecordable, string> refs = new Dictionary<IRecordable, string>();
-        private List<IRecordable> refsToWrite = new List<IRecordable>();
+        private Dictionary<object, string> refs = new Dictionary<object, string>();
+        private List<object> refsToWrite = new List<object>();
 
-        public string GetRef(IRecordable recordable)
+        public string GetRef(object referenced)
         {
-            var refid = refs.TryGetValue(recordable);
+            var refid = refs.TryGetValue(referenced);
             if (refid == null)
             {
                 refid = $"ref{refs.Count:D5}";
-                refs[recordable] = refid;
-                refsToWrite.Add(recordable);
+                refs[referenced] = refid;
+                refsToWrite.Add(referenced);
             }
 
             return refid;
@@ -173,10 +195,10 @@ namespace Def
             return refsToWrite.Any();
         }
 
-        public List<IRecordable> ConsumeRefsToWrite()
+        public List<object> ConsumeRefsToWrite()
         {
             var result = refsToWrite;
-            refsToWrite = new List<IRecordable>();
+            refsToWrite = new List<object>();
             return result;
         }
     }
@@ -203,14 +225,14 @@ namespace Def
 
             fields.Add(label);
 
-            element.Add(Serialization.ComposeElement(value, typeof(T), label, context));
+            element.Add(Serialization.ComposeElement(value, typeof(T), label, context, false));
         }
     }
 
     internal class ReaderContext
     {
         public string docName;
-        public Dictionary<string, IRecordable> refs = new Dictionary<string, IRecordable>();
+        public Dictionary<string, object> refs = new Dictionary<string, object>();
     }
 
     public class RecorderReader : Recorder
@@ -232,51 +254,8 @@ namespace Def
                 return;
             }
 
-            // TODO MOVE THIS INTO PARSER
-
-            if (typeof(IRecordable).IsAssignableFrom(typeof(T)))
-            {
-                // This is a reference!
-
-                if (recorded.Attribute("null")?.Value == "true")
-                {
-                    // This is null, it's just easier to write this way here in Genericland.
-                    value = default(T);
-                    return;
-                }
-
-                var refId = recorded.Attribute("ref")?.Value;
-                if (refId == null)
-                {
-                    Dbg.Err($"Reference stored with neither null nor ref");
-                    // Just leave it alone; hopefully its default value is sensible!
-                    return;
-                }
-
-                var reference = context.refs.TryGetValue(refId);
-                if (reference == null)
-                {
-                    Dbg.Err($"File referred to unrecognized reference ID {refId}");
-                    // Just leave it alone; hopefully its default value is sensible!
-                    return;
-                }
-
-                if (!(reference is T))
-                {
-                    Dbg.Err($"File referred to reference ID {refId} of type {value.GetType()}, but expected type {typeof(T)}");
-                    // Just leave it alone; hopefully its default value is sensible!
-                    return;
-                }
-
-                value = (T)reference;
-                return;
-            }
-            else
-            {
-                // Def or convertable, we hope
-                // Explicit cast here because we want an error if we have the wrong type!
-                value = (T)Serialization.ParseElement(recorded, typeof(T), null, false, context.docName);
-            }
+            // Explicit cast here because we want an error if we have the wrong type!
+            value = (T)Serialization.ParseElement(recorded, typeof(T), value, false, context.docName, context);
         }
     }
 }

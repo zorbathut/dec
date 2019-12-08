@@ -148,5 +148,21 @@ namespace Def
 
             return text;
         }
+
+        internal static string ConsumeAttribute(this XElement element, string attributeName)
+        {
+            var attribute = element.Attribute(attributeName);
+
+            if (attribute == null)
+            {
+                return null;
+            }
+            else
+            {
+                string result = attribute.Value;
+                attribute.Remove();
+                return result;
+            }
+        }
     }
 }
