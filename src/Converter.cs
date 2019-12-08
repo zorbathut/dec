@@ -2,6 +2,7 @@ namespace Def
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Xml.Linq;
 
     /// <summary>
@@ -66,6 +67,43 @@ namespace Def
         {
             context.Add(new XText(ToString(input)));
             return true;
+        }
+
+        public virtual object Record(object model, Type type, Recorder recorder)
+        {
+            switch (recorder.Mode)
+            {
+                case Recorder.Direction.Read:
+                {
+                    var sourceName = (recorder as RecorderReader).SourceName;
+                    var element = recorder.Xml;
+
+                    bool hasElements = element.Elements().Any();
+                    bool hasText = element.Nodes().OfType<XText>().Any();
+
+                    if (hasElements && hasText)
+                    {
+                        Dbg.Err($"{sourceName}:{element.LineNumber()}: Elements and text are not valid together with a non-Record Converter");
+                    }
+
+                    if (hasElements)
+                    {
+                        return FromXml(recorder.Xml, type, sourceName);
+                    }
+                    else
+                    {
+                        return FromString(element.GetText() ?? "", type, sourceName, element.LineNumber());
+                    }
+                }    
+
+                case Recorder.Direction.Write:
+                    ToXml(model, recorder.Xml);
+                    return model;
+
+                default:
+                    Dbg.Err($"Recorder is somehow in mode {recorder.Mode} which is not valid");
+                    return model;
+            }
         }
     }
 }

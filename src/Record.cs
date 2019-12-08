@@ -15,6 +15,15 @@ namespace Def
         // This handles literally everything. I wish I could do more validation at compiletime, but the existence of Converters makes that impossible.
         public abstract void Record<T>(ref T value, string label);
 
+        public abstract XElement Xml { get; }
+
+        public enum Direction
+        {
+            Read,
+            Write,
+        }
+        public abstract Direction Mode { get; }
+
         public static string Write(IRecordable recordable, bool pretty = true)
         {
             var doc = new XDocument();
@@ -79,8 +88,7 @@ namespace Def
 
             var refs = record.ElementNamed("refs");
 
-            var readerContext = new ReaderContext();
-            readerContext.docName = stringName;
+            var readerContext = new ReaderContext(stringName, true);
 
             // First, we need to make the instances for all the references, so they can be crosslinked appropriately
             foreach (var reference in refs.Elements())
@@ -120,7 +128,7 @@ namespace Def
                     reference.Attribute("id").Remove();
 
                     // I'm not totally sure why I'm using ParseElement here instead of calling the converter directly, except for a deep feeling that I'll regret it if I go through a nonstandard pathway.
-                    readerContext.refs[id] = Serialization.ParseElement(reference, possibleType, null, false, stringName);
+                    readerContext.refs[id] = Serialization.ParseElement(reference, possibleType, null, false, readerContext);
                     if (readerContext.refs[id].GetType() != possibleType)
                     {
                         Dbg.Wrn($"{stringName}:{reference.LineNumber()}: Converter for type {possibleType} returned an unexpected {readerContext.refs[id].GetType()} instead");
@@ -155,7 +163,7 @@ namespace Def
                 var refInstance = readerContext.refs[id];
                 
                 // Do our actual parsing
-                var refInstanceOutput = Serialization.ParseElement(reference, refInstance.GetType(), refInstance, false, stringName, context: readerContext);
+                var refInstanceOutput = Serialization.ParseElement(reference, refInstance.GetType(), refInstance, false, readerContext);
 
                 if (refInstance != refInstanceOutput)
                 {
@@ -227,18 +235,35 @@ namespace Def
 
             element.Add(Serialization.ComposeElement(value, typeof(T), label, context, false));
         }
+
+        public override XElement Xml { get => element; }
+        public override Direction Mode { get => Direction.Write; }
     }
 
     internal class ReaderContext
     {
-        public string docName;
-        public Dictionary<string, object> refs = new Dictionary<string, object>();
+        public string sourceName;
+        public Dictionary<string, object> refs;
+
+        public bool Record { get => refs != null; }
+
+        public ReaderContext(string sourceName, bool withRefs)
+        {
+            this.sourceName = sourceName;
+
+            if (withRefs)
+            {
+                refs = new Dictionary<string, object>();
+            }
+        }
     }
 
     public class RecorderReader : Recorder
     {
         private readonly XElement element;
         private readonly ReaderContext context;
+
+        public string SourceName { get => context.sourceName; }
 
         internal RecorderReader(XElement element, ReaderContext context)
         {
@@ -255,7 +280,10 @@ namespace Def
             }
 
             // Explicit cast here because we want an error if we have the wrong type!
-            value = (T)Serialization.ParseElement(recorded, typeof(T), value, false, context.docName, context);
+            value = (T)Serialization.ParseElement(recorded, typeof(T), value, false, context);
         }
+
+        public override XElement Xml { get => element; }
+        public override Direction Mode { get => Direction.Read; }
     }
 }

@@ -142,6 +142,8 @@ namespace Def
                 Dbg.Err($"{stringName}: Found {doc.Elements().Count()} root elements instead of the expected 1");
             }
 
+            var readerContext = new ReaderContext(input, false);
+
             foreach (var rootElement in doc.Elements())
             {
                 if (rootElement.Name.LocalName != "Defs")
@@ -182,7 +184,7 @@ namespace Def
 
                     Database.Register(defInstance);
 
-                    finishWork.Add(() => Serialization.ParseElement(defElement, typeHandle, defInstance, true, stringName));
+                    finishWork.Add(() => Serialization.ParseElement(defElement, typeHandle, defInstance, true, readerContext));
                 }
             }
         }

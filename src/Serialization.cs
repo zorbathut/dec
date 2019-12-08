@@ -53,7 +53,7 @@ namespace Def
             }
         }
 
-        internal static object ParseElement(XElement element, Type type, object model, bool rootNode, string inputName, ReaderContext context = null)
+        internal static object ParseElement(XElement element, Type type, object model, bool rootNode, ReaderContext context)
         {
             // The first thing we do is parse all our attributes. This is because we want to verify that there are no attributes being ignored.
             // Don't return anything until we do our element.HasAtttributes check!
@@ -62,14 +62,14 @@ namespace Def
             if (element.Attribute("class") != null)
             {
                 var className = element.Attribute("class").Value;
-                var possibleType = (Type)ParseString(className, typeof(Type), inputName, element.LineNumber());
+                var possibleType = (Type)ParseString(className, typeof(Type), context.sourceName, element.LineNumber());
                 if (!type.IsAssignableFrom(possibleType))
                 {
-                    Dbg.Err($"{inputName}:{element.LineNumber()}: Explicit type {className} cannot be assigned to expected type {type}");
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Explicit type {className} cannot be assigned to expected type {type}");
                 }
                 else if (model != null && model.GetType() != possibleType)
                 {
-                    Dbg.Err($"{inputName}:{element.LineNumber()}: Explicit type {className} does not match already-provided instance {type}");
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Explicit type {className} does not match already-provided instance {type}");
                 }
                 else
                 {
@@ -84,13 +84,13 @@ namespace Def
 
             if (shouldBeNull && refId != null)
             {
-                Dbg.Err($"{inputName}:{element.LineNumber()}: Element cannot be both null and a reference at the same time");
+                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Element cannot be both null and a reference at the same time");
             }
 
             // No remaining attributes are allowed
             if (element.HasAttributes)
             {
-                Dbg.Err($"{inputName}:{element.LineNumber()}: Has unconsumed attributes");
+                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Has unconsumed attributes");
             }
 
             // See if we just want to return null
@@ -109,25 +109,42 @@ namespace Def
             {
                 if (context == null)
                 {
-                    Dbg.Err($"{inputName}:{element.LineNumber()}: Found a reference object outside of record-reader mode");
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Found a reference object outside of record-reader mode");
                     return model;
                 }
 
                 if (!context.refs.ContainsKey(refId))
                 {
-                    Dbg.Err($"{inputName}:{element.LineNumber()}: Found a reference object {refId} without a valid reference mapping");
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Found a reference object {refId} without a valid reference mapping");
                     return model;
                 }
 
                 object refObject = context.refs[refId];
                 if (!type.IsAssignableFrom(refObject.GetType()))
                 {
-                    Dbg.Err($"{inputName}:{element.LineNumber()}: Reference object {refId} is of type {refObject.GetType()}, which cannot be converted to expected type {type}");
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Reference object {refId} is of type {refObject.GetType()}, which cannot be converted to expected type {type}");
                     return model;
                 }
 
                 return refObject;
             }
+
+            // Converters may do their own processing, so we'll just defer off to them now; hell, you can even have both elements and text, if that's your jam
+            if (Converters.ContainsKey(type))
+            {
+                // context might be null; that's OK at the moment
+                var result = Converters[type].Record(model, type, new RecorderReader(element, context));
+
+                if (result != null && !type.IsAssignableFrom(result.GetType()))
+                {
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Converter {Converters[type].GetType()} for {type} returned unexpected type {result.GetType()}");
+                    return null;
+                }
+
+                return result;
+            }
+
+            // After this point we won't be using a converter in any way, we'll be requiring native Def types (as native as it gets, at least)
 
             bool hasElements = element.Elements().Any();
             bool hasText = element.Nodes().OfType<XText>().Any();
@@ -135,12 +152,12 @@ namespace Def
 
             if (hasElements && hasText)
             {
-                Dbg.Err($"{inputName}:{element.LineNumber()}: Elements and text are never valid together");
+                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Elements and text are never valid together");
             }
 
             if (typeof(Def).IsAssignableFrom(type) && hasElements && !rootNode)
             {
-                Dbg.Err($"{inputName}:{element.LineNumber()}: Inline def definitions are not currently supported");
+                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Inline def definitions are not currently supported");
                 return null;
             }
 
@@ -148,18 +165,17 @@ namespace Def
                 (typeof(Def).IsAssignableFrom(type) && !rootNode) ||
                 type == typeof(Type) ||
                 type == typeof(string) ||
-                type.IsPrimitive ||
-                (!hasElements && Converters.ContainsKey(type)))
+                type.IsPrimitive)
             {
                 if (hasElements && !hasText)
                 {
-                    Dbg.Err($"{inputName}:{element.LineNumber()}: Elements are not valid when parsing {type}");
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Elements are not valid when parsing {type}");
                 }
 
-                return ParseString(text, type, inputName, element.LineNumber());
+                return ParseString(text, type, context.sourceName, element.LineNumber());
             }
 
-            // We either have elements, or we're a composite type of some sort that conceptually *does* contain elements, we just don't have any
+            // We either have elements, or we're a composite type of some sort that conceptually *does* contain elements, we just don't have any.
 
             // Special case: IRecordables
             if (typeof(IRecordable).IsAssignableFrom(type))
@@ -169,21 +185,6 @@ namespace Def
                 recordable.Record(new RecorderReader(element, context));
 
                 return recordable;
-            }
-
-            // Special case: Converter override
-            if (Converters.ContainsKey(type))
-            {
-                // It's possible we already have a model here. For the sake of simplicity (and allowing polymorphic-output Converters) we discard the model entirely.
-
-                var result = Converters[type].FromXml(element, type, inputName);
-                if (result != null && !type.IsAssignableFrom(result.GetType()))
-                {
-                    Dbg.Err($"{inputName}:{element.LineNumber()}: Converter {Converters[type].GetType()} for {type} returned unexpected type {result.GetType()}");
-                    return null;
-                }
-
-                return result;
             }
 
             // Special case: Lists
@@ -201,10 +202,10 @@ namespace Def
                 {
                     if (fieldElement.Name.LocalName != "li")
                     {
-                        Dbg.Err($"{inputName}:{fieldElement.LineNumber()}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
+                        Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                     }
 
-                    list.Add(ParseElement(fieldElement, referencedType, null, false, inputName, context: context));
+                    list.Add(ParseElement(fieldElement, referencedType, null, false, context));
                 }
 
                 return list;
@@ -222,10 +223,10 @@ namespace Def
                     var fieldElement = elements[i];
                     if (fieldElement.Name.LocalName != "li")
                     {
-                        Dbg.Err($"{inputName}:{fieldElement.LineNumber()}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
+                        Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                     }
 
-                    array.SetValue(ParseElement(fieldElement, referencedType, null, false, inputName, context: context), i);
+                    array.SetValue(ParseElement(fieldElement, referencedType, null, false, context), i);
                 }
 
                 return array;
@@ -253,35 +254,35 @@ namespace Def
 
                         if (keyNode == null)
                         {
-                            Dbg.Err($"{inputName}:{fieldElement.LineNumber()}: Dictionary includes li tag without a key");
+                            Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Dictionary includes li tag without a key");
                             continue;
                         }
 
                         if (valueNode == null)
                         {
-                            Dbg.Err($"{inputName}:{fieldElement.LineNumber()}: Dictionary includes li tag without a value");
+                            Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Dictionary includes li tag without a value");
                             continue;
                         }
 
-                        var key = ParseElement(keyNode, keyType, null, false, inputName, context: context);
+                        var key = ParseElement(keyNode, keyType, null, false, context);
 
                         if (dict.Contains(key))
                         {
-                            Dbg.Err($"{inputName}:{fieldElement.LineNumber()}: Dictionary includes duplicate key {key.ToString()}");
+                            Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Dictionary includes duplicate key {key.ToString()}");
                         }
 
-                        dict[key] = ParseElement(valueNode, valueType, null, false, inputName, context: context);
+                        dict[key] = ParseElement(valueNode, valueType, null, false, context);
                     }
                     else
                     {
-                        var key = ParseString(fieldElement.Name.LocalName, keyType, inputName, fieldElement.LineNumber());
+                        var key = ParseString(fieldElement.Name.LocalName, keyType, context.sourceName, fieldElement.LineNumber());
 
                         if (dict.Contains(key))
                         {
-                            Dbg.Err($"{inputName}:{fieldElement.LineNumber()}: Dictionary includes duplicate key {fieldElement.Name.LocalName}");
+                            Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Dictionary includes duplicate key {fieldElement.Name.LocalName}");
                         }
 
-                        dict[key] = ParseElement(fieldElement, valueType, null, false, inputName, context: context);
+                        dict[key] = ParseElement(fieldElement, valueType, null, false, context);
                     }
                 }
 
@@ -295,9 +296,9 @@ namespace Def
             // One big problem here is that I'm OK with security vulnerabilities in def xmls. Those are either supplied by the developer or by mod authors who are intended to have full code support anyway.
             // I'm less OK with security vulnerabilities in save files. Nobody expects a savefile can compromise their system.
             // And the full reflection system is probably impossible to secure, whereas the Record system should be secureable.
-            if (context != null)
+            if (context.Record)
             {
-                Dbg.Err($"{inputName}:{element.LineNumber()}: Falling back to reflection within a Record system; this is currently not allowed for security reasons");
+                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Falling back to reflection within a Record system; this is currently not allowed for security reasons");
                 return null;
             }
 
@@ -314,7 +315,7 @@ namespace Def
                 string fieldName = fieldElement.Name.LocalName;
                 if (fields.Contains(fieldName))
                 {
-                    Dbg.Err($"{inputName}:{element.LineNumber()}: Duplicate field {fieldName}");
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Duplicate field {fieldName}");
                     // Just allow us to fall through; it's an error, but one with a reasonably obvious handling mechanism
                 }
                 fields.Add(fieldName);
@@ -322,11 +323,11 @@ namespace Def
                 var fieldInfo = type.GetFieldFromHierarchy(fieldElement.Name.LocalName);
                 if (fieldInfo == null)
                 {
-                    Dbg.Err($"{inputName}:{element.LineNumber()}: Field {fieldElement.Name.LocalName} does not exist in type {type}");
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Field {fieldElement.Name.LocalName} does not exist in type {type}");
                     continue;
                 }
 
-                fieldInfo.SetValue(model, ParseElement(fieldElement, fieldInfo.FieldType, fieldInfo.GetValue(model), false, inputName, context: context));
+                fieldInfo.SetValue(model, ParseElement(fieldElement, fieldInfo.FieldType, fieldInfo.GetValue(model), false, context));
             }
 
             return model;
@@ -335,6 +336,7 @@ namespace Def
         internal static object ParseString(string text, Type type, string inputName, int lineNumber)
         {
             // Special case: Converter override
+            // This is redundant if we're being called from ParseElement, but we aren't always.
             if (Converters.ContainsKey(type))
             {
                 var result = Converters[type].FromString(text, type, inputName, lineNumber);
@@ -531,7 +533,7 @@ namespace Def
                 }
                 else
                 {
-                    converter.ToXml(value, result);
+                    converter.Record(value, fieldType, new RecorderWriter(result, context));
                 }
 
                 return result;
