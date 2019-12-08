@@ -258,6 +258,61 @@ namespace DefTest
             Assert.AreEqual(nested.intLL, deserialized.intLL);
         }
 
+        public class RecursiveParent : Def.IRecordable
+        {
+            public List<RecursiveNode> children = new List<RecursiveNode>();
+
+            public void Record(Def.Recorder record)
+            {
+                record.Record(ref children, "children");
+            }
+        }
+
+        public class RecursiveNode : Def.IRecordable
+        {
+            public RecursiveNode childA;
+            public RecursiveNode childB;
+
+            public void Record(Def.Recorder record)
+            {
+                record.Record(ref childA, "childA");
+                record.Record(ref childB, "childB");
+            }
+        }
+
+        [Test]
+        public void ContainerRecursive()
+        {
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { });
+            parser.Finish();
+
+            var parent = new RecursiveParent();
+            parent.children.Add(new RecursiveNode());
+            parent.children.Add(new RecursiveNode());
+            parent.children.Add(new RecursiveNode());
+
+            parent.children[0].childB = parent.children[1];
+            parent.children[1].childA = parent.children[0];
+
+            // look on my works, ye mighty, and despair
+            parent.children[2].childA = parent.children[2];
+            parent.children[2].childB = parent.children[2];
+
+            string serialized = Def.Recorder.Write(parent, pretty: true);
+            var deserialized = Def.Recorder.Read<RecursiveParent>(serialized);
+
+            Assert.IsNull(deserialized.children[0].childA);
+            Assert.AreSame(deserialized.children[1], deserialized.children[0].childB);
+
+            Assert.AreSame(deserialized.children[0], deserialized.children[1].childA);
+            Assert.IsNull(deserialized.children[1].childB);
+
+            Assert.AreSame(deserialized.children[2], deserialized.children[2].childA);
+            Assert.AreSame(deserialized.children[2], deserialized.children[2].childB);
+
+            Assert.AreEqual(3, deserialized.children.Count);
+        }
+
         // hierarchy
     }
 }
