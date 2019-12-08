@@ -120,12 +120,14 @@ namespace DefTest
             public StubDef a;
             public StubDef b;
             public StubDef empty;
+            public StubDef forceEmpty = StaticReferenceDefs.TestDefA;
 
             public void Record(Def.Recorder record)
             {
                 record.Record(ref a, "a");
                 record.Record(ref b, "b");
                 record.Record(ref empty, "empty");
+                record.Record(ref forceEmpty, "forceEmpty");
             }
         }
 
@@ -144,6 +146,7 @@ namespace DefTest
             defs.a = StaticReferenceDefs.TestDefA;
             defs.b = StaticReferenceDefs.TestDefB;
             // leave empty empty, of course
+            defs.forceEmpty = null;
 
             string serialized = Def.Recorder.Write(defs, pretty: true);
             var deserialized = Def.Recorder.Read<DefRecordable>(serialized);
@@ -151,6 +154,7 @@ namespace DefTest
             Assert.AreEqual(defs.a, deserialized.a);
             Assert.AreEqual(defs.b, deserialized.b);
             Assert.AreEqual(defs.empty, deserialized.empty);
+            Assert.AreEqual(defs.forceEmpty, deserialized.forceEmpty);
         }
 
         public class RefsChildRecordable : Def.IRecordable
@@ -320,6 +324,5 @@ namespace DefTest
             Assert.AreEqual(3, deserialized.children.Count);
         }
 
-        // hierarchy
     }
 }
