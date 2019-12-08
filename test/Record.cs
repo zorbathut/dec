@@ -15,12 +15,16 @@ namespace DefTest
             public bool boolValue;
             public string stringValue;
 
+            public Type typeValue;
+
             public void Record(Def.Recorder record)
             {
                 record.Record(ref intValue, "intValue");
                 record.Record(ref floatValue, "floatValue");
                 record.Record(ref boolValue, "boolValue");
                 record.Record(ref stringValue, "stringValue");
+
+                record.Record(ref typeValue, "typeValue");
             }
         }
 
@@ -35,6 +39,7 @@ namespace DefTest
             primitives.floatValue = 0.1234f;
             primitives.boolValue = true;
             primitives.stringValue = "<This is a test string value with some XML-sensitive characters.>";
+            primitives.typeValue = typeof(Def.Def);
 
             string serialized = Def.Recorder.Write(primitives, pretty: true);
             var deserialized = Def.Recorder.Read<PrimitivesRecordable>(serialized);
@@ -43,6 +48,8 @@ namespace DefTest
             Assert.AreEqual(primitives.floatValue, deserialized.floatValue);
             Assert.AreEqual(primitives.boolValue, deserialized.boolValue);
             Assert.AreEqual(primitives.stringValue, deserialized.stringValue);
+
+            Assert.AreEqual(primitives.typeValue, typeof(Def.Def));
         }
 
         public class ConverterRecordable : Def.IRecordable

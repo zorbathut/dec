@@ -435,6 +435,13 @@ namespace Def
                 return result;
             }
 
+            if (value is Type)
+            {
+                result.Add(new XText((value as Type).ToStringDefFormatted()));
+
+                return result;
+            }
+
             if (typeof(Def).IsAssignableFrom(fieldType))
             {
                 // It is! Let's just get the def name and be done with it.
