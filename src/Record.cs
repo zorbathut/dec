@@ -49,7 +49,7 @@ namespace Def
                     refs.Add(element);
 
                     element.SetAttributeValue("id", writerContext.GetRef(reference));
-                    element.SetAttributeValue("class", reference.GetType().ToString());
+                    element.SetAttributeValue("class", reference.GetType().ToStringDefFormatted());
                 }
             }
 

@@ -380,27 +380,7 @@ namespace Def
                     return null;
                 }
 
-                var possibleType = Type.GetType(text);
-                if (possibleType != null)
-                {
-                    return possibleType;
-                }
-
-                var possibleTypes = UtilReflection.GetAllTypes().Where(t => t.Name == text || t.FullName == text).ToArray();
-                if (possibleTypes.Length == 0)
-                {
-                    Dbg.Err($"{inputName}:{lineNumber}: Couldn't find type named {text}");
-                    return null;
-                }
-                else if (possibleTypes.Length > 1)
-                {
-                    Dbg.Err($"{inputName}:{lineNumber}: Found too many types named {text} ({possibleTypes.Select(t => t.FullName).ToCommaString()})");
-                    return possibleTypes[0];
-                }
-                else
-                {
-                    return possibleTypes[0];
-                }
+                return UtilReflection.ParseTypeDefFormatted(text, inputName, lineNumber);
             }
 
             // Various non-composite-type special-cases
