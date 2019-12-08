@@ -30,7 +30,14 @@ namespace DefTest
         [OneTimeSetUp]
         public void PrepHooks()
         {
-            Def.Config.WarningHandler = str => {
+            Def.Config.InfoHandler = str =>
+            {
+                System.Diagnostics.Debug.Print(str);
+                Console.WriteLine(str);
+            };
+
+            Def.Config.WarningHandler = str =>
+            {
                 System.Diagnostics.Debug.Print(str);
                 Console.WriteLine(str);
 
@@ -45,7 +52,8 @@ namespace DefTest
                 }
             };
 
-            Def.Config.ErrorHandler = str => {
+            Def.Config.ErrorHandler = str =>
+            {
                 System.Diagnostics.Debug.Print(str);
                 Console.WriteLine(str);
 
@@ -61,7 +69,8 @@ namespace DefTest
                 }
             };
 
-            Def.Config.ExceptionHandler = e => {
+            Def.Config.ExceptionHandler = e =>
+            {
                 Def.Config.ErrorHandler(e.ToString());
             };
         }
