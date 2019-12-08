@@ -62,7 +62,7 @@ namespace Def
                 }
                 else
                 {
-                    defTypes = Util.GetAllTypes().Where(t => t.IsSubclassOf(typeof(Def)));
+                    defTypes = UtilReflection.GetAllTypes().Where(t => t.IsSubclassOf(typeof(Def)));
                 }
 
                 foreach (var type in defTypes)
@@ -90,7 +90,7 @@ namespace Def
                 }
                 else
                 {
-                    staticRefs = Util.GetAllTypes().Where(t => t.HasAttribute(typeof(StaticReferencesAttribute)));
+                    staticRefs = UtilReflection.GetAllTypes().Where(t => t.HasAttribute(typeof(StaticReferencesAttribute)));
                 }
 
                 foreach (var type in staticRefs)

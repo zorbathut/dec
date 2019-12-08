@@ -50,7 +50,7 @@ namespace Def
         /// </remarks>
         public static Def Get(Type type, string name)
         {
-            var typedict = Lookup.TryGetValue(Util.GetDefHierarchyType(type));
+            var typedict = Lookup.TryGetValue(UtilReflection.GetDefHierarchyType(type));
             if (typedict == null)
             {
                 return null;
@@ -89,7 +89,7 @@ namespace Def
         
         internal static void Register(Def instance)
         {
-            var defType = Util.GetDefHierarchyType(instance.GetType());
+            var defType = UtilReflection.GetDefHierarchyType(instance.GetType());
             var dbType = typeof(Database<>).MakeGenericType(new[] { defType });
             Databases.Add(dbType);
 

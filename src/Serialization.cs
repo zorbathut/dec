@@ -29,7 +29,7 @@ namespace Def
             }
             else
             {
-                conversionTypes = Util.GetAllTypes().Where(t => t.IsSubclassOf(typeof(Converter)) && !t.IsAbstract);
+                conversionTypes = UtilReflection.GetAllTypes().Where(t => t.IsSubclassOf(typeof(Converter)) && !t.IsAbstract);
             }
 
             foreach (var type in conversionTypes)
@@ -350,7 +350,7 @@ namespace Def
             // Special case: defs
             if (typeof(Def).IsAssignableFrom(type))
             {
-                if (Util.GetDefHierarchyType(type) == null)
+                if (UtilReflection.GetDefHierarchyType(type) == null)
                 {
                     Dbg.Err($"{inputName}:{lineNumber}: Non-hierarchy defs cannot be used as references");
                     return null;
@@ -386,7 +386,7 @@ namespace Def
                     return possibleType;
                 }
 
-                var possibleTypes = Util.GetAllTypes().Where(t => t.Name == text || t.FullName == text).ToArray();
+                var possibleTypes = UtilReflection.GetAllTypes().Where(t => t.Name == text || t.FullName == text).ToArray();
                 if (possibleTypes.Length == 0)
                 {
                     Dbg.Err($"{inputName}:{lineNumber}: Couldn't find type named {text}");
