@@ -65,6 +65,36 @@ namespace DefTest
             Assert.AreEqual(result.data, new[] { 10, 9, 8, 7, 6 });
 	    }
 
+        public class ListOverrideDef : Def.Def
+        {
+            public List<int> dataA = new List<int> { 3, 4, 5 };
+            public List<int> dataB = new List<int> { 6, 7, 8 };
+            public List<int> dataC = new List<int> { 9, 10, 11 };
+        }
+
+        [Test]
+        public void ListOverride()
+        {
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(ListOverrideDef) });
+            parser.AddString(@"
+                <Defs>
+                    <ListOverrideDef defName=""TestDef"">
+                        <dataA>
+                            <li>2020</li>
+                        </dataA>
+                        <dataB />
+                    </ListOverrideDef>
+                </Defs>");
+            parser.Finish();
+
+            var result = Def.Database<ListOverrideDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(result.dataA, new[] { 2020 });
+            Assert.AreEqual(result.dataB, new int[0] );
+            Assert.AreEqual(result.dataC, new[] { 9, 10, 11 });
+        }
+
         public class NestedDef : Def.Def
         {
             public int[][] data;
@@ -194,5 +224,36 @@ namespace DefTest
 
             Assert.AreEqual(result.data, new Dictionary<string, string> { { "dupe", "10" } });
 	    }
+
+        public class DictionaryStringOverrideDef : Def.Def
+        {
+            public Dictionary<string, string> dataA = new Dictionary<string, string> { ["a"] = "1", ["b"] = "2", ["c"] = "3" };
+            public Dictionary<string, string> dataB = new Dictionary<string, string> { ["d"] = "4", ["e"] = "5", ["f"] = "6" };
+            public Dictionary<string, string> dataC = new Dictionary<string, string> { ["g"] = "7", ["h"] = "8", ["i"] = "9" };
+        }
+
+        [Test]
+        public void DictionaryOverrideString()
+        {
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(DictionaryStringOverrideDef) });
+            parser.AddString(@"
+                <Defs>
+                    <DictionaryStringOverrideDef defName=""TestDef"">
+                        <dataA>
+                            <u>2020</u>
+                            <v>2021</v>
+                        </dataA>
+                        <dataB />
+                    </DictionaryStringOverrideDef>
+                </Defs>");
+            parser.Finish();
+
+            var result = Def.Database<DictionaryStringOverrideDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(result.dataA, new Dictionary<string, string> { { "u", "2020" }, { "v", "2021" } });
+            Assert.AreEqual(result.dataB, new Dictionary<string, string> { });
+            Assert.AreEqual(result.dataC, new Dictionary<string, string> { ["g"] = "7", ["h"] = "8", ["i"] = "9" });
+        }
     }
 }
