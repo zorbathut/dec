@@ -474,13 +474,16 @@ namespace Def
                 return result;
             }
 
-            // Now we drop into ref-mode, if allowed
-            if (!forceRefContents && !fieldType.IsValueType)
+            // Check to see if we should make this into a ref
+            if (!fieldType.IsValueType)
             {
-                // We're going to turn this into a reference
-                result.SetAttributeValue("ref", context.GetRef(value));
+                if (context.RegisterReference(value, result))
+                {
+                    // The ref system has set up the appropriate tagging, so we're done!
+                    return result;
+                }
 
-                return result;
+                // This is not a reference! (yet, at least). So keep on generating it.
             }
 
             // We'll drop through if we're in force-ref-resolve mode, or if we have something that needs conversion and is a struct (classes get turned into refs)

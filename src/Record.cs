@@ -43,23 +43,19 @@ namespace Def
 
             recordable.Record(new RecorderWriter(data, writerContext));
 
-            // We have a bunch of refs that need to be written and we're going to deal with them here
-            // However, this is iffy because we may actually have *more* refs to output once we're done with the first batch.
-            // Keep repeating until we run out of new refs.
-            while (writerContext.HasRefsToWrite())
+            // Write our references!
+            if (writerContext.HasReferences())
             {
-                // Clear out our list so we won't lose any while we're iterating over our current list.
-                var refsToWrite = writerContext.ConsumeRefsToWrite();
-
                 // Canonical ordering to provide some stability and ease-of-reading.
-                foreach (var reference in refsToWrite.OrderBy(reference => writerContext.GetRef(reference)))
+                foreach (var reference in writerContext.StripAndOutputReferences().OrderBy(kvp => kvp.Key))
                 {
-                    var element = Serialization.ComposeElement(reference, reference.GetType(), "Ref", writerContext, true);
-                    refs.Add(element);
-
-                    element.SetAttributeValue("id", writerContext.GetRef(reference));
-                    element.SetAttributeValue("class", reference.GetType().ToStringDefFormatted());
+                    refs.Add(reference.Value);
                 }
+            }
+            else
+            {
+                // strip out the refs 'cause it looks better that way :V
+                refs.Remove();
             }
 
             return doc.ToString();
@@ -90,61 +86,64 @@ namespace Def
 
             var readerContext = new ReaderContext(stringName, true);
 
-            // First, we need to make the instances for all the references, so they can be crosslinked appropriately
-            foreach (var reference in refs.Elements())
+            if (refs != null)
             {
-                if (reference.Name.LocalName != "Ref")
+                // First, we need to make the instances for all the references, so they can be crosslinked appropriately
+                foreach (var reference in refs.Elements())
                 {
-                    Dbg.Wrn($"{stringName}:{reference.LineNumber()}: Reference element should be named 'Ref'");
+                    if (reference.Name.LocalName != "Ref")
+                    {
+                        Dbg.Wrn($"{stringName}:{reference.LineNumber()}: Reference element should be named 'Ref'");
+                    }
+
+                    var id = reference.Attribute("id")?.Value;
+                    if (id == null)
+                    {
+                        Dbg.Err($"{stringName}:{reference.LineNumber()}: Missing reference ID");
+                        continue;
+                    }
+
+                    var className = reference.Attribute("class")?.Value;
+                    if (className == null)
+                    {
+                        Dbg.Err($"{stringName}:{reference.LineNumber()}: Missing reference class name");
+                        continue;
+                    }
+
+                    var possibleType = (Type)Serialization.ParseString(className, typeof(Type), stringName, reference.LineNumber());
+                    if (possibleType.IsValueType)
+                    {
+                        Dbg.Err($"{stringName}:{reference.LineNumber()}: Reference assigned type {possibleType}, which is a value type");
+                        continue;
+                    }
+
+                    // Create a stub so other things can reference it later
+                    readerContext.refs[id] = Activator.CreateInstance(possibleType);
+                    if (readerContext.refs[id] == null)
+                    {
+                        Dbg.Err($"{stringName}:{reference.LineNumber()}: Reference of type {possibleType} was not properly created; this will cause issues");
+                        continue;
+                    }
                 }
 
-                var id = reference.Attribute("id")?.Value;
-                if (id == null)
+                // Now that all the refs exist, we can run through them again and actually parse them
+                foreach (var reference in refs.Elements())
                 {
-                    Dbg.Err($"{stringName}:{reference.LineNumber()}: Missing reference ID");
-                    continue;
-                }
+                    var id = reference.Attribute("id")?.Value;
 
-                var className = reference.Attribute("class")?.Value;
-                if (className == null)
-                {
-                    Dbg.Err($"{stringName}:{reference.LineNumber()}: Missing reference class name");
-                    continue;
-                }
+                    // The serialization routines don't know how to deal with this, so we'll remove it now
+                    reference.Attribute("id").Remove();
 
-                var possibleType = (Type)Serialization.ParseString(className, typeof(Type), stringName, reference.LineNumber());
-                if (possibleType.IsValueType)
-                {
-                    Dbg.Err($"{stringName}:{reference.LineNumber()}: Reference assigned type {possibleType}, which is a value type");
-                    continue;
-                }
+                    var refInstance = readerContext.refs[id];
 
-                // Create a stub so other things can reference it later
-                readerContext.refs[id] = Activator.CreateInstance(possibleType);
-                if (readerContext.refs[id] == null)
-                {
-                    Dbg.Err($"{stringName}:{reference.LineNumber()}: Reference of type {possibleType} was not properly created; this will cause issues");
-                    continue;
-                }
-            }
+                    // Do our actual parsing
+                    var refInstanceOutput = Serialization.ParseElement(reference, refInstance.GetType(), refInstance, readerContext, hasReferenceId: true);
 
-            // Now that all the refs exist, we can run through them again and actually parse them
-            foreach (var reference in refs.Elements())
-            {
-                var id = reference.Attribute("id")?.Value;
-
-                // The serialization routines don't know how to deal with this, so we'll remove it now
-                reference.Attribute("id").Remove();
-
-                var refInstance = readerContext.refs[id];
-                
-                // Do our actual parsing
-                var refInstanceOutput = Serialization.ParseElement(reference, refInstance.GetType(), refInstance, readerContext, hasReferenceId: true);
-
-                if (refInstance != refInstanceOutput)
-                {
-                    Dbg.Err($"{stringName}:{reference.LineNumber()}: Something really bizarre has happened and we got the wrong object back. Things are probably irrevocably broken. Please report this as a bug in Def.");
-                    continue;
+                    if (refInstance != refInstanceOutput)
+                    {
+                        Dbg.Err($"{stringName}:{reference.LineNumber()}: Something really bizarre has happened and we got the wrong object back. Things are probably irrevocably broken. Please report this as a bug in Def.");
+                        continue;
+                    }
                 }
             }
 
@@ -158,32 +157,77 @@ namespace Def
 
     internal class WriterContext
     {
-        private Dictionary<object, string> refs = new Dictionary<object, string>();
-        private List<object> refsToWrite = new List<object>();
+        // A map from object to the in-place element. This does *not* yet have the ref ID tagged, and will have to be extracted into a new Element later.
+        private Dictionary<object, XElement> refToElement = new Dictionary<object, XElement>();
 
-        public string GetRef(object referenced)
+        // A map from object to the string intended as a reference. This will be filled in only once a second reference to something is created.
+        private Dictionary<object, string> refToString = new Dictionary<object, string>();
+
+        public bool RegisterReference(object referenced, XElement element)
         {
-            var refid = refs.TryGetValue(referenced);
-            if (refid == null)
+            if (!refToElement.ContainsKey(referenced))
             {
-                refid = $"ref{refs.Count:D5}";
-                refs[referenced] = refid;
-                refsToWrite.Add(referenced);
+                // Insert it into our refToElement mapping
+                refToElement[referenced] = element;
+
+                // We still need this to be generated, so we'll just let that happen now
+                return false;
             }
 
-            return refid;
+            var refId = refToString.TryGetValue(referenced);
+            if (refId == null)
+            {
+                // We already had a reference, but we don't have a string ID for it. We need one now though!
+                refId = $"ref{refToString.Count:D5}";
+                refToString[referenced] = refId;
+            }
+
+            // Tag the XML element properly
+            element.SetAttributeValue("ref", refId);
+
+            // And we're done!
+            return true;
         }
 
-        public bool HasRefsToWrite()
+        public bool HasReferences()
         {
-            return refsToWrite.Any();
+            return refToString.Any();
         }
 
-        public List<object> ConsumeRefsToWrite()
+        public IEnumerable<KeyValuePair<string, XElement>> StripAndOutputReferences()
         {
-            var result = refsToWrite;
-            refsToWrite = new List<object>();
-            return result;
+            // It is *vitally* important that we do this step *after* all references are generated, not inline as we add references.
+            // This is because we have to move all the contents of the XML element, but if we do it during generation, a recursive-reference situation could result in us trying to move the contents before the XML element is fully generated.
+            // So we do it now, when we know that everything is finished.
+            foreach (var refblock in refToString)
+            {
+                var result = new XElement("Ref");
+                result.SetAttributeValue("id", refblock.Value);
+
+                var src = refToElement[refblock.Key];
+
+                // gotta ToArray() because it does not like mutating things while iterating
+                // And yes, you have to .Remove() also, otherwise you get copies in both places.
+                foreach (var attribute in src.Attributes().ToArray())
+                {
+                    attribute.Remove();
+                    result.Add(attribute);
+                }
+
+                foreach (var node in src.Nodes().ToArray())
+                {
+                    node.Remove();
+                    result.Add(node);
+                }
+
+                // Patch in the ref link
+                src.SetAttributeValue("ref", refblock.Value);
+
+                // We may not have had a class to begin with, but we sure need one now!
+                result.SetAttributeValue("class", refblock.Key.GetType().ToStringDefFormatted());
+
+                yield return new KeyValuePair<string, XElement>(refblock.Value, result);
+            }
         }
     }
 
