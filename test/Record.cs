@@ -457,5 +457,60 @@ namespace DefTest
             // should just leave this alone
             Assert.IsNotNull(deserialized.unparseable);
         }
+
+        public class RecursiveSquaredRecorder : Def.IRecordable
+        {
+            public RecursiveSquaredRecorder left;
+            public RecursiveSquaredRecorder right;
+
+            public void Record(Def.Recorder record)
+            {
+                record.Record(ref left, "left");
+                record.Record(ref right, "right");
+            }
+        }
+
+        [Test]
+        public void RecursiveSquared()
+        {
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { });
+            parser.Finish();
+
+            var root = new RecursiveSquaredRecorder();
+
+            var a = new RecursiveSquaredRecorder();
+            var b = new RecursiveSquaredRecorder();
+            var c = new RecursiveSquaredRecorder();
+
+            root.left = a;
+            root.right = a;
+
+            a.left = b;
+            a.right = b;
+            b.left = c;
+            b.right = c;
+            c.left = a;
+            c.right = a;
+
+            string serialized = Def.Recorder.Write(root, pretty: true);
+            var deserialized = Def.Recorder.Read<RecursiveSquaredRecorder>(serialized);
+
+            Assert.AreSame(deserialized.left, deserialized.right);
+            Assert.AreSame(deserialized.left.left, deserialized.right.right);
+            Assert.AreSame(deserialized.left.left.left, deserialized.right.right.right);
+            Assert.AreSame(deserialized.left.left.left.left, deserialized.right.right.right.right);
+
+            Assert.AreSame(deserialized.left, deserialized.right.right.right.right);
+
+            Assert.AreNotSame(deserialized, deserialized.left);
+            Assert.AreNotSame(deserialized, deserialized.left.left);
+            Assert.AreNotSame(deserialized, deserialized.left.left.left);
+            Assert.AreNotSame(deserialized, deserialized.left.left.left.left);
+
+            Assert.AreNotSame(deserialized.left, deserialized.left.left);
+            Assert.AreNotSame(deserialized.left, deserialized.left.left.left);
+
+            Assert.AreNotSame(deserialized.left.left, deserialized.left.left.left);
+        }
     }
 }
