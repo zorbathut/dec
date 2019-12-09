@@ -253,7 +253,7 @@ namespace Def
 
             fields.Add(label);
 
-            element.Add(Serialization.ComposeElement(value, typeof(T), label, context, false));
+            element.Add(Serialization.ComposeElement(value, typeof(T), label, context));
         }
 
         public override XElement Xml { get => element; }

@@ -426,7 +426,7 @@ namespace Def
             }
         }
 
-        internal static XElement ComposeElement(object value, Type fieldType, string label, WriterContext context, bool forceRefContents)
+        internal static XElement ComposeElement(object value, Type fieldType, string label, WriterContext context)
         {
             var result = new XElement(label);
 
@@ -496,7 +496,7 @@ namespace Def
 
                 for (int i = 0; i < list.Count; ++i)
                 {
-                    result.Add(ComposeElement(list[i], referencedType, "li", context, false));
+                    result.Add(ComposeElement(list[i], referencedType, "li", context));
                 }
 
                 return result;
@@ -519,8 +519,8 @@ namespace Def
                     var element = new XElement("li");
                     result.Add(element);
 
-                    element.Add(ComposeElement(iterator.Key, keyType, "key", context, false));
-                    element.Add(ComposeElement(iterator.Value, valueType, "value", context, false));
+                    element.Add(ComposeElement(iterator.Key, keyType, "key", context));
+                    element.Add(ComposeElement(iterator.Value, valueType, "value", context));
                 }
 
                 return result;
