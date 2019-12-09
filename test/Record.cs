@@ -420,5 +420,42 @@ namespace DefTest
             Assert.AreEqual(3, deserialized.children.Count);
         }
 
+        public class Unparseable
+        {
+
+        }
+
+        public class MisparseRecordable : Def.IRecordable
+        {
+            // amusingly, if this is "null", it works fine, because it just says "well it's null I'll mark as a null, done"
+            // I'm not sure I want to guarantee that behavior but I'm also not gonna make it an error, at least for now
+            public Unparseable unparseable = new Unparseable();
+
+            public void Record(Def.Recorder record)
+            {
+                record.Record(ref unparseable, "unparseable");
+            }
+        }
+
+        [Test]
+        public void Misparse()
+        {
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { });
+            parser.Finish();
+
+            var misparse = new MisparseRecordable();
+
+            string serialized = null;
+            ExpectErrors(() => serialized = Def.Recorder.Write(misparse, pretty: true));
+            Assert.IsNotNull(serialized);
+
+            MisparseRecordable deserialized = null;
+            ExpectErrors(() => deserialized = Def.Recorder.Read<MisparseRecordable>(serialized));
+
+            Assert.IsNotNull(deserialized);
+
+            // should just leave this alone
+            Assert.IsNotNull(deserialized.unparseable);
+        }
     }
 }

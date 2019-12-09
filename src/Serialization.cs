@@ -307,7 +307,7 @@ namespace Def
             if (context.Record)
             {
                 Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Falling back to reflection within a Record system; this is currently not allowed for security reasons");
-                return null;
+                return model;
             }
 
             // If we haven't been given a template class from our parent, go ahead and init to defaults
