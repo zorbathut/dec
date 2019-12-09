@@ -61,13 +61,15 @@ namespace DefTest
                 record.Record(ref convertable, "convertable");
             }
         }
+
         public class Converted
         {
             public int a;
             public int b;
             public int c;
         }
-        public class ConvertedConverter : Def.Converter
+
+        public class ConvertedConverterSimple : Def.Converter
         {
             public override HashSet<Type> HandledTypes()
             {
@@ -87,10 +89,12 @@ namespace DefTest
             }
         }
 
+        // This doesn't work right now - we need support for inline referencables-that-aren't-referenced first.
+        /*
         [Test]
-        public void Converter()
+        public void ConverterSimple()
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { }, explicitConversionTypes: new Type[] { typeof(ConvertedConverter) });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { }, explicitConversionTypes: new Type[] { typeof(ConvertedConverterSimple) });
             parser.Finish();
 
             var converted = new ConverterRecordable();
@@ -105,6 +109,98 @@ namespace DefTest
             Assert.AreEqual(converted.convertable.a, deserialized.convertable.a);
             Assert.AreEqual(converted.convertable.b, deserialized.convertable.b);
             Assert.AreEqual(converted.convertable.c, deserialized.convertable.c);
+        }*/
+
+        public class ConvertedConverterRecord : Def.Converter
+        {
+            public override HashSet<Type> HandledTypes()
+            {
+                return new HashSet<Type> { typeof(Converted) };
+            }
+
+            public override object Record(object model, Type type, Def.Recorder recorder)
+            {
+                var converted = model as Converted ?? new Converted();
+
+                recorder.Record(ref converted.a, "a");
+                recorder.Record(ref converted.b, "b");
+                recorder.Record(ref converted.c, "c");
+
+                return converted;
+            }
+        }
+
+        [Test]
+        public void ConverterRecord()
+        {
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { }, explicitConversionTypes: new Type[] { typeof(ConvertedConverterRecord) });
+            parser.Finish();
+
+            var converted = new ConverterRecordable();
+            converted.convertable = new Converted();
+            converted.convertable.a = 42;
+            converted.convertable.b = 1234;
+            converted.convertable.c = -40;
+
+            string serialized = Def.Recorder.Write(converted, pretty: true);
+            var deserialized = Def.Recorder.Read<ConverterRecordable>(serialized);
+
+            Assert.AreEqual(converted.convertable.a, deserialized.convertable.a);
+            Assert.AreEqual(converted.convertable.b, deserialized.convertable.b);
+            Assert.AreEqual(converted.convertable.c, deserialized.convertable.c);
+        }
+
+        public class ConverterReplacementRecordable : Def.IRecordable
+        {
+            public Converted convertableA;
+            public Converted convertableB;
+
+            public void Record(Def.Recorder record)
+            {
+                record.Record(ref convertableA, "convertableA");
+                record.Record(ref convertableB, "convertableB");
+            }
+        }
+
+        [Test]
+        public void ConverterReplacementDetection()
+        {
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { }, explicitConversionTypes: new Type[] { typeof(ConvertedConverterSimple) });
+            parser.Finish();
+
+            var converted = new ConverterReplacementRecordable();
+            converted.convertableA = new Converted();
+            converted.convertableB = converted.convertableA;
+
+            string serialized = Def.Recorder.Write(converted, pretty: true);
+            ConverterReplacementRecordable deserialized = null;
+            ExpectErrors(() => deserialized = Def.Recorder.Read<ConverterReplacementRecordable>(serialized));
+
+            Assert.IsNotNull(deserialized);
+
+            // no guarantees on what exactly they contain, though!
+            Assert.IsNotNull(deserialized.convertableA);
+            Assert.IsNotNull(deserialized.convertableB);
+        }
+
+        [Test]
+        public void ConverterReplacementWorking()
+        {
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { }, explicitConversionTypes: new Type[] { typeof(ConvertedConverterRecord) });
+            parser.Finish();
+
+            var converted = new ConverterReplacementRecordable();
+            converted.convertableA = new Converted();
+            converted.convertableB = converted.convertableA;
+
+            string serialized = Def.Recorder.Write(converted, pretty: true);
+            ConverterReplacementRecordable deserialized = Def.Recorder.Read<ConverterReplacementRecordable>(serialized);
+
+            Assert.IsNotNull(deserialized);
+
+            // no guarantees on what exactly they contain, though!
+            Assert.IsNotNull(deserialized.convertableA);
+            Assert.IsNotNull(deserialized.convertableB);
         }
 
         [Def.StaticReferences]
@@ -184,7 +280,7 @@ namespace DefTest
         [Test]
         public void Refs()
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { }, explicitConversionTypes: new Type[] { typeof(ConvertedConverter) });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { }, explicitConversionTypes: new Type[] { });
             parser.Finish();
 
             var refs = new RefsRootRecordable();

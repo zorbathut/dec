@@ -119,30 +119,12 @@ namespace Def
                     continue;
                 }
 
-                if (Serialization.Converters.ContainsKey(possibleType))
+                // Create a stub so other things can reference it later
+                readerContext.refs[id] = Activator.CreateInstance(possibleType);
+                if (readerContext.refs[id] == null)
                 {
-                    // We have a converter, so we just go ahead and make it instead of bothering with the two-pass method.
-                    // This is because converters actually can't reference other things, so it's safe. However, they also can return unpredictable data types, so we can't make a placeholder.
-
-                    // Remove the id so ParseElement doesn't choke.
-                    reference.Attribute("id").Remove();
-
-                    // I'm not totally sure why I'm using ParseElement here instead of calling the converter directly, except for a deep feeling that I'll regret it if I go through a nonstandard pathway.
-                    readerContext.refs[id] = Serialization.ParseElement(reference, possibleType, null, false, readerContext);
-                    if (readerContext.refs[id].GetType() != possibleType)
-                    {
-                        Dbg.Wrn($"{stringName}:{reference.LineNumber()}: Converter for type {possibleType} returned an unexpected {readerContext.refs[id].GetType()} instead");
-                    }
-                }
-                else
-                {
-                    // We don't have a converter, so we create a stub so other things can reference it later
-                    readerContext.refs[id] = Activator.CreateInstance(possibleType);
-                    if (readerContext.refs[id] == null)
-                    {
-                        Dbg.Err($"{stringName}:{reference.LineNumber()}: Reference of type {possibleType} was not properly created; this will cause issues");
-                        continue;
-                    }
+                    Dbg.Err($"{stringName}:{reference.LineNumber()}: Reference of type {possibleType} was not properly created; this will cause issues");
+                    continue;
                 }
             }
 
@@ -151,19 +133,13 @@ namespace Def
             {
                 var id = reference.Attribute("id")?.Value;
 
-                // If we don't have an ID, then we've already eaten it due to using a converter. And that means we're done, just move on.
-                if (id == null)
-                {
-                    continue;
-                }
-
                 // The serialization routines don't know how to deal with this, so we'll remove it now
                 reference.Attribute("id").Remove();
 
                 var refInstance = readerContext.refs[id];
                 
                 // Do our actual parsing
-                var refInstanceOutput = Serialization.ParseElement(reference, refInstance.GetType(), refInstance, false, readerContext);
+                var refInstanceOutput = Serialization.ParseElement(reference, refInstance.GetType(), refInstance, readerContext, hasReferenceId: true);
 
                 if (refInstance != refInstanceOutput)
                 {
@@ -280,7 +256,7 @@ namespace Def
             }
 
             // Explicit cast here because we want an error if we have the wrong type!
-            value = (T)Serialization.ParseElement(recorded, typeof(T), value, false, context);
+            value = (T)Serialization.ParseElement(recorded, typeof(T), value, context);
         }
 
         public override XElement Xml { get => element; }

@@ -239,5 +239,83 @@ namespace DefTest
             Assert.IsNotNull(Def.Database<NonEmptyPayloadDef>.Get("TestDefault").payload);
             Assert.IsNull(Def.Database<NonEmptyPayloadDef>.Get("TestNull").payload);
         }
+
+        public struct ConverterStructObj
+        {
+            public int intA;
+            public int intB;
+        }
+
+        public class ConverterStructDef : Def.Def
+        {
+            public ConverterStructObj replacedDefault;
+            public ConverterStructObj initializedUntouched = new ConverterStructObj { intA = 1, intB = 2 };
+            public ConverterStructObj initializedReplaced = new ConverterStructObj { intA = 3, intB = 4 };
+            public ConverterStructObj initializedTouched = new ConverterStructObj { intA = 5, intB = 6 };
+        }
+
+        public class ConverterStructConverter : Def.Converter
+        {
+            public override HashSet<Type> HandledTypes()
+            {
+                return new HashSet<Type>() { typeof(ConverterStructObj) };
+            }
+
+            public override object Record(object model, Type type, Def.Recorder recorder)
+            {
+                ConverterStructObj cso;
+
+                if (model == null)
+                {
+                    cso = new ConverterStructObj();
+                }
+                else
+                {
+                    cso = (ConverterStructObj)model;
+                }
+
+                recorder.Record(ref cso.intA, "intA");
+                recorder.Record(ref cso.intB, "intB");
+
+                return cso;
+            }
+        }
+
+        [Test]
+        public void ConverterStruct()
+        {
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(ConverterStructDef) }, explicitConversionTypes: new Type[] { typeof(ConverterStructConverter) });
+            parser.AddString(@"
+                <Defs>
+                    <ConverterStructDef defName=""TestDef"">
+                        <replacedDefault>
+                            <intA>20</intA>
+                            <intB>21</intB>
+                        </replacedDefault>
+                        <initializedReplaced>
+                            <intA>22</intA>
+                            <intB>23</intB>
+                        </initializedReplaced>
+                        <initializedTouched>
+                            <intA>24</intA>
+                        </initializedTouched>
+                    </ConverterStructDef>
+                </Defs>");
+            parser.Finish();
+
+            var testDef = Def.Database<ConverterStructDef>.Get("TestDef");
+
+            Assert.AreEqual(20, testDef.replacedDefault.intA);
+            Assert.AreEqual(21, testDef.replacedDefault.intB);
+
+            Assert.AreEqual(1, testDef.initializedUntouched.intA);
+            Assert.AreEqual(2, testDef.initializedUntouched.intB);
+
+            Assert.AreEqual(22, testDef.initializedReplaced.intA);
+            Assert.AreEqual(23, testDef.initializedReplaced.intB);
+
+            Assert.AreEqual(24, testDef.initializedTouched.intA);
+            Assert.AreEqual(6, testDef.initializedTouched.intB);
+        }
     }
 }

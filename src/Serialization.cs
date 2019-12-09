@@ -53,7 +53,7 @@ namespace Def
             }
         }
 
-        internal static object ParseElement(XElement element, Type type, object model, bool rootNode, ReaderContext context)
+        internal static object ParseElement(XElement element, Type type, object model, ReaderContext context, bool isRootDef = false, bool hasReferenceId = false)
         {
             // The first thing we do is parse all our attributes. This is because we want to verify that there are no attributes being ignored.
             // Don't return anything until we do our element.HasAtttributes check!
@@ -135,6 +135,14 @@ namespace Def
                 // context might be null; that's OK at the moment
                 var result = Converters[type].Record(model, type, new RecorderReader(element, context));
 
+                // This is an important check if we have a referenced type, because if we've changed the result, references won't link up to it properly.
+                // Outside referenced types, it doesn't matter - we want to give people as much control over modification as possible.
+                if (model != null && hasReferenceId && model != result)
+                {
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Converter {Converters[type].GetType()} for {type} ignored the model {model} while reading a referenced object; this may cause lost data");
+                    return result;
+                }
+
                 if (result != null && !type.IsAssignableFrom(result.GetType()))
                 {
                     Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Converter {Converters[type].GetType()} for {type} returned unexpected type {result.GetType()}");
@@ -155,14 +163,14 @@ namespace Def
                 Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Elements and text are never valid together");
             }
 
-            if (typeof(Def).IsAssignableFrom(type) && hasElements && !rootNode)
+            if (typeof(Def).IsAssignableFrom(type) && hasElements && !isRootDef)
             {
                 Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Inline def definitions are not currently supported");
                 return null;
             }
 
             if (hasText ||
-                (typeof(Def).IsAssignableFrom(type) && !rootNode) ||
+                (typeof(Def).IsAssignableFrom(type) && !isRootDef) ||
                 type == typeof(Type) ||
                 type == typeof(string) ||
                 type.IsPrimitive)
@@ -205,7 +213,7 @@ namespace Def
                         Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                     }
 
-                    list.Add(ParseElement(fieldElement, referencedType, null, false, context));
+                    list.Add(ParseElement(fieldElement, referencedType, null, context));
                 }
 
                 return list;
@@ -226,7 +234,7 @@ namespace Def
                         Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                     }
 
-                    array.SetValue(ParseElement(fieldElement, referencedType, null, false, context), i);
+                    array.SetValue(ParseElement(fieldElement, referencedType, null, context), i);
                 }
 
                 return array;
@@ -264,14 +272,14 @@ namespace Def
                             continue;
                         }
 
-                        var key = ParseElement(keyNode, keyType, null, false, context);
+                        var key = ParseElement(keyNode, keyType, null, context);
 
                         if (dict.Contains(key))
                         {
                             Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Dictionary includes duplicate key {key.ToString()}");
                         }
 
-                        dict[key] = ParseElement(valueNode, valueType, null, false, context);
+                        dict[key] = ParseElement(valueNode, valueType, null, context);
                     }
                     else
                     {
@@ -282,7 +290,7 @@ namespace Def
                             Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Dictionary includes duplicate key {fieldElement.Name.LocalName}");
                         }
 
-                        dict[key] = ParseElement(fieldElement, valueType, null, false, context);
+                        dict[key] = ParseElement(fieldElement, valueType, null, context);
                     }
                 }
 
@@ -327,7 +335,7 @@ namespace Def
                     continue;
                 }
 
-                fieldInfo.SetValue(model, ParseElement(fieldElement, fieldInfo.FieldType, fieldInfo.GetValue(model), false, context));
+                fieldInfo.SetValue(model, ParseElement(fieldElement, fieldInfo.FieldType, fieldInfo.GetValue(model), context));
             }
 
             return model;

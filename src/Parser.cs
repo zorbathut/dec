@@ -184,7 +184,7 @@ namespace Def
 
                     Database.Register(defInstance);
 
-                    finishWork.Add(() => Serialization.ParseElement(defElement, typeHandle, defInstance, true, readerContext));
+                    finishWork.Add(() => Serialization.ParseElement(defElement, typeHandle, defInstance, readerContext, isRootDef: true));
                 }
             }
         }
