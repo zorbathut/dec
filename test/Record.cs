@@ -512,5 +512,51 @@ namespace DefTest
 
             Assert.AreNotSame(deserialized.left.left, deserialized.left.left.left);
         }
+
+        [Test]
+        public void RecursiveSquaredRoot()
+        {
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { });
+            parser.Finish();
+
+            var root = new RecursiveSquaredRecorder();
+
+            var a = new RecursiveSquaredRecorder();
+            var b = new RecursiveSquaredRecorder();
+            var c = new RecursiveSquaredRecorder();
+
+            root.left = a;
+            root.right = a;
+
+            a.left = b;
+            a.right = b;
+            b.left = c;
+            b.right = c;
+            c.left = root;
+            c.right = root;
+
+            string serialized = Def.Recorder.Write(root, pretty: true);
+            var deserialized = Def.Recorder.Read<RecursiveSquaredRecorder>(serialized);
+
+            Assert.AreSame(deserialized.left, deserialized.right);
+            Assert.AreSame(deserialized.left.left, deserialized.right.right);
+            Assert.AreSame(deserialized.left.left.left, deserialized.right.right.right);
+            Assert.AreSame(deserialized.left.left.left.left, deserialized.right.right.right.right);
+
+            Assert.AreSame(deserialized, deserialized.right.right.right.right);
+
+            Assert.AreNotSame(deserialized, deserialized.left);
+            Assert.AreNotSame(deserialized, deserialized.left.left);
+            Assert.AreNotSame(deserialized, deserialized.left.left.left);
+
+            Assert.AreNotSame(deserialized.left, deserialized.left.left);
+            Assert.AreNotSame(deserialized.left, deserialized.left.left.left);
+            Assert.AreNotSame(deserialized.left, deserialized.left.left.left.left);
+
+            Assert.AreNotSame(deserialized.left.left, deserialized.left.left.left);
+            Assert.AreNotSame(deserialized.left.left.left, deserialized.left.left.left.left);
+
+            Assert.AreNotSame(deserialized.left.left.left, deserialized.left.left.left.left);
+        }
     }
 }

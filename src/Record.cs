@@ -36,12 +36,9 @@ namespace Def
             var refs = new XElement("refs");
             record.Add(refs);
 
-            var data = new XElement("data");
-            record.Add(data);
-
             var writerContext = new WriterContext();
 
-            recordable.Record(new RecorderWriter(data, writerContext));
+            record.Add(Serialization.ComposeElement(recordable, recordable.GetType(), "data", writerContext));
 
             // Write our references!
             if (writerContext.HasReferences())
@@ -149,9 +146,7 @@ namespace Def
 
             // And now, we can finally parse our actual root element!
             // (which accounts for a tiny percentage of things that need to be parsed)
-            var result = new T();
-            result.Record(new RecorderReader(record.ElementNamed("data"), readerContext));
-            return result;
+            return (T)Serialization.ParseElement(record.ElementNamed("data"), typeof(T), null, readerContext);
         }
     }
 
