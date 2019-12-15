@@ -8,7 +8,7 @@
     <title>Custom deserialization </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Custom deserialization ">
-    <meta name="generator" content="docfx 2.40.0.0">
+    <meta name="generator" content="docfx 2.48.0.0">
     
     <link rel="shortcut icon" href="../favicon.ico">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -71,7 +71,7 @@
 
 <pre><code class="lang-cs">public class ColorConverter : Def.Converter
 {
-    public override HashSet&lt;Type&gt; GeneratedTypes()
+    public override HashSet&lt;Type&gt; HandledTypes()
     {
         return new HashSet&lt;Type&gt;() { typeof(Color32) };
     }

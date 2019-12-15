@@ -8,7 +8,7 @@
     <title>Member parsing </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Member parsing ">
-    <meta name="generator" content="docfx 2.40.0.0">
+    <meta name="generator" content="docfx 2.48.0.0">
     
     <link rel="shortcut icon" href="../favicon.ico">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -105,13 +105,36 @@
 &lt;/NumberListDef&gt;
 </code></pre>
 <h2 id="dictionaries">Dictionaries</h2>
-<p>Dictionaries are defined using XML tags as keys. This means that you can make dictionaries only with key types that conform to the XML tag requirements; practically, this currently means <code>string</code>, <code>enum</code>, <code>bool</code>, or <code>Def</code>-derived types.</p>
+<p>Dictionaries are normally defined using XML tags as keys.</p>
 <pre><code class="lang-xml">&lt;MaterialValueDef defName=&quot;Medieval&quot;&gt;
   &lt;materials&gt;
     &lt;Iron&gt;1&lt;/Iron&gt;
     &lt;Steel&gt;3&lt;/Steel&gt;
     &lt;Uranium&gt;0.1&lt;/Uranium&gt;
     &lt;Aluminum&gt;20&lt;/Aluminum&gt;
+  &lt;/materials&gt;
+&lt;/MaterialValueDef&gt;
+</code></pre>
+<p>Using this format, you can make dictionaries only with key types that conform to the XML tag requirements; practically, this currently means <code>enum</code>, <code>bool</code>, <code>Def</code>-derived types, and most (but not all) <code>string</code>s.</p>
+<p>If you need to make a dictionary with looser requirements, you can use &lt;li&gt; sequences and &lt;key&gt;/&lt;value&gt; tags. This allows keys of any type that def can parse.</p>
+<pre><code class="lang-xml">&lt;MaterialValueDef defName=&quot;Medieval&quot;&gt;
+  &lt;materials&gt;
+    &lt;li&gt;
+      &lt;key&gt;Iron&lt;/key&gt;
+      &lt;value&gt;1&lt;/value&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;key&gt;Steel&lt;/key&gt;
+      &lt;value&gt;3&lt;/value&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;key&gt;Uranium&lt;/key&gt;
+      &lt;value&gt;0.1&lt;/value&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;key&gt;Aluminum&lt;/key&gt;
+      &lt;value&gt;20&lt;/value&gt;
+    &lt;/li&gt;
   &lt;/materials&gt;
 &lt;/MaterialValueDef&gt;
 </code></pre>

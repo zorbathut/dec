@@ -8,7 +8,7 @@
     <title>Quick Start </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Quick Start ">
-    <meta name="generator" content="docfx 2.40.0.0">
+    <meta name="generator" content="docfx 2.48.0.0">
     
     <link rel="shortcut icon" href="../favicon.ico">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -69,7 +69,7 @@
             <article class="content wrap" id="_content" data-uid="">
 <h1 id="quick-start">Quick Start</h1>
 
-<p>Define some classes derived from <a class="xref" href="../api/Def.Def.html"><code>Def.Def</code></a>.</p>
+<h2 id="define-some-classes-derived-from-defdef">Define some classes derived from <a class="xref" href="../api/Def.Def.html"><code>Def.Def</code></a>.</h2>
 <pre><code class="lang-cs">// The starting point for all defs is a class derived from Def.Def.
 // Here, we're defining a general template for monsters.
 class MonsterDef : Def.Def
@@ -110,47 +110,49 @@ class SpriteSheetDef : Def.Def
   public string filename;
 }
 </code></pre>
-<p>Write XML to define the actual things.</p>
-<pre><code class="lang-xml">&lt;!-- Here's a basic goblin. We've overridden the defaults we want changed and ignored the rest. --&gt;
-&lt;!-- Every def must be named via the defName attribute. These names must be unique within def type, but can overlap across different types. They are intended to be human-readable for debug and development purposes, but not user-visible. They must match the regexp [A-Za-z][A-Za-z0-9_]*. --&gt;
-&lt;MonsterDef defName=&quot;Goblin&quot;&gt;
-  &lt;maxHP&gt;20&lt;/maxHP&gt;
-  
-  &lt;!-- This connects MonsterDef.Goblin's spriteSheet to SpriteSheetDef.Goblin. --&gt;
-  &lt;spriteSheet&gt;Goblin&lt;/spriteSheet&gt;
-&lt;/MonsterDef&gt;
+<h2 id="write-xml-to-define-our-actual-objects">Write XML to define our actual objects.</h2>
+<pre><code class="lang-xml">&lt;Defs&gt;
+  &lt;!-- Here's a basic goblin. We've overridden the defaults we want changed and ignored the rest. --&gt;
+  &lt;!-- Every def must be named via the defName attribute. These names must be unique within def type, but can overlap across different types. They are intended to be human-readable for debug and development purposes, but not user-visible. They must match the regexp [A-Za-z][A-Za-z0-9_]*. --&gt;
+  &lt;MonsterDef defName=&quot;Goblin&quot;&gt;
+    &lt;maxHP&gt;20&lt;/maxHP&gt;
+    
+    &lt;!-- This connects MonsterDef.Goblin's spriteSheet to SpriteSheetDef.Goblin. --&gt;
+    &lt;spriteSheet&gt;Goblin&lt;/spriteSheet&gt;
+  &lt;/MonsterDef&gt;
 
-&lt;!-- This is a larger goblin. We've given it a new name, a larger render scale, and more health. --&gt;
-&lt;MonsterDef defName=&quot;MegaGoblin&quot;&gt;
-  &lt;maxHP&gt;100&lt;/maxHP&gt;
-  &lt;renderScale&gt;3&lt;/renderScale&gt;
-  &lt;spriteSheet&gt;Goblin&lt;/spriteSheet&gt;
-&lt;/MonsterDef&gt;
+  &lt;!-- This is a larger goblin. We've given it a new name, a larger render scale, and more health. --&gt;
+  &lt;MonsterDef defName=&quot;MegaGoblin&quot;&gt;
+    &lt;maxHP&gt;100&lt;/maxHP&gt;
+    &lt;renderScale&gt;3&lt;/renderScale&gt;
+    &lt;spriteSheet&gt;Goblin&lt;/spriteSheet&gt;
+  &lt;/MonsterDef&gt;
 
-&lt;!-- Here, we've defined a new tint for the DarkGoblin. Modifying members of included classes works like you'd expect XML to. --&gt;
-&lt;MonsterDef defName=&quot;DarkGoblin&quot;&gt;
-  &lt;maxHP&gt;40&lt;/maxHP&gt;
-  &lt;tint&gt;
-    &lt;r&gt;0.3&lt;/r&gt;
-    &lt;g&gt;0.3&lt;/g&gt;
-    &lt;b&gt;0.4&lt;/b&gt;
-  &lt;/tint&gt;
-  &lt;spriteSheet&gt;Goblin&lt;/spriteSheet&gt;
-&lt;/MonsterDef&gt;
+  &lt;!-- Here, we've defined a new tint for the DarkGoblin. Modifying members of included classes works like you'd expect XML to. --&gt;
+  &lt;MonsterDef defName=&quot;DarkGoblin&quot;&gt;
+    &lt;maxHP&gt;40&lt;/maxHP&gt;
+    &lt;tint&gt;
+      &lt;r&gt;0.3&lt;/r&gt;
+      &lt;g&gt;0.3&lt;/g&gt;
+      &lt;b&gt;0.4&lt;/b&gt;
+    &lt;/tint&gt;
+    &lt;spriteSheet&gt;Goblin&lt;/spriteSheet&gt;
+  &lt;/MonsterDef&gt;
 
-&lt;!-- Referencing other defs is as simple as typing their defName. All def references are validated at load time. --&gt;
-&lt;MonsterDef defName=&quot;AlchemyGoblin&quot;&gt;
-  &lt;maxHP&gt;10&lt;/maxHP&gt;
-  &lt;spriteSheet&gt;Goblin&lt;/spriteSheet&gt;
-  &lt;evolvedVariant&gt;MegaGoblin&lt;/evolvedVariant&gt;
-&lt;/MonsterDef&gt;
+  &lt;!-- Referencing other defs is as simple as typing their defName. All def references are validated at load time. --&gt;
+  &lt;MonsterDef defName=&quot;AlchemyGoblin&quot;&gt;
+    &lt;maxHP&gt;10&lt;/maxHP&gt;
+    &lt;spriteSheet&gt;Goblin&lt;/spriteSheet&gt;
+    &lt;evolvedVariant&gt;MegaGoblin&lt;/evolvedVariant&gt;
+  &lt;/MonsterDef&gt;
 
-&lt;!-- Defs can be referenced before they're defined. XML order is irrelevant. --&gt;
-&lt;SpriteSheetDef defName=&quot;Goblin&quot;&gt;
-  &lt;filename&gt;goblin.png&lt;/filename&gt;
-&lt;/SpriteSheetDef&gt;
+  &lt;!-- Defs can be referenced before they're defined. XML order is irrelevant. --&gt;
+  &lt;SpriteSheetDef defName=&quot;Goblin&quot;&gt;
+    &lt;filename&gt;goblin.png&lt;/filename&gt;
+  &lt;/SpriteSheetDef&gt;
+&lt;/Defs&gt;
 </code></pre>
-<p>Initialize the def framework via <a class="xref" href="../api/Def.Parser.html"><code>Parser</code></a>.</p>
+<h2 id="initialize-the-def-framework-via-parser">Initialize the def framework via <a class="xref" href="../api/Def.Parser.html"><code>Parser</code></a>.</h2>
 <pre><code class="lang-cs">// The Parser class handles all def initialization.
 var parser = new Parser();
 
@@ -167,7 +169,7 @@ parser.Finish();
 
 // You don't need to keep the Parser object around after this point.
 </code></pre>
-<p>Define some static references.</p>
+<h2 id="define-some-static-references">Define some static references.</h2>
 <pre><code class="lang-cs">// The attribute lets def know that it should fill this static class with data.
 [Def.StaticReferences]
 public static class MonsterDefs
@@ -187,7 +189,7 @@ public static class MonsterDefs
 // In this design, `SpriteSheetDef`s are referenced only through `MonsterDef`s.
 // Therefore there is no need for a `SpriteSheetDefs` class.
 </code></pre>
-<p>Use defs in code.</p>
+<h2 id="use-defs-in-code">Use defs in code.</h2>
 <pre><code class="lang-cs">// This is an example of an actual monster. There's no requirement that it be named &quot;Monster&quot;; def does not care what you do with the data it's generated.
 public class Monster
 {

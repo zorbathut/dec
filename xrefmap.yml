@@ -97,19 +97,58 @@ references:
   isSpec: "True"
   fullName: Def.Converter.FromXml
   nameWithType: Converter.FromXml
-- uid: Def.Converter.GeneratedTypes
-  name: GeneratedTypes()
-  href: api/Def.Converter.html#Def_Converter_GeneratedTypes
-  commentId: M:Def.Converter.GeneratedTypes
-  fullName: Def.Converter.GeneratedTypes()
-  nameWithType: Converter.GeneratedTypes()
-- uid: Def.Converter.GeneratedTypes*
-  name: GeneratedTypes
-  href: api/Def.Converter.html#Def_Converter_GeneratedTypes_
-  commentId: Overload:Def.Converter.GeneratedTypes
+- uid: Def.Converter.HandledTypes
+  name: HandledTypes()
+  href: api/Def.Converter.html#Def_Converter_HandledTypes
+  commentId: M:Def.Converter.HandledTypes
+  fullName: Def.Converter.HandledTypes()
+  nameWithType: Converter.HandledTypes()
+- uid: Def.Converter.HandledTypes*
+  name: HandledTypes
+  href: api/Def.Converter.html#Def_Converter_HandledTypes_
+  commentId: Overload:Def.Converter.HandledTypes
   isSpec: "True"
-  fullName: Def.Converter.GeneratedTypes
-  nameWithType: Converter.GeneratedTypes
+  fullName: Def.Converter.HandledTypes
+  nameWithType: Converter.HandledTypes
+- uid: Def.Converter.Record(System.Object,System.Type,Def.Recorder)
+  name: Record(Object, Type, Recorder)
+  href: api/Def.Converter.html#Def_Converter_Record_System_Object_System_Type_Def_Recorder_
+  commentId: M:Def.Converter.Record(System.Object,System.Type,Def.Recorder)
+  fullName: Def.Converter.Record(System.Object, System.Type, Def.Recorder)
+  nameWithType: Converter.Record(Object, Type, Recorder)
+- uid: Def.Converter.Record*
+  name: Record
+  href: api/Def.Converter.html#Def_Converter_Record_
+  commentId: Overload:Def.Converter.Record
+  isSpec: "True"
+  fullName: Def.Converter.Record
+  nameWithType: Converter.Record
+- uid: Def.Converter.ToString(System.Object)
+  name: ToString(Object)
+  href: api/Def.Converter.html#Def_Converter_ToString_System_Object_
+  commentId: M:Def.Converter.ToString(System.Object)
+  fullName: Def.Converter.ToString(System.Object)
+  nameWithType: Converter.ToString(Object)
+- uid: Def.Converter.ToString*
+  name: ToString
+  href: api/Def.Converter.html#Def_Converter_ToString_
+  commentId: Overload:Def.Converter.ToString
+  isSpec: "True"
+  fullName: Def.Converter.ToString
+  nameWithType: Converter.ToString
+- uid: Def.Converter.ToXml(System.Object,System.Xml.Linq.XElement)
+  name: ToXml(Object, XElement)
+  href: api/Def.Converter.html#Def_Converter_ToXml_System_Object_System_Xml_Linq_XElement_
+  commentId: M:Def.Converter.ToXml(System.Object,System.Xml.Linq.XElement)
+  fullName: Def.Converter.ToXml(System.Object, System.Xml.Linq.XElement)
+  nameWithType: Converter.ToXml(Object, XElement)
+- uid: Def.Converter.ToXml*
+  name: ToXml
+  href: api/Def.Converter.html#Def_Converter_ToXml_
+  commentId: Overload:Def.Converter.ToXml
+  isSpec: "True"
+  fullName: Def.Converter.ToXml
+  nameWithType: Converter.ToXml
 - uid: Def.Database
   name: Database
   href: api/Def.Database.html
@@ -285,6 +324,25 @@ references:
   isSpec: "True"
   fullName: Def.Def.ToString
   nameWithType: Def.ToString
+- uid: Def.IRecordable
+  name: IRecordable
+  href: api/Def.IRecordable.html
+  commentId: T:Def.IRecordable
+  fullName: Def.IRecordable
+  nameWithType: IRecordable
+- uid: Def.IRecordable.Record(Def.Recorder)
+  name: Record(Recorder)
+  href: api/Def.IRecordable.html#Def_IRecordable_Record_Def_Recorder_
+  commentId: M:Def.IRecordable.Record(Def.Recorder)
+  fullName: Def.IRecordable.Record(Def.Recorder)
+  nameWithType: IRecordable.Record(Recorder)
+- uid: Def.IRecordable.Record*
+  name: Record
+  href: api/Def.IRecordable.html#Def_IRecordable_Record_
+  commentId: Overload:Def.IRecordable.Record
+  isSpec: "True"
+  fullName: Def.IRecordable.Record
+  nameWithType: IRecordable.Record
 - uid: Def.Parser
   name: Parser
   href: api/Def.Parser.html
@@ -333,6 +391,101 @@ references:
   isSpec: "True"
   fullName: Def.Parser.Finish
   nameWithType: Parser.Finish
+- uid: Def.Recorder
+  name: Recorder
+  href: api/Def.Recorder.html
+  commentId: T:Def.Recorder
+  fullName: Def.Recorder
+  nameWithType: Recorder
+- uid: Def.Recorder.Direction
+  name: Recorder.Direction
+  href: api/Def.Recorder.Direction.html
+  commentId: T:Def.Recorder.Direction
+  fullName: Def.Recorder.Direction
+  nameWithType: Recorder.Direction
+- uid: Def.Recorder.Direction.Read
+  name: Read
+  href: api/Def.Recorder.Direction.html#Def_Recorder_Direction_Read
+  commentId: F:Def.Recorder.Direction.Read
+  fullName: Def.Recorder.Direction.Read
+  nameWithType: Recorder.Direction.Read
+- uid: Def.Recorder.Direction.Write
+  name: Write
+  href: api/Def.Recorder.Direction.html#Def_Recorder_Direction_Write
+  commentId: F:Def.Recorder.Direction.Write
+  fullName: Def.Recorder.Direction.Write
+  nameWithType: Recorder.Direction.Write
+- uid: Def.Recorder.Mode
+  name: Mode
+  href: api/Def.Recorder.html#Def_Recorder_Mode
+  commentId: P:Def.Recorder.Mode
+  fullName: Def.Recorder.Mode
+  nameWithType: Recorder.Mode
+- uid: Def.Recorder.Mode*
+  name: Mode
+  href: api/Def.Recorder.html#Def_Recorder_Mode_
+  commentId: Overload:Def.Recorder.Mode
+  isSpec: "True"
+  fullName: Def.Recorder.Mode
+  nameWithType: Recorder.Mode
+- uid: Def.Recorder.Read*
+  name: Read
+  href: api/Def.Recorder.html#Def_Recorder_Read_
+  commentId: Overload:Def.Recorder.Read
+  isSpec: "True"
+  fullName: Def.Recorder.Read
+  nameWithType: Recorder.Read
+- uid: Def.Recorder.Read``1(System.String,System.String)
+  name: Read<T>(String, String)
+  href: api/Def.Recorder.html#Def_Recorder_Read__1_System_String_System_String_
+  commentId: M:Def.Recorder.Read``1(System.String,System.String)
+  name.vb: Read(Of T)(String, String)
+  fullName: Def.Recorder.Read<T>(System.String, System.String)
+  fullName.vb: Def.Recorder.Read(Of T)(System.String, System.String)
+  nameWithType: Recorder.Read<T>(String, String)
+  nameWithType.vb: Recorder.Read(Of T)(String, String)
+- uid: Def.Recorder.Record*
+  name: Record
+  href: api/Def.Recorder.html#Def_Recorder_Record_
+  commentId: Overload:Def.Recorder.Record
+  isSpec: "True"
+  fullName: Def.Recorder.Record
+  nameWithType: Recorder.Record
+- uid: Def.Recorder.Record``1(``0@,System.String)
+  name: Record<T>(ref T, String)
+  href: api/Def.Recorder.html#Def_Recorder_Record__1___0__System_String_
+  commentId: M:Def.Recorder.Record``1(``0@,System.String)
+  name.vb: Record(Of T)(ByRef T, String)
+  fullName: Def.Recorder.Record<T>(ref T, System.String)
+  fullName.vb: Def.Recorder.Record(Of T)(ByRef T, System.String)
+  nameWithType: Recorder.Record<T>(ref T, String)
+  nameWithType.vb: Recorder.Record(Of T)(ByRef T, String)
+- uid: Def.Recorder.Write(Def.IRecordable,System.Boolean)
+  name: Write(IRecordable, Boolean)
+  href: api/Def.Recorder.html#Def_Recorder_Write_Def_IRecordable_System_Boolean_
+  commentId: M:Def.Recorder.Write(Def.IRecordable,System.Boolean)
+  fullName: Def.Recorder.Write(Def.IRecordable, System.Boolean)
+  nameWithType: Recorder.Write(IRecordable, Boolean)
+- uid: Def.Recorder.Write*
+  name: Write
+  href: api/Def.Recorder.html#Def_Recorder_Write_
+  commentId: Overload:Def.Recorder.Write
+  isSpec: "True"
+  fullName: Def.Recorder.Write
+  nameWithType: Recorder.Write
+- uid: Def.Recorder.Xml
+  name: Xml
+  href: api/Def.Recorder.html#Def_Recorder_Xml
+  commentId: P:Def.Recorder.Xml
+  fullName: Def.Recorder.Xml
+  nameWithType: Recorder.Xml
+- uid: Def.Recorder.Xml*
+  name: Xml
+  href: api/Def.Recorder.html#Def_Recorder_Xml_
+  commentId: Overload:Def.Recorder.Xml
+  isSpec: "True"
+  fullName: Def.Recorder.Xml
+  nameWithType: Recorder.Xml
 - uid: Def.StaticReferencesAttribute
   name: StaticReferencesAttribute
   href: api/Def.StaticReferencesAttribute.html
