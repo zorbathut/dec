@@ -5,25 +5,85 @@ namespace Def
     using System.Linq;
     using System.Xml.Linq;
 
+    /// <summary>
+    /// Base class for recordable elements.
+    /// </summary>
+    /// <remarks>
+    /// Inheriting from this is the easiest way to support Recorder serialization.
+    ///
+    /// If you need to record a class that you can't modify the definition of, see the Converter system.
+    /// </remarks>
     public interface IRecordable
     {
-        void Record(Recorder record);
+        /// <summary>
+        /// Serializes or deserializes this object to Recorder.
+        /// </summary>
+        /// <remarks>
+        /// This function is called both for serialization and deserialization. In most cases, you can simply call Recorder.Record functions to do the right thing.
+        ///
+        /// For more complicated requirements, check out Recorder's interface.
+        /// </remarks>
+        /// <example>
+        /// <code>
+        ///     public void Record(Recorder recorder)
+        ///     {
+        ///         // The Recorder interface figures out the right thing based on context.
+        ///         // Any members that are referenced elsewhere will be turned into refs automatically.
+        ///         // Members that don't show up in the saved data will be left at their default value.
+        ///         recorder.Record(ref integerMember, "integerMember");
+        ///         recorder.Record(ref classMember, "classMember");
+        ///         recorder.Record(ref structMember, "structMember");
+        ///         recorder.Record(ref collectionMember, "collectionMember");
+        ///     }
+        /// </code>
+        /// </example>
+        void Record(Recorder recorder);
     }
 
+    /// <summary>
+    /// Main class for the serialization/deserialization system.
+    /// </summary>
+    /// <remarks>
+    /// Recorder is used to call the main functions for serialization/deserialization. This includes both the static initiation functions (Read, Write) and the per-element status functions.
+    ///
+    /// To start serializing or deserializing an object, see Recorder.Read and Recorder.Write.
+    /// </remarks>
     public abstract class Recorder
     {
-        // This handles literally everything. I wish I could do more validation at compiletime, but the existence of Converters makes that impossible.
+        /// <summary>
+        /// Serialize or deserialize a member of a class.
+        /// </summary>
+        /// <remarks>
+        /// This function serializes or deserializes a class member. Call it with a reference to the member and a label for the member (usually the member's name.)
+        ///
+        /// In most cases, you don't need to do anything different for read vs. write; this function will figure out the details and do the right thing.
+        /// </remarks>
         public abstract void Record<T>(ref T value, string label);
 
-        public abstract XElement Xml { get; }
-
+        /// <summary>
+        /// Indicates whether this Recorder is being used for reading or writing.
+        /// </summary>
         public enum Direction
         {
             Read,
             Write,
         }
+        /// <summary>
+        /// Indicates whether this Recorder is being used for reading or writing.
+        /// </summary>
         public abstract Direction Mode { get; }
 
+        /// <summary>
+        /// Returns the XML element that is being read or written to.
+        /// </summary>
+        /// <remarks>
+        /// Generally not necessary to use; this is intended for when you're doing hand-written serialization and deserialization work.
+        /// </remarks>
+        public abstract XElement Xml { get; }
+
+        /// <summary>
+        /// Returns a fully-formed XML document starting at an object.
+        /// </summary>
         public static string Write(IRecordable recordable, bool pretty = true)
         {
             var doc = new XDocument();
@@ -58,6 +118,9 @@ namespace Def
             return doc.ToString();
         }
 
+        /// <summary>
+        /// Parses the output of Write, generating an object and all its related serialized data.
+        /// </summary>
         public static T Read<T>(string input, string stringName = "input") where T : IRecordable, new()
         {
             var doc = XDocument.Parse(input, LoadOptions.SetLineInfo);
@@ -273,7 +336,7 @@ namespace Def
         }
     }
 
-    public class RecorderReader : Recorder
+    internal class RecorderReader : Recorder
     {
         private readonly XElement element;
         private readonly ReaderContext context;
