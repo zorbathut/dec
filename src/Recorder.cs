@@ -123,7 +123,17 @@ namespace Def
         /// </summary>
         public static T Read<T>(string input, string stringName = "input")
         {
-            var doc = XDocument.Parse(input, LoadOptions.SetLineInfo);
+            XDocument doc;
+
+            try
+            {
+                doc = XDocument.Parse(input, LoadOptions.SetLineInfo);
+            }
+            catch (System.Xml.XmlException e)
+            {
+                Dbg.Ex(e);
+                return default(T);
+            }
 
             if (doc.Elements().Count() > 1)
             {
@@ -137,9 +147,16 @@ namespace Def
             }
 
             var recordFormatVersion = record.ElementNamed("recordFormatVersion");
-            if (recordFormatVersion.GetText() != "1")
+            if (recordFormatVersion == null)
+            {
+                Dbg.Err($"{stringName}:{record.LineNumber()}: Missing record format version, assuming the data is up-to-date");
+            }
+            else if (recordFormatVersion.GetText() != "1")
             {
                 Dbg.Err($"{stringName}:{recordFormatVersion.LineNumber()}: Unknown record format version {recordFormatVersion.GetText()}, expected 1 or earlier");
+
+                // I would rather not guess about this
+                return default(T);
             }
 
             var refs = record.ElementNamed("refs");
@@ -207,9 +224,17 @@ namespace Def
                 }
             }
 
+            var data = record.ElementNamed("data");
+            if (data == null)
+            {
+                Dbg.Err($"{stringName}:{record.LineNumber()}: No data element provided. This is not very recoverable.");
+
+                return default(T);
+            }
+
             // And now, we can finally parse our actual root element!
             // (which accounts for a tiny percentage of things that need to be parsed)
-            return (T)Serialization.ParseElement(record.ElementNamed("data"), typeof(T), null, readerContext);
+            return (T)Serialization.ParseElement(data, typeof(T), null, readerContext);
         }
     }
 
