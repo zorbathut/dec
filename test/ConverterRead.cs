@@ -317,5 +317,46 @@ namespace DefTest
             Assert.AreEqual(24, testDef.initializedTouched.intA);
             Assert.AreEqual(6, testDef.initializedTouched.intB);
         }
+
+        public class FallbackPayload
+        {
+            public int number = 0;
+        }
+
+        public class FallbackDef : Def.Def
+        {
+            public FallbackPayload payload;
+        }
+
+        public class FallbackConverter : Def.Converter
+        {
+            public override HashSet<Type> HandledTypes()
+            {
+                return new HashSet<Type>() { typeof(FallbackPayload) };
+            }
+
+            public override object FromString(string input, Type type, string inputName, int lineNumber)
+            {
+                return new FallbackPayload() { number = int.Parse(input) };
+            }
+        }
+
+        [Test]
+        public void Fallback()
+        {
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(FallbackDef) }, explicitConverters: new Type[] { typeof(FallbackConverter) });
+            parser.AddString(@"
+                <Defs>
+                    <FallbackDef defName=""TestDef"">
+                        <payload>
+                            4
+                            <garbage />
+                        </payload>
+                    </FallbackDef>
+                </Defs>");
+            ExpectErrors(() => parser.Finish());
+
+            Assert.AreEqual(4, Def.Database<FallbackDef>.Get("TestDef").payload.number);
+        }
     }
 }
