@@ -89,8 +89,6 @@ namespace DefTest
             }
         }
 
-        // This doesn't work right now - we need support for inline referencables-that-aren't-referenced first.
-        /*
         [Test]
         public void ConverterSimple()
         {
@@ -109,7 +107,7 @@ namespace DefTest
             Assert.AreEqual(converted.convertable.a, deserialized.convertable.a);
             Assert.AreEqual(converted.convertable.b, deserialized.convertable.b);
             Assert.AreEqual(converted.convertable.c, deserialized.convertable.c);
-        }*/
+        }
 
         public class ConvertedConverterRecord : Def.Converter
         {
