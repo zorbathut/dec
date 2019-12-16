@@ -31,7 +31,7 @@ namespace DefTest
         [Test]
 	    public void Primitives()
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ });
+            var parser = new Def.Parser(explicitOnly: true);
             parser.Finish();
 
             var primitives = new PrimitivesRecordable();
@@ -129,7 +129,7 @@ namespace DefTest
         [Test]
         public void Refs()
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { }, explicitConverters: new Type[] { });
+            var parser = new Def.Parser(explicitOnly: true);
             parser.Finish();
 
             var refs = new RefsRootRecordable();
@@ -165,7 +165,7 @@ namespace DefTest
         [Test]
         public void Containers()
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { });
+            var parser = new Def.Parser(explicitOnly: true);
             parser.Finish();
 
             var containers = new ContainersRecordable();
@@ -196,7 +196,7 @@ namespace DefTest
         [Test]
         public void ContainersNested()
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { });
+            var parser = new Def.Parser(explicitOnly: true);
             parser.Finish();
 
             var nested = new ContainersNestedRecordable();
@@ -239,7 +239,7 @@ namespace DefTest
         [Test]
         public void ContainerRecursive()
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { });
+            var parser = new Def.Parser(explicitOnly: true);
             parser.Finish();
 
             var parent = new RecursiveParent();
@@ -289,7 +289,7 @@ namespace DefTest
         [Test]
         public void Misparse()
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { });
+            var parser = new Def.Parser(explicitOnly: true);
             parser.Finish();
 
             var misparse = new MisparseRecordable();
@@ -322,7 +322,7 @@ namespace DefTest
         [Test]
         public void RecursiveSquared()
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { });
+            var parser = new Def.Parser(explicitOnly: true);
             parser.Finish();
 
             var root = new RecursiveSquaredRecorder();
@@ -365,7 +365,7 @@ namespace DefTest
         [Test]
         public void RecursiveSquaredRoot()
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { });
+            var parser = new Def.Parser(explicitOnly: true);
             parser.Finish();
 
             var root = new RecursiveSquaredRecorder();
@@ -411,7 +411,7 @@ namespace DefTest
         [Test]
         public void RootPrimitive()
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { });
+            var parser = new Def.Parser(explicitOnly: true);
             parser.Finish();
 
             int value = 4;
