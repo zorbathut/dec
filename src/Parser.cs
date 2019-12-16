@@ -42,7 +42,7 @@ namespace Def
         /// <remarks>
         /// Parameters are provided for the sake of unit tests. Using them is unnecessary and generally not recommended.
         /// </remarks>
-        public Parser(bool explicitOnly = false, Type[] explicitTypes = null, Type[] explicitStaticRefs = null, Type[] explicitConversionTypes = null)
+        public Parser(bool explicitOnly = false, Type[] explicitTypes = null, Type[] explicitStaticRefs = null, Type[] explicitConverters = null)
         {
             if (s_Status != Status.Uninitialized)
             {
@@ -109,7 +109,7 @@ namespace Def
                 }
             }
 
-            Serialization.Initialize(explicitOnly, explicitConversionTypes);
+            Serialization.Initialize(explicitOnly, explicitConverters);
         }
 
         private static readonly Regex DefNameValidator = new Regex(@"^[A-Za-z_][A-Za-z0-9_]*$", RegexOptions.Compiled);

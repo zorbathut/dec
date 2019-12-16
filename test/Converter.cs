@@ -40,7 +40,7 @@ namespace DefTest
         [Test]
 	    public void BasicFunctionality()
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(ConverterDef) }, explicitConversionTypes: new Type[]{ typeof(ConverterBasicTest) });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(ConverterDef) }, explicitConverters: new Type[]{ typeof(ConverterBasicTest) });
             parser.AddString(@"
                 <Defs>
                     <ConverterDef defName=""TestDefA"">
@@ -68,7 +68,7 @@ namespace DefTest
 	    public void EmptyConverterErr()
 	    {
             Def.Parser parser = null;
-            ExpectErrors(() => parser = new Def.Parser(explicitOnly: true, explicitConversionTypes: new Type[]{ typeof(EmptyConverter) }));
+            ExpectErrors(() => parser = new Def.Parser(explicitOnly: true, explicitConverters: new Type[]{ typeof(EmptyConverter) }));
             parser.Finish();
 	    }
 
@@ -92,7 +92,7 @@ namespace DefTest
 	    public void OverlappingConverters()
 	    {
             Def.Parser parser = null;
-            ExpectErrors(() => parser = new Def.Parser(explicitOnly: true, explicitConversionTypes: new Type[]{ typeof(StrConv1), typeof(StrConv2) }));
+            ExpectErrors(() => parser = new Def.Parser(explicitOnly: true, explicitConverters: new Type[]{ typeof(StrConv1), typeof(StrConv2) }));
             parser.Finish();
 	    }
 
@@ -122,7 +122,7 @@ namespace DefTest
         [Test]
 	    public void ConverterDict()
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(ConverterDictDef) }, explicitConversionTypes: new Type[]{ typeof(ConverterDictTest) });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(ConverterDictDef) }, explicitConverters: new Type[]{ typeof(ConverterDictTest) });
             parser.AddString(@"
                 <Defs>
                     <ConverterDictDef defName=""TestDef"">
@@ -150,7 +150,7 @@ namespace DefTest
         [Test]
         public void EmptyInputConverter()
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(ConverterStringDef) }, explicitConversionTypes: new Type[]{ typeof(ConverterDictTest) });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(ConverterStringDef) }, explicitConverters: new Type[]{ typeof(ConverterDictTest) });
             parser.AddString(@"
                 <Defs>
                     <ConverterStringDef defName=""TestDef"">
@@ -175,7 +175,7 @@ namespace DefTest
         [Test]
         public void DefaultFailureTestString()
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(ConverterStringDef) }, explicitConversionTypes: new Type[]{ typeof(DefaultFailureConverter) });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(ConverterStringDef) }, explicitConverters: new Type[]{ typeof(DefaultFailureConverter) });
             parser.AddString(@"
                 <Defs>
                     <ConverterStringDef defName=""TestDef"">
@@ -191,7 +191,7 @@ namespace DefTest
         [Test]
         public void DefaultFailureTestXml()
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(ConverterStringDef) }, explicitConversionTypes: new Type[]{ typeof(DefaultFailureConverter) });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(ConverterStringDef) }, explicitConverters: new Type[]{ typeof(DefaultFailureConverter) });
             parser.AddString(@"
                 <Defs>
                     <ConverterStringDef defName=""TestDef"">
@@ -225,7 +225,7 @@ namespace DefTest
         [Test]
         public void ConvertToNull()
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(NonEmptyPayloadDef) }, explicitConversionTypes: new Type[]{ typeof(DefaultNullConverter) });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(NonEmptyPayloadDef) }, explicitConverters: new Type[]{ typeof(DefaultNullConverter) });
             parser.AddString(@"
                 <Defs>
                     <NonEmptyPayloadDef defName=""TestDefault"">
@@ -284,7 +284,7 @@ namespace DefTest
         [Test]
         public void ConverterStruct()
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(ConverterStructDef) }, explicitConversionTypes: new Type[] { typeof(ConverterStructConverter) });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(ConverterStructDef) }, explicitConverters: new Type[] { typeof(ConverterStructConverter) });
             parser.AddString(@"
                 <Defs>
                     <ConverterStructDef defName=""TestDef"">
