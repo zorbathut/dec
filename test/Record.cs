@@ -558,5 +558,20 @@ namespace DefTest
 
             Assert.AreNotSame(deserialized.left.left.left, deserialized.left.left.left.left);
         }
+
+        [Test]
+        public void RootPrimitive()
+        {
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { });
+            parser.Finish();
+
+            int value = 4;
+
+            // gonna be honest, this feels kind of like overkill
+            string serialized = Def.Recorder.Write(value, pretty: true);
+            var deserialized = Def.Recorder.Read<int>(serialized);
+
+            Assert.AreEqual(value, deserialized);
+        }
     }
 }

@@ -84,7 +84,7 @@ namespace Def
         /// <summary>
         /// Returns a fully-formed XML document starting at an object.
         /// </summary>
-        public static string Write(IRecordable recordable, bool pretty = true)
+        public static string Write<T>(T target, bool pretty = true)
         {
             var doc = new XDocument();
 
@@ -98,7 +98,7 @@ namespace Def
 
             var writerContext = new WriterContext();
 
-            record.Add(Serialization.ComposeElement(recordable, recordable.GetType(), "data", writerContext));
+            record.Add(Serialization.ComposeElement(target, target != null ? target.GetType() : typeof(T), "data", writerContext));
 
             // Write our references!
             if (writerContext.HasReferences())
@@ -121,7 +121,7 @@ namespace Def
         /// <summary>
         /// Parses the output of Write, generating an object and all its related serialized data.
         /// </summary>
-        public static T Read<T>(string input, string stringName = "input") where T : IRecordable, new()
+        public static T Read<T>(string input, string stringName = "input")
         {
             var doc = XDocument.Parse(input, LoadOptions.SetLineInfo);
 
