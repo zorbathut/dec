@@ -6,6 +6,11 @@ namespace Def
     {
         internal static V TryGetValue<T, V>(this Dictionary<T, V> dict, T key)
         {
+            if (key == null)
+            {
+                return default(V);
+            }
+
             dict.TryGetValue(key, out V holder);
             return holder;
         }

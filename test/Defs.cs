@@ -337,5 +337,19 @@ namespace DefTest
             Assert.IsTrue(Def.Database<StubDef>.List.Contains(Def.Database<StubDef>.Get("TestDefB")));
             Assert.IsTrue(Def.Database<StubDef>.List.Contains(Def.Database<StubDef>.Get("TestDefC")));
         }
+
+        class NotActuallyADef
+        {
+
+        }
+
+        [Test]
+        public void DatabaseErrorQuery()
+        {
+            var parser = new Def.Parser(explicitOnly: true);
+            parser.Finish();
+
+            ExpectErrors(() => Assert.IsNull(Def.Database.Get(typeof(NotActuallyADef), "Fake")));
+        }
     }
 }
