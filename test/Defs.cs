@@ -314,5 +314,28 @@ namespace DefTest
             Assert.IsNotNull(Def.Database<PostLoadDef>.Get("TestDef"));
             Assert.IsTrue(Def.Database<PostLoadDef>.Get("TestDef").initted);
         }
+
+        [Test]
+        public void DatabaseList()
+        {
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(StubDef) });
+            parser.AddString(@"
+                <Defs>
+                    <StubDef defName=""TestDefA"" />
+                    <StubDef defName=""TestDefB"" />
+                    <StubDef defName=""TestDefC"" />
+                </Defs>");
+            parser.Finish();
+
+            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDefA"));
+            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDefB"));
+            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDefC"));
+
+            Assert.AreEqual(3, Def.Database<StubDef>.List.Length);
+
+            Assert.IsTrue(Def.Database<StubDef>.List.Contains(Def.Database<StubDef>.Get("TestDefA")));
+            Assert.IsTrue(Def.Database<StubDef>.List.Contains(Def.Database<StubDef>.Get("TestDefB")));
+            Assert.IsTrue(Def.Database<StubDef>.List.Contains(Def.Database<StubDef>.Get("TestDefC")));
+        }
     }
 }
