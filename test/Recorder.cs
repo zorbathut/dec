@@ -6,7 +6,7 @@ namespace DefTest
     using System.Text.RegularExpressions;
 
     [TestFixture]
-    public class Record : Base
+    public class Recorder : Base
     {
         public class PrimitivesRecordable : Def.IRecordable
         {
