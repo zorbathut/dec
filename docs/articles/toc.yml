@@ -10,6 +10,8 @@
       href: doc_hierarchy.md
     - name: Custom deserialization
       href: doc_custom.md
+    - name: Serialization
+      href: doc_serialization.md
     - name: Security
       href: doc_security.md
 - name: Future Plans
@@ -34,9 +36,13 @@
       href: fp_performance.md
     - name: Mod functionality
       href: fp_mods.md
-    - name: Serialization
-      href: fp_serialization.md
     - name: Factories
-      href: fp_serialization.md
+      href: fp_factories.md
+    - name: Serialization
+      items:
+        - name: Compatibility
+          href: fp_serialization_compatibility.md
+        - name: Interior links
+          href: fp_serialization_interior.md
 - name: Justifications
   href: justifications.md
