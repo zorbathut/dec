@@ -571,5 +571,42 @@ namespace DefTest
 
             Assert.AreEqual(value, deserialized);
         }
+
+        public class ConverterUnsuppliedClass
+        {
+            public int x;
+        }
+
+        public class ConverterUnsuppliedConverter : Def.Converter
+        {
+            public override HashSet<Type> HandledTypes()
+            {
+                return new HashSet<Type> { typeof(ConverterUnsuppliedClass) };
+            }
+
+            public override object FromString(string input, Type type, string inputName, int lineNumber)
+            {
+                return new ConverterUnsuppliedClass();
+            }
+
+            // whoops we forgot to write a ToString function
+        }
+
+        [Test]
+        public void ConverterUnsupplied()
+        {
+            var parser = new Def.Parser(explicitOnly: true, explicitConversionTypes: new Type[] { typeof(ConverterUnsuppliedConverter) });
+            parser.Finish();
+
+            var root = new ConverterUnsuppliedClass();
+
+            root.x = 42;
+
+            string serialized = null;
+            ExpectErrors(() => serialized = Def.Recorder.Write(root, pretty: true));
+            var deserialized = Def.Recorder.Read<ConverterUnsuppliedClass>(serialized);
+
+            Assert.IsNotNull(deserialized); // even if we don't know how to store it and deserialize it, we should at least be able to create it
+        }
     }
 }

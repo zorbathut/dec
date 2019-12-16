@@ -87,7 +87,12 @@ namespace Def
         /// </remarks>
         public virtual void ToXml(object input, XElement context)
         {
-            context.Add(new XText(ToString(input)));
+            // If we don't get anything valid from ToString(), just don't bother to add a node
+            var str = ToString(input);
+            if (str != null)
+            {
+                context.Add(new XText(str));
+            }
         }
 
         /// <summary>
