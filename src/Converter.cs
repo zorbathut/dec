@@ -160,6 +160,8 @@ namespace Def
                     return model;
 
                 default:
+                    // what have you done
+                    // *what have you done*
                     Dbg.Err($"Recorder is somehow in mode {recorder.Mode} which is not valid");
                     return model;
             }
