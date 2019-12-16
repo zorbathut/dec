@@ -460,12 +460,6 @@ references:
   fullName.vb: Def.Recorder.Record(Of T)(ByRef T, System.String)
   nameWithType: Recorder.Record<T>(ref T, String)
   nameWithType.vb: Recorder.Record(Of T)(ByRef T, String)
-- uid: Def.Recorder.Write(Def.IRecordable,System.Boolean)
-  name: Write(IRecordable, Boolean)
-  href: api/Def.Recorder.html#Def_Recorder_Write_Def_IRecordable_System_Boolean_
-  commentId: M:Def.Recorder.Write(Def.IRecordable,System.Boolean)
-  fullName: Def.Recorder.Write(Def.IRecordable, System.Boolean)
-  nameWithType: Recorder.Write(IRecordable, Boolean)
 - uid: Def.Recorder.Write*
   name: Write
   href: api/Def.Recorder.html#Def_Recorder_Write_
@@ -473,6 +467,15 @@ references:
   isSpec: "True"
   fullName: Def.Recorder.Write
   nameWithType: Recorder.Write
+- uid: Def.Recorder.Write``1(``0,System.Boolean)
+  name: Write<T>(T, Boolean)
+  href: api/Def.Recorder.html#Def_Recorder_Write__1___0_System_Boolean_
+  commentId: M:Def.Recorder.Write``1(``0,System.Boolean)
+  name.vb: Write(Of T)(T, Boolean)
+  fullName: Def.Recorder.Write<T>(T, System.Boolean)
+  fullName.vb: Def.Recorder.Write(Of T)(T, System.Boolean)
+  nameWithType: Recorder.Write<T>(T, Boolean)
+  nameWithType.vb: Recorder.Write(Of T)(T, Boolean)
 - uid: Def.Recorder.Xml
   name: Xml
   href: api/Def.Recorder.html#Def_Recorder_Xml

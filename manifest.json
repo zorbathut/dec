@@ -21,7 +21,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Def.Converter.html",
-          "hash": "OilqPMTbsmE76ncfYV0vcw=="
+          "hash": "qFu2yKt+bTDk0gtQDYeQ4g=="
         }
       },
       "is_incremental": false,
@@ -33,7 +33,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Def.Database-1.html",
-          "hash": "xyU/RZlFNAzg+Ch13t4QcA=="
+          "hash": "QHkR9ABIHLi8iimlw9MUFA=="
         }
       },
       "is_incremental": false,
@@ -81,7 +81,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Def.Parser.html",
-          "hash": "TMOmwmP3lnQTgLIRE4LVWQ=="
+          "hash": "yCODDSMPuZjg+jb74h4QvQ=="
         }
       },
       "is_incremental": false,
@@ -105,7 +105,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Def.Recorder.html",
-          "hash": "QNEQnmDZ/fsuMmuGI9k0Vw=="
+          "hash": "kfZRhDMUAd9u+HdrbZdSZQ=="
         }
       },
       "is_incremental": false,
@@ -201,7 +201,19 @@
       "output": {
         ".html": {
           "relative_path": "articles/doc_security.html",
-          "hash": "yNOGyJZJSZtMC5rVsp7Wog=="
+          "hash": "Q+J0+Hv1PWp4sQQZPZug9Q=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/doc_serialization.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/doc_serialization.html",
+          "hash": "TLmmK8CZG5faSqoKJF6D+w=="
         }
       },
       "is_incremental": false,
@@ -329,11 +341,23 @@
     },
     {
       "type": "Conceptual",
-      "source_relative_path": "articles/fp_serialization.md",
+      "source_relative_path": "articles/fp_serialization_compatibility.md",
       "output": {
         ".html": {
-          "relative_path": "articles/fp_serialization.html",
-          "hash": "WQqS3R2X/JB2gIFYd6oXPQ=="
+          "relative_path": "articles/fp_serialization_compatibility.html",
+          "hash": "bX36ZBSoGPA1jlHt1UKF9Q=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/fp_serialization_interior.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/fp_serialization_interior.html",
+          "hash": "bWW62xp062DfD8mgkXsXlg=="
         }
       },
       "is_incremental": false,
@@ -393,7 +417,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/toc.html",
-          "hash": "O6or/+zGxrgFoYPfqdzR9A=="
+          "hash": "4Hiic6VWtppf69OpWZRL3Q=="
         }
       },
       "is_incremental": false,
@@ -445,7 +469,7 @@
         "ConceptualDocumentProcessor": {
           "can_incremental": false,
           "incrementalPhase": "build",
-          "total_file_count": 21,
+          "total_file_count": 23,
           "skipped_file_count": 0
         },
         "ManagedReferenceDocumentProcessor": {
