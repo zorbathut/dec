@@ -25,6 +25,10 @@ namespace Def
 
         internal static string GetText(this XElement element)
         {
+            if (element == null)
+            {
+                return null;
+            }
             return element.Nodes().OfType<XText>().FirstOrDefault()?.Value;
         }
 
