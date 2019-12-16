@@ -25,17 +25,7 @@ namespace Def
 
         internal static string GetText(this XElement element)
         {
-            bool hasElements = element.Elements().Any();
-            bool hasText = element.Nodes().OfType<XText>().Any();
-            var text = hasText ? element.Nodes().OfType<XText>().First().Value : null;
-
-            if (hasElements && hasText)
-            {
-                Dbg.Err($"{element.LineNumber()}: Elements and text are never valid together");
-                return null;
-            }
-
-            return text;
+            return element.Nodes().OfType<XText>().FirstOrDefault()?.Value;
         }
 
         internal static string ConsumeAttribute(this XElement element, string attributeName)

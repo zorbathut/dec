@@ -156,12 +156,6 @@ namespace Def
 
             bool hasElements = element.Elements().Any();
             bool hasText = element.Nodes().OfType<XText>().Any();
-            var text = hasText ? element.Nodes().OfType<XText>().First().Value : "";
-
-            if (hasElements && hasText)
-            {
-                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Elements and text are never valid together");
-            }
 
             if (typeof(Def).IsAssignableFrom(type) && hasElements && !isRootDef)
             {
@@ -169,30 +163,35 @@ namespace Def
                 return null;
             }
 
+            // Special case: IRecordables
+            if (typeof(IRecordable).IsAssignableFrom(type))
+            {
+                var recordable = (IRecordable)( model ?? Activator.CreateInstance(type) );
+
+                recordable.Record(new RecorderReader(element, context));
+
+                return recordable;
+            }
+
+            // All our standard text-using options
             if (hasText ||
                 (typeof(Def).IsAssignableFrom(type) && !isRootDef) ||
                 type == typeof(Type) ||
                 type == typeof(string) ||
                 type.IsPrimitive)
             {
-                if (hasElements && !hasText)
+                if (hasElements)
                 {
                     Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Elements are not valid when parsing {type}");
                 }
 
-                return ParseString(text, type, context.sourceName, element.LineNumber());
+                return ParseString(element.GetText(), type, context.sourceName, element.LineNumber());
             }
 
-            // We either have elements, or we're a composite type of some sort that conceptually *does* contain elements, we just don't have any.
-
-            // Special case: IRecordables
-            if (typeof(IRecordable).IsAssignableFrom(type))
+            // Nothing past this point even supports text, so let's just get angry and break stuff.
+            if (hasText)
             {
-                var recordable = (IRecordable)(model ?? Activator.CreateInstance(type));
-
-                recordable.Record(new RecorderReader(element, context));
-
-                return recordable;
+                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Text detected in a situation where it is invalid; will be ignored");
             }
 
             // Special case: Lists
@@ -366,7 +365,7 @@ namespace Def
                     return null;
                 }
 
-                if (text == "")
+                if (text == "" || text == null)
                 {
                     // you reference nothing, you get the null
                     return null;

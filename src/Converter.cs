@@ -56,6 +56,15 @@ namespace Def
         public virtual object FromXml(XElement input, Type type, string inputName)
         {
             Dbg.Err($"{inputName}:{input.LineNumber()}: Failed to parse XML when attempting to parse {type}");
+
+            string text = input.GetText();
+            if (text != null)
+            {
+                // try to fall back to string?
+                return FromString(text, type, inputName, input.LineNumber());
+            }
+
+            // oh well
             return null;
         }
 
@@ -136,15 +145,7 @@ namespace Def
                     var sourceName = (recorder as RecorderReader).SourceName;
                     var element = recorder.Xml;
 
-                    bool hasElements = element.Elements().Any();
-                    bool hasText = element.Nodes().OfType<XText>().Any();
-
-                    if (hasElements && hasText)
-                    {
-                        Dbg.Err($"{sourceName}:{element.LineNumber()}: Elements and text are not valid together with a non-Record Converter");
-                    }
-
-                    if (hasElements)
+                    if (element.Elements().Any())
                     {
                         return FromXml(recorder.Xml, type, sourceName);
                     }
