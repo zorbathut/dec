@@ -7,7 +7,7 @@ namespace DefTest
     using System.Xml.Linq;
 
     [TestFixture]
-    public class Converter : Base
+    public class ConverterRead : Base
     {
         public class ConverterTestPayload
         {
