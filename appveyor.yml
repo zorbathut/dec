@@ -2,3 +2,12 @@ image: Visual Studio 2017
 
 before_build:
   - nuget restore
+
+environment:
+  COVERALLS_REPO_TOKEN:
+    secure: 1Zy27bXk1xZ/0Re6DNyIk1Hg37hNevrrf0Lz4g8HDW0t8vVDxjCwSmsZSDY5eTTq
+    
+after_test: 
+  - cmd: dotnet publish
+  - cmd: '%userprofile%\.nuget\packages\opencover\4.7.922\tools\OpenCover.Console.exe -register:user -filter:"+[def]*" -target:"c:\Program Files\dotnet\dotnet.exe" -targetargs:"test" -oldstyle -output:coverage.xml'
+  - cmd: '%userprofile%\.nuget\packages\coveralls.io\1.4.2\tools\coveralls.net.exe --opencover coverage.xml -r %COVERALLS_REPO_TOKEN%'
