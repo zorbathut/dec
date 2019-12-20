@@ -351,5 +351,26 @@ namespace DefTest
 
             ExpectErrors(() => Assert.IsNull(Def.Database.Get(typeof(NotActuallyADef), "Fake")));
         }
+
+        class DefHolder : Def.Def
+        {
+            public Def.Def invalidReference;
+        }
+
+        [Test]
+        public void DefMember()
+        {
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(DefHolder) });
+            parser.AddString(@"
+                <Defs>
+                    <DefHolder defName=""TestDef"">
+                        <invalidReference>TestDef</invalidReference>
+                    </DefHolder>
+                </Defs>");
+            ExpectErrors(() => parser.Finish());
+
+            Assert.IsNotNull(Def.Database<DefHolder>.Get("TestDef"));
+            Assert.IsNull(Def.Database<DefHolder>.Get("TestDef").invalidReference);
+        }
     }
 }
