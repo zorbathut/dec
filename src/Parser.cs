@@ -120,6 +120,12 @@ namespace Def
         /// <param name="stringName">A human-readable identifier useful for debugging. Generally, the name of the file that the string was read from. Not required (but very useful.)</param>
         public void AddString(string input, string stringName = "(unnamed)")
         {
+            // This is a really easy error to make; we might as well handle it.
+            if (input.EndsWith(".xml"))
+            {
+                Dbg.Err($"It looks like you've passed the filename {input} to AddString instead of the actual XML file. Either use AddFile() or pass the file contents in.");
+            }
+
             if (s_Status != Status.Accumulating)
             {
                 Dbg.Err($"Adding data while while the world is in {s_Status} state; should be {Status.Accumulating} state");

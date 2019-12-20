@@ -66,5 +66,13 @@ namespace DefTest
             Assert.IsNotNull(Def.Database<StubDef>.Get("TestDefA"));
             Assert.IsNotNull(Def.Database<StubDef>.Get("TestDefB"));
 	    }
+
+        [Test]
+        public void ProvidedFilenameForXml()
+        {
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(StubDef) });
+            ExpectErrors(() => parser.AddString(@"test.xml"));
+            parser.Finish();
+        }
     }
 }
