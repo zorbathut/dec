@@ -16,6 +16,7 @@ namespace Def
 
         // This is redundant with Database<T>, but it's a lot faster than using reflection
         private static readonly Dictionary<Type, Dictionary<string, Def>> Lookup = new Dictionary<Type, Dictionary<string, Def>>();
+        private static int CachedCount = -1;
 
         /// <summary>
         /// The total number of defs that exist.
@@ -24,7 +25,12 @@ namespace Def
         {
             get
             {
-                return Lookup.Values.Select(x => x.Count).Sum();
+                if (CachedCount == -1)
+                {
+                    CachedCount = Lookup.Select(kvp => UtilReflection.IsDefHierarchyType(kvp.Key) ? kvp.Value.Count : 0).Sum();
+                }
+
+                return CachedCount;
             }
         }
 
@@ -67,6 +73,7 @@ namespace Def
         /// </remarks>
         public static void Clear()
         {
+            CachedCount = -1;
             Lookup.Clear();
 
             foreach (var db in Databases)
@@ -89,6 +96,8 @@ namespace Def
         
         internal static void Register(Def instance)
         {
+            CachedCount = -1;
+
             Type registrationType = instance.GetType();
 
             while (true)

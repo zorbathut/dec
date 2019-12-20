@@ -351,6 +351,8 @@ namespace DefTest
             Assert.AreEqual(3, Def.Database<RootDef>.Count);
             Assert.AreEqual(2, Def.Database<ParentDef>.Count);
             Assert.AreEqual(1, Def.Database<ChildDef>.Count);
+
+            Assert.AreEqual(3, Def.Database.Count);
         }
 
         class NotActuallyADef
