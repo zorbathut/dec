@@ -2,7 +2,28 @@
 import argparse
 import os
 import shutil
+import stat
 import subprocess
+
+def rmtree_seriously(path):
+  if not os.path.exists(path):
+    return
+  
+  if os.path.isfile(path):
+    os.remove(path)
+    return
+  
+  # guess we're a directory!
+
+  # git really likes readonly'ing its files for some reason
+  # ganked directly from https://stackoverflow.com/questions/4829043/how-to-remove-read-only-attrib-directory-with-python-in-windows/4829285#4829285
+  def on_rm_error(func, path, exc_info):
+    # path contains the path of the file that couldn't be removed
+    # let's just assume that it's read-only and unlink it.
+    os.chmod(path, stat.S_IWRITE)
+    os.unlink(path)
+
+  shutil.rmtree("docs/_site", onerror = on_rm_error)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--serve', action='store_true')
@@ -15,16 +36,15 @@ if not args.serve and not args.deploy:
     exit(2);
 
 
-
 # obliterate caches, just for safety's sake
-if os.path.exists("docs/obj"): shutil.rmtree("docs/obj")
-if os.path.exists("docs/bin"): shutil.rmtree("docs/bin")
-if os.path.exists("docs/packages"): shutil.rmtree("docs/packages")
-if os.path.exists("docs/DROP"): shutil.rmtree("docs/DROP")
-if os.path.exists("docs/TEMP"): shutil.rmtree("docs/TEMP")
+rmtree_seriously("docs/obj")
+rmtree_seriously("docs/bin")
+rmtree_seriously("docs/packages")
+rmtree_seriously("docs/DROP")
+rmtree_seriously("docs/TEMP")
 
 # get the repo, make sure there's no files in it, just git
-if os.path.exists("docs/_site"): shutil.rmtree("docs/_site")
+rmtree_seriously("docs/_site")
 subprocess.check_call([
         "git",
         "clone",
@@ -33,10 +53,7 @@ subprocess.check_call([
         "docs/_site",
     ])
 for f in [ f"docs/_site/{f}" for f in os.listdir("docs/_site") if f != ".git" ]:
-    if os.path.isfile(f):
-        os.remove(f)
-    else:
-        shutil.rmtree(f)
+  rmtree_seriously(f)
 
 # generate docs
 subprocess.check_call([
@@ -75,4 +92,4 @@ if args.serve:
         ])
         
 # clear repo directory
-shutil.rmtree("docs/_site")
+rmtree_seriously("docs/_site")

@@ -315,22 +315,29 @@ namespace Def
                 model = Activator.CreateInstance(type);
             }
 
-            var fields = new HashSet<string>();
+            var setFields = new HashSet<string>();
             foreach (var fieldElement in element.Elements())
             {
                 // Check for fields that have been set multiple times
                 string fieldName = fieldElement.Name.LocalName;
-                if (fields.Contains(fieldName))
+                if (setFields.Contains(fieldName))
                 {
                     Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Duplicate field {fieldName}");
                     // Just allow us to fall through; it's an error, but one with a reasonably obvious handling mechanism
                 }
-                fields.Add(fieldName);
+                setFields.Add(fieldName);
 
-                var fieldInfo = type.GetFieldFromHierarchy(fieldElement.Name.LocalName);
+                var fieldInfo = type.GetFieldFromHierarchy(fieldName);
                 if (fieldInfo == null)
                 {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Field {fieldElement.Name.LocalName} does not exist in type {type}");
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Field {fieldName} does not exist in type {type}");
+                    continue;
+                }
+
+                // Check for fields we're not allowed to set
+                if (UtilReflection.ReflectionSetForbidden(fieldInfo))
+                {
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Field {fieldName} is not allowed to be set through reflection");
                     continue;
                 }
 

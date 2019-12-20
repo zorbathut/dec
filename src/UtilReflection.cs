@@ -123,5 +123,16 @@ namespace Def
                 return possibleTypes[0];
             }
         }
+
+        internal static bool ReflectionSetForbidden(FieldInfo field)
+        {
+            // Alright, this isn't exactly complicated right now
+            if (field.DeclaringType == typeof(Def))
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 }
