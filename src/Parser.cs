@@ -149,7 +149,7 @@ namespace Def
                 Dbg.Err($"{stringName}: Found {doc.Elements().Count()} root elements instead of the expected 1");
             }
 
-            var readerContext = new ReaderContext(input, false);
+            var readerContext = new ReaderContext(stringName, false);
 
             foreach (var rootElement in doc.Elements())
             {

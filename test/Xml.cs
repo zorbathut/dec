@@ -74,5 +74,16 @@ namespace DefTest
             ExpectErrors(() => parser.AddString(@"test.xml"));
             parser.Finish();
         }
+
+        [Test]
+        public void ProperStringName()
+        {
+            var parser = new Def.Parser(explicitOnly: true);
+            ExpectErrors(() => parser.AddString(@"
+                <Defs>
+                    <StubDef defName=""TestDefA"" />
+                </Defs>", "TestStringName"), str => str.StartsWith("TestStringName"));
+            parser.Finish();
+        }
     }
 }
