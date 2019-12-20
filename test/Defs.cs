@@ -352,7 +352,7 @@ namespace DefTest
             ExpectErrors(() => Assert.IsNull(Def.Database.Get(typeof(NotActuallyADef), "Fake")));
         }
 
-        class DefHolder : Def.Def
+        class DefMemberDef : Def.Def
         {
             public Def.Def invalidReference;
         }
@@ -371,6 +371,27 @@ namespace DefTest
 
             Assert.IsNotNull(Def.Database<DefHolder>.Get("TestDef"));
             Assert.IsNull(Def.Database<DefHolder>.Get("TestDef").invalidReference);
+        }
+
+        class SelfReferentialDef : Def.Def
+        {
+            public SelfReferentialDef recursive;
+        }
+
+        [Test]
+        public void SelfReferential()
+        {
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(SelfReferentialDef) });
+            parser.AddString(@"
+                <Defs>
+                    <SelfReferentialDef defName=""TestDef"">
+                        <recursive>TestDef</recursive>
+                    </SelfReferentialDef>
+                </Defs>");
+            parser.Finish();
+
+            Assert.IsNotNull(Def.Database<SelfReferentialDef>.Get("TestDef"));
+            Assert.AreSame(Def.Database<SelfReferentialDef>.Get("TestDef"), Def.Database<SelfReferentialDef>.Get("TestDef").recursive);
         }
     }
 }
