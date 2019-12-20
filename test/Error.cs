@@ -28,5 +28,14 @@ namespace DefTest
             // Make sure things are deinited properly
             Assert.Throws(typeof(ArgumentException), () => Def.Config.ErrorHandler("Test"));
         }
+
+        [Test]
+        public void ErrorValidator()
+        {
+            ExpectErrors(() => Def.Config.ErrorHandler("Test"), str => str == "Test");
+
+            // Make sure we get a real error if in fact we shouldn't have passed the error
+            Assert.Throws(typeof(NUnit.Framework.AssertionException), () => ExpectErrors(() => Def.Config.ErrorHandler("Test"), str => str == "Toast"));
+        }
     }
 }

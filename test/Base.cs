@@ -26,7 +26,8 @@ namespace DefTest
 
         private bool handlingErrors = false;
         private bool handledError = false;
-
+        private Func<string, bool> errorValidator = null;
+        
         [OneTimeSetUp]
         public void PrepHooks()
         {
@@ -56,6 +57,9 @@ namespace DefTest
             {
                 System.Diagnostics.Debug.Print(str);
                 Console.WriteLine(str);
+
+                // Check to see if this is considered a "valid" error.
+                Assert.IsTrue(errorValidator == null || errorValidator(str));
 
                 if (handlingErrors)
                 {
@@ -89,11 +93,13 @@ namespace DefTest
             handledWarning = false;
         }
 
-        protected void ExpectErrors(Action action)
+        // Return "true" if this is the expected error, "false" if this is a bad error
+        protected void ExpectErrors(Action action, Func<string, bool> errorValidator = null)
         {
             Assert.IsFalse(handlingErrors);
             handlingErrors = true;
             handledError = false;
+            this.errorValidator = errorValidator;
 
             action();
 
@@ -101,6 +107,7 @@ namespace DefTest
             Assert.IsTrue(handledError);
             handlingErrors = false;
             handledError = false;
+            this.errorValidator = null;
         }
 
         public class StubDef : Def.Def
