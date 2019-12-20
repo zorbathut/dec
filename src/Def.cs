@@ -13,11 +13,11 @@ namespace Def
         /// <summary>
         /// Unique string identifier.
         /// </summary>
-        public string defName;
+        public string DefName { get; internal set; }
 
         public override string ToString()
         {
-            return defName;
+            return DefName;
         }
 
         /// <summary>

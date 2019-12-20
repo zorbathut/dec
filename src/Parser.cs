@@ -187,7 +187,7 @@ namespace Def
 
                     // Create our instance
                     var defInstance = (Def)Activator.CreateInstance(typeHandle);
-                    defInstance.defName = defName;
+                    defInstance.DefName = defName;
 
                     Database.Register(defInstance);
 

@@ -458,7 +458,7 @@ namespace Def
                 {
                     var valueDef = value as Def;
 
-                    result.Add(new XText(valueDef.defName));
+                    result.Add(new XText(valueDef.DefName));
                 }
 
                 // "No data" is defined as null for defs, so we just do that

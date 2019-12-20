@@ -107,7 +107,7 @@ namespace Def
                 }
 
                 // We'll just rely on Database<T> to generate the relevant errors if we're overwriting something
-                typedict[instance.defName] = instance;
+                typedict[instance.DefName] = instance;
 
                 if (UtilReflection.IsDefHierarchyType(registrationType))
                 {
@@ -173,19 +173,19 @@ namespace Def
         {
             DefArray = null;
 
-            if (DefLookup.ContainsKey(instance.defName))
+            if (DefLookup.ContainsKey(instance.DefName))
             {
-                Dbg.Err($"Found repeated def {typeof(T)}.{instance.defName}");
+                Dbg.Err($"Found repeated def {typeof(T)}.{instance.DefName}");
 
                 // I . . . guess?
-                DefList[DefList.FindIndex(def => def == DefLookup[instance.defName])] = instance;
-                DefLookup[instance.defName] = instance;
+                DefList[DefList.FindIndex(def => def == DefLookup[instance.DefName])] = instance;
+                DefLookup[instance.DefName] = instance;
 
                 return;
             }
 
             DefList.Add(instance);
-            DefLookup[instance.defName] = instance;
+            DefLookup[instance.DefName] = instance;
         }
 
         internal static void Clear()
