@@ -3,6 +3,7 @@ namespace Def
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.IO;
     using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Text.RegularExpressions;
@@ -193,6 +194,21 @@ namespace Def
                     finishWork.Add(() => Serialization.ParseElement(defElement, typeHandle, defInstance, readerContext, isRootDef: true));
                 }
             }
+        }
+
+        /// <summary>
+        /// Pass a file in for processing.
+        /// </summary>
+        /// <param name="stringName">A human-readable identifier useful for debugging. Generally, the name of the file that the string was read from. Not required; will be derived from filename automatically</param>
+        public void AddFile(string filename, string identifier = null)
+        {
+            if (identifier == null)
+            {
+                // This is imperfect, but good enough. People can pass their own identifier in if they want something clever.
+                identifier = Path.GetFileName(filename);
+            }
+
+            AddString(File.ReadAllText(filename), identifier);
         }
 
         /// <summary>
