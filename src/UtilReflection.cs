@@ -45,7 +45,7 @@ namespace Def
 
             while (true)
             {
-                if (type.BaseType == typeof(Def))
+                if (IsDefHierarchyType(type))
                 {
                     return type;
                 }
@@ -58,6 +58,11 @@ namespace Def
                     return null;
                 }
             }
+        }
+
+        internal static bool IsDefHierarchyType(Type type)
+        {
+            return type.BaseType == typeof(Def);
         }
 
         internal static bool HasAttribute(this Type type, Type attribute)

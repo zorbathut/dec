@@ -89,22 +89,33 @@ namespace Def
         
         internal static void Register(Def instance)
         {
-            var defType = UtilReflection.GetDefHierarchyType(instance.GetType());
-            var dbType = typeof(Database<>).MakeGenericType(new[] { defType });
-            Databases.Add(dbType);
+            Type registrationType = instance.GetType();
 
-            var regFunction = dbType.GetMethod("Register", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
-            regFunction.Invoke(null, new[] { instance });
-
-            var typedict = Lookup.TryGetValue(defType);
-            if (typedict == null)
+            while (true)
             {
-                typedict = new Dictionary<string, Def>();
-                Lookup[defType] = typedict;
-            }
+                var dbType = typeof(Database<>).MakeGenericType(new[] { registrationType });
+                Databases.Add(dbType);
 
-            // We'll just rely on Database<T> to generate the relevant errors if we're overwriting something
-            typedict[instance.defName] = instance;
+                var regFunction = dbType.GetMethod("Register", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+                regFunction.Invoke(null, new[] { instance });
+
+                var typedict = Lookup.TryGetValue(registrationType);
+                if (typedict == null)
+                {
+                    typedict = new Dictionary<string, Def>();
+                    Lookup[registrationType] = typedict;
+                }
+
+                // We'll just rely on Database<T> to generate the relevant errors if we're overwriting something
+                typedict[instance.defName] = instance;
+
+                if (UtilReflection.IsDefHierarchyType(registrationType))
+                {
+                    break;
+                }
+
+                registrationType = registrationType.BaseType;
+            }
         }
     }
 

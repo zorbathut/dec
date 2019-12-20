@@ -310,6 +310,45 @@ namespace DefTest
             Assert.IsTrue(Def.Database<StubDef>.List.Contains(Def.Database<StubDef>.Get("TestDefC")));
         }
 
+        class RootDef : Def.Def
+        {
+
+        }
+
+        class ParentDef : RootDef
+        {
+
+        }
+
+        class ChildDef : ParentDef
+        {
+
+        }
+
+        [Test]
+        public void DatabaseHierarchy()
+        {
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(RootDef), typeof(ParentDef), typeof(ChildDef) });
+            parser.AddString(@"
+                <Defs>
+                    <RootDef defName=""RootDef"" />
+                    <ParentDef defName=""ParentDef"" />
+                    <ChildDef defName=""ChildDef"" />
+                </Defs>");
+            parser.Finish();
+
+            var root = Def.Database<RootDef>.Get("RootDef");
+            var parent = Def.Database<ParentDef>.Get("ParentDef");
+            var child = Def.Database<ChildDef>.Get("ChildDef");
+
+            Assert.IsTrue(Def.Database<RootDef>.List.Contains(root));
+            Assert.IsTrue(Def.Database<RootDef>.List.Contains(parent));
+            Assert.IsTrue(Def.Database<RootDef>.List.Contains(child));
+            Assert.IsTrue(Def.Database<ParentDef>.List.Contains(parent));
+            Assert.IsTrue(Def.Database<ParentDef>.List.Contains(child));
+            Assert.IsTrue(Def.Database<ChildDef>.List.Contains(child));
+        }
+
         class NotActuallyADef
         {
 
