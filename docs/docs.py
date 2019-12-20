@@ -5,7 +5,7 @@ import shutil
 import stat
 import subprocess
 
-def rmtree_seriously(path):
+def obliterate(path):
   if not os.path.exists(path):
     return
   
@@ -37,14 +37,14 @@ if not args.serve and not args.deploy:
 
 
 # obliterate caches, just for safety's sake
-rmtree_seriously("docs/obj")
-rmtree_seriously("docs/bin")
-rmtree_seriously("docs/packages")
-rmtree_seriously("docs/DROP")
-rmtree_seriously("docs/TEMP")
+obliterate("docs/obj")
+obliterate("docs/bin")
+obliterate("docs/packages")
+obliterate("docs/DROP")
+obliterate("docs/TEMP")
 
 # get the repo, make sure there's no files in it, just git
-rmtree_seriously("docs/_site")
+obliterate("docs/_site")
 subprocess.check_call([
         "git",
         "clone",
@@ -53,7 +53,7 @@ subprocess.check_call([
         "docs/_site",
     ])
 for f in [ f"docs/_site/{f}" for f in os.listdir("docs/_site") if f != ".git" ]:
-  rmtree_seriously(f)
+  obliterate(f)
 
 # generate docs
 subprocess.check_call([
@@ -92,4 +92,4 @@ if args.serve:
         ])
         
 # clear repo directory
-rmtree_seriously("docs/_site")
+obliterate("docs/_site")
