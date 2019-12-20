@@ -374,5 +374,26 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish(), err => err.Contains("camelCase"));
         }
+
+        [Test]
+        public void ForbiddenField()
+        {
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(StubDef) });
+
+            // This is a little silly because, as of this writing, DefName is a property and we don't even support writing to properties.
+            // So we're not really testing forbidden fields here. We're really just double-checking the fact that properties can't be written to.
+            // But someday I'll probably support properties, and then this had better work.
+            parser.AddString(@"
+                <Defs>
+                    <StubDef defName=""TestDef"">
+                        <DefName>NotTestDef</DefName>
+                    </StubDef>
+                </Defs>");
+
+            // Just in case I rename it back to lowercase, make sure we don't just get a spelling mismatch error here.
+            ExpectErrors(() => parser.Finish(), err => !err.Contains("defName"));
+
+            Assert.AreEqual("TestDef", Def.Database<StubDef>.Get("TestDef").DefName);
+        }
     }
 }
