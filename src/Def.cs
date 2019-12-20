@@ -15,14 +15,6 @@ namespace Def
         /// </summary>
         public string defName;
 
-        /// <summary>
-        /// Unique integer identifier.
-        /// </summary>
-        /// <remarks>
-        /// Guaranteed to be in the range [0, DefDatabase&lt;T&gt;.Count). Will not change at runtime, but not guaranteed to be stable between processes. Do not use as a serialization key.
-        /// </remarks>
-        public int index;
-
         public override string ToString()
         {
             return defName;

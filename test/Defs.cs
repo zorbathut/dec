@@ -218,34 +218,6 @@ namespace DefTest
         }
 
         [Test]
-	    public void Index()
-        {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef), typeof(StubBetaDef), typeof(StubChildDef) });
-            parser.AddString(@"
-                <Defs>
-                    <StubChildDef defName=""TestDefA"" />
-                    <StubBetaDef defName=""TestDefB"" />
-                    <StubDef defName=""TestDefC"" />
-                </Defs>");
-            parser.Finish();
-
-            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDefA"));
-            Assert.IsNotNull(Def.Database<StubBetaDef>.Get("TestDefB"));
-            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDefC"));
-
-            Assert.AreEqual(Def.Database<StubDef>.Get("TestDefA").index, 0);
-            Assert.AreEqual(Def.Database<StubBetaDef>.Get("TestDefB").index, 0);
-            Assert.AreEqual(Def.Database<StubDef>.Get("TestDefC").index, 1);
-
-            Assert.AreEqual(Def.Database<StubDef>.Count, 2);
-            Assert.AreEqual(Def.Database<StubBetaDef>.Count, 1);
-
-            Assert.AreEqual(Def.Database.Count, 3);
-
-            Assert.AreEqual(Def.Database.List.Count(), 3);
-        }
-
-        [Test]
 	    public void DebugPrint()
         {
             var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) });

@@ -160,25 +160,21 @@ namespace Def
 
         internal static void Register(T instance)
         {
+            DefArray = null;
+
             if (DefLookup.ContainsKey(instance.defName))
             {
                 Dbg.Err($"Found repeated def {typeof(T)}.{instance.defName}");
 
                 // I . . . guess?
-                int index = DefList.FindIndex(def => def == DefLookup[instance.defName]);
-
-                instance.index = index;
-                DefList[index] = instance;
+                DefList[DefList.FindIndex(def => def == DefLookup[instance.defName])] = instance;
                 DefLookup[instance.defName] = instance;
 
                 return;
             }
 
-            instance.index = DefList.Count;
             DefList.Add(instance);
             DefLookup[instance.defName] = instance;
-
-            DefArray = null;
         }
 
         internal static void Clear()

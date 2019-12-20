@@ -28,6 +28,8 @@
       href: fp_dynamic.md
     - name: Def hierarchy control
       href: fp_hierarchy.md
+    - name: Indexes
+      href: fp_index.md
     - name: Invalid database warnings
       href: fp_invdatabase.md
     - name: Type constraints
