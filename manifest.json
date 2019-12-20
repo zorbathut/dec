@@ -33,7 +33,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Def.Database-1.html",
-          "hash": "QHkR9ABIHLi8iimlw9MUFA=="
+          "hash": "th77oZ6qZkcU+U47Ie6o5w=="
         }
       },
       "is_incremental": false,
@@ -57,7 +57,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Def.Def.html",
-          "hash": "idhsNBK5hbCWSLauUgEpTg=="
+          "hash": "9MjCISj4S5h2ezmPGqKlGA=="
         }
       },
       "is_incremental": false,
@@ -81,7 +81,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Def.Parser.html",
-          "hash": "yCODDSMPuZjg+jb74h4QvQ=="
+          "hash": "mOffP64l6wgS4fKGIVSt7Q=="
         }
       },
       "is_incremental": false,
@@ -269,6 +269,18 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "articles/fp_index.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/fp_index.html",
+          "hash": "gKXzH6DyS4i8OTzJk2EtPQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "articles/fp_inheritance.md",
       "output": {
         ".html": {
@@ -417,7 +429,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/toc.html",
-          "hash": "4Hiic6VWtppf69OpWZRL3Q=="
+          "hash": "13RtM4EV7HUKpcKJ/i5KMg=="
         }
       },
       "is_incremental": false,
@@ -475,7 +487,7 @@
         "ConceptualDocumentProcessor": {
           "can_incremental": false,
           "incrementalPhase": "build",
-          "total_file_count": 23,
+          "total_file_count": 24,
           "skipped_file_count": 0
         }
       }

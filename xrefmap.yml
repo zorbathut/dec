@@ -286,18 +286,19 @@ references:
   isSpec: "True"
   fullName: Def.Def.ConfigErrors
   nameWithType: Def.ConfigErrors
-- uid: Def.Def.defName
-  name: defName
-  href: api/Def.Def.html#Def_Def_defName
-  commentId: F:Def.Def.defName
-  fullName: Def.Def.defName
-  nameWithType: Def.defName
-- uid: Def.Def.index
-  name: index
-  href: api/Def.Def.html#Def_Def_index
-  commentId: F:Def.Def.index
-  fullName: Def.Def.index
-  nameWithType: Def.index
+- uid: Def.Def.DefName
+  name: DefName
+  href: api/Def.Def.html#Def_Def_DefName
+  commentId: P:Def.Def.DefName
+  fullName: Def.Def.DefName
+  nameWithType: Def.DefName
+- uid: Def.Def.DefName*
+  name: DefName
+  href: api/Def.Def.html#Def_Def_DefName_
+  commentId: Overload:Def.Def.DefName
+  isSpec: "True"
+  fullName: Def.Def.DefName
+  nameWithType: Def.DefName
 - uid: Def.Def.PostLoad
   name: PostLoad()
   href: api/Def.Def.html#Def_Def_PostLoad
@@ -365,6 +366,19 @@ references:
   isSpec: "True"
   fullName: Def.Parser.Parser
   nameWithType: Parser.Parser
+- uid: Def.Parser.AddFile(System.String,System.String)
+  name: AddFile(String, String)
+  href: api/Def.Parser.html#Def_Parser_AddFile_System_String_System_String_
+  commentId: M:Def.Parser.AddFile(System.String,System.String)
+  fullName: Def.Parser.AddFile(System.String, System.String)
+  nameWithType: Parser.AddFile(String, String)
+- uid: Def.Parser.AddFile*
+  name: AddFile
+  href: api/Def.Parser.html#Def_Parser_AddFile_
+  commentId: Overload:Def.Parser.AddFile
+  isSpec: "True"
+  fullName: Def.Parser.AddFile
+  nameWithType: Parser.AddFile
 - uid: Def.Parser.AddString(System.String,System.String)
   name: AddString(String, String)
   href: api/Def.Parser.html#Def_Parser_AddString_System_String_System_String_
