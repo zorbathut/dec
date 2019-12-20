@@ -360,17 +360,17 @@ namespace DefTest
         [Test]
         public void DefMember()
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(DefHolder) });
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(DefMemberDef) });
             parser.AddString(@"
                 <Defs>
-                    <DefHolder defName=""TestDef"">
+                    <DefMemberDef defName=""TestDef"">
                         <invalidReference>TestDef</invalidReference>
-                    </DefHolder>
+                    </DefMemberDef>
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
-            Assert.IsNotNull(Def.Database<DefHolder>.Get("TestDef"));
-            Assert.IsNull(Def.Database<DefHolder>.Get("TestDef").invalidReference);
+            Assert.IsNotNull(Def.Database<DefMemberDef>.Get("TestDef"));
+            Assert.IsNull(Def.Database<DefMemberDef>.Get("TestDef").invalidReference);
         }
 
         class SelfReferentialDef : Def.Def
