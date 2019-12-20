@@ -9,7 +9,9 @@ namespace Def
 
     internal static class Util
     {
-        // I acknowledge that there is nothing here and that this is kind of silly at the moment.
-        // Someday, I'm sure I'll need utilities that aren't in my current categories, though!
+        internal static string LooseMatchCanonicalize(string input)
+        {
+            return input.Replace("_", "").ToLower();
+        }
     }
 }

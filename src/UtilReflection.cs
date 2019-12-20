@@ -34,6 +34,20 @@ namespace Def
             return result;
         }
 
+        internal static IEnumerable<FieldInfo> GetFieldsFromHierarchy(this Type type)
+        {
+            Type curType = type;
+            while (curType != null)
+            {
+                foreach (var field in curType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+                {
+                    yield return field;
+                }
+                
+                curType = curType.BaseType;
+            }
+        }
+
         internal static Type GetDefHierarchyType(Type type)
         {
             Type origType = type;

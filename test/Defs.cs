@@ -404,5 +404,51 @@ namespace DefTest
             Assert.IsNotNull(Def.Database<SelfReferentialDef>.Get("TestDef"));
             Assert.AreSame(Def.Database<SelfReferentialDef>.Get("TestDef"), Def.Database<SelfReferentialDef>.Get("TestDef").recursive);
         }
+
+        class LooseMatchDef : Def.Def
+        {
+            public string cat;
+            public string snake_case;
+            public string camelCase;
+        }
+
+        [Test]
+        public void LooseMatchCapitalization()
+        {
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(LooseMatchDef) });
+            parser.AddString(@"
+                <Defs>
+                    <LooseMatchDef defName=""TestDef"">
+                        <Cat>words</Cat>
+                    </LooseMatchDef>
+                </Defs>");
+            ExpectErrors(() => parser.Finish(), err => err.Contains("cat"));
+        }
+
+        [Test]
+        public void LooseMatchSnakeToCamel()
+        {
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(LooseMatchDef) });
+            parser.AddString(@"
+                <Defs>
+                    <LooseMatchDef defName=""TestDef"">
+                        <snakeCase>words</snakeCase>
+                    </LooseMatchDef>
+                </Defs>");
+            ExpectErrors(() => parser.Finish(), err => err.Contains("snake_case"));
+        }
+
+        [Test]
+        public void LooseMatchCamelToSnake()
+        {
+            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(LooseMatchDef) });
+            parser.AddString(@"
+                <Defs>
+                    <LooseMatchDef defName=""TestDef"">
+                        <camel_case>words</camel_case>
+                    </LooseMatchDef>
+                </Defs>");
+            ExpectErrors(() => parser.Finish(), err => err.Contains("camelCase"));
+        }
     }
 }

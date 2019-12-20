@@ -330,7 +330,30 @@ namespace Def
                 var fieldInfo = type.GetFieldFromHierarchy(fieldName);
                 if (fieldInfo == null)
                 {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Field {fieldName} does not exist in type {type}");
+                    // Try to find a close match, if we can, just for a better error message
+                    string match = null;
+                    string canonicalFieldName = Util.LooseMatchCanonicalize(fieldName);
+
+                    foreach (var testField in type.GetFieldsFromHierarchy())
+                    {
+                        if (Util.LooseMatchCanonicalize(testField.Name) == canonicalFieldName)
+                        {
+                            match = testField.Name;
+
+                            // We could in theory do something overly clever where we try to find the best name, but I really don't care that much; this is meant as a quick suggestion, not an ironclad solution.
+                            break;
+                        }
+                    }
+
+                    if (match != null)
+                    {
+                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Field {fieldName} does not exist in type {type}; did you mean {match}?");
+                    }
+                    else
+                    {
+                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Field {fieldName} does not exist in type {type}");
+                    }
+                    
                     continue;
                 }
 
