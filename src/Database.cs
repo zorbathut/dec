@@ -92,6 +92,7 @@ namespace Def
             StaticReferencesAttribute.StaticReferencesFilled.Clear();
 
             Parser.Clear();
+            Serialization.Clear();
         }
         
         internal static void Register(Def instance)

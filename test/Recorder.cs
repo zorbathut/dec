@@ -52,6 +52,27 @@ namespace DefTest
             Assert.AreEqual(primitives.typeValue, typeof(Def.Def));
         }
 
+        [Test]
+        public void Parserless()
+        {
+            var primitives = new PrimitivesRecordable();
+            primitives.intValue = 42;
+            primitives.floatValue = 0.1234f;
+            primitives.boolValue = true;
+            primitives.stringValue = "<This is a test string value with some XML-sensitive characters.>";
+            primitives.typeValue = typeof(Def.Def);
+
+            string serialized = Def.Recorder.Write(primitives, pretty: true);
+            var deserialized = Def.Recorder.Read<PrimitivesRecordable>(serialized);
+
+            Assert.AreEqual(primitives.intValue, deserialized.intValue);
+            Assert.AreEqual(primitives.floatValue, deserialized.floatValue);
+            Assert.AreEqual(primitives.boolValue, deserialized.boolValue);
+            Assert.AreEqual(primitives.stringValue, deserialized.stringValue);
+
+            Assert.AreEqual(primitives.typeValue, typeof(Def.Def));
+        }
+
         [Def.StaticReferences]
         public static class StaticReferenceDefs
         {

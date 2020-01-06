@@ -12,7 +12,9 @@ namespace Def
     /// </summary>
     internal static class Serialization
     {
-        internal static Dictionary<Type, Converter> Converters;
+        // Initialize it to empty in order to support Recorder operations without Def initialization.
+        // At some point we'll figure out how to support Converters at that point as well.
+        internal static Dictionary<Type, Converter> Converters = new Dictionary<Type, Converter>();
 
         internal static void Initialize(bool explicitOnly, Type[] explicitConversionTypes)
         {
@@ -592,6 +594,11 @@ namespace Def
 
                 return result;
             }
+        }
+
+        internal static void Clear()
+        {
+            Converters = new Dictionary<Type, Converter>();
         }
     }
 }
