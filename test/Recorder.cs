@@ -154,11 +154,13 @@ namespace DefTest
         {
             public List<int> intList = new List<int>();
             public Dictionary<string, string> stringDict = new Dictionary<string, string>();
+            public int[] intArray;
 
             public void Record(Def.Recorder record)
             {
                 record.Record(ref intList, "intList");
                 record.Record(ref stringDict, "stringDict");
+                record.Record(ref intArray, "intArray");
             }
         }
 
@@ -176,11 +178,14 @@ namespace DefTest
             containers.stringDict["Key"] = "Value";
             containers.stringDict["Info"] = "Data";
 
+            containers.intArray = new int[] { 10, 11, 12, 13, 15, 16, 18, 20, 22, 24, 27, 30, 33, 36, 39, 43, 47, 51, 56, 62, 68, 75, 82, 91 };
+
             string serialized = Def.Recorder.Write(containers, pretty: true);
             var deserialized = Def.Recorder.Read<ContainersRecordable>(serialized);
 
             Assert.AreEqual(containers.intList, deserialized.intList);
             Assert.AreEqual(containers.stringDict, deserialized.stringDict);
+            Assert.AreEqual(containers.intArray, deserialized.intArray);
         }
 
         public class ContainersNestedRecordable : Def.IRecordable

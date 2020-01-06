@@ -517,6 +517,20 @@ namespace Def
 
             // We'll drop through if we're in force-ref-resolve mode, or if we have something that needs conversion and is a struct (classes get turned into refs)
 
+            if (fieldType.IsArray)
+            {
+                var list = value as Array;
+
+                Type referencedType = fieldType.GetElementType();
+
+                for (int i = 0; i < list.Length; ++i)
+                {
+                    result.Add(ComposeElement(list.GetValue(i), referencedType, "li", context));
+                }
+
+                return result;
+            }
+
             if (fieldType.IsGenericType && fieldType.GetGenericTypeDefinition() == typeof(List<>))
             {
                 var list = value as IList;
