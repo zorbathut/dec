@@ -98,7 +98,8 @@ namespace Def
 
             var writerContext = new WriterContext();
 
-            record.Add(Serialization.ComposeElement(target, target != null ? target.GetType() : typeof(T), "data", writerContext));
+            var rootElement = Serialization.ComposeElement(target, target != null ? target.GetType() : typeof(T), "data", writerContext);
+            record.Add(rootElement);
 
             // Handle all our pending writes
             while (writerContext.DequeuePendingWrite() is var pending && pending != null)
@@ -106,16 +107,40 @@ namespace Def
                 pending();
             }
 
-            // Write our references!
-            if (writerContext.HasReferences())
+            // We now have a giant XML tree, potentially many thousands of nodes deep, where some nodes are references and some *should* be in the reference bank but aren't.
+            // We need to do two things:
+            // * Make all of our tagged references into actual references in the Refs section
+            // * Tag anything deeper than a certain depth as a reference, then move it into the Refs section
+            var depthTestsPending = new List<XElement>();
+            depthTestsPending.Add(rootElement);
+
+            // This is a loop between "write references" and "tag everything below a certain depth as needing to be turned into a reference".
+            // We do this in a loop so we don't have to worry about ironically blowing our stack while making a change required to not blow our stack.
+            while (true)
             {
                 // Canonical ordering to provide some stability and ease-of-reading.
                 foreach (var reference in writerContext.StripAndOutputReferences().OrderBy(kvp => kvp.Key))
                 {
                     refs.Add(reference.Value);
+                    depthTestsPending.Add(reference.Value);
+                }
+
+                bool found = false;
+                for (int i = 0; i < depthTestsPending.Count; ++i)
+                {
+                    // Magic number should probably be configurable at some point
+                    found |= writerContext.ProcessDepthLimitedReferences(depthTestsPending[i], 20);
+                }
+                depthTestsPending.Clear();
+
+                if (!found)
+                {
+                    // No new depth-clobbering references found, just move on
+                    break;
                 }
             }
-            else
+
+            if (refs.IsEmpty)
             {
                 // strip out the refs 'cause it looks better that way :V
                 refs.Remove();
@@ -249,11 +274,16 @@ namespace Def
         // A list of writes that still have to happen. This is used so we don't have to do deep recursive dives and potentially blow our stack.
         private List<Action> pendingWrites = new List<Action>();
 
-        // A map from object to the in-place element. This does *not* yet have the ref ID tagged, and will have to be extracted into a new Element later.
+        // Maps between object and the in-place element. This does *not* yet have the ref ID tagged, and will have to be extracted into a new Element later.
         private Dictionary<object, XElement> refToElement = new Dictionary<object, XElement>();
+        private Dictionary<XElement, object> elementToRef = new Dictionary<XElement, object>();
 
         // A map from object to the string intended as a reference. This will be filled in only once a second reference to something is created.
+        // This is cleared after we resolve references, then re-used for the depth capping code.
         private Dictionary<object, string> refToString = new Dictionary<object, string>();
+
+        // Current reference ID that we're on.
+        private int referenceId = 0;
 
         public void RegisterPendingWrite(Action action)
         {
@@ -278,6 +308,7 @@ namespace Def
             {
                 // Insert it into our refToElement mapping
                 refToElement[referenced] = element;
+                elementToRef[element] = referenced;
 
                 // We still need this to be generated, so we'll just let that happen now
                 return false;
@@ -287,7 +318,7 @@ namespace Def
             if (refId == null)
             {
                 // We already had a reference, but we don't have a string ID for it. We need one now though!
-                refId = $"ref{refToString.Count:D5}";
+                refId = $"ref{referenceId++:D5}";
                 refToString[referenced] = refId;
             }
 
@@ -296,11 +327,6 @@ namespace Def
 
             // And we're done!
             return true;
-        }
-
-        public bool HasReferences()
-        {
-            return refToString.Any();
         }
 
         public IEnumerable<KeyValuePair<string, XElement>> StripAndOutputReferences()
@@ -336,6 +362,30 @@ namespace Def
                 result.SetAttributeValue("class", refblock.Key.GetType().ToStringDefFormatted());
 
                 yield return new KeyValuePair<string, XElement>(refblock.Value, result);
+            }
+
+            // We're now done processing this segment and can erase it; we don't want to try doing this a second time!
+            refToString.Clear();
+        }
+
+        public bool ProcessDepthLimitedReferences(XElement node, int depthRemaining)
+        {
+            if (depthRemaining <= 0 && elementToRef.ContainsKey(node))
+            {
+                refToString[elementToRef[node]] = $"ref{referenceId++:D5}";
+                // We don't continue recursively because then we're threatening a stack overflow; we'll get it on the next pass
+
+                return true;
+            }
+            else
+            {
+                bool found = false;
+                foreach (var child in node.Elements())
+                {
+                    found |= ProcessDepthLimitedReferences(child, depthRemaining - 1);
+                }
+
+                return found;
             }
         }
     }
