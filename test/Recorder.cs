@@ -448,5 +448,63 @@ namespace DefTest
 
             Assert.AreEqual(value, deserialized);
         }
+
+        class DoubleLinkedRecorder : Def.IRecordable
+        {
+            public DoubleLinkedRecorder a;
+            public DoubleLinkedRecorder b;
+
+            public void Record(Def.Recorder record)
+            {
+                record.Record(ref a, "a");
+                record.Record(ref b, "b");
+            }
+        }
+
+        [Test]
+        public void DepthDoubleLinked()
+        {
+            // This test verifies that we can traverse an extremely deep structure without blowing the stack.
+            // We use double links so we don't have to worry about generating an absurd xml file in the process.
+            // As of this writing, *without* the stack compensation code, 1000 works and 2000 doesn't
+            // I'm choosing 10000 because it's well into the Doesn't Work territory, but it also doesn't take forever to run.
+            const int depth = 10000;
+
+            var parser = new Def.Parser(explicitOnly: true);
+            parser.Finish();
+
+            var root = new DoubleLinkedRecorder();
+
+            {
+                var current = root;
+                
+                for (int i = 1; i < depth; ++i)
+                {
+                    var next = new DoubleLinkedRecorder();
+                    current.a = next;
+                    current.b = next;
+                    current = next;
+                }
+            }
+
+            string serialized = Def.Recorder.Write(root, pretty: true);
+            Assert.IsNotNull(serialized);
+
+            DoubleLinkedRecorder deserialized = Def.Recorder.Read<DoubleLinkedRecorder>(serialized);
+            Assert.IsNotNull(deserialized);
+
+            {
+                var seen = new HashSet<DoubleLinkedRecorder>();
+                var current = deserialized;
+                while (current != null && !seen.Contains(current))
+                {
+                    Assert.AreEqual(current.a, current.b);
+                    seen.Add(current);
+                    current = current.a;
+                }
+
+                Assert.AreEqual(depth, seen.Count);
+            }
+        }
     }
 }

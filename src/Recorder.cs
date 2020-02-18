@@ -100,6 +100,12 @@ namespace Def
 
             record.Add(Serialization.ComposeElement(target, target != null ? target.GetType() : typeof(T), "data", writerContext));
 
+            // Handle all our pending writes
+            while (writerContext.DequeuePendingWrite() is var pending && pending != null)
+            {
+                pending();
+            }
+
             // Write our references!
             if (writerContext.HasReferences())
             {
@@ -240,11 +246,31 @@ namespace Def
 
     internal class WriterContext
     {
+        // A list of writes that still have to happen. This is used so we don't have to do deep recursive dives and potentially blow our stack.
+        private List<Action> pendingWrites = new List<Action>();
+
         // A map from object to the in-place element. This does *not* yet have the ref ID tagged, and will have to be extracted into a new Element later.
         private Dictionary<object, XElement> refToElement = new Dictionary<object, XElement>();
 
         // A map from object to the string intended as a reference. This will be filled in only once a second reference to something is created.
         private Dictionary<object, string> refToString = new Dictionary<object, string>();
+
+        public void RegisterPendingWrite(Action action)
+        {
+            pendingWrites.Add(action);
+        }
+
+        public Action DequeuePendingWrite()
+        {
+            if (pendingWrites.Count == 0)
+            {
+                return null;
+            }
+
+            var result = pendingWrites[pendingWrites.Count - 1];
+            pendingWrites.RemoveAt(pendingWrites.Count - 1);
+            return result;
+        }
 
         public bool RegisterReference(object referenced, XElement element)
         {

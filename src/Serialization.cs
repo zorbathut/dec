@@ -575,7 +575,7 @@ namespace Def
             {
                 var recordable = value as IRecordable;
 
-                recordable.Record(new RecorderWriter(result, context));
+                context.RegisterPendingWrite(() => recordable.Record(new RecorderWriter(result, context)));
 
                 return result;
             }
@@ -589,7 +589,7 @@ namespace Def
                 }
                 else
                 {
-                    converter.Record(value, fieldType, new RecorderWriter(result, context));
+                    context.RegisterPendingWrite(() => converter.Record(value, fieldType, new RecorderWriter(result, context)));
                 }
 
                 return result;
