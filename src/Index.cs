@@ -46,7 +46,7 @@ namespace Def
     /// Contains information on a single type of index.
     /// </summary>
     /// <remarks>
-    /// This is often used when doing high-performance processing over all elements of a type. See [Indexes](doc_indexes.md) for more details.
+    /// This is often used when doing high-performance processing over all elements of a type. See [Indexes](/articles/doc_indexes.html) for more details.
     /// </remarks>
     public static class Index<T>
     {
@@ -116,7 +116,7 @@ namespace Def
     /// Applied to mark an `int` member as an index.
     /// </summary>
     /// <remarks>
-    /// See [Indexes](doc_indexes.md) for more information.
+    /// See [Indexes](/articles/doc_indexes.html) for more information.
     /// </remarks>
     [System.AttributeUsage(System.AttributeTargets.Field)]
     public class IndexAttribute : System.Attribute
