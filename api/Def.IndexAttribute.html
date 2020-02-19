@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Namespace Def
+    <title>Class IndexAttribute
    </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Namespace Def
+    <meta name="title" content="Class IndexAttribute
    ">
     <meta name="generator" content="docfx 2.48.0.0">
     
@@ -68,56 +68,30 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="Def">
+            <article class="content wrap" id="_content" data-uid="Def.IndexAttribute">
   
-  <h1 id="Def" data-uid="Def" class="text-break">Namespace Def
+  
+  <h1 id="Def_IndexAttribute" data-uid="Def.IndexAttribute" class="text-break">Class IndexAttribute
   </h1>
-  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 summary"><p>Applied to mark an <code>int</code> member as an index.</p>
+</div>
   <div class="markdown level0 conceptual"></div>
-  <div class="markdown level0 remarks"></div>
-    <h3 id="classes">Classes
-  </h3>
-      <h4><a class="xref" href="Def.Config.html">Config</a></h4>
-      <section><p>Contains global configuration data that may be needed before parsing.
-Initialize as soon as possible.</p>
-</section>
-      <h4><a class="xref" href="Def.Converter.html">Converter</a></h4>
-      <section><p>Base class for converting to arbitrary types.</p>
-</section>
-      <h4><a class="xref" href="Def.Database.html">Database</a></h4>
-      <section><p>Contains information on all defs that exist.</p>
-</section>
-      <h4><a class="xref" href="Def.Database-1.html">Database&lt;T&gt;</a></h4>
-      <section><p>Contains information on a single type of Def.</p>
-</section>
-      <h4><a class="xref" href="Def.Def.html">Def</a></h4>
-      <section><p>Base class of all def-provided datatypes.</p>
-</section>
-      <h4><a class="xref" href="Def.Index-1.html">Index&lt;T&gt;</a></h4>
-      <section><p>Contains information on a single type of index.</p>
-</section>
-      <h4><a class="xref" href="Def.IndexAttribute.html">IndexAttribute</a></h4>
-      <section><p>Applied to mark an <code>int</code> member as an index.</p>
-</section>
-      <h4><a class="xref" href="Def.Parser.html">Parser</a></h4>
-      <section><p>Handles all parsing and initialization of def structures.</p>
-</section>
-      <h4><a class="xref" href="Def.Recorder.html">Recorder</a></h4>
-      <section><p>Main class for the serialization/deserialization system.</p>
-</section>
-      <h4><a class="xref" href="Def.StaticReferencesAttribute.html">StaticReferencesAttribute</a></h4>
-      <section><p>Signals that static references in this class should be filled out after parsing is complete.</p>
-</section>
-    <h3 id="interfaces">Interfaces
-  </h3>
-      <h4><a class="xref" href="Def.IRecordable.html">IRecordable</a></h4>
-      <section><p>Base class for recordable elements.</p>
-</section>
-    <h3 id="enums">Enums
-  </h3>
-      <h4><a class="xref" href="Def.Recorder.Direction.html">Recorder.Direction</a></h4>
-      <section><p>Indicates whether this Recorder is being used for reading or writing.</p>
-</section>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><span class="xref">System.Attribute</span></div>
+    <div class="level2"><span class="xref">IndexAttribute</span></div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Def.html">Def</a></h6>
+  <h6><strong>Assembly</strong>: def.dll</h6>
+  <h5 id="Def_IndexAttribute_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[AttributeUsage(AttributeTargets.Field)]
+public class IndexAttribute : Attribute</code></pre>
+  </div>
+  <h5 id="Def_IndexAttribute_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks"><p>See <a href="/articles/doc_indexes.html">Indexes</a> for more information.</p>
+</div>
 </article>
           </div>
           
@@ -125,6 +99,12 @@ Initialize as soon as possible.</p>
             <div class="sideaffix">
               <div class="contribution">
                 <ul class="nav">
+                  <li>
+                    <a href="https://github.com/zorbathut/def/new/master/apiSpec/new?filename=Def_IndexAttribute.md&amp;value=---%0Auid%3A%20Def.IndexAttribute%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Improve this Doc</a>
+                  </li>
+                  <li>
+                    <a href="https://github.com/zorbathut/def/blob/master/src/Index.cs/#L121" class="contribution-link">View Source</a>
+                  </li>
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">

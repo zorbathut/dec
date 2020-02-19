@@ -325,6 +325,72 @@ references:
   isSpec: "True"
   fullName: Def.Def.ToString
   nameWithType: Def.ToString
+- uid: Def.Index`1
+  name: Index<T>
+  href: api/Def.Index-1.html
+  commentId: T:Def.Index`1
+  name.vb: Index(Of T)
+  fullName: Def.Index<T>
+  fullName.vb: Def.Index(Of T)
+  nameWithType: Index<T>
+  nameWithType.vb: Index(Of T)
+- uid: Def.Index`1.Count
+  name: Count
+  href: api/Def.Index-1.html#Def_Index_1_Count
+  commentId: P:Def.Index`1.Count
+  fullName: Def.Index<T>.Count
+  fullName.vb: Def.Index(Of T).Count
+  nameWithType: Index<T>.Count
+  nameWithType.vb: Index(Of T).Count
+- uid: Def.Index`1.Count*
+  name: Count
+  href: api/Def.Index-1.html#Def_Index_1_Count_
+  commentId: Overload:Def.Index`1.Count
+  isSpec: "True"
+  fullName: Def.Index<T>.Count
+  fullName.vb: Def.Index(Of T).Count
+  nameWithType: Index<T>.Count
+  nameWithType.vb: Index(Of T).Count
+- uid: Def.Index`1.Get(System.Int32)
+  name: Get(Int32)
+  href: api/Def.Index-1.html#Def_Index_1_Get_System_Int32_
+  commentId: M:Def.Index`1.Get(System.Int32)
+  fullName: Def.Index<T>.Get(System.Int32)
+  fullName.vb: Def.Index(Of T).Get(System.Int32)
+  nameWithType: Index<T>.Get(Int32)
+  nameWithType.vb: Index(Of T).Get(Int32)
+- uid: Def.Index`1.Get*
+  name: Get
+  href: api/Def.Index-1.html#Def_Index_1_Get_
+  commentId: Overload:Def.Index`1.Get
+  isSpec: "True"
+  fullName: Def.Index<T>.Get
+  fullName.vb: Def.Index(Of T).Get
+  nameWithType: Index<T>.Get
+  nameWithType.vb: Index(Of T).Get
+- uid: Def.Index`1.List
+  name: List
+  href: api/Def.Index-1.html#Def_Index_1_List
+  commentId: P:Def.Index`1.List
+  fullName: Def.Index<T>.List
+  fullName.vb: Def.Index(Of T).List
+  nameWithType: Index<T>.List
+  nameWithType.vb: Index(Of T).List
+- uid: Def.Index`1.List*
+  name: List
+  href: api/Def.Index-1.html#Def_Index_1_List_
+  commentId: Overload:Def.Index`1.List
+  isSpec: "True"
+  fullName: Def.Index<T>.List
+  fullName.vb: Def.Index(Of T).List
+  nameWithType: Index<T>.List
+  nameWithType.vb: Index(Of T).List
+- uid: Def.IndexAttribute
+  name: IndexAttribute
+  href: api/Def.IndexAttribute.html
+  commentId: T:Def.IndexAttribute
+  fullName: Def.IndexAttribute
+  nameWithType: IndexAttribute
 - uid: Def.IRecordable
   name: IRecordable
   href: api/Def.IRecordable.html

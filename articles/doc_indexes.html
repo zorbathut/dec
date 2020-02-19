@@ -69,11 +69,35 @@
             <article class="content wrap" id="_content" data-uid="">
 <h1 id="indexes">Indexes</h1>
 
-<p>It's occasionally convenient for defs to have an integer index associated with them, where the index among a set of defs is between [0, defCount). This is mostly handy for doing array lookups; array lookups are much faster than a Dictionary&lt;Def, object&gt; lookup.</p>
-<p>The problem is that, in a complex hierarchy, it's not always obvious what type to associate the index with. Choosing a type too close to Def.Def itself results in an array with gaps, choosing a type too far away results in an array that doesn't contain everything necessary. This problem gets much worse with def hierarchy control.</p>
-<p>As a much smaller concern, most types will never have their index used, and that's just wasted memory. This is not really relevant though because there just aren't that many defs in most systems.</p>
-<p>The right solution is to add an Index Attribute that lets the def creator specify where indices need to be created.</p>
-<p>I'll get to this someday.</p>
+<p>Sometimes it's useful to have integer IDs for a class of objects. Def supports indices both for Defs themselves, and for members within the Def system.</p>
+<pre><code class="lang-cs">public class IndexedDef : Def.Def
+{
+    [Def.Index] public int index;
+}
+
+public class IndexedNonDefClass
+{
+    [Def.Index] public int index;
+}
+
+// Generate a temporary array with exactly the number of elements as there are IndexedDef's.
+int[] tempArray = new int[Index&lt;IndexedDef&gt;.Count];
+
+// Iterate over IndexedDef's and calculate values, storing the results in the temp array.
+for (int i = 0; i &lt; Index&lt;IndexedDef&gt;.Count; ++i)
+{
+    tempArray[i] = Index&lt;IndexedDef&gt;.Get(i).CalculateImportantValue();
+}
+
+// Modify them to get final results.
+ModifyValuesInSomeWayThatRequiresHavingThemAllAvailable(tempArray);
+
+// Get the highest value out of the temp array, then use Index to look up which def it refers to.
+IndexedDef best = Index&lt;IndexedDef&gt;.Get(IndexOfMax(tempArray));
+</code></pre>
+<p>Make an <code>int</code> member with the Def.Index attribute. All instances of that object, whether it be a Def, a non-Def class, or a struct, will be given a unique integer index. The full list will also be stored in Index&lt;T&gt;.</p>
+<p>These values are not consistent between execution runs - don't use them as part of serializing savegames!</p>
+<p>Indices may not be set properly on objects that are created as defaults and that are never explicitly defined in defs. This may be solved in the future; consider this a first revision of this feature.</p>
 </article>
           </div>
           
@@ -82,7 +106,7 @@
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/zorbathut/def/blob/master/docs/articles/fp_index.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/zorbathut/def/blob/master/docs/articles/doc_indexes.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>
