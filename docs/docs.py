@@ -23,7 +23,7 @@ def obliterate(path):
     os.chmod(path, stat.S_IWRITE)
     os.unlink(path)
 
-  shutil.rmtree("docs/_site", onerror = on_rm_error)
+  shutil.rmtree(path, onerror = on_rm_error)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--serve', action='store_true')
