@@ -93,6 +93,7 @@ namespace Def
 
             Parser.Clear();
             Serialization.Clear();
+            Index.Clear();
         }
         
         internal static void Register(Def instance)

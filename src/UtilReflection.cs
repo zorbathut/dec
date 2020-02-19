@@ -148,5 +148,64 @@ namespace Def
 
             return false;
         }
+
+        internal struct IndexInfo
+        {
+            public Type type;
+            public FieldInfo field;
+        }
+        internal static Dictionary<Type, IndexInfo[]> IndexInfoCached = new Dictionary<Type, IndexInfo[]>();
+        internal static IndexInfo[] GetIndicesForType(Type type)
+        {
+            if (IndexInfoCached.TryGetValue(type, out var result))
+            {
+                // found it in cache, we're done
+                return result;
+            }
+
+            IndexInfo[] indices = null;
+
+            if (type.BaseType != null)
+            {
+                indices = GetIndicesForType(type.BaseType);
+            }
+
+            FieldInfo matchedField = null;
+            foreach (var field in type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
+            {
+                if (field.GetCustomAttribute<IndexAttribute>() != null)
+                {
+                    if (matchedField != null)
+                    {
+                        Dbg.Err($"Too many indices in type {type} (found {matchedField} and {field}); only one will be filled");
+                    }
+
+                    matchedField = field;
+                }
+            }
+
+            if (matchedField != null)
+            {
+                IndexInfo[] indicesWorking;
+
+                if (indices != null)
+                {
+                    indicesWorking = new IndexInfo[indices.Length + 1];
+                    Array.Copy(indices, indicesWorking, indices.Length);
+                }
+                else
+                {
+                    indicesWorking = new IndexInfo[1];
+                }
+
+                indicesWorking[indicesWorking.Length - 1] = new IndexInfo { type = type, field = matchedField };
+
+                indices = indicesWorking;
+            }
+
+            IndexInfoCached[type] = indices;
+
+            return indices;
+        }
     }
 }

@@ -8,6 +8,8 @@
       href: doc_type.md
     - name: Def hierarchy roots
       href: doc_hierarchy.md
+    - name: Indexes
+      href: doc_indexes.md
     - name: Custom deserialization
       href: doc_custom.md
     - name: Serialization
