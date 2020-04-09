@@ -13,9 +13,9 @@ namespace DefTest
         }
 
         [Test]
-	    public void Array()
+	    public void Array([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(ArrayDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(ArrayDef) });
             parser.AddString(@"
                 <Defs>
                     <ArrayDef defName=""TestDef"">
@@ -30,6 +30,8 @@ namespace DefTest
                 </Defs>");
             parser.Finish();
 
+            DoBehavior(mode);
+
             var result = Def.Database<ArrayDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
@@ -42,9 +44,9 @@ namespace DefTest
         }
 
         [Test]
-	    public void List()
+	    public void List([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(ListDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(ListDef) });
             parser.AddString(@"
                 <Defs>
                     <ListDef defName=""TestDef"">
@@ -58,6 +60,8 @@ namespace DefTest
                     </ListDef>
                 </Defs>");
             parser.Finish();
+
+            DoBehavior(mode);
 
             var result = Def.Database<ListDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -73,9 +77,9 @@ namespace DefTest
         }
 
         [Test]
-        public void ListOverride()
+        public void ListOverride([Values] BehaviorMode mode)
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(ListOverrideDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[] { typeof(ListOverrideDef) });
             parser.AddString(@"
                 <Defs>
                     <ListOverrideDef defName=""TestDef"">
@@ -86,6 +90,8 @@ namespace DefTest
                     </ListOverrideDef>
                 </Defs>");
             parser.Finish();
+
+            DoBehavior(mode);
 
             var result = Def.Database<ListOverrideDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -101,9 +107,9 @@ namespace DefTest
         }
 
         [Test]
-	    public void Nested()
+	    public void Nested([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(NestedDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(NestedDef) });
             parser.AddString(@"
                 <Defs>
                     <NestedDef defName=""TestDef"">
@@ -121,6 +127,8 @@ namespace DefTest
                 </Defs>");
             parser.Finish();
 
+            DoBehavior(mode);
+
             var result = Def.Database<NestedDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
@@ -133,9 +141,9 @@ namespace DefTest
         }
 
         [Test]
-	    public void DictionaryString()
+	    public void DictionaryString([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(DictionaryStringDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(DictionaryStringDef) });
             parser.AddString(@"
                 <Defs>
                     <DictionaryStringDef defName=""TestDef"">
@@ -147,6 +155,8 @@ namespace DefTest
                 </Defs>");
             parser.Finish();
 
+            DoBehavior(mode);
+
             var result = Def.Database<DictionaryStringDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
@@ -154,9 +164,9 @@ namespace DefTest
 	    }
 
         [Test]
-        public void DictionaryLi()
+        public void DictionaryLi([Values] BehaviorMode mode)
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(DictionaryStringDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[] { typeof(DictionaryStringDef) });
             parser.AddString(@"
                 <Defs>
                     <DictionaryStringDef defName=""TestDef"">
@@ -174,6 +184,8 @@ namespace DefTest
                 </Defs>");
             parser.Finish();
 
+            DoBehavior(mode);
+
             var result = Def.Database<DictionaryStringDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
@@ -181,9 +193,9 @@ namespace DefTest
         }
 
         [Test]
-        public void DictionaryHybrid()
+        public void DictionaryHybrid([Values] BehaviorMode mode)
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(DictionaryStringDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[] { typeof(DictionaryStringDef) });
             parser.AddString(@"
                 <Defs>
                     <DictionaryStringDef defName=""TestDef"">
@@ -198,6 +210,8 @@ namespace DefTest
                 </Defs>");
             parser.Finish();
 
+            DoBehavior(mode);
+
             var result = Def.Database<DictionaryStringDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
@@ -205,9 +219,9 @@ namespace DefTest
         }
 
         [Test]
-	    public void DictionaryDuplicate()
+	    public void DictionaryDuplicate([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(DictionaryStringDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(DictionaryStringDef) });
             parser.AddString(@"
                 <Defs>
                     <DictionaryStringDef defName=""TestDef"">
@@ -218,6 +232,8 @@ namespace DefTest
                     </DictionaryStringDef>
                 </Defs>");
             ExpectErrors(() => parser.Finish());
+
+            DoBehavior(mode);
 
             var result = Def.Database<DictionaryStringDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -233,9 +249,9 @@ namespace DefTest
         }
 
         [Test]
-        public void DictionaryOverrideString()
+        public void DictionaryOverrideString([Values] BehaviorMode mode)
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(DictionaryStringOverrideDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[] { typeof(DictionaryStringOverrideDef) });
             parser.AddString(@"
                 <Defs>
                     <DictionaryStringOverrideDef defName=""TestDef"">
@@ -247,6 +263,8 @@ namespace DefTest
                     </DictionaryStringOverrideDef>
                 </Defs>");
             parser.Finish();
+
+            DoBehavior(mode);
 
             var result = Def.Database<DictionaryStringOverrideDef>.Get("TestDef");
             Assert.IsNotNull(result);
