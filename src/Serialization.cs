@@ -628,7 +628,7 @@ namespace Def
 
             // We absolutely should not be doing reflection when in recorder mode; that way lies madness.
             
-            foreach (var field in fieldType.GetFieldsFromHierarchy())
+            foreach (var field in value.GetType().GetFieldsFromHierarchy())
             {
                 if (field.IsBackingField())
                 {
