@@ -23,7 +23,7 @@ namespace Def
             foreach (var defObj in Database.List)
             {
                 // TODO: need a better string identifier; this should be basically the opposite of ParseTypeDefFormatted
-                var defXml = Serialization.ComposeElement(defObj, defObj.GetType(), defObj.GetType().Name, writerContext, isRootDef: true);
+                var defXml = Serialization.ComposeElement(defObj, defObj.GetType(), defObj.GetType().ComposeTypeDefFormatted(), writerContext, isRootDef: true);
                 defXml.Add(new XAttribute("defName", defObj.DefName));
                 record.Add(defXml);
             }

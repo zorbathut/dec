@@ -546,7 +546,7 @@ namespace Def
             // This is also where we need to start being concerned about types. If we have a type that isn't the expected type, tag it.
             if (value.GetType() != fieldType)
             {
-                result.Add(new XAttribute("class", value.GetType().Name));
+                result.Add(new XAttribute("class", value.GetType().ComposeTypeDefFormatted()));
             }
 
             if (fieldType.IsArray)

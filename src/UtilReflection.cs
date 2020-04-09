@@ -138,6 +138,11 @@ namespace Def
             }
         }
 
+        internal static string ComposeTypeDefFormatted(this Type type)
+        {
+            return type.Name;
+        }
+
         internal static bool ReflectionSetForbidden(FieldInfo field)
         {
             // Alright, this isn't exactly complicated right now
@@ -208,7 +213,7 @@ namespace Def
             return indices;
         }
 
-        public static bool IsBackingField(this FieldInfo field)
+        internal static bool IsBackingField(this FieldInfo field)
         {
             // I wish I could find something more authoritative on this.
             return field.Name.StartsWith("<");
