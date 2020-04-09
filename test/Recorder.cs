@@ -552,5 +552,57 @@ namespace DefTest
                 Assert.AreEqual(depth, seen.Count);
             }
         }
+
+        private class BaseRecordable : Def.IRecordable
+        {
+            public int baseVal = 0;
+
+            public virtual void Record(Def.Recorder record)
+            {
+                record.Record(ref baseVal, "baseVal");
+            }
+        }
+
+        private class DerivedRecordable : BaseRecordable
+        {
+            public int derivedVal = 0;
+
+            public override void Record(Def.Recorder record)
+            {
+                base.Record(record);
+
+                record.Record(ref derivedVal, "derivedVal");
+            }
+        }
+
+        private class RecordableContainer : Def.IRecordable
+        {
+            public BaseRecordable baseContainer;
+
+            public void Record(Def.Recorder record)
+            {
+                record.Record(ref baseContainer, "baseContainer");
+            }
+        }
+
+        [Test]
+        public void DerivedRecordables()
+        {
+            var parser = new Def.Parser(explicitOnly: true);
+            parser.Finish();
+
+            var root = new RecordableContainer();
+            root.baseContainer = new DerivedRecordable();
+            root.baseContainer.baseVal = 42;
+            (root.baseContainer as DerivedRecordable).derivedVal = 81;
+
+            string serialized = Def.Recorder.Write(root, pretty: true);
+            var deserialized = Def.Recorder.Read<RecordableContainer>(serialized);
+
+            Assert.AreEqual(typeof(DerivedRecordable), deserialized.baseContainer.GetType());
+
+            Assert.AreEqual(42, deserialized.baseContainer.baseVal);
+            Assert.AreEqual(81, ( root.baseContainer as DerivedRecordable ).derivedVal);
+        }
     }
 }
