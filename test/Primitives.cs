@@ -42,9 +42,9 @@ namespace DefTest
 	    }
 
         [Test]
-	    public void FailingIntParse()
+	    public void FailingIntParse([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(IntDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(IntDef) });
             parser.AddString(@"
                 <Defs>
                     <IntDef defName=""TestDef"">
@@ -53,6 +53,8 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
+            DoBehavior(mode);
+
             var result = Def.Database<IntDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
@@ -60,9 +62,9 @@ namespace DefTest
 	    }
 
         [Test]
-	    public void FailingIntParse2()
+	    public void FailingIntParse2([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(IntDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(IntDef) });
             parser.AddString(@"
                 <Defs>
                     <IntDef defName=""TestDef"">
@@ -71,6 +73,8 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
+            DoBehavior(mode);
+
             var result = Def.Database<IntDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
@@ -78,9 +82,9 @@ namespace DefTest
 	    }
 
 	    [Test]
-	    public void EmptyBoolParse()
+	    public void EmptyBoolParse([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(BoolDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(BoolDef) });
             parser.AddString(@"
                 <Defs>
                     <BoolDef defName=""TestDef"">
@@ -89,6 +93,8 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
+            DoBehavior(mode);
+
             var result = Def.Database<BoolDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
@@ -96,9 +102,9 @@ namespace DefTest
 	    }
 
 	    [Test]
-	    public void FailingBoolParse()
+	    public void FailingBoolParse([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(BoolDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(BoolDef) });
             parser.AddString(@"
                 <Defs>
                     <BoolDef defName=""TestDef"">
@@ -107,6 +113,8 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
+            DoBehavior(mode);
+
             var result = Def.Database<BoolDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
@@ -114,9 +122,9 @@ namespace DefTest
 	    }
 
         [Test]
-	    public void EmptyStringParse()
+	    public void EmptyStringParse([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StringDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(StringDef) });
             parser.AddString(@"
                 <Defs>
                     <StringDef defName=""TestDef"">
@@ -124,6 +132,8 @@ namespace DefTest
                     </StringDef>
                 </Defs>");
             parser.Finish();
+
+            DoBehavior(mode);
 
             var result = Def.Database<StringDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -149,9 +159,9 @@ namespace DefTest
         }
 
 	    [Test]
-	    public void BulkParse()
+	    public void BulkParse([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(BulkParseDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(BulkParseDef) });
             parser.AddString(@"
                 <Defs>
                     <BulkParseDef defName=""TestDef"">
@@ -167,6 +177,8 @@ namespace DefTest
                     </BulkParseDef>
                 </Defs>");
             parser.Finish();
+
+            DoBehavior(mode);
 
             var result = Def.Database<BulkParseDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -193,9 +205,9 @@ namespace DefTest
         }
 
         [Test]
-	    public void MissingMember()
+	    public void MissingMember([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(MissingMemberDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(MissingMemberDef) });
             parser.AddString(@"
                 <Defs>
                     <MissingMemberDef defName=""TestDef"">
@@ -205,6 +217,8 @@ namespace DefTest
                     </MissingMemberDef>
                 </Defs>");
             ExpectErrors(() => parser.Finish());
+
+            DoBehavior(mode);
 
             var result = Def.Database<MissingMemberDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -226,9 +240,9 @@ namespace DefTest
         }
 
         [Test]
-	    public void Enum()
+	    public void Enum([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(EnumDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(EnumDef) });
             parser.AddString(@"
                 <Defs>
                     <EnumDef defName=""TestDef"">
@@ -237,6 +251,8 @@ namespace DefTest
                 </Defs>");
             parser.Finish();
 
+            DoBehavior(mode);
+
             var result = Def.Database<EnumDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
@@ -244,9 +260,9 @@ namespace DefTest
 	    }
 
         [Test]
-	    public void InvalidAttribute()
+	    public void InvalidAttribute([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(IntDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(IntDef) });
             parser.AddString(@"
                 <Defs>
                     <IntDef defName=""TestDef"">
@@ -254,6 +270,8 @@ namespace DefTest
                     </IntDef>
                 </Defs>");
             ExpectErrors(() => parser.Finish());
+
+            DoBehavior(mode);
 
             var result = Def.Database<IntDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -274,9 +292,9 @@ namespace DefTest
         public class Generic<T> { }
 
         [Test]
-	    public void TypeBasic()
+	    public void TypeBasic([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(TypeDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(TypeDef) });
             parser.AddString(@"
                 <Defs>
                     <TypeDef defName=""TestDef"">
@@ -285,6 +303,8 @@ namespace DefTest
                 </Defs>");
             parser.Finish();
 
+            DoBehavior(mode);
+
             var result = Def.Database<TypeDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
@@ -292,9 +312,9 @@ namespace DefTest
 	    }
 
         [Test]
-	    public void TypeNested()
+	    public void TypeNested([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(TypeDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(TypeDef) });
             parser.AddString(@"
                 <Defs>
                     <TypeDef defName=""TestDef"">
@@ -303,6 +323,8 @@ namespace DefTest
                 </Defs>");
             parser.Finish();
 
+            DoBehavior(mode);
+
             var result = Def.Database<TypeDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
@@ -310,9 +332,9 @@ namespace DefTest
 	    }
 
         [Test]
-	    public void TypeStatic()
+	    public void TypeStatic([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(TypeDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(TypeDef) });
             parser.AddString(@"
                 <Defs>
                     <TypeDef defName=""TestDef"">
@@ -321,6 +343,8 @@ namespace DefTest
                 </Defs>");
             parser.Finish();
 
+            DoBehavior(mode);
+
             var result = Def.Database<TypeDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
@@ -328,9 +352,9 @@ namespace DefTest
 	    }
 
         [Test]
-	    public void TypeAbstract()
+	    public void TypeAbstract([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(TypeDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(TypeDef) });
             parser.AddString(@"
                 <Defs>
                     <TypeDef defName=""TestDef"">
@@ -339,6 +363,8 @@ namespace DefTest
                 </Defs>");
             parser.Finish();
 
+            DoBehavior(mode);
+
             var result = Def.Database<TypeDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
@@ -346,9 +372,9 @@ namespace DefTest
 	    }
 
         [Test]
-	    public void TypeDefRef()
+	    public void TypeDefRef([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(TypeDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(TypeDef) });
             parser.AddString(@"
                 <Defs>
                     <TypeDef defName=""TestDef"">
@@ -357,6 +383,8 @@ namespace DefTest
                 </Defs>");
             parser.Finish();
 
+            DoBehavior(mode);
+
             var result = Def.Database<TypeDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
@@ -364,9 +392,9 @@ namespace DefTest
 	    }
 
         [Test]
-	    public void TypeGenericA()
+	    public void TypeGenericA([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(TypeDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(TypeDef) });
             parser.AddString(@"
                 <Defs>
                     <TypeDef defName=""TestDef"">
@@ -375,6 +403,8 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
+            DoBehavior(mode);
+
             var result = Def.Database<TypeDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
@@ -382,9 +412,9 @@ namespace DefTest
 	    }
 
         [Test]
-	    public void TypeGenericB()
+	    public void TypeGenericB([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(TypeDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(TypeDef) });
             parser.AddString(@"
                 <Defs>
                     <TypeDef defName=""TestDef"">
@@ -393,6 +423,8 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
+            DoBehavior(mode);
+
             var result = Def.Database<TypeDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
@@ -400,9 +432,9 @@ namespace DefTest
 	    }
 
         [Test]
-	    public void TypeGenericC()
+	    public void TypeGenericC([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(TypeDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(TypeDef) });
             parser.AddString(@"
                 <Defs>
                     <TypeDef defName=""TestDef"">
@@ -411,6 +443,8 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
+            DoBehavior(mode);
+
             var result = Def.Database<TypeDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
@@ -418,9 +452,9 @@ namespace DefTest
 	    }
 
         [Test]
-	    public void TypeOverridden()
+	    public void TypeOverridden([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(TypeDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(TypeDef) });
             parser.AddString(@"
                 <Defs>
                     <TypeDef defName=""TestDef"">
@@ -429,6 +463,8 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
+            DoBehavior(mode);
+
             var result = Def.Database<TypeDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
@@ -436,9 +472,9 @@ namespace DefTest
 	    }
 
         [Test]
-	    public void TypeComplete()
+	    public void TypeComplete([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(TypeDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(TypeDef) });
             parser.AddString(@"
                 <Defs>
                     <TypeDef defName=""TestDef"">
@@ -446,6 +482,8 @@ namespace DefTest
                     </TypeDef>
                 </Defs>");
             parser.Finish();
+
+            DoBehavior(mode);
 
             var result = Def.Database<TypeDef>.Get("TestDef");
             Assert.IsNotNull(result);
