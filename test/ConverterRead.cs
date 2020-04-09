@@ -28,12 +28,12 @@ namespace DefTest
 
             public override object FromString(string input, Type type, string inputName, int lineNumber)
             {
-                return new ConverterTestPayload() {number = int.Parse(input) };
+                return new ConverterTestPayload() { number = int.Parse(input) };
             }
 
             public override object FromXml(XElement input, Type type, string inputName)
             {
-                return new ConverterTestPayload() {number = int.Parse(input.Nodes().OfType<XElement>().First().Nodes().OfType<XText>().First().Value) };
+                return new ConverterTestPayload() { number = int.Parse(input.Elements().First().Value) };
             }
         }
 
