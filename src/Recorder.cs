@@ -96,16 +96,13 @@ namespace Def
             var refs = new XElement("refs");
             record.Add(refs);
 
-            var writerContext = new WriterContext();
+            var writerContext = new WriterContext(true);
 
             var rootElement = Serialization.ComposeElement(target, target != null ? target.GetType() : typeof(T), "data", writerContext);
             record.Add(rootElement);
 
             // Handle all our pending writes
-            while (writerContext.DequeuePendingWrite() is var pending && pending != null)
-            {
-                pending();
-            }
+            writerContext.DequeuePendingWrites();
 
             // We now have a giant XML tree, potentially many thousands of nodes deep, where some nodes are references and some *should* be in the reference bank but aren't.
             // We need to do two things:
@@ -271,26 +268,47 @@ namespace Def
 
     internal class WriterContext
     {
+        public bool RecorderMode { get => refToElement != null; }
+
         // A list of writes that still have to happen. This is used so we don't have to do deep recursive dives and potentially blow our stack.
         private List<Action> pendingWrites = new List<Action>();
 
         // Maps between object and the in-place element. This does *not* yet have the ref ID tagged, and will have to be extracted into a new Element later.
-        private Dictionary<object, XElement> refToElement = new Dictionary<object, XElement>();
-        private Dictionary<XElement, object> elementToRef = new Dictionary<XElement, object>();
+        private Dictionary<object, XElement> refToElement = null;
+        private Dictionary<XElement, object> elementToRef = null;
 
         // A map from object to the string intended as a reference. This will be filled in only once a second reference to something is created.
         // This is cleared after we resolve references, then re-used for the depth capping code.
-        private Dictionary<object, string> refToString = new Dictionary<object, string>();
+        private Dictionary<object, string> refToString = null;
 
         // Current reference ID that we're on.
         private int referenceId = 0;
+
+        public WriterContext(bool recorderMode)
+        {
+            if (recorderMode)
+            {
+                // Initialize all of our reference structure.
+                refToElement = new Dictionary<object, XElement>();
+                elementToRef =  new Dictionary<XElement, object>();
+                refToString = new Dictionary<object, string>();
+            }
+        }
 
         public void RegisterPendingWrite(Action action)
         {
             pendingWrites.Add(action);
         }
 
-        public Action DequeuePendingWrite()
+        public void DequeuePendingWrites()
+        {
+            while (DequeuePendingWrite() is var pending && pending != null)
+            {
+                pending();
+            }
+        }
+
+        private Action DequeuePendingWrite()
         {
             if (pendingWrites.Count == 0)
             {
@@ -424,7 +442,7 @@ namespace Def
         public string sourceName;
         public Dictionary<string, object> refs;
 
-        public bool Record { get => refs != null; }
+        public bool RecorderMode { get => refs != null; }
 
         public ReaderContext(string sourceName, bool withRefs)
         {

@@ -207,5 +207,11 @@ namespace Def
 
             return indices;
         }
+
+        public static bool IsBackingField(this FieldInfo field)
+        {
+            // I wish I could find something more authoritative on this.
+            return field.Name.StartsWith("<");
+        }
     }
 }

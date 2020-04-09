@@ -22,9 +22,9 @@ namespace DefTest
         }
 
 	    [Test]
-	    public void EmptyIntParse()
+	    public void EmptyIntParse([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(IntDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(IntDef) });
             parser.AddString(@"
                 <Defs>
                     <IntDef defName=""TestDef"">
@@ -32,6 +32,8 @@ namespace DefTest
                     </IntDef>
                 </Defs>");
             ExpectErrors(() => parser.Finish());
+
+            DoBehavior(mode);
 
             var result = Def.Database<IntDef>.Get("TestDef");
             Assert.IsNotNull(result);

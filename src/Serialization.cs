@@ -308,7 +308,7 @@ namespace Def
             // One big problem here is that I'm OK with security vulnerabilities in def xmls. Those are either supplied by the developer or by mod authors who are intended to have full code support anyway.
             // I'm less OK with security vulnerabilities in save files. Nobody expects a savefile can compromise their system.
             // And the full reflection system is probably impossible to secure, whereas the Record system should be secureable.
-            if (context.Record)
+            if (context.RecorderMode)
             {
                 Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Falling back to reflection within a Record system; this is currently not allowed for security reasons");
                 return model;
@@ -481,7 +481,7 @@ namespace Def
             }
         }
 
-        internal static XElement ComposeElement(object value, Type fieldType, string label, WriterContext context)
+        internal static XElement ComposeElement(object value, Type fieldType, string label, WriterContext context, bool isRootDef = false)
         {
             var result = new XElement(label);
 
@@ -507,7 +507,7 @@ namespace Def
                 return result;
             }
 
-            if (typeof(Def).IsAssignableFrom(fieldType))
+            if (!isRootDef && typeof(Def).IsAssignableFrom(fieldType))
             {
                 // It is! Let's just get the def name and be done with it.
                 if (value != null)
@@ -530,7 +530,7 @@ namespace Def
             }
 
             // Check to see if we should make this into a ref
-            if (!fieldType.IsValueType)
+            if (context.RecorderMode && !fieldType.IsValueType)
             {
                 if (context.RegisterReference(value, result))
                 {
@@ -605,19 +605,34 @@ namespace Def
             }
 
             {
-                // Look for a converter; that's the only way we're going to handle this one!
+                // Look for a converter; that's the only way to handle this before we fall back to reflection
                 var converter = Serialization.Converters.TryGetValue(fieldType);
-                if (converter == null)
-                {
-                    Dbg.Err($"Couldn't find a converter for type {fieldType}");
-                }
-                else
+                if (converter != null)
                 {
                     context.RegisterPendingWrite(() => converter.Record(value, fieldType, new RecorderWriter(result, context)));
+                    return result;
                 }
+            }
 
+            if (context.RecorderMode)
+            {
+                Dbg.Err($"Couldn't find a composition method for type {fieldType}; do you need a Converter?");
                 return result;
             }
+
+            // We absolutely should not be doing reflection when in recorder mode; that way lies madness.
+            
+            foreach (var field in fieldType.GetFieldsFromHierarchy())
+            {
+                if (field.IsBackingField())
+                {
+                    continue;
+                }
+
+                result.Add(ComposeElement(field.GetValue(value), field.FieldType, field.Name, context));
+            }
+
+            return result;
         }
 
         internal static void Clear()

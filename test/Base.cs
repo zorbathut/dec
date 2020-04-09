@@ -19,6 +19,8 @@ namespace DefTest
 
             handlingErrors = false;
             handledError = false;
+
+            ResetBehaviorParser();
         }
 
         private bool handlingWarnings = false;
@@ -112,6 +114,71 @@ namespace DefTest
 
         public class StubDef : Def.Def
         {
+        }
+
+        // Everything after here is designed for the Behavior tests, where we run tests in a variety of ways to test serialization.
+
+        public bool behaviorParserStored = false;
+        public bool behaviorParserExplicitOnly = false;
+        public Type[] behaviorParserExplicitTypes = null;
+        public Type[] behaviorParserExplicitStaticRefs = null;
+        public Type[] behaviorParserExplicitConverters = null;
+
+        public void ResetBehaviorParser()
+        {
+            behaviorParserStored = false;
+            behaviorParserExplicitOnly = false;
+            behaviorParserExplicitTypes = null;
+            behaviorParserExplicitStaticRefs = null;
+            behaviorParserExplicitConverters = null;
+        }
+
+        public enum BehaviorMode
+        {
+             // Don't do anything special; just let it pass through.
+            Bare,
+
+            // Write it to .xml, clear the database, and reload it.
+            Rewritten,
+        }
+
+        public Def.Parser CreateParserForBehavior(bool explicitOnly = false, Type[] explicitTypes = null, Type[] explicitStaticRefs = null, Type[] explicitConverters = null)
+        {
+            Assert.IsFalse(behaviorParserStored);
+
+            behaviorParserStored = true;
+            behaviorParserExplicitOnly = explicitOnly;
+            behaviorParserExplicitTypes = explicitTypes;
+            behaviorParserExplicitStaticRefs = explicitStaticRefs;
+            behaviorParserExplicitConverters = explicitConverters;
+
+            return new Def.Parser(explicitOnly: explicitOnly, explicitTypes: explicitTypes, explicitStaticRefs: explicitStaticRefs, explicitConverters: explicitConverters);
+        }
+
+        public void DoBehavior(BehaviorMode mode)
+        {
+            if (mode == BehaviorMode.Bare)
+            {
+                // we actually have nothing to do here, we're good
+            }
+            else if (mode == BehaviorMode.Rewritten)
+            {
+                Assert.IsTrue(behaviorParserStored);
+
+                var writer = new Def.Writer();
+                string data = writer.Write();
+
+                Def.Database.Clear();
+
+                // gonna need to stash the parser input somewhere.
+                var parser = new Def.Parser(explicitOnly: behaviorParserExplicitOnly, explicitTypes: behaviorParserExplicitTypes, explicitStaticRefs: behaviorParserExplicitStaticRefs, explicitConverters: behaviorParserExplicitConverters);
+                parser.AddString(data);
+                parser.Finish();
+            }
+            else
+            {
+                Assert.IsTrue(false, "Bad case for behavior mode!");
+            }
         }
     }
 }
