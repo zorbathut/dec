@@ -22,9 +22,9 @@ namespace DefTest
         }
 
         [Test]
-	    public void Basic()
+	    public void Basic([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) });
             parser.AddString(@"
                 <Defs>
                     <RefTargetDef defName=""Target"" />
@@ -33,6 +33,8 @@ namespace DefTest
                     </RefSourceDef>
                 </Defs>");
             parser.Finish();
+
+            DoBehavior(mode);
 
             var target = Def.Database<RefTargetDef>.Get("Target");
             var source = Def.Database<RefSourceDef>.Get("Source");
@@ -43,9 +45,9 @@ namespace DefTest
 	    }
 
         [Test]
-	    public void Reversed()
+	    public void Reversed([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) });
             parser.AddString(@"
                 <Defs>
                     <RefSourceDef defName=""Source"">
@@ -54,6 +56,8 @@ namespace DefTest
                     <RefTargetDef defName=""Target"" />
                 </Defs>");
             parser.Finish();
+
+            DoBehavior(mode);
 
             var target = Def.Database<RefTargetDef>.Get("Target");
             var source = Def.Database<RefSourceDef>.Get("Source");
@@ -64,9 +68,9 @@ namespace DefTest
 	    }
 
         [Test]
-	    public void Multistring()
+	    public void Multistring([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) });
             parser.AddString(@"
                 <Defs>
                     <RefSourceDef defName=""Source"">
@@ -79,6 +83,8 @@ namespace DefTest
                 </Defs>");
             parser.Finish();
 
+            DoBehavior(mode);
+
             var target = Def.Database<RefTargetDef>.Get("Target");
             var source = Def.Database<RefSourceDef>.Get("Source");
             Assert.IsNotNull(target);
@@ -88,9 +94,9 @@ namespace DefTest
 	    }
 
         [Test]
-	    public void Refdef()
+	    public void Refdef([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefSourceDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefSourceDef) });
             parser.AddString(@"
                 <Defs>
                     <RefSourceDef defName=""Source"">
@@ -99,14 +105,16 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
+            DoBehavior(mode);
+
             var source = Def.Database<RefSourceDef>.Get("Source");
             Assert.IsNotNull(source);
 	    }
 
         [Test]
-	    public void Circular()
+	    public void Circular([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefCircularDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefCircularDef) });
             parser.AddString(@"
                 <Defs>
                     <RefCircularDef defName=""Alpha"">
@@ -118,6 +126,8 @@ namespace DefTest
                 </Defs>");
             parser.Finish();
 
+            DoBehavior(mode);
+
             var alpha = Def.Database<RefCircularDef>.Get("Alpha");
             var beta = Def.Database<RefCircularDef>.Get("Beta");
             Assert.IsNotNull(alpha);
@@ -128,9 +138,9 @@ namespace DefTest
 	    }
 
         [Test]
-	    public void CircularTight()
+	    public void CircularTight([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefCircularDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefCircularDef) });
             parser.AddString(@"
                 <Defs>
                     <RefCircularDef defName=""TestDef"">
@@ -139,6 +149,8 @@ namespace DefTest
                 </Defs>");
             parser.Finish();
 
+            DoBehavior(mode);
+
             var result = Def.Database<RefCircularDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
@@ -146,10 +158,10 @@ namespace DefTest
 	    }
 
         [Test]
-	    public void NullRef()
+	    public void NullRef([Values] BehaviorMode mode)
 	    {
             // This is a little wonky; we have to test it by duplicating a tag, which is technically an error
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefCircularDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefCircularDef) });
             parser.AddString(@"
                 <Defs>
                     <RefCircularDef defName=""TestDef"">
@@ -159,6 +171,8 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
+            DoBehavior(mode);
+
             var result = Def.Database<RefCircularDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
@@ -166,9 +180,9 @@ namespace DefTest
 	    }
 
         [Test]
-	    public void FailedLookup()
+	    public void FailedLookup([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefSourceDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefSourceDef) });
             parser.AddString(@"
                 <Defs>
                     <RefSourceDef defName=""TestDef"">
@@ -176,6 +190,8 @@ namespace DefTest
                     </RefSourceDef>
                 </Defs>");
             ExpectErrors(() => parser.Finish());
+
+            DoBehavior(mode);
 
             var result = Def.Database<RefSourceDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -189,9 +205,9 @@ namespace DefTest
         }
 
         [Test]
-	    public void BareDef()
+	    public void BareDef([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(BareDefDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(BareDefDef) });
             parser.AddString(@"
                 <Defs>
                     <BareDefDef defName=""TestDef"">
@@ -199,6 +215,8 @@ namespace DefTest
                     </BareDefDef>
                 </Defs>");
             ExpectErrors(() => parser.Finish());
+
+            DoBehavior(mode, expectErrors: true);
 
             var result = Def.Database<BareDefDef>.Get("TestDef");
             Assert.IsNotNull(result);
