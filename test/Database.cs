@@ -74,6 +74,11 @@ namespace DefTest
             Assert.AreEqual(1, Def.Database<ChildDef>.Count);
 
             Assert.AreEqual(3, Def.Database.Count);
+            Assert.AreEqual(3, Def.Database.List.Count());
+
+            Assert.Contains(root, Def.Database.List.ToArray());
+            Assert.Contains(parent, Def.Database.List.ToArray());
+            Assert.Contains(child, Def.Database.List.ToArray());
         }
 
         class NotActuallyADef
