@@ -20,9 +20,9 @@ namespace DefTest
         }
 
         [Test]
-	    public void Private()
+	    public void Private([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(PrivateDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(PrivateDef) });
             parser.AddString(@"
                 <Defs>
                     <PrivateDef defName=""TestDef"">
@@ -30,6 +30,8 @@ namespace DefTest
                     </PrivateDef>
                 </Defs>");
             parser.Finish();
+
+            DoBehavior(mode);
 
             var result = Def.Database<PrivateDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -50,9 +52,9 @@ namespace DefTest
         }
 
         [Test]
-	    public void Internal()
+	    public void Internal([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(InternalDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(InternalDef) });
             parser.AddString(@"
                 <Defs>
                     <InternalDef defName=""TestDef"">
@@ -60,6 +62,8 @@ namespace DefTest
                     </InternalDef>
                 </Defs>");
             parser.Finish();
+
+            DoBehavior(mode);
 
             var result = Def.Database<InternalDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -78,9 +82,9 @@ namespace DefTest
         }
 
         [Test]
-	    public void Protected()
+	    public void Protected([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(ProtectedDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(ProtectedDef) });
             parser.AddString(@"
                 <Defs>
                     <ProtectedDef defName=""TestDef"">
@@ -88,6 +92,8 @@ namespace DefTest
                     </ProtectedDef>
                 </Defs>");
             parser.Finish();
+
+            DoBehavior(mode);
 
             var result = Def.Database<ProtectedDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -113,9 +119,9 @@ namespace DefTest
         }
 
         [Test]
-	    public void PrivateParent()
+	    public void PrivateParent([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(PrivateChildDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(PrivateChildDef) });
             parser.AddString(@"
                 <Defs>
                     <PrivateChildDef defName=""TestDef"">
@@ -123,6 +129,8 @@ namespace DefTest
                     </PrivateChildDef>
                 </Defs>");
             parser.Finish();
+
+            DoBehavior(mode);
 
             var result = Def.Database<PrivateParentDef>.Get("TestDef");
             Assert.IsNotNull(result);
