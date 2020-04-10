@@ -35,12 +35,19 @@ namespace DefTest
             {
                 return new ConverterTestPayload() { number = int.Parse(input.Elements().First().Value) };
             }
+
+            // This doesn't 100% preserve the original format because there's no way to tell if it should be contained in cargo or not
+            // But honestly that's fine, I don't care for this purpose
+            public override string ToString(object input)
+            {
+                return (input as ConverterTestPayload).number.ToString();
+            }
         }
 
         [Test]
-	    public void BasicFunctionality()
+	    public void BasicFunctionality([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(ConverterDef) }, explicitConverters: new Type[]{ typeof(ConverterBasicTest) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(ConverterDef) }, explicitConverters: new Type[]{ typeof(ConverterBasicTest) });
             parser.AddString(@"
                 <Defs>
                     <ConverterDef defName=""TestDefA"">
@@ -51,6 +58,8 @@ namespace DefTest
                     </ConverterDef>
                 </Defs>");
             parser.Finish();
+
+            DoBehavior(mode);
 
             Assert.AreEqual(4, Def.Database<ConverterDef>.Get("TestDefA").payload.number);
             Assert.AreEqual(8, Def.Database<ConverterDef>.Get("TestDefB").payload.number);
@@ -112,6 +121,11 @@ namespace DefTest
             {
                 return new ConverterStringPayload() { payload = input };
             }
+
+            public override string ToString(object input)
+            {
+                return (input as ConverterStringPayload).payload;
+            }
         }
 
         public class ConverterDictDef : Def.Def
@@ -120,9 +134,9 @@ namespace DefTest
         }
 
         [Test]
-	    public void ConverterDict()
+	    public void ConverterDict([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(ConverterDictDef) }, explicitConverters: new Type[]{ typeof(ConverterDictTest) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(ConverterDictDef) }, explicitConverters: new Type[]{ typeof(ConverterDictTest) });
             parser.AddString(@"
                 <Defs>
                     <ConverterDictDef defName=""TestDef"">
@@ -134,6 +148,8 @@ namespace DefTest
                     </ConverterDictDef>
                 </Defs>");
             parser.Finish();
+
+            DoBehavior(mode);
 
             var testDef = Def.Database<ConverterDictDef>.Get("TestDef");
 
@@ -148,9 +164,9 @@ namespace DefTest
         }
 
         [Test]
-        public void EmptyInputConverter()
+        public void EmptyInputConverter([Values] BehaviorMode mode)
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(ConverterStringDef) }, explicitConverters: new Type[]{ typeof(ConverterDictTest) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(ConverterStringDef) }, explicitConverters: new Type[]{ typeof(ConverterDictTest) });
             parser.AddString(@"
                 <Defs>
                     <ConverterStringDef defName=""TestDef"">
@@ -158,6 +174,8 @@ namespace DefTest
                     </ConverterStringDef>
                 </Defs>");
             parser.Finish();
+
+            DoBehavior(mode);
 
             var testDef = Def.Database<ConverterStringDef>.Get("TestDef");
 
@@ -173,9 +191,9 @@ namespace DefTest
         }
 
         [Test]
-        public void DefaultFailureTestString()
+        public void DefaultFailureTestString([Values] BehaviorMode mode)
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(ConverterStringDef) }, explicitConverters: new Type[]{ typeof(DefaultFailureConverter) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(ConverterStringDef) }, explicitConverters: new Type[]{ typeof(DefaultFailureConverter) });
             parser.AddString(@"
                 <Defs>
                     <ConverterStringDef defName=""TestDef"">
@@ -184,14 +202,16 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
+            DoBehavior(mode);
+
             var testDef = Def.Database<ConverterStringDef>.Get("TestDef");
             Assert.IsNull(testDef.payload);
         }
 
         [Test]
-        public void DefaultFailureTestXml()
+        public void DefaultFailureTestXml([Values] BehaviorMode mode)
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(ConverterStringDef) }, explicitConverters: new Type[]{ typeof(DefaultFailureConverter) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(ConverterStringDef) }, explicitConverters: new Type[]{ typeof(DefaultFailureConverter) });
             parser.AddString(@"
                 <Defs>
                     <ConverterStringDef defName=""TestDef"">
@@ -199,6 +219,8 @@ namespace DefTest
                     </ConverterStringDef>
                 </Defs>");
             ExpectErrors(() => parser.Finish());
+
+            DoBehavior(mode);
 
             var testDef = Def.Database<ConverterStringDef>.Get("TestDef");
             Assert.IsNull(testDef.payload);
@@ -222,10 +244,13 @@ namespace DefTest
             }
         }
 
+        // Skipping BehaviorMode on this one; it's kind of weird that you can have a token that generates null without being "null", but it's even weirder to serialize that.
+        // This works for now but I don't see much reason to make it work with serialization. (For now, at least.)
+        // It could in theory be accomplished with XML . . .
         [Test]
         public void ConvertToNull()
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(NonEmptyPayloadDef) }, explicitConverters: new Type[]{ typeof(DefaultNullConverter) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(NonEmptyPayloadDef) }, explicitConverters: new Type[]{ typeof(DefaultNullConverter) });
             parser.AddString(@"
                 <Defs>
                     <NonEmptyPayloadDef defName=""TestDefault"">
@@ -282,9 +307,9 @@ namespace DefTest
         }
 
         [Test]
-        public void ConverterStruct()
+        public void ConverterStruct([Values] BehaviorMode mode)
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(ConverterStructDef) }, explicitConverters: new Type[] { typeof(ConverterStructConverter) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[] { typeof(ConverterStructDef) }, explicitConverters: new Type[] { typeof(ConverterStructConverter) });
             parser.AddString(@"
                 <Defs>
                     <ConverterStructDef defName=""TestDef"">
@@ -302,6 +327,8 @@ namespace DefTest
                     </ConverterStructDef>
                 </Defs>");
             parser.Finish();
+
+            DoBehavior(mode);
 
             var testDef = Def.Database<ConverterStructDef>.Get("TestDef");
 
@@ -339,12 +366,17 @@ namespace DefTest
             {
                 return new FallbackPayload() { number = int.Parse(input) };
             }
+
+            public override string ToString(object input)
+            {
+                return (input as FallbackPayload).number.ToString();
+            }
         }
 
         [Test]
-        public void Fallback()
+        public void Fallback([Values] BehaviorMode mode)
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(FallbackDef) }, explicitConverters: new Type[] { typeof(FallbackConverter) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[] { typeof(FallbackDef) }, explicitConverters: new Type[] { typeof(FallbackConverter) });
             parser.AddString(@"
                 <Defs>
                     <FallbackDef defName=""TestDef"">
@@ -355,6 +387,8 @@ namespace DefTest
                     </FallbackDef>
                 </Defs>");
             ExpectErrors(() => parser.Finish());
+
+            DoBehavior(mode);
 
             Assert.AreEqual(4, Def.Database<FallbackDef>.Get("TestDef").payload.number);
         }
