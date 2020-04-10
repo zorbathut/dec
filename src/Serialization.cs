@@ -635,6 +635,12 @@ namespace Def
                     continue;
                 }
 
+                if (field.GetCustomAttribute<IndexAttribute>() != null)
+                {
+                    // we don't save indices
+                    continue;
+                }
+
                 result.Add(ComposeElement(field.GetValue(value), field.FieldType, field.Name, context));
             }
 

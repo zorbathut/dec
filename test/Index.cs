@@ -24,9 +24,9 @@ namespace DefTest
         }
 
         [Test]
-        public void IndexBaseList()
+        public void IndexBaseList([Values] BehaviorMode mode)
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(IndexBaseDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[] { typeof(IndexBaseDef) });
             parser.AddString(@"
                 <Defs>
                     <IndexBaseDef defName=""TestDefA"" />
@@ -34,6 +34,8 @@ namespace DefTest
                     <IndexBaseDef defName=""TestDefC"" />
                 </Defs>");
             parser.Finish();
+
+            DoBehavior(mode);
 
             Assert.AreSame(Def.Database<IndexBaseDef>.Get("TestDefA"), Def.Index<IndexBaseDef>.Get(Def.Database<IndexBaseDef>.Get("TestDefA").index));
             Assert.AreSame(Def.Database<IndexBaseDef>.Get("TestDefB"), Def.Index<IndexBaseDef>.Get(Def.Database<IndexBaseDef>.Get("TestDefB").index));
@@ -43,9 +45,9 @@ namespace DefTest
         }
 
         [Test]
-        public void IndexDerivedList()
+        public void IndexDerivedList([Values] BehaviorMode mode)
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(IndexBaseDef), typeof(IndexDerivedDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[] { typeof(IndexBaseDef), typeof(IndexDerivedDef) });
             parser.AddString(@"
                 <Defs>
                     <IndexDerivedDef defName=""TestDefA"" />
@@ -55,6 +57,8 @@ namespace DefTest
                     <IndexDerivedDef defName=""TestDefE"" />
                 </Defs>");
             parser.Finish();
+
+            DoBehavior(mode);
 
             Assert.AreSame(Def.Database<IndexBaseDef>.Get("TestDefA"), Def.Index<IndexBaseDef>.Get(Def.Database<IndexBaseDef>.Get("TestDefA").index));
             Assert.AreSame(Def.Database<IndexBaseDef>.Get("TestDefB"), Def.Index<IndexBaseDef>.Get(Def.Database<IndexBaseDef>.Get("TestDefB").index));
@@ -71,9 +75,9 @@ namespace DefTest
         }
 
         [Test]
-        public void IndexLeafList()
+        public void IndexLeafList([Values] BehaviorMode mode)
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(IndexLeafDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[] { typeof(IndexLeafDef) });
             parser.AddString(@"
                 <Defs>
                     <IndexLeafDef defName=""TestDefA"" />
@@ -81,6 +85,8 @@ namespace DefTest
                     <IndexLeafDef defName=""TestDefC"" />
                 </Defs>");
             parser.Finish();
+
+            DoBehavior(mode);
 
             Assert.AreSame(Def.Database<IndexLeafDef>.Get("TestDefA"), Def.Index<IndexLeafDef>.Get(Def.Database<IndexLeafDef>.Get("TestDefA").index));
             Assert.AreSame(Def.Database<IndexLeafDef>.Get("TestDefB"), Def.Index<IndexLeafDef>.Get(Def.Database<IndexLeafDef>.Get("TestDefB").index));
@@ -109,9 +115,9 @@ namespace DefTest
         }
 
         [Test]
-        public void IndependentIndex()
+        public void IndependentIndex([Values] BehaviorMode mode)
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(IndependentIndexDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[] { typeof(IndependentIndexDef) });
             parser.AddString(@"
                 <Defs>
                     <IndependentIndexDef defName=""TestDefA"">
@@ -130,6 +136,8 @@ namespace DefTest
                     </IndependentIndexDef>
                 </Defs>");
             parser.Finish();
+
+            DoBehavior(mode);
 
             // At the moment, the expected behavior is that classes which are explicitly mentioned get indices, classes which default to null and aren't mentioned don't get indices.
             // Classes which default to objects and aren't explicitly mentioned are in a gray area where we currently don't guarantee anything.
