@@ -2,6 +2,7 @@ namespace DefTest
 {
     using NUnit.Framework;
     using System;
+    using System.Linq;
 
     [TestFixture]
     public class Base
@@ -155,7 +156,7 @@ namespace DefTest
             return new Def.Parser(explicitOnly: explicitOnly, explicitTypes: explicitTypes, explicitStaticRefs: explicitStaticRefs, explicitConverters: explicitConverters);
         }
 
-        public void DoBehavior(BehaviorMode mode)
+        public void DoBehavior(BehaviorMode mode, bool expectErrors = false)
         {
             if (mode == BehaviorMode.Bare)
             {
@@ -170,15 +171,31 @@ namespace DefTest
 
                 Def.Database.Clear();
 
-                // gonna need to stash the parser input somewhere.
-                var parser = new Def.Parser(explicitOnly: behaviorParserExplicitOnly, explicitTypes: behaviorParserExplicitTypes, explicitStaticRefs: behaviorParserExplicitStaticRefs, explicitConverters: behaviorParserExplicitConverters);
-                parser.AddString(data);
-                parser.Finish();
+                void RunParser()
+                {
+                    var parser = new Def.Parser(explicitOnly: behaviorParserExplicitOnly, explicitTypes: behaviorParserExplicitTypes, explicitStaticRefs: behaviorParserExplicitStaticRefs, explicitConverters: behaviorParserExplicitConverters);
+                    parser.AddString(data);
+                    parser.Finish();
+                }
+
+                if (expectErrors)
+                {
+                    ExpectErrors(() => RunParser());
+                }
+                else
+                {
+                    RunParser();
+                }
             }
             else
             {
                 Assert.IsTrue(false, "Bad case for behavior mode!");
             }
+        }
+
+        public System.Reflection.Assembly GetDefAssembly()
+        {
+            return AppDomain.CurrentDomain.GetAssemblies().Single(asm => asm.ManifestModule.Name == "def.dll");
         }
     }
 }

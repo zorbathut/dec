@@ -36,12 +36,20 @@ namespace Def
 
         internal static IEnumerable<FieldInfo> GetFieldsFromHierarchy(this Type type)
         {
+            // this probably needs to be cached
+
+            var seenFields = new HashSet<string>();
+
             Type curType = type;
             while (curType != null)
             {
                 foreach (var field in curType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly))
                 {
-                    yield return field;
+                    if (!seenFields.Contains(field.Name))
+                    {
+                        yield return field;
+                        seenFields.Add(field.Name);
+                    }
                 }
                 
                 curType = curType.BaseType;
