@@ -9,9 +9,9 @@ namespace DefTest
     public class Database : Base
     {
         [Test]
-        public void DatabaseList()
+        public void DatabaseList([Values] BehaviorMode mode)
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(StubDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[] { typeof(StubDef) });
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDefA"" />
@@ -19,6 +19,8 @@ namespace DefTest
                     <StubDef defName=""TestDefC"" />
                 </Defs>");
             parser.Finish();
+
+            DoBehavior(mode);
 
             Assert.IsNotNull(Def.Database<StubDef>.Get("TestDefA"));
             Assert.IsNotNull(Def.Database<StubDef>.Get("TestDefB"));
@@ -47,9 +49,9 @@ namespace DefTest
         }
 
         [Test]
-        public void DatabaseHierarchy()
+        public void DatabaseHierarchy([Values] BehaviorMode mode)
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[] { typeof(RootDef), typeof(ParentDef), typeof(ChildDef) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[] { typeof(RootDef), typeof(ParentDef), typeof(ChildDef) });
             parser.AddString(@"
                 <Defs>
                     <RootDef defName=""RootDef"" />
@@ -57,6 +59,8 @@ namespace DefTest
                     <ChildDef defName=""ChildDef"" />
                 </Defs>");
             parser.Finish();
+
+            DoBehavior(mode);
 
             var root = Def.Database<RootDef>.Get("RootDef");
             var parent = Def.Database<ParentDef>.Get("ParentDef");
