@@ -16,15 +16,17 @@ namespace DefTest
         }
 
         [Test]
-	    public void StaticReference()
+	    public void StaticReference([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ typeof(StaticReferenceDefs) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ typeof(StaticReferenceDefs) });
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDefA"" />
                     <StubDef defName=""TestDefB"" />
                 </Defs>");
             parser.Finish();
+
+            DoBehavior(mode);
 
             var resultA = Def.Database<StubDef>.Get("TestDefA");
             var resultB = Def.Database<StubDef>.Get("TestDefB");
@@ -49,14 +51,16 @@ namespace DefTest
         }
 
         [Test]
-	    public void PreciseClass()
+	    public void PreciseClass([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDerivedDef) }, explicitStaticRefs: new Type[]{ typeof(PreciseClassDefs) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDerivedDef) }, explicitStaticRefs: new Type[]{ typeof(PreciseClassDefs) });
             parser.AddString(@"
                 <Defs>
                     <StubDerivedDef defName=""TestDef"" />
                 </Defs>");
             parser.Finish();
+
+            DoBehavior(mode);
 
             var result = Def.Database<StubDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -73,14 +77,16 @@ namespace DefTest
         }
 
         [Test]
-	    public void SuperClass()
+	    public void SuperClass([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDerivedDef) }, explicitStaticRefs: new Type[]{ typeof(SuperClassDefs) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDerivedDef) }, explicitStaticRefs: new Type[]{ typeof(SuperClassDefs) });
             parser.AddString(@"
                 <Defs>
                     <StubDerivedDef defName=""TestDef"" />
                 </Defs>");
             parser.Finish();
+
+            DoBehavior(mode);
 
             var result = Def.Database<StubDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -97,14 +103,16 @@ namespace DefTest
         }
 
         [Test]
-	    public void SubClass()
+	    public void SubClass([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ typeof(SubClassDefs) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ typeof(SubClassDefs) });
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDef"" />
                 </Defs>");
             ExpectErrors(() => parser.Finish());
+
+            DoBehavior(mode, expectErrors: true);
 
             var result = Def.Database<StubDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -120,15 +128,17 @@ namespace DefTest
         }
 
         [Test]
-	    public void NoAttribute()
+	    public void NoAttribute([Values] BehaviorMode mode)
 	    {
             Def.Parser parser = null;
-            ExpectErrors(() => parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ typeof(NoAttributeDefs) }));
+            ExpectErrors(() => parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ typeof(NoAttributeDefs) }));
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDef"" />
                 </Defs>");
             parser.Finish();
+
+            DoBehavior(mode, expectErrors: true);
 
             var result = Def.Database<StubDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -143,14 +153,16 @@ namespace DefTest
         }
 
         [Test]
-	    public void NoInitializer()
+	    public void NoInitializer([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ typeof(NoInitializerDefs) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ typeof(NoInitializerDefs) });
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDef"" />
                 </Defs>");
             ExpectErrors(() => parser.Finish());
+
+            DoBehavior(mode, expectErrors: true);
 
             var result = Def.Database<StubDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -167,16 +179,17 @@ namespace DefTest
         }
 
         [Test]
-	    public void NoStatic()
+	    public void NoStatic([Values] BehaviorMode mode)
 	    {
             Def.Parser parser = null;
-            ExpectErrors(() => parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ typeof(NoStaticDefs) }));
-
+            ExpectErrors(() => parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ typeof(NoStaticDefs) }));
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDef"" />
                 </Defs>");
             parser.Finish();
+
+            DoBehavior(mode, expectErrors: true);
 
             var result = Def.Database<StubDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -193,14 +206,16 @@ namespace DefTest
         }
 
         [Test]
-	    public void Missing()
+	    public void Missing([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ typeof(MissingDefs) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ typeof(MissingDefs) });
             parser.AddString(@"
                 <Defs>
                 </Defs>");
             ExpectErrors(() => parser.Finish());
-	    }
+
+            DoBehavior(mode, expectErrors: true);
+        }
 
         [Def.StaticReferences]
         public static class EarlyTouchDefs
@@ -227,6 +242,8 @@ namespace DefTest
         [Test]
 	    public void LateTouch()
 	    {
+            // We avoid BehaviorMode here because the StaticReference error event can happen at most once, which means that we can't run the test twice without the second (and later) tests failing.
+            // This also means that test success would depend on test order run, which, no.
             var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) });
             parser.AddString(@"
                 <Defs>
@@ -255,6 +272,8 @@ namespace DefTest
         [Test]
 	    public void UnexpectedTouch()
 	    {
+            // We avoid BehaviorMode here because the StaticReference error event can happen at most once, which means that we can't run the test twice without the second (and later) tests failing.
+            // This also means that test success would depend on test order run, which, no.
             var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(UnexpectedTouchDef) });
             ExpectErrors(() => parser.AddString(@"
                 <Defs>
@@ -286,6 +305,8 @@ namespace DefTest
         [Test]
 	    public void ConstructorTouch()
 	    {
+            // We avoid BehaviorMode here because the StaticReference error event can happen at most once, which means that we can't run the test twice without the second (and later) tests failing.
+            // This also means that test success would depend on test order run, which, no.
             var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(ConstructorTouchDef) }, explicitStaticRefs: new Type[]{ typeof(ConstructorTouchDefs) });
             ExpectErrors(() => parser.AddString(@"
                 <Defs>
@@ -307,14 +328,16 @@ namespace DefTest
         }
 
         [Test]
-	    public void Internal()
+	    public void Internal([Values] BehaviorMode mode)
 	    {
-            var parser = new Def.Parser(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ typeof(InternalDefs) });
+            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) }, explicitStaticRefs: new Type[]{ typeof(InternalDefs) });
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDef"" />
                 </Defs>");
             parser.Finish();
+
+            DoBehavior(mode);
 
             Assert.IsNotNull(InternalDefs.TestDef);
 	    }
