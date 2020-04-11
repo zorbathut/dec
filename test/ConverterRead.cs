@@ -47,7 +47,7 @@ namespace DefTest
         [Test]
 	    public void BasicFunctionality([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(ConverterDef) }, explicitConverters: new Type[]{ typeof(ConverterBasicTest) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterDef) }, explicitConverters = new Type[]{ typeof(ConverterBasicTest) } });
             parser.AddString(@"
                 <Defs>
                     <ConverterDef defName=""TestDefA"">
@@ -77,7 +77,7 @@ namespace DefTest
 	    public void EmptyConverterErr()
 	    {
             Def.Parser parser = null;
-            ExpectErrors(() => parser = new Def.Parser(explicitOnly: true, explicitConverters: new Type[]{ typeof(EmptyConverter) }));
+            ExpectErrors(() => parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitConverters = new Type[]{ typeof(EmptyConverter) } }));
             parser.Finish();
 	    }
 
@@ -101,7 +101,7 @@ namespace DefTest
 	    public void OverlappingConverters()
 	    {
             Def.Parser parser = null;
-            ExpectErrors(() => parser = new Def.Parser(explicitOnly: true, explicitConverters: new Type[]{ typeof(StrConv1), typeof(StrConv2) }));
+            ExpectErrors(() => parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitConverters = new Type[]{ typeof(StrConv1), typeof(StrConv2) } }));
             parser.Finish();
 	    }
 
@@ -136,7 +136,7 @@ namespace DefTest
         [Test]
 	    public void ConverterDict([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(ConverterDictDef) }, explicitConverters: new Type[]{ typeof(ConverterDictTest) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterDictDef) }, explicitConverters = new Type[]{ typeof(ConverterDictTest) } });
             parser.AddString(@"
                 <Defs>
                     <ConverterDictDef defName=""TestDef"">
@@ -166,7 +166,7 @@ namespace DefTest
         [Test]
         public void EmptyInputConverter([Values] BehaviorMode mode)
         {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(ConverterStringDef) }, explicitConverters: new Type[]{ typeof(ConverterDictTest) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterStringDef) }, explicitConverters = new Type[]{ typeof(ConverterDictTest) } });
             parser.AddString(@"
                 <Defs>
                     <ConverterStringDef defName=""TestDef"">
@@ -193,7 +193,7 @@ namespace DefTest
         [Test]
         public void DefaultFailureTestString([Values] BehaviorMode mode)
         {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(ConverterStringDef) }, explicitConverters: new Type[]{ typeof(DefaultFailureConverter) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterStringDef) }, explicitConverters = new Type[]{ typeof(DefaultFailureConverter) } });
             parser.AddString(@"
                 <Defs>
                     <ConverterStringDef defName=""TestDef"">
@@ -211,7 +211,7 @@ namespace DefTest
         [Test]
         public void DefaultFailureTestXml([Values] BehaviorMode mode)
         {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(ConverterStringDef) }, explicitConverters: new Type[]{ typeof(DefaultFailureConverter) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterStringDef) }, explicitConverters = new Type[]{ typeof(DefaultFailureConverter) } });
             parser.AddString(@"
                 <Defs>
                     <ConverterStringDef defName=""TestDef"">
@@ -250,7 +250,7 @@ namespace DefTest
         [Test]
         public void ConvertToNull()
         {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(NonEmptyPayloadDef) }, explicitConverters: new Type[]{ typeof(DefaultNullConverter) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(NonEmptyPayloadDef) }, explicitConverters = new Type[]{ typeof(DefaultNullConverter) } });
             parser.AddString(@"
                 <Defs>
                     <NonEmptyPayloadDef defName=""TestDefault"">
@@ -309,7 +309,7 @@ namespace DefTest
         [Test]
         public void ConverterStruct([Values] BehaviorMode mode)
         {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[] { typeof(ConverterStructDef) }, explicitConverters: new Type[] { typeof(ConverterStructConverter) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[] { typeof(ConverterStructDef) }, explicitConverters = new Type[] { typeof(ConverterStructConverter) } });
             parser.AddString(@"
                 <Defs>
                     <ConverterStructDef defName=""TestDef"">
@@ -376,7 +376,7 @@ namespace DefTest
         [Test]
         public void Fallback([Values] BehaviorMode mode)
         {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[] { typeof(FallbackDef) }, explicitConverters: new Type[] { typeof(FallbackConverter) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[] { typeof(FallbackDef) }, explicitConverters = new Type[] { typeof(FallbackConverter) } });
             parser.AddString(@"
                 <Defs>
                     <FallbackDef defName=""TestDef"">

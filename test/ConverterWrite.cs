@@ -48,7 +48,7 @@ namespace DefTest
         [Test]
         public void ConverterSimple()
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitConverters: new Type[] { typeof(ConvertedConverterSimple) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterSimple) } });
             parser.Finish();
 
             var converted = new ConverterRecordable();
@@ -87,7 +87,7 @@ namespace DefTest
         [Test]
         public void ConverterRecord()
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitConverters: new Type[] { typeof(ConvertedConverterRecord) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterRecord) } });
             parser.Finish();
 
             var converted = new ConverterRecordable();
@@ -119,7 +119,7 @@ namespace DefTest
         [Test]
         public void ConverterReplacementDetection()
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitConverters: new Type[] { typeof(ConvertedConverterSimple) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterSimple) } });
             parser.Finish();
 
             var converted = new ConverterReplacementRecordable();
@@ -140,7 +140,7 @@ namespace DefTest
         [Test]
         public void ConverterReplacementWorking()
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitConverters: new Type[] { typeof(ConvertedConverterRecord) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterRecord) } });
             parser.Finish();
 
             var converted = new ConverterReplacementRecordable();
@@ -180,7 +180,7 @@ namespace DefTest
         [Test]
         public void ConverterUnsupplied()
         {
-            var parser = new Def.Parser(explicitOnly: true, explicitConverters: new Type[] { typeof(ConverterUnsuppliedConverter) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitConverters = new Type[] { typeof(ConverterUnsuppliedConverter) } });
             parser.Finish();
 
             var root = new ConverterUnsuppliedClass();

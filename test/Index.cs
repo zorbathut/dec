@@ -26,7 +26,7 @@ namespace DefTest
         [Test]
         public void IndexBaseList([Values] BehaviorMode mode)
         {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[] { typeof(IndexBaseDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[] { typeof(IndexBaseDef) } });
             parser.AddString(@"
                 <Defs>
                     <IndexBaseDef defName=""TestDefA"" />
@@ -47,7 +47,7 @@ namespace DefTest
         [Test]
         public void IndexDerivedList([Values] BehaviorMode mode)
         {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[] { typeof(IndexBaseDef), typeof(IndexDerivedDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[] { typeof(IndexBaseDef), typeof(IndexDerivedDef) } });
             parser.AddString(@"
                 <Defs>
                     <IndexDerivedDef defName=""TestDefA"" />
@@ -77,7 +77,7 @@ namespace DefTest
         [Test]
         public void IndexLeafList([Values] BehaviorMode mode)
         {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[] { typeof(IndexLeafDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[] { typeof(IndexLeafDef) } });
             parser.AddString(@"
                 <Defs>
                     <IndexLeafDef defName=""TestDefA"" />
@@ -117,7 +117,7 @@ namespace DefTest
         [Test]
         public void IndependentIndex([Values] BehaviorMode mode)
         {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[] { typeof(IndependentIndexDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[] { typeof(IndependentIndexDef) } });
             parser.AddString(@"
                 <Defs>
                     <IndependentIndexDef defName=""TestDefA"">

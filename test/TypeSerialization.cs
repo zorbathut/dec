@@ -27,7 +27,7 @@ namespace DefTest
         [SetUp]
         public void InitEnvironment()
         {
-            var parser = new Def.Parser(explicitOnly: true);
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { });
             parser.Finish();
         }
 

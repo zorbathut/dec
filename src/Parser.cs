@@ -38,12 +38,19 @@ namespace Def
         private static HashSet<Type> staticReferencesRegistering = new HashSet<Type>();
 
         /// <summary>
+        /// Parameters that are intended for the use of unit tests. Not recommended for actual code.
+        /// </summary>
+        public class UnitTestParameters
+        {
+            public Type[] explicitTypes = null;
+            public Type[] explicitStaticRefs = null;
+            public Type[] explicitConverters = null;
+        }
+
+        /// <summary>
         /// Creates a Parser.
         /// </summary>
-        /// <remarks>
-        /// Parameters are provided for the sake of unit tests. Using them is unnecessary and generally not recommended.
-        /// </remarks>
-        public Parser(bool explicitOnly = false, Type[] explicitTypes = null, Type[] explicitStaticRefs = null, Type[] explicitConverters = null)
+        public Parser(UnitTestParameters unitTestParameters = null)
         {
             if (s_Status != Status.Uninitialized)
             {
@@ -51,19 +58,21 @@ namespace Def
             }
             s_Status = Status.Accumulating;
 
+            bool unitTestMode = unitTestParameters != null;
+
             {
                 IEnumerable<Type> defTypes;
-                if (explicitTypes != null)
+                if (!unitTestMode)
                 {
-                    defTypes = explicitTypes;
+                    defTypes = UtilReflection.GetAllTypes().Where(t => t.IsSubclassOf(typeof(Def)));
                 }
-                else if (explicitOnly)
+                else if (unitTestParameters?.explicitTypes != null)
                 {
-                    defTypes = Enumerable.Empty<Type>();
+                    defTypes = unitTestParameters.explicitTypes;
                 }
                 else
                 {
-                    defTypes = UtilReflection.GetAllTypes().Where(t => t.IsSubclassOf(typeof(Def)));
+                    defTypes = Enumerable.Empty<Type>();
                 }
 
                 foreach (var type in defTypes)
@@ -81,17 +90,17 @@ namespace Def
 
             {
                 IEnumerable<Type> staticRefs;
-                if (explicitStaticRefs != null)
+                if (!unitTestMode)
                 {
-                    staticRefs = explicitStaticRefs;
+                    staticRefs = UtilReflection.GetAllTypes().Where(t => t.HasAttribute(typeof(StaticReferencesAttribute)));
                 }
-                else if (explicitOnly)
+                else if (unitTestParameters?.explicitStaticRefs != null)
                 {
-                    staticRefs = Enumerable.Empty<Type>();
+                    staticRefs = unitTestParameters.explicitStaticRefs;
                 }
                 else
                 {
-                    staticRefs = UtilReflection.GetAllTypes().Where(t => t.HasAttribute(typeof(StaticReferencesAttribute)));
+                    staticRefs = Enumerable.Empty<Type>();
                 }
 
                 foreach (var type in staticRefs)
@@ -110,7 +119,7 @@ namespace Def
                 }
             }
 
-            Serialization.Initialize(explicitOnly, explicitConverters);
+            Serialization.Initialize(unitTestMode, unitTestParameters?.explicitConverters);
         }
 
         private static readonly Regex DefNameValidator = new Regex(@"^[A-Za-z_][A-Za-z0-9_]*$", RegexOptions.Compiled);

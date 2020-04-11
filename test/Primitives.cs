@@ -24,7 +24,7 @@ namespace DefTest
 	    [Test]
 	    public void EmptyIntParse([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(IntDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(IntDef) } });
             parser.AddString(@"
                 <Defs>
                     <IntDef defName=""TestDef"">
@@ -44,7 +44,7 @@ namespace DefTest
         [Test]
 	    public void FailingIntParse([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(IntDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(IntDef) } });
             parser.AddString(@"
                 <Defs>
                     <IntDef defName=""TestDef"">
@@ -64,7 +64,7 @@ namespace DefTest
         [Test]
 	    public void FailingIntParse2([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(IntDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(IntDef) } });
             parser.AddString(@"
                 <Defs>
                     <IntDef defName=""TestDef"">
@@ -84,7 +84,7 @@ namespace DefTest
 	    [Test]
 	    public void EmptyBoolParse([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(BoolDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(BoolDef) } });
             parser.AddString(@"
                 <Defs>
                     <BoolDef defName=""TestDef"">
@@ -104,7 +104,7 @@ namespace DefTest
 	    [Test]
 	    public void FailingBoolParse([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(BoolDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(BoolDef) } });
             parser.AddString(@"
                 <Defs>
                     <BoolDef defName=""TestDef"">
@@ -124,7 +124,7 @@ namespace DefTest
         [Test]
 	    public void EmptyStringParse([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(StringDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(StringDef) } });
             parser.AddString(@"
                 <Defs>
                     <StringDef defName=""TestDef"">
@@ -161,7 +161,7 @@ namespace DefTest
 	    [Test]
 	    public void BulkParse([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(BulkParseDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(BulkParseDef) } });
             parser.AddString(@"
                 <Defs>
                     <BulkParseDef defName=""TestDef"">
@@ -207,7 +207,7 @@ namespace DefTest
         [Test]
 	    public void MissingMember([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(MissingMemberDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(MissingMemberDef) } });
             parser.AddString(@"
                 <Defs>
                     <MissingMemberDef defName=""TestDef"">
@@ -242,7 +242,7 @@ namespace DefTest
         [Test]
 	    public void Enum([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(EnumDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(EnumDef) } });
             parser.AddString(@"
                 <Defs>
                     <EnumDef defName=""TestDef"">
@@ -262,7 +262,7 @@ namespace DefTest
         [Test]
 	    public void InvalidAttribute([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(IntDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(IntDef) } });
             parser.AddString(@"
                 <Defs>
                     <IntDef defName=""TestDef"">
@@ -294,7 +294,7 @@ namespace DefTest
         [Test]
 	    public void TypeBasic([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(TypeDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDef) } });
             parser.AddString(@"
                 <Defs>
                     <TypeDef defName=""TestDef"">
@@ -314,7 +314,7 @@ namespace DefTest
         [Test]
 	    public void TypeNested([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(TypeDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDef) } });
             parser.AddString(@"
                 <Defs>
                     <TypeDef defName=""TestDef"">
@@ -334,7 +334,7 @@ namespace DefTest
         [Test]
 	    public void TypeStatic([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(TypeDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDef) } });
             parser.AddString(@"
                 <Defs>
                     <TypeDef defName=""TestDef"">
@@ -354,7 +354,7 @@ namespace DefTest
         [Test]
 	    public void TypeAbstract([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(TypeDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDef) } });
             parser.AddString(@"
                 <Defs>
                     <TypeDef defName=""TestDef"">
@@ -374,7 +374,7 @@ namespace DefTest
         [Test]
 	    public void TypeDefRef([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(TypeDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDef) } });
             parser.AddString(@"
                 <Defs>
                     <TypeDef defName=""TestDef"">
@@ -394,7 +394,7 @@ namespace DefTest
         [Test]
 	    public void TypeGenericA([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(TypeDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDef) } });
             parser.AddString(@"
                 <Defs>
                     <TypeDef defName=""TestDef"">
@@ -414,7 +414,7 @@ namespace DefTest
         [Test]
 	    public void TypeGenericB([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(TypeDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDef) } });
             parser.AddString(@"
                 <Defs>
                     <TypeDef defName=""TestDef"">
@@ -434,7 +434,7 @@ namespace DefTest
         [Test]
 	    public void TypeGenericC([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(TypeDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDef) } });
             parser.AddString(@"
                 <Defs>
                     <TypeDef defName=""TestDef"">
@@ -454,7 +454,7 @@ namespace DefTest
         [Test]
 	    public void TypeOverridden([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(TypeDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDef) } });
             parser.AddString(@"
                 <Defs>
                     <TypeDef defName=""TestDef"">
@@ -474,7 +474,7 @@ namespace DefTest
         [Test]
 	    public void TypeComplete([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(TypeDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDef) } });
             parser.AddString(@"
                 <Defs>
                     <TypeDef defName=""TestDef"">

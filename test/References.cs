@@ -24,7 +24,7 @@ namespace DefTest
         [Test]
 	    public void Basic([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) } });
             parser.AddString(@"
                 <Defs>
                     <RefTargetDef defName=""Target"" />
@@ -47,7 +47,7 @@ namespace DefTest
         [Test]
 	    public void Reversed([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) } });
             parser.AddString(@"
                 <Defs>
                     <RefSourceDef defName=""Source"">
@@ -70,7 +70,7 @@ namespace DefTest
         [Test]
 	    public void Multistring([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) } });
             parser.AddString(@"
                 <Defs>
                     <RefSourceDef defName=""Source"">
@@ -96,7 +96,7 @@ namespace DefTest
         [Test]
 	    public void Refdef([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefSourceDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefSourceDef) } });
             parser.AddString(@"
                 <Defs>
                     <RefSourceDef defName=""Source"">
@@ -114,7 +114,7 @@ namespace DefTest
         [Test]
 	    public void Circular([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefCircularDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefCircularDef) } });
             parser.AddString(@"
                 <Defs>
                     <RefCircularDef defName=""Alpha"">
@@ -140,7 +140,7 @@ namespace DefTest
         [Test]
 	    public void CircularTight([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefCircularDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefCircularDef) } });
             parser.AddString(@"
                 <Defs>
                     <RefCircularDef defName=""TestDef"">
@@ -161,7 +161,7 @@ namespace DefTest
 	    public void NullRef([Values] BehaviorMode mode)
 	    {
             // This is a little wonky; we have to test it by duplicating a tag, which is technically an error
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefCircularDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefCircularDef) } });
             parser.AddString(@"
                 <Defs>
                     <RefCircularDef defName=""TestDef"">
@@ -182,7 +182,7 @@ namespace DefTest
         [Test]
 	    public void FailedLookup([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(RefSourceDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefSourceDef) } });
             parser.AddString(@"
                 <Defs>
                     <RefSourceDef defName=""TestDef"">
@@ -207,7 +207,7 @@ namespace DefTest
         [Test]
 	    public void BareDef([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(BareDefDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(BareDefDef) } });
             parser.AddString(@"
                 <Defs>
                     <BareDefDef defName=""TestDef"">

@@ -119,19 +119,11 @@ namespace DefTest
 
         // Everything after here is designed for the Behavior tests, where we run tests in a variety of ways to test serialization.
 
-        public bool behaviorParserStored = false;
-        public bool behaviorParserExplicitOnly = false;
-        public Type[] behaviorParserExplicitTypes = null;
-        public Type[] behaviorParserExplicitStaticRefs = null;
-        public Type[] behaviorParserExplicitConverters = null;
+        private Def.Parser.UnitTestParameters behaviorParserUnitTestParameters = null;
 
         public void ResetBehaviorParser()
         {
-            behaviorParserStored = false;
-            behaviorParserExplicitOnly = false;
-            behaviorParserExplicitTypes = null;
-            behaviorParserExplicitStaticRefs = null;
-            behaviorParserExplicitConverters = null;
+            behaviorParserUnitTestParameters = null;
         }
 
         public enum BehaviorMode
@@ -143,17 +135,14 @@ namespace DefTest
             Rewritten,
         }
 
-        public Def.Parser CreateParserForBehavior(bool explicitOnly = false, Type[] explicitTypes = null, Type[] explicitStaticRefs = null, Type[] explicitConverters = null)
+        // This is a thin wrapper around `new Def.Parser` that exists solely so we can recreate a Def.Parser later with the same settings.
+        public Def.Parser CreateParserForBehavior(Def.Parser.UnitTestParameters unitTestParameters)
         {
-            Assert.IsFalse(behaviorParserStored);
+            Assert.IsNull(behaviorParserUnitTestParameters);
 
-            behaviorParserStored = true;
-            behaviorParserExplicitOnly = explicitOnly;
-            behaviorParserExplicitTypes = explicitTypes;
-            behaviorParserExplicitStaticRefs = explicitStaticRefs;
-            behaviorParserExplicitConverters = explicitConverters;
+            behaviorParserUnitTestParameters = unitTestParameters;
 
-            return new Def.Parser(explicitOnly: explicitOnly, explicitTypes: explicitTypes, explicitStaticRefs: explicitStaticRefs, explicitConverters: explicitConverters);
+            return new Def.Parser(unitTestParameters: unitTestParameters);
         }
 
         public void DoBehavior(BehaviorMode mode, bool expectErrors = false)
@@ -164,7 +153,7 @@ namespace DefTest
             }
             else if (mode == BehaviorMode.Rewritten)
             {
-                Assert.IsTrue(behaviorParserStored);
+                Assert.IsNotNull(behaviorParserUnitTestParameters);
 
                 var writer = new Def.Writer();
                 string data = writer.Write();
@@ -173,7 +162,7 @@ namespace DefTest
 
                 void RunParser()
                 {
-                    var parser = new Def.Parser(explicitOnly: behaviorParserExplicitOnly, explicitTypes: behaviorParserExplicitTypes, explicitStaticRefs: behaviorParserExplicitStaticRefs, explicitConverters: behaviorParserExplicitConverters);
+                    var parser = new Def.Parser(unitTestParameters: behaviorParserUnitTestParameters);
                     parser.AddString(data);
                     parser.Finish();
                 }

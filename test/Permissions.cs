@@ -22,7 +22,7 @@ namespace DefTest
         [Test]
 	    public void Private([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(PrivateDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(PrivateDef) } });
             parser.AddString(@"
                 <Defs>
                     <PrivateDef defName=""TestDef"">
@@ -54,7 +54,7 @@ namespace DefTest
         [Test]
 	    public void Internal([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(InternalDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(InternalDef) } });
             parser.AddString(@"
                 <Defs>
                     <InternalDef defName=""TestDef"">
@@ -84,7 +84,7 @@ namespace DefTest
         [Test]
 	    public void Protected([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(ProtectedDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(ProtectedDef) } });
             parser.AddString(@"
                 <Defs>
                     <ProtectedDef defName=""TestDef"">
@@ -121,7 +121,7 @@ namespace DefTest
         [Test]
 	    public void PrivateParent([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(PrivateChildDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(PrivateChildDef) } });
             parser.AddString(@"
                 <Defs>
                     <PrivateChildDef defName=""TestDef"">

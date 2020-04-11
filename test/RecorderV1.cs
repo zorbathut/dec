@@ -12,7 +12,7 @@ namespace DefTest
         [Test]
 	    public void Core()
 	    {
-            var parser = new Def.Parser(explicitOnly: true);
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { });
             parser.Finish();
 
             var deserialized = Def.Recorder.Read<int>(@"
@@ -27,7 +27,7 @@ namespace DefTest
         [Test]
         public void CoreFailures()
         {
-            var parser = new Def.Parser(explicitOnly: true);
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { });
             parser.Finish();
 
             ExpectErrors(() => Assert.AreEqual(0, Def.Recorder.Read<int>(@"")));

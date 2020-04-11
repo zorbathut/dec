@@ -11,7 +11,7 @@ namespace DefTest
         [Test]
 	    public void TrivialParse([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } });
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDef"">
@@ -27,7 +27,7 @@ namespace DefTest
         [Test]
 	    public void TrivialEmptyParse([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } });
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDef"" />
@@ -43,7 +43,7 @@ namespace DefTest
 	    public void NonDefType([Values] BehaviorMode mode)
 	    {
             Def.Parser parser = null;
-            ExpectErrors(() => parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(bool), typeof(StubDef) }));
+            ExpectErrors(() => parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(bool), typeof(StubDef) } }));
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDef"" />
@@ -58,7 +58,7 @@ namespace DefTest
         [Test]
 	    public void MissingDefType([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } });
             ExpectErrors(() => parser.AddString(@"
                 <Defs>
                     <NonexistentDef defName=""TestDefA"" />
@@ -75,7 +75,7 @@ namespace DefTest
         [Test]
 	    public void MissingDefName([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } });
             ExpectErrors(() => parser.AddString(@"
                 <Defs>
                     <StubDef />
@@ -88,7 +88,7 @@ namespace DefTest
         [Test]
 	    public void InvalidDefName([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } });
             ExpectErrors(() => parser.AddString(@"
                 <Defs>
                     <StubDef defName=""1NumberPrefix"" />
@@ -112,7 +112,7 @@ namespace DefTest
         [Test]
 	    public void DuplicateField([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(IntDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(IntDef) } });
             parser.AddString(@"
                 <Defs>
                     <IntDef defName=""TestDef"">
@@ -133,7 +133,7 @@ namespace DefTest
         [Test]
 	    public void DuplicateDef([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(IntDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(IntDef) } });
             ExpectErrors(() => parser.AddString(@"
                 <Defs>
                     <IntDef defName=""TestDef"">
@@ -166,7 +166,7 @@ namespace DefTest
         [Test]
 	    public void HierarchyDeepField([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(DeepChildDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(DeepChildDef) } });
             parser.AddString(@"
                 <Defs>
                     <DeepChildDef defName=""TestDef"">
@@ -205,7 +205,7 @@ namespace DefTest
         [Test]
 	    public void HierarchyDuplicateField([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(DupeChildDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(DupeChildDef) } });
             parser.AddString(@"
                 <Defs>
                     <DupeChildDef defName=""TestDef"">
@@ -226,7 +226,7 @@ namespace DefTest
         [Test]
 	    public void ExtraAttribute([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } });
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDef"" invalidAttribute=""hello"" />
@@ -251,7 +251,7 @@ namespace DefTest
         [Test]
 	    public void DebugPrint([Values] BehaviorMode mode)
         {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(StubDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } });
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDef"" />
@@ -281,7 +281,7 @@ namespace DefTest
         [Test]
 	    public void ConfigErrors([Values] BehaviorMode mode)
         {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(ErrorDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(ErrorDef) } });
             parser.AddString(@"
                 <Defs>
                     <ErrorDef defName=""TestDef"" />
@@ -311,7 +311,7 @@ namespace DefTest
         [Test]
 	    public void PostLoad([Values] BehaviorMode mode)
         {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(PostLoadDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(PostLoadDef) } });
             parser.AddString(@"
                 <Defs>
                     <PostLoadDef defName=""TestDef"" />
@@ -332,7 +332,7 @@ namespace DefTest
         [Test]
         public void DefMember([Values] BehaviorMode mode)
         {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[] { typeof(DefMemberDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[] { typeof(DefMemberDef) } });
             parser.AddString(@"
                 <Defs>
                     <DefMemberDef defName=""TestDef"">
@@ -355,7 +355,7 @@ namespace DefTest
         [Test]
         public void SelfReferential([Values] BehaviorMode mode)
         {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[] { typeof(SelfReferentialDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[] { typeof(SelfReferentialDef) } });
             parser.AddString(@"
                 <Defs>
                     <SelfReferentialDef defName=""TestDef"">
@@ -380,7 +380,7 @@ namespace DefTest
         [Test]
         public void LooseMatchCapitalization([Values] BehaviorMode mode)
         {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[] { typeof(LooseMatchDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[] { typeof(LooseMatchDef) } });
             parser.AddString(@"
                 <Defs>
                     <LooseMatchDef defName=""TestDef"">
@@ -395,7 +395,7 @@ namespace DefTest
         [Test]
         public void LooseMatchSnakeToCamel([Values] BehaviorMode mode)
         {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[] { typeof(LooseMatchDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[] { typeof(LooseMatchDef) } });
             parser.AddString(@"
                 <Defs>
                     <LooseMatchDef defName=""TestDef"">
@@ -410,7 +410,7 @@ namespace DefTest
         [Test]
         public void LooseMatchCamelToSnake([Values] BehaviorMode mode)
         {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[] { typeof(LooseMatchDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[] { typeof(LooseMatchDef) } });
             parser.AddString(@"
                 <Defs>
                     <LooseMatchDef defName=""TestDef"">
@@ -425,7 +425,7 @@ namespace DefTest
         [Test]
         public void ForbiddenField([Values] BehaviorMode mode)
         {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[] { typeof(StubDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDef) } });
 
             // This is a little silly because, as of this writing, DefName is a property and we don't even support writing to properties.
             // So we're not really testing forbidden fields here. We're really just double-checking the fact that properties can't be written to.

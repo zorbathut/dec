@@ -15,7 +15,7 @@ namespace DefTest
         [Test]
 	    public void Array([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(ArrayDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(ArrayDef) } });
             parser.AddString(@"
                 <Defs>
                     <ArrayDef defName=""TestDef"">
@@ -46,7 +46,7 @@ namespace DefTest
         [Test]
 	    public void List([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(ListDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(ListDef) } });
             parser.AddString(@"
                 <Defs>
                     <ListDef defName=""TestDef"">
@@ -79,7 +79,7 @@ namespace DefTest
         [Test]
         public void ListOverride([Values] BehaviorMode mode)
         {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[] { typeof(ListOverrideDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[] { typeof(ListOverrideDef) } });
             parser.AddString(@"
                 <Defs>
                     <ListOverrideDef defName=""TestDef"">
@@ -109,7 +109,7 @@ namespace DefTest
         [Test]
 	    public void Nested([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(NestedDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(NestedDef) } });
             parser.AddString(@"
                 <Defs>
                     <NestedDef defName=""TestDef"">
@@ -143,7 +143,7 @@ namespace DefTest
         [Test]
 	    public void DictionaryString([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(DictionaryStringDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(DictionaryStringDef) } });
             parser.AddString(@"
                 <Defs>
                     <DictionaryStringDef defName=""TestDef"">
@@ -166,7 +166,7 @@ namespace DefTest
         [Test]
         public void DictionaryLi([Values] BehaviorMode mode)
         {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[] { typeof(DictionaryStringDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryStringDef) } });
             parser.AddString(@"
                 <Defs>
                     <DictionaryStringDef defName=""TestDef"">
@@ -195,7 +195,7 @@ namespace DefTest
         [Test]
         public void DictionaryHybrid([Values] BehaviorMode mode)
         {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[] { typeof(DictionaryStringDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryStringDef) } });
             parser.AddString(@"
                 <Defs>
                     <DictionaryStringDef defName=""TestDef"">
@@ -221,7 +221,7 @@ namespace DefTest
         [Test]
 	    public void DictionaryDuplicate([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[]{ typeof(DictionaryStringDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(DictionaryStringDef) } });
             parser.AddString(@"
                 <Defs>
                     <DictionaryStringDef defName=""TestDef"">
@@ -251,7 +251,7 @@ namespace DefTest
         [Test]
         public void DictionaryOverrideString([Values] BehaviorMode mode)
         {
-            var parser = CreateParserForBehavior(explicitOnly: true, explicitTypes: new Type[] { typeof(DictionaryStringOverrideDef) });
+            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryStringOverrideDef) } });
             parser.AddString(@"
                 <Defs>
                     <DictionaryStringOverrideDef defName=""TestDef"">
