@@ -22,7 +22,8 @@ namespace DefTest
         [Test]
 	    public void Private([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(PrivateDef) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(PrivateDef) } };
+            var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
                     <PrivateDef defName=""TestDef"">
@@ -54,7 +55,8 @@ namespace DefTest
         [Test]
 	    public void Internal([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(InternalDef) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(InternalDef) } };
+            var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
                     <InternalDef defName=""TestDef"">
@@ -84,7 +86,8 @@ namespace DefTest
         [Test]
 	    public void Protected([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(ProtectedDef) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ProtectedDef) } };
+            var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
                     <ProtectedDef defName=""TestDef"">
@@ -121,7 +124,8 @@ namespace DefTest
         [Test]
 	    public void PrivateParent([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(PrivateChildDef) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(PrivateChildDef) } };
+            var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
                     <PrivateChildDef defName=""TestDef"">

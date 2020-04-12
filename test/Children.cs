@@ -20,7 +20,8 @@ namespace DefTest
         [Test]
 	    public void ChildClass([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(CCRoot) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(CCRoot) } };
+            var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
                     <CCRoot defName=""TestDef"">
@@ -54,7 +55,8 @@ namespace DefTest
         [Test]
 	    public void ChildClassDefaults([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(CCDRoot) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(CCDRoot) } };
+            var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
                     <CCDRoot defName=""TestDef"">
@@ -95,7 +97,8 @@ namespace DefTest
         [Test]
 	    public void ChildStruct([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(CSRoot) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(CSRoot) } };
+            var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
                     <CSRoot defName=""TestDef"">
@@ -147,7 +150,8 @@ namespace DefTest
         [Test]
 	    public void ExplicitType([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(ExplicitTypeDef) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ExplicitTypeDef) } };
+            var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
                     <ExplicitTypeDef defName=""TestDef"">
@@ -171,7 +175,8 @@ namespace DefTest
         [Test]
 	    public void ExplicitTypeOverspecify([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(ExplicitTypeDef) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ExplicitTypeDef) } };
+            var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
                     <ExplicitTypeDef defName=""TestDef"">
@@ -194,7 +199,8 @@ namespace DefTest
         [Test]
 	    public void ExplicitTypeBackwards([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(ExplicitTypeDerivedDef) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ExplicitTypeDerivedDef) } };
+            var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
                     <ExplicitTypeDerivedDef defName=""TestDef"">

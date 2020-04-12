@@ -12,7 +12,8 @@ namespace DefTest
         [Test]
 	    public void Core()
 	    {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            var parser = new Def.Parser();
             parser.Finish();
 
             var deserialized = Def.Recorder.Read<int>(@"
@@ -27,7 +28,8 @@ namespace DefTest
         [Test]
         public void CoreFailures()
         {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            var parser = new Def.Parser();
             parser.Finish();
 
             ExpectErrors(() => Assert.AreEqual(0, Def.Recorder.Read<int>(@"")));

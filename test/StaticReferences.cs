@@ -18,7 +18,8 @@ namespace DefTest
         [Test]
 	    public void StaticReference([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) }, explicitStaticRefs = new Type[]{ typeof(StaticReferenceDefs) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) }, explicitStaticRefs = new Type[]{ typeof(StaticReferenceDefs) } };
+            var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDefA"" />
@@ -53,7 +54,8 @@ namespace DefTest
         [Test]
 	    public void PreciseClass([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDerivedDef) }, explicitStaticRefs = new Type[]{ typeof(PreciseClassDefs) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDerivedDef) }, explicitStaticRefs = new Type[]{ typeof(PreciseClassDefs) } };
+            var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
                     <StubDerivedDef defName=""TestDef"" />
@@ -79,7 +81,8 @@ namespace DefTest
         [Test]
 	    public void SuperClass([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDerivedDef) }, explicitStaticRefs = new Type[]{ typeof(SuperClassDefs) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDerivedDef) }, explicitStaticRefs = new Type[]{ typeof(SuperClassDefs) } };
+            var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
                     <StubDerivedDef defName=""TestDef"" />
@@ -105,7 +108,9 @@ namespace DefTest
         [Test]
 	    public void SubClass([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) }, explicitStaticRefs = new Type[]{ typeof(SubClassDefs) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) }, explicitStaticRefs = new Type[]{ typeof(SubClassDefs) } };
+
+            var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDef"" />
@@ -130,8 +135,10 @@ namespace DefTest
         [Test]
 	    public void NoAttribute([Values] BehaviorMode mode)
 	    {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDef) }, explicitStaticRefs = new Type[] { typeof(NoAttributeDefs) } };
+
             Def.Parser parser = null;
-            ExpectErrors(() => parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) }, explicitStaticRefs = new Type[]{ typeof(NoAttributeDefs) } }));
+            ExpectErrors(() => parser = new Def.Parser());
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDef"" />
@@ -155,7 +162,8 @@ namespace DefTest
         [Test]
 	    public void NoInitializer([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) }, explicitStaticRefs = new Type[]{ typeof(NoInitializerDefs) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) }, explicitStaticRefs = new Type[]{ typeof(NoInitializerDefs) } };
+            var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDef"" />
@@ -181,8 +189,10 @@ namespace DefTest
         [Test]
 	    public void NoStatic([Values] BehaviorMode mode)
 	    {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDef) }, explicitStaticRefs = new Type[] { typeof(NoStaticDefs) } };
+
             Def.Parser parser = null;
-            ExpectErrors(() => parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) }, explicitStaticRefs = new Type[]{ typeof(NoStaticDefs) } }));
+            ExpectErrors(() => parser = new Def.Parser());
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDef"" />
@@ -208,7 +218,8 @@ namespace DefTest
         [Test]
 	    public void Missing([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) }, explicitStaticRefs = new Type[]{ typeof(MissingDefs) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) }, explicitStaticRefs = new Type[]{ typeof(MissingDefs) } };
+            var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
                 </Defs>");
@@ -244,7 +255,8 @@ namespace DefTest
 	    {
             // We avoid BehaviorMode here because the StaticReference error event can happen at most once, which means that we can't run the test twice without the second (and later) tests failing.
             // This also means that test success would depend on test order run, which, no.
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } };
+            var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
                 </Defs>");
@@ -274,7 +286,8 @@ namespace DefTest
 	    {
             // We avoid BehaviorMode here because the StaticReference error event can happen at most once, which means that we can't run the test twice without the second (and later) tests failing.
             // This also means that test success would depend on test order run, which, no.
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(UnexpectedTouchDef) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(UnexpectedTouchDef) } };
+            var parser = new Def.Parser();
             ExpectErrors(() => parser.AddString(@"
                 <Defs>
                     <UnexpectedTouchDef defName=""TestDef"" />
@@ -307,7 +320,8 @@ namespace DefTest
 	    {
             // We avoid BehaviorMode here because the StaticReference error event can happen at most once, which means that we can't run the test twice without the second (and later) tests failing.
             // This also means that test success would depend on test order run, which, no.
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConstructorTouchDef) }, explicitStaticRefs = new Type[]{ typeof(ConstructorTouchDefs) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConstructorTouchDef) }, explicitStaticRefs = new Type[]{ typeof(ConstructorTouchDefs) } };
+            var parser = new Def.Parser();
             ExpectErrors(() => parser.AddString(@"
                 <Defs>
                     <ConstructorTouchDef defName=""TestDef"" />
@@ -330,7 +344,8 @@ namespace DefTest
         [Test]
 	    public void Internal([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) }, explicitStaticRefs = new Type[]{ typeof(InternalDefs) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) }, explicitStaticRefs = new Type[]{ typeof(InternalDefs) } };
+            var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDef"" />

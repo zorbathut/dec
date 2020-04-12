@@ -27,7 +27,9 @@ namespace DefTest
         [SetUp]
         public void InitEnvironment()
         {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+
+            var parser = new Def.Parser();
             parser.Finish();
         }
 
@@ -52,7 +54,7 @@ namespace DefTest
 	    }
 
         [Test]
-        public void Def()
+        public void DefName()
         {
             TypeConversionBidirectional(typeof(Def.Def), "Def.Def");
             Assert.AreEqual(typeof(Def.Def), parseType("Def"));

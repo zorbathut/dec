@@ -31,7 +31,8 @@ namespace DefTest
         [Test]
 	    public void Primitives()
 	    {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            var parser = new Def.Parser();
             parser.Finish();
 
             var primitives = new PrimitivesRecordable();
@@ -100,7 +101,8 @@ namespace DefTest
         [Test]
         public void Defs()
         {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDef) }, explicitStaticRefs = new Type[] { typeof(StaticReferenceDefs) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDef) }, explicitStaticRefs = new Type[] { typeof(StaticReferenceDefs) } };
+            var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDefA"" />
@@ -150,7 +152,8 @@ namespace DefTest
         [Test]
         public void Refs()
         {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            var parser = new Def.Parser();
             parser.Finish();
 
             var refs = new RefsRootRecordable();
@@ -188,7 +191,8 @@ namespace DefTest
         [Test]
         public void Containers()
         {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            var parser = new Def.Parser();
             parser.Finish();
 
             var containers = new ContainersRecordable();
@@ -222,7 +226,8 @@ namespace DefTest
         [Test]
         public void ContainersNested()
         {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            var parser = new Def.Parser();
             parser.Finish();
 
             var nested = new ContainersNestedRecordable();
@@ -265,7 +270,8 @@ namespace DefTest
         [Test]
         public void ContainerRecursive()
         {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            var parser = new Def.Parser();
             parser.Finish();
 
             var parent = new RecursiveParent();
@@ -315,7 +321,8 @@ namespace DefTest
         [Test]
         public void Misparse()
         {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            var parser = new Def.Parser();
             parser.Finish();
 
             var misparse = new MisparseRecordable();
@@ -348,7 +355,8 @@ namespace DefTest
         [Test]
         public void RecursiveSquared()
         {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            var parser = new Def.Parser();
             parser.Finish();
 
             var root = new RecursiveSquaredRecorder();
@@ -391,7 +399,8 @@ namespace DefTest
         [Test]
         public void RecursiveSquaredRoot()
         {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            var parser = new Def.Parser();
             parser.Finish();
 
             var root = new RecursiveSquaredRecorder();
@@ -437,7 +446,8 @@ namespace DefTest
         [Test]
         public void RootPrimitive()
         {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            var parser = new Def.Parser();
             parser.Finish();
 
             int value = 4;
@@ -470,7 +480,8 @@ namespace DefTest
             // I'm choosing 10000 because it's well into the Doesn't Work territory, but it also doesn't take forever to run.
             const int depth = 10000;
 
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            var parser = new Def.Parser();
             parser.Finish();
 
             var root = new DoubleLinkedRecorder();
@@ -514,7 +525,8 @@ namespace DefTest
             // We use single links so we don't generate refs, we actually embed objects.
             const int depth = 10_000;
 
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            var parser = new Def.Parser();
             parser.Finish();
 
             var root = new DoubleLinkedRecorder();
@@ -588,7 +600,8 @@ namespace DefTest
         [Test]
         public void DerivedRecordables()
         {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            var parser = new Def.Parser();
             parser.Finish();
 
             var root = new RecordableContainer();

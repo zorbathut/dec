@@ -48,7 +48,8 @@ namespace DefTest
         [Test]
         public void ConverterSimple()
         {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterSimple) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterSimple) } };
+            var parser = new Def.Parser();
             parser.Finish();
 
             var converted = new ConverterRecordable();
@@ -87,7 +88,8 @@ namespace DefTest
         [Test]
         public void ConverterRecord()
         {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterRecord) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterRecord) } };
+            var parser = new Def.Parser();
             parser.Finish();
 
             var converted = new ConverterRecordable();
@@ -119,7 +121,8 @@ namespace DefTest
         [Test]
         public void ConverterReplacementDetection()
         {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterSimple) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterSimple) } };
+            var parser = new Def.Parser();
             parser.Finish();
 
             var converted = new ConverterReplacementRecordable();
@@ -140,7 +143,8 @@ namespace DefTest
         [Test]
         public void ConverterReplacementWorking()
         {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterRecord) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterRecord) } };
+            var parser = new Def.Parser();
             parser.Finish();
 
             var converted = new ConverterReplacementRecordable();
@@ -180,7 +184,8 @@ namespace DefTest
         [Test]
         public void ConverterUnsupplied()
         {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitConverters = new Type[] { typeof(ConverterUnsuppliedConverter) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConverterUnsuppliedConverter) } };
+            var parser = new Def.Parser();
             parser.Finish();
 
             var root = new ConverterUnsuppliedClass();

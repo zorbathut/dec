@@ -38,19 +38,9 @@ namespace Def
         private static HashSet<Type> staticReferencesRegistering = new HashSet<Type>();
 
         /// <summary>
-        /// Parameters that are intended for the use of unit tests. Not recommended for actual code.
-        /// </summary>
-        public class UnitTestParameters
-        {
-            public Type[] explicitTypes = null;
-            public Type[] explicitStaticRefs = null;
-            public Type[] explicitConverters = null;
-        }
-
-        /// <summary>
         /// Creates a Parser.
         /// </summary>
-        public Parser(UnitTestParameters unitTestParameters = null)
+        public Parser()
         {
             if (s_Status != Status.Uninitialized)
             {
@@ -58,7 +48,7 @@ namespace Def
             }
             s_Status = Status.Accumulating;
 
-            bool unitTestMode = unitTestParameters != null;
+            bool unitTestMode = Config.TestParameters != null;
 
             {
                 IEnumerable<Type> defTypes;
@@ -66,9 +56,9 @@ namespace Def
                 {
                     defTypes = UtilReflection.GetAllTypes().Where(t => t.IsSubclassOf(typeof(Def)));
                 }
-                else if (unitTestParameters?.explicitTypes != null)
+                else if (Config.TestParameters.explicitTypes != null)
                 {
-                    defTypes = unitTestParameters.explicitTypes;
+                    defTypes = Config.TestParameters.explicitTypes;
                 }
                 else
                 {
@@ -94,9 +84,9 @@ namespace Def
                 {
                     staticRefs = UtilReflection.GetAllTypes().Where(t => t.HasAttribute(typeof(StaticReferencesAttribute)));
                 }
-                else if (unitTestParameters?.explicitStaticRefs != null)
+                else if (Config.TestParameters.explicitStaticRefs != null)
                 {
-                    staticRefs = unitTestParameters.explicitStaticRefs;
+                    staticRefs = Config.TestParameters.explicitStaticRefs;
                 }
                 else
                 {
@@ -119,7 +109,7 @@ namespace Def
                 }
             }
 
-            Serialization.Initialize(unitTestMode, unitTestParameters?.explicitConverters);
+            Serialization.Initialize();
         }
 
         private static readonly Regex DefNameValidator = new Regex(@"^[A-Za-z_][A-Za-z0-9_]*$", RegexOptions.Compiled);

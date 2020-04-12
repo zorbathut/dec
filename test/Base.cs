@@ -20,8 +20,6 @@ namespace DefTest
 
             handlingErrors = false;
             handledError = false;
-
-            ResetBehaviorParser();
         }
 
         private bool handlingWarnings = false;
@@ -119,13 +117,6 @@ namespace DefTest
 
         // Everything after here is designed for the Behavior tests, where we run tests in a variety of ways to test serialization.
 
-        private Def.Parser.UnitTestParameters behaviorParserUnitTestParameters = null;
-
-        public void ResetBehaviorParser()
-        {
-            behaviorParserUnitTestParameters = null;
-        }
-
         public enum BehaviorMode
         {
              // Don't do anything special; just let it pass through.
@@ -133,16 +124,6 @@ namespace DefTest
 
             // Write it to .xml, clear the database, and reload it.
             Rewritten,
-        }
-
-        // This is a thin wrapper around `new Def.Parser` that exists solely so we can recreate a Def.Parser later with the same settings.
-        public Def.Parser CreateParserForBehavior(Def.Parser.UnitTestParameters unitTestParameters)
-        {
-            Assert.IsNull(behaviorParserUnitTestParameters);
-
-            behaviorParserUnitTestParameters = unitTestParameters;
-
-            return new Def.Parser(unitTestParameters: unitTestParameters);
         }
 
         public void DoBehavior(BehaviorMode mode, bool expectErrors = false)
@@ -153,8 +134,6 @@ namespace DefTest
             }
             else if (mode == BehaviorMode.Rewritten)
             {
-                Assert.IsNotNull(behaviorParserUnitTestParameters);
-
                 var writer = new Def.Writer();
                 string data = writer.Write();
 
@@ -162,7 +141,7 @@ namespace DefTest
 
                 void RunParser()
                 {
-                    var parser = new Def.Parser(unitTestParameters: behaviorParserUnitTestParameters);
+                    var parser = new Def.Parser();
                     parser.AddString(data);
                     parser.Finish();
                 }

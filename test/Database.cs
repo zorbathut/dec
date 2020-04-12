@@ -11,7 +11,9 @@ namespace DefTest
         [Test]
         public void DatabaseList([Values] BehaviorMode mode)
         {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDef) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDef) } };
+
+            var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDefA"" />
@@ -51,7 +53,9 @@ namespace DefTest
         [Test]
         public void DatabaseHierarchy([Values] BehaviorMode mode)
         {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[] { typeof(RootDef), typeof(ParentDef), typeof(ChildDef) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(RootDef), typeof(ParentDef), typeof(ChildDef) } };
+
+            var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
                     <RootDef defName=""RootDef"" />
@@ -93,7 +97,9 @@ namespace DefTest
         [Test]
         public void DatabaseErrorQuery()
         {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+
+            var parser = new Def.Parser();
             parser.Finish();
 
             ExpectErrors(() => Assert.IsNull(Def.Database.Get(typeof(NotActuallyADef), "Fake")));

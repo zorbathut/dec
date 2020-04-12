@@ -9,7 +9,8 @@ namespace DefTest
         [Test]
 	    public void DTDParse([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } };
+            var parser = new Def.Parser();
             parser.AddString(@"<?xml version=""1.0"" encoding=""UTF-8"" ?>
                 <Defs>
                     <StubDef defName=""TestDef"">
@@ -25,7 +26,8 @@ namespace DefTest
         [Test]
 	    public void IncorrectRoot([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } };
+            var parser = new Def.Parser();
             ExpectWarnings(() => parser.AddString(@"
                 <NotDefs>
                     <StubDef defName=""TestDef"" />
@@ -40,7 +42,8 @@ namespace DefTest
         [Test]
 	    public void MultipleRoot([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } };
+            var parser = new Def.Parser();
             ExpectErrors(() => parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDefA"" />
@@ -58,7 +61,8 @@ namespace DefTest
         [Test]
 	    public void MultiXML([Values] BehaviorMode mode)
 	    {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } };
+            var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDefA"" />
@@ -78,7 +82,8 @@ namespace DefTest
         [Test]
         public void ProvidedFilenameForXml([Values] BehaviorMode mode)
         {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDef) } });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDef) } };
+            var parser = new Def.Parser();
             ExpectErrors(() => parser.AddString(@"test.xml"));
             parser.Finish();
 
@@ -88,7 +93,8 @@ namespace DefTest
         [Test]
         public void ProperStringName([Values] BehaviorMode mode)
         {
-            var parser = CreateParserForBehavior(new Def.Parser.UnitTestParameters { });
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            var parser = new Def.Parser();
             ExpectErrors(() => parser.AddString(@"
                 <Defs>
                     <StubDef defName=""TestDefA"" />

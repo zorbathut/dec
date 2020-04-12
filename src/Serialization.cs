@@ -17,18 +17,18 @@ namespace Def
         // At some point we'll figure out how to support Converters at that point as well.
         internal static Dictionary<Type, Converter> Converters = new Dictionary<Type, Converter>();
 
-        internal static void Initialize(bool unitTestMode, Type[] explicitConversionTypes)
+        internal static void Initialize()
         {
             Converters = new Dictionary<Type, Converter>();
 
             IEnumerable<Type> conversionTypes;
-            if (!unitTestMode)
+            if (Config.TestParameters == null)
             {
                 conversionTypes = UtilReflection.GetAllTypes().Where(t => t.IsSubclassOf(typeof(Converter)) && !t.IsAbstract);
             }
-            else if (explicitConversionTypes != null)
+            else if (Config.TestParameters.explicitConverters != null)
             {
-                conversionTypes = explicitConversionTypes;
+                conversionTypes = Config.TestParameters.explicitConverters;
             }
             else
             {

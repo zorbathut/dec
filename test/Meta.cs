@@ -21,7 +21,8 @@ namespace DefTest
             // we don't test StubDefs.TestDef here because if we do, we'll kick off the detection
 
             {
-                var parser = new Def.Parser(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) }, explicitStaticRefs = new Type[]{ typeof(StubDefs) } });
+                Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) }, explicitStaticRefs = new Type[]{ typeof(StubDefs) } };
+            var parser = new Def.Parser();
                 parser.AddString(@"
                     <Defs>
                         <StubDef defName=""TestDef"" />
@@ -38,7 +39,8 @@ namespace DefTest
             Assert.IsNull(StubDefs.TestDef);
 
             {
-                var parser = new Def.Parser(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) }, explicitStaticRefs = new Type[]{ typeof(StubDefs) } });
+                Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) }, explicitStaticRefs = new Type[]{ typeof(StubDefs) } };
+            var parser = new Def.Parser();
                 parser.AddString(@"
                     <Defs>
                         <StubDef defName=""TestDef"" />
@@ -72,7 +74,8 @@ namespace DefTest
             // This double-checks it
 
             {
-                var parser = new Def.Parser(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) } });
+                Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) } };
+            var parser = new Def.Parser();
                 parser.AddString(@"
                     <Defs>
                         <RefTargetDef defName=""Target"" />
@@ -95,7 +98,8 @@ namespace DefTest
             Def.Database.Clear();
 
             {
-                var parser = new Def.Parser(new Def.Parser.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) } });
+                Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) } };
+            var parser = new Def.Parser();
                 parser.AddString(@"
                     <Defs>
                         <RefSourceDef defName=""Source"">

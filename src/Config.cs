@@ -85,10 +85,19 @@ namespace Def
         /// </remarks>
         public static bool DefaultHandlerShowConfigOnException = true;
 
+        /// <summary>
+        /// Parameters that are intended for unit tests. Not recommended or supported for actual code.
+        /// </summary>
+        public class UnitTestParameters
+        {
+            public Type[] explicitTypes = null;
+            public Type[] explicitStaticRefs = null;
+            public Type[] explicitConverters = null;
+        }
+        public static UnitTestParameters TestParameters { get; set; } = null;
+
         static Config()
         {
-            // TODO: unity here.
-
             string ExceptionSuffix()
             {
                 if (DefaultHandlerShowConfigOnException)
