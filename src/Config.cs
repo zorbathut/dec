@@ -2,6 +2,10 @@ namespace Def
 {
     using System;
 
+    #if UNITY_5_3_OR_NEWER
+        using UnityEngine;
+    #endif
+
     /// <summary>
     /// Contains global configuration data that may be needed before parsing.
     /// Initialize as soon as possible.
@@ -16,7 +20,7 @@ namespace Def
         ///
         /// If you're using any multithreading, this must be threadsafe.
         /// </remarks>
-        public static Action<string> InfoHandler { get; set; } = str => System.Diagnostics.Debug.Print(str);
+        public static Action<string> InfoHandler { get; set; }
 
         /// <summary>
         /// Callback for warning messages.
@@ -26,7 +30,7 @@ namespace Def
         ///
         /// If you're using any multithreading, this must be threadsafe.
         /// </remarks>
-        public static Action<string> WarningHandler { get; set; } = str => System.Diagnostics.Debug.Print(str);
+        public static Action<string> WarningHandler { get; set; }
 
         /// <summary>
         /// Callback for error messages.
@@ -38,7 +42,7 @@ namespace Def
         ///
         /// If you're using any multithreading, this must be threadsafe.
         /// </remarks>
-        public static Action<string> ErrorHandler { get; set; } = str => { System.Diagnostics.Debug.Print(str); Console.WriteLine(str); throw new ArgumentException(str); };
+        public static Action<string> ErrorHandler { get; set; }
 
         /// <summary>
         /// Callback for unhandled exceptions.
@@ -50,6 +54,115 @@ namespace Def
         ///
         /// If you're using any multithreading, this must be threadsafe.
         /// </remarks>
-        public static Action<Exception> ExceptionHandler { get; set; } = e => { System.Diagnostics.Debug.Print(e.ToString()); Console.WriteLine(e.ToString()); throw e; };
+        public static Action<Exception> ExceptionHandler { get; set; }
+
+        public enum DefaultExceptionBehavior
+        {
+            Never,
+            ErrorOnly,
+            ErrorAndWarning,
+        }
+
+        /// <summary>
+        /// Tells the default handlers when to throw exceptions.
+        /// </summary>
+        /// <remarks>
+        /// Ignored if you're not using the default handlers.
+        ///
+        /// Def is intended to work without exceptions; it's good at recovering from errors. This is very important if you have mods, as mods frequently have minor conflicts.
+        ///
+        /// However, many developers don't configure the error reporting when first installing the library, often running into bizarre issues because of it.
+        ///
+        /// This is set to be as loud and intrusive as possible just to get developers over that initial hump. I strongly recommend changing this to DefaultExceptionBehavior.Never, then ensuring that your errors and warnings are shown in a place you can't miss (like a popup or a modal dialog.)
+        /// </remarks>
+        public static DefaultExceptionBehavior DefaultHandlerThrowExceptions = DefaultExceptionBehavior.ErrorAndWarning;
+
+        /// <summary>
+        /// Tells the default handlers to attach a note to every exception saying that this behavior can be changed.
+        /// </summary>
+        /// <remarks>
+        /// Ignored if you're not using the default handlers.
+        /// </remarks>
+        public static bool DefaultHandlerShowConfigOnException = true;
+
+        static Config()
+        {
+            // TODO: unity here.
+
+            string ExceptionSuffix()
+            {
+                if (DefaultHandlerShowConfigOnException)
+                {
+                    return "\nThis error-handling behavior (as well as this message) can be modified in Def.Config.";
+                }
+                else
+                {
+                    return "";
+                }
+            }
+
+            #if UNITY_5_3_OR_NEWER
+                InfoHandler = (str) =>
+                {
+                    Debug.Log(str);
+                };
+
+                WarningHandler = (str) =>
+                {
+                    Debug.LogWarning(str);
+                    if (DefaultHandlerThrowExceptions >= DefaultExceptionBehavior.ErrorAndWarning)
+                    {
+                        throw new ArgumentException(str + ExceptionSuffix());
+                    }
+                };
+
+                ErrorHandler = (str) =>
+                {
+                    Debug.LogError(str);
+                    if (DefaultHandlerThrowExceptions >= DefaultExceptionBehavior.ErrorOnly)
+                    {
+                        throw new ArgumentException(str + ExceptionSuffix());
+                    }
+                };
+
+                ExceptionHandler = (e) =>
+                {
+                    Debug.LogException(e);
+                    throw e;
+                };
+            #else
+                InfoHandler = (str) =>
+                {
+                    System.Diagnostics.Debug.Print(str);
+                };
+
+                WarningHandler = (str) =>
+                {
+                    System.Diagnostics.Debug.Print(str);
+                    Console.WriteLine(str);
+                    if (DefaultHandlerThrowExceptions >= DefaultExceptionBehavior.ErrorAndWarning)
+                    {
+                        throw new ArgumentException(str + ExceptionSuffix());
+                    }
+                };
+
+                ErrorHandler = (str) =>
+                {
+                    System.Diagnostics.Debug.Print(str);
+                    Console.WriteLine(str);
+                    if (DefaultHandlerThrowExceptions >= DefaultExceptionBehavior.ErrorOnly)
+                    {
+                        throw new ArgumentException(str + ExceptionSuffix());
+                    }
+                };
+
+                ExceptionHandler = (e) =>
+                {
+                    System.Diagnostics.Debug.Print(e.ToString());
+                    Console.WriteLine(e.ToString());
+                    throw e;
+                };
+            #endif
+        }
     }
 }
