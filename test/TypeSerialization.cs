@@ -276,5 +276,28 @@ namespace DefTest
 
             TypeConversionBidirectional(typeof(Generic<Generic<Generic<int>>>), "Generic<Generic<Generic<int>>>");
         }
+
+        [Test]
+        public void GenericErrors()
+        {
+            Def.Config.UsingNamespaces = new string[] { "DefTest.TypeSerialization" };
+
+            // This is just me verifying a bunch of template error behaviors.
+            ExpectErrors(() => parseType("int<int>"));
+            ExpectErrors(() => parseType("Generic<>"));
+            ExpectErrors(() => parseType("Generic<int, int>"));
+            ExpectErrors(() => parseType("Generic<int><int>"));
+            ExpectErrors(() => parseType("Generic<int>>"));
+            ExpectErrors(() => parseType("Generic<int>."));
+            ExpectErrors(() => parseType(".Generic<int>"));
+            ExpectErrors(() => parseType("Generic<int>NestedStandard"));
+            ExpectErrors(() => parseType("Generic<int>..NestedStandard"));
+
+            ExpectErrors(() => parseType(""));
+            ExpectErrors(() => parseType("."));
+            ExpectErrors(() => parseType("<"));
+            ExpectErrors(() => parseType(">"));
+            ExpectErrors(() => parseType("<>"));
+        }
     }
 }

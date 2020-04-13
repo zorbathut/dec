@@ -121,7 +121,7 @@ namespace Def
             }
             else if (text[0] == '<')
             {
-                if (!root.IsGenericType)
+                if (!root.IsGenericTypeDefinition)
                 {
                     Dbg.Err($"{inputLine}:{lineNumber}: Found generic specification on non-generic type {root}");
                     return null;
@@ -180,6 +180,12 @@ namespace Def
                 if (tokenStart >= text.Length || text[tokenStart] != '>')
                 {
                     Dbg.Err($"{inputLine}:{lineNumber}: Failed to find closing angle bracket in type");
+                    return null;
+                }
+
+                if (parsedTypes.Count != root.GetGenericArguments().Length)
+                {
+                    Dbg.Err($"{inputLine}:{lineNumber}: Wrong number of generic arguments for type {root}");
                     return null;
                 }
 
