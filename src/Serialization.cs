@@ -387,6 +387,7 @@ namespace Def
                     for (int i = 0; i < indices.Length; ++i)
                     {
                         // We can do these in a single loop because structs can't have parents and order doesn't matter for classes.
+                        // Preregister/register combo is required for structs; if you send it to the index system before the int is set, the index system would also have to set it.
                         indices[i].field.SetValue(model, Index.Preregister(indices[i].type));
                         Index.Register(indices[i].type, model);
                     }
