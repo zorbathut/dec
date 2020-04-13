@@ -53,7 +53,10 @@ namespace DefTest
 
         public void TypeConversionOpaque(Type type)
         {
-            Assert.AreEqual(type, parseType(serializeType(type)));
+            string serialized = serializeType(type);
+            Type parsed = parseType(serialized);
+
+            Assert.AreEqual(type, parsed);
         }
 
         [Test]
@@ -107,18 +110,22 @@ namespace DefTest
         }
 
         [Test]
-        public void Generic()
+        public void GenericContainer()
         {
-            TypeConversionOpaque(typeof(List<int>));
-            TypeConversionOpaque(typeof(List<List<int>>));
-            TypeConversionOpaque(typeof(List<float>));
-            TypeConversionOpaque(typeof(Dictionary<List<float>, List<int>>));
+            Def.Config.UsingNamespaces = new string[] { "System.Collections.Generic" };
+
+            TypeConversionBidirectional(typeof(List<int>), "List<int>");
+            TypeConversionBidirectional(typeof(List<List<int>>), "List<List<int>>");
+            TypeConversionBidirectional(typeof(List<float>), "List<float>");
+            TypeConversionBidirectional(typeof(Dictionary<List<float>, List<int>>), "Dictionary<List<float>, List<int>>");
         }
 
         [Test]
         public void GenericDef()
         {
-            TypeConversionOpaque(typeof(List<Def.Def>));
+            Def.Config.UsingNamespaces = new string[] { "System.Collections.Generic" };
+
+            TypeConversionBidirectional(typeof(List<Def.Def>), "List<Def.Def>");
         }
 
         [Test]
@@ -184,5 +191,90 @@ namespace DefTest
             Assert.AreEqual(typeof(WithinClass), parseType("DefTest.TypeSerialization.WithinClass"));
         }
 
+        public class NestedA
+        {
+            public class NestedB
+            {
+                public class NestedC
+                {
+                    public class NestedD
+                    {
+                    }
+                }
+            }
+        }
+
+        [Test]
+        public void Nesting()
+        {
+            Def.Config.UsingNamespaces = new string[] { "DefTest.TypeSerialization" };
+
+            TypeConversionBidirectional(typeof(NestedA.NestedB.NestedC.NestedD), "NestedA.NestedB.NestedC.NestedD");
+        }
+
+        public class Generic<T>
+        {
+            public class NestedStandard
+            {
+
+            }
+
+            public class NestedGeneric<U>
+            {
+
+            }
+        }
+
+        public class Generic2Param<T, U>
+        {
+        }
+
+        [Test]
+        public void GenericSimple()
+        {
+            Def.Config.UsingNamespaces = new string[] { "DefTest.TypeSerialization" };
+
+            TypeConversionBidirectional(typeof(Generic<int>), "Generic<int>");
+
+            Assert.AreEqual(typeof(Generic<int>), parseType("Generic< int>"));
+            Assert.AreEqual(typeof(Generic<int>), parseType("Generic<int >"));
+            Assert.AreEqual(typeof(Generic<int>), parseType("Generic< int >"));
+        }
+
+        [Test]
+        public void GenericMultiple()
+        {
+            Def.Config.UsingNamespaces = new string[] { "DefTest.TypeSerialization" };
+
+            TypeConversionBidirectional(typeof(Generic2Param<int, double>), "Generic2Param<int, double>");
+            Assert.AreEqual(typeof(Generic2Param<int, double>), parseType("Generic2Param<int,double>"));
+        }
+
+        /*
+        // These currently don't work because nested generics turn out to not function like I expected.
+        // I'm gonna worry about this later - I don't know if anyone will *ever* use this functionality.
+        [Test]
+        public void GenericNestedSimple()
+        {
+            Def.Config.UsingNamespaces = new string[] { "DefTest.TypeSerialization" };
+
+            TypeConversionBidirectional(typeof(Generic<int>.NestedStandard), "Generic<int>.NestedStandard");
+        }
+
+        [Test]
+        public void GenericNestedGeneric()
+        {
+            Def.Config.UsingNamespaces = new string[] { "DefTest.TypeSerialization" };
+
+            TypeConversionBidirectional(typeof(Generic<int>.NestedGeneric<double>), "Generic<int>.NestedGeneric<double>");
+        }*/
+
+        [Test]
+        public void GenericRecursive()
+        {
+            Def.Config.UsingNamespaces = new string[] { "DefTest.TypeSerialization" };
+
+            TypeConversionBidirectional(typeof(Generic<Generic<Generic<int>>>), "Generic<Generic<Generic<int>>>");
+        }
     }
 }

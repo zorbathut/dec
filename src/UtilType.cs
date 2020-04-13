@@ -1,6 +1,7 @@
 namespace Def
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
 
@@ -39,10 +40,39 @@ namespace Def
             new PrimitiveTypeLookup { type = typeof(string), str = "string" },
         };
 
+        private static bool MatchesWithGeneric(string typeName, string defType)
+        {
+            return typeName.StartsWith(defType) && typeName[defType.Length] == '`';
+        }
+
         private static Type GetTypeFromAnyAssembly(string text)
         {
-            // "Distinct" is needed because some types, especially fundamental types, seem to show up in multiple assemblies for unclear reasons
-            return AppDomain.CurrentDomain.GetAssemblies().Select(asm => asm.GetType(text)).Where(t => t != null).Distinct().SingleOrDefaultChecked();
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            var types = assemblies.Select(asm =>
+                {
+                    {
+                        var type = asm.GetType(text);
+                        if (type != null)
+                        {
+                            return type;
+                        }
+                    }
+
+                    // We haven't found a type, but it's possible that we have a generic that it doesn't recognize.
+                    // This is unnecessarily slow and I absolutely need to fix it. For now? Let's just check everything!
+                    foreach (var type in asm.GetTypes())
+                    {
+                        if (MatchesWithGeneric(type.FullName, text))
+                        {
+                            return type;
+                        }
+                    }
+
+                    return null;
+                });
+
+            // "Distinct" is needed because some types, especially primitive types, seem to show up in multiple assemblies for unclear reasons
+            return types.Where(t => t != null).Distinct().SingleOrDefaultChecked();
         }
 
         private static Type ParseWithoutNamespace(Type root, string text)
@@ -62,12 +92,98 @@ namespace Def
                 // This is a member class of a class
                 int end = Math.Min(text.IndexOfUnbounded('<', 1), text.IndexOfUnbounded('.', 1));
                 string memberName = text.Substring(1, end - 1);
-                return ParseWithoutNamespace(root.GetNestedType(memberName, BindingFlags.Public | BindingFlags.NonPublic), text.Substring(end));
+
+                // Get our type
+                Type chosenType = root.GetNestedType(memberName, BindingFlags.Public | BindingFlags.NonPublic);
+
+                // Ho ho! We have gotten a type! It has definitely not failed!
+                // Unless it's a generic type in which case it might have failed.
+                if (chosenType == null)
+                {
+                    foreach (var prospectiveType in root.GetNestedTypes(BindingFlags.Public | BindingFlags.NonPublic))
+                    {
+                        if (MatchesWithGeneric(prospectiveType.Name, memberName))
+                        {
+                            chosenType = prospectiveType;
+                            break;
+                        }
+                    }
+                }
+
+                // Chain on to another call in case we have a further-nested class-of-class
+                return ParseWithoutNamespace(chosenType, text.Substring(end));
             }
             else if (text[0] == '<')
             {
+                if (!root.IsGenericType)
+                {
+                    Dbg.Err($"Found generic specification on non-generic type {root}");
+                    return null;
+                }
+
                 // This is a template
-                return null;
+                // Parsing this is going to be a bit tricky; in theory it's C#-regex-able but I haven't been able to find a good simple example
+                // So we're doing it by hand
+                // Which is slow
+                // Definitely gonna want caching for this at some point.
+                var parsedTypes = new List<Type>();
+                void AddParsedType(string type)
+                {
+                    parsedTypes.Add(ParseDefFormatted(type.Trim(), "TBD", -1));
+                }
+
+                int tokenStart = 1;
+                while (tokenStart < text.Length && text[tokenStart] != '>')
+                {
+                    int tokenEnd = tokenStart;
+
+                    int nestedBrackets = 0;
+                    while (tokenEnd < text.Length)
+                    {
+                        // just so we can stop calling this function
+                        char kar = text[tokenEnd];
+
+                        if (kar == ',')
+                        {
+                            AddParsedType(text.Substring(tokenStart, tokenEnd - tokenStart));
+                            tokenStart = tokenEnd + 1;
+                            tokenEnd = tokenStart;
+                            continue;
+                        }
+                        else if (kar == '<')
+                        {
+                            ++nestedBrackets;
+                        }
+                        else if (kar == '>' && nestedBrackets > 0)
+                        {
+                            --nestedBrackets;
+                        }
+                        else if (kar == '>')
+                        {
+                            // we have reached the end of the templates
+                            AddParsedType(text.Substring(tokenStart, tokenEnd - tokenStart));
+                            tokenStart = tokenEnd;
+                            break;
+                        }
+
+                        // consume another character!
+                        ++tokenEnd;
+                    }
+                }
+
+                if (tokenStart >= text.Length || text[tokenStart] != '>')
+                {
+                    Dbg.Err("Failed to find closing angle bracket in type");
+                    return null;
+                }
+
+                // Alright, we have a valid set of brackets, and a parsed set of types!
+                Type specifiedType = root.MakeGenericType(parsedTypes.ToArray());
+
+                // yay!
+
+                // We also might have more type to parse.
+                return ParseWithoutNamespace(specifiedType, text.Substring(tokenStart + 1));
             }
             else
             {
@@ -179,7 +295,13 @@ namespace Def
                 }
             }
 
-            string baseString = type.FullName.Replace("+", ".");
+            Type baseType = type;
+            if (type.IsConstructedGenericType)
+            {
+                baseType = type.GetGenericTypeDefinition();
+            }
+
+            string baseString = baseType.FullName.Replace("+", ".");
             string bestPrefix = "";
             foreach (var prefix in Config.UsingNamespaces)
             {
@@ -190,9 +312,21 @@ namespace Def
                 }
             }
 
-            // TODO: templates.
+            // Strip out the generic parameter count
+            int genericVariableSpecifier = baseString.IndexOfUnbounded('`');
 
-            return baseString.Substring(bestPrefix.Length);
+            string baseTypeString = baseString.Substring(bestPrefix.Length, genericVariableSpecifier - bestPrefix.Length);
+
+            if (type.IsConstructedGenericType)
+            {
+                // Assemble the generic types on top of this
+                string genericTypes = string.Join(", ", type.GenericTypeArguments.Select(t => t.ComposeDefFormatted()));
+                return $"{baseTypeString}<{genericTypes}>";
+            }
+            else
+            {
+                return baseTypeString;
+            }
         }
     }
 }
