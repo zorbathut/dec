@@ -15,6 +15,30 @@ namespace Def
 
         // When serializing types, we chop off as much of the prefix as we can. When deserializing types, we error if there's ambiguity based on existing prefixes.
 
+        private struct PrimitiveTypeLookup
+        {
+            public Type type;
+            public string str;
+        }
+        private static readonly PrimitiveTypeLookup[] PrimitiveTypes = new PrimitiveTypeLookup[]
+        {
+            new PrimitiveTypeLookup { type = typeof(int), str = "int" },
+            new PrimitiveTypeLookup { type = typeof(byte), str = "byte" },
+            new PrimitiveTypeLookup { type = typeof(sbyte), str = "sbyte" },
+            new PrimitiveTypeLookup { type = typeof(char), str = "char" },
+            new PrimitiveTypeLookup { type = typeof(decimal), str = "decimal" },
+            new PrimitiveTypeLookup { type = typeof(double), str = "double" },
+            new PrimitiveTypeLookup { type = typeof(float), str = "float" },
+            new PrimitiveTypeLookup { type = typeof(int), str = "int" },
+            new PrimitiveTypeLookup { type = typeof(uint), str = "uint" },
+            new PrimitiveTypeLookup { type = typeof(long), str = "long" },
+            new PrimitiveTypeLookup { type = typeof(ulong), str = "ulong" },
+            new PrimitiveTypeLookup { type = typeof(short), str = "short" },
+            new PrimitiveTypeLookup { type = typeof(ushort), str = "ushort" },
+            new PrimitiveTypeLookup { type = typeof(object), str = "object" },
+            new PrimitiveTypeLookup { type = typeof(string), str = "string" },
+        };
+
         private static Type GetTypeFromAnyAssembly(string text)
         {
             // "Distinct" is needed because some types, especially fundamental types, seem to show up in multiple assemblies for unclear reasons
@@ -107,6 +131,17 @@ namespace Def
 
             if (possibleTypes.Length == 0)
             {
+                // We're probably not going to be parsing primitive types often, so we stash this loop in the failure case to avoid its overhead.
+                // Also, these are keywords, so you can't define classes with these names without doing hideous @hackery.
+                // and if you're doing that, then causing a type conflict, then *complaining that it isn't giving you a warning*, then screw you anyway :V
+                for (int i = 0; i < PrimitiveTypes.Length; ++i)
+                {
+                    if (text == PrimitiveTypes[i].str)
+                    {
+                        return PrimitiveTypes[i].type;
+                    }
+                }
+
                 Dbg.Err($"{inputLine}:{lineNumber}: Couldn't find type named {text}");
                 return null;
             }
@@ -132,6 +167,15 @@ namespace Def
                     {
                         return explicitType.Name;
                     }
+                }
+            }
+
+            // We're going to have to do this entire loop at some point anyway, so we may as well do it now when we're just comparing Types
+            for (int i = 0; i < PrimitiveTypes.Length; ++i)
+            {
+                if (type == PrimitiveTypes[i].type)
+                {
+                    return PrimitiveTypes[i].str;
                 }
             }
 

@@ -59,11 +59,16 @@ namespace DefTest
         [Test]
 	    public void Primitives()
 	    {
-            TypeConversionBidirectional(typeof(int), "System.Int32");
-            TypeConversionBidirectional(typeof(float), "System.Single");
-            TypeConversionBidirectional(typeof(char), "System.Char");
-            TypeConversionBidirectional(typeof(string), "System.String");
-	    }
+            TypeConversionBidirectional(typeof(int), "int");
+            TypeConversionBidirectional(typeof(float), "float");
+            TypeConversionBidirectional(typeof(char), "char");
+            TypeConversionBidirectional(typeof(string), "string");
+
+            Assert.AreEqual(typeof(int), parseType("System.Int32"));
+            Assert.AreEqual(typeof(float), parseType("System.Single"));
+            Assert.AreEqual(typeof(char), parseType("System.Char"));
+            Assert.AreEqual(typeof(string), parseType("System.String"));
+        }
 
         [Test]
         public void DefName()
