@@ -224,8 +224,14 @@ namespace Def
             }
         }
 
+        private static Dictionary<string, Type> ParseCache = new Dictionary<string, Type>();
         internal static Type ParseDefFormatted(string text, string inputLine, int lineNumber)
         {
+            if (ParseCache.TryGetValue(text, out Type cacheVal))
+            {
+                return cacheVal;
+            }
+
             if (Config.TestParameters?.explicitTypes != null)
             {
                 // Test override, we check the test types first
@@ -233,6 +239,7 @@ namespace Def
                 {
                     if (text == explicitType.Name)
                     {
+                        ParseCache[text] = explicitType;
                         return explicitType;
                     }
                 }
@@ -245,35 +252,34 @@ namespace Def
                 .Where(t => t != null)
                 .ToArray();
 
+            Type result;
             if (possibleTypes.Length == 0)
             {
-                // We're probably not going to be parsing primitive types often, so we stash this loop in the failure case to avoid its overhead.
-                // Also, these are keywords, so you can't define classes with these names without doing hideous @hackery.
-                // and if you're doing that, then causing a type conflict, then *complaining that it isn't giving you a warning*, then screw you anyway :V
-                for (int i = 0; i < PrimitiveTypes.Length; ++i)
-                {
-                    if (text == PrimitiveTypes[i].str)
-                    {
-                        return PrimitiveTypes[i].type;
-                    }
-                }
-
                 Dbg.Err($"{inputLine}:{lineNumber}: Couldn't find type named {text}");
-                return null;
+                result = null;
             }
             else if (possibleTypes.Length > 1)
             {
                 Dbg.Err($"{inputLine}:{lineNumber}: Found too many types named {text} ({possibleTypes.Select(t => t.FullName).ToCommaString()})");
-                return possibleTypes[0];
+                result = possibleTypes[0];
             }
             else
             {
-                return possibleTypes[0];
+                result = possibleTypes[0];
             }
+
+            ParseCache[text] = result;
+            return result;
         }
 
+        private static Dictionary<Type, string> ComposeCache = new Dictionary<Type, string>();
         internal static string ComposeDefFormatted(this Type type)
         {
+            if (ComposeCache.TryGetValue(type, out string cacheVal))
+            {
+                return cacheVal;
+            }
+
             if (Config.TestParameters?.explicitTypes != null)
             {
                 // Test override, we check the test types first
@@ -281,52 +287,71 @@ namespace Def
                 {
                     if (type == explicitType)
                     {
-                        return explicitType.Name;
+                        string result = explicitType.Name;
+                        ComposeCache[type] = result;
+                        return result;
                     }
                 }
             }
 
-            // We're going to have to do this entire loop at some point anyway, so we may as well do it now when we're just comparing Types
+            {
+                // Main parsing
+                Type baseType = type;
+                if (type.IsConstructedGenericType)
+                {
+                    baseType = type.GetGenericTypeDefinition();
+                }
+
+                string baseString = baseType.FullName.Replace("+", ".");
+                string bestPrefix = "";
+                foreach (var prefix in Config.UsingNamespaces)
+                {
+                    string prospective = prefix + ".";
+                    if (bestPrefix.Length < prospective.Length && baseString.StartsWith(prospective))
+                    {
+                        bestPrefix = prospective;
+                    }
+                }
+
+                // Strip out the generic parameter count
+                int genericVariableSpecifier = baseString.IndexOfUnbounded('`');
+
+                string baseTypeString = baseString.Substring(bestPrefix.Length, genericVariableSpecifier - bestPrefix.Length);
+
+                string result;
+                if (type.IsConstructedGenericType)
+                {
+                    // Assemble the generic types on top of this
+                    string genericTypes = string.Join(", ", type.GenericTypeArguments.Select(t => t.ComposeDefFormatted()));
+                    result = $"{baseTypeString}<{genericTypes}>";
+                }
+                else
+                {
+                    result = baseTypeString;
+                }
+
+                ComposeCache[type] = result;
+                return result;
+            }
+        }
+
+        internal static void ClearCache()
+        {
+            ComposeCache.Clear();
+            ParseCache.Clear();
+
+            // Seed with our primitive types
             for (int i = 0; i < PrimitiveTypes.Length; ++i)
             {
-                if (type == PrimitiveTypes[i].type)
-                {
-                    return PrimitiveTypes[i].str;
-                }
+                ComposeCache[PrimitiveTypes[i].type] = PrimitiveTypes[i].str;
+                ParseCache[PrimitiveTypes[i].str] = PrimitiveTypes[i].type;
             }
+        }
 
-            Type baseType = type;
-            if (type.IsConstructedGenericType)
-            {
-                baseType = type.GetGenericTypeDefinition();
-            }
-
-            string baseString = baseType.FullName.Replace("+", ".");
-            string bestPrefix = "";
-            foreach (var prefix in Config.UsingNamespaces)
-            {
-                string prospective = prefix + ".";
-                if (bestPrefix.Length < prospective.Length && baseString.StartsWith(prospective))
-                {
-                    bestPrefix = prospective;
-                }
-            }
-
-            // Strip out the generic parameter count
-            int genericVariableSpecifier = baseString.IndexOfUnbounded('`');
-
-            string baseTypeString = baseString.Substring(bestPrefix.Length, genericVariableSpecifier - bestPrefix.Length);
-
-            if (type.IsConstructedGenericType)
-            {
-                // Assemble the generic types on top of this
-                string genericTypes = string.Join(", ", type.GenericTypeArguments.Select(t => t.ComposeDefFormatted()));
-                return $"{baseTypeString}<{genericTypes}>";
-            }
-            else
-            {
-                return baseTypeString;
-            }
+        static UtilType()
+        {
+            // seed the cache
+            ClearCache();
         }
     }
 }

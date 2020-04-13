@@ -141,6 +141,9 @@ namespace DefTest
 
                 Def.Database.Clear();
 
+                // This is a janky hack; it resets the type caches so we also generate errors again properly.
+                Def.Config.UsingNamespaces = Def.Config.UsingNamespaces;
+
                 void RunParser()
                 {
                     var parser = new Def.Parser();

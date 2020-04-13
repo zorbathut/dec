@@ -98,7 +98,15 @@ namespace Def
         /// <example>
         /// Config.UsingNamespaces = new string[] { "LegendOfAzureFuton" };
         /// </example>
-        public static IEnumerable<string> UsingNamespaces { get => UsingNamespaceBacking; set { UsingNamespaceBacking = value.ToArray(); } }
+        public static IEnumerable<string> UsingNamespaces
+        {
+            get => UsingNamespaceBacking;
+            set
+            {
+                UsingNamespaceBacking = value.ToArray();
+                UtilType.ClearCache();
+            }
+        }
         private static string[] UsingNamespaceBacking = new string[0];
 
         /// <summary>
