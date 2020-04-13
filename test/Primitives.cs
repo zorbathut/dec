@@ -304,7 +304,9 @@ namespace DefTest
         [Test]
 	    public void TypeBasic([Values] BehaviorMode mode)
 	    {
+            Def.Config.UsingNamespaces = new string[] { "DefTest.Primitives" };
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -325,7 +327,9 @@ namespace DefTest
         [Test]
 	    public void TypeNested([Values] BehaviorMode mode)
 	    {
+            Def.Config.UsingNamespaces = new string[] { "DefTest.Primitives", "DefTest.Primitives.ContainerA", "DefTest.Primitives.ContainerB" };
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -346,7 +350,9 @@ namespace DefTest
         [Test]
 	    public void TypeStatic([Values] BehaviorMode mode)
 	    {
+            Def.Config.UsingNamespaces = new string[] { "DefTest.Primitives" };
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -367,7 +373,9 @@ namespace DefTest
         [Test]
 	    public void TypeAbstract([Values] BehaviorMode mode)
 	    {
+            Def.Config.UsingNamespaces = new string[] { "DefTest.Primitives" };
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -472,7 +480,9 @@ namespace DefTest
         [Test]
 	    public void TypeOverridden([Values] BehaviorMode mode)
 	    {
+            Def.Config.UsingNamespaces = new string[] { "DefTest.Primitives", "DefTest.Primitives.ContainerA", "DefTest.Primitives.ContainerB" };
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -482,7 +492,7 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode);
+            DoBehavior(mode, expectErrors: true);
 
             var result = Def.Database<TypeDef>.Get("TestDef");
             Assert.IsNotNull(result);

@@ -16,6 +16,7 @@ namespace DefTest
 	    public void Array([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ArrayDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -48,6 +49,7 @@ namespace DefTest
 	    public void List([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ListDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -82,6 +84,7 @@ namespace DefTest
         public void ListOverride([Values] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ListOverrideDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -113,6 +116,7 @@ namespace DefTest
 	    public void Nested([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(NestedDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -148,6 +152,7 @@ namespace DefTest
 	    public void DictionaryString([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(DictionaryStringDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -172,6 +177,7 @@ namespace DefTest
         public void DictionaryLi([Values] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryStringDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -202,6 +208,7 @@ namespace DefTest
         public void DictionaryHybrid([Values] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryStringDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -229,6 +236,7 @@ namespace DefTest
 	    public void DictionaryDuplicate([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(DictionaryStringDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -260,6 +268,7 @@ namespace DefTest
         public void DictionaryOverrideString([Values] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryStringOverrideDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>

@@ -3,8 +3,17 @@ namespace DefTest
     using NUnit.Framework;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reflection;
     using System.Xml.Linq;
+
+    public class WithinNamespace
+    {
+        public class NestedClass
+        {
+
+        }
+    }
 
     [TestFixture]
     public class TypeSerialization : Base
@@ -15,12 +24,12 @@ namespace DefTest
         [OneTimeSetUp]
         public void CreateCallbacks()
         {
-            var reflectionClass = Assembly.GetAssembly(typeof(Def.Def)).GetType("Def.UtilReflection");
+            var reflectionClass = Assembly.GetAssembly(typeof(Def.Def)).GetType("Def.UtilType");
 
-            var serialize = reflectionClass.GetMethod("ToStringDefFormatted", BindingFlags.NonPublic | BindingFlags.Static);
+            var serialize = reflectionClass.GetMethod("ComposeDefFormatted", BindingFlags.NonPublic | BindingFlags.Static);
             serializeType = type => (string)serialize.Invoke(null, new object[] { type });
 
-            var parse = reflectionClass.GetMethod("ParseTypeDefFormatted", BindingFlags.NonPublic | BindingFlags.Static);
+            var parse = reflectionClass.GetMethod("ParseDefFormatted", BindingFlags.NonPublic | BindingFlags.Static);
             parseType = str => (Type)parse.Invoke(null, new object[] { str, "XXX", -1 });
         }
 
@@ -35,8 +44,11 @@ namespace DefTest
 
         public void TypeConversionBidirectional(Type type, string str)
         {
-            Assert.AreEqual(str, serializeType(type));
-            Assert.AreEqual(type, parseType(str));
+            string serialized = serializeType(type);
+            Type parsed = parseType(str);
+
+            Assert.AreEqual(str, serialized);
+            Assert.AreEqual(type, parsed);
         }
 
         public void TypeConversionOpaque(Type type)
@@ -57,20 +69,21 @@ namespace DefTest
         public void DefName()
         {
             TypeConversionBidirectional(typeof(Def.Def), "Def.Def");
-            Assert.AreEqual(typeof(Def.Def), parseType("Def"));
         }
 
         [Test]
         public void OutsideDef()
         {
-            Assert.AreEqual(typeof(Meta), parseType("Meta"));
-            Assert.AreEqual(typeof(TypeSerialization), parseType("TypeSerialization"));
+            Def.Config.UsingNamespaces = new string[] { "DefTest" };
+
+            TypeConversionBidirectional(typeof(Meta), "Meta");
+            TypeConversionBidirectional(typeof(TypeSerialization), "TypeSerialization");
         }
 
         [Test]
         public void System()
         {
-            Assert.AreEqual(typeof(XDocument), parseType("XDocument"));
+            Assert.AreEqual(typeof(XDocument), parseType("System.Xml.Linq.XDocument"));
         }
 
         [Test]
@@ -82,6 +95,9 @@ namespace DefTest
         [Test]
         public void Overloaded()
         {
+            // I'm not really guaranteed any of these besides System.IO, but this way at least I've got a good shot.
+            Def.Config.UsingNamespaces = new string[] { "System.IO", "System.Internal", "NUnit.VisualStudio.TestAdapter.Dump" };
+
             ExpectErrors(() => Assert.IsNotNull(parseType("File")));
         }
 
@@ -117,5 +133,51 @@ namespace DefTest
         {
             TypeConversionOpaque(typeof(Dictionary<Def.Def, Meta>));
         }
+
+        public class WithinClass { }
+
+        [Test]
+        public void UsingNonexistent()
+        {
+            TypeConversionBidirectional(typeof(WithinNamespace), "DefTest.WithinNamespace");
+            TypeConversionBidirectional(typeof(WithinNamespace.NestedClass), "DefTest.WithinNamespace.NestedClass");
+            TypeConversionBidirectional(typeof(WithinClass), "DefTest.TypeSerialization.WithinClass");
+        }
+
+        [Test]
+        public void UsingPartial()
+        {
+            Def.Config.UsingNamespaces = new string[] { "DefTest" };
+
+            TypeConversionBidirectional(typeof(WithinNamespace), "WithinNamespace");
+            TypeConversionBidirectional(typeof(WithinNamespace.NestedClass), "WithinNamespace.NestedClass");
+            TypeConversionBidirectional(typeof(WithinClass), "TypeSerialization.WithinClass");
+        }
+
+        [Test]
+        public void UsingLeapfrog()
+        {
+            Def.Config.UsingNamespaces = new string[] { "DefTest.TypeSerialization" };
+
+            TypeConversionBidirectional(typeof(WithinNamespace), "DefTest.WithinNamespace");
+            TypeConversionBidirectional(typeof(WithinNamespace.NestedClass), "DefTest.WithinNamespace.NestedClass");
+            TypeConversionBidirectional(typeof(WithinClass), "WithinClass");
+        }
+
+        [Test]
+        public void UsingExists()
+        {
+            Def.Config.UsingNamespaces = new string[] { "DefTest", "DefTest.TypeSerialization" };
+
+            TypeConversionBidirectional(typeof(WithinNamespace), "WithinNamespace");
+            TypeConversionBidirectional(typeof(WithinNamespace.NestedClass), "WithinNamespace.NestedClass");
+            TypeConversionBidirectional(typeof(WithinClass), "WithinClass");
+
+            // Fully specified always has to work
+            Assert.AreEqual(typeof(WithinNamespace), parseType("DefTest.WithinNamespace"));
+            Assert.AreEqual(typeof(WithinNamespace.NestedClass), parseType("DefTest.WithinNamespace.NestedClass"));
+            Assert.AreEqual(typeof(WithinClass), parseType("DefTest.TypeSerialization.WithinClass"));
+        }
+
     }
 }

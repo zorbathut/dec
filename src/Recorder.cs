@@ -377,7 +377,7 @@ namespace Def
                 src.SetAttributeValue("ref", refblock.Value);
 
                 // We may not have had a class to begin with, but we sure need one now!
-                result.SetAttributeValue("class", refblock.Key.GetType().ToStringDefFormatted());
+                result.SetAttributeValue("class", refblock.Key.GetType().ComposeDefFormatted());
 
                 yield return new KeyValuePair<string, XElement>(refblock.Value, result);
             }

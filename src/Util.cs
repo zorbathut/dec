@@ -13,5 +13,31 @@ namespace Def
         {
             return input.Replace("_", "").ToLower();
         }
+
+        internal static int IndexOfUnbounded(this string input, char character)
+        {
+            int index = input.IndexOf(character);
+            if (index == -1)
+            {
+                return input.Length;
+            }
+            else
+            {
+                return index;
+            }
+        }
+
+        internal static int IndexOfUnbounded(this string input, char character, int start)
+        {
+            int index = input.IndexOf(character, start);
+            if (index == -1)
+            {
+                return input.Length;
+            }
+            else
+            {
+                return index;
+            }
+        }
     }
 }

@@ -21,6 +21,7 @@ namespace DefTest
 	    public void ChildClass([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(CCRoot) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -56,6 +57,7 @@ namespace DefTest
 	    public void ChildClassDefaults([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(CCDRoot) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -98,6 +100,7 @@ namespace DefTest
 	    public void ChildStruct([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(CSRoot) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -150,7 +153,9 @@ namespace DefTest
         [Test]
 	    public void ExplicitType([Values] BehaviorMode mode)
 	    {
+            Def.Config.UsingNamespaces = new string[] { "DefTest.Children" };
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ExplicitTypeDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -175,7 +180,9 @@ namespace DefTest
         [Test]
 	    public void ExplicitTypeOverspecify([Values] BehaviorMode mode)
 	    {
+            Def.Config.UsingNamespaces = new string[] { "DefTest.Children" };
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ExplicitTypeDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -200,6 +207,7 @@ namespace DefTest
 	    public void ExplicitTypeBackwards([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ExplicitTypeDerivedDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>

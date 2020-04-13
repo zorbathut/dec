@@ -1,6 +1,8 @@
 namespace Def
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
 
     #if UNITY_5_3_OR_NEWER
         using UnityEngine;
@@ -84,6 +86,20 @@ namespace Def
         /// Ignored if you're not using the default handlers.
         /// </remarks>
         public static bool DefaultHandlerShowConfigOnException = true;
+
+        /// <summary>
+        /// The list of namespaces that def can access transparently.
+        /// </summary>
+        /// <remarks>
+        /// Generally this should consist of your project's primary namespace. If your project lives in multiple namespaces, you may wish to include them all.
+        ///
+        /// Should not be changed while a Parser or Writer object exists.
+        /// </remarks>
+        /// <example>
+        /// Config.UsingNamespaces = new string[] { "LegendOfAzureFuton" };
+        /// </example>
+        public static IEnumerable<string> UsingNamespaces { get => UsingNamespaceBacking; set { UsingNamespaceBacking = value.ToArray(); } }
+        private static string[] UsingNamespaceBacking = new string[0];
 
         /// <summary>
         /// Parameters that are intended for unit tests. Not recommended or supported for actual code.

@@ -48,6 +48,7 @@ namespace DefTest
 	    public void BasicFunctionality([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterDef) }, explicitConverters = new Type[]{ typeof(ConverterBasicTest) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -142,6 +143,7 @@ namespace DefTest
 	    public void ConverterDict([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterDictDef) }, explicitConverters = new Type[]{ typeof(ConverterDictTest) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -173,6 +175,7 @@ namespace DefTest
         public void EmptyInputConverter([Values] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterStringDef) }, explicitConverters = new Type[]{ typeof(ConverterDictTest) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -201,6 +204,7 @@ namespace DefTest
         public void DefaultFailureTestString([Values] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterStringDef) }, explicitConverters = new Type[]{ typeof(DefaultFailureConverter) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -220,6 +224,7 @@ namespace DefTest
         public void DefaultFailureTestXml([Values] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterStringDef) }, explicitConverters = new Type[]{ typeof(DefaultFailureConverter) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -260,6 +265,7 @@ namespace DefTest
         public void ConvertToNull()
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(NonEmptyPayloadDef) }, explicitConverters = new Type[]{ typeof(DefaultNullConverter) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -320,6 +326,7 @@ namespace DefTest
         public void ConverterStruct([Values] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ConverterStructDef) }, explicitConverters = new Type[] { typeof(ConverterStructConverter) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -388,6 +395,7 @@ namespace DefTest
         public void Fallback([Values] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(FallbackDef) }, explicitConverters = new Type[] { typeof(FallbackConverter) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>

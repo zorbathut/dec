@@ -3,6 +3,9 @@
 ## Define some classes derived from [`Def.Def`](xref:Def.Def).
 
 ```cs
+namespace ExampleGame
+{
+
 // The starting point for all defs is a class derived from Def.Def.
 // Here, we're defining a general template for monsters.
 class MonsterDef : Def.Def
@@ -41,6 +44,8 @@ class Color
 class SpriteSheetDef : Def.Def
 {
   public string filename;
+}
+
 }
 ```
 
@@ -92,16 +97,18 @@ class SpriteSheetDef : Def.Def
 ## Initialize the def framework via [`Parser`](xref:Def.Parser).
 
 ```cs
+// Add our namespace so Def doesn't require lots of verbose namespace specifications.
+Config.AddUsingNamespace("ExampleGame");
+
 // The Parser class handles all def initialization.
 var parser = new Parser();
 
-// Add individual XML documents through .AddString().
-// The second parameter is a file identifier to use for debugging. Use whatever is most convenient for you.
+// Add individual XML documents through .AddFile(), or .AddString() if you need to load them manually.
 // It's common to read from on-disk files, but you can get the data from any source you want.
-parser.AddString(File.ReadAllText("goblinData.xml"), "goblinData.xml");
+parser.AddFile("goblinData.xml");
 
 // Keep adding files until you've added everything.
-parser.AddString(File.ReadAllText("elfData.xml"), "elfData.xml");
+parser.AddFile("elfData.xml");
 
 // Call when you've added everything. This finishes all parsing.
 parser.Finish();

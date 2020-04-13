@@ -445,7 +445,7 @@ namespace Def
                     return null;
                 }
 
-                return UtilReflection.ParseTypeDefFormatted(text, inputName, lineNumber);
+                return UtilType.ParseDefFormatted(text, inputName, lineNumber);
             }
 
             // Various non-composite-type special-cases
@@ -502,7 +502,7 @@ namespace Def
 
             if (value is Type)
             {
-                result.Add(new XText((value as Type).ToStringDefFormatted()));
+                result.Add(new XText((value as Type).ComposeDefFormatted()));
 
                 return result;
             }
@@ -546,7 +546,7 @@ namespace Def
             // This is also where we need to start being concerned about types. If we have a type that isn't the expected type, tag it.
             if (value.GetType() != fieldType)
             {
-                result.Add(new XAttribute("class", value.GetType().ComposeTypeDefFormatted()));
+                result.Add(new XAttribute("class", value.GetType().ComposeDefFormatted()));
             }
 
             if (fieldType.IsArray)

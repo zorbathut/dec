@@ -12,6 +12,7 @@ namespace DefTest
 	    public void TrivialParse([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -29,6 +30,7 @@ namespace DefTest
 	    public void TrivialEmptyParse([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -63,6 +65,7 @@ namespace DefTest
 	    public void MissingDefType([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } };
+
             var parser = new Def.Parser();
             ExpectErrors(() => parser.AddString(@"
                 <Defs>
@@ -120,6 +123,7 @@ namespace DefTest
 	    public void DuplicateField([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(IntDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -142,6 +146,7 @@ namespace DefTest
 	    public void DuplicateDef([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(IntDef) } };
+
             var parser = new Def.Parser();
             ExpectErrors(() => parser.AddString(@"
                 <Defs>
@@ -176,6 +181,7 @@ namespace DefTest
 	    public void HierarchyDeepField([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(DeepChildDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -216,6 +222,7 @@ namespace DefTest
 	    public void HierarchyDuplicateField([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(DupeChildDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -238,6 +245,7 @@ namespace DefTest
 	    public void ExtraAttribute([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -264,6 +272,7 @@ namespace DefTest
 	    public void DebugPrint([Values] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -295,6 +304,7 @@ namespace DefTest
 	    public void ConfigErrors([Values] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ErrorDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -326,6 +336,7 @@ namespace DefTest
 	    public void PostLoad([Values] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(PostLoadDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -348,6 +359,7 @@ namespace DefTest
         public void DefMember([Values] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DefMemberDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -372,6 +384,7 @@ namespace DefTest
         public void SelfReferential([Values] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SelfReferentialDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -398,6 +411,7 @@ namespace DefTest
         public void LooseMatchCapitalization([Values] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(LooseMatchDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -414,6 +428,7 @@ namespace DefTest
         public void LooseMatchSnakeToCamel([Values] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(LooseMatchDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -430,6 +445,7 @@ namespace DefTest
         public void LooseMatchCamelToSnake([Values] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(LooseMatchDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -446,6 +462,7 @@ namespace DefTest
         public void ForbiddenField([Values] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDef) } };
+
             var parser = new Def.Parser();
 
             // This is a little silly because, as of this writing, DefName is a property and we don't even support writing to properties.

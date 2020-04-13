@@ -161,8 +161,8 @@ namespace Def
                 {
                     string typeName = defElement.Name.LocalName;
 
-                    Type typeHandle = typeLookup.TryGetValue(typeName);
-                    if (typeHandle == null)
+                    Type typeHandle = UtilType.ParseDefFormatted(typeName, stringName, defElement.LineNumber());
+                    if (typeHandle == null || !typeof(Def).IsAssignableFrom(typeHandle))
                     {
                         Dbg.Err($"{stringName}:{defElement.LineNumber()}: {typeName} is not a valid root Def type");
                         continue;

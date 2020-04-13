@@ -97,60 +97,6 @@ namespace Def
             return AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes());
         }
 
-        internal static string ToStringDefFormatted(this Type type)
-        {
-            return type.ToString();
-        }
-
-        private static Type GetTypeCallback(Assembly requestedAssembly, string typeName, bool ignoreCase)
-        {
-            if (requestedAssembly != null)
-            {
-                return requestedAssembly.GetType(typeName, false, ignoreCase);
-            }
-
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                var result = assembly.GetType(typeName, false, ignoreCase);
-                if (result != null)
-                {
-                    return result;
-                }
-            }
-            
-            return null;
-        }
-
-        internal static Type ParseTypeDefFormatted(string text, string inputLine, int lineNumber)
-        {
-            var possibleType = Type.GetType(text, null, GetTypeCallback);
-            if (possibleType != null)
-            {
-                return possibleType;
-            }
-
-            var possibleTypes = UtilReflection.GetAllTypes().Where(t => t.Name == text || t.FullName == text).ToArray();
-            if (possibleTypes.Length == 0)
-            {
-                Dbg.Err($"{inputLine}:{lineNumber}: Couldn't find type named {text}");
-                return null;
-            }
-            else if (possibleTypes.Length > 1)
-            {
-                Dbg.Err($"{inputLine}:{lineNumber}: Found too many types named {text} ({possibleTypes.Select(t => t.FullName).ToCommaString()})");
-                return possibleTypes[0];
-            }
-            else
-            {
-                return possibleTypes[0];
-            }
-        }
-
-        internal static string ComposeTypeDefFormatted(this Type type)
-        {
-            return type.Name;
-        }
-
         internal static bool ReflectionSetForbidden(FieldInfo field)
         {
             // Alright, this isn't exactly complicated right now

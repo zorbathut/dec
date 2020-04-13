@@ -48,10 +48,23 @@ namespace Def
                 {
                     // maybe we need a better error message here.
                     Dbg.Err("Multiple items found when only one is expected");
+
+                    // no point in continuing
+                    break;
                 }
             }
 
             return result;
+        }
+
+        internal static IEnumerable<T> Concat<T>(this IEnumerable<T> enumerable, T element)
+        {
+            foreach (var e in enumerable)
+            {
+                yield return e;
+            }
+
+            yield return element;
         }
     }
 }

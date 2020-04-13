@@ -20,6 +20,8 @@ namespace DefTest
 
             handlingErrors = false;
             handledError = false;
+
+            Def.Config.UsingNamespaces = new string[0];
         }
 
         private bool handlingWarnings = false;
