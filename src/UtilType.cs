@@ -4,6 +4,7 @@ namespace Def
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using System.Text.RegularExpressions;
 
     static class UtilType
     {
@@ -45,34 +46,39 @@ namespace Def
             return typeName.StartsWith(defType) && typeName[defType.Length] == '`';
         }
 
+        private static Regex GenericParameterMatcher = new Regex("`[0-9]+", RegexOptions.Compiled);
+        private static Dictionary<string, Type[]> StrippedTypeCache = null;
         private static Type GetTypeFromAnyAssembly(string text)
         {
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            var types = assemblies.Select(asm =>
-                {
-                    {
-                        var type = asm.GetType(text);
-                        if (type != null)
-                        {
-                            return type;
-                        }
-                    }
+            // This is technically unnecessary if we're not parsing a generic, but we may as well do it because the cache will still be faster for nongenerics.
+            // If we really wanted a perf boost here, we'd do one pass for non-template objects, then do it again on a cache miss to fill it with template stuff.
+            // But there's probably much better performance boosts to be seen throughout this.
+            if (StrippedTypeCache == null)
+            {
+                StrippedTypeCache = AppDomain.CurrentDomain.GetAssemblies()
+                    .SelectMany(asm => asm.GetTypes())
+                    .Distinct()
+                    .GroupBy(t => GenericParameterMatcher.Replace(t.FullName, ""))
+                    .ToDictionary(
+                        group => group.Key,
+                        group => group.ToArray());
+            }
 
-                    // We haven't found a type, but it's possible that we have a generic that it doesn't recognize.
-                    // This is unnecessarily slow and I absolutely need to fix it. For now? Let's just check everything!
-                    foreach (var type in asm.GetTypes())
-                    {
-                        if (MatchesWithGeneric(type.FullName, text))
-                        {
-                            return type;
-                        }
-                    }
+            var result = StrippedTypeCache.TryGetValue(text);
 
-                    return null;
-                });
-
-            // "Distinct" is needed because some types, especially primitive types, seem to show up in multiple assemblies for unclear reasons
-            return types.Where(t => t != null).Distinct().SingleOrDefaultChecked();
+            if (result == null)
+            {
+                return null;
+            }
+            else if (result.Length == 1)
+            {
+                return result[0];
+            }
+            else
+            {
+                Dbg.Err($"Too many types found with name {text}");
+                return result[0];
+            }
         }
 
         private static Type ParseWithoutNamespace(Type root, string text)
@@ -339,6 +345,7 @@ namespace Def
         {
             ComposeCache.Clear();
             ParseCache.Clear();
+            StrippedTypeCache = null;
 
             // Seed with our primitive types
             for (int i = 0; i < PrimitiveTypes.Length; ++i)
