@@ -380,19 +380,7 @@ namespace Def
 
 
             // Set up our index fields; this has to happen last in case we're a struct
-            {
-                var indices = UtilReflection.GetIndicesForType(model.GetType());
-                if (indices != null)
-                {
-                    for (int i = 0; i < indices.Length; ++i)
-                    {
-                        // We can do these in a single loop because structs can't have parents and order doesn't matter for classes.
-                        // Preregister/register combo is required for structs; if you send it to the index system before the int is set, the index system would also have to set it.
-                        indices[i].field.SetValue(model, Index.Preregister(indices[i].type));
-                        Index.Register(indices[i].type, model);
-                    }
-                }
-            }
+            Index.Register(ref model);
 
             return model;
         }

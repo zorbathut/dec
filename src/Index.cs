@@ -3,10 +3,18 @@ namespace Def
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
 
     internal static class Index
     {
         private static readonly HashSet<Type> Indices = new HashSet<Type>();
+
+        // NOTE: This whole thing came across when I was trying to pass a reference to a struct into a function.
+        // As near as I can tell, the important part is that you ref it *once*, not twice. If you use ref again you end up with a reference to the struct's box, which I suppose makes sense.
+        // While trying to figure this out I ended up building this little layer which also functions as a cache layer. It's probably a nice speed boost.
+        // It's also probably unnecessary, but, whatever, it's written, just gonna leave it in place.
+        // If this code seems silly: you're not wrong..
+        private static Dictionary<Type, Action<object, FieldInfo>> RegisterFunctions = new Dictionary<Type, Action<object, FieldInfo>>();
 
         /// <summary>
         /// Clears all index state, preparing the environment for a new Parser run.
@@ -21,24 +29,29 @@ namespace Def
                 db.GetMethod("Clear", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic).Invoke(null, null);
             }
             Indices.Clear();
+            RegisterFunctions.Clear();
         }
 
-        internal static int Preregister(Type indexType)
+        internal static void Register(ref object instance)
         {
-            var dbType = typeof(Index<>).MakeGenericType(new[] { indexType });
-            Indices.Add(dbType);
+            var indices = UtilReflection.GetIndicesForType(instance.GetType());
+            if (indices != null)
+            {
+                for (int i = 0; i < indices.Length; ++i)
+                {
+                    var registerFunction = RegisterFunctions.TryGetValue(indices[i].type);
+                    if (registerFunction == null)
+                    {
+                        var dbType = typeof(Index<>).MakeGenericType(new[] { indices[i].type });
+                        Indices.Add(dbType);
 
-            var regFunction = dbType.GetMethod("Preregister", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
-            return (int)regFunction.Invoke(null, null);
-        }
+                        registerFunction = dbType.GetMethod("Register", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic).CreateDelegate(typeof(Action<object, FieldInfo>)) as Action<object, FieldInfo>;
+                        RegisterFunctions[indices[i].type] = registerFunction;
+                    }
 
-        internal static void Register(Type indexType, object instance)
-        {
-            var dbType = typeof(Index<>).MakeGenericType(new[] { indexType });
-            Indices.Add(dbType);
-
-            var regFunction = dbType.GetMethod("Register", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
-            regFunction.Invoke(null, new[] { instance });
+                    registerFunction(instance, indices[i].field);
+                }
+            }
         }
     }
 
@@ -94,15 +107,16 @@ namespace Def
             return (IndexArray ?? List)[index];
         }
 
-        internal static int Preregister()
+        internal static void Register(object instance, FieldInfo field)
         {
-            return IndexList.Count;
-        }
-
-        internal static void Register(T instance)
-        {
+            // Clear our cached info
             IndexArray = null;
-            IndexList.Add(instance);
+
+            // Set the appropriate member
+            field.SetValue(instance, IndexList.Count);
+
+            // Add this to the list
+            IndexList.Add((T)instance);
         }
 
         internal static void Clear()
