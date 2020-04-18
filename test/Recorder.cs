@@ -498,7 +498,7 @@ namespace DefTest
             Assert.AreEqual(value, deserialized);
         }
 
-        class DoubleLinkedRecorder : Def.IRecordable
+        private class DoubleLinkedRecorder : Def.IRecordable
         {
             public DoubleLinkedRecorder a;
             public DoubleLinkedRecorder b;

@@ -35,17 +35,17 @@ namespace DefTest
             Assert.IsTrue(Def.Database<StubDef>.List.Contains(Def.Database<StubDef>.Get("TestDefC")));
         }
 
-        class RootDef : Def.Def
+        private class RootDef : Def.Def
         {
 
         }
 
-        class ParentDef : RootDef
+        private class ParentDef : RootDef
         {
 
         }
 
-        class ChildDef : ParentDef
+        private class ChildDef : ParentDef
         {
 
         }
@@ -89,7 +89,7 @@ namespace DefTest
             Assert.Contains(child, Def.Database.List.ToArray());
         }
 
-        class NotActuallyADef
+        private class NotActuallyADef
         {
 
         }

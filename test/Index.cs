@@ -15,7 +15,7 @@ namespace DefTest
 
         public class IndexDerivedDef : IndexBaseDef
         {
-            [Def.Index] public int index;
+            [Def.Index] public new int index;
         }
 
         public class IndexLeafDef : StubDef

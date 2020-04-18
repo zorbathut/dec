@@ -2,6 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    
+    <!-- 0649: "is never assigned to, and will always have its default value null". This is obviously pointless with such a reflection-heavy library. -->
+    <NoWarn>0649</NoWarn>
   </PropertyGroup>
   
   <ItemGroup>

@@ -6,7 +6,7 @@ namespace Def
     using System.Reflection;
     using System.Text.RegularExpressions;
 
-    static class UtilType
+    internal static class UtilType
     {
         // Our Official Type Format:
         // Namespaces are separated by .'s, for example, LowerNamespace.UpperNamespace.ClassName
