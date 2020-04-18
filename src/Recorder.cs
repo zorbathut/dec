@@ -235,11 +235,21 @@ namespace Def
                 foreach (var reference in refs.Elements())
                 {
                     var id = reference.Attribute("id")?.Value;
+                    if (id == null)
+                    {
+                        // Just skip it, we don't have anything useful we can do here
+                        continue;
+                    }
 
                     // The serialization routines don't know how to deal with this, so we'll remove it now
                     reference.Attribute("id").Remove();
 
-                    var refInstance = readerContext.refs[id];
+                    var refInstance = readerContext.refs.TryGetValue(id);
+                    if (refInstance == null)
+                    {
+                        // We failed to parse this for some reason, so just skip it now
+                        continue;
+                    }
 
                     // Do our actual parsing
                     var refInstanceOutput = Serialization.ParseElement(reference, refInstance.GetType(), refInstance, readerContext, hasReferenceId: true);

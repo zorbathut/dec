@@ -3,7 +3,7 @@ namespace DefTest
     using NUnit.Framework;
     using System;
     using System.Collections.Generic;
-    using System.Text.RegularExpressions;
+    using System.Linq;
 
     [TestFixture]
     public class Recorder : Base
@@ -658,6 +658,170 @@ namespace DefTest
 
             Assert.AreEqual(42, deserialized.baseContainer.baseVal);
             Assert.AreEqual(81, ( root.baseContainer as DerivedRecordable ).derivedVal);
+        }
+
+        [Test]
+        public void BadRefTag()
+        {
+            string serialized = @"
+                <Record>
+                  <recordFormatVersion>1</recordFormatVersion>
+                  <refs>
+                    <Raf id=""ref00000"" class=""DefTest.Recorder.RefsChildRecordable"" />
+                  </refs>
+                  <data>
+                    <childAone ref=""ref00000"" />
+                    <childAtwo ref=""ref00000"" />
+                    <childB />
+                    <childEmpty null=""true"" />
+                  </data>
+                </Record>";
+            RefsRootRecordable deserialized = null;
+            ExpectWarnings(() => deserialized = Def.Recorder.Read<RefsRootRecordable>(serialized));
+
+            Assert.IsNotNull(deserialized.childAone);
+            Assert.IsNotNull(deserialized.childAtwo);
+            Assert.IsNotNull(deserialized.childB);
+            Assert.IsNull(deserialized.childEmpty);
+
+            Assert.AreEqual(deserialized.childAone, deserialized.childAtwo);
+            Assert.AreNotEqual(deserialized.childAone, deserialized.childB);
+        }
+
+        [Test]
+        public void MissingId()
+        {
+            string serialized = @"
+                <Record>
+                  <recordFormatVersion>1</recordFormatVersion>
+                  <refs>
+                    <Ref class=""DefTest.Recorder.RefsChildRecordable"" />
+                    <Ref id=""ref00000"" class=""DefTest.Recorder.RefsChildRecordable"" />
+                  </refs>
+                  <data>
+                    <childAone ref=""ref00000"" />
+                    <childAtwo ref=""ref00000"" />
+                    <childB />
+                    <childEmpty null=""true"" />
+                  </data>
+                </Record>";
+            RefsRootRecordable deserialized = null;
+            ExpectErrors(() => deserialized = Def.Recorder.Read<RefsRootRecordable>(serialized));
+
+            Assert.IsNotNull(deserialized.childAone);
+            Assert.IsNotNull(deserialized.childAtwo);
+            Assert.IsNotNull(deserialized.childB);
+            Assert.IsNull(deserialized.childEmpty);
+
+            Assert.AreEqual(deserialized.childAone, deserialized.childAtwo);
+            Assert.AreNotEqual(deserialized.childAone, deserialized.childB);
+        }
+
+        [Test]
+        public void MissingClass()
+        {
+            string serialized = @"
+                <Record>
+                  <recordFormatVersion>1</recordFormatVersion>
+                  <refs>
+                    <Ref id=""PLACE"" />
+                    <Ref id=""ref00000"" class=""DefTest.Recorder.RefsChildRecordable"" />
+                  </refs>
+                  <data>
+                    <childAone ref=""ref00000"" />
+                    <childAtwo ref=""ref00000"" />
+                    <childB />
+                    <childEmpty null=""true"" />
+                  </data>
+                </Record>";
+            RefsRootRecordable deserialized = null;
+            ExpectErrors(() => deserialized = Def.Recorder.Read<RefsRootRecordable>(serialized));
+
+            Assert.IsNotNull(deserialized.childAone);
+            Assert.IsNotNull(deserialized.childAtwo);
+            Assert.IsNotNull(deserialized.childB);
+            Assert.IsNull(deserialized.childEmpty);
+
+            Assert.AreEqual(deserialized.childAone, deserialized.childAtwo);
+            Assert.AreNotEqual(deserialized.childAone, deserialized.childB);
+        }
+
+        struct AStruct { }
+
+        [Test]
+        public void RefStruct()
+        {
+            string serialized = @"
+                <Record>
+                  <recordFormatVersion>1</recordFormatVersion>
+                  <refs>
+                    <Ref id=""PLACE"" class=""DefTest.Recorder.AStruct"" />
+                    <Ref id=""ref00000"" class=""DefTest.Recorder.RefsChildRecordable"" />
+                  </refs>
+                  <data>
+                    <childAone ref=""ref00000"" />
+                    <childAtwo ref=""ref00000"" />
+                    <childB />
+                    <childEmpty null=""true"" />
+                  </data>
+                </Record>";
+            RefsRootRecordable deserialized = null;
+            ExpectErrors(() => deserialized = Def.Recorder.Read<RefsRootRecordable>(serialized));
+
+            Assert.IsNotNull(deserialized.childAone);
+            Assert.IsNotNull(deserialized.childAtwo);
+            Assert.IsNotNull(deserialized.childB);
+            Assert.IsNull(deserialized.childEmpty);
+
+            Assert.AreEqual(deserialized.childAone, deserialized.childAtwo);
+            Assert.AreNotEqual(deserialized.childAone, deserialized.childB);
+        }
+
+        [Test]
+        public void PointlessRef()
+        {
+            // This is weird, but right now it's OK.
+
+            string serialized = @"
+                <Record>
+                  <recordFormatVersion>1</recordFormatVersion>
+                  <refs>
+                    <Ref id=""PLACE"" class=""DefTest.Recorder.RefsChildRecordable"" />
+                    <Ref id=""ref00000"" class=""DefTest.Recorder.RefsChildRecordable"" />
+                  </refs>
+                  <data>
+                    <childAone ref=""ref00000"" />
+                    <childAtwo ref=""ref00000"" />
+                    <childB />
+                    <childEmpty null=""true"" />
+                  </data>
+                </Record>";
+            RefsRootRecordable deserialized = Def.Recorder.Read<RefsRootRecordable>(serialized);
+
+            Assert.IsNotNull(deserialized.childAone);
+            Assert.IsNotNull(deserialized.childAtwo);
+            Assert.IsNotNull(deserialized.childB);
+            Assert.IsNull(deserialized.childEmpty);
+
+            Assert.AreEqual(deserialized.childAone, deserialized.childAtwo);
+            Assert.AreNotEqual(deserialized.childAone, deserialized.childB);
+        }
+
+        public class AttributeRecordable : Def.IRecordable
+        {
+            public string attributing = "";
+
+            public void Record(Def.Recorder record)
+            {
+                if (record.Mode == Def.Recorder.Direction.Read)
+                {
+                    attributing = record.Xml.Attributes().Single(attr => attr.Name == "converted").Value;
+                }
+                else
+                {
+                    record.Xml.SetAttributeValue("converted", attributing);
+                }
+            }
         }
     }
 }
