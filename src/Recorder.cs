@@ -165,6 +165,7 @@ namespace Def
 
             if (doc.Elements().Count() > 1)
             {
+                // This isn't testable, unfortunately; XDocument doesn't even support multiple root elements.
                 Dbg.Err($"{stringName}: Found {doc.Elements().Count()} root elements instead of the expected 1");
             }
 
@@ -226,6 +227,7 @@ namespace Def
                     readerContext.refs[id] = Activator.CreateInstance(possibleType);
                     if (readerContext.refs[id] == null)
                     {
+                        // This is difficult to test; there are very few things that can get CreateInstance to return null, and right now the type system doesn't support them (int? for example)
                         Dbg.Err($"{stringName}:{reference.LineNumber()}: Reference of type {possibleType} was not properly created; this will cause issues");
                         continue;
                     }

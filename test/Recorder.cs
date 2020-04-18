@@ -871,5 +871,32 @@ namespace DefTest
             Assert.AreSame(holder.a, holder.b);
             Assert.AreSame(holder.a, holder.c);
         }
+
+        public class MultiRecordRec : Def.IRecordable
+        {
+            public int x;
+            public int y;
+
+            public void Record(Def.Recorder record)
+            {
+                record.Record(ref x, "x");
+                record.Record(ref y, "x");  // oops!
+            }
+        }
+
+        [Test]
+        public void MultiRecord()
+        {
+            var mr = new MultiRecordRec();
+            mr.x = 3;
+            mr.y = 5;
+
+            string serialized = null;
+            ExpectErrors(() => serialized = Def.Recorder.Write(mr, pretty: true));
+            var deserialized = Def.Recorder.Read<MultiRecordRec>(serialized);
+
+            Assert.AreEqual(mr.x, deserialized.x);
+            // y's value is left undefined
+        }
     }
 }
