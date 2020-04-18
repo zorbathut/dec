@@ -300,5 +300,21 @@ namespace DefTest
             ExpectErrors(() => parseType(">"));
             ExpectErrors(() => parseType("<>"));
         }
+
+        [Test]
+        public void OverloadedNames()
+        {
+            Def.Config.UsingNamespaces = new string[] { "DefTest.OverloadedNames" };
+
+            // In theory we could handle this one properly; right now, we don't, though, and I want to make sure it does the right thing when it stops generating errors
+            ExpectErrors(() => parseType("Foo"));
+            ExpectErrors(() => parseType("Foo<int>"));
+        }
+    }
+
+    namespace OverloadedNames
+    {
+        public class Foo { }
+        public class Foo<T> { }
     }
 }
