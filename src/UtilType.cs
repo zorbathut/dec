@@ -144,7 +144,7 @@ namespace Def
                     int tokenEnd = tokenStart;
 
                     int nestedBrackets = 0;
-                    while (tokenEnd < text.Length)
+                    while (true)
                     {
                         // just so we can stop calling this function
                         char kar = text[tokenEnd];
@@ -174,6 +174,13 @@ namespace Def
 
                         // consume another character!
                         ++tokenEnd;
+
+                        if (tokenEnd >= text.Length)
+                        {
+                            // We've hit the end; this is a failure, but it'll be picked up by the below error
+                            tokenStart = tokenEnd;
+                            break;
+                        }
                     }
                 }
 

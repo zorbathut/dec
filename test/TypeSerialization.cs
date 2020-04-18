@@ -285,6 +285,7 @@ namespace DefTest
             // This is just me verifying a bunch of template error behaviors.
             ExpectErrors(() => parseType("int<int>"));
             ExpectErrors(() => parseType("Generic<>"));
+            ExpectErrors(() => parseType("Generic<int"));
             ExpectErrors(() => parseType("Generic<int, int>"));
             ExpectErrors(() => parseType("Generic<int><int>"));
             ExpectErrors(() => parseType("Generic<int>>"));
