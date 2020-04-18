@@ -183,6 +183,24 @@ namespace DefTest
         }
 
         [Test]
+        public void CreateDeleteHierarchy()
+        {
+            var a = Def.Database.Create<LeafADef>("A");
+
+            Assert.AreSame(a, Def.Database<RootDef>.Get("A"));
+            Assert.AreSame(a, Def.Database<LeafADef>.Get("A"));
+            Assert.AreSame(a, Def.Database.Get(typeof(RootDef), "A"));
+            Assert.AreSame(a, Def.Database.Get(typeof(LeafADef), "A"));
+
+            Def.Database.Delete(a);
+
+            Assert.IsNull(Def.Database<RootDef>.Get("A"));
+            Assert.IsNull(Def.Database<LeafADef>.Get("A"));
+            Assert.IsNull(Def.Database.Get(typeof(RootDef), "A"));
+            Assert.IsNull(Def.Database.Get(typeof(LeafADef), "A"));
+        }
+
+        [Test]
         public void Rename([Values] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDef) } };
