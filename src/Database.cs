@@ -63,10 +63,110 @@ namespace Def
         }
 
         /// <summary>
+        /// Creates a Def.
+        /// </summary>
+        /// <remarks>
+        /// This will be supported for dynamically-generated Defs in the future, but right now exists mostly for the Writer functionality. It is currently not recommended to use this during actual gameplay.
+        ///
+        /// At this time, this will not register Indexes. This behavior may change at some point in the future.
+        /// </remarks>
+        public static Def Create(Type type, string defName)
+        {
+            if (!typeof(Def).IsAssignableFrom(type))
+            {
+                Dbg.Err($"Attempting to dynamically create a Def of type {type}, which is not actually a Def");
+                return null;
+            }
+
+            // This is definitely not the most efficient way to do this.
+            return typeof(Database).GetMethod("Create`1").MakeGenericMethod(new[] { type }).Invoke(null, null) as Def;
+        }
+
+        /// <summary>
+        /// Creates a Def.
+        /// </summary>
+        /// <remarks>
+        /// This will be supported for dynamically-generated Defs in the future, but right now exists mostly for the Writer functionality. It is currently not recommended to use this during actual gameplay.
+        ///
+        /// At this time, this will not register Indexes. This behavior may change at some point in the future.
+        /// </remarks>
+        public static T Create<T>(string defName) where T : Def, new()
+        {
+            if (Database<T>.Get(defName) != null)
+            {
+                Dbg.Err($"Attempting to dynamically create {typeof(T)}:{defName} when it already exists");
+                return null;
+            }
+
+            if (Get(UtilReflection.GetDefHierarchyType(typeof(T)), defName) != null)
+            {
+                Dbg.Err($"Attempting to dynamically create {typeof(T)}:{defName} when a conflicting Def already exists");
+                return null;
+            }
+
+            var defInstance = new T();
+            defInstance.DefName = defName;
+
+            Register(defInstance);
+
+            return defInstance;
+        }
+
+        /// <summary>
+        /// Deletes an existing def.
+        /// </summary>
+        /// <remarks>
+        /// This exists mostly for the Writer functionality. It is generally not recommended to use this during actual gameplay.
+        ///
+        /// At this time, this will not unregister existing Indexes. This behavior may change at some point in the future.
+        /// </remarks>
+        public static void Delete(Def def)
+        {
+            if (Get(def.GetType(), def.DefName) != def)
+            {
+                Dbg.Err($"Attempting to delete {def} when it either has already been deleted or never existed");
+                return;
+            }
+
+            Unregister(def);
+        }
+
+        /// <summary>
+        /// Renames an existing def.
+        /// </summary>
+        /// <remarks>
+        /// This exists mostly for the Writer functionality. It is generally not recommended to use this during actual gameplay.
+        /// </remarks>
+        public static void Rename(Def def, string defName)
+        {
+            if (Get(def.GetType(), def.DefName) != def)
+            {
+                Dbg.Err($"Attempting to rename what used to be {def} but is no longer a registered Def");
+                return;
+            }
+
+            if (def.DefName == defName)
+            {
+                // uhhh . . . okay?
+                return;
+            }
+
+            if (Get(UtilReflection.GetDefHierarchyType(def.GetType()), defName) != null)
+            {
+                Dbg.Err($"Attempting to rename {def} to {defName} when it already exists");
+                return;
+            }
+
+            Unregister(def);
+            def.DefName = defName;
+            Register(def);
+        }
+
+        /// <summary>
         /// Clears all global def state, preparing the environment for a new Parser run.
         /// </summary>
         /// <remarks>
-        /// This exists mostly for the sake of unit tests, but can be used in production as well. Be aware that re-parsing XML files will create an entire new set of Def objects, it will not replace data in existing objects.
+        /// This exists mostly for the sake of unit tests. It is generally not recommended to use this during actual gameplay. Be aware that re-parsing XML files will create an entire new set of Def objects, it will not replace data in existing objects.
         /// </remarks>
         public static void Clear()
         {
@@ -100,7 +200,19 @@ namespace Def
                 CachedList = Lookup.Where(kvp => UtilReflection.IsDefHierarchyType(kvp.Key)).SelectMany(kvp => kvp.Value.Values).ToArray();
             }
         }
-        
+
+        private static Dictionary<string, Def> GetLookupFor(Type type)
+        {
+            var typedict = Lookup.TryGetValue(type);
+            if (typedict == null)
+            {
+                typedict = new Dictionary<string, Def>();
+                Lookup[type] = typedict;
+            }
+
+            return typedict;
+        }
+
         internal static void Register(Def instance)
         {
             CachedList = null;
@@ -115,15 +227,38 @@ namespace Def
                 var regFunction = dbType.GetMethod("Register", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
                 regFunction.Invoke(null, new[] { instance });
 
-                var typedict = Lookup.TryGetValue(registrationType);
-                if (typedict == null)
+                // We'll just rely on Database<T> to generate the relevant errors if we're overwriting something
+                GetLookupFor(registrationType)[instance.DefName] = instance;
+
+                if (UtilReflection.IsDefHierarchyType(registrationType))
                 {
-                    typedict = new Dictionary<string, Def>();
-                    Lookup[registrationType] = typedict;
+                    break;
                 }
 
-                // We'll just rely on Database<T> to generate the relevant errors if we're overwriting something
-                typedict[instance.DefName] = instance;
+                registrationType = registrationType.BaseType;
+            }
+        }
+
+        internal static void Unregister(Def instance)
+        {
+            CachedList = null;
+
+            Type registrationType = instance.GetType();
+
+            while (true)
+            {
+                var dbType = typeof(Database<>).MakeGenericType(new[] { registrationType });
+                Databases.Add(dbType);
+
+                var regFunction = dbType.GetMethod("Unregister", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+                regFunction.Invoke(null, new[] { instance });
+
+                var lookup = GetLookupFor(registrationType);
+                if (lookup.TryGetValue(instance.DefName) == instance)
+                {
+                    // It's possible this fails if we've clobbered the database with accidental overwrites from an xml file, but, well, what can you do I guess
+                    lookup.Remove(instance.DefName);
+                }
 
                 if (UtilReflection.IsDefHierarchyType(registrationType))
                 {
@@ -202,6 +337,18 @@ namespace Def
 
             DefList.Add(instance);
             DefLookup[instance.DefName] = instance;
+        }
+
+        internal static void Unregister(T instance)
+        {
+            DefArray = null;
+
+            if (DefLookup.TryGetValue(instance.DefName) == instance)
+            {
+                DefLookup.Remove(instance.DefName);
+            }
+
+            DefList.Remove(instance);
         }
 
         internal static void Clear()
