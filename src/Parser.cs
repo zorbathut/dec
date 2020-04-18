@@ -145,6 +145,7 @@ namespace Def
 
             if (doc.Elements().Count() > 1)
             {
+                // This isn't testable, unfortunately; XDocument doesn't even support multiple root elements.
                 Dbg.Err($"{stringName}: Found {doc.Elements().Count()} root elements instead of the expected 1");
             }
 
