@@ -4,19 +4,19 @@ namespace Def
 
     internal static class Dbg
     {
-        internal static void Inf(string format)
+        internal static void Inf(string str)
         {
-            Config.InfoHandler(format);
+            Config.InfoHandler(str);
         }
 
-        internal static void Wrn(string format)
+        internal static void Wrn(string str)
         {
-            Config.WarningHandler(format);
+            Config.WarningHandler(str);
         }
 
-        internal static void Err(string format)
+        internal static void Err(string str)
         {
-            Config.ErrorHandler(format);
+            Config.ErrorHandler(str);
         }
 
         internal static void Ex(Exception e)
