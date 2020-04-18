@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "def-test", "test\def-test.c
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "def_docs", "docs\def_docs.csproj", "{AB4CCED1-7CF8-4C76-84E6-75AF6ADACAE6}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "loaf", "example\loaf\loaf.csproj", "{9CEFCF34-ED1F-47EA-A00C-37ADFAE2978E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,6 +42,14 @@ Global
 		{AB4CCED1-7CF8-4C76-84E6-75AF6ADACAE6}.Release|Any CPU.Build.0 = Debug|x86
 		{AB4CCED1-7CF8-4C76-84E6-75AF6ADACAE6}.Release|x86.ActiveCfg = Debug|x86
 		{AB4CCED1-7CF8-4C76-84E6-75AF6ADACAE6}.Release|x86.Build.0 = Debug|x86
+		{9CEFCF34-ED1F-47EA-A00C-37ADFAE2978E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CEFCF34-ED1F-47EA-A00C-37ADFAE2978E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CEFCF34-ED1F-47EA-A00C-37ADFAE2978E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9CEFCF34-ED1F-47EA-A00C-37ADFAE2978E}.Debug|x86.Build.0 = Debug|Any CPU
+		{9CEFCF34-ED1F-47EA-A00C-37ADFAE2978E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CEFCF34-ED1F-47EA-A00C-37ADFAE2978E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CEFCF34-ED1F-47EA-A00C-37ADFAE2978E}.Release|x86.ActiveCfg = Release|Any CPU
+		{9CEFCF34-ED1F-47EA-A00C-37ADFAE2978E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
