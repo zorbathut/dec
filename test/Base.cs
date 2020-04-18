@@ -128,7 +128,7 @@ namespace DefTest
             Rewritten,
         }
 
-        public void DoBehavior(BehaviorMode mode, bool expectErrors = false)
+        public void DoBehavior(BehaviorMode mode, bool expectWriteErrors = false, bool expectParseErrors = false)
         {
             if (mode == BehaviorMode.Bare)
             {
@@ -136,8 +136,21 @@ namespace DefTest
             }
             else if (mode == BehaviorMode.Rewritten)
             {
-                var writer = new Def.Writer();
-                string data = writer.Write();
+                string data = null;
+                void RunWriter()
+                {
+                    var writer = new Def.Writer();
+                    data = writer.Write();
+                }
+
+                if (expectWriteErrors)
+                {
+                    ExpectErrors(() => RunWriter());
+                }
+                else
+                {
+                    RunWriter();
+                }
 
                 Def.Database.Clear();
 
@@ -151,7 +164,7 @@ namespace DefTest
                     parser.Finish();
                 }
 
-                if (expectErrors)
+                if (expectParseErrors)
                 {
                     ExpectErrors(() => RunParser());
                 }

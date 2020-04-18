@@ -503,7 +503,15 @@ namespace Def
                 {
                     var valueDef = value as Def;
 
-                    result.Add(new XText(valueDef.DefName));
+                    if (valueDef != Database.Get(valueDef.GetType(), valueDef.DefName))
+                    {
+                        Dbg.Err("Referenced def {valueDef} no longer exists in the database; serializing an error value instead");
+                        result.Add(new XText($"{valueDef.DefName}_DELETED"));
+                    }
+                    else
+                    {
+                        result.Add(new XText(valueDef.DefName));
+                    }
                 }
 
                 // "No data" is defined as null for defs, so we just do that

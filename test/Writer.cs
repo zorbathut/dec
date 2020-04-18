@@ -197,8 +197,50 @@ namespace DefTest
             Assert.IsNull(Def.Database<IntDef>.Get("ThreePhoenix"));
         }
 
-        // def reference to a def that no longer officially exists
-            // also test this in Recorder, now that it's a thing that can happen
+        [Test]
+        public void ReferenceDeleted([Values] BehaviorMode mode)
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDef) } };
+
+            var ephemeral = Def.Database.Create<SomeDefs>("Ephemeral");
+            var stored = Def.Database.Create<SomeDefs>("Stored");
+
+            stored.defs = ephemeral;
+
+            Def.Database.Delete(ephemeral);
+
+            DoBehavior(mode, expectWriteErrors: true, expectParseErrors: true);
+
+            if (mode != BehaviorMode.Bare)
+            {
+                Assert.IsNull(Def.Database<SomeDefs>.Get("Stored").defs);
+                Assert.IsNull(Def.Database<SomeDefs>.Get("Ephemeral"));
+            }
+        }
+
+        [Test]
+        public void ReferenceReplaced([Values] BehaviorMode mode)
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDef) } };
+
+            var ephemeral = Def.Database.Create<SomeDefs>("Ephemeral");
+            var stored = Def.Database.Create<SomeDefs>("Stored");
+
+            stored.defs = ephemeral;
+
+            Def.Database.Delete(ephemeral);
+
+            Def.Database.Create<SomeDefs>("Ephemeral");
+
+            DoBehavior(mode, expectWriteErrors: true, expectParseErrors: true);
+
+            if (mode != BehaviorMode.Bare)
+            {
+                Assert.IsNull(Def.Database<SomeDefs>.Get("Stored").defs);
+                Assert.IsNotNull(Def.Database<SomeDefs>.Get("Ephemeral"));
+            }
+        }
+
         // make sure to explore the create and delete and rename error pathways
     }
 }

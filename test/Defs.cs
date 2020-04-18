@@ -56,7 +56,7 @@ namespace DefTest
                 </Defs>");
             parser.Finish();
 
-            DoBehavior(mode, expectErrors: true);
+            DoBehavior(mode, expectParseErrors: true);
 
             Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
 	    }
@@ -234,7 +234,7 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode, expectErrors: true);
+            DoBehavior(mode, expectParseErrors: true);
 
             var result = (DupeChildDef)Def.Database<DupeParentDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -314,7 +314,7 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode, expectErrors: true);
+            DoBehavior(mode, expectParseErrors: true);
 
             Assert.IsNotNull(Def.Database<ErrorDef>.Get("TestDef"));
         }
@@ -371,7 +371,7 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode, expectErrors: true);
+            DoBehavior(mode, expectParseErrors: true);
 
             Assert.IsNotNull(Def.Database<DefMemberDef>.Get("TestDef"));
             Assert.IsNull(Def.Database<DefMemberDef>.Get("TestDef").invalidReference);

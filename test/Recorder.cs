@@ -127,6 +127,35 @@ namespace DefTest
             Assert.AreEqual(defs.forceEmpty, deserialized.forceEmpty);
         }
 
+        [Test]
+        public void DefsRemoved()
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDef) }, explicitStaticRefs = new Type[] { typeof(StaticReferenceDefs) } };
+
+            var parser = new Def.Parser();
+            parser.AddString(@"
+                <Defs>
+                    <StubDef defName=""TestDefA"" />
+                    <StubDef defName=""TestDefB"" />
+                </Defs>");
+            parser.Finish();
+
+            var defs = new DefRecordable();
+            defs.a = StaticReferenceDefs.TestDefA;
+            defs.b = StaticReferenceDefs.TestDefB;
+
+            Def.Database.Delete(StaticReferenceDefs.TestDefA);
+
+            string serialized = null;
+            ExpectErrors(() => serialized = Def.Recorder.Write(defs, pretty: true));
+            DefRecordable deserialized = null;
+            ExpectErrors(() => deserialized = Def.Recorder.Read<DefRecordable>(serialized));
+
+            Assert.IsNull(deserialized.a);
+            Assert.AreEqual(defs.b, deserialized.b);
+        }
+
+
         public class RefsChildRecordable : Def.IRecordable
         {
             public void Record(Def.Recorder record)
