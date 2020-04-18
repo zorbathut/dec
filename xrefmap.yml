@@ -13,6 +13,42 @@ references:
   commentId: T:Def.Config
   fullName: Def.Config
   nameWithType: Config
+- uid: Def.Config.DefaultExceptionBehavior
+  name: Config.DefaultExceptionBehavior
+  href: api/Def.Config.DefaultExceptionBehavior.html
+  commentId: T:Def.Config.DefaultExceptionBehavior
+  fullName: Def.Config.DefaultExceptionBehavior
+  nameWithType: Config.DefaultExceptionBehavior
+- uid: Def.Config.DefaultExceptionBehavior.ErrorAndWarning
+  name: ErrorAndWarning
+  href: api/Def.Config.DefaultExceptionBehavior.html#Def_Config_DefaultExceptionBehavior_ErrorAndWarning
+  commentId: F:Def.Config.DefaultExceptionBehavior.ErrorAndWarning
+  fullName: Def.Config.DefaultExceptionBehavior.ErrorAndWarning
+  nameWithType: Config.DefaultExceptionBehavior.ErrorAndWarning
+- uid: Def.Config.DefaultExceptionBehavior.ErrorOnly
+  name: ErrorOnly
+  href: api/Def.Config.DefaultExceptionBehavior.html#Def_Config_DefaultExceptionBehavior_ErrorOnly
+  commentId: F:Def.Config.DefaultExceptionBehavior.ErrorOnly
+  fullName: Def.Config.DefaultExceptionBehavior.ErrorOnly
+  nameWithType: Config.DefaultExceptionBehavior.ErrorOnly
+- uid: Def.Config.DefaultExceptionBehavior.Never
+  name: Never
+  href: api/Def.Config.DefaultExceptionBehavior.html#Def_Config_DefaultExceptionBehavior_Never
+  commentId: F:Def.Config.DefaultExceptionBehavior.Never
+  fullName: Def.Config.DefaultExceptionBehavior.Never
+  nameWithType: Config.DefaultExceptionBehavior.Never
+- uid: Def.Config.DefaultHandlerShowConfigOnException
+  name: DefaultHandlerShowConfigOnException
+  href: api/Def.Config.html#Def_Config_DefaultHandlerShowConfigOnException
+  commentId: F:Def.Config.DefaultHandlerShowConfigOnException
+  fullName: Def.Config.DefaultHandlerShowConfigOnException
+  nameWithType: Config.DefaultHandlerShowConfigOnException
+- uid: Def.Config.DefaultHandlerThrowExceptions
+  name: DefaultHandlerThrowExceptions
+  href: api/Def.Config.html#Def_Config_DefaultHandlerThrowExceptions
+  commentId: F:Def.Config.DefaultHandlerThrowExceptions
+  fullName: Def.Config.DefaultHandlerThrowExceptions
+  nameWithType: Config.DefaultHandlerThrowExceptions
 - uid: Def.Config.ErrorHandler
   name: ErrorHandler
   href: api/Def.Config.html#Def_Config_ErrorHandler
@@ -52,6 +88,56 @@ references:
   isSpec: "True"
   fullName: Def.Config.InfoHandler
   nameWithType: Config.InfoHandler
+- uid: Def.Config.TestParameters
+  name: TestParameters
+  href: api/Def.Config.html#Def_Config_TestParameters
+  commentId: P:Def.Config.TestParameters
+  fullName: Def.Config.TestParameters
+  nameWithType: Config.TestParameters
+- uid: Def.Config.TestParameters*
+  name: TestParameters
+  href: api/Def.Config.html#Def_Config_TestParameters_
+  commentId: Overload:Def.Config.TestParameters
+  isSpec: "True"
+  fullName: Def.Config.TestParameters
+  nameWithType: Config.TestParameters
+- uid: Def.Config.UnitTestParameters
+  name: Config.UnitTestParameters
+  href: api/Def.Config.UnitTestParameters.html
+  commentId: T:Def.Config.UnitTestParameters
+  fullName: Def.Config.UnitTestParameters
+  nameWithType: Config.UnitTestParameters
+- uid: Def.Config.UnitTestParameters.explicitConverters
+  name: explicitConverters
+  href: api/Def.Config.UnitTestParameters.html#Def_Config_UnitTestParameters_explicitConverters
+  commentId: F:Def.Config.UnitTestParameters.explicitConverters
+  fullName: Def.Config.UnitTestParameters.explicitConverters
+  nameWithType: Config.UnitTestParameters.explicitConverters
+- uid: Def.Config.UnitTestParameters.explicitStaticRefs
+  name: explicitStaticRefs
+  href: api/Def.Config.UnitTestParameters.html#Def_Config_UnitTestParameters_explicitStaticRefs
+  commentId: F:Def.Config.UnitTestParameters.explicitStaticRefs
+  fullName: Def.Config.UnitTestParameters.explicitStaticRefs
+  nameWithType: Config.UnitTestParameters.explicitStaticRefs
+- uid: Def.Config.UnitTestParameters.explicitTypes
+  name: explicitTypes
+  href: api/Def.Config.UnitTestParameters.html#Def_Config_UnitTestParameters_explicitTypes
+  commentId: F:Def.Config.UnitTestParameters.explicitTypes
+  fullName: Def.Config.UnitTestParameters.explicitTypes
+  nameWithType: Config.UnitTestParameters.explicitTypes
+- uid: Def.Config.UsingNamespaces
+  name: UsingNamespaces
+  href: api/Def.Config.html#Def_Config_UsingNamespaces
+  commentId: P:Def.Config.UsingNamespaces
+  fullName: Def.Config.UsingNamespaces
+  nameWithType: Config.UsingNamespaces
+- uid: Def.Config.UsingNamespaces*
+  name: UsingNamespaces
+  href: api/Def.Config.html#Def_Config_UsingNamespaces_
+  commentId: Overload:Def.Config.UsingNamespaces
+  isSpec: "True"
+  fullName: Def.Config.UsingNamespaces
+  nameWithType: Config.UsingNamespaces
 - uid: Def.Config.WarningHandler
   name: WarningHandler
   href: api/Def.Config.html#Def_Config_WarningHandler
@@ -181,6 +267,41 @@ references:
   isSpec: "True"
   fullName: Def.Database.Count
   nameWithType: Database.Count
+- uid: Def.Database.Create(System.Type,System.String)
+  name: Create(Type, String)
+  href: api/Def.Database.html#Def_Database_Create_System_Type_System_String_
+  commentId: M:Def.Database.Create(System.Type,System.String)
+  fullName: Def.Database.Create(System.Type, System.String)
+  nameWithType: Database.Create(Type, String)
+- uid: Def.Database.Create*
+  name: Create
+  href: api/Def.Database.html#Def_Database_Create_
+  commentId: Overload:Def.Database.Create
+  isSpec: "True"
+  fullName: Def.Database.Create
+  nameWithType: Database.Create
+- uid: Def.Database.Create``1(System.String)
+  name: Create<T>(String)
+  href: api/Def.Database.html#Def_Database_Create__1_System_String_
+  commentId: M:Def.Database.Create``1(System.String)
+  name.vb: Create(Of T)(String)
+  fullName: Def.Database.Create<T>(System.String)
+  fullName.vb: Def.Database.Create(Of T)(System.String)
+  nameWithType: Database.Create<T>(String)
+  nameWithType.vb: Database.Create(Of T)(String)
+- uid: Def.Database.Delete(Def.Def)
+  name: Delete(Def)
+  href: api/Def.Database.html#Def_Database_Delete_Def_Def_
+  commentId: M:Def.Database.Delete(Def.Def)
+  fullName: Def.Database.Delete(Def.Def)
+  nameWithType: Database.Delete(Def)
+- uid: Def.Database.Delete*
+  name: Delete
+  href: api/Def.Database.html#Def_Database_Delete_
+  commentId: Overload:Def.Database.Delete
+  isSpec: "True"
+  fullName: Def.Database.Delete
+  nameWithType: Database.Delete
 - uid: Def.Database.Get(System.Type,System.String)
   name: Get(Type, String)
   href: api/Def.Database.html#Def_Database_Get_System_Type_System_String_
@@ -207,6 +328,19 @@ references:
   isSpec: "True"
   fullName: Def.Database.List
   nameWithType: Database.List
+- uid: Def.Database.Rename(Def.Def,System.String)
+  name: Rename(Def, String)
+  href: api/Def.Database.html#Def_Database_Rename_Def_Def_System_String_
+  commentId: M:Def.Database.Rename(Def.Def,System.String)
+  fullName: Def.Database.Rename(Def.Def, System.String)
+  nameWithType: Database.Rename(Def, String)
+- uid: Def.Database.Rename*
+  name: Rename
+  href: api/Def.Database.html#Def_Database_Rename_
+  commentId: Overload:Def.Database.Rename
+  isSpec: "True"
+  fullName: Def.Database.Rename
+  nameWithType: Database.Rename
 - uid: Def.Database`1
   name: Database<T>
   href: api/Def.Database-1.html
@@ -416,15 +550,12 @@ references:
   commentId: T:Def.Parser
   fullName: Def.Parser
   nameWithType: Parser
-- uid: Def.Parser.#ctor(System.Boolean,System.Type[],System.Type[],System.Type[])
-  name: Parser(Boolean, Type[], Type[], Type[])
-  href: api/Def.Parser.html#Def_Parser__ctor_System_Boolean_System_Type___System_Type___System_Type___
-  commentId: M:Def.Parser.#ctor(System.Boolean,System.Type[],System.Type[],System.Type[])
-  name.vb: Parser(Boolean, Type(), Type(), Type())
-  fullName: Def.Parser.Parser(System.Boolean, System.Type[], System.Type[], System.Type[])
-  fullName.vb: Def.Parser.Parser(System.Boolean, System.Type(), System.Type(), System.Type())
-  nameWithType: Parser.Parser(Boolean, Type[], Type[], Type[])
-  nameWithType.vb: Parser.Parser(Boolean, Type(), Type(), Type())
+- uid: Def.Parser.#ctor
+  name: Parser()
+  href: api/Def.Parser.html#Def_Parser__ctor
+  commentId: M:Def.Parser.#ctor
+  fullName: Def.Parser.Parser()
+  nameWithType: Parser.Parser()
 - uid: Def.Parser.#ctor*
   name: Parser
   href: api/Def.Parser.html#Def_Parser__ctor_
@@ -588,3 +719,22 @@ references:
   isSpec: "True"
   fullName: Def.StaticReferencesAttribute.Initialized
   nameWithType: StaticReferencesAttribute.Initialized
+- uid: Def.Writer
+  name: Writer
+  href: api/Def.Writer.html
+  commentId: T:Def.Writer
+  fullName: Def.Writer
+  nameWithType: Writer
+- uid: Def.Writer.Write
+  name: Write()
+  href: api/Def.Writer.html#Def_Writer_Write
+  commentId: M:Def.Writer.Write
+  fullName: Def.Writer.Write()
+  nameWithType: Writer.Write()
+- uid: Def.Writer.Write*
+  name: Write
+  href: api/Def.Writer.html#Def_Writer_Write_
+  commentId: Overload:Def.Writer.Write
+  isSpec: "True"
+  fullName: Def.Writer.Write
+  nameWithType: Writer.Write

@@ -70,7 +70,10 @@
 <h1 id="quick-start">Quick Start</h1>
 
 <h2 id="define-some-classes-derived-from-defdef">Define some classes derived from <a class="xref" href="../api/Def.Def.html"><code>Def.Def</code></a>.</h2>
-<pre><code class="lang-cs">// The starting point for all defs is a class derived from Def.Def.
+<pre><code class="lang-cs">namespace ExampleGame
+{
+
+// The starting point for all defs is a class derived from Def.Def.
 // Here, we're defining a general template for monsters.
 class MonsterDef : Def.Def
 {
@@ -108,6 +111,8 @@ class Color
 class SpriteSheetDef : Def.Def
 {
   public string filename;
+}
+
 }
 </code></pre>
 <h2 id="write-xml-to-define-our-actual-objects">Write XML to define our actual objects.</h2>
@@ -153,16 +158,18 @@ class SpriteSheetDef : Def.Def
 &lt;/Defs&gt;
 </code></pre>
 <h2 id="initialize-the-def-framework-via-parser">Initialize the def framework via <a class="xref" href="../api/Def.Parser.html"><code>Parser</code></a>.</h2>
-<pre><code class="lang-cs">// The Parser class handles all def initialization.
+<pre><code class="lang-cs">// Add our namespace so Def doesn't require lots of verbose namespace specifications.
+Config.AddUsingNamespace(&quot;ExampleGame&quot;);
+
+// The Parser class handles all def initialization.
 var parser = new Parser();
 
-// Add individual XML documents through .AddString().
-// The second parameter is a file identifier to use for debugging. Use whatever is most convenient for you.
+// Add individual XML documents through .AddFile(), or .AddString() if you need to load them manually.
 // It's common to read from on-disk files, but you can get the data from any source you want.
-parser.AddString(File.ReadAllText(&quot;goblinData.xml&quot;), &quot;goblinData.xml&quot;);
+parser.AddFile(&quot;goblinData.xml&quot;);
 
 // Keep adding files until you've added everything.
-parser.AddString(File.ReadAllText(&quot;elfData.xml&quot;), &quot;elfData.xml&quot;);
+parser.AddFile(&quot;elfData.xml&quot;);
 
 // Call when you've added everything. This finishes all parsing.
 parser.Finish();
