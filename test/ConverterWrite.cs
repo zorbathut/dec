@@ -49,6 +49,7 @@ namespace DefTest
         public void ConverterSimple()
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterSimple) } };
+
             var parser = new Def.Parser();
             parser.Finish();
 
@@ -89,6 +90,7 @@ namespace DefTest
         public void ConverterRecord()
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterRecord) } };
+
             var parser = new Def.Parser();
             parser.Finish();
 
@@ -122,6 +124,7 @@ namespace DefTest
         public void ConverterReplacementDetection()
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterSimple) } };
+
             var parser = new Def.Parser();
             parser.Finish();
 
@@ -144,6 +147,7 @@ namespace DefTest
         public void ConverterReplacementWorking()
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterRecord) } };
+
             var parser = new Def.Parser();
             parser.Finish();
 
@@ -185,6 +189,7 @@ namespace DefTest
         public void ConverterUnsupplied()
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConverterUnsuppliedConverter) } };
+
             var parser = new Def.Parser();
             parser.Finish();
 

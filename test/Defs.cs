@@ -84,6 +84,7 @@ namespace DefTest
 	    public void MissingDefName([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } };
+
             var parser = new Def.Parser();
             ExpectErrors(() => parser.AddString(@"
                 <Defs>
@@ -98,6 +99,7 @@ namespace DefTest
 	    public void InvalidDefName([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } };
+
             var parser = new Def.Parser();
             ExpectErrors(() => parser.AddString(@"
                 <Defs>

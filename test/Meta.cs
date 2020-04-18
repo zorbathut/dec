@@ -22,7 +22,8 @@ namespace DefTest
 
             {
                 Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) }, explicitStaticRefs = new Type[]{ typeof(StubDefs) } };
-            var parser = new Def.Parser();
+
+                var parser = new Def.Parser();
                 parser.AddString(@"
                     <Defs>
                         <StubDef defName=""TestDef"" />
@@ -40,7 +41,8 @@ namespace DefTest
 
             {
                 Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) }, explicitStaticRefs = new Type[]{ typeof(StubDefs) } };
-            var parser = new Def.Parser();
+
+                var parser = new Def.Parser();
                 parser.AddString(@"
                     <Defs>
                         <StubDef defName=""TestDef"" />
@@ -75,7 +77,8 @@ namespace DefTest
 
             {
                 Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) } };
-            var parser = new Def.Parser();
+
+                var parser = new Def.Parser();
                 parser.AddString(@"
                     <Defs>
                         <RefTargetDef defName=""Target"" />
@@ -99,7 +102,8 @@ namespace DefTest
 
             {
                 Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) } };
-            var parser = new Def.Parser();
+
+                var parser = new Def.Parser();
                 parser.AddString(@"
                     <Defs>
                         <RefSourceDef defName=""Source"">

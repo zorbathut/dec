@@ -32,6 +32,7 @@ namespace DefTest
 	    public void Primitives()
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+
             var parser = new Def.Parser();
             parser.Finish();
 
@@ -102,6 +103,7 @@ namespace DefTest
         public void Defs()
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDef) }, explicitStaticRefs = new Type[] { typeof(StaticReferenceDefs) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -153,6 +155,7 @@ namespace DefTest
         public void Refs()
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+
             var parser = new Def.Parser();
             parser.Finish();
 
@@ -192,6 +195,7 @@ namespace DefTest
         public void Containers()
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+
             var parser = new Def.Parser();
             parser.Finish();
 
@@ -227,6 +231,7 @@ namespace DefTest
         public void ContainersNested()
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+
             var parser = new Def.Parser();
             parser.Finish();
 
@@ -271,6 +276,7 @@ namespace DefTest
         public void ContainerRecursive()
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+
             var parser = new Def.Parser();
             parser.Finish();
 
@@ -322,6 +328,7 @@ namespace DefTest
         public void Misparse()
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+
             var parser = new Def.Parser();
             parser.Finish();
 
@@ -356,6 +363,7 @@ namespace DefTest
         public void RecursiveSquared()
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+
             var parser = new Def.Parser();
             parser.Finish();
 
@@ -400,6 +408,7 @@ namespace DefTest
         public void RecursiveSquaredRoot()
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+
             var parser = new Def.Parser();
             parser.Finish();
 
@@ -447,6 +456,7 @@ namespace DefTest
         public void RootPrimitive()
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+
             var parser = new Def.Parser();
             parser.Finish();
 
@@ -481,6 +491,7 @@ namespace DefTest
             const int depth = 10000;
 
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+
             var parser = new Def.Parser();
             parser.Finish();
 
@@ -526,6 +537,7 @@ namespace DefTest
             const int depth = 10_000;
 
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+
             var parser = new Def.Parser();
             parser.Finish();
 
@@ -601,6 +613,7 @@ namespace DefTest
         public void DerivedRecordables()
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+
             var parser = new Def.Parser();
             parser.Finish();
 

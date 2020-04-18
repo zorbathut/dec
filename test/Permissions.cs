@@ -23,6 +23,7 @@ namespace DefTest
 	    public void Private([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(PrivateDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -56,6 +57,7 @@ namespace DefTest
 	    public void Internal([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(InternalDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -87,6 +89,7 @@ namespace DefTest
 	    public void Protected([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ProtectedDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -125,6 +128,7 @@ namespace DefTest
 	    public void PrivateParent([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(PrivateChildDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>

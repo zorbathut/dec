@@ -27,6 +27,7 @@ namespace DefTest
         public void IndexBaseList([Values] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndexBaseDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -49,6 +50,7 @@ namespace DefTest
         public void IndexDerivedList([Values] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndexBaseDef), typeof(IndexDerivedDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -80,6 +82,7 @@ namespace DefTest
         public void IndexLeafList([Values] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndexLeafDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -121,6 +124,7 @@ namespace DefTest
         public void IndependentIndex([Values] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndependentIndexDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>

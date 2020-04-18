@@ -10,6 +10,7 @@ namespace DefTest
 	    public void DTDParse([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"<?xml version=""1.0"" encoding=""UTF-8"" ?>
                 <Defs>
@@ -27,6 +28,7 @@ namespace DefTest
 	    public void IncorrectRoot([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } };
+
             var parser = new Def.Parser();
             ExpectWarnings(() => parser.AddString(@"
                 <NotDefs>
@@ -43,6 +45,7 @@ namespace DefTest
 	    public void MultipleRoot([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } };
+
             var parser = new Def.Parser();
             ExpectErrors(() => parser.AddString(@"
                 <Defs>
@@ -62,6 +65,7 @@ namespace DefTest
 	    public void MultiXML([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -83,6 +87,7 @@ namespace DefTest
         public void ProvidedFilenameForXml([Values] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDef) } };
+
             var parser = new Def.Parser();
             ExpectErrors(() => parser.AddString(@"test.xml"));
             parser.Finish();
@@ -94,6 +99,7 @@ namespace DefTest
         public void ProperStringName([Values] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+
             var parser = new Def.Parser();
             ExpectErrors(() => parser.AddString(@"
                 <Defs>

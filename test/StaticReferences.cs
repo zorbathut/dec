@@ -19,6 +19,7 @@ namespace DefTest
 	    public void StaticReference([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) }, explicitStaticRefs = new Type[]{ typeof(StaticReferenceDefs) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -55,6 +56,7 @@ namespace DefTest
 	    public void PreciseClass([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDerivedDef) }, explicitStaticRefs = new Type[]{ typeof(PreciseClassDefs) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -82,6 +84,7 @@ namespace DefTest
 	    public void SuperClass([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDerivedDef) }, explicitStaticRefs = new Type[]{ typeof(SuperClassDefs) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -163,6 +166,7 @@ namespace DefTest
 	    public void NoInitializer([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) }, explicitStaticRefs = new Type[]{ typeof(NoInitializerDefs) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -219,6 +223,7 @@ namespace DefTest
 	    public void Missing([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) }, explicitStaticRefs = new Type[]{ typeof(MissingDefs) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -256,6 +261,7 @@ namespace DefTest
             // We avoid BehaviorMode here because the StaticReference error event can happen at most once, which means that we can't run the test twice without the second (and later) tests failing.
             // This also means that test success would depend on test order run, which, no.
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -287,6 +293,7 @@ namespace DefTest
             // We avoid BehaviorMode here because the StaticReference error event can happen at most once, which means that we can't run the test twice without the second (and later) tests failing.
             // This also means that test success would depend on test order run, which, no.
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(UnexpectedTouchDef) } };
+
             var parser = new Def.Parser();
             ExpectErrors(() => parser.AddString(@"
                 <Defs>
@@ -321,6 +328,7 @@ namespace DefTest
             // We avoid BehaviorMode here because the StaticReference error event can happen at most once, which means that we can't run the test twice without the second (and later) tests failing.
             // This also means that test success would depend on test order run, which, no.
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConstructorTouchDef) }, explicitStaticRefs = new Type[]{ typeof(ConstructorTouchDefs) } };
+
             var parser = new Def.Parser();
             ExpectErrors(() => parser.AddString(@"
                 <Defs>
@@ -345,6 +353,7 @@ namespace DefTest
 	    public void Internal([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) }, explicitStaticRefs = new Type[]{ typeof(InternalDefs) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>

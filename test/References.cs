@@ -25,6 +25,7 @@ namespace DefTest
 	    public void Basic([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -49,6 +50,7 @@ namespace DefTest
 	    public void Reversed([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -73,6 +75,7 @@ namespace DefTest
 	    public void Multistring([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -100,6 +103,7 @@ namespace DefTest
 	    public void Refdef([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefSourceDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -119,6 +123,7 @@ namespace DefTest
 	    public void Circular([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefCircularDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -146,6 +151,7 @@ namespace DefTest
 	    public void CircularTight([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefCircularDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -168,6 +174,7 @@ namespace DefTest
 	    {
             // This is a little wonky; we have to test it by duplicating a tag, which is technically an error
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefCircularDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -190,6 +197,7 @@ namespace DefTest
 	    public void FailedLookup([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefSourceDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
@@ -216,6 +224,7 @@ namespace DefTest
 	    public void BareDef([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(BareDefDef) } };
+
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>

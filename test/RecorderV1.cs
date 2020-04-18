@@ -13,6 +13,7 @@ namespace DefTest
 	    public void Core()
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+
             var parser = new Def.Parser();
             parser.Finish();
 
@@ -29,6 +30,7 @@ namespace DefTest
         public void CoreFailures()
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+
             var parser = new Def.Parser();
             parser.Finish();
 
