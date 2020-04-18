@@ -90,15 +90,15 @@ namespace Def
                 Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Element cannot be both null and a reference at the same time");
             }
 
-            // No remaining attributes are allowed
-            if (element.HasAttributes)
-            {
-                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Has unconsumed attributes");
-            }
-
             // See if we just want to return null
             if (shouldBeNull)
             {
+                // No remaining attributes are allowed in nulls
+                if (element.HasAttributes)
+                {
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Has unconsumed attributes");
+                }
+
                 // okay
                 return null;
 
@@ -110,6 +110,12 @@ namespace Def
             // See if we can get a ref out of it
             if (refId != null)
             {
+                // No remaining attributes are allowed in refs
+                if (element.HasAttributes)
+                {
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Has unconsumed attributes");
+                }
+
                 if (context == null)
                 {
                     Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Found a reference object outside of record-reader mode");
@@ -176,6 +182,12 @@ namespace Def
                 // TODO: support indices if this is within the Def system?
 
                 return recordable;
+            }
+
+            // No remaining attributes are allowed past this point!
+            if (element.HasAttributes)
+            {
+                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Has unconsumed attributes");
             }
 
             // All our standard text-using options

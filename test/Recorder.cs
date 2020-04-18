@@ -823,5 +823,53 @@ namespace DefTest
                 }
             }
         }
+
+        public class AttributeHolder : Def.IRecordable
+        {
+            public AttributeRecordable a;
+            public AttributeRecordable b;
+            public AttributeRecordable c;
+
+            public void Record(Def.Recorder record)
+            {
+                record.Record(ref a, "a");
+                record.Record(ref b, "b");
+                record.Record(ref c, "c");
+            }
+        }
+
+        [Test]
+        public void Attributes()
+        {
+            var holder = new AttributeHolder();
+
+            holder.a = new AttributeRecordable { attributing = "hello_an_attribute" };
+            holder.b = new AttributeRecordable { attributing = "<XML-SENSITIVE>" };
+            holder.c = new AttributeRecordable { attributing = "I guess I'll write some more text here?" };
+
+            string serialized = Def.Recorder.Write(holder, pretty: true);
+            var deserialized = Def.Recorder.Read<AttributeHolder>(serialized);
+
+            Assert.AreEqual(holder.a.attributing, deserialized.a.attributing);
+            Assert.AreEqual(holder.b.attributing, deserialized.b.attributing);
+            Assert.AreEqual(holder.c.attributing, deserialized.c.attributing);
+        }
+
+        [Test]
+        public void AttributeRef()
+        {
+            var holder = new AttributeHolder();
+
+            holder.a = new AttributeRecordable { attributing = "I am being referenced!" };
+            holder.b = holder.a;
+            holder.c = holder.a;
+
+            string serialized = Def.Recorder.Write(holder, pretty: true);
+            var deserialized = Def.Recorder.Read<AttributeHolder>(serialized);
+
+            Assert.AreEqual(holder.a.attributing, deserialized.a.attributing);
+            Assert.AreSame(holder.a, holder.b);
+            Assert.AreSame(holder.a, holder.c);
+        }
     }
 }
