@@ -91,7 +91,7 @@ namespace DefTest
             action();
 
             Assert.IsTrue(handlingWarnings);
-            Assert.IsTrue(handledWarning);
+            Assert.IsTrue(handledWarning, "Expected warning but did not generate one");
             handlingWarnings = false;
             handledWarning = false;
         }
@@ -107,7 +107,7 @@ namespace DefTest
             action();
 
             Assert.IsTrue(handlingErrors);
-            Assert.IsTrue(handledError);
+            Assert.IsTrue(handledError, "Expected error but did not generate one");
             handlingErrors = false;
             handledError = false;
             this.errorValidator = null;
