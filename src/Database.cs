@@ -79,7 +79,9 @@ namespace Def
             }
 
             // This is definitely not the most efficient way to do this.
-            return typeof(Database).GetMethod("Create`1").MakeGenericMethod(new[] { type }).Invoke(null, null) as Def;
+            var createMethod = typeof(Database).GetMethod("Create", new[] { typeof(string) });
+            var madeMethod = createMethod.MakeGenericMethod(new[] { type });
+            return madeMethod.Invoke(null, new[] { defName }) as Def;
         }
 
         /// <summary>

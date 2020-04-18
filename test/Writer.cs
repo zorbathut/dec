@@ -34,6 +34,28 @@ namespace DefTest
         }
 
         [Test]
+        public void CreationNonGeneric([Values] BehaviorMode mode)
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SomeDefs), typeof(SomeValues) } };
+
+            (Def.Database.Create(typeof(SomeValues), "Hello") as SomeValues).number = 10;
+            (Def.Database.Create(typeof(SomeValues), "Goodbye") as SomeValues).number = 42;
+
+            DoBehavior(mode);
+
+            Assert.AreEqual(10, Def.Database<SomeValues>.Get("Hello").number);
+            Assert.AreEqual(42, Def.Database<SomeValues>.Get("Goodbye").number);
+        }
+
+        private class NotADef { }
+
+        [Test]
+        public void CreationNonGenericNonDef([Values] BehaviorMode mode)
+        {
+            ExpectErrors(() => Def.Database.Create(typeof(NotADef), "NotADef"));
+        }
+
+        [Test]
         public void MultiCreation([Values] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SomeDefs), typeof(SomeValues) } };
