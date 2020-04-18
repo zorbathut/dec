@@ -22,8 +22,6 @@ namespace DefTest
         [Test]
         public void Creation([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SomeDefs), typeof(SomeValues) } };
-
             Def.Database.Create<SomeValues>("Hello").number = 10;
             Def.Database.Create<SomeValues>("Goodbye").number = 42;
 
@@ -36,8 +34,6 @@ namespace DefTest
         [Test]
         public void CreationNonGeneric([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SomeDefs), typeof(SomeValues) } };
-
             (Def.Database.Create(typeof(SomeValues), "Hello") as SomeValues).number = 10;
             (Def.Database.Create(typeof(SomeValues), "Goodbye") as SomeValues).number = 42;
 
@@ -58,8 +54,6 @@ namespace DefTest
         [Test]
         public void MultiCreation([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SomeDefs), typeof(SomeValues) } };
-
             Def.Database.Create<SomeDefs>("Defs");
             Def.Database.Create<SomeValues>("Values");
 
@@ -73,10 +67,34 @@ namespace DefTest
         }
 
         [Test]
+        public void FailedCreation()
+        {
+            Def.Database.Create<SomeDefs>("Def");
+            ExpectErrors(() => Def.Database.Create<SomeDefs>("Def"));
+            Def.Database.Delete(Def.Database<SomeDefs>.Get("Def"));
+            Def.Database.Create<SomeDefs>("Def");
+            ExpectErrors(() => Def.Database.Create<SomeDefs>("Def"));
+            ExpectErrors(() => Def.Database.Create<SomeDefs>("Def"));
+        }
+
+        private class RootDef : Def.Def { }
+        private class LeafADef : RootDef { }
+        private class LeafBDef : RootDef { }
+
+        [Test]
+        public void FailedForkCreation()
+        {
+            Def.Database.Create<LeafADef>("Def");
+            ExpectErrors(() => Def.Database.Create<LeafBDef>("Def"));
+            Def.Database.Delete(Def.Database<RootDef>.Get("Def"));
+            Def.Database.Create<RootDef>("Def");
+            ExpectErrors(() => Def.Database.Create<LeafADef>("Def"));
+            ExpectErrors(() => Def.Database.Create<LeafBDef>("Def"));
+        }
+
+        [Test]
         public void Databases()
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SomeDefs), typeof(SomeValues) } };
-
             var selfRef = Def.Database.Create<SomeDefs>("SelfRef");
             var otherRef = Def.Database.Create<SomeDefs>("OtherRef");
             var values = Def.Database.Create<SomeValues>("Values");
@@ -93,8 +111,6 @@ namespace DefTest
         [Test]
         public void References([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SomeDefs), typeof(SomeValues) } };
-
             var selfRef = Def.Database.Create<SomeDefs>("SelfRef");
             var otherRef = Def.Database.Create<SomeDefs>("OtherRef");
             var values = Def.Database.Create<SomeValues>("Values");
@@ -194,6 +210,23 @@ namespace DefTest
         }
 
         [Test]
+        public void RenameError([Values] BehaviorMode mode)
+        {
+            var a = Def.Database.Create<StubDef>("A");
+            var b = Def.Database.Create<StubDef>("B");
+            var c = Def.Database.Create<StubDef>("C");
+
+            ExpectErrors(() => Def.Database.Rename(a, "B"));
+            Def.Database.Rename(c, "C");
+
+            DoBehavior(mode);
+
+            Assert.IsNotNull(Def.Database<StubDef>.Get("A"));
+            Assert.IsNotNull(Def.Database<StubDef>.Get("B"));
+            Assert.IsNotNull(Def.Database<StubDef>.Get("C"));
+        }
+
+        [Test]
         public void RenameDeleted([Values] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDef) } };
@@ -222,8 +255,6 @@ namespace DefTest
         [Test]
         public void ReferenceDeleted([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDef) } };
-
             var ephemeral = Def.Database.Create<SomeDefs>("Ephemeral");
             var stored = Def.Database.Create<SomeDefs>("Stored");
 
@@ -243,8 +274,6 @@ namespace DefTest
         [Test]
         public void ReferenceReplaced([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDef) } };
-
             var ephemeral = Def.Database.Create<SomeDefs>("Ephemeral");
             var stored = Def.Database.Create<SomeDefs>("Stored");
 

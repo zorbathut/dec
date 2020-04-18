@@ -147,13 +147,7 @@ namespace Def
                 return;
             }
 
-            if (def.DefName == defName)
-            {
-                // uhhh . . . okay?
-                return;
-            }
-
-            if (Get(UtilReflection.GetDefHierarchyType(def.GetType()), defName) != null)
+            if (def.DefName != defName && Get(UtilReflection.GetDefHierarchyType(def.GetType()), defName) != null)
             {
                 Dbg.Err($"Attempting to rename {def} to {defName} when it already exists");
                 return;
