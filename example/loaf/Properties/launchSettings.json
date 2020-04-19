@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "loaf": {
+      "commandName": "Project",
+      "workingDirectory": "$(ProjectDir)"
+    }
+  }
+}

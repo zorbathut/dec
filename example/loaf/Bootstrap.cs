@@ -1,6 +1,8 @@
 
 namespace Loaf
 {
+    using System.IO;
+
     public static class Bootstrap
     {
         public static void Main()
@@ -15,12 +17,17 @@ namespace Loaf
             Def.Config.UsingNamespaces = new string[] { "Loaf" };
 
             var parser = new Def.Parser();
-            // load files
+            foreach (var file in Directory.GetFiles("data"))
+            {
+                parser.AddFile(file);
+            }
             parser.Finish();
             
-            Dbg.Inf("Welcome to Legend of the Amethyst Futon!");
-            Dbg.Inf("Your quest: find the Amethyst Futon, rumored to be the most comfortable resting device in the kingdom.");
-            Dbg.Inf("Good luck!");
+            Cns.Out("Welcome to Legend of the Amethyst Futon!");
+            Cns.Out("Your quest: find the Amethyst Futon, rumored to be the most comfortable resting device in the kingdom.");
+            Cns.Out("Good luck!");
+
+            Dungeon.Fight(Def.Database<MonsterDef>.Get("FeaturelessCube"));
         }
     }
 }

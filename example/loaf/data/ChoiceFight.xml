@@ -1,0 +1,4 @@
+<Defs>
+  <ChoiceFightDef defName="Fight" />
+  <ChoiceFightDef defName="Run" />
+</Defs>
