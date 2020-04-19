@@ -1,0 +1,4 @@
+<Defs>
+  <Location.OutcomeDef defName="Return" />
+  <Location.OutcomeDef defName="Death" />
+</Defs>

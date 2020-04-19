@@ -3,13 +3,17 @@ namespace Loaf
 {
     using System.IO;
 
-    public class DungeonDef : Cns.ChoiceDef
+    public class DungeonDef : LocationDef
     {
-        public string name;
         public RollTable<MonsterDef> monsters;
+
+        public override Location Create()
+        {
+            return new Dungeon(this);
+        }
     }
 
-    public class Dungeon
+    public class Dungeon : Location
     {
         [Def.StaticReferences]
         private static class DungeonChoices
@@ -49,19 +53,19 @@ namespace Loaf
             this.def = def;
         }
 
-        public OutcomeDef Visit()
+        public override Location.OutcomeDef Visit()
         {
             while (true)
             {
                 var result = Fight(def.monsters.Roll());
                 if (result == Outcomes.Death)
                 {
-                    return Outcomes.Death;
+                    return Location.Outcomes.Death;
                 }
                 else if (result == Outcomes.Fled)
                 {
                     Cns.Out("You escape the dungeon.");
-                    return Outcomes.Fled;
+                    return Location.Outcomes.Return;
                 }
 
                 Cns.Out("");
@@ -70,8 +74,7 @@ namespace Loaf
                 var choice = Cns.Choice<DungeonChoiceDef>();
                 if (choice == DungeonChoices.Leave)
                 {
-                    // I mean, kinda.
-                    return Outcomes.Fled;
+                    return Location.Outcomes.Return;
                 }
             }
 

@@ -4,4 +4,8 @@
 
   <Dungeon.DungeonChoiceDef defName="FindMore" />
   <Dungeon.DungeonChoiceDef defName="Leave" />
+
+  <Dungeon.OutcomeDef defName="Victory" />
+  <Dungeon.OutcomeDef defName="Death" />
+  <Dungeon.OutcomeDef defName="Fled" />
 </Defs>

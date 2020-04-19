@@ -1,5 +1,0 @@
-<Defs>
-  <Dungeon.OutcomeDef defName="Victory" />
-  <Dungeon.OutcomeDef defName="Death" />
-  <Dungeon.OutcomeDef defName="Fled" />
-</Defs>
