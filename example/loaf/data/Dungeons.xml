@@ -1,0 +1,21 @@
+<Defs>
+  <DungeonDef defName="TestDungeon">
+    <monsters>
+      <items>
+        <OttomanSoldier>1</OttomanSoldier>
+        <KnightStand>1</KnightStand>
+        <Chairiot>1</Chairiot>
+        <ArmoireKnight>1</ArmoireKnight>
+        <BureauAgent>1</BureauAgent>
+        <ChestyWarrior>1</ChestyWarrior>
+        <Bearcubby>1</Bearcubby>
+        <MirrorChampion>1</MirrorChampion>
+        <Nightstandstalker>1</Nightstandstalker>
+        <Secretary>1</Secretary>
+        <SofaKing>1</SofaKing>
+        <HotelValet>1</HotelValet>
+        <VanityElemental>1</VanityElemental>
+      </items>
+    </monsters>
+  </DungeonDef>
+</Defs>

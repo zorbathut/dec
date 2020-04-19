@@ -3,7 +3,11 @@ namespace Loaf
 {
     using System.IO;
 
-    
+    public class DungeonDef : Def.Def
+    {
+        public string name;
+        public RollTable<MonsterDef> monsters;
+    }
 
     public class Dungeon
     {
@@ -38,11 +42,18 @@ namespace Loaf
         }
         public class OutcomeDef : Def.Def { }
 
+        private DungeonDef def;
+
+        public Dungeon(DungeonDef def)
+        {
+            this.def = def;
+        }
+
         public void Visit()
         {
             while (true)
             {
-                var result = Fight(Def.Database<MonsterDef>.Get("FeaturelessCube"));
+                var result = Fight(def.monsters.Roll());
                 if (result == Outcomes.Death)
                 {
                     Cns.Out("You have died.", color: System.ConsoleColor.Red);

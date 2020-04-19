@@ -10,6 +10,11 @@ namespace Loaf
             Generator = new System.Random();
         }
 
+        public static float Value(float val)
+        {
+            return (float)(Generator.NextDouble() * val);
+        }
+
         public static int Roll(int sides)
         {
             // this is technically slightly biased

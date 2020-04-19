@@ -1,7 +1,3 @@
 <Defs>
-  <MonsterDef defName="FeaturelessCube">
-    <name>featureless cube</name>
-    <hp>20</hp>
-    <damage>2d4</damage>
-  </MonsterDef>
+
 </Defs>

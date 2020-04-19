@@ -1,0 +1,79 @@
+<Defs>
+  <MonsterDef defName="OttomanSoldier">
+    <name>ottoman soldier</name>
+    <hp>20</hp>
+    <damage>2d4</damage>
+  </MonsterDef>
+
+  <MonsterDef defName="KnightStand">
+    <name>knightstand</name>
+    <hp>20</hp>
+    <damage>2d4</damage>
+  </MonsterDef>
+
+  <MonsterDef defName="Chairiot">
+    <name>chairiot</name>
+    <hp>20</hp>
+    <damage>2d4</damage>
+  </MonsterDef>
+
+  <MonsterDef defName="ArmoireKnight">
+    <name>armoire knight</name>
+    <hp>20</hp>
+    <damage>2d4</damage>
+  </MonsterDef>
+
+  <MonsterDef defName="BureauAgent">
+    <name>bureau agent</name>
+    <hp>20</hp>
+    <damage>2d4</damage>
+  </MonsterDef>
+
+  <MonsterDef defName="ChestyWarrior">
+    <name>chesty warrior</name>
+    <hp>20</hp>
+    <damage>2d4</damage>
+  </MonsterDef>
+
+  <MonsterDef defName="Bearcubby">
+    <name>bearcubby</name>
+    <hp>20</hp>
+    <damage>2d4</damage>
+  </MonsterDef>
+
+  <MonsterDef defName="MirrorChampion">
+    <name>knightstand</name>
+    <hp>20</hp>
+    <damage>2d4</damage>
+  </MonsterDef>
+
+  <MonsterDef defName="Nightstandstalker">
+    <name>nightstandstalker</name>
+    <hp>20</hp>
+    <damage>2d4</damage>
+  </MonsterDef>
+
+  <MonsterDef defName="Secretary">
+    <name>secretary</name>
+    <hp>20</hp>
+    <damage>2d4</damage>
+  </MonsterDef>
+
+  <MonsterDef defName="SofaKing">
+    <name>sofa king</name>
+    <hp>20</hp>
+    <damage>2d4</damage>
+  </MonsterDef>
+
+  <MonsterDef defName="HotelValet">
+    <name>hotel valet</name>
+    <hp>20</hp>
+    <damage>2d4</damage>
+  </MonsterDef>
+
+  <MonsterDef defName="VanityElemental">
+    <name>vanity elemental</name>
+    <hp>20</hp>
+    <damage>2d4</damage>
+  </MonsterDef>
+</Defs>
