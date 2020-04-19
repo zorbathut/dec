@@ -53,7 +53,7 @@ namespace Loaf
                 var choice = Cns.Choice<FightChoiceDef>();
                 if (choice == DungeonChoices.Fight)
                 {
-                    playerHp -= 2;
+                    playerHp -= monster.damage.Roll();
                     monsterHp -= 4;
                 }
                 else if (choice == DungeonChoices.Run)
