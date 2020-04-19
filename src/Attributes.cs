@@ -8,7 +8,7 @@ namespace Def
     /// Signals that static references in this class should be filled out after parsing is complete.
     /// </summary>
     /// <remarks>
-    /// In addition, the class's static constructor should call StaticReferences.Initialized().
+    /// In addition, the class's static constructor should call StaticReferencesAttribute.Initialized().
     /// </remarks>
     [AttributeUsage(AttributeTargets.Class)]  
     public class StaticReferencesAttribute : Attribute
