@@ -3,22 +3,22 @@ namespace Loaf
 {
     using System.IO;
 
-    [Def.StaticReferences]
-    public static class DungeonChoices
-    {
-        static DungeonChoices()
-        {
-            Def.StaticReferencesAttribute.Initialized();
-        }
-
-        public static ChoiceFightDef Fight;
-        public static ChoiceFightDef Run;
-    }
-
     public class ChoiceFightDef : Def.Def { }
 
     public static class Dungeon
     {
+        [Def.StaticReferences]
+        public static class DungeonChoices
+        {
+            static DungeonChoices()
+            {
+                Def.StaticReferencesAttribute.Initialized();
+            }
+
+            public static ChoiceFightDef Fight;
+            public static ChoiceFightDef Run;
+        }
+
         public static void Fight(MonsterDef monster)
         {
             int playerHp = 10;
