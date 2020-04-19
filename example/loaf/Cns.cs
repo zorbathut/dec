@@ -25,7 +25,7 @@ namespace Loaf
             Out($"{choiceList}? ", crlf: false);
             while (true)
             {
-                var key = Console.ReadKey();
+                var key = Console.ReadKey(true);
 
                 var choice = choices.Where(c => char.ToLower(c.DefName[0]) == char.ToLower(key.KeyChar)).FirstOrDefault();
                 if (choice != null)

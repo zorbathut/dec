@@ -3,23 +3,38 @@ namespace Loaf
 {
     using System.IO;
 
-    public class ChoiceFightDef : Def.Def { }
+    
 
     public static class Dungeon
     {
         [Def.StaticReferences]
-        public static class DungeonChoices
+        private static class DungeonChoices
         {
             static DungeonChoices()
             {
                 Def.StaticReferencesAttribute.Initialized();
             }
 
-            public static ChoiceFightDef Fight;
-            public static ChoiceFightDef Run;
+            public static FightChoiceDef Fight;
+            public static FightChoiceDef Run;
         }
+        private class FightChoiceDef : Def.Def { }
 
-        public static void Fight(MonsterDef monster)
+        [Def.StaticReferences]
+        public static class Outcomes
+        {
+            static Outcomes()
+            {
+                Def.StaticReferencesAttribute.Initialized();
+            }
+
+            public static OutcomeDef Victory;
+            public static OutcomeDef Death;
+            public static OutcomeDef Fled;
+        }
+        public class OutcomeDef : Def.Def { }
+
+        public static OutcomeDef Fight(MonsterDef monster)
         {
             int playerHp = 10;
             int monsterHp = monster.hp;
@@ -30,11 +45,12 @@ namespace Loaf
             while (playerHp > 0 && monsterHp > 0)
             {
                 Cns.Out($"");
+                Cns.Out($"");
                 Cns.Out($"{playerHp,4} / {20,4}: Your health");
                 Cns.Out($"{monsterHp,4} / {monster.hp,4}: The monster's health");
                 Cns.Out($"");
 
-                var choice = Cns.Choice<ChoiceFightDef>();
+                var choice = Cns.Choice<FightChoiceDef>();
                 if (choice == DungeonChoices.Fight)
                 {
                     playerHp -= 2;
@@ -42,8 +58,17 @@ namespace Loaf
                 }
                 else if (choice == DungeonChoices.Run)
                 {
-                    break;
+                    return Outcomes.Fled;
                 }
+            }
+
+            if (playerHp <= 0)
+            {
+                return Outcomes.Death;
+            }
+            else
+            {
+                return Outcomes.Victory;
             }
         }
     }
