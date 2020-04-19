@@ -3,7 +3,7 @@ namespace Loaf
     using System;
     using System.Linq;
 
-    internal static class Cns
+    public static class Cns
     {
         public class ChoiceDef : Def.Def
         {
@@ -24,12 +24,25 @@ namespace Loaf
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-        internal static T Choice<T>() where T : ChoiceDef
+        internal static T Choice<T>(bool longForm = false) where T : ChoiceDef
         {
-            T[] choices = Def.Database<T>.List;
-            string choiceList = string.Join(", ", choices.Select(choice => $"({choice.DefName[0]}){choice.DefName.Substring(1)}"));
+            string separator;
+            string prompt;
+            if (longForm)
+            {
+                separator = "\n";
+                prompt = "\n";
+            }
+            else
+            {
+                separator = ", ";
+                prompt = "? ";
+            }
 
-            Out($"{choiceList}? ", crlf: false);
+            T[] choices = Def.Database<T>.List;
+            string choiceList = string.Join(separator, choices.Select(choice => $"({choice.DefName[0]}){choice.DefName.Substring(1)}"));
+
+            Out($"{choiceList}{prompt}", crlf: false);
             while (true)
             {
                 var key = Console.ReadKey(true);

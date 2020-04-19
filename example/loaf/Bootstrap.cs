@@ -22,12 +22,8 @@ namespace Loaf
                 parser.AddFile(file);
             }
             parser.Finish();
-            
-            Cns.Out("Welcome to Legend of the Amethyst Futon!");
-            Cns.Out("Your quest: find the Amethyst Futon, rumored to be the most comfortable resting device in the kingdom.");
-            Cns.Out("Good luck!");
 
-            new Dungeon(Def.Database<DungeonDef>.Get("TestDungeon")).Visit();
+            Game.Run();
         }
     }
 }

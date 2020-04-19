@@ -3,7 +3,7 @@ namespace Loaf
 {
     using System.IO;
 
-    public class DungeonDef : Def.Def
+    public class DungeonDef : Cns.ChoiceDef
     {
         public string name;
         public RollTable<MonsterDef> monsters;
@@ -49,20 +49,19 @@ namespace Loaf
             this.def = def;
         }
 
-        public void Visit()
+        public OutcomeDef Visit()
         {
             while (true)
             {
                 var result = Fight(def.monsters.Roll());
                 if (result == Outcomes.Death)
                 {
-                    Cns.Out("You have died.", color: System.ConsoleColor.Red);
-                    return;
+                    return Outcomes.Death;
                 }
                 else if (result == Outcomes.Fled)
                 {
                     Cns.Out("You escape the dungeon.");
-                    return;
+                    return Outcomes.Fled;
                 }
 
                 Cns.Out("");
@@ -71,7 +70,8 @@ namespace Loaf
                 var choice = Cns.Choice<DungeonChoiceDef>();
                 if (choice == DungeonChoices.Leave)
                 {
-                    return;
+                    // I mean, kinda.
+                    return Outcomes.Fled;
                 }
             }
 
