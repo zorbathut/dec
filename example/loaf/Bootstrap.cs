@@ -27,8 +27,7 @@ namespace Loaf
             Cns.Out("Your quest: find the Amethyst Futon, rumored to be the most comfortable resting device in the kingdom.");
             Cns.Out("Good luck!");
 
-            var outcome = Dungeon.Fight(Def.Database<MonsterDef>.Get("FeaturelessCube"));
-            Dbg.Inf($"{outcome}");
+            new Dungeon().Visit();
         }
     }
 }

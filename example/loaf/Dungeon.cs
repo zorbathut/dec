@@ -5,7 +5,7 @@ namespace Loaf
 
     
 
-    public static class Dungeon
+    public class Dungeon
     {
         [Def.StaticReferences]
         private static class DungeonChoices
@@ -17,8 +17,12 @@ namespace Loaf
 
             public static FightChoiceDef Fight;
             public static FightChoiceDef Run;
+
+            public static DungeonChoiceDef FindMore;
+            public static DungeonChoiceDef Leave;
         }
-        private class FightChoiceDef : Def.Def { }
+        private class FightChoiceDef : Cns.ChoiceDef { }
+        private class DungeonChoiceDef : Cns.ChoiceDef { }
 
         [Def.StaticReferences]
         public static class Outcomes
@@ -34,7 +38,35 @@ namespace Loaf
         }
         public class OutcomeDef : Def.Def { }
 
-        public static OutcomeDef Fight(MonsterDef monster)
+        public void Visit()
+        {
+            while (true)
+            {
+                var result = Fight(Def.Database<MonsterDef>.Get("FeaturelessCube"));
+                if (result == Outcomes.Death)
+                {
+                    Cns.Out("You have died.", color: System.ConsoleColor.Red);
+                    return;
+                }
+                else if (result == Outcomes.Fled)
+                {
+                    Cns.Out("You escape the dungeon.");
+                    return;
+                }
+
+                Cns.Out("");
+                Cns.Out("The monster is slain!", color: System.ConsoleColor.White);
+
+                var choice = Cns.Choice<DungeonChoiceDef>();
+                if (choice == DungeonChoices.Leave)
+                {
+                    return;
+                }
+            }
+
+        }
+
+        private static OutcomeDef Fight(MonsterDef monster)
         {
             int playerHp = 10;
             int monsterHp = monster.hp;

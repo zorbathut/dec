@@ -1,4 +1,7 @@
 <Defs>
   <Dungeon.FightChoiceDef defName="Fight" />
   <Dungeon.FightChoiceDef defName="Run" />
+
+  <Dungeon.DungeonChoiceDef defName="FindMore" />
+  <Dungeon.DungeonChoiceDef defName="Leave" />
 </Defs>

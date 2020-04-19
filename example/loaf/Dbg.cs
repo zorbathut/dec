@@ -13,14 +13,14 @@ namespace Loaf
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine(str);
-            Console.ForegroundColor = ConsoleColor.White;
+            Console.ForegroundColor = ConsoleColor.Gray;
         }
 
         internal static void Err(string str)
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(str);
-            Console.ForegroundColor = ConsoleColor.White;
+            Console.ForegroundColor = ConsoleColor.Gray;
         }
 
         internal static void Ex(Exception e)
