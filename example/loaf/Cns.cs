@@ -20,7 +20,7 @@ namespace Loaf
         internal static T Choice<T>() where T : Def.Def
         {
             T[] choices = Def.Database<T>.List;
-            string choiceList = string.Join(", ", choices.Select(choice => $"({choice.DefName[0]}){choice.DefName.Substring(1)})"));
+            string choiceList = string.Join(", ", choices.Select(choice => $"({choice.DefName[0]}){choice.DefName.Substring(1)}"));
 
             Out($"{choiceList}? ", crlf: false);
             while (true)

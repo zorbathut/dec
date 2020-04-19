@@ -1,6 +1,6 @@
 <Defs>
   <WeaponDef defName="RustySword">
     <name>Rusty Sword</name>
-    <damage>3</damage>
+    <damage>3d8</damage>
   </WeaponDef>
 </Defs>
