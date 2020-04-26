@@ -4,6 +4,8 @@ namespace Loaf
     {
         public int baud;
         public float crlfDelay;
+
+        public bool suppressDelay = false;
     }
 
     [Def.StaticReferences]

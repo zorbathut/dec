@@ -25,12 +25,12 @@ namespace Loaf
             // Print it slow to make it feel more like a game coming over a modem.
             for (int idx = 0; idx < str.Length; ++idx)
             {
-                while (stopwatch.ElapsedTicks < (idx * Stopwatch.Frequency * 10 / Config.Global.baud));
+                while (!Config.Global.suppressDelay && stopwatch.ElapsedTicks < (idx * Stopwatch.Frequency * 10 / Config.Global.baud));
 
                 Console.Write(str[idx]);
             }
 
-            if (crlf)
+            if (!Config.Global.suppressDelay && crlf)
             {
                 Thread.Sleep((int)(Config.Global.crlfDelay * 1000));
             }
