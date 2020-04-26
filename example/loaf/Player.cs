@@ -4,7 +4,7 @@ namespace Loaf
     using System.Collections.Generic;
     using System.Linq;
 
-    public class Player : SingletonManual<Player>
+    public class Player : SingletonManual<Player>, Def.IRecordable
     {
         private List<ItemDef> inventory = new List<ItemDef>();
 
@@ -24,6 +24,11 @@ namespace Loaf
             {
                 inventory.Add(item);
             }
+        }
+
+        public void Record(Def.Recorder recorder)
+        {
+            recorder.Record(ref inventory, "inventory");
         }
     }
 }

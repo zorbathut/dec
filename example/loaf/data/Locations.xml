@@ -2,4 +2,8 @@
   <LocationTypedDef defName="YourBedroom">
     <type>Locations.YourBedroom</type>
   </LocationTypedDef>
+
+  <LocationTypedDef defName="FairyGrotto">
+    <type>Locations.FairyGrotto</type>
+  </LocationTypedDef>
 </Defs>
