@@ -1,0 +1,5 @@
+<Defs>
+  <LocationTypedDef defName="YourBedroom">
+    <type>Locations.YourBedroom</type>
+  </LocationTypedDef>
+</Defs>

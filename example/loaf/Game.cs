@@ -12,11 +12,12 @@ namespace Loaf
             while (true)
             {
                 Cns.Out("");
-                Cns.Out("You stand at a crossroads, both literally and metaphorically. As with most crossroads, you can travel in many directions.");
+                Cns.Out("");
+                Cns.Out("You stand at a crossroads, both literally and metaphorically.");
                 Cns.Out("");
 
-                var dungeon = new Dungeon(Cns.Choice<DungeonDef>(longForm: true));
-                var result = dungeon.Visit();
+                var location = Cns.Choice<LocationDef>(longForm: true).Create();
+                var result = location.Visit();
 
                 if (result == Location.Outcomes.Death)
                 {
