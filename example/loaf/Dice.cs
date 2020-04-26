@@ -10,6 +10,11 @@ namespace Loaf
         private int count;
         private int sides;
 
+        public float Average
+        {
+            get => (sides / 2f + 0.5f) * count;
+        }
+
         public int Roll()
         {
             int accumulator = 0;

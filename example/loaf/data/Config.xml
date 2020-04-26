@@ -2,5 +2,9 @@
   <ConfigDef defName="Global">
     <baud>1200</baud>
     <crlfDelay>0.2</crlfDelay>
+
+    <startingItems>
+      <li>RustySword</li>
+    </startingItems>
   </ConfigDef>
 </Defs>

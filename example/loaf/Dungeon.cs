@@ -100,7 +100,7 @@ namespace Loaf
                 if (choice == DungeonChoices.Fight)
                 {
                     playerHp -= monster.damage.Roll();
-                    monsterHp -= Player.Instance.GetCurrentWeapon().damage.Roll();
+                    monsterHp -= Player.Instance.CurrentWeapon.damage.Roll();
                 }
                 else if (choice == DungeonChoices.Run)
                 {

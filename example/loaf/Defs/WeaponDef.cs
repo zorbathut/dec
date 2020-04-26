@@ -1,9 +1,8 @@
 
 namespace Loaf
 {
-    public class WeaponDef : Def.Def
+    public class WeaponDef : ItemDef
     {
-        public string name;
         public Dice damage;
     }
 }

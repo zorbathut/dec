@@ -1,11 +1,29 @@
 
 namespace Loaf
 {
-    public class Player : Singleton<Player>
+    using System.Collections.Generic;
+    using System.Linq;
+
+    public class Player : SingletonManual<Player>
     {
-        public WeaponDef GetCurrentWeapon()
+        private List<ItemDef> inventory = new List<ItemDef>();
+
+        public IEnumerable<ItemDef> Inventory
         {
-            return Def.Database<WeaponDef>.List[0];
+            get => inventory;
+        }
+
+        public WeaponDef CurrentWeapon
+        {
+            get => inventory.OfType<WeaponDef>().MaxOfOrDefault(weapon => weapon.damage.Average);
+        }
+
+        public void AcquireItem(ItemDef item)
+        {
+            if (!inventory.Contains(item))
+            {
+                inventory.Add(item);
+            }
         }
     }
 }

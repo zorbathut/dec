@@ -5,6 +5,17 @@ namespace Loaf
     {
         public static void Run()
         {
+
+            // Create player
+            {
+                var player = new Player();
+                foreach (var item in Config.Global.startingItems)
+                {
+                    player.AcquireItem(item);
+                }
+                Player.Set(player);
+            }
+
             Cns.Out("Welcome to Legend of the Amethyst Futon!");
             Cns.Out("Your quest: find the Amethyst Futon, rumored to be the most comfortable resting device in the kingdom.");
             Cns.Out("Good luck!");
