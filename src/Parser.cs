@@ -27,7 +27,6 @@ namespace Def
         private static Status s_Status = Status.Uninitialized;
 
         // Data stored from initialization parameters
-        private Dictionary<string, Type> typeLookup = new Dictionary<string, Type>();
         private List<Type> staticReferences = new List<Type>();
         
         // List of work to be run during the Finish stage
@@ -49,34 +48,6 @@ namespace Def
             s_Status = Status.Accumulating;
 
             bool unitTestMode = Config.TestParameters != null;
-
-            {
-                IEnumerable<Type> defTypes;
-                if (!unitTestMode)
-                {
-                    defTypes = UtilReflection.GetAllTypes().Where(t => t.IsSubclassOf(typeof(Def)));
-                }
-                else if (Config.TestParameters.explicitTypes != null)
-                {
-                    defTypes = Config.TestParameters.explicitTypes;
-                }
-                else
-                {
-                    defTypes = Enumerable.Empty<Type>();
-                }
-
-                foreach (var type in defTypes)
-                {
-                    if (type.IsSubclassOf(typeof(Def)))
-                    {
-                        typeLookup[type.Name] = type;
-                    }
-                    else
-                    {
-                        Dbg.Err($"{type} is not a subclass of Def");
-                    }
-                }
-            }
 
             {
                 IEnumerable<Type> staticRefs;

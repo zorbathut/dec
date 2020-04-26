@@ -42,24 +42,6 @@ namespace DefTest
 
             Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
 	    }
-        
-        [Test]
-	    public void NonDefType([Values] BehaviorMode mode)
-	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(bool), typeof(StubDef) } };
-
-            Def.Parser parser = null;
-            ExpectErrors(() => parser = new Def.Parser());
-            parser.AddString(@"
-                <Defs>
-                    <StubDef defName=""TestDef"" />
-                </Defs>");
-            parser.Finish();
-
-            DoBehavior(mode, expectParseErrors: true);
-
-            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
-	    }
 
         [Test]
 	    public void MissingDefType([Values] BehaviorMode mode)
