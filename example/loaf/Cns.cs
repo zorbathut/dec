@@ -1,7 +1,9 @@
 namespace Loaf
 {
     using System;
+    using System.Diagnostics;
     using System.Linq;
+    using System.Threading;
 
     public static class Cns
     {
@@ -15,12 +17,24 @@ namespace Loaf
             Console.ForegroundColor = color;
             if (crlf)
             {
-                Console.WriteLine(str);
+                str = str + "\n";
             }
-            else
+
+            var stopwatch = Stopwatch.StartNew();
+
+            // Print it slow to make it feel more like a game coming over a modem.
+            for (int idx = 0; idx < str.Length; ++idx)
             {
-                Console.Write(str);
+                while (stopwatch.ElapsedTicks < (idx * Stopwatch.Frequency * 10 / Config.Global.baud));
+
+                Console.Write(str[idx]);
             }
+
+            if (crlf)
+            {
+                Thread.Sleep((int)(Config.Global.crlfDelay * 1000));
+            }
+
             Console.ForegroundColor = ConsoleColor.White;
         }
 

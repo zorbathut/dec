@@ -1,0 +1,6 @@
+<Defs>
+  <ConfigDef defName="Global">
+    <baud>1200</baud>
+    <crlfDelay>0.2</crlfDelay>
+  </ConfigDef>
+</Defs>
