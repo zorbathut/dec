@@ -273,10 +273,7 @@ namespace Def
             {
                 try
                 {
-                    foreach (var err in def.ConfigErrors())
-                    {
-                        Dbg.Err($"{def.GetType()} {def}: {err}");
-                    }
+                    def.ConfigErrors(err => Dbg.Err($"{def.GetType()} {def}: {err}"));
                 }
                 catch (Exception e)
                 {
@@ -288,10 +285,7 @@ namespace Def
             {
                 try
                 {
-                    foreach (var err in def.PostLoad())
-                    {
-                        Dbg.Err($"{def.GetType()} {def}: {err}");
-                    }
+                    def.PostLoad(err => Dbg.Err($"{def.GetType()} {def}: {err}"));
                 }
                 catch (Exception e)
                 {

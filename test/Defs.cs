@@ -291,14 +291,11 @@ namespace DefTest
 
         public class ErrorDef : Def.Def
         {
-            public override IEnumerable<string> ConfigErrors()
+            public override void ConfigErrors(Action<string> report)
             {
-                foreach (var err in base.ConfigErrors())
-                {
-                    yield return err;
-                }
+                base.ConfigErrors(report);
 
-                yield return "I am never valid";
+                report("I am never valid");
             }
         }
 
@@ -323,12 +320,9 @@ namespace DefTest
         {
             public bool initted = false;
 
-            public override IEnumerable<string> PostLoad()
+            public override void PostLoad(Action<string> report)
             {
-                foreach (var err in base.PostLoad())
-                {
-                    yield return err;
-                }
+                base.PostLoad(report);
 
                 initted = true;
             }

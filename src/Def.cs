@@ -1,5 +1,6 @@
 namespace Def
 {
+    using System;
     using System.Collections.Generic;
 
     /// <summary>
@@ -21,15 +22,12 @@ namespace Def
         }
 
         /// <summary>
-        /// Overrideable function to return configuration errors.
+        /// Overrideable function to report configuration errors.
         /// </summary>
         /// <remarks>
         /// StaticReferences will be initialized before this function is called. This function may be called in parallel across your defs, in any order.
         /// </remarks>
-        public virtual IEnumerable<string> ConfigErrors()
-        {
-            yield break;
-        }
+        public virtual void ConfigErrors(Action<string> reporter) { }
 
         /// <summary>
         /// Overrideable function to do post-load one-time setup tasks.
@@ -37,11 +35,8 @@ namespace Def
         /// <remarks>
         /// StaticReferences will be initialized before this function is called. This function will be called serially across your defs, but with undefined order.
         ///
-        /// Error strings can be returned from this as well, and will be reported in the same way as ConfigErrors()-reported errors.
+        /// Error strings can be reported from this as well, and will be displayed in the same way as ConfigErrors()-reported errors.
         /// </remarks>
-        public virtual IEnumerable<string> PostLoad()
-        {
-            yield break;
-        }
+        public virtual void PostLoad(Action<string> reporter) { }
     }
 }
