@@ -226,5 +226,24 @@ namespace DefTest
             Assert.AreEqual(20, Def.Database<SimpleDef>.Get("Before").overridden);
             Assert.AreEqual(30, Def.Database<SimpleDef>.Get("After").overridden);
         }
+
+        [Test]
+        public void BadAbstractTag([Values] BehaviorMode mode)
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SimpleDef) } };
+
+            var parser = new Def.Parser();
+            ExpectErrors(() => parser.AddString(@"
+                <Defs>
+                    <SimpleDef defName=""Obj"" abstract=""cheese"">
+                        <overridden>10</overridden>
+                     </SimpleDef>
+                </Defs>"));
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            Assert.AreEqual(10, Def.Database<SimpleDef>.Get("Obj").overridden);
+        }
     }
 }
