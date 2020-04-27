@@ -11,6 +11,7 @@ namespace DefTest
         {
             public int defaulted;
             public int overridden;
+            public int doubleOverridden;
 
             public class SubObject
             {
@@ -244,6 +245,65 @@ namespace DefTest
             DoBehavior(mode);
 
             Assert.AreEqual(10, Def.Database<SimpleDef>.Get("Obj").overridden);
+        }
+
+        [Test]
+        public void DoubleInheritance([Values] bool trunkAbstract, [Values] bool branchAbstract, [Values] bool leafAbstract, [Values] BehaviorMode mode)
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SimpleDef) } };
+
+            var parser = new Def.Parser();
+            parser.AddString($@"
+                <Defs>
+                    <SimpleDef defName=""Trunk"" {(trunkAbstract ? "abstract=\"true\"" : "")}>
+                        <defaulted>1</defaulted>
+                        <overridden>2</overridden>
+                        <doubleOverridden>3</doubleOverridden>
+                     </SimpleDef>
+                    <SimpleDef defName=""Branch"" parent=""Trunk"" {(branchAbstract ? "abstract=\"true\"" : "")}>
+                        <overridden>20</overridden>
+                        <doubleOverridden>30</doubleOverridden>
+                     </SimpleDef>
+                    <SimpleDef defName=""Leaf"" parent=""Branch"" {(leafAbstract ? "abstract=\"true\"" : "")}>
+                        <doubleOverridden>300</doubleOverridden>
+                     </SimpleDef>
+                </Defs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            if (trunkAbstract)
+            {
+                Assert.IsNull(Def.Database<SimpleDef>.Get("Trunk"));
+            }
+            else
+            {
+                Assert.AreEqual(1, Def.Database<SimpleDef>.Get("Trunk").defaulted);
+                Assert.AreEqual(2, Def.Database<SimpleDef>.Get("Trunk").overridden);
+                Assert.AreEqual(3, Def.Database<SimpleDef>.Get("Trunk").doubleOverridden);
+            }
+
+            if (branchAbstract)
+            {
+                Assert.IsNull(Def.Database<SimpleDef>.Get("Branch"));
+            }
+            else
+            {
+                Assert.AreEqual(1, Def.Database<SimpleDef>.Get("Branch").defaulted);
+                Assert.AreEqual(20, Def.Database<SimpleDef>.Get("Branch").overridden);
+                Assert.AreEqual(30, Def.Database<SimpleDef>.Get("Branch").doubleOverridden);
+            }
+
+            if (leafAbstract)
+            {
+                Assert.IsNull(Def.Database<SimpleDef>.Get("Leaf"));
+            }
+            else
+            {
+                Assert.AreEqual(1, Def.Database<SimpleDef>.Get("Leaf").defaulted);
+                Assert.AreEqual(20, Def.Database<SimpleDef>.Get("Leaf").overridden);
+                Assert.AreEqual(300, Def.Database<SimpleDef>.Get("Leaf").doubleOverridden);
+            }
         }
     }
 }
