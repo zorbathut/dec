@@ -9,7 +9,8 @@ namespace Def
     /// <remarks>
     /// All defs should inherit from this.
     /// </remarks>
-    public class Def
+    [Abstract]
+    public abstract class Def
     {
         /// <summary>
         /// Unique string identifier.

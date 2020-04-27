@@ -120,5 +120,48 @@ namespace DefTest
             Assert.AreEqual(60, Def.Database<IntDef>.Get("TestDef").value);
             Assert.AreEqual(70, Def.Database<IntDef>.Get("TestDef").nonSerializedValue);
         }
+
+        [Def.AbstractAttribute]
+        public abstract class AbstractRootDef : Def.Def
+        {
+            public int absInt = 0;
+        }
+
+        public class ConcreteChildADef : AbstractRootDef
+        {
+            public int ccaInt = 0;
+        }
+
+        public class ConcreteChildBDef : AbstractRootDef
+        {
+            public int ccbInt = 0;
+        }
+
+        [Test]
+        public void AbstractRoot([Values] BehaviorMode mode)
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ConcreteChildADef), typeof(ConcreteChildBDef) } };
+
+            var parser = new Def.Parser();
+            parser.AddString(@"
+                <Defs>
+                    <ConcreteChildADef defName=""TestDef"">
+                        <absInt>20</absInt>
+                        <ccaInt>30</ccaInt>
+                    </ConcreteChildADef>
+                    <ConcreteChildBDef defName=""TestDef"">
+                        <absInt>40</absInt>
+                        <ccbInt>50</ccbInt>
+                    </ConcreteChildBDef>
+                </Defs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            Assert.AreEqual(20, Def.Database<ConcreteChildADef>.Get("TestDef").absInt);
+            Assert.AreEqual(30, Def.Database<ConcreteChildADef>.Get("TestDef").ccaInt);
+            Assert.AreEqual(40, Def.Database<ConcreteChildBDef>.Get("TestDef").absInt);
+            Assert.AreEqual(50, Def.Database<ConcreteChildBDef>.Get("TestDef").ccbInt);
+        }
     }
 }

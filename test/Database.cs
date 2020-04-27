@@ -2,8 +2,8 @@ namespace DefTest
 {
     using NUnit.Framework;
     using System;
-    using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
 
     [TestFixture]
     public class Database : Base
@@ -103,6 +103,75 @@ namespace DefTest
             parser.Finish();
 
             ExpectErrors(() => Assert.IsNull(Def.Database.Get(typeof(NotActuallyADef), "Fake")));
+        }
+
+        private Func<Type, Type> getDefRootType;
+
+        [OneTimeSetUp]
+        public void CreateCallbacks()
+        {
+            var reflectionClass = Assembly.GetAssembly(typeof(Def.Def)).GetType("Def.UtilType");
+
+            var serialize = reflectionClass.GetMethod("GetDefRootType", BindingFlags.NonPublic | BindingFlags.Static);
+            getDefRootType = type => (Type)serialize.Invoke(null, new object[] { type });
+        }
+
+        abstract class CppAbstractTypeDef : Def.Def
+        {
+        }
+
+        class CppAbstractTypeDerivedDef : CppAbstractTypeDef
+        {
+        }
+
+        class CppAbstractTypeDerived2Def : CppAbstractTypeDerivedDef
+        {
+        }
+
+        [Def.Abstract]
+        class DefAbstractTypeDef : Def.Def
+        {
+        }
+
+        class DefAbstractTypeDerivedDef : DefAbstractTypeDef
+        {
+        }
+
+        class DefAbstractTypeDerived2Def : DefAbstractTypeDerivedDef
+        {
+        }
+
+        [Def.Abstract]
+        abstract class FullAbstractTypeDef : Def.Def
+        {
+        }
+
+        class FullAbstractTypeDerivedDef : FullAbstractTypeDef
+        {
+        }
+
+        class FullAbstractTypeDerived2Def : FullAbstractTypeDerivedDef
+        {
+        }
+
+        [Test]
+        public void DefRootTypeTests()
+        {
+            Assert.AreEqual(typeof(CppAbstractTypeDef), getDefRootType(typeof(CppAbstractTypeDerivedDef)));
+            Assert.AreEqual(typeof(CppAbstractTypeDef), getDefRootType(typeof(CppAbstractTypeDef)));
+
+            Assert.AreEqual(typeof(FullAbstractTypeDerivedDef), getDefRootType(typeof(FullAbstractTypeDerivedDef)));
+
+            // now for some errors
+            ExpectErrors(() => Assert.IsNull(getDefRootType(typeof(FullAbstractTypeDef))));
+            ExpectErrors(() => Assert.IsNull(getDefRootType(typeof(DefAbstractTypeDef))));
+
+            // We've already errored once on DefAbstract, so it's currently not required to happen again (but it's allowed to.)
+            Assert.AreEqual(typeof(DefAbstractTypeDerivedDef), getDefRootType(typeof(DefAbstractTypeDerivedDef)));
+
+            Assert.AreEqual(typeof(CppAbstractTypeDef), getDefRootType(typeof(CppAbstractTypeDerived2Def)));
+            Assert.AreEqual(typeof(DefAbstractTypeDerivedDef), getDefRootType(typeof(DefAbstractTypeDerived2Def)));
+            Assert.AreEqual(typeof(FullAbstractTypeDerivedDef), getDefRootType(typeof(FullAbstractTypeDerived2Def)));
         }
     }
 }

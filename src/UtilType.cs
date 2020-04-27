@@ -374,35 +374,85 @@ namespace Def
             ClearCache();
         }
 
-        internal static bool IsDefHierarchyType(this Type type)
+        internal enum DefDatabaseStatus
         {
-            return type.BaseType == typeof(Def);
+            Invalid,
+            Abstract,
+            Root,
+            Branch,
+        }
+        private static Dictionary<Type, DefDatabaseStatus> GetDefDatabaseStatusCache = new Dictionary<Type, DefDatabaseStatus>();
+        internal static DefDatabaseStatus GetDefDatabaseStatus(this Type type)
+        {
+            if (!GetDefDatabaseStatusCache.TryGetValue(type, out var result))
+            {
+                if (!typeof(Def).IsAssignableFrom(type))
+                {
+                    Dbg.Err($"Queried the def hierarchy status of a type {type} that doesn't even inherit from Def.");
+
+                    result = DefDatabaseStatus.Invalid;
+                }
+                else if (type.GetCustomAttribute<AbstractAttribute>(false) != null)
+                {
+                    if (!type.IsAbstract)
+                    {
+                        Dbg.Err($"Type {type} is tagged DefAbstract, but is not abstract.");
+                    }
+
+                    if (type.BaseType != typeof(object) && GetDefDatabaseStatus(type.BaseType) > DefDatabaseStatus.Abstract)
+                    {
+                        Dbg.Err($"Type {type} is tagged DefAbstract, but inherits from {type.BaseType} which is within the database.");
+                    }
+
+                    result = DefDatabaseStatus.Abstract;
+                }
+                else if (type.BaseType.GetCustomAttribute<AbstractAttribute>(false) != null)
+                {
+                    // We do this just to validate everything beneath this; it will return false.
+                    GetDefDatabaseStatus(type.BaseType);
+
+                    result = DefDatabaseStatus.Root;
+                }
+                else
+                {
+                    // Further validation.
+                    GetDefDatabaseStatus(type.BaseType);
+
+                    // Our parent isn't NotDatabaseRootAttribute. We are not a database root, but we also can't say anything meaningful about our parents.
+                    result = DefDatabaseStatus.Branch;
+                }
+
+                GetDefDatabaseStatusCache.Add(type, result);
+            }
+
+            return result;
         }
 
-        internal static Type GetDefHierarchyType(this Type type)
+        private static Dictionary<Type, Type> GetDefRootTypeCache = new Dictionary<Type, Type>();
+        internal static Type GetDefRootType(this Type type)
         {
-            Type origType = type;
-            if (type == typeof(Def))
+            if (!GetDefRootTypeCache.TryGetValue(type, out var result))
             {
-                Dbg.Err("Def objects do not exist in a standalone hierarchy");
-                return type;
-            }
-
-            while (true)
-            {
-                if (IsDefHierarchyType(type))
+                if (GetDefDatabaseStatus(type) <= DefDatabaseStatus.Abstract)
                 {
-                    return type;
+                    Dbg.Err($"{type} does not exist within a database hierarchy.");
+                    result = null;
+                }
+                else
+                {
+                    Type currentType = type;
+                    while (GetDefDatabaseStatus(currentType) == DefDatabaseStatus.Branch)
+                    {
+                        currentType = currentType.BaseType;
+                    }
+
+                    result = currentType;
                 }
 
-                type = type.BaseType;
-
-                if (type == null)
-                {
-                    Dbg.Err($"Type {origType} does not inherit from Def");
-                    return null;
-                }
+                GetDefRootTypeCache.Add(type, result);
             }
+
+            return result;
         }
     }
 }

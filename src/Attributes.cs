@@ -27,4 +27,16 @@ namespace Def
             Parser.StaticReferencesInitialized();
         }
     }
+
+    /// <summary>
+    /// Signals that this Def-deriving class is not a valid database root. No classes of this type will be instantiated and children of this class will have their own namespaces.
+    /// </summary>
+    /// <remarks>
+    /// Classes with this attribute must be abstract. The parent class of this class must also be marked with this.
+    /// </remarks>
+    [AttributeUsage(AttributeTargets.Class)]
+    public class AbstractAttribute : Attribute
+    {
+
+    }
 }

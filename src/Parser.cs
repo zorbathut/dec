@@ -5,6 +5,7 @@ namespace Def
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Runtime.CompilerServices;
     using System.Text.RegularExpressions;
     using System.Xml.Linq;
@@ -72,7 +73,7 @@ namespace Def
                 IEnumerable<Type> staticRefs;
                 if (!unitTestMode)
                 {
-                    staticRefs = UtilReflection.GetAllTypes().Where(t => t.HasAttribute(typeof(StaticReferencesAttribute)));
+                    staticRefs = UtilReflection.GetAllTypes().Where(t => t.GetCustomAttribute<StaticReferencesAttribute>() != null);
                 }
                 else if (Config.TestParameters.explicitStaticRefs != null)
                 {
@@ -85,7 +86,7 @@ namespace Def
 
                 foreach (var type in staticRefs)
                 {
-                    if (!type.HasAttribute(typeof(StaticReferencesAttribute)))
+                    if (type.GetCustomAttribute<StaticReferencesAttribute>() == null)
                     {
                         Dbg.Err($"{type} is not tagged as StaticReferences");
                     }
@@ -204,7 +205,7 @@ namespace Def
 
                     // Register ourselves as an available parenting object
                     {
-                        var identifier = Tuple.Create(typeHandle.GetDefHierarchyType(), defName);
+                        var identifier = Tuple.Create(typeHandle.GetDefRootType(), defName);
                         if (potentialParents.ContainsKey(identifier))
                         {
                             Dbg.Err($"{stringName}:{defElement.LineNumber()}: Def {identifier.Item1}:{identifier:Item2} redefined");
@@ -280,7 +281,7 @@ namespace Def
                 string parentDefName = work.parent;
                 while (parentDefName != null)
                 {
-                    var parentData = potentialParents.TryGetValue(Tuple.Create(work.target.GetType().GetDefHierarchyType(), parentDefName));
+                    var parentData = potentialParents.TryGetValue(Tuple.Create(work.target.GetType().GetDefRootType(), parentDefName));
 
                     // This is a struct for the sake of performance, so child itself won't be null
                     if (parentData.xml == null)

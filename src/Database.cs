@@ -53,7 +53,7 @@ namespace Def
         /// </remarks>
         public static Def Get(Type type, string name)
         {
-            var typedict = Lookup.TryGetValue(type.GetDefHierarchyType());
+            var typedict = Lookup.TryGetValue(type.GetDefRootType());
             if (typedict == null)
             {
                 return null;
@@ -100,7 +100,7 @@ namespace Def
                 return null;
             }
 
-            if (Get(typeof(T).GetDefHierarchyType(), defName) != null)
+            if (Get(typeof(T).GetDefRootType(), defName) != null)
             {
                 Dbg.Err($"Attempting to dynamically create {typeof(T)}:{defName} when a conflicting Def already exists");
                 return null;
@@ -147,7 +147,7 @@ namespace Def
                 return;
             }
 
-            if (def.DefName != defName && Get(def.GetType().GetDefHierarchyType(), defName) != null)
+            if (def.DefName != defName && Get(def.GetType().GetDefRootType(), defName) != null)
             {
                 Dbg.Err($"Attempting to rename {def} to {defName} when it already exists");
                 return;
@@ -193,7 +193,7 @@ namespace Def
         {
             if (CachedList == null)
             {
-                CachedList = Lookup.Where(kvp => kvp.Key.IsDefHierarchyType()).SelectMany(kvp => kvp.Value.Values).ToArray();
+                CachedList = Lookup.Where(kvp => kvp.Key.GetDefDatabaseStatus() == UtilType.DefDatabaseStatus.Root).SelectMany(kvp => kvp.Value.Values).ToArray();
             }
         }
 
@@ -226,7 +226,7 @@ namespace Def
                 // We'll just rely on Database<T> to generate the relevant errors if we're overwriting something
                 GetLookupFor(registrationType)[instance.DefName] = instance;
 
-                if (registrationType.IsDefHierarchyType())
+                if (registrationType.GetDefDatabaseStatus() == UtilType.DefDatabaseStatus.Root)
                 {
                     break;
                 }
@@ -256,7 +256,7 @@ namespace Def
                     lookup.Remove(instance.DefName);
                 }
 
-                if (registrationType.IsDefHierarchyType())
+                if (registrationType.GetDefDatabaseStatus() == UtilType.DefDatabaseStatus.Root)
                 {
                     break;
                 }
