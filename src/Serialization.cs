@@ -416,7 +416,7 @@ namespace Def
             // Special case: defs
             if (typeof(Def).IsAssignableFrom(type))
             {
-                if (UtilReflection.GetDefHierarchyType(type) == null)
+                if (type.GetDefHierarchyType() == null)
                 {
                     Dbg.Err($"{inputName}:{lineNumber}: Non-hierarchy defs cannot be used as references");
                     return null;

@@ -56,37 +56,6 @@ namespace Def
             }
         }
 
-        internal static Type GetDefHierarchyType(Type type)
-        {
-            Type origType = type;
-            if (type == typeof(Def))
-            {
-                Dbg.Err("Def objects do not exist in a standalone hierarchy");
-                return type;
-            }
-
-            while (true)
-            {
-                if (IsDefHierarchyType(type))
-                {
-                    return type;
-                }
-
-                type = type.BaseType;
-
-                if (type == null)
-                {
-                    Dbg.Err($"Type {origType} does not inherit from Def");
-                    return null;
-                }
-            }
-        }
-
-        internal static bool IsDefHierarchyType(Type type)
-        {
-            return type.BaseType == typeof(Def);
-        }
-
         internal static bool HasAttribute(this Type type, Type attribute)
         {
             return type.GetCustomAttributes(attribute).Any();

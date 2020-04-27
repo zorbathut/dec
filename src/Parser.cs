@@ -28,7 +28,26 @@ namespace Def
 
         // Data stored from initialization parameters
         private List<Type> staticReferences = new List<Type>();
-        
+
+        // A list of types that can be inherited from
+        private struct Parent
+        {
+            public XElement xml;
+            public ReaderContext context;
+            public string parent;
+        }
+        private Dictionary<Tuple<Type, string>, Parent> potentialParents = new Dictionary<Tuple<Type, string>, Parent>();
+
+        // A list of inheritance-based work that still has to be resolved
+        private struct InheritanceJob
+        {
+            public Def target;
+            public XElement xml;
+            public ReaderContext context;
+            public string parent;
+        }
+        private List<InheritanceJob> inheritanceJobs = new List<InheritanceJob>();
+
         // List of work to be run during the Finish stage
         private List<Action> finishWork = new List<Action>();
 
@@ -156,13 +175,65 @@ namespace Def
                     // Consume defName so we know it's not hanging around
                     defElement.Attribute("defName").Remove();
 
-                    // Create our instance
-                    var defInstance = (Def)Activator.CreateInstance(typeHandle);
-                    defInstance.DefName = defName;
+                    // Check to see if we're abstract
+                    bool abstrct = false;
+                    {
+                        var abstractAttribute = defElement.Attribute("abstract");
+                        if (abstractAttribute != null)
+                        {
+                            if (!bool.TryParse(abstractAttribute.Value, out abstrct))
+                            {
+                                Dbg.Err($"{stringName}:{defElement.LineNumber()}: Error encountered when parsing abstract attribute");
+                            }
 
-                    Database.Register(defInstance);
+                            abstractAttribute.Remove();
+                        }
+                    }
 
-                    finishWork.Add(() => Serialization.ParseElement(defElement, typeHandle, defInstance, readerContext, isRootDef: true));
+                    // Get our parent info
+                    string parent = null;
+                    {
+                        var parentAttribute = defElement.Attribute("parent");
+                        if (parentAttribute != null)
+                        {
+                            parent = parentAttribute.Value;
+
+                            parentAttribute.Remove();
+                        }
+                    }
+
+                    // Register ourselves as an available parenting object
+                    {
+                        var identifier = Tuple.Create(typeHandle.GetDefHierarchyType(), defName);
+                        if (potentialParents.ContainsKey(identifier))
+                        {
+                            Dbg.Err($"{stringName}:{defElement.LineNumber()}: Def {identifier.Item1}:{identifier:Item2} redefined");
+                        }
+                        else
+                        {
+                            potentialParents[identifier] = new Parent { xml = defElement, context = readerContext, parent = parent };
+                        }
+                    }
+
+                    if (!abstrct)
+                    {
+                        // Not abstract, so create our instance
+                        var defInstance = (Def)Activator.CreateInstance(typeHandle);
+                        defInstance.DefName = defName;
+
+                        Database.Register(defInstance);
+
+                        if (parent == null)
+                        {
+                            // Non-parent objects are simple; we just handle them here in order to avoid unnecessary GC churn
+                            finishWork.Add(() => Serialization.ParseElement(defElement, typeHandle, defInstance, readerContext, isRootDef: true));
+                        }
+                        else
+                        {
+                            // Add an inheritance resolution job; we'll take care of this soon
+                            inheritanceJobs.Add(new InheritanceJob { target = defInstance, xml = defElement, context = readerContext, parent = parent });
+                        }
+                    }
                 }
             }
         }
@@ -192,6 +263,51 @@ namespace Def
                 Dbg.Err($"Finishing while the world is in {s_Status} state; should be {Status.Accumulating} state");
             }
             s_Status = Status.Processing;
+
+            // Resolve all our inheritance jobs
+            foreach (var work in inheritanceJobs)
+            {
+                // These are the actions we need to perform; we actually have to resolve these backwards (it makes their construction a little easier)
+                // The final parse is listed first, then all the children up to the final point
+                var actions = new List<Action>();
+
+                actions.Add(() => Serialization.ParseElement(work.xml, work.target.GetType(), work.target, work.context, isRootDef: true));
+
+                string currentDefName = work.target.DefName;
+                XElement currentXml = work.xml;
+                ReaderContext currentContext = work.context;
+
+                string parentDefName = work.parent;
+                while (parentDefName != null)
+                {
+                    var parentData = potentialParents.TryGetValue(Tuple.Create(work.target.GetType().GetDefHierarchyType(), parentDefName));
+
+                    // This is a struct for the sake of performance, so child itself won't be null
+                    if (parentData.xml == null)
+                    {
+                        Dbg.Err($"{currentContext.sourceName}:{currentXml.LineNumber()}: Def {currentDefName} is attempting to use parent {parentDefName}, but no such def exists");
+
+                        // Not much more we can do here.
+                        break;
+                    }
+
+                    actions.Add(() => Serialization.ParseElement(parentData.xml, work.target.GetType(), work.target, parentData.context, isRootDef: true));
+
+                    currentDefName = parentDefName;
+                    currentXml = parentData.xml;
+                    currentContext = parentData.context;
+
+                    parentDefName = parentData.parent;
+                }
+
+                finishWork.Add(() =>
+                {
+                    for (int i = actions.Count - 1; i >= 0; --i)
+                    {
+                        actions[i]();
+                    }
+                });
+            }
 
             foreach (var work in finishWork)
             {

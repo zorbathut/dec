@@ -373,5 +373,36 @@ namespace Def
             // seed the cache
             ClearCache();
         }
+
+        internal static bool IsDefHierarchyType(this Type type)
+        {
+            return type.BaseType == typeof(Def);
+        }
+
+        internal static Type GetDefHierarchyType(this Type type)
+        {
+            Type origType = type;
+            if (type == typeof(Def))
+            {
+                Dbg.Err("Def objects do not exist in a standalone hierarchy");
+                return type;
+            }
+
+            while (true)
+            {
+                if (IsDefHierarchyType(type))
+                {
+                    return type;
+                }
+
+                type = type.BaseType;
+
+                if (type == null)
+                {
+                    Dbg.Err($"Type {origType} does not inherit from Def");
+                    return null;
+                }
+            }
+        }
     }
 }
