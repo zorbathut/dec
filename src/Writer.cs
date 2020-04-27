@@ -17,12 +17,10 @@ namespace Def
             var record = new XElement("Defs");
             doc.Add(record);
 
-            // We're not really storing anything long-term here, we're just 
             var writerContext = new WriterContext(false);
 
             foreach (var defObj in Database.List)
             {
-                // TODO: need a better string identifier; this should be basically the opposite of ParseTypeDefFormatted
                 var defXml = Serialization.ComposeElement(defObj, defObj.GetType(), defObj.GetType().ComposeDefFormatted(), writerContext, isRootDef: true);
                 defXml.Add(new XAttribute("defName", defObj.DefName));
                 record.Add(defXml);
