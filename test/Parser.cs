@@ -71,5 +71,54 @@ namespace DefTest
 
             ExpectErrors(() => Def.Database.Clear());
         }
+
+        public class IntDef : Def.Def
+        {
+            public int value = 42;
+
+            [NonSerialized]
+            public int nonSerializedValue = 70;
+        }
+
+        [Test]
+        public void NonSerializablePositive([Values] BehaviorMode mode)
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDef) } };
+
+            var parser = new Def.Parser();
+            parser.AddString(@"
+                <Defs>
+                    <IntDef defName=""TestDef"">
+                        <value>55</value>
+                    </IntDef>
+                </Defs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            Assert.AreEqual(55, Def.Database<IntDef>.Get("TestDef").value);
+            Assert.AreEqual(70, Def.Database<IntDef>.Get("TestDef").nonSerializedValue);
+        }
+
+        [Test]
+        public void NonSerializableNegative([Values] BehaviorMode mode)
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDef) } };
+
+            var parser = new Def.Parser();
+            parser.AddString(@"
+                <Defs>
+                    <IntDef defName=""TestDef"">
+                        <value>60</value>
+                        <nonSerializedValue>65</nonSerializedValue>
+                    </IntDef>
+                </Defs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoBehavior(mode);
+
+            Assert.AreEqual(60, Def.Database<IntDef>.Get("TestDef").value);
+            Assert.AreEqual(70, Def.Database<IntDef>.Get("TestDef").nonSerializedValue);
+        }
     }
 }

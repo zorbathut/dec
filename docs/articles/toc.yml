@@ -16,12 +16,12 @@
       href: doc_custom.md
     - name: Serialization
       href: doc_serialization.md
+    - name: Nonserialized members
+      href: doc_nonserialized.md
     - name: Security
       href: doc_security.md
 - name: Future Plans
   items:
-    - name: Nonserialized fields
-      href: fp_nonserialized.md
     - name: Multiple inheritance
       href: fp_multipleinheritance.md
     - name: Translation

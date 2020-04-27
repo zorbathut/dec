@@ -380,6 +380,12 @@ namespace Def
                     continue;
                 }
 
+                if (fieldInfo.GetCustomAttribute<NonSerializedAttribute>() != null)
+                {
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Attempting to set nonserialized field {fieldName}");
+                    continue;
+                }
+
                 // Check for fields we're not allowed to set
                 if (UtilReflection.ReflectionSetForbidden(fieldInfo))
                 {
@@ -647,6 +653,12 @@ namespace Def
                 if (field.GetCustomAttribute<IndexAttribute>() != null)
                 {
                     // we don't save indices
+                    continue;
+                }
+
+                if (field.GetCustomAttribute<NonSerializedAttribute>() != null)
+                {
+                    // we also don't save nonserialized
                     continue;
                 }
 

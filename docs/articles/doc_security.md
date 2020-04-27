@@ -11,7 +11,7 @@ Some things an attacker can do that you may wish to be aware of:
 * By choosing which class to create, an attacker may be ale to create classes of any type that inherit from types used as members in Defs. This will cause the default constructor to be executed. This can be mitigated by initializing all class members in Defs to non-null values; by modifying source, one could mostly remove the ability of this library to create new classes.
 * This also applies to Defs themselves. Any Def-inheriting class can be instantiated. This is harder to remove without eliminating necessary functionality.
 * It's common for Defs to include Type members, usually as a factory pattern to create objects with complicated behavior. Type members are entirely unconstrained and can refer to any type, even types without the expected base class. This is best mitigated by implementing [type constraints](fp_typeconstraints.md).
-* Def will happily allow people to change both public and private members, including private members in base classes. This behavior is not always expected and can easily put objects in internally inconsistent states. This issue can be mitigated by implementing [the NonSerialized attribute](fp_nonserialized.md).
+* Def will happily allow people to change both public and private members, including private members in base classes. This behavior is not always expected and can easily put objects in internally inconsistent states. This can be avoided by tagging internal-only fields with System.NonSerializedAttribute and accepting any input on any other field.
 
 If you think of another possible attack, please let me know and I'll add it to this list.
 

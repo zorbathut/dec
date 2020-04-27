@@ -28,4 +28,4 @@ class ExampleDef : Def.Def
 </ExampleDef>
 ```
 
-It's somewhat common to have cached or otherwise derived data within defs. Right now, you can accidentally (or maliciously) define that data within your XML. We could use the existing C# System.NonSerialized attribute to signal that certain fields should not be defined from within XML.
+It's somewhat common to have cached or otherwise derived data within defs. Use the System.NonSerialized attribute to signal that certain fields should not be defined from within XML; doing so will cause an error and prevent the assignment.

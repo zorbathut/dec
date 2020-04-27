@@ -310,6 +310,26 @@ namespace DefTest
             }
         }
 
-        // make sure to explore the create and delete and rename error pathways
+        public class NonSerializedDef : Def.Def
+        {
+            public int serializedValue = 30;
+
+            [NonSerialized]
+            public int nonSerializedValue = 40;
+        }
+
+        [Test]
+        public void NonSerialized()
+        {
+            var ephemeral = Def.Database.Create<NonSerializedDef>("TestDef");
+            ephemeral.serializedValue = 35;
+            ephemeral.nonSerializedValue = 45;
+
+            var writer = new Def.Writer();
+            string data = writer.Write();
+
+            Assert.IsTrue(data.Contains("serializedValue"));
+            Assert.IsFalse(data.Contains("nonSerializedValue"));
+        }
     }
 }
