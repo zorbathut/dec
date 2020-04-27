@@ -273,11 +273,63 @@ namespace DefTest
 
         public class ErrorDef : Def.Def
         {
+            public bool touchedBefore = false;
+            public bool touchedAfter = false;
+
             public override void ConfigErrors(Action<string> report)
             {
                 base.ConfigErrors(report);
 
+                touchedBefore = true;
+
                 report("I am never valid");
+
+                touchedAfter = true;
+            }
+        }
+
+        public class PostLoadErrorDef : Def.Def
+        {
+            public bool touchedBefore = false;
+            public bool touchedAfter = false;
+
+            public override void PostLoad(Action<string> report)
+            {
+                base.PostLoad(report);
+
+                touchedBefore = true;
+
+                report("I am never valid, at a weird time");
+
+                touchedAfter = true;
+            }
+        }
+
+        public class ErrorExceptionDef : Def.Def
+        {
+            public bool touched = false;
+
+            public override void ConfigErrors(Action<string> report)
+            {
+                base.ConfigErrors(report);
+
+                touched = true;
+
+                throw new FormatException();
+            }
+        }
+
+        public class PostLoadErrorExceptionDef : Def.Def
+        {
+            public bool touched = false;
+
+            public override void PostLoad(Action<string> report)
+            {
+                base.PostLoad(report);
+
+                touched = true;
+
+                throw new FormatException();
             }
         }
 
@@ -289,13 +341,76 @@ namespace DefTest
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
-                    <ErrorDef defName=""TestDef"" />
+                    <ErrorDef defName=""TestDefA"" />
+                    <ErrorDef defName=""TestDefB"" />
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode, expectParseErrors: true);
 
-            Assert.IsNotNull(Def.Database<ErrorDef>.Get("TestDef"));
+            Assert.IsTrue(Def.Database<ErrorDef>.Get("TestDefA").touchedBefore);
+            Assert.IsTrue(Def.Database<ErrorDef>.Get("TestDefA").touchedAfter);
+            Assert.IsTrue(Def.Database<ErrorDef>.Get("TestDefB").touchedBefore);
+            Assert.IsTrue(Def.Database<ErrorDef>.Get("TestDefB").touchedAfter);
+        }
+
+        [Test]
+        public void PostLoadErrors([Values] BehaviorMode mode)
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(PostLoadErrorDef) } };
+
+            var parser = new Def.Parser();
+            parser.AddString(@"
+                <Defs>
+                    <PostLoadErrorDef defName=""TestDefA"" />
+                    <PostLoadErrorDef defName=""TestDefB"" />
+                </Defs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoBehavior(mode, expectParseErrors: true);
+
+            Assert.IsTrue(Def.Database<PostLoadErrorDef>.Get("TestDefA").touchedBefore);
+            Assert.IsTrue(Def.Database<PostLoadErrorDef>.Get("TestDefA").touchedAfter);
+            Assert.IsTrue(Def.Database<PostLoadErrorDef>.Get("TestDefB").touchedBefore);
+            Assert.IsTrue(Def.Database<PostLoadErrorDef>.Get("TestDefB").touchedAfter);
+        }
+
+        [Test]
+        public void ConfigExceptionErrors([Values] BehaviorMode mode)
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ErrorExceptionDef) } };
+
+            var parser = new Def.Parser();
+            parser.AddString(@"
+                <Defs>
+                    <ErrorExceptionDef defName=""TestDefA"" />
+                    <ErrorExceptionDef defName=""TestDefB"" />
+                </Defs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoBehavior(mode, expectParseErrors: true);
+
+            Assert.IsTrue(Def.Database<ErrorExceptionDef>.Get("TestDefA").touched);
+            Assert.IsTrue(Def.Database<ErrorExceptionDef>.Get("TestDefB").touched);
+        }
+
+        [Test]
+        public void PostLoadExceptionErrors([Values] BehaviorMode mode)
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(PostLoadErrorExceptionDef) } };
+
+            var parser = new Def.Parser();
+            parser.AddString(@"
+                <Defs>
+                    <PostLoadErrorExceptionDef defName=""TestDefA"" />
+                    <PostLoadErrorExceptionDef defName=""TestDefB"" />
+                </Defs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoBehavior(mode, expectParseErrors: true);
+
+            Assert.IsTrue(Def.Database<PostLoadErrorExceptionDef>.Get("TestDefA").touched);
+            Assert.IsTrue(Def.Database<PostLoadErrorExceptionDef>.Get("TestDefB").touched);
         }
 
         public class PostLoadDef : Def.Def
