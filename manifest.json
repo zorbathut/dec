@@ -81,7 +81,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Def.Def.html",
-          "hash": "9MjCISj4S5h2ezmPGqKlGA=="
+          "hash": "ci8gObb7cm8zWIz+xU8y2w=="
         }
       },
       "is_incremental": false,
@@ -129,7 +129,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Def.Parser.html",
-          "hash": "wP2lAFkkVNXEKjDu+G/TRQ=="
+          "hash": "i5Q+UXCAOk21i0WJ2PuGRg=="
         }
       },
       "is_incremental": false,
@@ -165,7 +165,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Def.StaticReferencesAttribute.html",
-          "hash": "IYed776xJc1smJzfEXX+LA=="
+          "hash": "3clf5i6aPBgG6fUZDIwuUA=="
         }
       },
       "is_incremental": false,
@@ -257,6 +257,18 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "articles/doc_inheritance.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/doc_inheritance.html",
+          "hash": "EWKbyxKf2YXlbh2KRT5FnA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "articles/doc_parsing.md",
       "output": {
         ".html": {
@@ -341,23 +353,11 @@
     },
     {
       "type": "Conceptual",
-      "source_relative_path": "articles/fp_inheritance.md",
-      "output": {
-        ".html": {
-          "relative_path": "articles/fp_inheritance.html",
-          "hash": "ZUUFZrG7aJsnoXKZEtfEDw=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "Conceptual",
       "source_relative_path": "articles/fp_inplace.md",
       "output": {
         ".html": {
           "relative_path": "articles/fp_inplace.html",
-          "hash": "UjEaS21XXZkBEshOEYpTew=="
+          "hash": "fmgcZUkmACGzORu089P19g=="
         }
       },
       "is_incremental": false,
@@ -382,6 +382,18 @@
         ".html": {
           "relative_path": "articles/fp_mods.html",
           "hash": "2K87hR5MiKncCuODvUwjfw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/fp_multipleinheritance.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/fp_multipleinheritance.html",
+          "hash": "6eswmaJFnwXsQTuYV0WeaQ=="
         }
       },
       "is_incremental": false,
@@ -489,7 +501,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/toc.html",
-          "hash": "VGg7tAvOb0jmRuZ0kWKkFA=="
+          "hash": "QNWbnaIYWl7afo1LegchCw=="
         }
       },
       "is_incremental": false,
@@ -547,7 +559,7 @@
         "ConceptualDocumentProcessor": {
           "can_incremental": false,
           "incrementalPhase": "build",
-          "total_file_count": 24,
+          "total_file_count": 25,
           "skipped_file_count": 0
         }
       }

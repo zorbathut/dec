@@ -407,12 +407,15 @@ references:
   commentId: T:Def.Def
   fullName: Def.Def
   nameWithType: Def
-- uid: Def.Def.ConfigErrors
-  name: ConfigErrors()
-  href: api/Def.Def.html#Def_Def_ConfigErrors
-  commentId: M:Def.Def.ConfigErrors
-  fullName: Def.Def.ConfigErrors()
-  nameWithType: Def.ConfigErrors()
+- uid: Def.Def.ConfigErrors(System.Action{System.String})
+  name: ConfigErrors(Action<String>)
+  href: api/Def.Def.html#Def_Def_ConfigErrors_System_Action_System_String__
+  commentId: M:Def.Def.ConfigErrors(System.Action{System.String})
+  name.vb: ConfigErrors(Action(Of String))
+  fullName: Def.Def.ConfigErrors(System.Action<System.String>)
+  fullName.vb: Def.Def.ConfigErrors(System.Action(Of System.String))
+  nameWithType: Def.ConfigErrors(Action<String>)
+  nameWithType.vb: Def.ConfigErrors(Action(Of String))
 - uid: Def.Def.ConfigErrors*
   name: ConfigErrors
   href: api/Def.Def.html#Def_Def_ConfigErrors_
@@ -433,12 +436,15 @@ references:
   isSpec: "True"
   fullName: Def.Def.DefName
   nameWithType: Def.DefName
-- uid: Def.Def.PostLoad
-  name: PostLoad()
-  href: api/Def.Def.html#Def_Def_PostLoad
-  commentId: M:Def.Def.PostLoad
-  fullName: Def.Def.PostLoad()
-  nameWithType: Def.PostLoad()
+- uid: Def.Def.PostLoad(System.Action{System.String})
+  name: PostLoad(Action<String>)
+  href: api/Def.Def.html#Def_Def_PostLoad_System_Action_System_String__
+  commentId: M:Def.Def.PostLoad(System.Action{System.String})
+  name.vb: PostLoad(Action(Of String))
+  fullName: Def.Def.PostLoad(System.Action<System.String>)
+  fullName.vb: Def.Def.PostLoad(System.Action(Of System.String))
+  nameWithType: Def.PostLoad(Action<String>)
+  nameWithType.vb: Def.PostLoad(Action(Of String))
 - uid: Def.Def.PostLoad*
   name: PostLoad
   href: api/Def.Def.html#Def_Def_PostLoad_

@@ -97,7 +97,7 @@
     <a href="https://github.com/zorbathut/def/new/master/apiSpec/new?filename=Def_Def_DefName.md&amp;value=---%0Auid%3A%20Def.Def.DefName%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/zorbathut/def/blob/master/src/Def.cs/#L16">View Source</a>
+    <a href="https://github.com/zorbathut/def/blob/master/src/Def.cs/#L17">View Source</a>
   </span>
   <a id="Def_Def_DefName_" data-uid="Def.Def.DefName*"></a>
   <h4 id="Def_Def_DefName" data-uid="Def.Def.DefName">DefName</h4>
@@ -127,79 +127,83 @@
   </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/zorbathut/def/new/master/apiSpec/new?filename=Def_Def_ConfigErrors.md&amp;value=---%0Auid%3A%20Def.Def.ConfigErrors%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+    <a href="https://github.com/zorbathut/def/new/master/apiSpec/new?filename=Def_Def_ConfigErrors_System_Action_System_String__.md&amp;value=---%0Auid%3A%20Def.Def.ConfigErrors(System.Action%7BSystem.String%7D)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/zorbathut/def/blob/master/src/Def.cs/#L29">View Source</a>
+    <a href="https://github.com/zorbathut/def/blob/master/src/Def.cs/#L30">View Source</a>
   </span>
   <a id="Def_Def_ConfigErrors_" data-uid="Def.Def.ConfigErrors*"></a>
-  <h4 id="Def_Def_ConfigErrors" data-uid="Def.Def.ConfigErrors">ConfigErrors()</h4>
-  <div class="markdown level1 summary"><p>Overrideable function to return configuration errors.</p>
+  <h4 id="Def_Def_ConfigErrors_System_Action_System_String__" data-uid="Def.Def.ConfigErrors(System.Action{System.String})">ConfigErrors(Action&lt;String&gt;)</h4>
+  <div class="markdown level1 summary"><p>Overrideable function to report configuration errors.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public virtual IEnumerable&lt;string&gt; ConfigErrors()</code></pre>
+    <pre><code class="lang-csharp hljs">public virtual void ConfigErrors(Action&lt;string&gt; reporter)</code></pre>
   </div>
-  <h5 class="returns">Returns</h5>
+  <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
       <tr>
         <th>Type</th>
+        <th>Name</th>
         <th>Description</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<span class="xref">System.String</span>&gt;</td>
+        <td><span class="xref">System.Action</span>&lt;<span class="xref">System.String</span>&gt;</td>
+        <td><span class="parametername">reporter</span></td>
         <td></td>
       </tr>
     </tbody>
   </table>
-  <h5 id="Def_Def_ConfigErrors_remarks">Remarks</h5>
+  <h5 id="Def_Def_ConfigErrors_System_Action_System_String___remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>StaticReferences will be initialized before this function is called. This function may be called in parallel across your defs, in any order.</p>
 </div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/zorbathut/def/new/master/apiSpec/new?filename=Def_Def_PostLoad.md&amp;value=---%0Auid%3A%20Def.Def.PostLoad%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+    <a href="https://github.com/zorbathut/def/new/master/apiSpec/new?filename=Def_Def_PostLoad_System_Action_System_String__.md&amp;value=---%0Auid%3A%20Def.Def.PostLoad(System.Action%7BSystem.String%7D)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/zorbathut/def/blob/master/src/Def.cs/#L42">View Source</a>
+    <a href="https://github.com/zorbathut/def/blob/master/src/Def.cs/#L40">View Source</a>
   </span>
   <a id="Def_Def_PostLoad_" data-uid="Def.Def.PostLoad*"></a>
-  <h4 id="Def_Def_PostLoad" data-uid="Def.Def.PostLoad">PostLoad()</h4>
+  <h4 id="Def_Def_PostLoad_System_Action_System_String__" data-uid="Def.Def.PostLoad(System.Action{System.String})">PostLoad(Action&lt;String&gt;)</h4>
   <div class="markdown level1 summary"><p>Overrideable function to do post-load one-time setup tasks.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public virtual IEnumerable&lt;string&gt; PostLoad()</code></pre>
+    <pre><code class="lang-csharp hljs">public virtual void PostLoad(Action&lt;string&gt; reporter)</code></pre>
   </div>
-  <h5 class="returns">Returns</h5>
+  <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
       <tr>
         <th>Type</th>
+        <th>Name</th>
         <th>Description</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<span class="xref">System.String</span>&gt;</td>
+        <td><span class="xref">System.Action</span>&lt;<span class="xref">System.String</span>&gt;</td>
+        <td><span class="parametername">reporter</span></td>
         <td></td>
       </tr>
     </tbody>
   </table>
-  <h5 id="Def_Def_PostLoad_remarks">Remarks</h5>
+  <h5 id="Def_Def_PostLoad_System_Action_System_String___remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>StaticReferences will be initialized before this function is called. This function will be called serially across your defs, but with undefined order.</p>
-<p>Error strings can be returned from this as well, and will be reported in the same way as ConfigErrors()-reported errors.</p>
+<p>Error strings can be reported from this as well, and will be displayed in the same way as ConfigErrors()-reported errors.</p>
 </div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/zorbathut/def/new/master/apiSpec/new?filename=Def_Def_ToString.md&amp;value=---%0Auid%3A%20Def.Def.ToString%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/zorbathut/def/blob/master/src/Def.cs/#L18">View Source</a>
+    <a href="https://github.com/zorbathut/def/blob/master/src/Def.cs/#L19">View Source</a>
   </span>
   <a id="Def_Def_ToString_" data-uid="Def.Def.ToString*"></a>
   <h4 id="Def_Def_ToString" data-uid="Def.Def.ToString">ToString()</h4>
@@ -237,7 +241,7 @@
                     <a href="https://github.com/zorbathut/def/new/master/apiSpec/new?filename=Def_Def.md&amp;value=---%0Auid%3A%20Def.Def%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Improve this Doc</a>
                   </li>
                   <li>
-                    <a href="https://github.com/zorbathut/def/blob/master/src/Def.cs/#L11" class="contribution-link">View Source</a>
+                    <a href="https://github.com/zorbathut/def/blob/master/src/Def.cs/#L12" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>
