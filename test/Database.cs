@@ -154,6 +154,25 @@ namespace DefTest
         {
         }
 
+        [Def.Abstract]
+        abstract class FullAbstractTypeDerived3ADef : FullAbstractTypeDerived2Def
+        {
+        }
+
+        class FullAbstractTypeDerived4ADef : FullAbstractTypeDerived3ADef
+        {
+        }
+
+        [Def.Abstract]
+        abstract class FullAbstractTypeDerived3BDef : FullAbstractTypeDerived2Def
+        {
+        }
+
+        class FullAbstractTypeDerived4BDef : FullAbstractTypeDerived3BDef
+        {
+        }
+
+
         [Test]
         public void DefRootTypeTests()
         {
@@ -172,6 +191,9 @@ namespace DefTest
             Assert.AreEqual(typeof(CppAbstractTypeDef), getDefRootType(typeof(CppAbstractTypeDerived2Def)));
             Assert.AreEqual(typeof(DefAbstractTypeDerivedDef), getDefRootType(typeof(DefAbstractTypeDerived2Def)));
             Assert.AreEqual(typeof(FullAbstractTypeDerivedDef), getDefRootType(typeof(FullAbstractTypeDerived2Def)));
+
+            ExpectErrors(() => Assert.IsNull(getDefRootType(typeof(FullAbstractTypeDerived3ADef))));
+            ExpectErrors(() => Assert.AreEqual(typeof(FullAbstractTypeDerived4BDef), getDefRootType(typeof(FullAbstractTypeDerived4BDef))));
         }
     }
 }

@@ -408,14 +408,14 @@ namespace Def
                 }
                 else if (type.BaseType.GetCustomAttribute<AbstractAttribute>(false) != null)
                 {
-                    // We do this just to validate everything beneath this; it will return false.
+                    // We do this just to validate everything beneath this. It'd better return Abstract! More importantly, it goes through all parents and makes sure they're consistent.
                     GetDefDatabaseStatus(type.BaseType);
 
                     result = DefDatabaseStatus.Root;
                 }
                 else
                 {
-                    // Further validation.
+                    // Further validation. This time we really hope it returns Abstract or Root. More importantly, it goes through all parents and makes sure they're consistent.
                     GetDefDatabaseStatus(type.BaseType);
 
                     // Our parent isn't NotDatabaseRootAttribute. We are not a database root, but we also can't say anything meaningful about our parents.
