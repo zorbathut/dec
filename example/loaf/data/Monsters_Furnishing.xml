@@ -1,79 +1,58 @@
 <Defs>
-  <MonsterDef defName="OttomanSoldier">
+  <MonsterDef defName="FurnishingBase" abstract="true">
+    <hp>20</hp>
+    <damage>2d4</damage>
+  </MonsterDef>
+  
+  <MonsterDef defName="OttomanSoldier" parent="FurnishingBase">
     <name>ottoman soldier</name>
-    <hp>20</hp>
-    <damage>2d4</damage>
   </MonsterDef>
 
-  <MonsterDef defName="KnightStand">
+  <MonsterDef defName="KnightStand" parent="FurnishingBase">
     <name>knightstand</name>
-    <hp>20</hp>
-    <damage>2d4</damage>
   </MonsterDef>
 
-  <MonsterDef defName="Chairiot">
+  <MonsterDef defName="Chairiot" parent="FurnishingBase">
     <name>chairiot</name>
-    <hp>20</hp>
-    <damage>2d4</damage>
   </MonsterDef>
 
-  <MonsterDef defName="ArmoireKnight">
+  <MonsterDef defName="ArmoireKnight" parent="FurnishingBase">
     <name>armoire knight</name>
-    <hp>20</hp>
-    <damage>2d4</damage>
   </MonsterDef>
 
-  <MonsterDef defName="BureauAgent">
+  <MonsterDef defName="BureauAgent" parent="FurnishingBase">
     <name>bureau agent</name>
-    <hp>20</hp>
-    <damage>2d4</damage>
   </MonsterDef>
 
-  <MonsterDef defName="ChestyWarrior">
+  <MonsterDef defName="ChestyWarrior" parent="FurnishingBase">
     <name>chesty warrior</name>
-    <hp>20</hp>
-    <damage>2d4</damage>
   </MonsterDef>
 
-  <MonsterDef defName="Bearcubby">
+  <MonsterDef defName="Bearcubby" parent="FurnishingBase">
     <name>bearcubby</name>
-    <hp>20</hp>
-    <damage>2d4</damage>
   </MonsterDef>
 
-  <MonsterDef defName="MirrorChampion">
+  <MonsterDef defName="MirrorChampion" parent="FurnishingBase">
     <name>knightstand</name>
-    <hp>20</hp>
-    <damage>2d4</damage>
   </MonsterDef>
 
-  <MonsterDef defName="Nightstandstalker">
+  <MonsterDef defName="Nightstandstalker" parent="FurnishingBase">
     <name>nightstandstalker</name>
-    <hp>20</hp>
-    <damage>2d4</damage>
   </MonsterDef>
 
-  <MonsterDef defName="Secretary">
+  <MonsterDef defName="Secretary" parent="FurnishingBase">
     <name>secretary</name>
-    <hp>20</hp>
-    <damage>2d4</damage>
   </MonsterDef>
 
-  <MonsterDef defName="SofaKing">
+  <MonsterDef defName="SofaKing" parent="FurnishingBase">
     <name>sofa king</name>
-    <hp>20</hp>
-    <damage>2d4</damage>
   </MonsterDef>
 
-  <MonsterDef defName="HotelValet">
+  <MonsterDef defName="HotelValet" parent="FurnishingBase">
     <name>hotel valet</name>
-    <hp>20</hp>
-    <damage>2d4</damage>
   </MonsterDef>
 
-  <MonsterDef defName="VanityElemental">
+  <MonsterDef defName="VanityElemental" parent="FurnishingBase">
     <name>vanity elemental</name>
-    <hp>20</hp>
-    <damage>2d4</damage>
   </MonsterDef>
 </Defs>
