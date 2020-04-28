@@ -396,12 +396,12 @@ namespace Def
                 {
                     if (!type.IsAbstract)
                     {
-                        Dbg.Err($"Type {type} is tagged DefAbstract, but is not abstract.");
+                        Dbg.Err($"Type {type} is tagged Def.Abstract, but is not abstract.");
                     }
 
                     if (type.BaseType != typeof(object) && GetDefDatabaseStatus(type.BaseType) > DefDatabaseStatus.Abstract)
                     {
-                        Dbg.Err($"Type {type} is tagged DefAbstract, but inherits from {type.BaseType} which is within the database.");
+                        Dbg.Err($"Type {type} is tagged Def.Abstract, but inherits from {type.BaseType} which is within the database.");
                     }
 
                     result = DefDatabaseStatus.Abstract;
