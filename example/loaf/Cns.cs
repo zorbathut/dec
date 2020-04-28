@@ -7,7 +7,8 @@ namespace Loaf
 
     public static class Cns
     {
-        public class ChoiceDef : Def.Def
+        [Def.Abstract]
+        public abstract class ChoiceDef : Def.Def
         {
 
         }
