@@ -6,4 +6,8 @@
   <LocationTypedDef defName="FairyGrotto">
     <type>Locations.FairyGrotto</type>
   </LocationTypedDef>
+
+  <LocationTypedDef defName="ArmorsShop">
+    <type>Locations.Shop</type>
+  </LocationTypedDef>
 </Defs>

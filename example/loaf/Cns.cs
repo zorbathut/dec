@@ -1,6 +1,7 @@
 namespace Loaf
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
     using System.Threading;
@@ -39,7 +40,7 @@ namespace Loaf
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-        internal static T Choice<T>(bool longForm = false) where T : ChoiceDef
+        internal static T Choice<T>(T[] items, Func<T, string> label, bool longForm = false)
         {
             string separator;
             string prompt;
@@ -54,21 +55,31 @@ namespace Loaf
                 prompt = "? ";
             }
 
-            T[] choices = Def.Database<T>.List;
-            string choiceList = string.Join(separator, choices.Select(choice => $"({choice.DefName[0]}){choice.DefName.Substring(1)}"));
+            T[] choices = items;
+            string choiceList = string.Join(separator, choices.Select(choice =>
+            {
+                string choiceLabel = label(choice);
+                return $"({choiceLabel[0]}){choiceLabel.Substring(1)}";
+            }));
 
             Out($"{choiceList}{prompt}", crlf: false);
             while (true)
             {
                 var key = Console.ReadKey(true);
 
-                var choice = choices.Where(c => char.ToLower(c.DefName[0]) == char.ToLower(key.KeyChar)).FirstOrDefault();
-                if (choice != null)
+                var success = choices.Where(c => char.ToLower(label(c)[0]) == char.ToLower(key.KeyChar));
+                var choice = success.SingleOrDefault();
+                if (success.Any())
                 {
                     Out(""); // we need a CRLF
                     return choice;
                 }
             }
+        }
+
+        internal static T Choice<T>(bool longForm = false) where T : ChoiceDef
+        {
+            return Choice(Def.Database<T>.List, choice => choice.DefName, longForm: longForm);
         }
     }
 }

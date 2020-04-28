@@ -1,6 +1,24 @@
 <Defs>
   <WeaponDef defName="RustySword">
     <name>Rusty Sword</name>
+    <damage>2d4</damage>
+  </WeaponDef>
+
+  <WeaponDef defName="RustlessSword">
+    <name>Rustless Sword</name>
     <damage>3d8</damage>
+    <price>200</price>
+  </WeaponDef>
+
+  <WeaponDef defName="DiamondScourge">
+    <name>Diamond Scourge</name>
+    <damage>4d12</damage>
+    <price>4000</price>
+  </WeaponDef>
+
+  <WeaponDef defName="Couchbane">
+    <name>Couchbane</name>
+    <damage>5d20</damage>
+    <price>30000</price>
   </WeaponDef>
 </Defs>

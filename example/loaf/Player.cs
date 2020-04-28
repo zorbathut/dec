@@ -10,6 +10,11 @@ namespace Loaf
         private List<ItemDef> inventory = new List<ItemDef>();
         private int gold = 0;
 
+        public int Gold
+        {
+            get => gold;
+        }
+
         public IEnumerable<ItemDef> Inventory
         {
             get => inventory;
@@ -31,6 +36,19 @@ namespace Loaf
         public void AcquireGold(int gold)
         {
             this.gold = (int)Math.Min((long)this.gold + gold, int.MaxValue);
+        }
+
+        public bool SpendGold(int gold)
+        {
+            if (this.gold >= gold)
+            {
+                this.gold = this.gold - gold;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public void Record(Def.Recorder recorder)

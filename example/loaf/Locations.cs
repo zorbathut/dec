@@ -1,7 +1,9 @@
 
 namespace Loaf.Locations
 {
+    using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
 
     public class YourBedroom : Location
     {
@@ -19,6 +21,10 @@ namespace Loaf.Locations
             foreach (var item in Player.Instance.Inventory)
             {
                 Cns.Out($"  {item.name}");
+            }
+            if (Player.Instance.Gold > 0)
+            {
+                Cns.Out($"  {Player.Instance.Gold} gold");
             }
             Cns.Out("");
             Cns.Out($"You are currently wielding a {Player.Instance.CurrentWeapon.name}.");
@@ -47,6 +53,52 @@ namespace Loaf.Locations
 
             Cns.Out("The Fairy cheerfully informs you that your game has been saved.");
             Cns.Out("Come back any time!");
+
+            return Outcomes.Return;
+        }
+    }
+
+    public class Shop : Location
+    {
+        public Shop(LocationDef locationDef) { }
+
+        public override OutcomeDef Visit()
+        {
+            Cns.Out("Welcome to Armor's Shop!");
+            Cns.Out("I'm Armor, the owner of this fine joint. We're the national leader in weapons!");
+            Cns.Out("We don't sell armor, though. It's just that my name is Armor.");
+            Cns.Out("This is a weapon shop, owned by myself, a man named Armor, who does not make armor.");
+            Cns.Out("I acknowledge this is confusing.");
+            Cns.Out("");
+            Cns.Out($"By the size of your wallet, I can see you have {Player.Instance.Gold} gold. See anything you want to buy?");
+            Cns.Out("");
+
+            var choices = Def.Database<WeaponDef>.List.Where(weapon => weapon.price > 0 && !Player.Instance.Inventory.Contains(weapon)).OrderBy(weapon => weapon.price).ToList();
+            choices.Add(null);  // we'll use this for the "nothing" option
+
+            var choice = Cns.Choice<WeaponDef>(choices.ToArray(), weapon =>
+            {
+                if (weapon == null)
+                {
+                    return "Leave";
+                }
+
+                return $"{weapon.name} ({weapon.price} gold)";
+            }, true);
+
+            if (choice != null)
+            {
+                if (Player.Instance.SpendGold(choice.price))
+                {
+                    Cns.Out("All yours, enjoy!");
+
+                    Player.Instance.AcquireItem(choice);
+                }
+                else
+                {
+                    Cns.Out("You can't afford it! Get out of my shop and come back when you've got more money.");
+                }
+            }
 
             return Outcomes.Return;
         }
