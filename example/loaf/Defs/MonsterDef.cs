@@ -6,5 +6,6 @@ namespace Loaf
         public string name;
         public int hp;
         public Dice damage;
+        public Dice gold;
     }
 }

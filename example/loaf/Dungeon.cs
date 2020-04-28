@@ -68,9 +68,6 @@ namespace Loaf
                     return Location.Outcomes.Return;
                 }
 
-                Cns.Out("");
-                Cns.Out("The monster is slain!", color: System.ConsoleColor.White);
-
                 var choice = Cns.Choice<DungeonChoiceDef>();
                 if (choice == DungeonChoices.Leave)
                 {
@@ -114,6 +111,15 @@ namespace Loaf
             }
             else
             {
+                Cns.Out("");
+                Cns.Out("The monster is slain!", color: System.ConsoleColor.White);
+
+                int goldIncome = monster.gold.Roll();
+                Player.Instance.AcquireGold(goldIncome);
+                Cns.Out($"You root around in the dirt for a bit and find {goldIncome} gold.");
+
+                Cns.Out("");
+
                 return Outcomes.Victory;
             }
         }

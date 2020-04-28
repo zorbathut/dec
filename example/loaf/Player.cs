@@ -1,12 +1,14 @@
 
 namespace Loaf
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
     public class Player : SingletonManual<Player>, Def.IRecordable
     {
         private List<ItemDef> inventory = new List<ItemDef>();
+        private int gold = 0;
 
         public IEnumerable<ItemDef> Inventory
         {
@@ -26,9 +28,15 @@ namespace Loaf
             }
         }
 
+        public void AcquireGold(int gold)
+        {
+            this.gold = (int)Math.Min((long)this.gold + gold, int.MaxValue);
+        }
+
         public void Record(Def.Recorder recorder)
         {
             recorder.Record(ref inventory, "inventory");
+            recorder.Record(ref gold, "gold");
         }
     }
 }
