@@ -2,6 +2,7 @@
 namespace Loaf
 {
     using System.IO;
+    using System.Linq;
 
     public static class Game
     {
@@ -63,7 +64,9 @@ namespace Loaf
                 Cns.Out("You stand at a crossroads, both literally and metaphorically.");
                 Cns.Out("");
 
-                var location = Cns.Choice<LocationDef>(longForm: true).Create();
+                var destinations = Def.Database<LocationDef>.List.Where(loc => loc.requiredItem == null || Player.Instance.Inventory.Contains(loc.requiredItem));
+
+                var location = Cns.Choice(items: destinations.ToArray(), longForm: true).Create();
                 var result = location.Visit();
 
                 if (result == Location.Outcomes.Death)

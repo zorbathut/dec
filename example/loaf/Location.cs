@@ -23,6 +23,8 @@ namespace Loaf
 
     public abstract class LocationDef : Cns.ChoiceDef
     {
+        public ItemDef requiredItem;
+
         public abstract Location Create();
     }
 

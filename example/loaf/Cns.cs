@@ -77,9 +77,9 @@ namespace Loaf
             }
         }
 
-        internal static T Choice<T>(bool longForm = false) where T : ChoiceDef
+        internal static T Choice<T>(T[] items = null, bool longForm = false) where T : ChoiceDef
         {
-            return Choice(Def.Database<T>.List, choice => choice.DefName, longForm: longForm);
+            return Choice(items ?? Def.Database<T>.List, choice => choice.DefName, longForm: longForm);
         }
     }
 }
