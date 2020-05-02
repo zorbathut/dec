@@ -49,7 +49,7 @@ namespace Loaf.Locations
             Cns.Out("");
 
             // This seems like an appropriate time to do this.
-            File.WriteAllText("loaf.sav", Def.Recorder.Write(Player.Instance));
+            File.WriteAllText(Config.Global.saveFilename, Def.Recorder.Write(Player.Instance));
 
             Cns.Out("The Fairy cheerfully informs you that your game has been saved.");
             Cns.Out("Come back any time!");

@@ -6,5 +6,6 @@
     <startingItems>
       <li>RustySword</li>
     </startingItems>
+    <saveFilename>loaf.sav</saveFilename>
   </ConfigDef>
 </Defs>

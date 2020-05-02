@@ -1,4 +1,7 @@
 <Defs>
   <Location.OutcomeDef defName="Return" />
   <Location.OutcomeDef defName="Death" />
+
+  <Game.StartGameChoiceDef defName="NewGame" />
+  <Game.StartGameChoiceDef defName="Load" />
 </Defs>

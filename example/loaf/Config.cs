@@ -10,6 +10,7 @@ namespace Loaf
         public bool suppressDelay = false;
 
         public List<ItemDef> startingItems;
+        public string saveFilename;
     }
 
     [Def.StaticReferences]

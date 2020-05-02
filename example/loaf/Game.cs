@@ -1,12 +1,43 @@
 
 namespace Loaf
 {
+    using System.IO;
+
     public static class Game
     {
-        public static void Run()
+        private class StartGameChoiceDef : Cns.ChoiceDef { }
+
+        [Def.StaticReferences]
+        private static class StartGameChoices
         {
+            static StartGameChoices()
+            {
+                Def.StaticReferencesAttribute.Initialized();
+            }
+
+            public static StartGameChoiceDef NewGame;
+            public static StartGameChoiceDef Load;
+        }
+
+        private static void InitializePlayer()
+        {
+            bool newGame = true;
+
+            if (File.Exists(Config.Global.saveFilename))
+            {
+                var choice = Cns.Choice<StartGameChoiceDef>();
+                if (choice == StartGameChoices.Load)
+                {
+                    newGame = false;
+                    Player.Set(Def.Recorder.Read<Player>(File.ReadAllText(Config.Global.saveFilename)));
+                }
+
+                Cns.Out("");
+                Cns.Out("");
+            }
 
             // Create player
+            if (newGame)
             {
                 var player = new Player();
                 foreach (var item in Config.Global.startingItems)
@@ -15,6 +46,11 @@ namespace Loaf
                 }
                 Player.Set(player);
             }
+        }
+
+        public static void Run()
+        {
+            InitializePlayer();
 
             Cns.Out("Welcome to Legend of the Amethyst Futon!");
             Cns.Out("Your quest: find the Amethyst Futon, rumored to be the most comfortable resting device in the kingdom.");
