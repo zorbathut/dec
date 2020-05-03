@@ -47,6 +47,7 @@
 
   <MonsterDef defName="SofaKing" parent="FurnishingBase">
     <name>sofa king</name>
+    <loot>FutonMap</loot>
   </MonsterDef>
 
   <MonsterDef defName="HotelValet" parent="FurnishingBase">

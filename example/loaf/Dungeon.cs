@@ -1,7 +1,7 @@
 
 namespace Loaf
 {
-    using System.IO;
+    using System.Linq;
 
     public class DungeonDef : LocationDef
     {
@@ -113,6 +113,12 @@ namespace Loaf
             {
                 Cns.Out("");
                 Cns.Out("The monster is slain!", color: System.ConsoleColor.White);
+
+                if (monster.loot != null && !Player.Instance.Inventory.Contains(monster.loot))
+                {
+                    Cns.Out($"You find a {monster.loot.name}!", color: System.ConsoleColor.Cyan);
+                    Player.Instance.AcquireItem(monster.loot);
+                }
 
                 int goldIncome = monster.gold.Roll();
                 Player.Instance.AcquireGold(goldIncome);

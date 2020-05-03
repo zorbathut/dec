@@ -11,6 +11,8 @@ namespace Loaf
 
         public List<ItemDef> startingItems;
         public string saveFilename;
+
+        public bool alternateEnding = false;
     }
 
     [Def.StaticReferences]

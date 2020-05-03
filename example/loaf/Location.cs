@@ -15,6 +15,7 @@ namespace Loaf
 
             public static OutcomeDef Return;
             public static OutcomeDef Death;
+            public static OutcomeDef Victory;
         }
         public class OutcomeDef : Def.Def { }
 

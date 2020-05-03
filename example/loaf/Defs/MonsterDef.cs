@@ -7,5 +7,7 @@ namespace Loaf
         public int hp;
         public Dice damage;
         public Dice gold;
+
+        public ItemDef loot;
     }
 }

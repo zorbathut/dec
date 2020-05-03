@@ -71,10 +71,17 @@ namespace Loaf
 
                 if (result == Location.Outcomes.Death)
                 {
-                    // Do death here.
                     Cns.Out("");
                     Cns.Out("You have died.", color: System.ConsoleColor.Red);
                     Cns.Out("But that's okay. You got better.");
+                }
+                else if (result == Location.Outcomes.Victory)
+                {
+                    Cns.Out("");
+                    Cns.Out("CONGRATULATIONS! You win!");
+
+                    // unceremoniously dump the player out of the game
+                    return;
                 }
             }
         }

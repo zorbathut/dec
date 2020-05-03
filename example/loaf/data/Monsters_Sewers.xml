@@ -11,6 +11,7 @@
 
   <MonsterDef defName="SaturatedGoblin" parent="SewerBase">
     <name>saturated goblin</name>
+    <loot>ArmorShopMap</loot>
   </MonsterDef>
 
   <MonsterDef defName="SoakedBugbear" parent="SewerBase">
@@ -23,6 +24,7 @@
 
   <MonsterDef defName="WaterloggedOrc" parent="SewerBase">
     <name>waterlogged orc</name>
+    <loot>CaveMap</loot>
   </MonsterDef>
 
   <MonsterDef defName="DrippingBat" parent="SewerBase">

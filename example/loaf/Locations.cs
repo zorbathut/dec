@@ -103,5 +103,57 @@ namespace Loaf.Locations
             return Outcomes.Return;
         }
     }
+
+    public class Futon : Location
+    {
+        public Futon(LocationDef locationDef) { }
+
+        public override OutcomeDef Visit()
+        {
+            Cns.Out("You've finally tracked down the Emerald Futon!");
+            Cns.Out("It was in your living room all along!");
+            Cns.Out("");
+
+            if (!Config.Global.alternateEnding)
+            {
+                Cns.Out("With excitement and trepidation, you sit down upon the futon.");
+                Cns.Out("");
+                Cns.Out("");
+                Cns.Out("");
+                Cns.Out("It's not very comfortable.");
+                Cns.Out("");
+                Cns.Out("");
+            }
+            else
+            {
+                Cns.Out("You're feeling sleepy, so you decide to take a nap.");
+                Cns.Out("");
+                Cns.Out("You can't figure out how to make it turn into a bed.");
+                Cns.Out("");
+                Cns.Out("Wait, hold on. There it is.");
+                Cns.Out("");
+                Cns.Out("No, that's not right. Hold on. Still looking.");
+                Cns.Out("");
+                Cns.Out("Aha! Found it!");
+                Cns.Out("");
+                Cns.Out("It doesn't work.");
+                Cns.Out("Looks like it's broken.");
+                Cns.Out("");
+                Cns.Out("");
+                Cns.Out("");
+                Cns.Out("");
+                Cns.Out("");
+                Cns.Out("you tried so hard");
+                Cns.Out("and got so far");
+                Cns.Out("but in the end");
+                Cns.Out("it doesn't even mattress");
+                Cns.Out("");
+                Cns.Out("");
+            }
+            
+
+            return Outcomes.Victory;
+        }
+    }
 }
 

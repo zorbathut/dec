@@ -11,4 +11,9 @@
     <type>Locations.Shop</type>
     <requiredItem>ArmorShopMap</requiredItem>
   </LocationTypedDef>
+
+  <LocationTypedDef defName="LivingRoom">
+    <type>Locations.Futon</type>
+    <requiredItem>FutonMap</requiredItem>
+  </LocationTypedDef>
 </Defs>
