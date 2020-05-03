@@ -3,7 +3,7 @@
   <Dungeon.FightChoiceDef defName="Run" />
 
   <Dungeon.DungeonChoiceDef defName="FindMore">
-    <label>Find More</label>
+    <label>Find more</label>
   </Dungeon.DungeonChoiceDef>
   <Dungeon.DungeonChoiceDef defName="Leave" />
 
