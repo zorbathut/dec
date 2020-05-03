@@ -19,7 +19,7 @@
   <WeaponDef defName="Couchbane">
     <name>Couchbane</name>
     <damage>5d20</damage>
-    <price>30000</price>
+    <price>60000</price>
   </WeaponDef>
 
   <ArmorDef defName="StinkySocks">

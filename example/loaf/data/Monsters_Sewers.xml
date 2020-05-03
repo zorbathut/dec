@@ -1,8 +1,8 @@
 <Defs>
   <MonsterDef defName="SewerBase" abstract="true">
     <hp>20</hp>
-    <damage>1d1</damage>
-    <gold>20d20</gold>
+    <damage>2d4</damage>
+    <gold>4d10</gold>
   </MonsterDef>
   
   <MonsterDef defName="MoistRat" parent="SewerBase">

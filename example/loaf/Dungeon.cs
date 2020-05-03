@@ -116,7 +116,7 @@ namespace Loaf
                 }
             }
 
-            if (playerHp <= 0)
+            if (monsterHp > 0)
             {
                 return Outcomes.Death;
             }

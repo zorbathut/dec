@@ -1,8 +1,8 @@
 <Defs>
   <MonsterDef defName="FurnishingBase" abstract="true">
-    <hp>20</hp>
-    <damage>1d1</damage>
-    <gold>20d20</gold>
+    <hp>100</hp>
+    <damage>3d8</damage>
+    <gold>20d600</gold>
   </MonsterDef>
   
   <MonsterDef defName="OttomanSoldier" parent="FurnishingBase">

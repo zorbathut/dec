@@ -3,6 +3,7 @@
     <baud>1200</baud>
     <crlfDelay>0.2</crlfDelay>
 
+    <playerHp>20</playerHp>
     <startingItems>
       <li>RustySword</li>
     </startingItems>

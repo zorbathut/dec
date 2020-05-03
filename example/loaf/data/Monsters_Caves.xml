@@ -1,57 +1,57 @@
 <Defs>
   <MonsterDef defName="CavesBase" abstract="true">
-    <hp>20</hp>
-    <damage>1d1</damage>
-    <gold>20d20</gold>
+    <hp>40</hp>
+    <damage>2d6</damage>
+    <gold>10d100</gold>
   </MonsterDef>
   
-  <MonsterDef defName="AmethystApe" parent="SewerBase">
+  <MonsterDef defName="AmethystApe" parent="CavesBase">
     <name>amethyst ape</name>
   </MonsterDef>
 
-  <MonsterDef defName="AmberAuroch" parent="SewerBase">
+  <MonsterDef defName="AmberAuroch" parent="CavesBase">
     <name>amber auroch</name>
   </MonsterDef>
 
-  <MonsterDef defName="EmeraldEttin" parent="SewerBase">
+  <MonsterDef defName="EmeraldEttin" parent="CavesBase">
     <name>emerald ettin</name>
     <loot>JaggedBracer</loot>
   </MonsterDef>
 
-  <MonsterDef defName="JadeJackal" parent="SewerBase">
+  <MonsterDef defName="JadeJackal" parent="CavesBase">
     <name>jade jackal</name>
   </MonsterDef>
 
-  <MonsterDef defName="LapisLamia" parent="SewerBase">
+  <MonsterDef defName="LapisLamia" parent="CavesBase">
     <name>lapis lamia</name>
   </MonsterDef>
 
-  <MonsterDef defName="OpalOgre" parent="SewerBase">
+  <MonsterDef defName="OpalOgre" parent="CavesBase">
     <name>opal ogre</name>
     <loot>JaggedBracer</loot>
   </MonsterDef>
 
-  <MonsterDef defName="PearlPegasus" parent="SewerBase">
+  <MonsterDef defName="PearlPegasus" parent="CavesBase">
     <name>pearl pegasus</name>
   </MonsterDef>
 
-  <MonsterDef defName="RubyRevenant" parent="SewerBase">
+  <MonsterDef defName="RubyRevenant" parent="CavesBase">
     <name>ruby revenant</name>
   </MonsterDef>
 
-  <MonsterDef defName="SapphireSuccubus" parent="SewerBase">
+  <MonsterDef defName="SapphireSuccubus" parent="CavesBase">
     <name>sapphire succubus</name>
   </MonsterDef>
 
-  <MonsterDef defName="TurquoiseTurtle" parent="SewerBase">
+  <MonsterDef defName="TurquoiseTurtle" parent="CavesBase">
     <name>turquoise turtle</name>
   </MonsterDef>
 
-  <MonsterDef defName="TopazTiger" parent="SewerBase">
+  <MonsterDef defName="TopazTiger" parent="CavesBase">
     <name>topaz tiger</name>
   </MonsterDef>
 
-  <MonsterDef defName="DiamondDragon" parent="SewerBase">
+  <MonsterDef defName="DiamondDragon" parent="CavesBase">
     <name>diamond dragon</name>
     <loot>WoodworkerMap</loot>
   </MonsterDef>
