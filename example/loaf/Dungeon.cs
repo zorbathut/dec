@@ -128,6 +128,10 @@ namespace Loaf
                 if (monster.loot != null && !Player.Instance.Inventory.Contains(monster.loot))
                 {
                     Cns.Out($"You find a {monster.loot.name}!", color: System.ConsoleColor.Cyan);
+                    if (monster.loot is ArmorDef)
+                    {
+                        Cns.Out($"You put it on. It fits perfectly.", color: System.ConsoleColor.Cyan);
+                    }
                     Player.Instance.AcquireItem(monster.loot);
                 }
 
