@@ -9,6 +9,7 @@ namespace Loaf
 
         public bool suppressDelay = false;
 
+        public int playerHp;
         public List<ItemDef> startingItems;
         public string saveFilename;
 

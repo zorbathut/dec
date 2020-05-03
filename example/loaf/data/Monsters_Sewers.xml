@@ -16,10 +16,12 @@
 
   <MonsterDef defName="SoakedBugbear" parent="SewerBase">
     <name>soaked bugbear</name>
+    <loot>StinkySocks</loot>
   </MonsterDef>
 
   <MonsterDef defName="SoddenGremlin" parent="SewerBase">
     <name>sodden gremlin</name>
+    <loot>StinkySocks</loot>
   </MonsterDef>
 
   <MonsterDef defName="WaterloggedOrc" parent="SewerBase">

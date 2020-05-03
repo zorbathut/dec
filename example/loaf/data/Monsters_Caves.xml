@@ -15,6 +15,7 @@
 
   <MonsterDef defName="EmeraldEttin" parent="SewerBase">
     <name>emerald ettin</name>
+    <loot>JaggedBracer</loot>
   </MonsterDef>
 
   <MonsterDef defName="JadeJackal" parent="SewerBase">
@@ -27,6 +28,7 @@
 
   <MonsterDef defName="OpalOgre" parent="SewerBase">
     <name>opal ogre</name>
+    <loot>JaggedBracer</loot>
   </MonsterDef>
 
   <MonsterDef defName="PearlPegasus" parent="SewerBase">

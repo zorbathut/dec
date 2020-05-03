@@ -21,4 +21,19 @@
     <damage>5d20</damage>
     <price>30000</price>
   </WeaponDef>
+
+  <ArmorDef defName="StinkySocks">
+    <name>Stinky Socks</name>
+    <armor>1d4</armor>
+  </ArmorDef>
+  
+  <ArmorDef defName="JaggedBracer">
+    <name>Jagged Bracer</name>
+    <armor>2d6</armor>
+  </ArmorDef>
+  
+  <ArmorDef defName="Breastslab">
+    <name>Breastslab</name>
+    <armor>3d8</armor>
+  </ArmorDef>
 </Defs>

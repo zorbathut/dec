@@ -33,7 +33,7 @@ namespace Loaf
         private class DungeonChoiceDef : Cns.ChoiceDef { }
 
         [Def.StaticReferences]
-        public static class Outcomes
+        public new static class Outcomes
         {
             static Outcomes()
             {
@@ -44,7 +44,7 @@ namespace Loaf
             public static OutcomeDef Death;
             public static OutcomeDef Fled;
         }
-        public class OutcomeDef : Def.Def { }
+        public new class OutcomeDef : Def.Def { }
 
         private DungeonDef def;
 
@@ -79,7 +79,7 @@ namespace Loaf
 
         private static OutcomeDef Fight(MonsterDef monster)
         {
-            int playerHp = 10;
+            int playerHp = Config.Global.playerHp;
             int monsterHp = monster.hp;
 
             Cns.Out($"");
@@ -89,14 +89,25 @@ namespace Loaf
             {
                 Cns.Out($"");
                 Cns.Out($"");
-                Cns.Out($"{playerHp,4} / {20,4}: Your health");
+                Cns.Out($"{playerHp,4} / {Config.Global.playerHp,4}: Your health");
                 Cns.Out($"{monsterHp,4} / {monster.hp,4}: The monster's health");
                 Cns.Out($"");
 
                 var choice = Cns.Choice<FightChoiceDef>();
                 if (choice == DungeonChoices.Fight)
                 {
-                    playerHp -= monster.damage.Roll();
+                    int attack = monster.damage.Roll();
+                    int defense = Player.Instance.Inventory.OfType<ArmorDef>().Select(armor => armor.armor.Roll()).Sum();
+
+                    if (attack > defense)
+                    {
+                        playerHp -= monster.damage.Roll();
+                    }
+                    else
+                    {
+                        Cns.Out("Its attack bounces off your armor!");
+                    }
+
                     monsterHp -= Player.Instance.CurrentWeapon.damage.Roll();
                 }
                 else if (choice == DungeonChoices.Run)
