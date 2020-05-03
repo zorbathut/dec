@@ -1,19 +1,25 @@
 <Defs>
   <LocationTypedDef defName="YourBedroom">
     <type>Locations.YourBedroom</type>
+    <label>Your Bedroom</label>
+    <key>b</key>
   </LocationTypedDef>
 
   <LocationTypedDef defName="FairyGrotto">
     <type>Locations.FairyGrotto</type>
+    <label>Fairy Grotto</label>
   </LocationTypedDef>
 
   <LocationTypedDef defName="ArmorsShop">
     <type>Locations.Shop</type>
     <requiredItem>ArmorShopMap</requiredItem>
+    <label>Armor's Shop</label>
   </LocationTypedDef>
 
   <LocationTypedDef defName="LivingRoom">
     <type>Locations.Futon</type>
     <requiredItem>FutonMap</requiredItem>
+    <label>Your Living Room</label>
+    <key>L</key>
   </LocationTypedDef>
 </Defs>

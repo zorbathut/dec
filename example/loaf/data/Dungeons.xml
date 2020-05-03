@@ -16,6 +16,7 @@
   </DungeonDef>
 
   <DungeonDef defName="CrystalCaves">
+    <label>Crystal Caves</label>
     <requiredItem>CaveMap</requiredItem>
     <monsters>
       <items>
@@ -36,6 +37,7 @@
   </DungeonDef>
   
   <DungeonDef defName="WoodworkersHut">
+    <label>Woodworker's Hut</label>
     <requiredItem>WoodworkerMap</requiredItem>
     <monsters>
       <items>

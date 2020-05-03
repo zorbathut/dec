@@ -84,7 +84,7 @@ namespace Loaf.Locations
                 }
 
                 return $"{weapon.name} ({weapon.price} gold)";
-            }, true);
+            }, longForm: true);
 
             if (choice != null)
             {

@@ -3,6 +3,8 @@
   <Location.OutcomeDef defName="Death" />
   <Location.OutcomeDef defName="Victory" />
 
-  <Game.StartGameChoiceDef defName="NewGame" />
+  <Game.StartGameChoiceDef defName="NewGame">
+    <label>New game</label>
+  </Game.StartGameChoiceDef>
   <Game.StartGameChoiceDef defName="Load" />
 </Defs>

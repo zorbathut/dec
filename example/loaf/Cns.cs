@@ -11,6 +11,24 @@ namespace Loaf
         [Def.Abstract]
         public abstract class ChoiceDef : Def.Def
         {
+            private string label;
+            private char key = '\0';
+
+            public string Label
+            {
+                get
+                {
+                    return label ?? DefName;
+                }
+            }
+
+            public char Key
+            {
+                get
+                {
+                    return (key != '\0') ? key : Label[0];
+                }
+            }
 
         }
 
@@ -40,7 +58,7 @@ namespace Loaf
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-        internal static T Choice<T>(T[] items, Func<T, string> label, bool longForm = false)
+        internal static T Choice<T>(T[] items, Func<T, string> label, Func<T, char> key = null, bool longForm = false)
         {
             string separator;
             string prompt;
@@ -55,19 +73,31 @@ namespace Loaf
                 prompt = "? ";
             }
 
+            if (key == null)
+            {
+                key = item => label(item)[0];
+            }
+
             T[] choices = items;
             string choiceList = string.Join(separator, choices.Select(choice =>
             {
                 string choiceLabel = label(choice);
-                return $"({choiceLabel[0]}){choiceLabel.Substring(1)}";
+                int index = choiceLabel.IndexOf(key(choice), StringComparison.InvariantCultureIgnoreCase);
+                return $"{choiceLabel.Substring(0, index)}({char.ToUpper(key(choice))}){choiceLabel.Substring(index + 1)}";
             }));
 
             Out($"{choiceList}{prompt}", crlf: false);
             while (true)
             {
-                var key = Console.ReadKey(true);
+                // get rid of pending input
+                while (Console.KeyAvailable)
+                {
+                    Console.ReadKey(true);
+                }
 
-                var success = choices.Where(c => char.ToLower(label(c)[0]) == char.ToLower(key.KeyChar));
+                var userKey = Console.ReadKey(true);
+
+                var success = choices.Where(c => char.ToLower(key(c)) == char.ToLower(userKey.KeyChar));
                 var choice = success.SingleOrDefault();
                 if (success.Any())
                 {
@@ -79,7 +109,7 @@ namespace Loaf
 
         internal static T Choice<T>(T[] items = null, bool longForm = false) where T : ChoiceDef
         {
-            return Choice(items ?? Def.Database<T>.List, choice => choice.DefName, longForm: longForm);
+            return Choice(items ?? Def.Database<T>.List, choice => choice.Label, key: choice => choice.Key, longForm: longForm);
         }
     }
 }

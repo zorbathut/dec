@@ -2,7 +2,9 @@
   <Dungeon.FightChoiceDef defName="Fight" />
   <Dungeon.FightChoiceDef defName="Run" />
 
-  <Dungeon.DungeonChoiceDef defName="FindMore" />
+  <Dungeon.DungeonChoiceDef defName="FindMore">
+    <label>Find More</label>
+  </Dungeon.DungeonChoiceDef>
   <Dungeon.DungeonChoiceDef defName="Leave" />
 
   <Dungeon.OutcomeDef defName="Victory" />
