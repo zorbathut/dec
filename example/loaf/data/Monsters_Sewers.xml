@@ -1,0 +1,43 @@
+<Defs>
+  <MonsterDef defName="SewerBase" abstract="true">
+    <hp>20</hp>
+    <damage>1d1</damage>
+    <gold>20d20</gold>
+  </MonsterDef>
+  
+  <MonsterDef defName="MoistRat" parent="SewerBase">
+    <name>moist rat</name>
+  </MonsterDef>
+
+  <MonsterDef defName="SaturatedGoblin" parent="SewerBase">
+    <name>saturated goblin</name>
+  </MonsterDef>
+
+  <MonsterDef defName="SoakedBugbear" parent="SewerBase">
+    <name>soaked bugbear</name>
+  </MonsterDef>
+
+  <MonsterDef defName="SoddenGremlin" parent="SewerBase">
+    <name>sodden gremlin</name>
+  </MonsterDef>
+
+  <MonsterDef defName="WaterloggedOrc" parent="SewerBase">
+    <name>waterlogged orc</name>
+  </MonsterDef>
+
+  <MonsterDef defName="DrippingBat" parent="SewerBase">
+    <name>dripping bat</name>
+  </MonsterDef>
+
+  <MonsterDef defName="DrenchedOgre" parent="SewerBase">
+    <name>drenched ogre</name>
+  </MonsterDef>
+
+  <MonsterDef defName="SoppingSpider" parent="SewerBase">
+    <name>sopping spider</name>
+  </MonsterDef>
+
+  <MonsterDef defName="SoggySlime" parent="SewerBase">
+    <name>soggy slime</name>
+  </MonsterDef>
+</Defs>

@@ -1,5 +1,42 @@
 <Defs>
-  <DungeonDef defName="TestDungeon">
+  <DungeonDef defName="Sewers">
+    <monsters>
+      <items>
+        <MoistRat>1</MoistRat>
+        <SaturatedGoblin>1</SaturatedGoblin>
+        <SoakedBugbear>1</SoakedBugbear>
+        <SoddenGremlin>1</SoddenGremlin>
+        <WaterloggedOrc>1</WaterloggedOrc>
+        <DrippingBat>1</DrippingBat>
+        <DrenchedOgre>1</DrenchedOgre>
+        <SoppingSpider>1</SoppingSpider>
+        <SoggySlime>1</SoggySlime>
+      </items>
+    </monsters>
+  </DungeonDef>
+
+  <DungeonDef defName="CrystalCaves">
+    <requiredItem>CaveMap</requiredItem>
+    <monsters>
+      <items>
+        <AmethystApe>1</AmethystApe>
+        <AmberAuroch>1</AmberAuroch>
+        <EmeraldEttin>1</EmeraldEttin>
+        <JadeJackal>1</JadeJackal>
+        <LapisLamia>1</LapisLamia>
+        <OpalOgre>1</OpalOgre>
+        <PearlPegasus>1</PearlPegasus>
+        <RubyRevenant>1</RubyRevenant>
+        <SapphireSuccubus>1</SapphireSuccubus>
+        <TurquoiseTurtle>1</TurquoiseTurtle>
+        <TopazTiger>1</TopazTiger>
+        <DiamondDragon>1</DiamondDragon>
+      </items>
+    </monsters>
+  </DungeonDef>
+  
+  <DungeonDef defName="WoodworkersHut">
+    <requiredItem>WoodworkerMap</requiredItem>
     <monsters>
       <items>
         <OttomanSoldier>1</OttomanSoldier>

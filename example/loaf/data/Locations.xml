@@ -9,6 +9,6 @@
 
   <LocationTypedDef defName="ArmorsShop">
     <type>Locations.Shop</type>
-    <requiredItem>ArmorMap</requiredItem>
+    <requiredItem>ArmorShopMap</requiredItem>
   </LocationTypedDef>
 </Defs>

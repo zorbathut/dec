@@ -1,0 +1,55 @@
+<Defs>
+  <MonsterDef defName="CavesBase" abstract="true">
+    <hp>20</hp>
+    <damage>1d1</damage>
+    <gold>20d20</gold>
+  </MonsterDef>
+  
+  <MonsterDef defName="AmethystApe" parent="SewerBase">
+    <name>amethyst ape</name>
+  </MonsterDef>
+
+  <MonsterDef defName="AmberAuroch" parent="SewerBase">
+    <name>amber auroch</name>
+  </MonsterDef>
+
+  <MonsterDef defName="EmeraldEttin" parent="SewerBase">
+    <name>emerald ettin</name>
+  </MonsterDef>
+
+  <MonsterDef defName="JadeJackal" parent="SewerBase">
+    <name>jade jackal</name>
+  </MonsterDef>
+
+  <MonsterDef defName="LapisLamia" parent="SewerBase">
+    <name>lapis lamia</name>
+  </MonsterDef>
+
+  <MonsterDef defName="OpalOgre" parent="SewerBase">
+    <name>opal ogre</name>
+  </MonsterDef>
+
+  <MonsterDef defName="PearlPegasus" parent="SewerBase">
+    <name>pearl pegasus</name>
+  </MonsterDef>
+
+  <MonsterDef defName="RubyRevenant" parent="SewerBase">
+    <name>ruby revenant</name>
+  </MonsterDef>
+
+  <MonsterDef defName="SapphireSuccubus" parent="SewerBase">
+    <name>sapphire succubus</name>
+  </MonsterDef>
+
+  <MonsterDef defName="TurquoiseTurtle" parent="SewerBase">
+    <name>turquoise turtle</name>
+  </MonsterDef>
+
+  <MonsterDef defName="TopazTiger" parent="SewerBase">
+    <name>topaz tiger</name>
+  </MonsterDef>
+
+  <MonsterDef defName="DiamondDragon" parent="SewerBase">
+    <name>diamond dragon</name>
+  </MonsterDef>
+</Defs>
