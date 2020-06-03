@@ -3,6 +3,10 @@ namespace Loaf
 {
     using System.Linq;
 
+    // Recommend reading the LocationDef documentation for more information.
+    //
+    // When creating a builder like this, I recommend passing the Def in as a constructor parameter.
+    // The constructor can always ignore it, but if there's any relevant data, the constructor will need access to the Def.
     public class DungeonDef : LocationDef
     {
         public RollTable<MonsterDef> monsters;
@@ -15,6 +19,8 @@ namespace Loaf
 
     public class Dungeon : Location
     {
+        // Def has no trouble with classes that are members of other classes, so we can make a little specialized Def hierarchy here just for the sake of dungeon choices.
+        // In fact, we can make *two* little specialized hierarchies.
         [Def.StaticReferences]
         private static class DungeonChoices
         {
@@ -32,6 +38,8 @@ namespace Loaf
         private class FightChoiceDef : Cns.ChoiceDef { }
         private class DungeonChoiceDef : Cns.ChoiceDef { }
 
+        // It's tempting to combine this with Location.Outcomes, since they contain most of the same elements.
+        // It's so cheap and easy to make another Def type that I recommend avoiding this instinct; keep your types separate.
         [Def.StaticReferences]
         public new static class Outcomes
         {
@@ -74,7 +82,6 @@ namespace Loaf
                     return Location.Outcomes.Return;
                 }
             }
-
         }
 
         private static OutcomeDef Fight(MonsterDef monster)
@@ -101,6 +108,9 @@ namespace Loaf
 
                     if (attack > defense)
                     {
+                        // Okay this is actually a bug - this should be playerHp -= (attack - defense).
+                        // Except I already went through and (vaguely) balanced the game, and this isn't meant to be *fun*, just a tech demo.
+                        // So I'm just leaving it in place.
                         playerHp -= monster.damage.Roll();
                     }
                     else
@@ -128,10 +138,13 @@ namespace Loaf
                 if (monster.loot != null && !Player.Instance.Inventory.Contains(monster.loot))
                 {
                     Cns.Out($"You find a {monster.loot.name}!", color: System.ConsoleColor.Cyan);
+
+                    // You could also make this a virtual function on ItemDef with an override on ArmorDef, maybe named OnPickup().
                     if (monster.loot is ArmorDef)
                     {
                         Cns.Out($"You put it on. It fits perfectly.", color: System.ConsoleColor.Cyan);
                     }
+
                     Player.Instance.AcquireItem(monster.loot);
                 }
 

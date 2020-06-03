@@ -2,6 +2,9 @@ namespace Loaf
 {
     using System.Collections.Generic;
 
+    // In many situations I've found it useful to have a ConfigDef class with a bunch of global parameters.
+    // This is simply making use of the Def system to provide a centralized settings registry.
+    // It's overkill, but it's effective.
     public class ConfigDef : Def.Def
     {
         public int baud;
@@ -16,6 +19,7 @@ namespace Loaf
         public bool alternateEnding = false;
     }
 
+    // Using a StaticReferences for the global ConfigDef means you can access it from anywhere via Config.Global.fieldName.
     [Def.StaticReferences]
     public static class Config
     {

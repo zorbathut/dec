@@ -5,6 +5,8 @@ namespace Loaf
     using System.Collections.Generic;
     using System.Text.RegularExpressions;
 
+    // This is an example of using a custom Converter class.
+    // Nobody wants to write <damage><count>4</count><sides>6</sides></damage>, so instead you can just do <damage>4d6</damage>.
     public class Dice
     {
         private int count;
@@ -32,6 +34,7 @@ namespace Loaf
                 return new HashSet<Type>() { typeof(Dice) };
             }
 
+            // We don't have to worry *too* much about exceptions here; any exceptions that are thrown are guaranteed to be caught, reported, and recovered from.
             private static Regex Parser = new Regex("(?<count>[0-9]+)d(?<sides>[0-9]+)", RegexOptions.Compiled);
             public override object FromString(string input, Type type, string inputName, int lineNumber)
             {

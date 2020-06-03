@@ -5,6 +5,10 @@ namespace Loaf.Locations
     using System.IO;
     using System.Linq;
 
+    // Definitely avoid the urge to *over*generalize.
+    // All of these locations require custom code and it's just not worth the effort to try expressing these in XML.
+    // Make a class that does your thing, pass it in as a Type, be done with it.
+
     public class YourBedroom : Location
     {
         public YourBedroom(LocationDef locationDef) { }
@@ -61,6 +65,7 @@ namespace Loaf.Locations
             Cns.Out("");
 
             // This seems like an appropriate time to do this.
+            // Check out Player.Record() for the implementation of Player serialization.
             File.WriteAllText(Config.Global.saveFilename, Def.Recorder.Write(Player.Instance));
 
             Cns.Out("The Fairy cheerfully informs you that your game has been saved.");
@@ -162,7 +167,6 @@ namespace Loaf.Locations
                 Cns.Out("");
                 Cns.Out("");
             }
-            
 
             return Outcomes.Victory;
         }

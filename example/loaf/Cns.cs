@@ -6,8 +6,21 @@ namespace Loaf
     using System.Linq;
     using System.Threading;
 
+    // The Cns class handles console output for Loaf. This consists of two pieces of functionality.
+    //
+    // Cns.Out prints lines and does the slow-modem-transfer effect.
+    // Cns.Choice is much more interesting; it uses the Def system to make it easy to print out prompts.
+    //
+    // Using the Def system for prompt elements seems like massive overkill, but it has advantages.
+    // First, it makes prompts very easy to mod.
+    // Def doesn't (yet) support mods, but Locations could be modded by just making more LocationDef's, while other UI elements could be modded with use of new Def's and with Harmony.
+    // Second, it allows you to attach information to prompts easily.
+    // During the development of Loaf, I added custom labels and keypresses to prompts; on a GUI game, one could easily add tooltips or other scriptable elements.
     public static class Cns
     {
+        // This is our base Choice class.
+        // Note that it's tagged Def.Abstract so that choices for different UI elements end up in different Def hierarchies and can share DefNames.
+        // Otherwise you'd need a unique name for every item that inherits from ChoiceDef.
         [Def.Abstract]
         public abstract class ChoiceDef : Def.Def
         {
@@ -29,33 +42,13 @@ namespace Loaf
                     return (key != '\0') ? key : Label[0];
                 }
             }
-
         }
 
-        internal static void Out(string str, bool crlf = true, ConsoleColor color = ConsoleColor.Gray)
+        // I also want to support choices for things that aren't ChoiceDefs, so this is a thin adapter to make ChoiceDefs work transparently.
+        // Note that, if it isn't given an explicit list of items, it just yanks every possible item out of the Def database.
+        internal static T Choice<T>(T[] items = null, bool longForm = false) where T : ChoiceDef
         {
-            Console.ForegroundColor = color;
-            if (crlf)
-            {
-                str = str + "\n";
-            }
-
-            var stopwatch = Stopwatch.StartNew();
-
-            // Print it slow to make it feel more like a game coming over a modem.
-            for (int idx = 0; idx < str.Length; ++idx)
-            {
-                while (!Config.Global.suppressDelay && stopwatch.ElapsedTicks < (idx * Stopwatch.Frequency * 10 / Config.Global.baud));
-
-                Console.Write(str[idx]);
-            }
-
-            if (!Config.Global.suppressDelay && crlf)
-            {
-                Thread.Sleep((int)(Config.Global.crlfDelay * 1000));
-            }
-
-            Console.ForegroundColor = ConsoleColor.White;
+            return Choice(items ?? Def.Database<T>.List, choice => choice.Label, key: choice => choice.Key, longForm: longForm);
         }
 
         internal static T Choice<T>(T[] items, Func<T, string> label, Func<T, char> key = null, bool longForm = false)
@@ -107,9 +100,30 @@ namespace Loaf
             }
         }
 
-        internal static T Choice<T>(T[] items = null, bool longForm = false) where T : ChoiceDef
+        internal static void Out(string str, bool crlf = true, ConsoleColor color = ConsoleColor.Gray)
         {
-            return Choice(items ?? Def.Database<T>.List, choice => choice.Label, key: choice => choice.Key, longForm: longForm);
+            Console.ForegroundColor = color;
+            if (crlf)
+            {
+                str = str + "\n";
+            }
+
+            var stopwatch = Stopwatch.StartNew();
+
+            // Print it slow to make it feel more like a game coming over a modem.
+            for (int idx = 0; idx < str.Length; ++idx)
+            {
+                while (!Config.Global.suppressDelay && stopwatch.ElapsedTicks < (idx * Stopwatch.Frequency * 10 / Config.Global.baud)) { }
+
+                Console.Write(str[idx]);
+            }
+
+            if (!Config.Global.suppressDelay && crlf)
+            {
+                Thread.Sleep((int)(Config.Global.crlfDelay * 1000));
+            }
+
+            Console.ForegroundColor = ConsoleColor.White;
         }
     }
 }

@@ -5,6 +5,8 @@ namespace Loaf
     using System.Collections.Generic;
     using System.Linq;
 
+    // For the sake of this example, we're just using a player singleton.
+    // It's marked IRecordable so we can save our game. 
     public class Player : SingletonManual<Player>, Def.IRecordable
     {
         private List<ItemDef> inventory = new List<ItemDef>();
@@ -51,6 +53,16 @@ namespace Loaf
             }
         }
 
+        // This is the entire serialization and deserialization code.
+        // 
+        // I recognize that this is almost suspiciously simple.
+        // It feels like one of those tutorials where it shows you an example that is specifically customized to the abilities of the library,
+        // and where any actual real-world implementation is many times more complicated and finicky.
+        //
+        // It isn't, though. It really is this simple.
+        //
+        // Recorder handles primitive types, collections, Def references, class references, non-tree structures, and circular structures automatically.
+        // In most cases all you need to do is list your fields and Recorder will do the rest.
         public void Record(Def.Recorder recorder)
         {
             recorder.Record(ref inventory, "inventory");
