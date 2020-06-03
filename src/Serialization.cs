@@ -88,6 +88,9 @@ namespace Def
             if (shouldBeNull && refId != null)
             {
                 Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Element cannot be both null and a reference at the same time");
+
+                // There's no good answer here, but we're sticking with the null because it feels like an error-handling path that the user is more likely to properly support.
+                refId = null;
             }
 
             // See if we just want to return null

@@ -898,5 +898,26 @@ namespace DefTest
             Assert.AreEqual(mr.x, deserialized.x);
             // y's value is left undefined
         }
+
+        [Test]
+        public void NullRef()
+        {
+            // This is weird and not OK. I've chosen to prioritize the null over the ref, on the theory that there are a lot of ways that broken files can turn into null anyway.
+
+            string serialized = @"
+                <Record>
+                  <recordFormatVersion>1</recordFormatVersion>
+                  <refs>
+                    <Ref id=""ref00000"" class=""DefTest.Recorder.RefsChildRecordable"" />
+                  </refs>
+                  <data>
+                    <childAone ref=""ref00000"" null=""true""/>
+                  </data>
+                </Record>";
+            RefsRootRecordable deserialized = null;
+            ExpectErrors(() => deserialized = Def.Recorder.Read<RefsRootRecordable>(serialized));
+
+            Assert.IsNull(deserialized.childAone);
+        }
     }
 }
