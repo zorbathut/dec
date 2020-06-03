@@ -899,6 +899,16 @@ namespace DefTest
             // y's value is left undefined
         }
 
+        public class PrimitivesContainer : Def.IRecordable
+        {
+            public PrimitivesRecordable recordable;
+
+            public void Record(Def.Recorder record)
+            {
+                record.Record(ref recordable, "recordable");
+            }
+        }
+
         [Test]
         public void NullRef()
         {
@@ -908,16 +918,78 @@ namespace DefTest
                 <Record>
                   <recordFormatVersion>1</recordFormatVersion>
                   <refs>
-                    <Ref id=""ref00000"" class=""DefTest.Recorder.RefsChildRecordable"" />
+                    <Ref id=""ref00000"" class=""DefTest.Recorder.PrimitivesRecordable"" />
                   </refs>
                   <data>
-                    <childAone ref=""ref00000"" null=""true""/>
+                    <recordable ref=""ref00000"" null=""true""/>
                   </data>
                 </Record>";
-            RefsRootRecordable deserialized = null;
-            ExpectErrors(() => deserialized = Def.Recorder.Read<RefsRootRecordable>(serialized));
+            PrimitivesContainer deserialized = null;
+            ExpectErrors(() => deserialized = Def.Recorder.Read<PrimitivesContainer>(serialized));
 
-            Assert.IsNull(deserialized.childAone);
+            Assert.IsNull(deserialized.recordable);
+        }
+
+        [Test]
+        public void ExtraAttributeRef()
+        {
+            // Just ignore the extra attribute.
+
+            string serialized = @"
+                <Record>
+                  <recordFormatVersion>1</recordFormatVersion>
+                  <refs>
+                    <Ref id=""ref00000"" class=""DefTest.Recorder.PrimitivesRecordable"">
+                        <intValue>42</intValue>
+                    </Ref>
+                  </refs>
+                  <data>
+                    <recordable ref=""ref00000"" garbage=""yup"" />
+                  </data>
+                </Record>";
+            PrimitivesContainer deserialized = null;
+            ExpectErrors(() => deserialized = Def.Recorder.Read<PrimitivesContainer>(serialized));
+
+            Assert.AreEqual(42, deserialized.recordable.intValue);
+        }
+
+        [Test]
+        public void MissingRef()
+        {
+            // Turn it into null.
+
+            string serialized = @"
+                <Record>
+                  <recordFormatVersion>1</recordFormatVersion>
+                  <data>
+                    <recordable ref=""ref00000"" />
+                  </data>
+                </Record>";
+            PrimitivesContainer deserialized = null;
+            ExpectErrors(() => deserialized = Def.Recorder.Read<PrimitivesContainer>(serialized));
+
+            Assert.IsNull(deserialized.recordable);
+        }
+
+        [Test]
+        public void MistypedRef()
+        {
+            // Turn it into null.
+
+            string serialized = @"
+                <Record>
+                  <recordFormatVersion>1</recordFormatVersion>
+                  <refs>
+                    <Ref id=""ref00000"" class=""DefTest.Recorder.PrimitivesContainer"" />
+                  </refs>
+                  <data>
+                    <recordable ref=""ref00000"" />
+                  </data>
+                </Record>";
+            PrimitivesContainer deserialized = null;
+            ExpectErrors(() => deserialized = Def.Recorder.Read<PrimitivesContainer>(serialized));
+
+            Assert.IsNull(deserialized.recordable);
         }
     }
 }
