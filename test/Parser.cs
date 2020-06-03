@@ -163,5 +163,33 @@ namespace DefTest
             Assert.AreEqual(40, Def.Database<ConcreteChildBDef>.Get("TestDef").absInt);
             Assert.AreEqual(50, Def.Database<ConcreteChildBDef>.Get("TestDef").ccbInt);
         }
+
+        [Test]
+        public void LoadFile([Values] BehaviorMode mode)
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDef) } };
+
+            var parser = new Def.Parser();
+            parser.AddFile("data/Parser.LoadFile.xml");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            Assert.AreEqual(55, Def.Database<IntDef>.Get("TestDef").value);
+        }
+
+        [Test]
+        public void LoadFileError([Values] BehaviorMode mode)
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDef) } };
+
+            var parser = new Def.Parser();
+            parser.AddFile("data/Parser.LoadFileError.xml");
+            ExpectErrors(() => parser.Finish(), str => str.Contains("Parser.LoadFileError"));
+
+            DoBehavior(mode);
+
+            Assert.IsNotNull(Def.Database<IntDef>.Get("TestDef"));
+        }
     }
 }

@@ -2,6 +2,7 @@ namespace DefTest
 {
     using NUnit.Framework;
     using System;
+    using System.IO;
     using System.Linq;
 
     [TestFixture]
@@ -80,6 +81,12 @@ namespace DefTest
             {
                 Def.Config.ErrorHandler(e.ToString());
             };
+
+            // Find our data directory
+            while (!Directory.Exists("data"))
+            {
+                Environment.CurrentDirectory = Path.GetDirectoryName(Environment.CurrentDirectory);
+            }
         }
 
         protected void ExpectWarnings(Action action)

@@ -1,0 +1,5 @@
+<Defs>
+    <IntDef defName="TestDef">
+        <velue>55</velue>
+    </IntDef>
+</Defs>
