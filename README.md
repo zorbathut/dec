@@ -15,6 +15,8 @@ Dual-licensed under MIT or the [Unlicense](http://unlicense.org).
 
 * [API reference](https://zorbathut.github.io/def/api/index.html)
 
+* [Example project: Legend of the Amethyst Futon](example/loaf)
+
 
 ### Support
 
