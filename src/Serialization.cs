@@ -142,7 +142,29 @@ namespace Def
             if (Converters.ContainsKey(type))
             {
                 // context might be null; that's OK at the moment
-                var result = Converters[type].Record(model, type, new RecorderReader(element, context));
+                object result;
+
+                try
+                {
+                    result = Converters[type].Record(model, type, new RecorderReader(element, context));
+                }
+                catch (Exception e)
+                {
+                    Dbg.Ex(e);
+
+                    if (model != null)
+                    {
+                        result = model;
+                    }
+                    else if (type.IsValueType)
+                    {
+                        result = Activator.CreateInstance(type);
+                    }
+                    else
+                    {
+                        result = null;
+                    }
+                }
 
                 // This is an important check if we have a referenced type, because if we've changed the result, references won't link up to it properly.
                 // Outside referenced types, it doesn't matter - we want to give people as much control over modification as possible.
@@ -409,7 +431,26 @@ namespace Def
             // This is redundant if we're being called from ParseElement, but we aren't always.
             if (Converters.ContainsKey(type))
             {
-                var result = Converters[type].FromString(text, type, inputName, lineNumber);
+                object result;
+
+                try
+                {
+                    result = Converters[type].FromString(text, type, inputName, lineNumber);
+                }
+                catch (Exception e)
+                {
+                    Dbg.Ex(e);
+
+                    if (type.IsValueType)
+                    {
+                        result = Activator.CreateInstance(type);
+                    }
+                    else
+                    {
+                        result = null;
+                    }
+                }
+
                 if (result != null && !type.IsAssignableFrom(result.GetType()))
                 {
                     Dbg.Err($"{inputName}:{lineNumber}: Converter {Converters[type].GetType()} for {type} returned unexpected type {result.GetType()}");

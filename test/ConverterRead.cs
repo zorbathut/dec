@@ -412,5 +412,65 @@ namespace DefTest
 
             Assert.AreEqual(4, Def.Database<FallbackDef>.Get("TestDef").payload.number);
         }
+
+        public class ExceptionPayload
+        {
+
+        }
+
+        public class ExceptionDef : Def.Def
+        {
+            public ExceptionPayload payload;
+
+            public int before;
+            public int after;
+        }
+
+        public class ExceptionConverter : Def.Converter
+        {
+            public override HashSet<Type> HandledTypes()
+            {
+                return new HashSet<Type>() { typeof(ExceptionPayload) };
+            }
+
+            public override object FromString(string input, Type type, string inputName, int lineNumber)
+            {
+                throw new InvalidOperationException();
+            }
+
+            public override string ToString(object input)
+            {
+                throw new InvalidOperationException();
+            }
+        }
+
+        [Test]
+        public void Exception([Values] BehaviorMode mode)
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExceptionDef) }, explicitConverters = new Type[] { typeof(ExceptionConverter) } };
+
+            var parser = new Def.Parser();
+            parser.AddString(@"
+                <Defs>
+                    <ExceptionDef defName=""TestDefA"">
+                        <before>1</before>
+                        <payload />
+                        <after>2</after>
+                    </ExceptionDef>
+                    <ExceptionDef defName=""TestDefB"">
+                        <before>3</before>
+                        <payload />
+                        <after>4</after>
+                    </ExceptionDef>
+                </Defs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoBehavior(mode);
+
+            Assert.AreEqual(1, Def.Database<ExceptionDef>.Get("TestDefA").before);
+            Assert.AreEqual(2, Def.Database<ExceptionDef>.Get("TestDefA").after);
+            Assert.AreEqual(3, Def.Database<ExceptionDef>.Get("TestDefB").before);
+            Assert.AreEqual(4, Def.Database<ExceptionDef>.Get("TestDefB").after);
+        }
     }
 }
