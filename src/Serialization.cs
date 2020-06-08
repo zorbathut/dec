@@ -509,8 +509,8 @@ namespace Def
                 }
                 catch (System.Exception e)  // I would normally not catch System.Exception, but TypeConverter is wrapping FormatException in an Exception for some reason
                 {
-                    Dbg.Ex(e);
-                    return Activator.CreateInstance(type);
+                    Dbg.Err($"{inputName}:{lineNumber}: {e.ToString()}");
+                    return null;
                 }
             }
             else if (type == typeof(string))

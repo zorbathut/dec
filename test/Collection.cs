@@ -40,6 +40,28 @@ namespace DefTest
             Assert.AreEqual(result.data, new[] { 10, 9, 8, 7, 6 });
 	    }
 
+        [Test]
+        public void ArrayMismatch([Values] BehaviorMode mode)
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDef) } };
+
+            var parser = new Def.Parser();
+            parser.AddString(@"
+                <Defs>
+                    <ArrayDef defName=""TestDef"">
+                        <data>nope</data>
+                    </ArrayDef>
+                </Defs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoBehavior(mode);
+
+            var result = Def.Database<ArrayDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.IsNull(result.data);
+        }
+
         public class ListDef : Def.Def
         {
             public List<int> data;
