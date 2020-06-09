@@ -2,6 +2,8 @@ namespace DefTest
 {
     using NUnit.Framework;
     using System;
+    using System.Collections.Generic;
+    using System.Reflection;
 
     [TestFixture]
     public class Meta : Base
@@ -122,5 +124,25 @@ namespace DefTest
                 Assert.IsNull(source.target);
             }
 	    }
+
+        [Test]
+        public void ClassCacheReset()
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+
+            var parseCache = (Dictionary<string, Type>)Assembly.GetAssembly(typeof(Def.Def)).GetType("Def.UtilType").GetField("ParseCache", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
+
+            // This will be equal to our seeded intro values.
+            int baseSize = parseCache.Count;
+            Assert.AreEqual(baseSize, parseCache.Count);
+
+            parseCache.Add("Meta", typeof(Meta));
+            Assert.AreEqual(baseSize + 1, parseCache.Count);
+
+            DoBehavior(BehaviorMode.Rewritten);
+
+            // Hopefully we reset after doing the DoBehavior()!
+            Assert.AreEqual(baseSize, parseCache.Count);
+        }
     }
 }
