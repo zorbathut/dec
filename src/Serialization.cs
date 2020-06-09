@@ -523,7 +523,7 @@ namespace Def
             }
             else
             {
-                // If we don't have text, and we're any primitive type, that's an error (and return default value I guess)
+                // If we don't have text, and we've fallen down to this point, that's an error (and return original value I guess)
                 Dbg.Err($"{inputName}:{lineNumber}: Empty field provided for type {type}");
                 return model;
             }
