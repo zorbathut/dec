@@ -216,7 +216,7 @@ namespace Def
                         continue;
                     }
 
-                    var possibleType = (Type)Serialization.ParseString(className, typeof(Type), stringName, reference.LineNumber());
+                    var possibleType = (Type)Serialization.ParseString(className, typeof(Type), null, stringName, reference.LineNumber());
                     if (possibleType.IsValueType)
                     {
                         Dbg.Err($"{stringName}:{reference.LineNumber()}: Reference assigned type {possibleType}, which is a value type");

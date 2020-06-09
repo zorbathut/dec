@@ -65,7 +65,7 @@ namespace Def
             if (element.Attribute("class") != null)
             {
                 var className = element.Attribute("class").Value;
-                var possibleType = (Type)ParseString(className, typeof(Type), context.sourceName, element.LineNumber());
+                var possibleType = (Type)ParseString(className, typeof(Type), null, context.sourceName, element.LineNumber());
                 if (!type.IsAssignableFrom(possibleType))
                 {
                     Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Explicit type {className} cannot be assigned to expected type {type}");
@@ -227,7 +227,7 @@ namespace Def
                     Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Elements are not valid when parsing {type}");
                 }
 
-                return ParseString(element.GetText(), type, context.sourceName, element.LineNumber());
+                return ParseString(element.GetText(), type, model, context.sourceName, element.LineNumber());
             }
 
             // Nothing past this point even supports text, so let's just get angry and break stuff.
@@ -266,7 +266,10 @@ namespace Def
                 Type referencedType = type.GetElementType();
 
                 var elements = element.Elements().ToArray();
-                var array = (Array)(model ?? Activator.CreateInstance(type, new object[] { elements.Length }));
+
+                // We don't bother falling back on model here; we probably need to recreate it anyway with the right length
+                var array = (Array)Activator.CreateInstance(type, new object[] { elements.Length });
+
                 for (int i = 0; i < elements.Length; ++i)
                 {
                     var fieldElement = elements[i];
@@ -324,7 +327,7 @@ namespace Def
                     }
                     else
                     {
-                        var key = ParseString(fieldElement.Name.LocalName, keyType, context.sourceName, fieldElement.LineNumber());
+                        var key = ParseString(fieldElement.Name.LocalName, keyType, null, context.sourceName, fieldElement.LineNumber());
 
                         if (dict.Contains(key))
                         {
@@ -428,7 +431,7 @@ namespace Def
             return model;
         }
 
-        internal static object ParseString(string text, Type type, string inputName, int lineNumber)
+        internal static object ParseString(string text, Type type, object model, string inputName, int lineNumber)
         {
             // Special case: Converter override
             // This is redundant if we're being called from ParseElement, but we aren't always.
@@ -510,7 +513,7 @@ namespace Def
                 catch (System.Exception e)  // I would normally not catch System.Exception, but TypeConverter is wrapping FormatException in an Exception for some reason
                 {
                     Dbg.Err($"{inputName}:{lineNumber}: {e.ToString()}");
-                    return null;
+                    return model;
                 }
             }
             else if (type == typeof(string))
@@ -518,17 +521,11 @@ namespace Def
                 // If we don't have text, and we're a string, return ""
                 return "";
             }
-            else if (type.IsPrimitive)
-            {
-                // If we don't have text, and we're any primitive type, that's an error (and return default values I guess)
-                Dbg.Err($"{inputName}:{lineNumber}: Empty field provided for type {type}");
-                return Activator.CreateInstance(type);
-            }
             else
             {
-                // If we don't have text, and we're not a primitive type, then I'm not sure how we got here, but return null
+                // If we don't have text, and we're any primitive type, that's an error (and return default value I guess)
                 Dbg.Err($"{inputName}:{lineNumber}: Empty field provided for type {type}");
-                return null;
+                return model;
             }
         }
 

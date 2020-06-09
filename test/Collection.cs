@@ -9,7 +9,8 @@ namespace DefTest
     {
         public class ArrayDef : Def.Def
         {
-            public int[] data;
+            public int[] dataEmpty = null;
+            public int[] dataProvided = new int[] { 10, 20 };
         }
 
         [Test]
@@ -21,13 +22,20 @@ namespace DefTest
             parser.AddString(@"
                 <Defs>
                     <ArrayDef defName=""TestDef"">
-                        <data>
+                        <dataEmpty>
                             <li>10</li>
                             <li>9</li>
                             <li>8</li>
                             <li>7</li>
                             <li>6</li>
-                        </data>
+                        </dataEmpty>
+                        <dataProvided>
+                            <li>10</li>
+                            <li>9</li>
+                            <li>8</li>
+                            <li>7</li>
+                            <li>6</li>
+                        </dataProvided>
                     </ArrayDef>
                 </Defs>");
             parser.Finish();
@@ -37,11 +45,12 @@ namespace DefTest
             var result = Def.Database<ArrayDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
-            Assert.AreEqual(result.data, new[] { 10, 9, 8, 7, 6 });
+            Assert.AreEqual(result.dataEmpty, new[] { 10, 9, 8, 7, 6 });
+            Assert.AreEqual(result.dataProvided, new[] { 10, 9, 8, 7, 6 });
 	    }
 
         [Test]
-        public void ArrayMismatch([Values] BehaviorMode mode)
+        public void ArrayAsStringError([Values] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDef) } };
 
@@ -49,7 +58,8 @@ namespace DefTest
             parser.AddString(@"
                 <Defs>
                     <ArrayDef defName=""TestDef"">
-                        <data>nope</data>
+                        <dataEmpty>nope</dataEmpty>
+                        <dataProvided>nope</dataProvided>
                     </ArrayDef>
                 </Defs>");
             ExpectErrors(() => parser.Finish());
@@ -59,7 +69,93 @@ namespace DefTest
             var result = Def.Database<ArrayDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
-            Assert.IsNull(result.data);
+            // error should default to existing data
+            Assert.IsNull(result.dataEmpty);
+            Assert.AreEqual(result.dataProvided, new[] { 10, 20 });
+        }
+
+        [Test]
+        public void ArrayZero([Values] BehaviorMode mode)
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDef) } };
+
+            var parser = new Def.Parser();
+            parser.AddString(@"
+                <Defs>
+                    <ArrayDef defName=""TestDef"">
+                        <dataEmpty></dataEmpty>
+                        <dataProvided></dataProvided>
+                    </ArrayDef>
+                </Defs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            var result = Def.Database<ArrayDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(result.dataEmpty, new int[] { });
+            Assert.AreEqual(result.dataProvided, new int[] { });
+        }
+
+        [Test]
+        public void ArrayNull([Values] BehaviorMode mode)
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDef) } };
+
+            var parser = new Def.Parser();
+            parser.AddString(@"
+                <Defs>
+                    <ArrayDef defName=""TestDef"">
+                        <dataEmpty null=""true""></dataEmpty>
+                        <dataProvided null=""true""></dataProvided>
+                    </ArrayDef>
+                </Defs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            var result = Def.Database<ArrayDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.IsNull(result.dataEmpty);
+            Assert.IsNull(result.dataProvided);
+        }
+
+        [Test]
+        public void ArrayElementMisparse([Values] BehaviorMode mode)
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDef) } };
+
+            var parser = new Def.Parser();
+            parser.AddString(@"
+                <Defs>
+                    <ArrayDef defName=""TestDef"">
+                        <dataEmpty>
+                            <li>10</li>
+                            <li>9</li>
+                            <li>8</li>
+                            <li>dog</li>
+                            <li>6</li>
+                        </dataEmpty>
+                        <dataProvided>
+                            <li>10</li>
+                            <li>9</li>
+                            <li>8</li>
+                            <li>dog</li>
+                            <li>6</li>
+                        </dataProvided>
+                    </ArrayDef>
+                </Defs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoBehavior(mode);
+
+            var result = Def.Database<ArrayDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(result.dataEmpty, new[] { 10, 9, 8, 0, 6 });
+            Assert.AreEqual(result.dataProvided, new[] { 10, 9, 8, 0, 6 });
         }
 
         public class ListDef : Def.Def

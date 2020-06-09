@@ -40,7 +40,7 @@ namespace DefTest
             var result = Def.Database<IntDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
-            Assert.AreEqual(0, result.value);
+            Assert.AreEqual(4, result.value);
 	    }
 
         [Test]
@@ -62,7 +62,7 @@ namespace DefTest
             var result = Def.Database<IntDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
-            Assert.AreEqual(0, result.value);
+            Assert.AreEqual(4, result.value);
 	    }
 
         [Test]
@@ -84,7 +84,7 @@ namespace DefTest
             var result = Def.Database<IntDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
-            Assert.AreEqual(0, result.value);
+            Assert.AreEqual(4, result.value);
 	    }
 
 	    [Test]
@@ -106,7 +106,7 @@ namespace DefTest
             var result = Def.Database<BoolDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
-            Assert.AreEqual(false, result.value);
+            Assert.AreEqual(true, result.value);
 	    }
 
 	    [Test]
@@ -128,7 +128,7 @@ namespace DefTest
             var result = Def.Database<BoolDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
-            Assert.AreEqual(false, result.value);
+            Assert.AreEqual(true, result.value);
 	    }
 
         [Test]
