@@ -46,7 +46,7 @@ namespace DefTest
         }
 
         [Test]
-        public void ConverterSimple()
+        public void ConverterSimple([Values] bool pretty)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterSimple) } };
 
@@ -59,7 +59,7 @@ namespace DefTest
             converted.convertable.b = 1234;
             converted.convertable.c = -40;
 
-            string serialized = Def.Recorder.Write(converted, pretty: true);
+            string serialized = Def.Recorder.Write(converted, pretty: pretty);
             var deserialized = Def.Recorder.Read<ConverterRecordable>(serialized);
 
             Assert.AreEqual(converted.convertable.a, deserialized.convertable.a);
@@ -87,7 +87,7 @@ namespace DefTest
         }
 
         [Test]
-        public void ConverterRecord()
+        public void ConverterRecord([Values] bool pretty)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterRecord) } };
 
@@ -100,7 +100,7 @@ namespace DefTest
             converted.convertable.b = 1234;
             converted.convertable.c = -40;
 
-            string serialized = Def.Recorder.Write(converted, pretty: true);
+            string serialized = Def.Recorder.Write(converted, pretty: pretty);
             var deserialized = Def.Recorder.Read<ConverterRecordable>(serialized);
 
             Assert.AreEqual(converted.convertable.a, deserialized.convertable.a);
@@ -121,7 +121,7 @@ namespace DefTest
         }
 
         [Test]
-        public void ConverterReplacementDetection()
+        public void ConverterReplacementDetection([Values] bool pretty)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterSimple) } };
 
@@ -132,7 +132,7 @@ namespace DefTest
             converted.convertableA = new Converted();
             converted.convertableB = converted.convertableA;
 
-            string serialized = Def.Recorder.Write(converted, pretty: true);
+            string serialized = Def.Recorder.Write(converted, pretty: pretty);
             ConverterReplacementRecordable deserialized = null;
             ExpectErrors(() => deserialized = Def.Recorder.Read<ConverterReplacementRecordable>(serialized));
 
@@ -144,7 +144,7 @@ namespace DefTest
         }
 
         [Test]
-        public void ConverterReplacementWorking()
+        public void ConverterReplacementWorking([Values] bool pretty)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterRecord) } };
 
@@ -155,7 +155,7 @@ namespace DefTest
             converted.convertableA = new Converted();
             converted.convertableB = converted.convertableA;
 
-            string serialized = Def.Recorder.Write(converted, pretty: true);
+            string serialized = Def.Recorder.Write(converted, pretty: pretty);
             ConverterReplacementRecordable deserialized = Def.Recorder.Read<ConverterReplacementRecordable>(serialized);
 
             Assert.IsNotNull(deserialized);
@@ -186,7 +186,7 @@ namespace DefTest
         }
 
         [Test]
-        public void ConverterUnsupplied()
+        public void ConverterUnsupplied([Values] bool pretty)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConverterUnsuppliedConverter) } };
 
@@ -198,7 +198,7 @@ namespace DefTest
             root.x = 42;
 
             string serialized = null;
-            ExpectErrors(() => serialized = Def.Recorder.Write(root, pretty: true));
+            ExpectErrors(() => serialized = Def.Recorder.Write(root, pretty: pretty));
             var deserialized = Def.Recorder.Read<ConverterUnsuppliedClass>(serialized);
 
             Assert.IsNotNull(deserialized); // even if we don't know how to store it and deserialize it, we should at least be able to create it

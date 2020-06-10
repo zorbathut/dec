@@ -29,7 +29,7 @@ namespace DefTest
         }
 
         [Test]
-	    public void Primitives()
+	    public void Primitives([Values] bool pretty)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
 
@@ -43,7 +43,7 @@ namespace DefTest
             primitives.stringValue = "<This is a test string value with some XML-sensitive characters.>";
             primitives.typeValue = typeof(Def.Def);
 
-            string serialized = Def.Recorder.Write(primitives, pretty: true);
+            string serialized = Def.Recorder.Write(primitives, pretty: pretty);
             var deserialized = Def.Recorder.Read<PrimitivesRecordable>(serialized);
 
             Assert.AreEqual(primitives.intValue, deserialized.intValue);
@@ -55,7 +55,7 @@ namespace DefTest
         }
 
         [Test]
-        public void Parserless()
+        public void Parserless([Values] bool pretty)
         {
             var primitives = new PrimitivesRecordable();
             primitives.intValue = 42;
@@ -64,7 +64,7 @@ namespace DefTest
             primitives.stringValue = "<This is a test string value with some XML-sensitive characters.>";
             primitives.typeValue = typeof(Def.Def);
 
-            string serialized = Def.Recorder.Write(primitives, pretty: true);
+            string serialized = Def.Recorder.Write(primitives, pretty: pretty);
             var deserialized = Def.Recorder.Read<PrimitivesRecordable>(serialized);
 
             Assert.AreEqual(primitives.intValue, deserialized.intValue);
@@ -100,7 +100,7 @@ namespace DefTest
         }
 
         [Test]
-        public void Defs()
+        public void Defs([Values] bool pretty)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDef) }, explicitStaticRefs = new Type[] { typeof(StaticReferenceDefs) } };
 
@@ -118,7 +118,7 @@ namespace DefTest
             // leave empty empty, of course
             defs.forceEmpty = null;
 
-            string serialized = Def.Recorder.Write(defs, pretty: true);
+            string serialized = Def.Recorder.Write(defs, pretty: pretty);
             var deserialized = Def.Recorder.Read<DefRecordable>(serialized);
 
             Assert.AreEqual(defs.a, deserialized.a);
@@ -128,7 +128,7 @@ namespace DefTest
         }
 
         [Test]
-        public void DefsRemoved()
+        public void DefsRemoved([Values] bool pretty)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDef) }, explicitStaticRefs = new Type[] { typeof(StaticReferenceDefs) } };
 
@@ -147,7 +147,7 @@ namespace DefTest
             Def.Database.Delete(StaticReferenceDefs.TestDefA);
 
             string serialized = null;
-            ExpectErrors(() => serialized = Def.Recorder.Write(defs, pretty: true));
+            ExpectErrors(() => serialized = Def.Recorder.Write(defs, pretty: pretty));
             DefRecordable deserialized = null;
             ExpectErrors(() => deserialized = Def.Recorder.Read<DefRecordable>(serialized));
 
@@ -181,7 +181,7 @@ namespace DefTest
         }
         
         [Test]
-        public void Refs()
+        public void Refs([Values] bool pretty)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
 
@@ -194,7 +194,7 @@ namespace DefTest
             refs.childB = new RefsChildRecordable();
             refs.childEmpty = null;
 
-            string serialized = Def.Recorder.Write(refs, pretty: true);
+            string serialized = Def.Recorder.Write(refs, pretty: pretty);
             var deserialized = Def.Recorder.Read<RefsRootRecordable>(serialized);
 
             Assert.IsNotNull(deserialized.childAone);
@@ -221,7 +221,7 @@ namespace DefTest
         }
 
         [Test]
-        public void Containers()
+        public void Containers([Values] bool pretty)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
 
@@ -238,7 +238,7 @@ namespace DefTest
 
             containers.intArray = new int[] { 10, 11, 12, 13, 15, 16, 18, 20, 22, 24, 27, 30, 33, 36, 39, 43, 47, 51, 56, 62, 68, 75, 82, 91 };
 
-            string serialized = Def.Recorder.Write(containers, pretty: true);
+            string serialized = Def.Recorder.Write(containers, pretty: pretty);
             var deserialized = Def.Recorder.Read<ContainersRecordable>(serialized);
 
             Assert.AreEqual(containers.intList, deserialized.intList);
@@ -257,7 +257,7 @@ namespace DefTest
         }
 
         [Test]
-        public void ContainersNested()
+        public void ContainersNested([Values] bool pretty)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
 
@@ -273,7 +273,7 @@ namespace DefTest
             nested.intLL[0].Add(95);
             nested.intLL[2].Add(203);
 
-            string serialized = Def.Recorder.Write(nested, pretty: true);
+            string serialized = Def.Recorder.Write(nested, pretty: pretty);
             var deserialized = Def.Recorder.Read<ContainersNestedRecordable>(serialized);
 
             Assert.AreEqual(nested.intLL, deserialized.intLL);
@@ -302,7 +302,7 @@ namespace DefTest
         }
 
         [Test]
-        public void ContainerRecursive()
+        public void ContainerRecursive([Values] bool pretty)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
 
@@ -321,7 +321,7 @@ namespace DefTest
             parent.children[2].childA = parent.children[2];
             parent.children[2].childB = parent.children[2];
 
-            string serialized = Def.Recorder.Write(parent, pretty: true);
+            string serialized = Def.Recorder.Write(parent, pretty: pretty);
             var deserialized = Def.Recorder.Read<RecursiveParent>(serialized);
 
             Assert.IsNull(deserialized.children[0].childA);
@@ -354,7 +354,7 @@ namespace DefTest
         }
 
         [Test]
-        public void Misparse()
+        public void Misparse([Values] bool pretty)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
 
@@ -364,7 +364,7 @@ namespace DefTest
             var misparse = new MisparseRecordable();
 
             string serialized = null;
-            ExpectErrors(() => serialized = Def.Recorder.Write(misparse, pretty: true));
+            ExpectErrors(() => serialized = Def.Recorder.Write(misparse, pretty: pretty));
             Assert.IsNotNull(serialized);
 
             MisparseRecordable deserialized = null;
@@ -389,7 +389,7 @@ namespace DefTest
         }
 
         [Test]
-        public void RecursiveSquared()
+        public void RecursiveSquared([Values] bool pretty)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
 
@@ -412,7 +412,7 @@ namespace DefTest
             c.left = a;
             c.right = a;
 
-            string serialized = Def.Recorder.Write(root, pretty: true);
+            string serialized = Def.Recorder.Write(root, pretty: pretty);
             var deserialized = Def.Recorder.Read<RecursiveSquaredRecorder>(serialized);
 
             Assert.AreSame(deserialized.left, deserialized.right);
@@ -434,7 +434,7 @@ namespace DefTest
         }
 
         [Test]
-        public void RecursiveSquaredRoot()
+        public void RecursiveSquaredRoot([Values] bool pretty)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
 
@@ -457,7 +457,7 @@ namespace DefTest
             c.left = root;
             c.right = root;
 
-            string serialized = Def.Recorder.Write(root, pretty: true);
+            string serialized = Def.Recorder.Write(root, pretty: pretty);
             var deserialized = Def.Recorder.Read<RecursiveSquaredRecorder>(serialized);
 
             Assert.AreSame(deserialized.left, deserialized.right);
@@ -482,7 +482,7 @@ namespace DefTest
         }
 
         [Test]
-        public void RootPrimitive()
+        public void RootPrimitive([Values] bool pretty)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
 
@@ -492,7 +492,7 @@ namespace DefTest
             int value = 4;
 
             // gonna be honest, this feels kind of like overkill
-            string serialized = Def.Recorder.Write(value, pretty: true);
+            string serialized = Def.Recorder.Write(value, pretty: pretty);
             var deserialized = Def.Recorder.Read<int>(serialized);
 
             Assert.AreEqual(value, deserialized);
@@ -511,7 +511,7 @@ namespace DefTest
         }
 
         [Test]
-        public void DepthDoubleLinked()
+        public void DepthDoubleLinked([Values] bool pretty)
         {
             // This test verifies that we can write an extremely deep structure without blowing the stack.
             // We use double links so we don't have to worry about generating an absurd xml file in the process.
@@ -538,7 +538,7 @@ namespace DefTest
                 }
             }
 
-            string serialized = Def.Recorder.Write(root, pretty: true);
+            string serialized = Def.Recorder.Write(root, pretty: pretty);
             Assert.IsNotNull(serialized);
 
             DoubleLinkedRecorder deserialized = Def.Recorder.Read<DoubleLinkedRecorder>(serialized);
@@ -559,7 +559,7 @@ namespace DefTest
         }
 
         [Test]
-        public void DepthSingleLinked()
+        public void DepthSingleLinked([Values] bool pretty)
         {
             // This test verifies that we can serialize and/or read an extremely deep structure without blowing the stack.
             // We use single links so we don't generate refs, we actually embed objects.
@@ -583,7 +583,7 @@ namespace DefTest
                 }
             }
 
-            string serialized = Def.Recorder.Write(root, pretty: true);
+            string serialized = Def.Recorder.Write(root, pretty: pretty);
             Assert.IsNotNull(serialized);
 
             // This verifies we haven't done an n^2 monstrosity by letting the depth get too far.
@@ -639,7 +639,7 @@ namespace DefTest
         }
 
         [Test]
-        public void DerivedRecordables()
+        public void DerivedRecordables([Values] bool pretty)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
 
@@ -651,7 +651,7 @@ namespace DefTest
             root.baseContainer.baseVal = 42;
             (root.baseContainer as DerivedRecordable).derivedVal = 81;
 
-            string serialized = Def.Recorder.Write(root, pretty: true);
+            string serialized = Def.Recorder.Write(root, pretty: pretty);
             var deserialized = Def.Recorder.Read<RecordableContainer>(serialized);
 
             Assert.AreEqual(typeof(DerivedRecordable), deserialized.baseContainer.GetType());
@@ -839,7 +839,7 @@ namespace DefTest
         }
 
         [Test]
-        public void Attributes()
+        public void Attributes([Values] bool pretty)
         {
             var holder = new AttributeHolder();
 
@@ -847,7 +847,7 @@ namespace DefTest
             holder.b = new AttributeRecordable { attributing = "<XML-SENSITIVE>" };
             holder.c = new AttributeRecordable { attributing = "I guess I'll write some more text here?" };
 
-            string serialized = Def.Recorder.Write(holder, pretty: true);
+            string serialized = Def.Recorder.Write(holder, pretty: pretty);
             var deserialized = Def.Recorder.Read<AttributeHolder>(serialized);
 
             Assert.AreEqual(holder.a.attributing, deserialized.a.attributing);
@@ -856,7 +856,7 @@ namespace DefTest
         }
 
         [Test]
-        public void AttributeRef()
+        public void AttributeRef([Values] bool pretty)
         {
             var holder = new AttributeHolder();
 
@@ -864,7 +864,7 @@ namespace DefTest
             holder.b = holder.a;
             holder.c = holder.a;
 
-            string serialized = Def.Recorder.Write(holder, pretty: true);
+            string serialized = Def.Recorder.Write(holder, pretty: pretty);
             var deserialized = Def.Recorder.Read<AttributeHolder>(serialized);
 
             Assert.AreEqual(holder.a.attributing, deserialized.a.attributing);
@@ -885,14 +885,14 @@ namespace DefTest
         }
 
         [Test]
-        public void MultiRecord()
+        public void MultiRecord([Values] bool pretty)
         {
             var mr = new MultiRecordRec();
             mr.x = 3;
             mr.y = 5;
 
             string serialized = null;
-            ExpectErrors(() => serialized = Def.Recorder.Write(mr, pretty: true));
+            ExpectErrors(() => serialized = Def.Recorder.Write(mr, pretty: pretty));
             var deserialized = Def.Recorder.Read<MultiRecordRec>(serialized);
 
             Assert.AreEqual(mr.x, deserialized.x);
