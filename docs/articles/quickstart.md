@@ -98,7 +98,7 @@ class SpriteSheetDef : Def.Def
 
 ```cs
 // Add our namespace so Def doesn't require lots of verbose namespace specifications.
-Config.AddUsingNamespace("ExampleGame");
+Config.UsingNamespaces = new string[] { "ExampleGame" };
 
 // The Parser class handles all def initialization.
 var parser = new Parser();

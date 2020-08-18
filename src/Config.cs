@@ -96,7 +96,7 @@ namespace Def
         /// Should not be changed while a Parser or Writer object exists.
         /// </remarks>
         /// <example>
-        /// Config.UsingNamespaces = new string[] { "LegendOfAzureFuton" };
+        /// Config.UsingNamespaces = new string[] { "LegendOfAmethystFuton" };
         /// </example>
         public static IEnumerable<string> UsingNamespaces
         {
