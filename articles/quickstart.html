@@ -159,7 +159,7 @@ class SpriteSheetDef : Def.Def
 </code></pre>
 <h2 id="initialize-the-def-framework-via-parser">Initialize the def framework via <a class="xref" href="../api/Def.Parser.html"><code>Parser</code></a>.</h2>
 <pre><code class="lang-cs">// Add our namespace so Def doesn't require lots of verbose namespace specifications.
-Config.AddUsingNamespace(&quot;ExampleGame&quot;);
+Config.UsingNamespaces = new string[] { &quot;ExampleGame&quot; };
 
 // The Parser class handles all def initialization.
 var parser = new Parser();

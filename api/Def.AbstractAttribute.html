@@ -5,9 +5,11 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Nonserialized fields </title>
+    <title>Class AbstractAttribute
+   </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Nonserialized fields ">
+    <meta name="title" content="Class AbstractAttribute
+   ">
     <meta name="generator" content="docfx 2.48.0.0">
     
     <link rel="shortcut icon" href="../favicon.ico">
@@ -66,34 +68,30 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="">
-<h1 id="nonserialized-fields">Nonserialized fields</h1>
-
-<pre><code class="lang-cs">class ExampleDef : Def.Def
-{
-  int value;
+            <article class="content wrap" id="_content" data-uid="Def.AbstractAttribute">
   
-  [NonSerialized] private int cachedDerivedValue = -1;
   
-  int GetCachedDerivedValue()
-  {
-    if (cachedDerivedValue == -1)
-    {
-      cachedDerivedValue = Util.CalculateComplicatedDerivedValue(value);
-    }
-    
-    return cachedDerivedValue;
-  }
-}
-</code></pre>
-<pre><code class="lang-xml">&lt;ExampleDef defName=&quot;Example&quot;&gt;
-  &lt;value&gt;3&lt;/value&gt;
-  
-  &lt;!-- Thanks to the [NonSerialized] attribute, this will cause an error! --&gt;
-  &lt;cachedDerivedValue&gt;0&lt;/cachedDerivedValue&gt;
-&lt;/ExampleDef&gt;
-</code></pre>
-<p>It's somewhat common to have cached or otherwise derived data within defs. Right now, you can accidentally (or maliciously) define that data within your XML. We could use the existing C# System.NonSerialized attribute to signal that certain fields should not be defined from within XML.</p>
+  <h1 id="Def_AbstractAttribute" data-uid="Def.AbstractAttribute" class="text-break">Class AbstractAttribute
+  </h1>
+  <div class="markdown level0 summary"><p>Signals that this Def-deriving class is not a valid database root. No classes of this type will be instantiated and children of this class will have their own namespaces.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><span class="xref">System.Attribute</span></div>
+    <div class="level2"><span class="xref">AbstractAttribute</span></div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Def.html">Def</a></h6>
+  <h6><strong>Assembly</strong>: def.dll</h6>
+  <h5 id="Def_AbstractAttribute_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[AttributeUsage(AttributeTargets.Class)]
+public class AbstractAttribute : Attribute</code></pre>
+  </div>
+  <h5 id="Def_AbstractAttribute_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks"><p>Classes with this attribute must be abstract. The parent class of this class must also be marked with this.</p>
+</div>
 </article>
           </div>
           
@@ -102,7 +100,10 @@
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/zorbathut/def/blob/master/docs/articles/fp_nonserialized.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/zorbathut/def/new/master/apiSpec/new?filename=Def_AbstractAttribute.md&amp;value=---%0Auid%3A%20Def.AbstractAttribute%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Improve this Doc</a>
+                  </li>
+                  <li>
+                    <a href="https://github.com/zorbathut/def/blob/master/src/Attributes.cs/#L37" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

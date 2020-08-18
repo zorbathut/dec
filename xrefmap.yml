@@ -7,6 +7,12 @@ references:
   commentId: N:Def
   fullName: Def
   nameWithType: Def
+- uid: Def.AbstractAttribute
+  name: AbstractAttribute
+  href: api/Def.AbstractAttribute.html
+  commentId: T:Def.AbstractAttribute
+  fullName: Def.AbstractAttribute
+  nameWithType: AbstractAttribute
 - uid: Def.Config
   name: Config
   href: api/Def.Config.html
