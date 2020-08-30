@@ -61,6 +61,47 @@ namespace Def
             return AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes());
         }
 
+        internal static bool IsUserAssembly(this Assembly asm)
+        {
+            var name = asm.FullName;
+
+            // Filter out system libraries
+            if (name.StartsWith("mscorlib,") || name.StartsWith("System,") || name.StartsWith("System."))
+            {
+                return false;
+            }
+
+            // Filter out Mono
+            if (name.StartsWith("Mono."))
+            {
+                return false;
+            }
+
+            // Filter out nunit, almost entirely so our test results look better
+            if (name.StartsWith("nunit.framework,"))
+            {
+                return false;
+            }
+
+            // Filter out Unity
+            if (name.StartsWith("Unity.") || name.StartsWith("UnityEngine,") || name.StartsWith("UnityEngine.") || name.StartsWith("UnityEditor,") || name.StartsWith("UnityEditor."))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        internal static IEnumerable<Assembly> GetAllUserAssemblies()
+        {
+            return AppDomain.CurrentDomain.GetAssemblies().Where(asm => asm.IsUserAssembly());
+        }
+
+        internal static IEnumerable<Type> GetAllUserTypes()
+        {
+            return GetAllUserAssemblies().SelectMany(a => a.GetTypes());
+        }
+
         internal static bool ReflectionSetForbidden(FieldInfo field)
         {
             // Alright, this isn't exactly complicated right now

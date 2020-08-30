@@ -73,7 +73,7 @@ namespace Def
                 IEnumerable<Type> staticRefs;
                 if (!unitTestMode)
                 {
-                    staticRefs = UtilReflection.GetAllTypes().Where(t => t.GetCustomAttribute<StaticReferencesAttribute>() != null);
+                    staticRefs = UtilReflection.GetAllUserTypes().Where(t => t.GetCustomAttribute<StaticReferencesAttribute>() != null);
                 }
                 else if (Config.TestParameters.explicitStaticRefs != null)
                 {
@@ -407,6 +407,11 @@ namespace Def
             if (s_Status != Status.Distributing)
             {
                 Dbg.Err($"Initializing static reference class {type} while the world is in {s_Status} state; should be {Status.Distributing} state - this probably means you accessed a static reference class before it was ready");
+            }
+
+            if (!type.Assembly.IsUserAssembly())
+            {
+                Dbg.Err($"Attempting to initialize static references in assembly {type.Assembly} which is considered a non-user assembly; please change UtilReflection.IsUserAssembly to suit your unfortunately-named project");
             }
             else if (!staticReferencesRegistering.Contains(type))
             {
