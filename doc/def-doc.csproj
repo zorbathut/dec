@@ -1,0 +1,9 @@
+<Project ToolsVersion="15.0">
+  <PropertyGroup>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <None Include="**" />
+  </ItemGroup>
+  
+</Project>

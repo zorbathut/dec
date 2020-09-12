@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "def", "src\def.csproj", "{B
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "def-test", "test\def-test.csproj", "{DEBE65A3-0988-4442-9372-72C0E928A985}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "def_docs", "docs\def_docs.csproj", "{AB4CCED1-7CF8-4C76-84E6-75AF6ADACAE6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "def-doc", "doc\def-doc.csproj", "{AB4CCED1-7CF8-4C76-84E6-75AF6ADACAE6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "loaf", "example\loaf\loaf.csproj", "{9CEFCF34-ED1F-47EA-A00C-37ADFAE2978E}"
 EndProject
