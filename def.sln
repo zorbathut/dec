@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2016
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30503.244
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "def", "src\def.csproj", "{B57A7C73-7542-4F8A-A662-2EB70C2E7C37}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "def_docs", "docs\def_docs.csproj", "{AB4CCED1-7CF8-4C76-84E6-75AF6ADACAE6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "loaf", "example\loaf\loaf.csproj", "{9CEFCF34-ED1F-47EA-A00C-37ADFAE2978E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "def-sharpfuzz", "util\sharpfuzz\def-sharpfuzz.csproj", "{D9B8BA36-ECA4-4FF0-A3BB-0B6DD3EBD821}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,6 +52,14 @@ Global
 		{9CEFCF34-ED1F-47EA-A00C-37ADFAE2978E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9CEFCF34-ED1F-47EA-A00C-37ADFAE2978E}.Release|x86.ActiveCfg = Release|Any CPU
 		{9CEFCF34-ED1F-47EA-A00C-37ADFAE2978E}.Release|x86.Build.0 = Release|Any CPU
+		{D9B8BA36-ECA4-4FF0-A3BB-0B6DD3EBD821}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9B8BA36-ECA4-4FF0-A3BB-0B6DD3EBD821}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9B8BA36-ECA4-4FF0-A3BB-0B6DD3EBD821}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D9B8BA36-ECA4-4FF0-A3BB-0B6DD3EBD821}.Debug|x86.Build.0 = Debug|Any CPU
+		{D9B8BA36-ECA4-4FF0-A3BB-0B6DD3EBD821}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9B8BA36-ECA4-4FF0-A3BB-0B6DD3EBD821}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9B8BA36-ECA4-4FF0-A3BB-0B6DD3EBD821}.Release|x86.ActiveCfg = Release|Any CPU
+		{D9B8BA36-ECA4-4FF0-A3BB-0B6DD3EBD821}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

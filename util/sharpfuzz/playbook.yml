@@ -1,0 +1,88 @@
+---
+- hosts: all
+  name: sharpfuzz setup
+  
+  tasks:
+  - name: Install apt packages
+    apt:
+      pkg:
+      # required for MS dotnet sources to work
+      - apt-transport-https
+      
+      # required to build AFL
+      - make
+      - build-essential
+    become: yes
+
+  - name: Install dotnet SDK
+    block:
+    - name: Install Microsoft apt sources
+      apt:
+        deb: https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb
+      register: ms_src_install
+    - name: Update apt
+      apt:
+        update_cache: yes
+      when: ms_src_install.changed
+    - name: Install dotnet SDK
+      apt:
+        name: dotnet-sdk-3.1
+    become: yes
+
+  # We should be able to install afl off apt, but as of this writing:
+  # * ubuntu 18.04 has a broken afl
+  # * ubuntu 18.10 through 19.10 don't have full support for .net
+  # * ubuntu 20.04 doesn't work properly with ansible
+  # * So, fine. We build it ourselves.
+  # We do not bother with the sharpfuzz patch, we'll just use the environment variable.
+  - name: Install AFL
+    block:
+    - name: Make working directory
+      file:
+        path: /tmp/afl
+        state: directory
+    - name: Download and unpack source
+      unarchive:
+        src: https://lcamtuf.coredump.cx/afl/releases/afl-2.52b.tgz # no special reason, it's just the latest version when I wrote this
+        dest: /tmp/afl
+        remote_src: yes
+    - name: Build and install
+      make:
+        chdir: /tmp/afl/afl-2.52b
+        target: install
+      become: yes
+  
+  - name: Install sharpfuzz
+    command: dotnet tool install --global SharpFuzz.CommandLine
+    ignore_errors: yes # I have no idea how to make this happen only when necessary, but it'll fail later on if it breaks.
+
+  - name: Copy source
+    # A bunch of our commands either break horribly if there's local files from Windows or break horribly if it's a shared mount, possibly due to permissions issues.
+    # To fix this, we just make a copy of the whole thing.
+    command: rsync -a --exclude='/.git' --filter=':- .gitignore' /vagrant/ /vagrant_build
+    become: yes
+    
+  - name: Build and instrument def
+    block:
+    - name: Build def
+      command:
+        cmd: dotnet build src/def.csproj
+        chdir: /vagrant_build
+    - name: Copy def
+      copy:
+        src: /vagrant_build/src/bin/Debug/netstandard2.0/def.dll
+        remote_src: yes
+        dest: /vagrant_build/util/sharpfuzz/def.dll
+    - name: Instrument def
+      command:
+        cmd: /home/vagrant/.dotnet/tools/sharpfuzz util/sharpfuzz/def.dll # This should be in the path but I don't know how to get ansible to recognize a path change, since it's only added to the path when we install dotnet tools.
+        chdir: /vagrant_build
+  
+  - name: Build DefSharpFuzz
+    command:
+      cmd: dotnet build util/sharpfuzz/def-sharpfuzz.csproj
+      chdir: /vagrant_build
+  
+  - name: Disable core dump notifications
+    command: echo core >/proc/sys/kernel/core_pattern
+    become: yes

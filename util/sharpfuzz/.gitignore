@@ -1,0 +1,4 @@
+.vagrant
+
+# part of the sharpfuzz build process
+def.dll
