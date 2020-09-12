@@ -109,5 +109,17 @@ namespace DefTest
 
             DoBehavior(mode);
         }
+
+        [Test]
+        public void Garbage([Values] BehaviorMode mode)
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+
+            var parser = new Def.Parser();
+            ExpectErrors(() => parser.AddString(@"�SimpleDef defName=""Hello""><value>3</value></SimpleDef>"));
+            parser.Finish();
+
+            DoBehavior(mode);
+        }
     }
 }

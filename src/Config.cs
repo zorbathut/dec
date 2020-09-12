@@ -193,7 +193,10 @@ namespace Def
                 {
                     System.Diagnostics.Debug.Print(e.ToString());
                     Console.WriteLine(e.ToString());
-                    throw e;
+                    if (DefaultHandlerThrowExceptions >= DefaultExceptionBehavior.ErrorOnly)
+                    {
+                        throw e;
+                    }
                 };
             #endif
         }
