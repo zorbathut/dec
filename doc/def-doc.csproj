@@ -4,6 +4,10 @@
   
   <ItemGroup>
     <None Include="**" />
+    <None Remove="_site/**" />
+    <None Remove="obj/**" />
+    <None Remove="api/**/*.yml" />
+    <None Remove="api/.manifest" />
   </ItemGroup>
   
 </Project>
