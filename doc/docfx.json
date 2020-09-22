@@ -3,9 +3,7 @@
     {
       "src": [
         {
-          "files": [
-            "src/**.csproj"
-          ],
+          "files": ["src/**.csproj"],
           "src": ".."
         }
       ],
@@ -25,8 +23,9 @@
       },
       {
         "files": [
-          "articles/**.md",
-          "articles/**/toc.yml",
+          "quickstart/**/*.{md,yml}",
+          "documentation/**/*.{md,yml}",
+          "future/**/*.{md,yml}",
           "toc.yml",
           "*.md"
         ]

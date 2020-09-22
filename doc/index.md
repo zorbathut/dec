@@ -50,4 +50,4 @@ I plan to use this tool in all of my upcoming projects; it remains to be seen if
 
 ----
 
-If you'd like to delve more deeply, I recommend starting at [Quick Start](articles/quickstart.md).
+If you'd like to delve more deeply, I recommend starting at [Quick Start](quickstart/quickstart.md).

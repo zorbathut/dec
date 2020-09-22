@@ -1,0 +1,24 @@
+- name: Multiple inheritance
+  href: multipleinheritance.md
+- name: Translation
+  href: translation.md
+- name: In-place data updating
+  href: inplace.md
+- name: Dynamic def creation
+  href: dynamic.md
+- name: Invalid database warnings
+  href: invdatabase.md
+- name: Type constraints
+  href: typeconstraints.md
+- name: Performance
+  href: performance.md
+- name: Mod functionality
+  href: mods.md
+- name: Factories
+  href: factories.md
+- name: Serialization
+  items:
+    - name: Compatibility
+      href: serialization_compatibility.md
+    - name: Interior links
+      href: serialization_interior.md

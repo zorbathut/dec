@@ -1,5 +1,9 @@
-- name: Articles
-  href: articles/
-- name: API Documentation
+- name: Quick Start
+  href: quickstart/
+- name: Documentation
+  href: documentation/
+- name: API Reference
   href: api/
   homepage: api/index.md
+- name: Future Plans
+  href: future/

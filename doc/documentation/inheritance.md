@@ -36,6 +36,6 @@
 
 When you need many things that are in some way similar, it can be useful to create a set of default values that can be applied on demand. Abstract defs, determined by the `abstract="true"` attribute, won't be included in the Def database.
 
-A standard single-inheritance structure is not always sufficient, but [multiple inheritance](fp_multipleinheritance.md) is not yet implemented.
+A standard single-inheritance structure is not always sufficient, but [multiple inheritance](/future/multipleinheritance.md) is not yet implemented.
 
-Most members are straight-out replaced if specified in child types. This includes collections, such as List and Dictionary; there is currently no way to append to a base type's collection, though [this functionality is planned](fp_mods.md). Composite types are modified on a per-element basis.
+Most members are straight-out replaced if specified in child types. This includes collections, such as List and Dictionary; there is currently no way to append to a base type's collection, though [this functionality is planned](/future/mods.md). Composite types are modified on a per-element basis.

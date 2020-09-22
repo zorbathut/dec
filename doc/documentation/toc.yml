@@ -1,0 +1,20 @@
+- name: Member parsing
+  href: parsing.md
+- name: Explicit type specification
+  href: type.md
+- name: Def inheritance
+  href: inheritance.md
+- name: Def hierarchy roots
+  href: hierarchy.md
+- name: Indexes
+  href: indexes.md
+- name: Custom deserialization
+  href: custom.md
+- name: Serialization
+  href: serialization.md
+- name: Nonserialized members
+  href: nonserialized.md
+- name: Security
+  href: security.md
+- name: Justifications
+  href: justifications.md
