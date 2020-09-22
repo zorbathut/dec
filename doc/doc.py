@@ -37,33 +37,33 @@ if not args.serve and not args.deploy:
 
 
 # obliterate caches, just for safety's sake
-obliterate("docs/obj")
-obliterate("docs/bin")
-obliterate("docs/packages")
-obliterate("docs/DROP")
-obliterate("docs/TEMP")
+obliterate("doc/obj")
+obliterate("doc/bin")
+obliterate("doc/packages")
+obliterate("doc/DROP")
+obliterate("doc/TEMP")
 
 # get the repo, make sure there's no files in it, just git
-obliterate("docs/_site")
+obliterate("doc/_site")
 subprocess.check_call([
         "git",
         "clone",
         "-b", "gh-pages",
         ".",
-        "docs/_site",
+        "doc/_site",
     ])
-for f in [ f"docs/_site/{f}" for f in os.listdir("docs/_site") if f != ".git" ]:
+for f in [ f"doc/_site/{f}" for f in os.listdir("doc/_site") if f != ".git" ]:
   obliterate(f)
 
 # generate docs
 subprocess.check_call([
         "docfx",
-        "docs/docfx.json",
+        "doc/docfx.json",
     ])
 
 if args.deploy:
     # update repo
-    os.chdir("docs/_site")
+    os.chdir("doc/_site")
 
     subprocess.check_call([
             "git",
@@ -88,8 +88,8 @@ if args.deploy:
 if args.serve:
     subprocess.check_call([
             "docfx",
-            "serve", "docs/_site",
+            "serve", "doc/_site",
         ])
         
 # clear repo directory
-obliterate("docs/_site")
+obliterate("doc/_site")
