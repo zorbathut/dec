@@ -27,7 +27,14 @@
           "documentation/**/*.{md,yml}",
           "future/**/*.{md,yml}",
           "toc.yml",
-          "*.md"
+          "*.md",
+        ]
+      }
+    ],
+    "resource": [
+      {
+        "files": [
+          "**/*.png"
         ]
       }
     ],

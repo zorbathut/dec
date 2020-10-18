@@ -1,2 +1,12 @@
-- name: Quick Start
+- name: Installation
+  href: installation.md
+- name: Setup
+  href: setup.md
+- name: Def type creation
+  href: setup.md
+- name: Def instance creation
+  href: setup.md
+- name: Using Defs from your code
+  href: setup.md
+- name: Old delete me
   href: quickstart.md
