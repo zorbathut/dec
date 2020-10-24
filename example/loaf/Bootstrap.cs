@@ -16,12 +16,9 @@ namespace Loaf
             // Configure Def's namespaces
             Def.Config.UsingNamespaces = new string[] { "Loaf" };
 
-            // In most cases, you'll just want to read all the XML files in your data directory
+            // In most cases, you'll just want to read all the XML files in your data directory, which is easy
             var parser = new Def.Parser();
-            foreach (var file in Directory.GetFiles("data"))
-            {
-                parser.AddFile(file);
-            }
+            parser.AddDirectory("data");
             parser.Finish();
 
             // Everything is now initialized; start the game!
