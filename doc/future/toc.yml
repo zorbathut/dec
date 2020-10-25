@@ -16,6 +16,8 @@
   href: mods.md
 - name: Factories
   href: factories.md
+- name: CSV support
+  href: csv.md
 - name: Serialization
   items:
     - name: Compatibility
