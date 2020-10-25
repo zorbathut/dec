@@ -1,11 +1,13 @@
+- name: Introduction
+  href: introduction.md
 - name: Installation
   href: installation.md
 - name: Setup
   href: setup.md
-- name: Def type creation
-  href: setup.md
-- name: Def instance creation
-  href: setup.md
+- name: Def Type creation
+  href: deftypes.md
+- name: Def Instance creation
+  href: definstances.md
 - name: Using Defs from your code
   href: setup.md
 - name: Old delete me
