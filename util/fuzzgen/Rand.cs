@@ -7,7 +7,7 @@ namespace Fuzzgen
     {
         private static Random rand = new Random();
 
-        public static float Next(int max)
+        public static int Next(int max)
         {
             return rand.Next(max);
         }
