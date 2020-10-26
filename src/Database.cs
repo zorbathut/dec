@@ -187,6 +187,8 @@ namespace Def
             Parser.Clear();
             Serialization.Clear();
             Index.Clear();
+
+            UtilReflection.IndexInfoCached.Clear();
         }
 
         private static void BuildCaches()
