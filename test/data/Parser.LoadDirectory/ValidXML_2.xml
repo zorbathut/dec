@@ -1,0 +1,5 @@
+<Defs>
+    <IntDef defName="TestDef2">
+        <value>80</value>
+    </IntDef>
+</Defs>

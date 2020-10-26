@@ -191,5 +191,20 @@ namespace DefTest
 
             Assert.IsNotNull(Def.Database<IntDef>.Get("TestDef"));
         }
+
+        [Test]
+        public void LoadDirectory([Values] BehaviorMode mode)
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDef) } };
+
+            var parser = new Def.Parser();
+            parser.AddDirectory("data/Parser.LoadDirectory");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            Assert.AreEqual(40, Def.Database<IntDef>.Get("TestDef1").value);
+            Assert.AreEqual(80, Def.Database<IntDef>.Get("TestDef2").value);
+        }
     }
 }
