@@ -22,18 +22,19 @@ namespace Fuzzgen
             switch (type)
             {
                 case Type.Struct:
-                    sb.AppendLine($"internal struct {name} {{");
+                    sb.AppendLine($"internal struct {name}");
                     break;
 
                 case Type.Class:
-                    sb.AppendLine($"internal class {name} {{");
+                    sb.AppendLine($"internal class {name}");
                     break;
 
                 case Type.Def:
-                    sb.AppendLine($"internal class {name} : Def.Def {{");
+                    sb.AppendLine($"internal class {name} : Def.Def");
                     break;
             }
 
+            sb.AppendLine($"{{");
             sb.AppendLine($"}}");
 
             return sb.ToString();
