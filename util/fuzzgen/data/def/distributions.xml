@@ -1,0 +1,9 @@
+<Defs>
+  <CompositeTypeDistributionDef defName="Distribution">
+    <elements>
+      <Def>3</Def>
+      <Struct>2</Struct>
+      <Class>5</Class>
+    </elements>
+  </CompositeTypeDistributionDef>
+</Defs>

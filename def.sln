@@ -14,9 +14,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "def-sharpfuzz", "util\sharpfuzz\def-sharpfuzz.csproj", "{D9B8BA36-ECA4-4FF0-A3BB-0B6DD3EBD821}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "fuzzgen", "util\fuzzgen\fuzzgen.csproj", "{484AD613-37BF-4EC2-8A26-2505DF6D2717}"
-	ProjectSection(ProjectDependencies) = postProject
-		{B57A7C73-7542-4F8A-A662-2EB70C2E7C37} = {B57A7C73-7542-4F8A-A662-2EB70C2E7C37}
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
