@@ -58,7 +58,8 @@ class MonsterDef : Def.Def
   // Defs can reference other defs.
   public SpriteSheetDef spriteSheet;
   
-  // Def references are not limited to a tree structures. Defs can reference other defs in circles, reference other defs of the same type, and even reference themselves.
+  // Def references are not limited to a tree structures. Defs can reference other defs in circles,
+  // reference other defs of the same type, and even reference themselves.
   public MonsterDef evolvedVariant = null;
 }
 ```
@@ -68,7 +69,10 @@ class MonsterDef : Def.Def
 ```xml
 <Defs>
   <!-- Here's a basic goblin. We've overridden the defaults we want changed and ignored the rest. -->
-  <!-- Every def must be named via the defName attribute. These names must be unique within def type, but can overlap across different types. They are intended to be human-readable for debug and development purposes, but not user-visible. They must match the regexp [A-Za-z][A-Za-z0-9_]*. -->
+  <!-- Every def must be named via the defName attribute. -->
+  <!-- These names must be unique within def type, but can overlap across different types. -->
+  <!-- They are intended to be human-readable for debug and development purposes, but not user-visible. -->
+  <!-- They must match the regexp [A-Za-z][A-Za-z0-9_]*. -->
   <MonsterDef defName="Goblin">
     <maxHP>20</maxHP>
     
@@ -83,7 +87,8 @@ class MonsterDef : Def.Def
     <spriteSheet>Goblin</spriteSheet>
   </MonsterDef>
 
-  <!-- Here, we've defined a new tint for the DarkGoblin. Modifying members of included classes works like you'd expect XML to. -->
+  <!-- Here, we've defined a new tint for the DarkGoblin. -->
+  <!-- Modifying members of included classes works like you'd expect XML to. -->
   <MonsterDef defName="DarkGoblin">
     <maxHP>40</maxHP>
     <tint>
@@ -94,7 +99,8 @@ class MonsterDef : Def.Def
     <spriteSheet>Goblin</spriteSheet>
   </MonsterDef>
 
-  <!-- Referencing other defs is as simple as typing their defName. All def references are validated at load time. -->
+  <!-- Referencing other defs is as simple as typing their defName. -->
+  <!-- All def references are validated at load time. -->
   <MonsterDef defName="AlchemyGoblin">
     <maxHP>10</maxHP>
     <spriteSheet>Goblin</spriteSheet>
@@ -123,14 +129,17 @@ public static class MonsterDefs
   public static MonsterDef Goblin;
   public static MonsterDef DarkGoblin;
   
-  // You don't have to include all defs here - in fact, it's recommended that you only include defs that you plan to reference by name.
+  // You don't have to include all defs here - in fact,
+  // it's recommended that you only include defs that you plan to reference by name.
 }
 ```
 
 #### Use defs in code.
 
 ```cs
-// This is an example of an actual monster. There's no requirement that it be named "Monster"; def does not care what you do with the data it's generated.
+// This is an example of an actual monster.
+// There's no requirement that it be named "Monster";
+// def does not care what you do with the data it's generated.
 public class Monster
 {
   public Monster(MonsterDef def)
@@ -152,7 +161,8 @@ public class GoblinGenerator
   public Generate()
   {
     // If you need to use a static reference, just pull it out of the static reference class.
-    // (We're assuming that you have an Entity system in this project already. The details are up to you; def doesn't specify anything about entities.)
+    // (We're assuming that you have an Entity system in this project already.
+    // The details are up to you; def doesn't specify anything about entities.)
     Entity.Spawn(MonsterDefs.Goblin);
   }
 }
