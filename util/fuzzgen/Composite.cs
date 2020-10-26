@@ -41,7 +41,7 @@ namespace Fuzzgen
 
             foreach (var m in members)
             {
-                sb.AppendLine($"  {m.type} {m.name};");
+                sb.AppendLine($"  {m.WriteToOutput()}");
             }
 
             sb.AppendLine($"}}");

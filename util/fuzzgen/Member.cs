@@ -14,6 +14,11 @@ namespace Fuzzgen
             ContainerDictionary,
         }
         public Type type;
+
+        public string WriteToOutput()
+        {
+            return $"{type} {name};";
+        }
     }
 
     internal class MemberTypeDistributionDef : Distribution<Member.Type> { }
