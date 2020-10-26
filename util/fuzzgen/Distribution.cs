@@ -10,7 +10,7 @@ namespace Fuzzgen
 
         public T Choose()
         {
-            T chosen = default(T);
+            var chosen = default(T);
             float total = 0f;
 
             foreach (var elem in elements)
