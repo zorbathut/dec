@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "fuzzgen": {
+      "commandName": "Project",
+      "workingDirectory": "$(ProjectDir)"
+    }
+  }
+}
