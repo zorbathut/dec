@@ -7,6 +7,6 @@
 - name: Def types and instances
   href: defs.md
 - name: Using Defs from your code
-  href: setup.md
-- name: Old delete me
-  href: quickstart.md
+  href: using.md
+- name: TL;DR
+  href: tldr.md
