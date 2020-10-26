@@ -7,17 +7,26 @@ namespace Fuzzgen
 
         public enum Type
         {
-            Primitive,
-            Class,
+            Int,
+            /*Class,
             Def,
             ContainerList,
-            ContainerDictionary,
+            ContainerDictionary,*/
         }
         public Type type;
 
+        public string TypeToCSharp()
+        {
+            switch (type)
+            {
+                case Type.Int: return "int";
+                default: Dbg.Err("Invalid type!"); return "int";
+            }
+        }
+
         public string WriteToOutput()
         {
-            return $"{type} {name};";
+            return $"{TypeToCSharp()} {name};";
         }
     }
 

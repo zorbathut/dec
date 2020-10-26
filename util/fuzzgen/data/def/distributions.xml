@@ -9,11 +9,11 @@
 
   <MemberTypeDistributionDef defName="Distribution">
     <elements>
-      <Primitive>5</Primitive>
-      <Class>2</Class>
+      <Int>5</Int>
+      <!--<Class>2</Class>
       <Def>2</Def>
       <ContainerList>2</ContainerList>
-      <ContainerDictionary>1</ContainerDictionary>
+      <ContainerDictionary>1</ContainerDictionary>-->
     </elements>
   </MemberTypeDistributionDef>
 </Defs>
