@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Quick Start </title>
+    <title>Def types and instances </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Quick Start ">
+    <meta name="title" content="Def types and instances ">
     <meta name="generator" content="docfx 2.48.0.0">
     
     <link rel="shortcut icon" href="../favicon.ico">
@@ -67,14 +67,12 @@
         <div class="article row grid-right">
           <div class="col-md-10">
             <article class="content wrap" id="_content" data-uid="">
-<h1 id="quick-start">Quick Start</h1>
+<h1 id="def-types-and-instances">Def types and instances</h1>
 
-<h2 id="define-some-classes-derived-from-defdef">Define some classes derived from <a class="xref" href="../api/Def.Def.html"><code>Def.Def</code></a>.</h2>
-<pre><code class="lang-cs">namespace ExampleGame
-{
-
-// The starting point for all defs is a class derived from Def.Def.
-// Here, we're defining a general template for monsters.
+<p>The next step is to create Def types.</p>
+<p>Def types are simply C# classes that inherit from <a class="xref" href="../api/Def.Def.html">Def.Def</a> and contain some number of properties. Here's an example of what that might look like - your game will likely contain a different set of things.</p>
+<pre><code class="lang-cs">// Here, we're defining a general template for monsters.
+// This goes somewhere appropriate in your C# game code.
 class MonsterDef : Def.Def
 {
   // Most types can be defined as simple fields.
@@ -92,31 +90,13 @@ class MonsterDef : Def.Def
   // Def references are not limited to a tree structures. Defs can reference other defs in circles, reference other defs of the same type, and even reference themselves.
   public MonsterDef evolvedVariant = null;
 }
-
-// Classes that aren't derived from Def.Def will be recursively parsed.
-// There's nothing magic about either these classes or `Def.Def`-derived classes. You can have functions, static members, or anything else you'd normally want in a class.
-class Color
-{
-  public Color() { }
-  public Color(float r, float g, float b) { this.r = r; this.g = g; this.b = b; }
-  
-  public readonly static Color White = new Color(1, 1, 1);
-  
-  public float r = 1;
-  public float g = 1;
-  public float b = 1;
-}
-
-// Don't hesitate to make simple defs. Defs are lightweight and it's easy to add to them later.
-class SpriteSheetDef : Def.Def
-{
-  public string filename;
-}
-
-}
 </code></pre>
-<h2 id="write-xml-to-define-our-actual-objects">Write XML to define our actual objects.</h2>
-<pre><code class="lang-xml">&lt;Defs&gt;
+<p>Once you have a Def type, you can start writing Def instances. Here's a few examples of that, using the above Def type.</p>
+<pre><code class="lang-xml">&lt;!-- This is an XML file, and should be placed so it can be read from your built games. --&gt;
+&lt;!-- Details vary per engine; if you're on Unity, look up StreamingAssets. --&gt;
+&lt;!-- The filename doesn't matter, aside from having an .xml extension. --&gt;
+
+&lt;Defs&gt;
   &lt;!-- Here's a basic goblin. We've overridden the defaults we want changed and ignored the rest. --&gt;
   &lt;!-- Every def must be named via the defName attribute. These names must be unique within def type, but can overlap across different types. They are intended to be human-readable for debug and development purposes, but not user-visible. They must match the regexp [A-Za-z][A-Za-z0-9_]*. --&gt;
   &lt;MonsterDef defName=&quot;Goblin&quot;&gt;
@@ -157,74 +137,6 @@ class SpriteSheetDef : Def.Def
   &lt;/SpriteSheetDef&gt;
 &lt;/Defs&gt;
 </code></pre>
-<h2 id="initialize-the-def-framework-via-parser">Initialize the def framework via <a class="xref" href="../api/Def.Parser.html"><code>Parser</code></a>.</h2>
-<pre><code class="lang-cs">// Add our namespace so Def doesn't require lots of verbose namespace specifications.
-Config.UsingNamespaces = new string[] { &quot;ExampleGame&quot; };
-
-// The Parser class handles all def initialization.
-var parser = new Parser();
-
-// Add individual XML documents through .AddFile(), or .AddString() if you need to load them manually.
-// It's common to read from on-disk files, but you can get the data from any source you want.
-parser.AddFile(&quot;goblinData.xml&quot;);
-
-// Keep adding files until you've added everything.
-parser.AddFile(&quot;elfData.xml&quot;);
-
-// Call when you've added everything. This finishes all parsing.
-parser.Finish();
-
-// You don't need to keep the Parser object around after this point.
-</code></pre>
-<h2 id="define-some-static-references">Define some static references.</h2>
-<pre><code class="lang-cs">// The attribute lets def know that it should fill this static class with data.
-[Def.StaticReferences]
-public static class MonsterDefs
-{
-  // This bit of copy-pasted code is required to automatically detect some errors.
-  // def will also detect if you haven't included this code and warn you about it.
-  static MonsterDefs() { Def.StaticReferencesAttribute.Initialized(); }
-
-  // Include static members for any defs you want to reference directly.
-  public static MonsterDef Goblin;
-  public static MonsterDef DarkGoblin;
-  
-  // You don't have to include all defs here - in fact, it's recommended that you only include defs that you plan to reference by name.
-}
-
-// You don't have to include reference classes for def types you don't intend to reference by name.
-// In this design, `SpriteSheetDef`s are referenced only through `MonsterDef`s.
-// Therefore there is no need for a `SpriteSheetDefs` class.
-</code></pre>
-<h2 id="use-defs-in-code">Use defs in code.</h2>
-<pre><code class="lang-cs">// This is an example of an actual monster. There's no requirement that it be named &quot;Monster&quot;; def does not care what you do with the data it's generated.
-public class Monster
-{
-  public Monster(MonsterDef def)
-  {
-    // It's common for objects to keep a reference to the def that they're created from.
-    this.def = def;
-    
-    // defs are just classes; using things from them is simple.
-    hp = def.maxHP;
-  }
-  
-  private MonsterDef def;
-  
-  private float hp;
-}
-
-public class GoblinGenerator
-{
-  public Generate()
-  {
-    // If you need to use a static reference, just pull it out of the static reference class.
-    // (We're assuming that you have an Entity system in this project already. The details are up to you; def doesn't specify anything about entities.)
-    Entity.Spawn(MonsterDefs.Goblin);
-  }
-}
-</code></pre>
-<p>And those are the basics.</p>
 </article>
           </div>
           
@@ -233,7 +145,7 @@ public class GoblinGenerator
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/zorbathut/def/blob/master/docs/articles/quickstart.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/zorbathut/def/blob/master/doc/quickstart/defs.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>

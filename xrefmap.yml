@@ -575,6 +575,19 @@ references:
   isSpec: "True"
   fullName: Def.Parser.Parser
   nameWithType: Parser.Parser
+- uid: Def.Parser.AddDirectory(System.String,System.String)
+  name: AddDirectory(String, String)
+  href: api/Def.Parser.html#Def_Parser_AddDirectory_System_String_System_String_
+  commentId: M:Def.Parser.AddDirectory(System.String,System.String)
+  fullName: Def.Parser.AddDirectory(System.String, System.String)
+  nameWithType: Parser.AddDirectory(String, String)
+- uid: Def.Parser.AddDirectory*
+  name: AddDirectory
+  href: api/Def.Parser.html#Def_Parser_AddDirectory_
+  commentId: Overload:Def.Parser.AddDirectory
+  isSpec: "True"
+  fullName: Def.Parser.AddDirectory
+  nameWithType: Parser.AddDirectory
 - uid: Def.Parser.AddFile(System.String,System.String)
   name: AddFile(String, String)
   href: api/Def.Parser.html#Def_Parser_AddFile_System_String_System_String_
@@ -750,3 +763,6 @@ references:
   isSpec: "True"
   fullName: Def.Writer.Write
   nameWithType: Writer.Write
+- uid: future_csv
+  name: CSV Support
+  href: future/csv.html

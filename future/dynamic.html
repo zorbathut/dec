@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Justifications </title>
+    <title>Dynamic def creation </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Justifications ">
+    <meta name="title" content="Dynamic def creation ">
     <meta name="generator" content="docfx 2.48.0.0">
     
     <link rel="shortcut icon" href="../favicon.ico">
@@ -67,25 +67,11 @@
         <div class="article row grid-right">
           <div class="col-md-10">
             <article class="content wrap" id="_content" data-uid="">
-<h1 id="justifications">Justifications</h1>
+<h1 id="dynamic-def-creation">Dynamic def creation</h1>
 
-<h2 id="text-formats">Text formats</h2>
-<p>I suspect it's only a matter of time before someone asks me why I'm using XML.</p>
-<p>XML is definitely not perfect, but it has a set of features which I want that other text-based data descriptors don't have. I'll list alternatives and explain why they fall short.</p>
-<h3 id="json">JSON</h3>
-<p>JSON is designed as a computer-to-computer descriptive language, not a human-facing written language. The big dealbreaker here is a lack of comments, which are near-crucial for large human-authored files, but there's other human-antifeatures like a lack of trailing commas in lists.</p>
-<p>On top of that, it's more typed than I prefer; I'd like to keep typing data in exactly one place, and that's the C# class definitions. JSON understands strings, integers, booleans, lists, and dictionaries, and that's about three more things than I want it to know about.</p>
-<h3 id="json5">JSON5</h3>
-<p>JSON5 is basically &quot;JSON, with trailing commas and comments&quot;. It's definitely better than JSON, but support is lacking; as of today there's a single C# implementation with almost no usage and less documentation than def. It also shares the typing issues of JSON.</p>
-<h3 id="yaml">YAML</h3>
-<p>YAML includes comments and better human-intended features, but has worse typing issues than JSON, with many documented cases where naive but reasonable input results in completely incorrect data. YAML is also a whitespace-sensitive language; I admit I'm not a fan of that in general, but in my experience it's devastating for data markup languages, where it's common to have <em>extremely</em> large blocks containing a lot of information.</p>
-<h3 id="strictyaml">StrictYAML</h3>
-<p>Similar to the JSON5/JSON comparison, StrictYAML is a modified version of YAML, mostly removing YAML's weird typing behavior. I actually rather like StrictYAML and use it on other projects; however, the only StrictYAML parser that exists today is in Python.</p>
-<p>It shares the whitespace-sensitive behavior of YAML.</p>
-<h3 id="ini-format">.ini format</h3>
-<p>Classic Windows INIs are an untyped configuration language. They're actually rather nice for simple configurations, but they don't have native support for nested structures, which makes them somewhat unusable for this application.</p>
-<h3 id="custom-written-format">Custom-written format</h3>
-<p>I'm not a big fan of reinventing the wheel, especially when I have something that's Good Enough. Why bother when I can just use XML?</p>
+<p>Creating new defs at runtime is rarely the technically-best solution, but sometimes it's a whole lot easier than the &quot;best&quot; solution, and game development is all about tradeoffs.</p>
+<p>We'll need to provide a point in the setup process where a callback can return code-generated defs. This will need to go through extensive validation to ensure that we're not overriding defNames. In addition, it's currently unclear how this should work relative to StaticReferences; certainly many StaticReferences will be necessary for building defs, but then we'll need to evaluate StaticReferences again to link those defs in. In fact, we may need to do this several times.</p>
+<p>Doing this efficiently isn't trivial, and coming up with an interface for it is similarly awkward. This feature is likely to wait until someone actually needs it. (If that's you, please let me know!)</p>
 </article>
           </div>
           
@@ -94,7 +80,7 @@
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/zorbathut/def/blob/master/docs/articles/justifications.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/zorbathut/def/blob/master/doc/future/dynamic.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>

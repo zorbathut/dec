@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Def hierarchy roots </title>
+    <title>Explicit type specification </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Def hierarchy roots ">
+    <meta name="title" content="Explicit type specification ">
     <meta name="generator" content="docfx 2.48.0.0">
     
     <link rel="shortcut icon" href="../favicon.ico">
@@ -67,28 +67,32 @@
         <div class="article row grid-right">
           <div class="col-md-10">
             <article class="content wrap" id="_content" data-uid="">
-<h1 id="def-hierarchy-roots">Def hierarchy roots</h1>
+<h1 id="explicit-type-specification">Explicit type specification</h1>
 
-<p>Every def type is registered in exactly one category. One def, one category; this rule is immutable. Each category has its own namespace where each Def inside it must be named uniquely, but Defs in different categories can share names.</p>
-<pre><code>Def.Def
-  - MineralDef
-  - RenderPassDef
-  - ActorDef
-    - MonsterDef
-    - NPCDef
-  - CosmeticDef
+<p>Sometimes you may want to explicitly specify the type of a member. This can be done with the &quot;class&quot; attribute.</p>
+<pre><code class="lang-cs">class ExampleDef : Def.Def
+{
+  BaseClass data;
+}
 </code></pre>
-<p>By default, categories are defined as anything directly inheriting from Def.Def In the above inheritance chart, MineralDef, RenderPassDef, ActorDef, and CosmeticDef all define categories; MonsterDef and NPCDef become part of the ActorDef category.</p>
-<p>If you want to define a Def type that has several child categories, this can be done with the Def.Abstract attribute. Classes with Def.Abstract applied must also be abstract, with the C# <code>abstract</code> keyword.</p>
-<pre><code>Def.Def
-  - [Def.Abstract] MenuItemDef
-    - MainMenuItemDef
-    - GameOverMenuItemDef
-    - [Def.Abstract] IngameMenuItemDef
-        - ShopMenuItemDef
-        - BankerMenuItemDef
+<pre><code class="lang-xml">&lt;ExampleDef defType=&quot;Example&quot;&gt;
+  &lt;data class=&quot;DerivedClass&quot;&gt;
+    &lt;innerData&gt;Kittens&lt;/innerData&gt;
+  &lt;/data&gt;
+&lt;/ExampleDef&gt;
 </code></pre>
-<p>This example includes four categories; MainMenuItemDef, GameOverMenuItemDef, ShopMenuItemDef, and BankerMenuItemDef. You could have a four defs named <code>Exit</code>, one in each category. You can't make defs of type MenuItemDef or IngameMenuItemDef; they aren't in any category.</p>
+<p>Your class must match the already-provided instance if you've provided a default value:</p>
+<pre><code class="lang-cs">class ExampleDef : Def.Def
+{
+  BaseClass data = new BaseClass();
+}
+</code></pre>
+<pre><code class="lang-xml">&lt;ExampleDef defType=&quot;Example&quot;&gt;
+  &lt;data class=&quot;DerivedClass&quot;&gt; &lt;!-- this is an error; must be BaseClass, or omitted --&gt;
+  &lt;/data&gt;
+&lt;/ExampleDef&gt;
+</code></pre>
+<p>Types are described using the same conventions listed under <a href="parsing.html">type member parsing</a>.</p>
 </article>
           </div>
           
@@ -97,7 +101,7 @@
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/zorbathut/def/blob/master/docs/articles/doc_hierarchy.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/zorbathut/def/blob/master/doc/documentation/type.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>

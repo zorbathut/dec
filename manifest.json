@@ -1,6 +1,6 @@
 {
   "homepages": [],
-  "source_base_path": "C:/werk/def/docs",
+  "source_base_path": "C:/werk/def/doc",
   "xrefmap": "xrefmap.yml",
   "files": [
     {
@@ -69,7 +69,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Def.Database-1.html",
-          "hash": "W7rjgd+dwxCyJVetM3icLQ=="
+          "hash": "MHyf/0VyVPGpWjoLaCot/g=="
         }
       },
       "is_incremental": false,
@@ -81,7 +81,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Def.Database.html",
-          "hash": "s54Mr0HN8xy1UP4+sc8DGg=="
+          "hash": "BuQd0jQvrWbWueoGGDd5uw=="
         }
       },
       "is_incremental": false,
@@ -117,7 +117,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Def.Index-1.html",
-          "hash": "pj+S+1/4Ehki8tWwV6qaqQ=="
+          "hash": "bdgXbxEElY+L4jUanbiVbw=="
         }
       },
       "is_incremental": false,
@@ -129,7 +129,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Def.IndexAttribute.html",
-          "hash": "FZ7ybSsHwXP5rdM/uZpTDg=="
+          "hash": "qfRc7TNC+Z+qPZVMHWMRkw=="
         }
       },
       "is_incremental": false,
@@ -141,7 +141,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Def.Parser.html",
-          "hash": "tvkool9oaxYszf48mr7biQ=="
+          "hash": "YXW4lxqVeCFNjXKj6TWmvw=="
         }
       },
       "is_incremental": false,
@@ -213,7 +213,7 @@
       "output": {
         ".html": {
           "relative_path": "api/index.html",
-          "hash": "jEi9BHcCnLf9Fh/ID+47zg=="
+          "hash": "Jj8daYaZa35F0ey1YYVdbA=="
         }
       },
       "is_incremental": false,
@@ -233,11 +233,11 @@
     },
     {
       "type": "Conceptual",
-      "source_relative_path": "articles/doc_custom.md",
+      "source_relative_path": "documentation/custom.md",
       "output": {
         ".html": {
-          "relative_path": "articles/doc_custom.html",
-          "hash": "gB7QFJltnKfIwbFuHgsS9g=="
+          "relative_path": "documentation/custom.html",
+          "hash": "KB7Lt0k8asweTuu2KuGaPw=="
         }
       },
       "is_incremental": false,
@@ -245,11 +245,11 @@
     },
     {
       "type": "Conceptual",
-      "source_relative_path": "articles/doc_hierarchy.md",
+      "source_relative_path": "documentation/hierarchy.md",
       "output": {
         ".html": {
-          "relative_path": "articles/doc_hierarchy.html",
-          "hash": "nIDvMDNGx6jDsJSzjvbmng=="
+          "relative_path": "documentation/hierarchy.html",
+          "hash": "qS4FKYfMvjU9O2OvSSkQYQ=="
         }
       },
       "is_incremental": false,
@@ -257,11 +257,11 @@
     },
     {
       "type": "Conceptual",
-      "source_relative_path": "articles/doc_indexes.md",
+      "source_relative_path": "documentation/indexes.md",
       "output": {
         ".html": {
-          "relative_path": "articles/doc_indexes.html",
-          "hash": "F5ylwP24K8JYwad1jt04zA=="
+          "relative_path": "documentation/indexes.html",
+          "hash": "f0ENjZydimsQkI7K/kBL0g=="
         }
       },
       "is_incremental": false,
@@ -269,11 +269,11 @@
     },
     {
       "type": "Conceptual",
-      "source_relative_path": "articles/doc_inheritance.md",
+      "source_relative_path": "documentation/inheritance.md",
       "output": {
         ".html": {
-          "relative_path": "articles/doc_inheritance.html",
-          "hash": "EWKbyxKf2YXlbh2KRT5FnA=="
+          "relative_path": "documentation/inheritance.html",
+          "hash": "wJTNi1koC2T3NRIidHxX/Q=="
         }
       },
       "is_incremental": false,
@@ -281,11 +281,11 @@
     },
     {
       "type": "Conceptual",
-      "source_relative_path": "articles/doc_nonserialized.md",
+      "source_relative_path": "documentation/justifications.md",
       "output": {
         ".html": {
-          "relative_path": "articles/doc_nonserialized.html",
-          "hash": "eyMANIDsV//LdReH473PnQ=="
+          "relative_path": "documentation/justifications.html",
+          "hash": "Ptxk8HKKuz37lUzyEDgO8w=="
         }
       },
       "is_incremental": false,
@@ -293,11 +293,11 @@
     },
     {
       "type": "Conceptual",
-      "source_relative_path": "articles/doc_parsing.md",
+      "source_relative_path": "documentation/nonserialized.md",
       "output": {
         ".html": {
-          "relative_path": "articles/doc_parsing.html",
-          "hash": "6U1GxV8OTD3ZZcw0Aev40w=="
+          "relative_path": "documentation/nonserialized.html",
+          "hash": "u4+6dY4M5Ph9AVt5zj5evg=="
         }
       },
       "is_incremental": false,
@@ -305,11 +305,11 @@
     },
     {
       "type": "Conceptual",
-      "source_relative_path": "articles/doc_security.md",
+      "source_relative_path": "documentation/parsing.md",
       "output": {
         ".html": {
-          "relative_path": "articles/doc_security.html",
-          "hash": "+RTYNrPB4EmaJJT4wBLOWw=="
+          "relative_path": "documentation/parsing.html",
+          "hash": "Xuzhn5ikMH7gKDK68OM+pA=="
         }
       },
       "is_incremental": false,
@@ -317,11 +317,11 @@
     },
     {
       "type": "Conceptual",
-      "source_relative_path": "articles/doc_serialization.md",
+      "source_relative_path": "documentation/security.md",
       "output": {
         ".html": {
-          "relative_path": "articles/doc_serialization.html",
-          "hash": "TLmmK8CZG5faSqoKJF6D+w=="
+          "relative_path": "documentation/security.html",
+          "hash": "OrFytWsrv8UdHmqYPJlOIQ=="
         }
       },
       "is_incremental": false,
@@ -329,167 +329,11 @@
     },
     {
       "type": "Conceptual",
-      "source_relative_path": "articles/doc_type.md",
+      "source_relative_path": "documentation/serialization.md",
       "output": {
         ".html": {
-          "relative_path": "articles/doc_type.html",
-          "hash": "ejjT4QvIVwwfxgqRpHyhTQ=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "Conceptual",
-      "source_relative_path": "articles/fp_dynamic.md",
-      "output": {
-        ".html": {
-          "relative_path": "articles/fp_dynamic.html",
-          "hash": "fYgAzM80Djl6TR3vDI0yQA=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "Conceptual",
-      "source_relative_path": "articles/fp_factories.md",
-      "output": {
-        ".html": {
-          "relative_path": "articles/fp_factories.html",
-          "hash": "IkNrBTdoXYAsAPjznqxUFw=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "Conceptual",
-      "source_relative_path": "articles/fp_inplace.md",
-      "output": {
-        ".html": {
-          "relative_path": "articles/fp_inplace.html",
-          "hash": "fmgcZUkmACGzORu089P19g=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "Conceptual",
-      "source_relative_path": "articles/fp_invdatabase.md",
-      "output": {
-        ".html": {
-          "relative_path": "articles/fp_invdatabase.html",
-          "hash": "ql9msbasq7jCZ0ogXg0sMw=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "Conceptual",
-      "source_relative_path": "articles/fp_mods.md",
-      "output": {
-        ".html": {
-          "relative_path": "articles/fp_mods.html",
-          "hash": "2K87hR5MiKncCuODvUwjfw=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "Conceptual",
-      "source_relative_path": "articles/fp_multipleinheritance.md",
-      "output": {
-        ".html": {
-          "relative_path": "articles/fp_multipleinheritance.html",
-          "hash": "6eswmaJFnwXsQTuYV0WeaQ=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "Conceptual",
-      "source_relative_path": "articles/fp_performance.md",
-      "output": {
-        ".html": {
-          "relative_path": "articles/fp_performance.html",
-          "hash": "RZfUNcSpKKrVyMSwLfhV+Q=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "Conceptual",
-      "source_relative_path": "articles/fp_serialization_compatibility.md",
-      "output": {
-        ".html": {
-          "relative_path": "articles/fp_serialization_compatibility.html",
-          "hash": "bX36ZBSoGPA1jlHt1UKF9Q=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "Conceptual",
-      "source_relative_path": "articles/fp_serialization_interior.md",
-      "output": {
-        ".html": {
-          "relative_path": "articles/fp_serialization_interior.html",
-          "hash": "bWW62xp062DfD8mgkXsXlg=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "Conceptual",
-      "source_relative_path": "articles/fp_translation.md",
-      "output": {
-        ".html": {
-          "relative_path": "articles/fp_translation.html",
-          "hash": "CRfxs3mndE+9d0OuY7UcUg=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "Conceptual",
-      "source_relative_path": "articles/fp_typeconstraints.md",
-      "output": {
-        ".html": {
-          "relative_path": "articles/fp_typeconstraints.html",
-          "hash": "VCffeA7jL+FaaPrxFtRS5w=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "Conceptual",
-      "source_relative_path": "articles/justifications.md",
-      "output": {
-        ".html": {
-          "relative_path": "articles/justifications.html",
-          "hash": "7aB8SoVVNxiCJGAwMamMRQ=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "Conceptual",
-      "source_relative_path": "articles/quickstart.md",
-      "output": {
-        ".html": {
-          "relative_path": "articles/quickstart.html",
-          "hash": "KivOBKtX7WTMMTZTRWpqvQ=="
+          "relative_path": "documentation/serialization.html",
+          "hash": "38fZTyyUsZK2EqTfhOoD2A=="
         }
       },
       "is_incremental": false,
@@ -497,11 +341,191 @@
     },
     {
       "type": "Toc",
-      "source_relative_path": "articles/toc.yml",
+      "source_relative_path": "documentation/toc.yml",
       "output": {
         ".html": {
-          "relative_path": "articles/toc.html",
-          "hash": "xy92eaEAVGF9RISBEHnT2g=="
+          "relative_path": "documentation/toc.html",
+          "hash": "cjzZGO/eAZVAb+qX/rT+NQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/type.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/type.html",
+          "hash": "J7KuxdXOt+z+Sf2o7j8ZbA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "future/csv.md",
+      "output": {
+        ".html": {
+          "relative_path": "future/csv.html",
+          "hash": "15xqq6ZjvRjOW1gP6QjCvw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "future/dynamic.md",
+      "output": {
+        ".html": {
+          "relative_path": "future/dynamic.html",
+          "hash": "xDl7Qed5HjZCkwD6aatDow=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "future/factories.md",
+      "output": {
+        ".html": {
+          "relative_path": "future/factories.html",
+          "hash": "l9neEfPZzsR8gqZxiGuXhw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "future/future.md",
+      "output": {
+        ".html": {
+          "relative_path": "future/future.html",
+          "hash": "gZ2u2sPar1iewpyreLq9/g=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "future/inplace.md",
+      "output": {
+        ".html": {
+          "relative_path": "future/inplace.html",
+          "hash": "RAuRJaBcovoGZ3Q+z3qh2w=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "future/invdatabase.md",
+      "output": {
+        ".html": {
+          "relative_path": "future/invdatabase.html",
+          "hash": "sYkzIj8aLJxVDviOYBnbgg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "future/mods.md",
+      "output": {
+        ".html": {
+          "relative_path": "future/mods.html",
+          "hash": "vgK+a85NFkBSK7Ma6WIwDA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "future/multipleinheritance.md",
+      "output": {
+        ".html": {
+          "relative_path": "future/multipleinheritance.html",
+          "hash": "1tM9Ju3wSjg9H3eRsyh56A=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "future/performance.md",
+      "output": {
+        ".html": {
+          "relative_path": "future/performance.html",
+          "hash": "8RDtps4SD3d4sOTVe5vRFQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "future/serialization_compatibility.md",
+      "output": {
+        ".html": {
+          "relative_path": "future/serialization_compatibility.html",
+          "hash": "fvDNisR7CJ2TZXk8IztQZg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "future/serialization_interior.md",
+      "output": {
+        ".html": {
+          "relative_path": "future/serialization_interior.html",
+          "hash": "YnH/+au0RBwEekhgKshPpg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "future/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "future/toc.html",
+          "hash": "CXePrEAYJ4xJtYuf4xLdeQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "future/translation.md",
+      "output": {
+        ".html": {
+          "relative_path": "future/translation.html",
+          "hash": "GUk9Q5wFZpSV93eLwW6Jjw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "future/typeconstraints.md",
+      "output": {
+        ".html": {
+          "relative_path": "future/typeconstraints.html",
+          "hash": "xWBq1lMbSaZuPdeMwXkI9Q=="
         }
       },
       "is_incremental": false,
@@ -513,7 +537,113 @@
       "output": {
         ".html": {
           "relative_path": "index.html",
-          "hash": "ZJe8XxcEPRhzgWA5hFyF6A=="
+          "hash": "g4HHIwIz7LGHABGQR0TSnQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "quickstart/defs.md",
+      "output": {
+        ".html": {
+          "relative_path": "quickstart/defs.html",
+          "hash": "ZiIkjg6XhWMrxGDhGqBkOg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "quickstart/installation.md",
+      "output": {
+        ".html": {
+          "relative_path": "quickstart/installation.html",
+          "hash": "QsN8dNtv2drhBRSlCkE1/A=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "quickstart/installation_godot.png",
+      "output": {
+        "resource": {
+          "relative_path": "quickstart/installation_godot.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "quickstart/installation_unity.png",
+      "output": {
+        "resource": {
+          "relative_path": "quickstart/installation_unity.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "quickstart/introduction.md",
+      "output": {
+        ".html": {
+          "relative_path": "quickstart/introduction.html",
+          "hash": "cgiy20CF7WrWI7eDIHrVfQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "quickstart/setup.md",
+      "output": {
+        ".html": {
+          "relative_path": "quickstart/setup.html",
+          "hash": "xHoJ+szjSx9auz8SopqyNA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "quickstart/tldr.md",
+      "output": {
+        ".html": {
+          "relative_path": "quickstart/tldr.html",
+          "hash": "okqclErAYsXG69A0cFhOHA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "quickstart/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "quickstart/toc.html",
+          "hash": "iO/iSJkKnl4X3YxI+fPsxg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "quickstart/using.md",
+      "output": {
+        ".html": {
+          "relative_path": "quickstart/using.html",
+          "hash": "TXDGgKA6/tJ+jy8QKZQBYQ=="
         }
       },
       "is_incremental": false,
@@ -525,7 +655,7 @@
       "output": {
         ".html": {
           "relative_path": "toc.html",
-          "hash": "WgcKrn/EfoBdF4FFJbIV7g=="
+          "hash": "4KS6ZbN4zThwx/6ucM5/Lw=="
         }
       },
       "is_incremental": false,
@@ -550,16 +680,23 @@
           "total_file_count": 0,
           "skipped_file_count": 0
         },
-        "ConceptualDocumentProcessor": {
+        "ResourceDocumentProcessor": {
           "can_incremental": false,
+          "details": "Processor ResourceDocumentProcessor cannot support incremental build because the processor doesn't implement ISupportIncrementalDocumentProcessor interface.",
           "incrementalPhase": "build",
-          "total_file_count": 24,
+          "total_file_count": 0,
           "skipped_file_count": 0
         },
         "ManagedReferenceDocumentProcessor": {
           "can_incremental": false,
           "incrementalPhase": "build",
           "total_file_count": 17,
+          "skipped_file_count": 0
+        },
+        "ConceptualDocumentProcessor": {
+          "can_incremental": false,
+          "incrementalPhase": "build",
+          "total_file_count": 31,
           "skipped_file_count": 0
         }
       }

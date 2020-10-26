@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>In-place data updating </title>
+    <title>Performance </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="In-place data updating ">
+    <meta name="title" content="Performance ">
     <meta name="generator" content="docfx 2.48.0.0">
     
     <link rel="shortcut icon" href="../favicon.ico">
@@ -67,12 +67,16 @@
         <div class="article row grid-right">
           <div class="col-md-10">
             <article class="content wrap" id="_content" data-uid="">
-<h1 id="in-place-data-updating">In-place data updating</h1>
+<h1 id="performance">Performance</h1>
 
-<p>There's nothing in def itself that prevents people from modifying values at runtime. While this is strongly discouraged in production code, it's a useful tool for rapid development; a good UI can change data tuning from a day-long process into a minute-long process.</p>
-<p>Normally, the user then has to transcribe the changed value into the .xml files. But it sure would be cool if def could do that on its own! The XML library it uses provides enough metadata to regenerate the same file byte-for-byte; injecting modified data at the same time wouldn't be too hard.</p>
-<p>Def now supports serializing the def database into an .xml file, via the Writer class. But it's limited and doesn't produce good human-readable output.</p>
-<p>This is likely going to happen after I have the appropriate UI rewritten.</p>
+<p>A lot of the code in def was written with the intent of getting it working. It is <em>gratuitously</em> inefficient, simply because at the scale I'm currently working, inefficiencies are undetectable.</p>
+<p>If you're using def on a larger-scale project, it's starting to get slow, and you're willing to share your code and XML with me, please get in touch; repro cases are necessary to get actual work done.</p>
+<h2 id="caching">Caching</h2>
+<p>C#'s reflection API is not terribly fast, and def currently queries it over and over. Simply storing these values before re-requesting them would go a long way to improve performance.</p>
+<h2 id="multithreading">Multithreading</h2>
+<p>Much of the parsing process is designed so it can be split into multiple tasks in a thread pool with little-to-no interference. Modern computers usually have 4 cores or more, and this would roughly quadruple loading speed.</p>
+<h2 id="baking">Baking</h2>
+<p>Parsing XML is intrinsically slow and will never be particularly fast. Baking the XML into a pre-parsed binary format could dramatically improve load time, at the cost of considerable implementation difficulty. This is likely worth doing only if the previous two steps prove insufficient.</p>
 </article>
           </div>
           
@@ -81,7 +85,7 @@
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/zorbathut/def/blob/master/docs/articles/fp_inplace.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/zorbathut/def/blob/master/doc/future/performance.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>

@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Security </title>
+    <title>Using Defs from your code </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Security ">
+    <meta name="title" content="Using Defs from your code ">
     <meta name="generator" content="docfx 2.48.0.0">
     
     <link rel="shortcut icon" href="../favicon.ico">
@@ -67,25 +67,39 @@
         <div class="article row grid-right">
           <div class="col-md-10">
             <article class="content wrap" id="_content" data-uid="">
-<h1 id="security">Security</h1>
+<h1 id="using-defs-from-your-code">Using Defs from your code</h1>
 
-<h2 id="parser">Parser</h2>
-<p>Def is currently not intended to be secure in any way. It is expected to be used in an environment where all pieces - the assemblies running, the function calls made on it, and the XML data passed in - are trusted. If you want to use it in a partially-untrusted environment I strongly recommend doing a security audit beforehand.</p>
-<p>That said, it shouldn't be unnecessarily insecure. Most of what it does is text parsing, and aside from obvious things like a malicious attacker sending a literally infinite XML document, it should generally not be exploitable in any way. Even though security is not a goal of this project, exploits that can be fixed without removing features are considered bugs.</p>
-<p>Some things an attacker can do that you may wish to be aware of:</p>
-<ul>
-<li>By choosing which class to create, an attacker may be ale to create classes of any type that inherit from types used as members in Defs. This will cause the default constructor to be executed. This can be mitigated by initializing all class members in Defs to non-null values; by modifying source, one could mostly remove the ability of this library to create new classes.</li>
-<li>This also applies to Defs themselves. Any Def-inheriting class can be instantiated. This is harder to remove without eliminating necessary functionality.</li>
-<li>It's common for Defs to include Type members, usually as a factory pattern to create objects with complicated behavior. Type members are entirely unconstrained and can refer to any type, even types without the expected base class. This is best mitigated by implementing <a href="fp_typeconstraints.html">type constraints</a>.</li>
-<li>Def will happily allow people to change both public and private members, including private members in base classes. This behavior is not always expected and can easily put objects in internally inconsistent states. This can be avoided by tagging internal-only fields with System.NonSerializedAttribute and accepting any input on any other field.</li>
-</ul>
-<p>If you think of another possible attack, please let me know and I'll add it to this list.</p>
-<h2 id="recorder">Recorder</h2>
-<p>While Def XML data is expected to come from a secure source, savegames are not. People commonly trade savegames around and would be surprised if this turned out to be a major security issue.</p>
-<p>To mitigate this, Recorder saves do not support reflection-based serialization or deserialization. They also carefully enforce the type of class that can be created, preventing it from being instantiated in the first place if it is not a match for the underlying variable.</p>
-<p>This isn't capable of solving everything. <code>object</code> fields will allow any type to be instantiated, and <code>Type</code> fields can accept any type (at least until <a href="fp_typeconstraints.html">type constraints</a> are added.) However, most of these issues now rely on the game programmer instead of Recorder's infrastructure.</p>
-<p>I suspect there remain vulnerabilities. Please report them and I'll do my best to fix them.</p>
-<p>In the end, this is a client-side video game library, and you should not install mods or run savegames from untrusted sources; this has been a vulnerability in games for many years and it's unlikely to stop now.</p>
+<h2 id="enumeration">Enumeration</h2>
+<p>The first and least common way to use Defs is via <a class="xref" href="../api/Def.Database-1.html#Def_Database_1_List"><code>Def.Database&lt;T&gt;.List</code></a>. This lists all Defs of a given type, which is useful if your Def is a list of things that sensibly needs to be traversed (keybinds, game difficulties, monsters when trying to display a Bestiary).</p>
+<h2 id="lookup-by-name">Lookup by name</h2>
+<p>In most cases, you don't want <em>all</em> Defs, you want a <em>specific</em> Def. A good way to do this is with static references. Create the following class somewhere in your code:</p>
+<pre><code class="lang-cs">// The attribute lets def know that it should fill this static class with data.
+[Def.StaticReferences]
+public static class MonsterDefs
+{
+  // This bit of copy-pasted code is required to automatically detect some errors.
+  // def will also detect if you haven't included this code and warn you about it.
+  static MonsterDefs() { Def.StaticReferencesAttribute.Initialized(); }
+
+  // Include static members for any defs you want to reference directly.
+  public static MonsterDef Goblin;
+  public static MonsterDef DarkGoblin;
+  
+  // You don't have to include all defs here - in fact, it's recommended that you only include defs that you plan to reference by name.
+}
+</code></pre>
+<p>Now you can reference <code>MonsterDefs.Goblin</code> directly, with no more post-startup performance cost than checking a static member of a class. In addition, Def will verify on startup that all referenced Defs exist.</p>
+<p>You can also search Defs by name with <a class="xref" href="../api/Def.Database-1.html#Def_Database_1_Get_"><code>Def.Database&lt;T&gt;.Get()</code></a> <strong>but this is not recommended</strong> because errors will be detected only at runtime, not startup-time, and it's significantly slower than a static member lookup.</p>
+<h2 id="references">References</h2>
+<p>The most common way of using Defs is as a member of another Def. For example:</p>
+<pre><code class="lang-cs">class EnemyDef : Def.Def
+{
+    public WeaponDef weapon;
+}
+</code></pre>
+<p>The Def library will fill these in based on your XML and you can just use them as a normal member.</p>
+<h2 id="debug-functionality">Debug Functionality</h2>
+<p>If you really need a list of <em>every</em> Def, of <em>every</em> type, you can use <a class="xref" href="../api/Def.Database.html#Def_Database_List"><code>Def.Database.List</code></a>, but this is slow and very uncommon outside of debug code.</p>
 </article>
           </div>
           
@@ -94,7 +108,7 @@
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/zorbathut/def/blob/master/docs/articles/doc_security.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/zorbathut/def/blob/master/doc/quickstart/using.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>

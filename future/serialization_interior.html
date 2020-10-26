@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Custom deserialization </title>
+    <title>Serialization: Interior save links </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Custom deserialization ">
+    <meta name="title" content="Serialization: Interior save links ">
     <meta name="generator" content="docfx 2.48.0.0">
     
     <link rel="shortcut icon" href="../favicon.ico">
@@ -67,37 +67,10 @@
         <div class="article row grid-right">
           <div class="col-md-10">
             <article class="content wrap" id="_content" data-uid="">
-<h1 id="custom-deserialization">Custom deserialization</h1>
+<h1 id="serialization-interior-save-links">Serialization: Interior save links</h1>
 
-<pre><code class="lang-cs">public class ColorConverter : Def.Converter
-{
-    public override HashSet&lt;Type&gt; HandledTypes()
-    {
-        return new HashSet&lt;Type&gt;() { typeof(Color32) };
-    }
-
-    public override object FromString(string input, Type type, string inputName, int lineNumber)
-    {
-        return Util.ParseColorFromString(input);
-    }
-
-    public override object FromXml(XElement input, Type type, string inputName)
-    {
-        return Util.ParseColorFromXml(input);
-    }
-}
-</code></pre>
-<pre><code class="lang-xml">&lt;ExampleDef defName=&quot;Example&quot;&gt;
-  &lt;tintA&gt;
-    &lt;r&gt;0.3&lt;/r&gt;
-    &lt;g&gt;0.5&lt;/g&gt;
-    &lt;b&gt;0.8&lt;/b&gt;
-  &lt;/tintA&gt;
-  &lt;tintB&gt;(0.3, 0.5, 0.8)&lt;/tintB&gt;
-  &lt;tintC&gt;#4C7FCC&lt;/tintC&gt;
-&lt;/ExampleDef&gt;
-</code></pre>
-<p>Providing custom deserializers for your own classes, or third-party classes, is as easy as defining classes that derive from <a class="xref" href="../api/Def.Converter.html"><code>Def.Converter</code></a>. <a class="xref" href="../api/Def.Parser.html"><code>Def.Parser</code></a> will automatically find them during startup and register them. Please check <a class="xref" href="../api/Def.Converter.html"><code>Def.Converter</code></a> documentation for more details.</p>
+<p>It's somewhat common for saved structures to want references to the guts of a def. We'd need some way to name those interior structures so they can be reliably serialized and deserialized. In most cases, this can be done automatically by the path of the child object, but list or array paths tend to be unstable and we'd want to provide explicit sub-object naming of some kind.</p>
+<p>This will potentially turn into a nasty hairball if we ever support non-tree structures in defs themselves.</p>
 </article>
           </div>
           
@@ -106,7 +79,7 @@
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/zorbathut/def/blob/master/docs/articles/doc_custom.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/zorbathut/def/blob/master/doc/future/serialization_interior.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>

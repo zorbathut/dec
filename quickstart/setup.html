@@ -1,0 +1,159 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Setup </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Setup ">
+    <meta name="generator" content="docfx 2.48.0.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="setup">Setup</h1>
+
+<p>Def is designed to be initialized exactly once, at the beginning of your program. Normally you'll want to initialize it after displaying your initial loading screen but before displaying the main menu. This allows you to include Def-authored information within the main menu, such as difficulty settings, keybinds, or savegame metadata.</p>
+<p>The exact way of accomplishing this will depend on your engine and your game architecture. On Unity, we recommend <a href="https://docs.unity3d.com/ScriptReference/RuntimeInitializeOnLoadMethodAttribute-ctor.html">RuntimeInitializeOnLoadMethod</a>; on Godot, <a href="https://docs.godotengine.org/en/stable/getting_started/step_by_step/singletons_autoload.html">AutoLoad</a>. These are not the only solutions and you should use whatever you feel most comfortable with, as long as you can guarantee that the following code will be run exactly once each time the game is started.</p>
+<h2 id="summary">Summary</h2>
+<p>Most initial Def initialization routines will look like this.</p>
+<pre><code class="lang-cs">void StartupDef()
+{
+    Def.Config.DefaultHandlerThrowExceptions = false;
+    Def.Config.UsingNamespaces = new string[] { &quot;YourGame&quot; };
+
+    var parser = new Def.Parser();
+    parser.AddDirectory(&quot;data&quot;);
+    parser.Finish();
+}
+</code></pre>
+<p>Read on for more explanation.</p>
+<h2 id="logging">Logging</h2>
+<p>Def will generate warning and error messages. <i>It is strongly recommended that you make these unignorable to developers.</i> Popup windows and modal dialogs may be appropriate here; Def does its best to recover from errors, which is great for mod compatibility but can be frustrating for developers if the error message is easily missable.</p>
+<p>By default, Def will output to your normal system error log (Unity log for Unity programs, C# console otherwise). If you have your own logging framework, or want to decorate Def messages with a recognizable tag, this is the place to do it. <a class="xref" href="../api/Def.Config.html#Def_Config_InfoHandler">Def.Config.InfoHandler</a>, <a class="xref" href="../api/Def.Config.html#Def_Config_WarningHandler">Def.Config.WarningHandler</a>, <a class="xref" href="../api/Def.Config.html#Def_Config_ErrorHandler">Def.Config.ErrorHandler</a>, and <a class="xref" href="../api/Def.Config.html#Def_Config_ExceptionHandler">Def.Config.ExceptionHandler</a> can all be assigned separately for their respective type of log message.</p>
+<pre><code class="lang-cs">Def.Config.InfoHandler = str =&gt; YourGame.Logging.LogInfoMessage(str);
+Def.Config.WarningHandler = str =&gt; YourGame.Logging.LogWarningMessage(str);
+Def.Config.ErrorHandler = str =&gt; YourGame.Logging.LogErrorMessage(str);
+Def.Config.ExceptionHandler = e =&gt; YourGame.Logging.LogException(e);
+</code></pre>
+<h2 id="exceptions">Exceptions</h2>
+<p>As mentioned above, Def attempts to recover from errors whenever possible. However, we've found that new Def developers often miss error messages and end up very confused. To help with that, Def's default log handler throws exceptions on warnings and errors, along with an explanatory message about how this can be suppressed; specifically, through <a class="xref" href="../api/Def.Config.html#Def_Config_DefaultHandlerThrowExceptions">Def.Config.DefaultHandlerThrowExceptions</a>.</p>
+<pre><code class="lang-cs">Def.Config.DefaultHandlerThrowExceptions = false;
+</code></pre>
+<p>If you want to keep the exception behavior, but don't want the message, the message alone can be suppressed with <a class="xref" href="../api/Def.Config.html#Def_Config_DefaultHandlerShowConfigOnException">Def.Config.DefaultHandlerShowConfigOnException</a>.</p>
+<pre><code class="lang-cs">Def.Config.DefaultHandlerShowConfigOnException = false;
+</code></pre>
+<p>If you've defined your own logging handlers, Def's default exception throwing will be automatically disabled. You can throw your own exceptions if you prefer that behavior.</p>
+<h2 id="namespaces">Namespaces</h2>
+<p>It's common to specify classes within Def XML. It's also common for games to be contained within their own namespaces, which makes class names verbose and slow to type. <a class="xref" href="../api/Def.Config.html#Def_Config_UsingNamespaces">Def.Config.UsingNamespaces</a> lets you provide Def with your game namespaces in the manner of a C# <code>using</code> directive. You can specify as many namespaces as you like.</p>
+<pre><code class="lang-cs">Def.Config.UsingNamespaces = new string[] { &quot;YourGame&quot;, &quot;YourGame.Gameplay&quot; };
+</code></pre>
+<h2 id="parsing">Parsing</h2>
+<p>Def construction is done via a class named <a class="xref" href="../api/Def.Parser.html">Def.Parser</a>. At some point in the future Parser will support multithreaded parsing and incremental parsing. That day is not today, and at the moment it's a simple interface for feeding in XML data.</p>
+<p>Def files are simple XML files, normally stored along with the rest of your game data. Most people will simply put these in a dedicated subdirectory and <a class="xref" href="../api/Def.Parser.html#Def_Parser_AddDirectory_">Def.Parser.AddDirectory()</a> will scan the entire directory for <code>*.xml</code> files (or other extensions, provided as a parameter to the function) to make this as easy as possible.</p>
+<pre><code class="lang-cs">var parser = new Def.Parser();
+parser.AddDirectory(&quot;data&quot;);
+parser.Finish();
+</code></pre>
+<p>Parser can be garbage-collected after this completes.</p>
+<p>If you need to add files manually, <a class="xref" href="../api/Def.Parser.html#Def_Parser_AddFile_">Def.Parser.AddFile()</a> exists; if your XML data is stored in some format besides plain files, <a class="xref" href="../api/Def.Parser.html#Def_Parser_AddString_">Def.Parser.AddString()</a> allows you to add raw XML data.</p>
+<p>On Unity, it's likely that you'll place XML files inside the StreamingAssets directory, in which case you'd want to read them using Unity's <a href="https://docs.unity3d.com/ScriptReference/Application-streamingAssetsPath.html">Application.streamingAssetsPath</a> property.</p>
+<pre><code class="lang-cs">var parser = new Def.Parser();
+parser.AddDirectory(Application.streamingAssetsPath);
+parser.Finish();
+</code></pre>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/zorbathut/def/blob/master/doc/quickstart/setup.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

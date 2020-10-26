@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Type constraints </title>
+    <title>Def hierarchy roots </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Type constraints ">
+    <meta name="title" content="Def hierarchy roots ">
     <meta name="generator" content="docfx 2.48.0.0">
     
     <link rel="shortcut icon" href="../favicon.ico">
@@ -67,16 +67,28 @@
         <div class="article row grid-right">
           <div class="col-md-10">
             <article class="content wrap" id="_content" data-uid="">
-<h1 id="type-constraints">Type constraints</h1>
+<h1 id="def-hierarchy-roots">Def hierarchy roots</h1>
 
-<pre><code class="lang-cs">class MonsterDef : Def.Def
-{
-  [TypeConstraint(MonsterAI)]
-  Type aiWorker;
-}
+<p>Every def type is registered in exactly one category. One def, one category; this rule is immutable. Each category has its own namespace where each Def inside it must be named uniquely, but Defs in different categories can share names.</p>
+<pre><code>Def.Def
+  - MineralDef
+  - RenderPassDef
+  - ActorDef
+    - MonsterDef
+    - NPCDef
+  - CosmeticDef
 </code></pre>
-<p>It's common to use Type members in Defs as a way of selecting complicated behaviors. However, right now <em>any</em> Type can be entered into there, requiring further manual validation.</p>
-<p>It would be easy to introduce a TypeConstraintAttribute to solve this common issue.</p>
+<p>By default, categories are defined as anything directly inheriting from Def.Def In the above inheritance chart, MineralDef, RenderPassDef, ActorDef, and CosmeticDef all define categories; MonsterDef and NPCDef become part of the ActorDef category.</p>
+<p>If you want to define a Def type that has several child categories, this can be done with the Def.Abstract attribute. Classes with Def.Abstract applied must also be abstract, with the C# <code>abstract</code> keyword.</p>
+<pre><code>Def.Def
+  - [Def.Abstract] MenuItemDef
+    - MainMenuItemDef
+    - GameOverMenuItemDef
+    - [Def.Abstract] IngameMenuItemDef
+        - ShopMenuItemDef
+        - BankerMenuItemDef
+</code></pre>
+<p>This example includes four categories; MainMenuItemDef, GameOverMenuItemDef, ShopMenuItemDef, and BankerMenuItemDef. You could have a four defs named <code>Exit</code>, one in each category. You can't make defs of type MenuItemDef or IngameMenuItemDef; they aren't in any category.</p>
 </article>
           </div>
           
@@ -85,7 +97,7 @@
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/zorbathut/def/blob/master/docs/articles/fp_typeconstraints.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/zorbathut/def/blob/master/doc/documentation/hierarchy.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>

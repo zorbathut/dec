@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Indexes </title>
+    <title>Recorder </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Indexes ">
+    <meta name="title" content="Recorder ">
     <meta name="generator" content="docfx 2.48.0.0">
     
     <link rel="shortcut icon" href="../favicon.ico">
@@ -67,37 +67,38 @@
         <div class="article row grid-right">
           <div class="col-md-10">
             <article class="content wrap" id="_content" data-uid="">
-<h1 id="indexes">Indexes</h1>
+<h1 id="recorder">Recorder</h1>
 
-<p>Sometimes it's useful to have integer IDs for a class of objects. Def supports indices both for Defs themselves, and for members within the Def system.</p>
-<pre><code class="lang-cs">public class IndexedDef : Def.Def
-{
-    [Def.Index] public int index;
-}
-
-public class IndexedNonDefClass
-{
-    [Def.Index] public int index;
-}
-
-// Generate a temporary array with exactly the number of elements as there are IndexedDef's.
-int[] tempArray = new int[Index&lt;IndexedDef&gt;.Count];
-
-// Iterate over IndexedDef's and calculate values, storing the results in the temp array.
-for (int i = 0; i &lt; Index&lt;IndexedDef&gt;.Count; ++i)
-{
-    tempArray[i] = Index&lt;IndexedDef&gt;.Get(i).CalculateImportantValue();
-}
-
-// Modify them to get final results.
-ModifyValuesInSomeWayThatRequiresHavingThemAllAvailable(tempArray);
-
-// Get the highest value out of the temp array, then use Index to look up which def it refers to.
-IndexedDef best = Index&lt;IndexedDef&gt;.Get(IndexOfMax(tempArray));
+<p>def has a serialization layer built-in, intended for savegames and configuration.</p>
+<h2 id="serializing-and-deserializing">Serializing and deserializing</h2>
+<pre><code class="lang-cs">string serializedString = Recorder.Write(anyObject);
+var deserializedObject = Recorder.Read&lt;ObjectType&gt;(serializedString);
 </code></pre>
-<p>Make an <code>int</code> member with the Def.Index attribute. All instances of that object, whether it be a Def, a non-Def class, or a struct, will be given a unique integer index. The full list will also be stored in Index&lt;T&gt;.</p>
-<p>These values are not consistent between execution runs - don't use them as part of serializing savegames!</p>
-<p>Indices may not be set properly on objects that are created as defaults and that are never explicitly defined in defs. This may be solved in the future; consider this a first revision of this feature.</p>
+<p>Recorder supports the same types that def does. Defs themselves will be serialized as a reference, not as a fully serialized class. This is true only when referencing the def itself, not objects contained within the def's structure; this <a href="/future/serialization_interior.md">may be provided later</a>.</p>
+<p>Child objects will be serialized recursively. In addition, Recorder supports non-tree structures and circular references. Recorder doesn't require any explicit ownership semantics; multiply referenced objects will be handled automatically, without any extra effort required by the programmer.</p>
+<h2 id="custom-serialization">Custom serialization</h2>
+<p>Recorder does not support the automatic reflection-based parsing that Def.Parser does. This is partly for security reasons and partly for practicality reasons; the author's experience is that fully automatic reflection-based game saves rarely work well.</p>
+<p>Recorder does support <a class="xref" href="../api/Def.Converter.html"><code>Def.Converter</code></a>, but this isn't the intended way to handle custom serialization. Most custom serialization should be taken care of by inheriting from <a class="xref" href="../api/Def.IRecordable.html"><code>Def.IRecordable</code></a>, then overriding <a class="xref" href="../api/Def.IRecordable.html#Def_IRecordable_Record_Def_Recorder_"><code>Def.IRecordable.Record</code></a>. This function provides you with a <a class="xref" href="../api/Def.Recorder.html"><code>Def.Recorder</code></a>, whose most important function is Def.Recorder.Record. This function can be used to easily serialize any type that Recorder supports.</p>
+<pre><code class="lang-cs">public class RecordableExample : Def.IRecorder
+{
+    int intMember;
+    SomeClass classMember;
+    SomeStruct structMember;
+    List&lt;string&gt; collectionMember;
+    
+    public void Record(Recorder recorder)
+    {
+        recorder.Record(ref integerMember, &quot;integerMember&quot;);
+        recorder.Record(ref classMember, &quot;classMember&quot;);
+        recorder.Record(ref structMember, &quot;structMember&quot;);
+        recorder.Record(ref collectionMember, &quot;collectionMember&quot;);
+    }
+}
+</code></pre>
+<h2 id="def-compatibility">Def Compatibility</h2>
+<p>While the savegame format is not guaranteed and may change without notice, we plan to support full backwards compatibility for all time. The save format includes a version number that Recorder will read and adjust for whenever necessary.</p>
+<h2 id="game-compatibility">Game Compatibility</h2>
+<p>At the moment, Recorder includes no features to assist with porting old savegames to new versions of a game. This <a href="/future/serialization_compatibility.md">may be provided later</a>.</p>
 </article>
           </div>
           
@@ -106,7 +107,7 @@ IndexedDef best = Index&lt;IndexedDef&gt;.Get(IndexOfMax(tempArray));
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/zorbathut/def/blob/master/docs/articles/doc_indexes.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/zorbathut/def/blob/master/doc/documentation/serialization.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>

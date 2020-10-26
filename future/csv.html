@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Recorder </title>
+    <title>CSV Support </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Recorder ">
+    <meta name="title" content="CSV Support ">
     <meta name="generator" content="docfx 2.48.0.0">
     
     <link rel="shortcut icon" href="../favicon.ico">
@@ -66,39 +66,10 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="">
-<h1 id="recorder">Recorder</h1>
+            <article class="content wrap" id="_content" data-uid="future_csv">
+<h1 id="csv-support">CSV Support</h1>
 
-<p>def has a serialization layer built-in, intended for savegames and configuration.</p>
-<h2 id="serializing-and-deserializing">Serializing and deserializing</h2>
-<pre><code class="lang-cs">string serializedString = Recorder.Write(anyObject);
-var deserializedObject = Recorder.Read&lt;ObjectType&gt;(serializedString);
-</code></pre>
-<p>Recorder supports the same types that def does. Defs themselves will be serialized as a reference, not as a fully serialized class. This is true only when referencing the def itself, not objects contained within the def's structure; this <a href="fp_serialization_interior.html">may be provided later</a>.</p>
-<p>Child objects will be serialized recursively. In addition, Recorder supports non-tree structures and circular references. Recorder doesn't require any explicit ownership semantics; multiply referenced objects will be handled automatically, without any extra effort required by the programmer.</p>
-<h2 id="custom-serialization">Custom serialization</h2>
-<p>Recorder does not support the automatic reflection-based parsing that Def.Parser does. This is partly for security reasons and partly for practicality reasons; the author's experience is that fully automatic reflection-based game saves rarely work well.</p>
-<p>Recorder does support <a class="xref" href="../api/Def.Converter.html"><code>Def.Converter</code></a>, but this isn't the intended way to handle custom serialization. Most custom serialization should be taken care of by inheriting from <a class="xref" href="../api/Def.IRecordable.html"><code>Def.IRecordable</code></a>, then overriding <a class="xref" href="../api/Def.IRecordable.html#Def_IRecordable_Record_Def_Recorder_"><code>Def.IRecordable.Record</code></a>. This function provides you with a <a class="xref" href="../api/Def.Recorder.html"><code>Def.Recorder</code></a>, whose most important function is Def.Recorder.Record. This function can be used to easily serialize any type that Recorder supports.</p>
-<pre><code class="lang-cs">public class RecordableExample : Def.IRecorder
-{
-    int intMember;
-    SomeClass classMember;
-    SomeStruct structMember;
-    List&lt;string&gt; collectionMember;
-    
-    public void Record(Recorder recorder)
-    {
-        recorder.Record(ref integerMember, &quot;integerMember&quot;);
-        recorder.Record(ref classMember, &quot;classMember&quot;);
-        recorder.Record(ref structMember, &quot;structMember&quot;);
-        recorder.Record(ref collectionMember, &quot;collectionMember&quot;);
-    }
-}
-</code></pre>
-<h2 id="def-compatibility">Def Compatibility</h2>
-<p>While the savegame format is not guaranteed and may change without notice, we plan to support full backwards compatibility for all time. The save format includes a version number that Recorder will read and adjust for whenever necessary.</p>
-<h2 id="game-compatibility">Game Compatibility</h2>
-<p>At the moment, Recorder includes no features to assist with porting old savegames to new versions of a game. This <a href="fp_serialization_compatibility.html">may be provided later</a>.</p>
+<p>Designers really like using Excel. There's no reason Def couldn't import data directly from CSVs. In some cases I imagine programmer-authored data would come from XML files and designer-authored data would come from CSVs, but the same infrastructure designed for mods would work just as well here.</p>
 </article>
           </div>
           
@@ -107,7 +78,7 @@ var deserializedObject = Recorder.Read&lt;ObjectType&gt;(serializedString);
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/zorbathut/def/blob/master/docs/articles/doc_serialization.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/zorbathut/def/blob/master/doc/future/csv.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>

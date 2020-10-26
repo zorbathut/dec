@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Mod functionality </title>
+    <title>Invalid database warnings </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Mod functionality ">
+    <meta name="title" content="Invalid database warnings ">
     <meta name="generator" content="docfx 2.48.0.0">
     
     <link rel="shortcut icon" href="../favicon.ico">
@@ -67,56 +67,12 @@
         <div class="article row grid-right">
           <div class="col-md-10">
             <article class="content wrap" id="_content" data-uid="">
-<h1 id="mod-functionality">Mod functionality</h1>
+<h1 id="invalid-database-warnings">Invalid database warnings</h1>
 
-<p>As a text-based format, def XMLs are very conducive to making user-authored mods. However, at the moment there's no good way for those user-authored mods to interact with core functionality.</p>
-<p>Assume these examples are an attempt to mod this XML:</p>
-<pre><code class="lang-xml">&lt;ExampleDef defName=&quot;Example&quot;&gt;
-  &lt;value&gt;4&lt;/value&gt;
-  &lt;listOfStrings&gt;
-    &lt;li&gt;Yabba&lt;/li&gt;
-    &lt;li&gt;Dabba&lt;/li&gt;
-    &lt;li&gt;Doo&lt;/li&gt;
-  &lt;/listOfStrings&gt;
-&lt;/ExampleDef&gt;
-
-## Overriding
-
-```xml
-&lt;ExampleDef defName=&quot;Example&quot; mode=&quot;replace&quot;&gt;
-  &lt;value&gt;10&lt;/value&gt;
-  &lt;listOfStrings&gt;
-    &lt;li&gt;Abra&lt;/li&gt;
-    &lt;li&gt;Cadabra&lt;/li&gt;
-  &lt;/listOfStrings&gt;
-&lt;/ExampleDef&gt;
-</code></pre>
-<p>It's easy to allow mods to simply nuke-and-rewrite existing defs. This isn't the most powerful technique available, but it's effective in many situations.</p>
-<h2 id="splicing">Splicing</h2>
-<pre><code class="lang-xml">&lt;ExampleDef defName=&quot;Example&quot; mode=&quot;modify&quot;&gt;
-  &lt;value&gt;10&lt;/value&gt;
-&lt;/ExampleDef&gt;
-</code></pre>
-<p>Alternatively, or additionally, we could allow for per-field overriding. This would behave similar to if the original def is a Parent.</p>
-<p>Lists make things more difficult. Some behaviors seem easy:</p>
-<pre><code class="lang-xml">&lt;ExampleDef defName=&quot;Example&quot; mode=&quot;modify&quot;&gt;
-  &lt;listOfStrings mode=&quot;append&quot;&gt;
-    &lt;li&gt;And more!&lt;/li&gt;
-  &lt;/listOfStrings&gt;
-&lt;/ExampleDef&gt;
-</code></pre>
-<pre><code class="lang-xml">&lt;ExampleDef defName=&quot;Example&quot; mode=&quot;modify&quot;&gt;
-  &lt;listOfStrings mode=&quot;replace&quot;&gt;
-    &lt;li&gt;Alla&lt;/li&gt;
-    &lt;li&gt;Khazam&lt;/li&gt;
-  &lt;/listOfStrings&gt;
-&lt;/ExampleDef&gt;
-</code></pre>
-<p>but others may require a heavier-weight approach.</p>
-<h2 id="patching">Patching</h2>
-<p>No matter how many features we add, someone will always want to modify existing data in a way that we haven't foreseen. A good solution to this is unclear. Both Rimworld and Starbound have solutions, but both of these solutions have proven flawed, both from a power perspective and a performance perspective.</p>
-<p>I currently have no better ideas here.</p>
-</article>
+<p>Right now Database<t> only requires that T inherit from Def.Def. It's perfectly valid to try accessing a database consisting of Def.Def itself, or of a subclass that doesn't define a hierarchy.<p>
+<p>We should probably yell really loudly at the user whenever this happens.</p>
+<p>This is on hold until someone makes the mistake and gets annoyed that they weren't warned about it.</p>
+</t></article>
           </div>
           
           <div class="hidden-sm col-md-2" role="complementary">
@@ -124,7 +80,7 @@
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/zorbathut/def/blob/master/docs/articles/fp_mods.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/zorbathut/def/blob/master/doc/future/invdatabase.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>
