@@ -1,13 +1,24 @@
-# Quick Start
+# Too Long, Didn't Read
+
+## Set up Def and add your XML directory.
+
+```cs
+void CalledOnceDuringGameStartup()
+{
+    Def.Config.DefaultHandlerThrowExceptions = false;
+    Def.Config.UsingNamespaces = new string[] { "YourGame" };
+
+    var parser = new Def.Parser();
+    parser.AddDirectory("data");
+    parser.Finish();
+}
+```
 
 ## Define some classes derived from [`Def.Def`](xref:Def.Def).
 
 ```cs
-namespace ExampleGame
-{
-
-// The starting point for all defs is a class derived from Def.Def.
 // Here, we're defining a general template for monsters.
+// This goes somewhere appropriate in your C# game code.
 class MonsterDef : Def.Def
 {
   // Most types can be defined as simple fields.
@@ -24,28 +35,6 @@ class MonsterDef : Def.Def
   
   // Def references are not limited to a tree structures. Defs can reference other defs in circles, reference other defs of the same type, and even reference themselves.
   public MonsterDef evolvedVariant = null;
-}
-
-// Classes that aren't derived from Def.Def will be recursively parsed.
-// There's nothing magic about either these classes or `Def.Def`-derived classes. You can have functions, static members, or anything else you'd normally want in a class.
-class Color
-{
-  public Color() { }
-  public Color(float r, float g, float b) { this.r = r; this.g = g; this.b = b; }
-  
-  public readonly static Color White = new Color(1, 1, 1);
-  
-  public float r = 1;
-  public float g = 1;
-  public float b = 1;
-}
-
-// Don't hesitate to make simple defs. Defs are lightweight and it's easy to add to them later.
-class SpriteSheetDef : Def.Def
-{
-  public string filename;
-}
-
 }
 ```
 
@@ -94,28 +83,6 @@ class SpriteSheetDef : Def.Def
 </Defs>
 ```
 
-## Initialize the def framework via [`Parser`](xref:Def.Parser).
-
-```cs
-// Add our namespace so Def doesn't require lots of verbose namespace specifications.
-Config.UsingNamespaces = new string[] { "ExampleGame" };
-
-// The Parser class handles all def initialization.
-var parser = new Parser();
-
-// Add individual XML documents through .AddFile(), or .AddString() if you need to load them manually.
-// It's common to read from on-disk files, but you can get the data from any source you want.
-parser.AddFile("goblinData.xml");
-
-// Keep adding files until you've added everything.
-parser.AddFile("elfData.xml");
-
-// Call when you've added everything. This finishes all parsing.
-parser.Finish();
-
-// You don't need to keep the Parser object around after this point.
-```
-
 ## Define some static references.
 
 ```cs
@@ -133,10 +100,6 @@ public static class MonsterDefs
   
   // You don't have to include all defs here - in fact, it's recommended that you only include defs that you plan to reference by name.
 }
-
-// You don't have to include reference classes for def types you don't intend to reference by name.
-// In this design, `SpriteSheetDef`s are referenced only through `MonsterDef`s.
-// Therefore there is no need for a `SpriteSheetDefs` class.
 ```
 
 ## Use defs in code.
@@ -169,5 +132,3 @@ public class GoblinGenerator
   }
 }
 ```
-
-And those are the basics.
