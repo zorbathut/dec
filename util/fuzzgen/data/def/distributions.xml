@@ -6,4 +6,14 @@
       <Class>5</Class>
     </elements>
   </CompositeTypeDistributionDef>
+
+  <MemberTypeDistributionDef defName="Distribution">
+    <elements>
+      <Primitive>5</Primitive>
+      <Class>2</Class>
+      <Def>2</Def>
+      <ContainerList>2</ContainerList>
+      <ContainerDictionary>1</ContainerDictionary>
+    </elements>
+  </MemberTypeDistributionDef>
 </Defs>

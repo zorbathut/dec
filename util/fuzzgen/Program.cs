@@ -3,21 +3,20 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection.Metadata;
 
 namespace Fuzzgen
 {
     internal static class Program
     {
-        private static Random Rand = new Random();
-
         private static string[] AnimalWords;
-        private static string GenerateClassName()
+        private static string GenerateIdentifier()
         {
             string name = "";
 
             for (int i = 0; i < 3; ++i)
             {
-                name += AnimalWords[Rand.Next(0, AnimalWords.Length)];
+                name += AnimalWords[Rand.Next(AnimalWords.Length)];
             }
 
             return name;
@@ -47,12 +46,12 @@ namespace Fuzzgen
         {
             Init();
 
-            // Generate data
+            // Generate initial composites
             var composites = new List<Composite>();
             for (int i = 0; i < 100; ++i)
             {
                 var c = new Composite();
-                c.name = GenerateClassName();
+                c.name = GenerateIdentifier();
 
                 c.type = CompositeTypeDistribution.Distribution.Choose();
                 if (c.type == Composite.Type.Def)
@@ -61,6 +60,23 @@ namespace Fuzzgen
                 }
 
                 composites.Add(c);
+            }
+
+            // Generate parameters
+            foreach (var c in composites)
+            {
+                // 0-99, weighted heavily towards 0
+                int parameterCount = (int)(Math.Pow(10, Math.Pow(Rand.Next(1f), 2) * 2) - 1);
+
+                for (int i = 0; i < parameterCount; ++i)
+                {
+                    var m = new Member();
+                    m.name = GenerateIdentifier();
+
+                    m.type = MemberTypeDistribution.Distribution.Choose();
+
+                    c.members.Add(m);
+                }
             }
 
             // Output data

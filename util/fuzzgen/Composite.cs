@@ -1,4 +1,5 @@
 
+using System.Collections.Generic;
 using System.Text;
 
 namespace Fuzzgen
@@ -14,6 +15,8 @@ namespace Fuzzgen
             Def,
         }
         public Type type;
+
+        public List<Member> members = new List<Member>();
 
         public string WriteToOutput()
         {
@@ -35,6 +38,12 @@ namespace Fuzzgen
             }
 
             sb.AppendLine($"{{");
+
+            foreach (var m in members)
+            {
+                sb.AppendLine($"  {m.type} {m.name};");
+            }
+
             sb.AppendLine($"}}");
 
             return sb.ToString();
