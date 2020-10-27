@@ -5,7 +5,7 @@
 
 Def is a C# library for defining game asset types in XML. It includes extensive error reporting and recovery for ease of development, uses reflection to prevent writing lots of boilerplate code, is designed to allow easy moddability moddable by endusers (though not yet implemented), and includes a serialization system (intended for savegames, but often used for other things) that integrates cleanly with the underlying Def types.
 
-Def instances are intended to represent classes of thing rather than instances of things. As an example, you might have `ObjectDef.Chair` and `MonsterDef.Goblin`. Individual chairs or goblins in your level would contain references to those Def instances, in whatever way is easiest for your level editor or generator.
+Def instances are intended to represent classes of thing rather than specific things. As an example, you might have `ObjectDef.Chair` and `MonsterDef.Goblin`, but you wouldn't have a Def instance for each individual chair or goblin in a level. Individual chairs or goblins would contain references to the `ObjectDef.Chair`/`MonsterDef.Goblin` Def instances, in whatever way is easiest for your level editor or entity system.
 
 The Def library does not tie itself to any particular engine and works within Godot, Unity, MonoGame, or any other C# environment.
 
