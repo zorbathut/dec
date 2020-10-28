@@ -102,7 +102,7 @@ namespace Fuzzgen
                         if (Rand.Next(1f) < chance)
                         {
                             // generate a value for this member
-                            instance.values[member] = Rand.NextInt();
+                            instance.values[member] = member.GenerateValue();
                         }
                     }
 

@@ -9,7 +9,7 @@ namespace Fuzzgen
         public string defName;
 
         public Composite composite;
-        public Dictionary<Member, int> values = new Dictionary<Member, int>();
+        public Dictionary<Member, Value> values = new Dictionary<Member, Value>();
 
         public string WriteCsharp()
         {
@@ -20,7 +20,7 @@ namespace Fuzzgen
 
             foreach (var val in values)
             {
-                sb.AppendLine($"Assert.AreEqual({val.Value}, Def.Database<{composite.name}>.Get(\"{defName}\").{val.Key.name});");
+                sb.AppendLine($"Assert.AreEqual({val.Value.WriteCsharp()}, Def.Database<{composite.name}>.Get(\"{defName}\").{val.Key.name});");
             }
 
             return sb.ToString();
@@ -33,7 +33,7 @@ namespace Fuzzgen
             sb.AppendLine($"<{composite.name} defName=\"{defName}\">");
             foreach (var val in values)
             {
-                sb.AppendLine($"  <{val.Key.name}>{val.Value}</{val.Key.name}>");
+                sb.AppendLine($"  <{val.Key.name}>{val.Value.WriteXml()}</{val.Key.name}>");
             }
             sb.AppendLine($"</{composite.name}>");
 

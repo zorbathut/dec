@@ -15,6 +15,11 @@ namespace Fuzzgen
         }
         public Type type;
 
+        public Value GenerateValue()
+        {
+            return new Value() { value = Rand.NextInt() };
+        }
+
         public string TypeToCSharp()
         {
             switch (type)
