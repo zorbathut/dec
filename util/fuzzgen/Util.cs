@@ -1,4 +1,5 @@
 
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace Fuzzgen
@@ -15,6 +16,17 @@ namespace Fuzzgen
             }
 
             return Regex.Replace(input, "^", new string(' ', levels * 4), RegexOptions.Multiline) + suffix;
+        }
+
+        internal static V TryGetValue<T, V>(this Dictionary<T, V> dict, T key)
+        {
+            if (key == null)
+            {
+                return default(V);
+            }
+
+            dict.TryGetValue(key, out V holder);
+            return holder;
         }
     }
 }

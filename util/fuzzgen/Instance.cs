@@ -18,9 +18,10 @@ namespace Fuzzgen
             sb.AppendLine();
             sb.AppendLine($"Assert.IsNotNull(Def.Database<{composite.name}>.Get(\"{defName}\"));");
 
-            foreach (var val in values)
+            foreach (var val in composite.members)
             {
-                sb.AppendLine($"Assert.AreEqual({val.Value.WriteCsharp()}, Def.Database<{composite.name}>.Get(\"{defName}\").{val.Key.name});");
+                var contents = values.TryGetValue(val) ?? val.initialized;
+                sb.AppendLine($"Assert.AreEqual({contents.WriteCsharp()}, Def.Database<{composite.name}>.Get(\"{defName}\").{val.name});");
             }
 
             return sb.ToString();

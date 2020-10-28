@@ -71,12 +71,7 @@ namespace Fuzzgen
 
                 for (int i = 0; i < parameterCount; ++i)
                 {
-                    var m = new Member();
-                    m.name = GenerateIdentifier();
-
-                    m.type = MemberTypeDistribution.Distribution.Choose();
-
-                    c.members.Add(m);
+                    c.members.Add(new Member(c, GenerateIdentifier(), MemberTypeDistribution.Distribution.Choose()));
                 }
             }
 
