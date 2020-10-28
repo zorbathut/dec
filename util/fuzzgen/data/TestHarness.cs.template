@@ -1,0 +1,25 @@
+namespace DefTest
+{
+    using System;
+    using NUnit.Framework;
+
+    [TestFixture]
+    public class Fuzzgen : Base
+    {
+<<COMPOSITES>>
+
+        [Test]
+        public void FuzzgenTest([Values] BehaviorMode mode)
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { <<TYPES>> } };
+
+            var parser = new Def.Parser();
+            parser.AddFile(<<FILENAME>>);
+            parser.Finish();
+
+            DoBehavior(mode);
+
+<<TESTS>>
+        }
+    }
+}

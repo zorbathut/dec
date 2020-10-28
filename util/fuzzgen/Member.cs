@@ -24,9 +24,9 @@ namespace Fuzzgen
             }
         }
 
-        public string WriteToOutput()
+        public string WriteCsharp()
         {
-            return $"{TypeToCSharp()} {name};";
+            return $"public {TypeToCSharp()} {name};";
         }
     }
 

@@ -1,9 +1,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection.Metadata;
+using System.Text;
 
 namespace Fuzzgen
 {
@@ -65,8 +67,7 @@ namespace Fuzzgen
             // Generate parameters
             foreach (var c in composites)
             {
-                // 0-99, weighted heavily towards 0
-                int parameterCount = (int)(Math.Pow(10, Math.Pow(Rand.Next(1f), 2) * 2) - 1);
+                int parameterCount = Rand.WeightedDistribution();
 
                 for (int i = 0; i < parameterCount; ++i)
                 {
@@ -79,10 +80,80 @@ namespace Fuzzgen
                 }
             }
 
-            // Output data
+            // Generate instances
+            var instances = new List<Instance>();
             foreach (var c in composites)
             {
-                Dbg.Inf(c.WriteToOutput());
+                if (c.type != Composite.Type.Def)
+                {
+                    continue;
+                }
+
+                int creations = Rand.WeightedDistribution();
+                for (int i = 0; i < creations; ++i)
+                {
+                    var instance = new Instance();
+                    instance.defName = GenerateIdentifier();
+                    instance.composite = c;
+
+                    float chance = Rand.Next(1f);
+                    foreach (var member in c.members)
+                    {
+                        if (Rand.Next(1f) < chance)
+                        {
+                            // generate a value for this member
+                            instance.values[member] = Rand.NextInt();
+                        }
+                    }
+
+                    instances.Add(instance);
+                }
+            }
+
+            // Output cs file
+            {
+                string testHarness = File.ReadAllText("data/TestHarness.cs.template");
+
+                var csComposites = new StringBuilder();
+                foreach (var c in composites)
+                {
+                    csComposites.Append(Util.Indent(c.WriteCsharp(), 2));
+                }
+
+                var tests = new StringBuilder();
+                foreach (var i in instances)
+                {
+                    tests.Append(Util.Indent(i.WriteCsharp(), 3));
+                }
+
+                var types = string.Join(", ", composites.Select(c => $"typeof({c.name})"));
+                var filename = "data/Fuzzgen.FuzzgenTest.xml";
+
+                testHarness = testHarness
+                    .Replace("<<COMPOSITES>>", csComposites.ToString())
+                    .Replace("<<TYPES>>", types)
+                    .Replace("<<FILENAME>>", $"\"{filename}\"")
+                    .Replace("<<TESTS>>", tests.ToString());
+
+                Dbg.Inf(testHarness);
+
+                File.WriteAllText("../../test/Fuzzgen.cs", testHarness);
+            }
+
+            // Output xml
+            {
+                var sb = new StringBuilder();
+                sb.AppendLine("<Defs>");
+
+                foreach (var i in instances)
+                {
+                    sb.AppendLine(Util.Indent(i.WriteXml()));
+                }
+
+                sb.AppendLine("</Defs>");
+
+                Dbg.Inf(sb.ToString());
+                File.WriteAllText("../../test/data/Fuzzgen.FuzzgenTest.xml", sb.ToString());
             }
         }
     }

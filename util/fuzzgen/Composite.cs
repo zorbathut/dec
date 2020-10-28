@@ -18,7 +18,7 @@ namespace Fuzzgen
 
         public List<Member> members = new List<Member>();
 
-        public string WriteToOutput()
+        public string WriteCsharp()
         {
             var sb = new StringBuilder();
 
@@ -41,7 +41,7 @@ namespace Fuzzgen
 
             foreach (var m in members)
             {
-                sb.AppendLine($"  {m.WriteToOutput()}");
+                sb.AppendLine($"    {m.WriteCsharp()}");
             }
 
             sb.AppendLine($"}}");
