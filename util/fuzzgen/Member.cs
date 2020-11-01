@@ -9,7 +9,14 @@ namespace Fuzzgen
 
         public enum Type
         {
+            Short,
+            Ushort,
             Int,
+            Uint,
+            Long,
+            Ulong,
+            Float,
+            Double,
             /*Class,
             Def,
             ContainerList,
@@ -28,7 +35,7 @@ namespace Fuzzgen
             if (composite.type == Composite.Type.Struct)
             {
                 // structs always init to zero
-                initialized = new Value() { value = 0 };
+                initialized = new Value() { valueCs = "0", valueXml = "0" };
             }
             else
             {
@@ -38,14 +45,80 @@ namespace Fuzzgen
 
         public Value GenerateValue()
         {
-            return new Value() { value = Rand.NextInt() };
+            switch (type)
+            {
+                case Type.Short:
+                    {
+                        short value = (short)Rand.NextInt();
+                        return new Value() { valueCs = value.ToString(), valueXml = value.ToString() };
+                    }
+                case Type.Ushort:
+                    {
+                        ushort value = (ushort)Rand.NextInt();
+                        return new Value() { valueCs = value.ToString(), valueXml = value.ToString() };
+                    }
+                case Type.Int:
+                    {
+                        int value = (int)Rand.NextInt();
+                        return new Value() { valueCs = value.ToString(), valueXml = value.ToString() };
+                    }
+                case Type.Uint:
+                    {
+                        uint value = (uint)Rand.NextInt();
+                        return new Value() { valueCs = value.ToString(), valueXml = value.ToString() };
+                    }
+                case Type.Long:
+                    {
+                        long value = (long)Rand.NextLong();
+                        return new Value() { valueCs = value.ToString(), valueXml = value.ToString() };
+                    }
+                case Type.Ulong:
+                    {
+                        ulong value = (ulong)Rand.NextLong();
+                        return new Value() { valueCs = value.ToString(), valueXml = value.ToString() };
+                    }
+                case Type.Float:
+                    {
+                        float value = Rand.NextFloat();
+                        if (float.IsNaN(value))
+                        {
+                            return new Value() { valueCs = "float.NaN", valueXml = float.NaN.ToString() };
+                        }
+                        else
+                        {
+                            return new Value() { valueCs = value.ToString() + 'f', valueXml = value.ToString() };
+                        }
+                    }
+                case Type.Double:
+                    {
+                        double value = Rand.NextDouble();
+                        if (double.IsNaN(value))
+                        {
+                            return new Value() { valueCs = "double.NaN", valueXml = double.NaN.ToString() };
+                        }
+                        else
+                        {
+                            return new Value() { valueCs = value.ToString(), valueXml = value.ToString() };
+                        }
+                    }
+                default:
+                    Dbg.Err("Unknown member type!");
+                    return new Value() { valueCs = "0", valueXml = "0" };
+            }
         }
 
         public string TypeToCSharp()
         {
             switch (type)
             {
+                case Type.Short: return "short";
+                case Type.Ushort: return "ushort";
                 case Type.Int: return "int";
+                case Type.Uint: return "uint";
+                case Type.Long: return "long";
+                case Type.Ulong: return "ulong";
+                case Type.Float: return "float";
+                case Type.Double: return "double";
                 default: Dbg.Err("Invalid type!"); return "int";
             }
         }

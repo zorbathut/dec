@@ -9,7 +9,14 @@
 
   <MemberTypeDistributionDef defName="Distribution">
     <elements>
+      <Short>0.1</Short>
+      <Ushort>0.1</Ushort>
       <Int>5</Int>
+      <Uint>0.1</Uint>
+      <Long>0.1</Long>
+      <Ulong>0.1</Ulong>
+      <Float>1</Float>
+      <Double>1</Double>
       <!--<Class>2</Class>
       <Def>2</Def>
       <ContainerList>2</ContainerList>

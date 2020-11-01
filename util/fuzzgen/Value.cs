@@ -3,16 +3,17 @@ namespace Fuzzgen
 {
     internal class Value
     {
-        public int value;
+        public string valueCs;
+        public string valueXml;
 
         public string WriteCsharp()
         {
-            return value.ToString();
+            return valueCs;
         }
 
         public string WriteXml()
         {
-            return value.ToString();
+            return valueXml;
         }
     }
 }
