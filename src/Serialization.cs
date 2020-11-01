@@ -536,6 +536,16 @@ namespace Def
             // Do all our unreferencables first
             if (fieldType.IsPrimitive)
             {
+                if (Compat.DoubleRoundtripBroken)
+                {
+                    if (fieldType == typeof(double))
+                    {
+                        result.Add(new XText(((double)value).ToString("G17")));
+
+                        return result;
+                    }
+                }
+
                 result.Add(new XText(value.ToString()));
 
                 return result;
