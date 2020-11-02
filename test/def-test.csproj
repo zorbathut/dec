@@ -1,11 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <Configurations>Debug 2.1;Release 2.1;Debug 3.0;Release 3.0</Configurations>
     
     <!-- 0649: "is never assigned to, and will always have its default value null". This is obviously pointless with such a reflection-heavy library. -->
     <NoWarn>0649</NoWarn>
   </PropertyGroup>
+  
+  <PropertyGroup Condition="$(Configuration.Contains('2.1'))">
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="$(Configuration.Contains('3.0'))">
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="$(Configuration.Contains('Debug'))">
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+
   
   <ItemGroup>
     <PackageReference Include="coveralls.io" Version="1.4.2" />
