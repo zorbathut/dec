@@ -1,0 +1,20 @@
+version: 2.1
+
+orbs:
+  win: circleci/windows@2.2.0
+
+jobs:
+  build:
+    executor: win/default     
+
+    steps:
+      - checkout
+      - run:
+          name: Build
+          command: dotnet build
+      - run:
+          name: Test
+          command: dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+      - run:
+          name: Submit coverage data
+          command: '~\.nuget\packages\coveralls.io\1.4.2\tools\coveralls.net.exe --opencover test/coverage.opencover.xml -r $env:COVERALLS_REPO_TOKEN'

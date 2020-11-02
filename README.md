@@ -1,7 +1,7 @@
 def
 ---
 
-[![Build status](https://ci.appveyor.com/api/projects/status/e2o9s2qqk20g6bfn?svg=true)](https://ci.appveyor.com/project/BenRogWilhelm/def) [![Coverage Status](https://coveralls.io/repos/github/zorbathut/def/badge.svg)](https://coveralls.io/github/zorbathut/def) [![Support](https://img.shields.io/discord/703688553707601962?label=support&logo=discord)](https://discord.gg/vQv9DMA)
+[![Build status](https://circleci.com/gh/zorbathut/def.svg?style=shield)](https://circleci.com/gh/zorbathut/def) [![Coverage Status](https://coveralls.io/repos/github/zorbathut/def/badge.svg)](https://coveralls.io/github/zorbathut/def) [![Support](https://img.shields.io/discord/703688553707601962?label=support&logo=discord)](https://discord.gg/vQv9DMA)
 
 Def is a C# library for defining game asset types in XML. It includes extensive error reporting and recovery for ease of development, uses reflection to prevent writing lots of boilerplate code, is designed to allow easy moddability moddable by endusers (though not yet implemented), and includes a serialization system (intended for savegames, but often used for other things) that integrates cleanly with the underlying Def types.
 
