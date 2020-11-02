@@ -10,6 +10,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Setup
+          command: dotnet tool install -g coveralls.net --version 1.0.0
+      - run:
           name: Build 2.1
           command: dotnet build -c "Debug 2.1"
       - run:
@@ -27,4 +30,4 @@ jobs:
             mv test/coverage.opencover.xml test/coverage.opencover.3.0.xml
       - run:
           name: Submit coverage data
-          command: '~\.nuget\packages\coveralls.io\1.4.2\tools\coveralls.net.exe --opencover test -f coverage.opencover.*.xml -r $env:COVERALLS_REPO_TOKEN'
+          command: csmacnz.Coveralls.exe --useRelativePaths --multiple -i 'opencover=test/coverage.opencover.2.1.xml;opencover=test/coverage.opencover.3.0.xml' --serviceName circleci --jobId $env:CIRCLE_BUILD_NUM --commitId $(git rev-parse HEAD) --commitBranch $(git branch --show-current) --commitAuthor $(git log -1 --pretty=format:'%an') --commitEmail $(git log -1 --pretty=format:'%ae') --commitMessage $(git log -1 --pretty='%s')  --repoToken $env:COVERALLS_REPO_TOKEN
