@@ -86,7 +86,8 @@ namespace Fuzzgen
                         }
                         else
                         {
-                            return new Value() { valueCs = value.ToString() + 'f', valueXml = value.ToString() };
+                            // In theory the "R" format here should work, but .net2.1 bugs prevent it from doing so.
+                            return new Value() { valueCs = value.ToString("G17") + 'f', valueXml = value.ToString("G29") };
                         }
                     }
                 case Type.Double:
@@ -98,7 +99,8 @@ namespace Fuzzgen
                         }
                         else
                         {
-                            return new Value() { valueCs = value.ToString(), valueXml = value.ToString() };
+                            // In theory the "R" format here should work, but .net2.1 bugs prevent it from doing so.
+                            return new Value() { valueCs = value.ToString("G17") + 'd', valueXml = value.ToString("G29") };
                         }
                     }
                 default:
