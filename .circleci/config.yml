@@ -17,13 +17,14 @@ jobs:
           command: dotnet build -c "Debug 3.0"
       - run:
           name: Test 2.1
-          command: dotnet test -c "Debug 2.1" /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+          command: |
+            dotnet test -c "Debug 2.1" /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+            mv test/coverage.opencover.xml test/coverage.opencover.2.1.xml
       - run:
           name: Test 3.0
-          command: dotnet test -c "Debug 3.0"
+          command: |
+            dotnet test -c "Debug 3.0" /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+            mv test/coverage.opencover.xml test/coverage.opencover.3.0.xml
       - run:
-          # We currently submit coverage data only for 2.1 because its coverage is a strict superset of 3.0.
-          # This should be fixed, but it's difficult to do so; we either need to combine coverage files, or use coveralls' parallel feature.
-          # Both of these are nontrivial so I'm punting on the entire issue.
           name: Submit coverage data
-          command: '~\.nuget\packages\coveralls.io\1.4.2\tools\coveralls.net.exe --opencover test/coverage.opencover.xml -r $env:COVERALLS_REPO_TOKEN'
+          command: '~\.nuget\packages\coveralls.io\1.4.2\tools\coveralls.net.exe --opencover test -f coverage.opencover.*.xml -r $env:COVERALLS_REPO_TOKEN'
