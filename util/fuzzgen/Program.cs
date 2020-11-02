@@ -1,29 +1,13 @@
 
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Text;
 
 namespace Fuzzgen
 {
     internal static class Program
     {
-        private static string[] AnimalWords;
-        private static string GenerateIdentifier()
-        {
-            string name = "";
-
-            for (int i = 0; i < 3; ++i)
-            {
-                name += AnimalWords[Rand.Next(AnimalWords.Length)];
-            }
-
-            return name;
-        }
-
         private static void Init()
         {
             // Configure Def's error reporting
@@ -39,9 +23,6 @@ namespace Fuzzgen
             var parser = new Def.Parser();
             parser.AddDirectory("data/def");
             parser.Finish();
-
-            // Init animal words list
-            AnimalWords = File.ReadAllText("data/animals.txt").Split(new char[] { ' ', '\r', '\n' }).Distinct().ToArray();
         }
 
         private static void Main()
@@ -53,7 +34,7 @@ namespace Fuzzgen
             for (int i = 0; i < 100; ++i)
             {
                 var c = new Composite();
-                c.name = GenerateIdentifier();
+                c.name = Rand.NextString();
 
                 c.type = CompositeTypeDistribution.Distribution.Choose();
                 if (c.type == Composite.Type.Def)
@@ -71,7 +52,7 @@ namespace Fuzzgen
 
                 for (int i = 0; i < parameterCount; ++i)
                 {
-                    c.members.Add(new Member(c, GenerateIdentifier(), MemberTypeDistribution.Distribution.Choose()));
+                    c.members.Add(new Member(c, Rand.NextString(), MemberTypeDistribution.Distribution.Choose()));
                 }
             }
 
@@ -88,7 +69,7 @@ namespace Fuzzgen
                 for (int i = 0; i < creations; ++i)
                 {
                     var instance = new Instance();
-                    instance.defName = GenerateIdentifier();
+                    instance.defName = Rand.NextString();
                     instance.composite = c;
 
                     float chance = Rand.Next(1f);

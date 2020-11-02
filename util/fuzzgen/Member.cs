@@ -17,7 +17,9 @@ namespace Fuzzgen
             Ulong,
             Float,
             Double,
-            /*Class,
+            String,
+            Bool,
+            /*Composite,
             Def,
             ContainerList,
             ContainerDictionary,*/
@@ -103,6 +105,16 @@ namespace Fuzzgen
                             return new Value() { valueCs = value.ToString("G17") + 'd', valueXml = value.ToString("G29") };
                         }
                     }
+                case Type.String:
+                    {
+                        string value = Rand.NextString();
+                        return new Value() { valueCs = $"\"{value}\"", valueXml = value };
+                    }
+                case Type.Bool:
+                    {
+                        bool value = Rand.OneIn(2f);
+                        return new Value() { valueCs = value.ToString().ToLower(), valueXml = value.ToString() };
+                    }
                 default:
                     Dbg.Err("Unknown member type!");
                     return new Value() { valueCs = "0", valueXml = "0" };
@@ -121,6 +133,8 @@ namespace Fuzzgen
                 case Type.Ulong: return "ulong";
                 case Type.Float: return "float";
                 case Type.Double: return "double";
+                case Type.String: return "string";
+                case Type.Bool: return "bool";
                 default: Dbg.Err("Invalid type!"); return "int";
             }
         }

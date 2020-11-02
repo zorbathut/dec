@@ -16,7 +16,9 @@
       <Long>0.1</Long>
       <Ulong>0.1</Ulong>
       <Float>1</Float>
-      <Double>1</Double>
+      <Double>0.1</Double>
+      <String>1</String>
+      <Bool>1</Bool>
       <!--<Class>2</Class>
       <Def>2</Def>
       <ContainerList>2</ContainerList>

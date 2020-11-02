@@ -1,11 +1,20 @@
 
 using System;
+using System.Linq;
+using System.IO;
 
 namespace Fuzzgen
 {
     internal static class Rand
     {
         private static Random rand = new Random();
+
+        private static string[] AnimalWords;
+
+        static Rand()
+        {
+            AnimalWords = File.ReadAllText("data/animals.txt").Split(new char[] { ' ', '\r', '\n' }).Distinct().ToArray();
+        }
 
         public static int Next(int max)
         {
@@ -26,6 +35,23 @@ namespace Fuzzgen
         {
             // this distribution is probably weird but it's good enough
             return (long)((ulong)NextInt() | ((ulong)NextInt() << 32));
+        }
+
+        public static string NextString()
+        {
+            string name = "";
+
+            for (int i = 0; i < 3; ++i)
+            {
+                name += AnimalWords[Rand.Next(AnimalWords.Length)];
+            }
+
+            return name;
+        }
+
+        public static bool OneIn(float val)
+        {
+            return Next(val) < 1f;
         }
 
         public static float NextFloat()
