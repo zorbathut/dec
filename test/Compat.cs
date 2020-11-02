@@ -13,11 +13,13 @@ namespace DefTest
         {
             public double a;
             public double b;
+            public float c;
 
             public void Record(Def.Recorder record)
             {
                 record.Record(ref a, "a");
                 record.Record(ref b, "b");
+                record.Record(ref c, "c");
             }
         }
 
@@ -46,12 +48,14 @@ namespace DefTest
             var mr = new DoubleRec();
             mr.a = -8.22272715124268E-63;
             mr.b = -2.30119041724042E-247;
+            mr.c = -30984198100f;
 
             string serialized = Def.Recorder.Write(mr, pretty: pretty);
             var deserialized = Def.Recorder.Read<DoubleRec>(serialized);
 
             Assert.AreEqual(mr.a, deserialized.a);
             Assert.AreEqual(mr.b, deserialized.b);
+            Assert.AreEqual(mr.c, deserialized.c);
         }
     }
 }
