@@ -29,8 +29,9 @@ namespace Fuzzgen
         {
             Init();
 
+            var env = new Env();
+
             // Generate initial composites
-            var composites = new List<Composite>();
             for (int i = 0; i < 100; ++i)
             {
                 var c = new Composite();
@@ -42,11 +43,11 @@ namespace Fuzzgen
                     c.name += "Def";
                 }
 
-                composites.Add(c);
+                env.types.Add(c);
             }
 
             // Generate parameters
-            foreach (var c in composites)
+            foreach (var c in env.types)
             {
                 int parameterCount = Rand.WeightedDistribution();
 
@@ -58,7 +59,7 @@ namespace Fuzzgen
 
             // Generate instances
             var instances = new List<Instance>();
-            foreach (var c in composites)
+            foreach (var c in env.types)
             {
                 if (c.type != Composite.Type.Def)
                 {
@@ -91,7 +92,7 @@ namespace Fuzzgen
                 string testHarness = File.ReadAllText("data/TestHarness.cs.template");
 
                 var csComposites = new StringBuilder();
-                foreach (var c in composites)
+                foreach (var c in env.types)
                 {
                     csComposites.Append(Util.Indent(c.WriteCsharp(), 2));
                 }
@@ -102,7 +103,7 @@ namespace Fuzzgen
                     tests.Append(Util.Indent(i.WriteCsharp(), 3));
                 }
 
-                var types = string.Join(", ", composites.Select(c => $"typeof({c.name})"));
+                var types = string.Join(", ", env.types.Select(c => $"typeof({c.name})"));
                 var filename = "data/Fuzzgen.FuzzgenTest.xml";
 
                 testHarness = testHarness
