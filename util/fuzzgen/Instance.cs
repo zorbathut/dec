@@ -7,9 +7,9 @@ namespace Fuzzgen
 {
     internal class Instance
     {
-        private string defName;
+        public string defName { get; private set; }
 
-        private Composite composite;
+        public Composite composite { get; private set; }
         private Dictionary<Member, Value> values = new Dictionary<Member, Value>();
 
         public Instance(Env env, Composite composite)

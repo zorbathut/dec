@@ -48,5 +48,23 @@ namespace Fuzzgen
 
             return result;
         }
+
+        internal static T RandomElementOr<T>(this IEnumerable<T> input, T fallback)
+        {
+            var result = fallback;
+            int count = 0;
+
+            var enumerator = input.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                ++count;
+                if (Rand.OneIn(count))
+                {
+                    result = enumerator.Current;
+                }
+            }
+
+            return result;
+        }
     }
 }

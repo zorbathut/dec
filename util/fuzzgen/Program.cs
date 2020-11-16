@@ -58,7 +58,6 @@ namespace Fuzzgen
             }
 
             // Generate instances
-            var instances = new List<Instance>();
             foreach (var c in env.types)
             {
                 if (c.type != Composite.Type.Def)
@@ -69,7 +68,7 @@ namespace Fuzzgen
                 int creations = Rand.WeightedDistribution();
                 for (int i = 0; i < creations; ++i)
                 {
-                    instances.Add(new Instance(env, c));
+                    env.instances.Add(new Instance(env, c));
                 }
             }
 
@@ -84,7 +83,7 @@ namespace Fuzzgen
                 }
 
                 var tests = new StringBuilder();
-                foreach (var i in instances)
+                foreach (var i in env.instances)
                 {
                     tests.Append(Util.Indent(i.WriteCsharpCompareDef(), 3));
                 }
@@ -108,7 +107,7 @@ namespace Fuzzgen
                 var sb = new StringBuilder();
                 sb.AppendLine("<Defs>");
 
-                foreach (var i in instances)
+                foreach (var i in env.instances)
                 {
                     sb.AppendLine(Util.Indent(i.WriteXmlDef()));
                 }

@@ -20,8 +20,8 @@
       <String>1</String>
       <Bool>1</Bool>
       <Composite>1</Composite>
-      <!--<Def>2</Def>
-      <ContainerList>2</ContainerList>
+      <Def>2</Def>
+      <!--<ContainerList>2</ContainerList>
       <ContainerDictionary>1</ContainerDictionary>-->
     </elements>
   </MemberTypeDistributionDef>

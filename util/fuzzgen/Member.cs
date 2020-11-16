@@ -22,8 +22,8 @@ namespace Fuzzgen
             String,
             Bool,
             Composite,
-            /*Def,
-            ContainerList,
+            Def,
+            /*ContainerList,
             ContainerDictionary,*/
         }
         public readonly Type type;
@@ -63,6 +63,11 @@ namespace Fuzzgen
                     //initialized = new ValueComposite(env, compositeChild);
                     initialized = null;
                 }
+            }
+            else if (type == Type.Def)
+            {
+                compositeChild = env.types.Where(inst => inst.type == Composite.Type.Def).RandomElement();
+                initialized = new ValueSimple("null", "");
             }
             else if (parent.type == Composite.Type.Struct)
             {
@@ -142,6 +147,18 @@ namespace Fuzzgen
                     }
                 case Type.Composite:
                     return new ValueComposite(env, compositeChild);
+                case Type.Def:
+                    {
+                        var instance = env.instances.Where(inst => inst.composite == compositeChild).RandomElementOr(null);
+                        if (instance == null)
+                        {
+                            return new ValueSimple("null", "");
+                        }
+                        else
+                        {
+                            return new ValueSimple($"Def.Database<{compositeChild.name}>.Get(\"{instance.defName}\")", instance.defName);
+                        }
+                    }
                 default:
                     Dbg.Err("Unknown member type!");
                     return new ValueSimple("0", "0");
@@ -163,6 +180,7 @@ namespace Fuzzgen
                 case Type.String: return "string";
                 case Type.Bool: return "bool";
                 case Type.Composite: return compositeChild.name;
+                case Type.Def: return compositeChild.name;
                 default: Dbg.Err("Invalid type!"); return "int";
             }
         }
