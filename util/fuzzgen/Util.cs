@@ -28,5 +28,25 @@ namespace Fuzzgen
             dict.TryGetValue(key, out V holder);
             return holder;
         }
+
+        internal static T RandomElement<T>(this IEnumerable<T> input)
+        {
+            var enumerator = input.GetEnumerator();
+
+            enumerator.MoveNext();
+            var result = enumerator.Current;
+            int count = 1;
+
+            while (enumerator.MoveNext())
+            {
+                ++count;
+                if (Rand.OneIn(count))
+                {
+                    result = enumerator.Current;
+                }
+            }
+
+            return result;
+        }
     }
 }

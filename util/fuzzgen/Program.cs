@@ -53,7 +53,7 @@ namespace Fuzzgen
 
                 for (int i = 0; i < parameterCount; ++i)
                 {
-                    c.members.Add(new Member(c, Rand.NextString(), MemberTypeDistribution.Distribution.Choose()));
+                    c.members.Add(new Member(env, c, Rand.NextString(), MemberTypeDistribution.Distribution.Choose()));
                 }
             }
 
@@ -69,21 +69,7 @@ namespace Fuzzgen
                 int creations = Rand.WeightedDistribution();
                 for (int i = 0; i < creations; ++i)
                 {
-                    var instance = new Instance();
-                    instance.defName = Rand.NextString();
-                    instance.composite = c;
-
-                    float chance = Rand.Next(1f);
-                    foreach (var member in c.members)
-                    {
-                        if (Rand.Next(1f) < chance)
-                        {
-                            // generate a value for this member
-                            instance.values[member] = member.GenerateValue();
-                        }
-                    }
-
-                    instances.Add(instance);
+                    instances.Add(new Instance(env, c));
                 }
             }
 
@@ -94,13 +80,13 @@ namespace Fuzzgen
                 var csComposites = new StringBuilder();
                 foreach (var c in env.types)
                 {
-                    csComposites.Append(Util.Indent(c.WriteCsharp(), 2));
+                    csComposites.Append(Util.Indent(c.WriteCsharpDefinition(), 2));
                 }
 
                 var tests = new StringBuilder();
                 foreach (var i in instances)
                 {
-                    tests.Append(Util.Indent(i.WriteCsharp(), 3));
+                    tests.Append(Util.Indent(i.WriteCsharpCompareDef(), 3));
                 }
 
                 var types = string.Join(", ", env.types.Select(c => $"typeof({c.name})"));
@@ -124,7 +110,7 @@ namespace Fuzzgen
 
                 foreach (var i in instances)
                 {
-                    sb.AppendLine(Util.Indent(i.WriteXml()));
+                    sb.AppendLine(Util.Indent(i.WriteXmlDef()));
                 }
 
                 sb.AppendLine("</Defs>");

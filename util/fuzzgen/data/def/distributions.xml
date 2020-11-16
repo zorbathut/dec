@@ -19,8 +19,8 @@
       <Double>0.1</Double>
       <String>1</String>
       <Bool>1</Bool>
-      <!--<Class>2</Class>
-      <Def>2</Def>
+      <Composite>1</Composite>
+      <!--<Def>2</Def>
       <ContainerList>2</ContainerList>
       <ContainerDictionary>1</ContainerDictionary>-->
     </elements>

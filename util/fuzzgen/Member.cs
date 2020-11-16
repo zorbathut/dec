@@ -1,9 +1,11 @@
 
+using System.Linq;
+
 namespace Fuzzgen
 {
     internal class Member
     {
-        public readonly Composite composite;
+        public readonly Composite parent;
 
         public readonly string name;
 
@@ -19,77 +21,100 @@ namespace Fuzzgen
             Double,
             String,
             Bool,
-            /*Composite,
-            Def,
+            Composite,
+            /*Def,
             ContainerList,
             ContainerDictionary,*/
         }
         public readonly Type type;
 
         public readonly Value initialized;
+        private Composite compositeChild;
 
-        public Member(Composite composite, string name, Type type)
+        public Member(Env env, Composite parent, string name, Type type)
         {
-            this.composite = composite;
+            this.parent = parent;
             this.name = name;
             this.type = type;
 
-            if (composite.type == Composite.Type.Struct)
+            if (type == Type.Composite)
             {
-                // structs always init to zero
-                initialized = new Value() { valueCs = "0", valueXml = "0" };
+                if (parent.type == Composite.Type.Struct)
+                {
+                    // We only want to include structs that happen after us in the type list
+                    var structs = env.types.SkipWhile(etype => etype != parent).Skip(1).Where(etype => etype.type == Composite.Type.Struct);
+                    var classes = env.types.Where(etype => etype.type == Composite.Type.Class);
+                    compositeChild = structs.Concat(classes).RandomElement();
+                }
+                else
+                {
+                    compositeChild = env.types.Where(etype => etype.type != Composite.Type.Def).RandomElement();
+                }
+
+                if (parent.type == Composite.Type.Struct)
+                {
+                    initialized = null; // won't be used anywhere anyway, just fall back on defaults
+                }
+                else
+                {
+                    // It's actually a giant pain to get composite defaults working. I really want to do it, but it's nontrivial to calculate exactly what value something should have.
+                    // (At least, with this layout. Maybe this is a sign my code is structured badly.)
+                    // Anyway, for now, I'm just punting on the matter.
+                    //initialized = new ValueComposite(env, compositeChild);
+                    initialized = null;
+                }
+            }
+            else if (parent.type == Composite.Type.Struct)
+            {
+                // structs always init to basic types
+                if (type == Type.String || type == Type.Composite && this.compositeChild.type != Composite.Type.Struct)
+                {
+                    initialized = new ValueSimple("null");
+                }
+                else if (type == Type.Bool)
+                {
+                    initialized = new ValueSimple("false");
+                }
+                else if (type != Type.Composite)
+                {
+                    initialized = new ValueSimple("0");
+                }
+
+                // otherwise it's a struct composite and we don't really have anything sensible to compare it to
             }
             else
             {
-                initialized = GenerateValue();
+                initialized = GenerateValue(env);
             }
         }
 
-        public Value GenerateValue()
+        public Value GenerateValue(Env env)
         {
             switch (type)
             {
                 case Type.Short:
-                    {
-                        short value = (short)Rand.NextInt();
-                        return new Value() { valueCs = value.ToString(), valueXml = value.ToString() };
-                    }
+                    return new ValueSimple(((short)Rand.NextInt()).ToString());
                 case Type.Ushort:
-                    {
-                        ushort value = (ushort)Rand.NextInt();
-                        return new Value() { valueCs = value.ToString(), valueXml = value.ToString() };
-                    }
+                    return new ValueSimple(((ushort)Rand.NextInt()).ToString());
                 case Type.Int:
-                    {
-                        int value = (int)Rand.NextInt();
-                        return new Value() { valueCs = value.ToString(), valueXml = value.ToString() };
-                    }
+                    return new ValueSimple(((int)Rand.NextInt()).ToString());
                 case Type.Uint:
-                    {
-                        uint value = (uint)Rand.NextInt();
-                        return new Value() { valueCs = value.ToString(), valueXml = value.ToString() };
-                    }
+                    return new ValueSimple(((uint)Rand.NextInt()).ToString());
                 case Type.Long:
-                    {
-                        long value = (long)Rand.NextLong();
-                        return new Value() { valueCs = value.ToString(), valueXml = value.ToString() };
-                    }
+                    return new ValueSimple(((long)Rand.NextLong()).ToString());
                 case Type.Ulong:
-                    {
-                        ulong value = (ulong)Rand.NextLong();
-                        return new Value() { valueCs = value.ToString(), valueXml = value.ToString() };
-                    }
+                    return new ValueSimple(((ulong)Rand.NextLong()).ToString());
                 case Type.Float:
                     {
                         float value = Rand.NextFloat();
                         if (float.IsNaN(value))
                         {
-                            return new Value() { valueCs = "float.NaN", valueXml = float.NaN.ToString() };
+                            return new ValueSimple("float.NaN", float.NaN.ToString());
                         }
                         else
                         {
                             // In theory the "R" format here should work, but .net2.1 bugs prevent it from doing so.
-                            return new Value() { valueCs = value.ToString("G17") + 'f', valueXml = value.ToString("G29") };
+                            return new ValueSimple(value.ToString("G17") + 'f', value.ToString("G29"));
                         }
                     }
                 case Type.Double:
@@ -97,27 +122,29 @@ namespace Fuzzgen
                         double value = Rand.NextDouble();
                         if (double.IsNaN(value))
                         {
-                            return new Value() { valueCs = "double.NaN", valueXml = double.NaN.ToString() };
+                            return new ValueSimple("double.NaN", double.NaN.ToString());
                         }
                         else
                         {
                             // In theory the "R" format here should work, but .net2.1 bugs prevent it from doing so.
-                            return new Value() { valueCs = value.ToString("G17") + 'd', valueXml = value.ToString("G29") };
+                            return new ValueSimple(value.ToString("G17") + 'd', value.ToString("G29"));
                         }
                     }
                 case Type.String:
                     {
                         string value = Rand.NextString();
-                        return new Value() { valueCs = $"\"{value}\"", valueXml = value };
+                        return new ValueSimple($"\"{value}\"", value);
                     }
                 case Type.Bool:
                     {
                         bool value = Rand.OneIn(2f);
-                        return new Value() { valueCs = value.ToString().ToLower(), valueXml = value.ToString() };
+                        return new ValueSimple(value.ToString().ToLower(), value.ToString());
                     }
+                case Type.Composite:
+                    return new ValueComposite(env, compositeChild);
                 default:
                     Dbg.Err("Unknown member type!");
-                    return new Value() { valueCs = "0", valueXml = "0" };
+                    return new ValueSimple("0", "0");
             }
         }
 
@@ -135,19 +162,20 @@ namespace Fuzzgen
                 case Type.Double: return "double";
                 case Type.String: return "string";
                 case Type.Bool: return "bool";
+                case Type.Composite: return compositeChild.name;
                 default: Dbg.Err("Invalid type!"); return "int";
             }
         }
 
-        public string WriteCsharp()
+        public string WriteCSharpInit()
         {
-            if (composite.type == Composite.Type.Struct)
+            if (parent.type == Composite.Type.Struct || initialized == null)
             {
                 return $"public {TypeToCSharp()} {name};";
             }
             else
             {
-                return $"public {TypeToCSharp()} {name} = {initialized.WriteCsharp()};";
+                return $"public {TypeToCSharp()} {name}{initialized.WriteCsharpInit()};";
             }
         }
     }
