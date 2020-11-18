@@ -1,0 +1,38 @@
+name: Test
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: Setup 2.1
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '2.1.x'
+    - name: Setup 3.0
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '3.0.x'
+    - name: Setup tooling
+      run: dotnet tool install -g coveralls.net --version 1.0.0
+    - name: Setup environment
+      run: dotnet restore
+    - name: Build 2.1
+      run: dotnet build --configuration "Debug 2.1"
+    - name: Build 3.0
+      run: dotnet build --configuration "Debug 3.0"
+    - name: Test 2.1
+      run: dotnet test -c "Debug 2.1" /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=coverage.opencover.2.1.xml
+    - name: Test 3.0
+      run: dotnet test -c "Debug 3.0" /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=coverage.opencover.3.0.xml
+    - name: Echo coverage data
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+      run: echo csmacnz.Coveralls --useRelativePaths --multiple -i 'opencover=test/coverage.opencover.2.1.xml;opencover=test/coverage.opencover.3.0.xml' --serviceName github-ci --jobId $GITHUB_RUN_ID --commitId $(git rev-parse HEAD) --commitBranch "${GITHUB_REF:-none}" --commitAuthor "$(git log -1 --pretty=format:'%an')" --commitEmail "$(git log -1 --pretty=format:'%ae')" --commitMessage "$(git log -1 --pretty='%s')" --repoToken $COVERALLS_REPO_TOKEN
+    - name: Submit coverage data
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+      run: csmacnz.Coveralls --useRelativePaths --multiple -i 'opencover=test/coverage.opencover.2.1.xml;opencover=test/coverage.opencover.3.0.xml' --serviceName github-ci --jobId $GITHUB_RUN_ID --commitId $(git rev-parse HEAD) --commitBranch "${GITHUB_REF:-none}" --commitAuthor "$(git log -1 --pretty=format:'%an')" --commitEmail "$(git log -1 --pretty=format:'%ae')" --commitMessage "$(git log -1 --pretty='%s')" --repoToken $COVERALLS_REPO_TOKEN
