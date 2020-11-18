@@ -20,14 +20,10 @@ jobs:
           command: dotnet build -c "Debug 3.0"
       - run:
           name: Test 2.1
-          command: |
-            dotnet test -c "Debug 2.1" /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
-            mv test/coverage.opencover.xml test/coverage.opencover.2.1.xml
+          command: dotnet test -c "Debug 2.1" /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=coverage.opencover.2.1.xml
       - run:
           name: Test 3.0
-          command: |
-            dotnet test -c "Debug 3.0" /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
-            mv test/coverage.opencover.xml test/coverage.opencover.3.0.xml
+          command: dotnet test -c "Debug 3.0" /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=coverage.opencover.3.0.xml
       - run:
           name: Submit coverage data
           command: csmacnz.Coveralls.exe --useRelativePaths --multiple -i 'opencover=test/coverage.opencover.2.1.xml;opencover=test/coverage.opencover.3.0.xml' --serviceName circleci --jobId $env:CIRCLE_BUILD_NUM --commitId $(git rev-parse HEAD) --commitBranch $(git branch --show-current) --commitAuthor $(git log -1 --pretty=format:'%an') --commitEmail $(git log -1 --pretty=format:'%ae') --commitMessage $(git log -1 --pretty='%s')  --repoToken $env:COVERALLS_REPO_TOKEN
