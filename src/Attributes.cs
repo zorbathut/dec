@@ -13,7 +13,8 @@ namespace Def
     [AttributeUsage(AttributeTargets.Class)]  
     public class StaticReferencesAttribute : Attribute
     {
-        internal static List<Type> StaticReferencesFilled = new List<Type>();
+        // This keeps track of which static references we actually have filled. It exists largely for Database.Clear().
+        internal static HashSet<Type> StaticReferencesFilled = new HashSet<Type>();
 
         /// <summary>
         /// Informs the construction environment that a static-reference class has been constructed.

@@ -52,9 +52,8 @@ namespace Def
         // List of work to be run during the Finish stage
         private List<Action> finishWork = new List<Action>();
 
-        // Used to deal with static reference validation
-        private static HashSet<Type> staticReferencesRegistered = new HashSet<Type>();
-        private static HashSet<Type> staticReferencesRegistering = new HashSet<Type>();
+        // Used for static reference validation
+        private static Action s_StaticReferenceHandler = null;
 
         /// <summary>
         /// Creates a Parser.
@@ -334,11 +333,16 @@ namespace Def
             }
             s_Status = Status.Distributing;
 
-            staticReferencesRegistering.Clear();
-            staticReferencesRegistering.UnionWith(staticReferences);
             foreach (var stat in staticReferences)
             {
-                StaticReferencesAttribute.StaticReferencesFilled.Add(stat);
+                if (!StaticReferencesAttribute.StaticReferencesFilled.Contains(stat))
+                {
+                    s_StaticReferenceHandler = () =>
+                    {
+                        s_StaticReferenceHandler = null;
+                        StaticReferencesAttribute.StaticReferencesFilled.Add(stat);
+                    };
+                }
 
                 foreach (var field in stat.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static))
                 {
@@ -358,9 +362,10 @@ namespace Def
                     }
                 }
 
-                if (!staticReferencesRegistered.Contains(stat))
+                if (s_StaticReferenceHandler != null)
                 {
-                    Dbg.Err($"Failed to properly register {stat}; you may be missing a call to Def.StaticReferences.Initialized() in its static constructor");
+                    Dbg.Err($"Failed to properly register {stat}; you may be missing a call to Def.StaticReferences.Initialized() in its static constructor, or the class may already have been initialized elsewhere (this should have thrown an error)");
+                    s_StaticReferenceHandler = null;
                 }
             }
 
@@ -413,25 +418,13 @@ namespace Def
         [MethodImpl(MethodImplOptions.NoInlining)]
         internal static void StaticReferencesInitialized()
         {
-            var frame = new StackFrame(2);
-            var method = frame.GetMethod();
-            var type = method.DeclaringType;
-
-            if (s_Status != Status.Distributing)
+            if (s_StaticReferenceHandler != null)
             {
-                Dbg.Err($"Initializing static reference class {type} while the world is in {s_Status} state; should be {Status.Distributing} state - this probably means you accessed a static reference class before it was ready");
+                s_StaticReferenceHandler();
+                return;
             }
 
-            if (!type.Assembly.IsUserAssembly())
-            {
-                Dbg.Err($"Attempting to initialize static references in assembly {type.Assembly} which is considered a non-user assembly; please change UtilReflection.IsUserAssembly to suit your unfortunately-named project");
-            }
-            else if (!staticReferencesRegistering.Contains(type))
-            {
-                Dbg.Err($"Initializing static reference class {type} which was not originally detected as a static reference class");
-            }
-
-            staticReferencesRegistered.Add(type);
+            Dbg.Err($"Initializing static reference class at an inappropriate time - this probably means you accessed a static reference class before it was ready");
         }
     }
 }

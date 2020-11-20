@@ -334,7 +334,7 @@ namespace DefTest
                 <Defs>
                     <ConstructorTouchDef defName=""TestDef"" />
                 </Defs>"));
-            parser.Finish();
+            ExpectErrors(() => parser.Finish());
 
             Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
 	    }

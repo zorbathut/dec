@@ -182,7 +182,6 @@ namespace Def
                     field.SetValue(null, null);
                 }
             }
-            StaticReferencesAttribute.StaticReferencesFilled.Clear();
 
             Parser.Clear();
             Serialization.Clear();
