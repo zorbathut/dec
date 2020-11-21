@@ -331,6 +331,11 @@ namespace Def
             // "No data" is defined as null for defs, so we just do that
         }
 
+        public override void TagClass(Type type)
+        {
+            node.Add(new XAttribute("class", type.ComposeDefFormatted()));
+        }
+
         public override void WriteExplicitNull()
         {
             node.SetAttributeValue("null", "true");

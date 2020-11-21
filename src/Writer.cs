@@ -29,6 +29,8 @@ namespace Def
         public abstract void WriteExplicitNull();
         public abstract bool WriteReference(object value);
 
+        public abstract void TagClass(Type type);
+
         // get rid of me
         public abstract XElement GetXElement();
     }
