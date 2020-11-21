@@ -331,6 +331,11 @@ namespace Def
             // "No data" is defined as null for defs, so we just do that
         }
 
+        public override void WriteExplicitNull()
+        {
+            node.SetAttributeValue("null", "true");
+        }
+
         public override XElement GetXElement()
         {
             return node;

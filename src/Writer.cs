@@ -26,6 +26,7 @@ namespace Def
         public abstract void WriteString(string value);
         public abstract void WriteType(Type value);
         public abstract void WriteDef(Def value);
+        public abstract void WriteExplicitNull();
 
         // get rid of me
         public abstract XElement GetXElement();

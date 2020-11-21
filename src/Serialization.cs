@@ -566,7 +566,8 @@ namespace Def
             // Everything after this represents "null" with an explicit XML tag, so let's just do that
             if (value == null)
             {
-                result.SetAttributeValue("null", "true");
+                node.WriteExplicitNull();
+                
                 return;
             }
 
