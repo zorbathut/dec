@@ -529,7 +529,7 @@ namespace Def
             }
         }
 
-        internal static void ComposeElement(object value, Type fieldType, WriterNode node, bool isRootDef = false)
+        internal static void ComposeElement(WriterNode node, object value, Type fieldType, bool isRootDef = false)
         {
             // Do all our unreferencables first
             if (fieldType.IsPrimitive)
@@ -595,7 +595,7 @@ namespace Def
 
                 for (int i = 0; i < list.Length; ++i)
                 {
-                    ComposeElement(list.GetValue(i), referencedType, node.CreateChild("li"));
+                    ComposeElement(node.CreateChild("li"), list.GetValue(i), referencedType);
                 }
 
                 return;
@@ -609,7 +609,7 @@ namespace Def
 
                 for (int i = 0; i < list.Count; ++i)
                 {
-                    ComposeElement(list[i], referencedType, node.CreateChild("li"));
+                    ComposeElement(node.CreateChild("li"), list[i], referencedType);
                 }
 
                 return;
@@ -631,8 +631,8 @@ namespace Def
                     // Revisit this later when someone (possibly myself) really wants it improved.
                     var li = node.CreateChild("li");
 
-                    ComposeElement(iterator.Key, keyType, li.CreateChild("key"));
-                    ComposeElement(iterator.Value, valueType, li.CreateChild("value"));
+                    ComposeElement(li.CreateChild("key"), iterator.Key, keyType);
+                    ComposeElement(li.CreateChild("value"), iterator.Value, valueType);
                 }
 
                 return;
@@ -684,7 +684,7 @@ namespace Def
                     continue;
                 }
 
-                ComposeElement(field.GetValue(value), field.FieldType, node.CreateChild(field.Name));
+                ComposeElement(node.CreateChild(field.Name), field.GetValue(value), field.FieldType);
             }
 
             return;

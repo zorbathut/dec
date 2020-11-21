@@ -88,7 +88,7 @@ namespace Def
         {
             var writerContext = new WriterXmlRecord();
 
-            Serialization.ComposeElement(target, target != null ? target.GetType() : typeof(T), writerContext.StartData());
+            Serialization.ComposeElement(writerContext.StartData(), target, target != null ? target.GetType() : typeof(T));
 
             return writerContext.Finish();
         }
@@ -245,7 +245,7 @@ namespace Def
 
             fields.Add(label);
 
-            Serialization.ComposeElement(value, typeof(T), node.CreateChild(label));
+            Serialization.ComposeElement(node.CreateChild(label), value, typeof(T));
         }
 
         public override XElement Xml { get => node.GetXElement(); }

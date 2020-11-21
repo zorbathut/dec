@@ -16,7 +16,7 @@ namespace Def
 
             foreach (var defObj in Database.List)
             {
-                Serialization.ComposeElement(defObj, defObj.GetType(), writerContext.StartDef(defObj.GetType(), defObj.DefName), isRootDef: true);
+                Serialization.ComposeElement(writerContext.StartDef(defObj.GetType(), defObj.DefName), defObj, defObj.GetType(), isRootDef: true);
             }
 
             return writerContext.Finish();
