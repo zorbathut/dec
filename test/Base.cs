@@ -144,19 +144,19 @@ namespace DefTest
             else if (mode == BehaviorMode.Rewritten)
             {
                 string data = null;
-                void RunWriter()
+                void RunComposer()
                 {
-                    var writer = new Def.Writer();
-                    data = writer.Write();
+                    var composer = new Def.Composer();
+                    data = composer.Compose();
                 }
 
                 if (expectWriteErrors)
                 {
-                    ExpectErrors(() => RunWriter());
+                    ExpectErrors(() => RunComposer());
                 }
                 else
                 {
-                    RunWriter();
+                    RunComposer();
                 }
 
                 Def.Database.Clear();

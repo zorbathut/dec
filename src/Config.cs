@@ -93,7 +93,7 @@ namespace Def
         /// <remarks>
         /// Generally this should consist of your project's primary namespace. If your project lives in multiple namespaces, you may wish to include them all.
         ///
-        /// Should not be changed while a Parser or Writer object exists.
+        /// Should not be changed while a Parser or Composer object exists.
         /// </remarks>
         /// <example>
         /// Config.UsingNamespaces = new string[] { "LegendOfAmethystFuton" };

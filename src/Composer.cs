@@ -8,9 +8,9 @@ namespace Def
     /// <remarks>
     /// This class is under heavy development and its API is likely to be unstable and undocumented.
     /// </remarks>
-    public class Writer
+    public class Composer
     {
-        public string Write()
+        public string Compose()
         {
             var doc = new XDocument();
 

@@ -66,7 +66,7 @@ namespace Def
         /// Creates a Def.
         /// </summary>
         /// <remarks>
-        /// This will be supported for dynamically-generated Defs in the future, but right now exists mostly for the Writer functionality. It is currently not recommended to use this during actual gameplay.
+        /// This will be supported for dynamically-generated Defs in the future, but right now exists mostly for the Composer functionality. It is currently not recommended to use this during actual gameplay.
         ///
         /// At this time, this will not register Indexes. This behavior may change at some point in the future.
         /// </remarks>
@@ -88,7 +88,7 @@ namespace Def
         /// Creates a Def.
         /// </summary>
         /// <remarks>
-        /// This will be supported for dynamically-generated Defs in the future, but right now exists mostly for the Writer functionality. It is currently not recommended to use this during actual gameplay.
+        /// This will be supported for dynamically-generated Defs in the future, but right now exists mostly for the Composer functionality. It is currently not recommended to use this during actual gameplay.
         ///
         /// At this time, this will not register Indexes. This behavior may change at some point in the future.
         /// </remarks>
@@ -118,7 +118,7 @@ namespace Def
         /// Deletes an existing def.
         /// </summary>
         /// <remarks>
-        /// This exists mostly for the Writer functionality. It is generally not recommended to use this during actual gameplay.
+        /// This exists mostly for the Composer functionality. It is generally not recommended to use this during actual gameplay.
         ///
         /// At this time, this will not unregister existing Indexes. This behavior may change at some point in the future.
         /// </remarks>
@@ -137,7 +137,7 @@ namespace Def
         /// Renames an existing def.
         /// </summary>
         /// <remarks>
-        /// This exists mostly for the Writer functionality. It is generally not recommended to use this during actual gameplay.
+        /// This exists mostly for the Composer functionality. It is generally not recommended to use this during actual gameplay.
         /// </remarks>
         public static void Rename(Def def, string defName)
         {

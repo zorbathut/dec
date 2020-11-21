@@ -4,7 +4,7 @@ namespace DefTest
     using System;
 
     [TestFixture]
-    public class Writer : Base
+    public class Composer : Base
     {
         // A lot of the Writer functionality is tested via BehaviorMode.Rewritten in other tests, so these tests mostly handle the Create/Delete/Rename functions.
 
@@ -325,8 +325,8 @@ namespace DefTest
             ephemeral.serializedValue = 35;
             ephemeral.nonSerializedValue = 45;
 
-            var writer = new Def.Writer();
-            string data = writer.Write();
+            var writer = new Def.Composer();
+            string data = writer.Compose();
 
             Assert.IsTrue(data.Contains("serializedValue"));
             Assert.IsFalse(data.Contains("nonSerializedValue"));
