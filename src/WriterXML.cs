@@ -303,6 +303,11 @@ namespace Def
             node.Add(new XText(value));
         }
 
+        public override void WriteType(Type value)
+        {
+            node.Add(new XText(value.ComposeDefFormatted()));
+        }
+
         public override XElement GetXElement()
         {
             return node;

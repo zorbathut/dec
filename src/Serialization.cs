@@ -550,7 +550,7 @@ namespace Def
 
             if (value is Type)
             {
-                result.Add(new XText((value as Type).ComposeDefFormatted()));
+                node.WriteType(value as Type);
 
                 return;
             }
