@@ -12,23 +12,14 @@ namespace Def
     {
         public string Compose()
         {
-            var doc = new XDocument();
-
-            var record = new XElement("Defs");
-            doc.Add(record);
-
             var writerContext = new WriterXMLCompose();
 
             foreach (var defObj in Database.List)
             {
-                var defXml = Serialization.ComposeElement(defObj, defObj.GetType(), defObj.GetType().ComposeDefFormatted(), writerContext, isRootDef: true);
-                defXml.Add(new XAttribute("defName", defObj.DefName));
-                record.Add(defXml);
+                Serialization.ComposeElement(defObj, defObj.GetType(), writerContext.StartDef(defObj.GetType(), defObj.DefName), isRootDef: true);
             }
 
-            writerContext.DequeuePendingWrites();
-
-            return doc.ToString();
+            return writerContext.Finish();
         }
     }
 }

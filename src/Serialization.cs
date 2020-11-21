@@ -529,9 +529,9 @@ namespace Def
             }
         }
 
-        internal static XElement ComposeElement(object value, Type fieldType, string label, Writer writer, bool isRootDef = false)
+        internal static void ComposeElement(object value, Type fieldType, WriterNode node, bool isRootDef = false)
         {
-            var result = new XElement(label);
+            var result = node.GetXElement();
 
             // Do all our unreferencables first
             if (fieldType.IsPrimitive)
@@ -542,33 +542,33 @@ namespace Def
                     {
                         result.Add(new XText(((double)value).ToString("G17")));
 
-                        return result;
+                        return;
                     }
                     else if (fieldType == typeof(float))
                     {
                         result.Add(new XText(((float)value).ToString("G9")));
 
-                        return result;
+                        return;
                     }
                 }
 
                 result.Add(new XText(value.ToString()));
 
-                return result;
+                return;
             }
             
             if (value is string)
             {
                 result.Add(new XText(value as string));
 
-                return result;
+                return;
             }
 
             if (value is Type)
             {
                 result.Add(new XText((value as Type).ComposeDefFormatted()));
 
-                return result;
+                return;
             }
 
             if (!isRootDef && typeof(Def).IsAssignableFrom(fieldType))
@@ -591,23 +591,23 @@ namespace Def
 
                 // "No data" is defined as null for defs, so we just do that
 
-                return result;
+                return;
             }
 
             // Everything after this represents "null" with an explicit XML tag, so let's just do that
             if (value == null)
             {
                 result.SetAttributeValue("null", "true");
-                return result;
+                return;
             }
 
             // Check to see if we should make this into a ref
-            if (writer.RecorderMode && !fieldType.IsValueType)
+            if (node.Writer.RecorderMode && !fieldType.IsValueType)
             {
-                if (writer.RegisterReference(value, result))
+                if (node.Writer.RegisterReference(value, result))
                 {
                     // The ref system has set up the appropriate tagging, so we're done!
-                    return result;
+                    return;
                 }
 
                 // This is not a reference! (yet, at least). So keep on generating it.
@@ -629,10 +629,10 @@ namespace Def
 
                 for (int i = 0; i < list.Length; ++i)
                 {
-                    result.Add(ComposeElement(list.GetValue(i), referencedType, "li", writer));
+                    ComposeElement(list.GetValue(i), referencedType, node.CreateChild("li"));
                 }
 
-                return result;
+                return;
             }
 
             if (fieldType.IsGenericType && fieldType.GetGenericTypeDefinition() == typeof(List<>))
@@ -643,10 +643,10 @@ namespace Def
 
                 for (int i = 0; i < list.Count; ++i)
                 {
-                    result.Add(ComposeElement(list[i], referencedType, "li", writer));
+                    ComposeElement(list[i], referencedType, node.CreateChild("li"));
                 }
 
-                return result;
+                return;
             }
 
             if (fieldType.IsGenericType && fieldType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
@@ -663,23 +663,22 @@ namespace Def
                     // In theory, some dicts support inline format, not li format. Inline format is cleaner and smaller and we should be using it when possible.
                     // In practice, it's hard and I'm lazy and this always works, and we're not providing any guarantees about cleanliness of serialized output.
                     // Revisit this later when someone (possibly myself) really wants it improved.
-                    var element = new XElement("li");
-                    result.Add(element);
+                    var li = node.CreateChild("li");
 
-                    element.Add(ComposeElement(iterator.Key, keyType, "key", writer));
-                    element.Add(ComposeElement(iterator.Value, valueType, "value", writer));
+                    ComposeElement(iterator.Key, keyType, li.CreateChild("key"));
+                    ComposeElement(iterator.Value, valueType, li.CreateChild("value"));
                 }
 
-                return result;
+                return;
             }
 
             if (typeof(IRecordable).IsAssignableFrom(fieldType))
             {
                 var recordable = value as IRecordable;
 
-                writer.RegisterPendingWrite(() => recordable.Record(new RecorderWriter(result, writer)));
+                node.Writer.RegisterPendingWrite(() => recordable.Record(new RecorderWriter(result, node)));
 
-                return result;
+                return;
             }
 
             {
@@ -687,15 +686,15 @@ namespace Def
                 var converter = Serialization.Converters.TryGetValue(fieldType);
                 if (converter != null)
                 {
-                    writer.RegisterPendingWrite(() => converter.Record(value, fieldType, new RecorderWriter(result, writer)));
-                    return result;
+                    node.Writer.RegisterPendingWrite(() => converter.Record(value, fieldType, new RecorderWriter(result, node)));
+                    return;
                 }
             }
 
-            if (writer.RecorderMode)
+            if (node.Writer.RecorderMode)
             {
                 Dbg.Err($"Couldn't find a composition method for type {fieldType}; do you need a Converter?");
-                return result;
+                return;
             }
 
             // We absolutely should not be doing reflection when in recorder mode; that way lies madness.
@@ -719,10 +718,10 @@ namespace Def
                     continue;
                 }
 
-                result.Add(ComposeElement(field.GetValue(value), field.FieldType, field.Name, writer));
+                ComposeElement(field.GetValue(value), field.FieldType, node.CreateChild(field.Name));
             }
 
-            return result;
+            return;
         }
 
         internal static void Clear()

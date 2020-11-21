@@ -14,4 +14,15 @@ namespace Def
 
         public abstract bool RegisterReference(object referenced, XElement element);
     }
+
+    internal abstract class WriterNode
+    {
+        public abstract Writer Writer { get; }
+
+        // this needs to be more abstract
+        public abstract WriterNode CreateChild(string label);
+
+        // get rid of me
+        public abstract XElement GetXElement();
+    }
 }

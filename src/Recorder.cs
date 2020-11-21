@@ -86,64 +86,11 @@ namespace Def
         /// </summary>
         public static string Write<T>(T target, bool pretty = true)
         {
-            var doc = new XDocument();
-
-            var record = new XElement("Record");
-            doc.Add(record);
-
-            record.Add(new XElement("recordFormatVersion", 1));
-
-            var refs = new XElement("refs");
-            record.Add(refs);
-
             var writerContext = new WriterXMLRecord();
 
-            var rootElement = Serialization.ComposeElement(target, target != null ? target.GetType() : typeof(T), "data", writerContext);
-            record.Add(rootElement);
+            Serialization.ComposeElement(target, target != null ? target.GetType() : typeof(T), writerContext.StartData());
 
-            // Handle all our pending writes
-            writerContext.DequeuePendingWrites();
-
-            // We now have a giant XML tree, potentially many thousands of nodes deep, where some nodes are references and some *should* be in the reference bank but aren't.
-            // We need to do two things:
-            // * Make all of our tagged references into actual references in the Refs section
-            // * Tag anything deeper than a certain depth as a reference, then move it into the Refs section
-            var depthTestsPending = new List<XElement>();
-            depthTestsPending.Add(rootElement);
-
-            // This is a loop between "write references" and "tag everything below a certain depth as needing to be turned into a reference".
-            // We do this in a loop so we don't have to worry about ironically blowing our stack while making a change required to not blow our stack.
-            while (true)
-            {
-                // Canonical ordering to provide some stability and ease-of-reading.
-                foreach (var reference in writerContext.StripAndOutputReferences().OrderBy(kvp => kvp.Key))
-                {
-                    refs.Add(reference.Value);
-                    depthTestsPending.Add(reference.Value);
-                }
-
-                bool found = false;
-                for (int i = 0; i < depthTestsPending.Count; ++i)
-                {
-                    // Magic number should probably be configurable at some point
-                    found |= writerContext.ProcessDepthLimitedReferences(depthTestsPending[i], 20);
-                }
-                depthTestsPending.Clear();
-
-                if (!found)
-                {
-                    // No new depth-clobbering references found, just move on
-                    break;
-                }
-            }
-
-            if (refs.IsEmpty)
-            {
-                // strip out the refs 'cause it looks better that way :V
-                refs.Remove();
-            }
-
-            return doc.ToString();
+            return writerContext.Finish();
         }
 
         /// <summary>
@@ -282,12 +229,12 @@ namespace Def
     {
         private readonly XElement element;
         private readonly HashSet<string> fields = new HashSet<string>();
-        private readonly Writer writer;
+        private readonly WriterNode node;
 
-        internal RecorderWriter(XElement element, Writer writer)
+        internal RecorderWriter(XElement element, WriterNode node)
         {
             this.element = element;
-            this.writer = writer;
+            this.node = node;
         }
 
         public override void Record<T>(ref T value, string label)
@@ -300,7 +247,7 @@ namespace Def
 
             fields.Add(label);
 
-            element.Add(Serialization.ComposeElement(value, typeof(T), label, writer));
+            Serialization.ComposeElement(value, typeof(T), node.CreateChild(label));
         }
 
         public override XElement Xml { get => element; }

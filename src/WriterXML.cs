@@ -40,10 +40,33 @@ namespace Def
     {
         public override bool RecorderMode { get => false; }
 
+        private XDocument doc;
+        private XElement defs;
+
+        public WriterXMLCompose()
+        {
+            doc = new XDocument();
+
+            defs = new XElement("Defs");
+            doc.Add(defs);
+        }
+
         public override bool RegisterReference(object referenced, XElement element)
         {
             Dbg.Err("WriterXMLCompose.RegisterReference called incorrectly; this will definitely not work right");
             return false;
+        }
+
+        public WriterNode StartDef(Type type, string defName)
+        {
+            return WriterNodeXML.StartDef(this, defs, type.ComposeDefFormatted(), defName);
+        }
+
+        public string Finish()
+        {
+            DequeuePendingWrites();
+
+            return doc.ToString();
         }
     }
 
@@ -61,6 +84,24 @@ namespace Def
 
         // Current reference ID that we're on.
         private int referenceId = 0;
+
+        private XDocument doc;
+        private XElement record;
+        private XElement refs;
+        private XElement rootElement;
+
+        public WriterXMLRecord()
+        {
+            doc = new XDocument();
+
+            record = new XElement("Record");
+            doc.Add(record);
+
+            record.Add(new XElement("recordFormatVersion", 1));
+
+            refs = new XElement("refs");
+            record.Add(refs);
+        }
 
         public override bool RegisterReference(object referenced, XElement element)
         {
@@ -147,6 +188,98 @@ namespace Def
 
                 return found;
             }
+        }
+
+        public WriterNodeXML StartData()
+        {
+            var node = WriterNodeXML.StartData(this, record, "data");
+            rootElement = node.GetXElement();
+            return node;
+        }
+
+        public string Finish()
+        {
+            // Handle all our pending writes
+            DequeuePendingWrites();
+
+            // We now have a giant XML tree, potentially many thousands of nodes deep, where some nodes are references and some *should* be in the reference bank but aren't.
+            // We need to do two things:
+            // * Make all of our tagged references into actual references in the Refs section
+            // * Tag anything deeper than a certain depth as a reference, then move it into the Refs section
+            var depthTestsPending = new List<XElement>();
+            depthTestsPending.Add(rootElement);
+
+            // This is a loop between "write references" and "tag everything below a certain depth as needing to be turned into a reference".
+            // We do this in a loop so we don't have to worry about ironically blowing our stack while making a change required to not blow our stack.
+            while (true)
+            {
+                // Canonical ordering to provide some stability and ease-of-reading.
+                foreach (var reference in StripAndOutputReferences().OrderBy(kvp => kvp.Key))
+                {
+                    refs.Add(reference.Value);
+                    depthTestsPending.Add(reference.Value);
+                }
+
+                bool found = false;
+                for (int i = 0; i < depthTestsPending.Count; ++i)
+                {
+                    // Magic number should probably be configurable at some point
+                    found |= ProcessDepthLimitedReferences(depthTestsPending[i], 20);
+                }
+                depthTestsPending.Clear();
+
+                if (!found)
+                {
+                    // No new depth-clobbering references found, just move on
+                    break;
+                }
+            }
+
+            if (refs.IsEmpty)
+            {
+                // strip out the refs 'cause it looks better that way :V
+                refs.Remove();
+            }
+
+            return doc.ToString();
+        }
+    }
+
+    internal class WriterNodeXML : WriterNode
+    {
+        private WriterXML writer;
+        private XElement node;
+
+        public override Writer Writer { get => writer; }
+
+        private WriterNodeXML(WriterXML writer, XElement parent, string label)
+        {
+            this.writer = writer;
+
+            node = new XElement(label);
+            parent.Add(node);
+        }
+
+        public static WriterNodeXML StartDef(WriterXMLCompose writer, XElement defRoot, string type, string defName)
+        {
+            var node = new WriterNodeXML(writer, defRoot, type);
+            node.GetXElement().Add(new XAttribute("defName", defName));
+            return node;
+        }
+
+        public static WriterNodeXML StartData(WriterXMLRecord writer, XElement defRoot, string name)
+        {
+            return new WriterNodeXML(writer, defRoot, name);
+        }
+
+        public override WriterNode CreateChild(string label)
+        {
+            return new WriterNodeXML(writer, node, label);
+        }
+
+        public override XElement GetXElement()
+        {
+            return node;
         }
     }
 }
