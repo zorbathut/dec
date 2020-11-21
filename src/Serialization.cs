@@ -572,18 +572,16 @@ namespace Def
             }
 
             // Check to see if we should make this into a ref
-            if (node.Writer.RecorderMode && !fieldType.IsValueType)
+            if (!fieldType.IsValueType)
             {
-                if (node.Writer.RegisterReference(value, result))
+                if (node.WriteReference(value))
                 {
                     // The ref system has set up the appropriate tagging, so we're done!
                     return;
                 }
 
-                // This is not a reference! (yet, at least). So keep on generating it.
+                // Either this isn't a reference yet, or we don't even support references in this mode. So keep on processing.
             }
-
-            // We'll drop through if we're in force-ref-resolve mode, or if we have something that needs conversion and is a struct (classes get turned into refs)
 
             // This is also where we need to start being concerned about types. If we have a type that isn't the expected type, tag it.
             if (value.GetType() != fieldType)
@@ -661,7 +659,7 @@ namespace Def
                 }
             }
 
-            if (node.Writer.RecorderMode)
+            if (!node.Writer.AllowReflection)
             {
                 Dbg.Err($"Couldn't find a composition method for type {fieldType}; do you need a Converter?");
                 return;

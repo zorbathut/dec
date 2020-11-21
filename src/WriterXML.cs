@@ -38,7 +38,7 @@ namespace Def
 
     internal class WriterXmlCompose : WriterXml
     {
-        public override bool RecorderMode { get => false; }
+        public override bool AllowReflection { get => true; }
 
         private XDocument doc;
         private XElement defs;
@@ -53,7 +53,7 @@ namespace Def
 
         public override bool RegisterReference(object referenced, XElement element)
         {
-            Dbg.Err("WriterXmlCompose.RegisterReference called incorrectly; this will definitely not work right");
+            // We never register references in Compose mode.
             return false;
         }
 
@@ -72,7 +72,7 @@ namespace Def
 
     internal class WriterXmlRecord : WriterXml
     {
-        public override bool RecorderMode { get => true; }
+        public override bool AllowReflection { get => false; }
 
         // Maps between object and the in-place element. This does *not* yet have the ref ID tagged, and will have to be extracted into a new Element later.
         private Dictionary<object, XElement> refToElement = new Dictionary<object, XElement>();
@@ -133,7 +133,7 @@ namespace Def
         public IEnumerable<KeyValuePair<string, XElement>> StripAndOutputReferences()
         {
             // It is *vitally* important that we do this step *after* all references are generated, not inline as we add references.
-            // This is because we have to move all the contents of the XML element, but if we do it during generation, a recursive-reference situation could result in us trying to move the contents before the XML element is fully generated.
+            // This is because we have to move all the contents of the XML element, but if we do it during generation, a recursive-reference situation could result in us trying to move the XML element before its contents are fully generated.
             // So we do it now, when we know that everything is finished.
             foreach (var refblock in refToString)
             {
@@ -334,6 +334,11 @@ namespace Def
         public override void WriteExplicitNull()
         {
             node.SetAttributeValue("null", "true");
+        }
+
+        public override bool WriteReference(object value)
+        {
+            return writer.RegisterReference(value, node);
         }
 
         public override XElement GetXElement()

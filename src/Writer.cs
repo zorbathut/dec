@@ -7,7 +7,7 @@ namespace Def
 
     internal abstract class Writer
     {
-        public abstract bool RecorderMode { get; }
+        public abstract bool AllowReflection { get; }
 
         public abstract void RegisterPendingWrite(Action action);
         public abstract void DequeuePendingWrites();
@@ -27,6 +27,7 @@ namespace Def
         public abstract void WriteType(Type value);
         public abstract void WriteDef(Def value);
         public abstract void WriteExplicitNull();
+        public abstract bool WriteReference(object value);
 
         // get rid of me
         public abstract XElement GetXElement();
