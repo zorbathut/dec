@@ -298,6 +298,11 @@ namespace Def
             node.Add(new XText(value.ToString()));
         }
 
+        public override void WriteString(string value)
+        {
+            node.Add(new XText(value));
+        }
+
         public override XElement GetXElement()
         {
             return node;

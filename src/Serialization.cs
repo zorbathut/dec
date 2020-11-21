@@ -543,7 +543,7 @@ namespace Def
             
             if (value is string)
             {
-                result.Add(new XText(value as string));
+                node.WriteString(value as string);
 
                 return;
             }

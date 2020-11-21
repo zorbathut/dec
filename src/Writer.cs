@@ -23,6 +23,7 @@ namespace Def
         public abstract WriterNode CreateChild(string label);
 
         public abstract void WritePrimitive(object value);
+        public abstract void WriteString(string value);
 
         // get rid of me
         public abstract XElement GetXElement();
