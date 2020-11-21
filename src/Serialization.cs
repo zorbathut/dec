@@ -640,9 +640,7 @@ namespace Def
 
             if (typeof(IRecordable).IsAssignableFrom(fieldType))
             {
-                var recordable = value as IRecordable;
-
-                node.Writer.RegisterPendingWrite(() => recordable.Record(new RecorderWriter(node)));
+                node.WriteRecord(value as IRecordable);
 
                 return;
             }
@@ -652,7 +650,7 @@ namespace Def
                 var converter = Serialization.Converters.TryGetValue(fieldType);
                 if (converter != null)
                 {
-                    node.Writer.RegisterPendingWrite(() => converter.Record(value, fieldType, new RecorderWriter(node)));
+                    node.WriteConvertable(converter, value, fieldType);
                     return;
                 }
             }

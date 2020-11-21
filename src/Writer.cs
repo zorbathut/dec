@@ -28,6 +28,8 @@ namespace Def
         public abstract void WriteDef(Def value);
         public abstract void WriteExplicitNull();
         public abstract bool WriteReference(object value);
+        public abstract void WriteRecord(IRecordable value);
+        public abstract void WriteConvertable(Converter converter, object value, Type fieldType);
 
         public abstract void TagClass(Type type);
 

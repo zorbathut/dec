@@ -346,6 +346,16 @@ namespace Def
             return writer.RegisterReference(value, node);
         }
 
+        public override void WriteRecord(IRecordable value)
+        {
+            writer.RegisterPendingWrite(() => value.Record(new RecorderWriter(this)));
+        }
+
+        public override void WriteConvertable(Converter converter, object value, Type fieldType)
+        {
+            writer.RegisterPendingWrite(() => converter.Record(value, fieldType, new RecorderWriter(this)));
+        }
+
         public override XElement GetXElement()
         {
             return node;
