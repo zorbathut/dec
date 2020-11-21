@@ -10,12 +10,14 @@ namespace Def
         // A list of writes that still have to happen. This is used so we don't have to do deep recursive dives and potentially blow our stack.
         private List<Action> pendingWrites = new List<Action>();
 
-        public override void RegisterPendingWrite(Action action)
+        public abstract bool RegisterReference(object referenced, XElement element);
+
+        public void RegisterPendingWrite(Action action)
         {
             pendingWrites.Add(action);
         }
 
-        public override void DequeuePendingWrites()
+        public void DequeuePendingWrites()
         {
             while (DequeuePendingWrite() is var pending && pending != null)
             {

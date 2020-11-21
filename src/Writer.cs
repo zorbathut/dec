@@ -8,11 +8,6 @@ namespace Def
     internal abstract class Writer
     {
         public abstract bool AllowReflection { get; }
-
-        public abstract void RegisterPendingWrite(Action action);
-        public abstract void DequeuePendingWrites();
-
-        public abstract bool RegisterReference(object referenced, XElement element);
     }
 
     internal abstract class WriterNode
