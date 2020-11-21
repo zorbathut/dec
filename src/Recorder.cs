@@ -227,13 +227,11 @@ namespace Def
 
     internal class RecorderWriter : Recorder
     {
-        private readonly XElement element;
         private readonly HashSet<string> fields = new HashSet<string>();
         private readonly WriterNode node;
 
-        internal RecorderWriter(XElement element, WriterNode node)
+        internal RecorderWriter(WriterNode node)
         {
-            this.element = element;
             this.node = node;
         }
 
@@ -250,7 +248,7 @@ namespace Def
             Serialization.ComposeElement(value, typeof(T), node.CreateChild(label));
         }
 
-        public override XElement Xml { get => element; }
+        public override XElement Xml { get => node.GetXElement(); }
         public override Direction Mode { get => Direction.Write; }
     }
 

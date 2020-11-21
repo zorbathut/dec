@@ -531,8 +531,6 @@ namespace Def
 
         internal static void ComposeElement(object value, Type fieldType, WriterNode node, bool isRootDef = false)
         {
-            var result = node.GetXElement();
-
             // Do all our unreferencables first
             if (fieldType.IsPrimitive)
             {
@@ -644,7 +642,7 @@ namespace Def
             {
                 var recordable = value as IRecordable;
 
-                node.Writer.RegisterPendingWrite(() => recordable.Record(new RecorderWriter(result, node)));
+                node.Writer.RegisterPendingWrite(() => recordable.Record(new RecorderWriter(node)));
 
                 return;
             }
@@ -654,7 +652,7 @@ namespace Def
                 var converter = Serialization.Converters.TryGetValue(fieldType);
                 if (converter != null)
                 {
-                    node.Writer.RegisterPendingWrite(() => converter.Record(value, fieldType, new RecorderWriter(result, node)));
+                    node.Writer.RegisterPendingWrite(() => converter.Record(value, fieldType, new RecorderWriter(node)));
                     return;
                 }
             }
