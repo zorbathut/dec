@@ -245,7 +245,7 @@ namespace Def
         }
     }
 
-    internal class WriterNodeXml : WriterNode
+    internal sealed class WriterNodeXml : WriterNode
     {
         private WriterXml writer;
         private XElement node;
@@ -275,6 +275,27 @@ namespace Def
         public override WriterNode CreateChild(string label)
         {
             return new WriterNodeXml(writer, node, label);
+        }
+
+        public override void WritePrimitive(object value)
+        {
+            if (Compat.FloatRoundtripBroken)
+            {
+                if (value.GetType() == typeof(double))
+                {
+                    node.Add(new XText(((double)value).ToString("G17")));
+
+                    return;
+                }
+                else if (value.GetType() == typeof(float))
+                {
+                    node.Add(new XText(((float)value).ToString("G9")));
+
+                    return;
+                }
+            }
+
+            node.Add(new XText(value.ToString()));
         }
 
         public override XElement GetXElement()

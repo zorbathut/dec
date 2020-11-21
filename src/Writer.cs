@@ -22,6 +22,8 @@ namespace Def
         // this needs to be more abstract
         public abstract WriterNode CreateChild(string label);
 
+        public abstract void WritePrimitive(object value);
+
         // get rid of me
         public abstract XElement GetXElement();
     }

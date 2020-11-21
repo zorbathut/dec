@@ -536,23 +536,7 @@ namespace Def
             // Do all our unreferencables first
             if (fieldType.IsPrimitive)
             {
-                if (Compat.FloatRoundtripBroken)
-                {
-                    if (fieldType == typeof(double))
-                    {
-                        result.Add(new XText(((double)value).ToString("G17")));
-
-                        return;
-                    }
-                    else if (fieldType == typeof(float))
-                    {
-                        result.Add(new XText(((float)value).ToString("G9")));
-
-                        return;
-                    }
-                }
-
-                result.Add(new XText(value.ToString()));
+                node.WritePrimitive(value);
 
                 return;
             }
