@@ -96,7 +96,7 @@ namespace Def
             var refs = new XElement("refs");
             record.Add(refs);
 
-            var writerContext = new WriterContext(true);
+            var writerContext = new Writer(true);
 
             var rootElement = Serialization.ComposeElement(target, target != null ? target.GetType() : typeof(T), "data", writerContext);
             record.Add(rootElement);
@@ -278,7 +278,7 @@ namespace Def
         }
     }
 
-    internal class WriterContext
+    internal class Writer
     {
         public bool RecorderMode { get => refToElement != null; }
 
@@ -296,7 +296,7 @@ namespace Def
         // Current reference ID that we're on.
         private int referenceId = 0;
 
-        public WriterContext(bool recorderMode)
+        public Writer(bool recorderMode)
         {
             if (recorderMode)
             {
@@ -424,12 +424,12 @@ namespace Def
     {
         private readonly XElement element;
         private readonly HashSet<string> fields = new HashSet<string>();
-        private readonly WriterContext context;
+        private readonly Writer writer;
 
-        internal RecorderWriter(XElement element, WriterContext context)
+        internal RecorderWriter(XElement element, Writer writer)
         {
             this.element = element;
-            this.context = context;
+            this.writer = writer;
         }
 
         public override void Record<T>(ref T value, string label)
@@ -442,7 +442,7 @@ namespace Def
 
             fields.Add(label);
 
-            element.Add(Serialization.ComposeElement(value, typeof(T), label, context));
+            element.Add(Serialization.ComposeElement(value, typeof(T), label, writer));
         }
 
         public override XElement Xml { get => element; }

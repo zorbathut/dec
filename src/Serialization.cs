@@ -529,7 +529,7 @@ namespace Def
             }
         }
 
-        internal static XElement ComposeElement(object value, Type fieldType, string label, WriterContext context, bool isRootDef = false)
+        internal static XElement ComposeElement(object value, Type fieldType, string label, Writer writer, bool isRootDef = false)
         {
             var result = new XElement(label);
 
@@ -602,9 +602,9 @@ namespace Def
             }
 
             // Check to see if we should make this into a ref
-            if (context.RecorderMode && !fieldType.IsValueType)
+            if (writer.RecorderMode && !fieldType.IsValueType)
             {
-                if (context.RegisterReference(value, result))
+                if (writer.RegisterReference(value, result))
                 {
                     // The ref system has set up the appropriate tagging, so we're done!
                     return result;
@@ -629,7 +629,7 @@ namespace Def
 
                 for (int i = 0; i < list.Length; ++i)
                 {
-                    result.Add(ComposeElement(list.GetValue(i), referencedType, "li", context));
+                    result.Add(ComposeElement(list.GetValue(i), referencedType, "li", writer));
                 }
 
                 return result;
@@ -643,7 +643,7 @@ namespace Def
 
                 for (int i = 0; i < list.Count; ++i)
                 {
-                    result.Add(ComposeElement(list[i], referencedType, "li", context));
+                    result.Add(ComposeElement(list[i], referencedType, "li", writer));
                 }
 
                 return result;
@@ -666,8 +666,8 @@ namespace Def
                     var element = new XElement("li");
                     result.Add(element);
 
-                    element.Add(ComposeElement(iterator.Key, keyType, "key", context));
-                    element.Add(ComposeElement(iterator.Value, valueType, "value", context));
+                    element.Add(ComposeElement(iterator.Key, keyType, "key", writer));
+                    element.Add(ComposeElement(iterator.Value, valueType, "value", writer));
                 }
 
                 return result;
@@ -677,7 +677,7 @@ namespace Def
             {
                 var recordable = value as IRecordable;
 
-                context.RegisterPendingWrite(() => recordable.Record(new RecorderWriter(result, context)));
+                writer.RegisterPendingWrite(() => recordable.Record(new RecorderWriter(result, writer)));
 
                 return result;
             }
@@ -687,12 +687,12 @@ namespace Def
                 var converter = Serialization.Converters.TryGetValue(fieldType);
                 if (converter != null)
                 {
-                    context.RegisterPendingWrite(() => converter.Record(value, fieldType, new RecorderWriter(result, context)));
+                    writer.RegisterPendingWrite(() => converter.Record(value, fieldType, new RecorderWriter(result, writer)));
                     return result;
                 }
             }
 
-            if (context.RecorderMode)
+            if (writer.RecorderMode)
             {
                 Dbg.Err($"Couldn't find a composition method for type {fieldType}; do you need a Converter?");
                 return result;
@@ -719,7 +719,7 @@ namespace Def
                     continue;
                 }
 
-                result.Add(ComposeElement(field.GetValue(value), field.FieldType, field.Name, context));
+                result.Add(ComposeElement(field.GetValue(value), field.FieldType, field.Name, writer));
             }
 
             return result;
