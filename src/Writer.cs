@@ -13,9 +13,5 @@ namespace Def
         public abstract void DequeuePendingWrites();
 
         public abstract bool RegisterReference(object referenced, XElement element);
-
-        public abstract IEnumerable<KeyValuePair<string, XElement>> StripAndOutputReferences();
-
-        public abstract bool ProcessDepthLimitedReferences(XElement node, int depthRemaining);
     }
 }

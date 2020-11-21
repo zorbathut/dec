@@ -17,7 +17,7 @@ namespace Def
             var record = new XElement("Defs");
             doc.Add(record);
 
-            var writerContext = new WriterXML(false);
+            var writerContext = new WriterXMLCompose();
 
             foreach (var defObj in Database.List)
             {

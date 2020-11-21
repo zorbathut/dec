@@ -96,7 +96,7 @@ namespace Def
             var refs = new XElement("refs");
             record.Add(refs);
 
-            var writerContext = new WriterXML(true);
+            var writerContext = new WriterXMLRecord();
 
             var rootElement = Serialization.ComposeElement(target, target != null ? target.GetType() : typeof(T), "data", writerContext);
             record.Add(rootElement);

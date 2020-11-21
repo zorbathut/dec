@@ -5,34 +5,10 @@ namespace Def
     using System.Linq;
     using System.Xml.Linq;
 
-    internal class WriterXML : Writer
+    internal abstract class WriterXML : Writer
     {
-        public override bool RecorderMode { get => refToElement != null; }
-
         // A list of writes that still have to happen. This is used so we don't have to do deep recursive dives and potentially blow our stack.
         private List<Action> pendingWrites = new List<Action>();
-
-        // Maps between object and the in-place element. This does *not* yet have the ref ID tagged, and will have to be extracted into a new Element later.
-        private Dictionary<object, XElement> refToElement = null;
-        private Dictionary<XElement, object> elementToRef = null;
-
-        // A map from object to the string intended as a reference. This will be filled in only once a second reference to something is created.
-        // This is cleared after we resolve references, then re-used for the depth capping code.
-        private Dictionary<object, string> refToString = null;
-
-        // Current reference ID that we're on.
-        private int referenceId = 0;
-
-        public WriterXML(bool recorderMode)
-        {
-            if (recorderMode)
-            {
-                // Initialize all of our reference structure.
-                refToElement = new Dictionary<object, XElement>();
-                elementToRef = new Dictionary<XElement, object>();
-                refToString = new Dictionary<object, string>();
-            }
-        }
 
         public override void RegisterPendingWrite(Action action)
         {
@@ -58,6 +34,33 @@ namespace Def
             pendingWrites.RemoveAt(pendingWrites.Count - 1);
             return result;
         }
+    }
+
+    internal class WriterXMLCompose : WriterXML
+    {
+        public override bool RecorderMode { get => false; }
+
+        public override bool RegisterReference(object referenced, XElement element)
+        {
+            Dbg.Err("WriterXMLCompose.RegisterReference called incorrectly; this will definitely not work right");
+            return false;
+        }
+    }
+
+    internal class WriterXMLRecord : WriterXML
+    {
+        public override bool RecorderMode { get => true; }
+
+        // Maps between object and the in-place element. This does *not* yet have the ref ID tagged, and will have to be extracted into a new Element later.
+        private Dictionary<object, XElement> refToElement = new Dictionary<object, XElement>();
+        private Dictionary<XElement, object> elementToRef = new Dictionary<XElement, object>();
+
+        // A map from object to the string intended as a reference. This will be filled in only once a second reference to something is created.
+        // This is cleared after we resolve references, then re-used for the depth capping code.
+        private Dictionary<object, string> refToString = new Dictionary<object, string>();
+
+        // Current reference ID that we're on.
+        private int referenceId = 0;
 
         public override bool RegisterReference(object referenced, XElement element)
         {
@@ -86,7 +89,7 @@ namespace Def
             return true;
         }
 
-        public override IEnumerable<KeyValuePair<string, XElement>> StripAndOutputReferences()
+        public IEnumerable<KeyValuePair<string, XElement>> StripAndOutputReferences()
         {
             // It is *vitally* important that we do this step *after* all references are generated, not inline as we add references.
             // This is because we have to move all the contents of the XML element, but if we do it during generation, a recursive-reference situation could result in us trying to move the contents before the XML element is fully generated.
@@ -125,7 +128,7 @@ namespace Def
             refToString.Clear();
         }
 
-        public override bool ProcessDepthLimitedReferences(XElement node, int depthRemaining)
+        public bool ProcessDepthLimitedReferences(XElement node, int depthRemaining)
         {
             if (depthRemaining <= 0 && elementToRef.ContainsKey(node))
             {
