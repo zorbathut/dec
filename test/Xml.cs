@@ -62,7 +62,7 @@ namespace DefTest
         }
 
         [Test]
-	    public void MultiXML([Values] BehaviorMode mode)
+	    public void MultiXml([Values] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } };
 

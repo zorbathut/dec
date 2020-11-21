@@ -5,7 +5,7 @@ namespace Def
     using System.Linq;
     using System.Xml.Linq;
 
-    internal abstract class WriterXML : Writer
+    internal abstract class WriterXml : Writer
     {
         // A list of writes that still have to happen. This is used so we don't have to do deep recursive dives and potentially blow our stack.
         private List<Action> pendingWrites = new List<Action>();
@@ -36,14 +36,14 @@ namespace Def
         }
     }
 
-    internal class WriterXMLCompose : WriterXML
+    internal class WriterXmlCompose : WriterXml
     {
         public override bool RecorderMode { get => false; }
 
         private XDocument doc;
         private XElement defs;
 
-        public WriterXMLCompose()
+        public WriterXmlCompose()
         {
             doc = new XDocument();
 
@@ -53,13 +53,13 @@ namespace Def
 
         public override bool RegisterReference(object referenced, XElement element)
         {
-            Dbg.Err("WriterXMLCompose.RegisterReference called incorrectly; this will definitely not work right");
+            Dbg.Err("WriterXmlCompose.RegisterReference called incorrectly; this will definitely not work right");
             return false;
         }
 
         public WriterNode StartDef(Type type, string defName)
         {
-            return WriterNodeXML.StartDef(this, defs, type.ComposeDefFormatted(), defName);
+            return WriterNodeXml.StartDef(this, defs, type.ComposeDefFormatted(), defName);
         }
 
         public string Finish()
@@ -70,7 +70,7 @@ namespace Def
         }
     }
 
-    internal class WriterXMLRecord : WriterXML
+    internal class WriterXmlRecord : WriterXml
     {
         public override bool RecorderMode { get => true; }
 
@@ -90,7 +90,7 @@ namespace Def
         private XElement refs;
         private XElement rootElement;
 
-        public WriterXMLRecord()
+        public WriterXmlRecord()
         {
             doc = new XDocument();
 
@@ -190,9 +190,9 @@ namespace Def
             }
         }
 
-        public WriterNodeXML StartData()
+        public WriterNodeXml StartData()
         {
-            var node = WriterNodeXML.StartData(this, record, "data");
+            var node = WriterNodeXml.StartData(this, record, "data");
             rootElement = node.GetXElement();
             return node;
         }
@@ -245,14 +245,14 @@ namespace Def
         }
     }
 
-    internal class WriterNodeXML : WriterNode
+    internal class WriterNodeXml : WriterNode
     {
-        private WriterXML writer;
+        private WriterXml writer;
         private XElement node;
 
         public override Writer Writer { get => writer; }
 
-        private WriterNodeXML(WriterXML writer, XElement parent, string label)
+        private WriterNodeXml(WriterXml writer, XElement parent, string label)
         {
             this.writer = writer;
 
@@ -260,21 +260,21 @@ namespace Def
             parent.Add(node);
         }
 
-        public static WriterNodeXML StartDef(WriterXMLCompose writer, XElement defRoot, string type, string defName)
+        public static WriterNodeXml StartDef(WriterXmlCompose writer, XElement defRoot, string type, string defName)
         {
-            var node = new WriterNodeXML(writer, defRoot, type);
+            var node = new WriterNodeXml(writer, defRoot, type);
             node.GetXElement().Add(new XAttribute("defName", defName));
             return node;
         }
 
-        public static WriterNodeXML StartData(WriterXMLRecord writer, XElement defRoot, string name)
+        public static WriterNodeXml StartData(WriterXmlRecord writer, XElement defRoot, string name)
         {
-            return new WriterNodeXML(writer, defRoot, name);
+            return new WriterNodeXml(writer, defRoot, name);
         }
 
         public override WriterNode CreateChild(string label)
         {
-            return new WriterNodeXML(writer, node, label);
+            return new WriterNodeXml(writer, node, label);
         }
 
         public override XElement GetXElement()

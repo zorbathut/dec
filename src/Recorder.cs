@@ -86,7 +86,7 @@ namespace Def
         /// </summary>
         public static string Write<T>(T target, bool pretty = true)
         {
-            var writerContext = new WriterXMLRecord();
+            var writerContext = new WriterXmlRecord();
 
             Serialization.ComposeElement(target, target != null ? target.GetType() : typeof(T), writerContext.StartData());
 

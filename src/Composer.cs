@@ -12,7 +12,7 @@ namespace Def
     {
         public string Compose()
         {
-            var writerContext = new WriterXMLCompose();
+            var writerContext = new WriterXmlCompose();
 
             foreach (var defObj in Database.List)
             {
