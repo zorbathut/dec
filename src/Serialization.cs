@@ -555,25 +555,10 @@ namespace Def
                 return;
             }
 
+            // Handle Def types, if this isn't a root (otherwise we'd just reference ourselves and that's kind of pointless)
             if (!isRootDef && typeof(Def).IsAssignableFrom(fieldType))
             {
-                // It is! Let's just get the def name and be done with it.
-                if (value != null)
-                {
-                    var valueDef = value as Def;
-
-                    if (valueDef != Database.Get(valueDef.GetType(), valueDef.DefName))
-                    {
-                        Dbg.Err("Referenced def {valueDef} no longer exists in the database; serializing an error value instead");
-                        result.Add(new XText($"{valueDef.DefName}_DELETED"));
-                    }
-                    else
-                    {
-                        result.Add(new XText(valueDef.DefName));
-                    }
-                }
-
-                // "No data" is defined as null for defs, so we just do that
+                node.WriteDef(value as Def);
 
                 return;
             }

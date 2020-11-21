@@ -25,6 +25,7 @@ namespace Def
         public abstract void WritePrimitive(object value);
         public abstract void WriteString(string value);
         public abstract void WriteType(Type value);
+        public abstract void WriteDef(Def value);
 
         // get rid of me
         public abstract XElement GetXElement();

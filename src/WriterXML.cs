@@ -308,6 +308,29 @@ namespace Def
             node.Add(new XText(value.ComposeDefFormatted()));
         }
 
+        public override void WriteDef(Def value)
+        {
+            // Get the def name and be done with it.
+            if (value != null)
+            {
+                var valueDef = value as Def;
+
+                if (valueDef != Database.Get(valueDef.GetType(), valueDef.DefName))
+                {
+                    Dbg.Err("Referenced def {valueDef} no longer exists in the database; serializing an error value instead");
+                    node.Add(new XText($"{valueDef.DefName}_DELETED"));
+
+                    // if you actually have a def named SomePreviouslyExistingDef_DELETED then you need to sort out what you're doing with your life
+                }
+                else
+                {
+                    node.Add(new XText(valueDef.DefName));
+                }
+            }
+
+            // "No data" is defined as null for defs, so we just do that
+        }
+
         public override XElement GetXElement()
         {
             return node;
