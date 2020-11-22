@@ -46,7 +46,7 @@ namespace DefTest
         }
 
         [Test]
-        public void ConverterSimple([Values(RecorderMode.Bare, RecorderMode.Pretty)] RecorderMode mode)
+        public void ConverterSimple([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterSimple) } };
 
@@ -86,7 +86,7 @@ namespace DefTest
         }
 
         [Test]
-        public void ConverterRecord([Values(RecorderMode.Bare, RecorderMode.Pretty)] RecorderMode mode)
+        public void ConverterRecord([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterRecord) } };
 
@@ -119,7 +119,7 @@ namespace DefTest
         }
 
         [Test]
-        public void ConverterReplacementDetection([Values(RecorderMode.Bare, RecorderMode.Pretty)] RecorderMode mode)
+        public void ConverterReplacementDetection([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterSimple) } };
 
@@ -140,7 +140,7 @@ namespace DefTest
         }
 
         [Test]
-        public void ConverterReplacementWorking([Values(RecorderMode.Bare, RecorderMode.Pretty)] RecorderMode mode)
+        public void ConverterReplacementWorking([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterRecord) } };
 
@@ -181,7 +181,7 @@ namespace DefTest
         }
 
         [Test]
-        public void ConverterUnsupplied([Values(RecorderMode.Bare, RecorderMode.Pretty)] RecorderMode mode)
+        public void ConverterUnsupplied([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConverterUnsuppliedConverter) } };
 

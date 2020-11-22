@@ -45,7 +45,7 @@ namespace DefTest
         }
 
         [Test]
-	    public void BasicFunctionality([Values(BehaviorMode.Bare, BehaviorMode.Rewritten)] BehaviorMode mode)
+	    public void BasicFunctionality([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterDef) }, explicitConverters = new Type[]{ typeof(ConverterBasicTest) } };
 
@@ -140,7 +140,7 @@ namespace DefTest
         }
 
         [Test]
-	    public void ConverterDict([Values(BehaviorMode.Bare, BehaviorMode.Rewritten)] BehaviorMode mode)
+	    public void ConverterDict([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
 	    {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterDictDef) }, explicitConverters = new Type[]{ typeof(ConverterDictTest) } };
 
@@ -172,7 +172,7 @@ namespace DefTest
         }
 
         [Test]
-        public void EmptyInputConverter([Values(BehaviorMode.Bare, BehaviorMode.Rewritten)] BehaviorMode mode)
+        public void EmptyInputConverter([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterStringDef) }, explicitConverters = new Type[]{ typeof(ConverterDictTest) } };
 
@@ -323,7 +323,7 @@ namespace DefTest
         }
 
         [Test]
-        public void ConverterStruct([Values(RecorderMode.Bare, RecorderMode.Pretty)] BehaviorMode mode)
+        public void ConverterStruct([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ConverterStructDef) }, explicitConverters = new Type[] { typeof(ConverterStructConverter) } };
 
@@ -392,7 +392,7 @@ namespace DefTest
         }
 
         [Test]
-        public void Fallback([Values(BehaviorMode.Bare, BehaviorMode.Rewritten)] BehaviorMode mode)
+        public void Fallback([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(FallbackDef) }, explicitConverters = new Type[] { typeof(FallbackConverter) } };
 

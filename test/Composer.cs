@@ -271,7 +271,7 @@ namespace DefTest
         }
 
         [Test]
-        public void ReferenceDeleted([Values(BehaviorMode.Bare, BehaviorMode.Rewritten)] BehaviorMode mode)
+        public void ReferenceDeleted([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
         {
             var ephemeral = Def.Database.Create<SomeDefs>("Ephemeral");
             var stored = Def.Database.Create<SomeDefs>("Stored");
@@ -290,7 +290,7 @@ namespace DefTest
         }
 
         [Test]
-        public void ReferenceReplaced([Values(BehaviorMode.Bare, BehaviorMode.Rewritten)] BehaviorMode mode)
+        public void ReferenceReplaced([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
         {
             var ephemeral = Def.Database.Create<SomeDefs>("Ephemeral");
             var stored = Def.Database.Create<SomeDefs>("Stored");

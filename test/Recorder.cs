@@ -173,7 +173,7 @@ namespace DefTest
         }
 
         [Test]
-        public void DefsRemoved([Values(RecorderMode.Bare, RecorderMode.Pretty)] RecorderMode mode)
+        public void DefsRemoved([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDef) }, explicitStaticRefs = new Type[] { typeof(StaticReferenceDefs) } };
 
@@ -392,7 +392,7 @@ namespace DefTest
         }
 
         [Test]
-        public void Misparse([Values(RecorderMode.Bare, RecorderMode.Pretty)] RecorderMode mode)
+        public void Misparse([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
 
@@ -541,7 +541,7 @@ namespace DefTest
         }
 
         [Test]
-        public void DepthDoubleLinked([Values(RecorderMode.Bare, RecorderMode.Pretty)] RecorderMode mode)
+        public void DepthDoubleLinked([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
             // This test verifies that we can write an extremely deep structure without blowing the stack.
             // We use double links so we don't have to worry about generating an absurd xml file in the process.
@@ -585,7 +585,7 @@ namespace DefTest
         }
 
         [Test]
-        public void DepthSingleLinked([Values(RecorderMode.Bare, RecorderMode.Pretty)] RecorderMode mode)
+        public void DepthSingleLinked([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
             // This test verifies that we can serialize and/or read an extremely deep structure without blowing the stack.
             // We use single links so we don't generate refs, we actually embed objects.
@@ -861,7 +861,7 @@ namespace DefTest
         }
 
         [Test]
-        public void Attributes([Values(RecorderMode.Bare, RecorderMode.Pretty)] RecorderMode mode)
+        public void Attributes([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
             var holder = new AttributeHolder();
 
@@ -877,7 +877,7 @@ namespace DefTest
         }
 
         [Test]
-        public void AttributeRef([Values(RecorderMode.Bare, RecorderMode.Pretty)] RecorderMode mode)
+        public void AttributeRef([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
             var holder = new AttributeHolder();
 
@@ -905,7 +905,7 @@ namespace DefTest
         }
 
         [Test]
-        public void MultiRecord([Values(RecorderMode.Bare, RecorderMode.Pretty)] RecorderMode mode)
+        public void MultiRecord([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
             var mr = new MultiRecordRec();
             mr.x = 3;
