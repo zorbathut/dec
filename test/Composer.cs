@@ -331,5 +331,37 @@ namespace DefTest
             Assert.IsTrue(data.Contains("serializedValue"));
             Assert.IsFalse(data.Contains("nonSerializedValue"));
         }
+
+        public class EnumContainer : Def.Def
+        {
+            public enum Enum
+            {
+                Alpha,
+                Beta,
+                Gamma,
+            }
+
+            public Enum alph;
+            public Enum bet;
+            public Enum gam;
+        }
+
+        [Test]
+        public void Enum([Values] bool pretty)
+        {
+            var enums = Def.Database.Create<EnumContainer>("TestDef");
+            enums.alph = EnumContainer.Enum.Alpha;
+            enums.bet = EnumContainer.Enum.Beta;
+            enums.gam = EnumContainer.Enum.Gamma;
+
+            var writer = new Def.Composer();
+            string data = writer.Compose();
+
+            Assert.IsTrue(data.Contains("Alpha"));
+            Assert.IsTrue(data.Contains("Beta"));
+            Assert.IsTrue(data.Contains("Gamma"));
+
+            Assert.IsFalse(data.Contains("__value"));
+        }
     }
 }

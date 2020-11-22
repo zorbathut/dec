@@ -538,7 +538,14 @@ namespace Def
 
                 return;
             }
-            
+
+            if (typeof(System.Enum).IsAssignableFrom(fieldType))
+            {
+                node.WriteEnum(value);
+
+                return;
+            }
+
             if (value is string)
             {
                 node.WriteString(value as string);

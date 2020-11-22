@@ -300,6 +300,11 @@ namespace Def
             node.Add(new XText(value.ToString()));
         }
 
+        public override void WriteEnum(object value)
+        {
+            node.Add(new XText(value.ToString()));
+        }
+
         public override void WriteString(string value)
         {
             node.Add(new XText(value));

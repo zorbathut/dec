@@ -54,6 +54,54 @@ namespace DefTest
             Assert.AreEqual(primitives.typeValue, typeof(Def.Def));
         }
 
+        public class EnumRecordable : Def.IRecordable
+        {
+            public enum Enum
+            {
+                Alpha,
+                Beta,
+                Gamma,
+            }
+
+            public Enum alph;
+            public Enum bet;
+            public Enum gam;
+
+            public void Record(Def.Recorder record)
+            {
+                record.Record(ref alph, "alph");
+                record.Record(ref bet, "bet");
+                record.Record(ref gam, "gam");
+            }
+        }
+
+        [Test]
+        public void Enum([Values] bool pretty)
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+
+            var parser = new Def.Parser();
+            parser.Finish();
+
+            var enums = new EnumRecordable();
+            enums.alph = EnumRecordable.Enum.Alpha;
+            enums.bet = EnumRecordable.Enum.Beta;
+            enums.gam = EnumRecordable.Enum.Gamma;
+
+            string serialized = Def.Recorder.Write(enums, pretty: pretty);
+            var deserialized = Def.Recorder.Read<EnumRecordable>(serialized);
+
+            Assert.AreEqual(enums.alph, deserialized.alph);
+            Assert.AreEqual(enums.bet, deserialized.bet);
+            Assert.AreEqual(enums.gam, deserialized.gam);
+
+            Assert.IsTrue(serialized.Contains("Alpha"));
+            Assert.IsTrue(serialized.Contains("Beta"));
+            Assert.IsTrue(serialized.Contains("Gamma"));
+
+            Assert.IsFalse(serialized.Contains("__value"));
+        }
+
         [Test]
         public void Parserless([Values] bool pretty)
         {
