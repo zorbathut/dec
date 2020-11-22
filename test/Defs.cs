@@ -444,7 +444,7 @@ namespace DefTest
             Assert.IsTrue(Def.Database<PostLoadDef>.Get("TestDef").initted);
         }
 
-        private class DefMemberDef : Def.Def
+        public class DefMemberDef : Def.Def
         {
             public Def.Def invalidReference;
         }
@@ -469,7 +469,7 @@ namespace DefTest
             Assert.IsNull(Def.Database<DefMemberDef>.Get("TestDef").invalidReference);
         }
 
-        private class SelfReferentialDef : Def.Def
+        public class SelfReferentialDef : Def.Def
         {
             public SelfReferentialDef recursive;
         }
@@ -494,7 +494,7 @@ namespace DefTest
             Assert.AreSame(Def.Database<SelfReferentialDef>.Get("TestDef"), Def.Database<SelfReferentialDef>.Get("TestDef").recursive);
         }
 
-        private class LooseMatchDef : Def.Def
+        public class LooseMatchDef : Def.Def
         {
             public string cat;
             public string snake_case;
