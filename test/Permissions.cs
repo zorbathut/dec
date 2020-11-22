@@ -7,6 +7,60 @@ namespace DefTest
     [TestFixture]
     public class Permissions : Base
     {
+        private class PrivateDef : Def.Def
+        {
+            public int value;
+        }
+
+        [Test]
+        public void Private([Values] BehaviorMode mode)
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(PrivateDef) } };
+
+            var parser = new Def.Parser();
+            parser.AddString(@"
+                <Defs>
+                    <PrivateDef defName=""TestDef"">
+                        <value>20</value>
+                    </PrivateDef>
+                </Defs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            var result = Def.Database<PrivateDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(result.value, 20);
+        }
+
+        internal class InternalDef : Def.Def
+        {
+            public int value;
+        }
+
+        [Test]
+        public void Internal([Values] BehaviorMode mode)
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(InternalDef) } };
+
+            var parser = new Def.Parser();
+            parser.AddString(@"
+                <Defs>
+                    <InternalDef defName=""TestDef"">
+                        <value>20</value>
+                    </InternalDef>
+                </Defs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            var result = Def.Database<InternalDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(result.value, 20);
+        }
+
         public class PrivateMemberDef : Def.Def
         {
             #pragma warning disable CS0649
