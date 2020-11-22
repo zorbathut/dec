@@ -629,7 +629,7 @@ namespace DefTest
             }
         }
 
-        private class BaseRecordable : Def.IRecordable
+        public class BaseRecordable : Def.IRecordable
         {
             public int baseVal = 0;
 
@@ -639,7 +639,7 @@ namespace DefTest
             }
         }
 
-        private class DerivedRecordable : BaseRecordable
+        public class DerivedRecordable : BaseRecordable
         {
             public int derivedVal = 0;
 
@@ -651,7 +651,7 @@ namespace DefTest
             }
         }
 
-        private class RecordableContainer : Def.IRecordable
+        public class RecordableContainer : Def.IRecordable
         {
             public BaseRecordable baseContainer;
 
