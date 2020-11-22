@@ -347,7 +347,7 @@ namespace DefTest
         }
 
         [Test]
-        public void Enum([Values] bool pretty)
+        public void Enum()
         {
             var enums = Def.Database.Create<EnumContainer>("TestDef");
             enums.alph = EnumContainer.Enum.Alpha;

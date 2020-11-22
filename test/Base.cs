@@ -262,5 +262,56 @@ namespace DefTest
         {
             return AppDomain.CurrentDomain.GetAssemblies().Single(asm => asm.ManifestModule.Name == "def.dll");
         }
+
+        // Everything after here is designed for the Recorder tests, where we run tests in a variety of ways to test serialization.
+
+        public enum RecorderMode
+        {
+            // Write and read in compact form.
+            Bare,
+
+            // Write and read in pretty form.
+            Pretty,
+        }
+
+        public T DoRecorderRoundTrip<T>(T input, RecorderMode mode, Action<string> testSerializedResult = null, bool expectWriteErrors = false, bool expectReadErrors = false)
+        {
+            string serialized = null;
+            void DoSerialize()
+            {
+                serialized = Def.Recorder.Write(input, pretty: mode == RecorderMode.Pretty);
+            }
+            if (expectWriteErrors)
+            {
+                ExpectErrors(DoSerialize);
+            }
+            else
+            {
+                DoSerialize();
+            }
+            Assert.IsNotNull(serialized);
+
+            if (testSerializedResult != null)
+            {
+                testSerializedResult(serialized);
+            }
+
+            T deserialized = default;
+            void DoDeserialize()
+            {
+                deserialized = Def.Recorder.Read<T>(serialized);
+            }
+            if (expectReadErrors)
+            {
+                ExpectErrors(DoDeserialize);
+            }
+            else
+            {
+                DoDeserialize();
+            }
+            Assert.IsNotNull(serialized);
+
+            return deserialized;
+        }
     }
 }

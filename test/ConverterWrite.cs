@@ -46,7 +46,7 @@ namespace DefTest
         }
 
         [Test]
-        public void ConverterSimple([Values] bool pretty)
+        public void ConverterSimple([Values] RecorderMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterSimple) } };
 
@@ -59,8 +59,7 @@ namespace DefTest
             converted.convertible.b = 1234;
             converted.convertible.c = -40;
 
-            string serialized = Def.Recorder.Write(converted, pretty: pretty);
-            var deserialized = Def.Recorder.Read<ConverterRecordable>(serialized);
+            var deserialized = DoRecorderRoundTrip(converted, mode);
 
             Assert.AreEqual(converted.convertible.a, deserialized.convertible.a);
             Assert.AreEqual(converted.convertible.b, deserialized.convertible.b);
@@ -87,7 +86,7 @@ namespace DefTest
         }
 
         [Test]
-        public void ConverterRecord([Values] bool pretty)
+        public void ConverterRecord([Values] RecorderMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterRecord) } };
 
@@ -100,8 +99,7 @@ namespace DefTest
             converted.convertible.b = 1234;
             converted.convertible.c = -40;
 
-            string serialized = Def.Recorder.Write(converted, pretty: pretty);
-            var deserialized = Def.Recorder.Read<ConverterRecordable>(serialized);
+            var deserialized = DoRecorderRoundTrip(converted, mode);
 
             Assert.AreEqual(converted.convertible.a, deserialized.convertible.a);
             Assert.AreEqual(converted.convertible.b, deserialized.convertible.b);
@@ -121,7 +119,7 @@ namespace DefTest
         }
 
         [Test]
-        public void ConverterReplacementDetection([Values] bool pretty)
+        public void ConverterReplacementDetection([Values] RecorderMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterSimple) } };
 
@@ -132,9 +130,7 @@ namespace DefTest
             converted.convertibleA = new Converted();
             converted.convertibleB = converted.convertibleA;
 
-            string serialized = Def.Recorder.Write(converted, pretty: pretty);
-            ConverterReplacementRecordable deserialized = null;
-            ExpectErrors(() => deserialized = Def.Recorder.Read<ConverterReplacementRecordable>(serialized));
+            var deserialized = DoRecorderRoundTrip(converted, mode, expectReadErrors: true);
 
             Assert.IsNotNull(deserialized);
 
@@ -144,7 +140,7 @@ namespace DefTest
         }
 
         [Test]
-        public void ConverterReplacementWorking([Values] bool pretty)
+        public void ConverterReplacementWorking([Values] RecorderMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterRecord) } };
 
@@ -155,8 +151,7 @@ namespace DefTest
             converted.convertibleA = new Converted();
             converted.convertibleB = converted.convertibleA;
 
-            string serialized = Def.Recorder.Write(converted, pretty: pretty);
-            ConverterReplacementRecordable deserialized = Def.Recorder.Read<ConverterReplacementRecordable>(serialized);
+            var deserialized = DoRecorderRoundTrip(converted, mode);
 
             Assert.IsNotNull(deserialized);
 
@@ -186,7 +181,7 @@ namespace DefTest
         }
 
         [Test]
-        public void ConverterUnsupplied([Values] bool pretty)
+        public void ConverterUnsupplied([Values] RecorderMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConverterUnsuppliedConverter) } };
 
@@ -197,9 +192,7 @@ namespace DefTest
 
             root.x = 42;
 
-            string serialized = null;
-            ExpectErrors(() => serialized = Def.Recorder.Write(root, pretty: pretty));
-            var deserialized = Def.Recorder.Read<ConverterUnsuppliedClass>(serialized);
+            var deserialized = DoRecorderRoundTrip(root, mode, expectWriteErrors: true);
 
             Assert.IsNotNull(deserialized); // even if we don't know how to store it and deserialize it, we should at least be able to create it
         }

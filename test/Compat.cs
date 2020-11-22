@@ -24,7 +24,7 @@ namespace DefTest
         }
 
         [Test]
-        public void DotNet21FloatIssue([Values] bool pretty)
+        public void DotNet21FloatIssue([Values] RecorderMode mode)
         {
             // Intended to verify that this test doesn't stop working somehow, so we actually test both codepaths . . .
             bool floatSuccess = -8.22272715124268E-63 == double.Parse("-8.22272715124268E-63");
@@ -50,8 +50,7 @@ namespace DefTest
             mr.b = -2.30119041724042E-247;
             mr.c = -30984198100f;
 
-            string serialized = Def.Recorder.Write(mr, pretty: pretty);
-            var deserialized = Def.Recorder.Read<DoubleRec>(serialized);
+            var deserialized = DoRecorderRoundTrip(mr, mode);
 
             Assert.AreEqual(mr.a, deserialized.a);
             Assert.AreEqual(mr.b, deserialized.b);
