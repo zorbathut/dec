@@ -1,8 +1,7 @@
 namespace Def
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
+    using System.Collections;
     using System.Xml.Linq;
 
     internal abstract class Writer
@@ -26,6 +25,9 @@ namespace Def
         public abstract void WriteDef(Def value);
         public abstract void WriteExplicitNull();
         public abstract bool WriteReference(object value);
+        public abstract void WriteArray(Array value);
+        public abstract void WriteList(IList value);
+        public abstract void WriteDictionary(IDictionary value);
         public abstract void WriteRecord(IRecordable value);
         public abstract void WriteConvertable(Converter converter, object value, Type fieldType);
 

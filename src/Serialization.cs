@@ -596,51 +596,21 @@ namespace Def
 
             if (fieldType.IsArray)
             {
-                var list = value as Array;
-
-                Type referencedType = fieldType.GetElementType();
-
-                for (int i = 0; i < list.Length; ++i)
-                {
-                    ComposeElement(node.CreateChild("li"), list.GetValue(i), referencedType);
-                }
+                node.WriteArray(value as Array);
 
                 return;
             }
 
             if (fieldType.IsGenericType && fieldType.GetGenericTypeDefinition() == typeof(List<>))
             {
-                var list = value as IList;
-                
-                Type referencedType = fieldType.GetGenericArguments()[0];
-
-                for (int i = 0; i < list.Count; ++i)
-                {
-                    ComposeElement(node.CreateChild("li"), list[i], referencedType);
-                }
+                node.WriteList(value as IList);
 
                 return;
             }
 
             if (fieldType.IsGenericType && fieldType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
             {
-                var dict = value as IDictionary;
-
-                Type keyType = fieldType.GetGenericArguments()[0];
-                Type valueType = fieldType.GetGenericArguments()[1];
-
-                // I really want some way to canonicalize this ordering
-                IDictionaryEnumerator iterator = dict.GetEnumerator();
-                while (iterator.MoveNext())
-                {
-                    // In theory, some dicts support inline format, not li format. Inline format is cleaner and smaller and we should be using it when possible.
-                    // In practice, it's hard and I'm lazy and this always works, and we're not providing any guarantees about cleanliness of serialized output.
-                    // Revisit this later when someone (possibly myself) really wants it improved.
-                    var li = node.CreateChild("li");
-
-                    ComposeElement(li.CreateChild("key"), iterator.Key, keyType);
-                    ComposeElement(li.CreateChild("value"), iterator.Value, valueType);
-                }
+                node.WriteDictionary(value as IDictionary);
 
                 return;
             }

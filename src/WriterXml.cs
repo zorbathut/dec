@@ -1,6 +1,7 @@
 namespace Def
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using System.Xml.Linq;
@@ -356,6 +357,45 @@ namespace Def
         public override bool WriteReference(object value)
         {
             return writer.RegisterReference(value, node);
+        }
+
+        public override void WriteArray(Array value)
+        {
+            Type referencedType = value.GetType().GetElementType();
+
+            for (int i = 0; i < value.Length; ++i)
+            {
+                Serialization.ComposeElement(CreateChild("li"), value.GetValue(i), referencedType);
+            }
+        }
+
+        public override void WriteList(IList value)
+        {
+            Type referencedType = value.GetType().GetGenericArguments()[0];
+
+            for (int i = 0; i < value.Count; ++i)
+            {
+                Serialization.ComposeElement(CreateChild("li"), value[i], referencedType);
+            }
+        }
+
+        public override void WriteDictionary(IDictionary value)
+        {
+            Type keyType = value.GetType().GetGenericArguments()[0];
+            Type valueType = value.GetType().GetGenericArguments()[1];
+
+            // I really want some way to canonicalize this ordering
+            IDictionaryEnumerator iterator = value.GetEnumerator();
+            while (iterator.MoveNext())
+            {
+                // In theory, some dicts support inline format, not li format. Inline format is cleaner and smaller and we should be using it when possible.
+                // In practice, it's hard and I'm lazy and this always works, and we're not providing any guarantees about cleanliness of serialized output.
+                // Revisit this later when someone (possibly myself) really wants it improved.
+                var li = CreateChild("li");
+
+                Serialization.ComposeElement(li.CreateChild("key"), iterator.Key, keyType);
+                Serialization.ComposeElement(li.CreateChild("value"), iterator.Value, valueType);
+            }
         }
 
         public override void WriteRecord(IRecordable value)
