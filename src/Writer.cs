@@ -11,7 +11,7 @@ namespace Def
 
     internal abstract class WriterNode
     {
-        public abstract Writer Writer { get; }
+        public abstract bool AllowReflection { get; }
 
         // this needs to be more abstract
         public abstract WriterNode CreateChild(string label);

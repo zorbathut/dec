@@ -632,7 +632,7 @@ namespace Def
                 }
             }
 
-            if (!node.Writer.AllowReflection)
+            if (!node.AllowReflection)
             {
                 Dbg.Err($"Couldn't find a composition method for type {fieldType}; do you need a Converter?");
                 return;

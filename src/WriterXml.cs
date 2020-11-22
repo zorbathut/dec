@@ -253,7 +253,7 @@ namespace Def
         private WriterXml writer;
         private XElement node;
 
-        public override Writer Writer { get => writer; }
+        public override bool AllowReflection { get => writer.AllowReflection; }
 
         private WriterNodeXml(WriterXml writer, XElement parent, string label)
         {
