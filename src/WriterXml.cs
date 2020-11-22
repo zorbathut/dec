@@ -9,33 +9,20 @@ namespace Def
     internal abstract class WriterXml : Writer
     {
         // A list of writes that still have to happen. This is used so we don't have to do deep recursive dives and potentially blow our stack.
-        private List<Action> pendingWrites = new List<Action>();
+        // I think this is only used for WriterXmlRecord, but right now this all goes through WriterNodeXml which is meant to work with both of these.
+        // The inheritance tree is kind of messed up right now and should be fixed.
+        private WriterUtil.PendingWriteCoordinator pendingWriteCoordinator = new WriterUtil.PendingWriteCoordinator();
 
         public abstract bool RegisterReference(object referenced, XElement element);
 
         public void RegisterPendingWrite(Action action)
         {
-            pendingWrites.Add(action);
+            pendingWriteCoordinator.RegisterPendingWrite(action);
         }
 
         public void DequeuePendingWrites()
         {
-            while (DequeuePendingWrite() is var pending && pending != null)
-            {
-                pending();
-            }
-        }
-
-        private Action DequeuePendingWrite()
-        {
-            if (pendingWrites.Count == 0)
-            {
-                return null;
-            }
-
-            var result = pendingWrites[pendingWrites.Count - 1];
-            pendingWrites.RemoveAt(pendingWrites.Count - 1);
-            return result;
+            pendingWriteCoordinator.DequeuePendingWrites();
         }
     }
 
