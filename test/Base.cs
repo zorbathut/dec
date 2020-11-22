@@ -190,7 +190,6 @@ namespace DefTest
             }
             else if (mode == BehaviorMode.Validation)
             {
-                var composer = new Def.Composer();
                 string data = null;
                 void RunComposer()
                 {
