@@ -234,7 +234,7 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode, expectParseErrors: true);
+            DoBehavior(mode, rewrite_expectParseErrors: true);
 
             var result = Def.Database<BareDefDef>.Get("TestDef");
             Assert.IsNotNull(result);

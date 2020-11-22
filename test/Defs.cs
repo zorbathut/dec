@@ -217,7 +217,7 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode, expectWriteErrors: true, expectParseErrors: true);
+            DoBehavior(mode, rewrite_expectWriteErrors: true, rewrite_expectParseErrors: true);
 
             var result = (DupeChildDef)Def.Database<DupeParentDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -347,7 +347,7 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode, expectParseErrors: true);
+            DoBehavior(mode, rewrite_expectParseErrors: true);
 
             Assert.IsTrue(Def.Database<ErrorDef>.Get("TestDefA").touchedBefore);
             Assert.IsTrue(Def.Database<ErrorDef>.Get("TestDefA").touchedAfter);
@@ -368,7 +368,7 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode, expectParseErrors: true);
+            DoBehavior(mode, rewrite_expectParseErrors: true);
 
             Assert.IsTrue(Def.Database<PostLoadErrorDef>.Get("TestDefA").touchedBefore);
             Assert.IsTrue(Def.Database<PostLoadErrorDef>.Get("TestDefA").touchedAfter);
@@ -389,7 +389,7 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode, expectParseErrors: true);
+            DoBehavior(mode, rewrite_expectParseErrors: true);
 
             Assert.IsTrue(Def.Database<ErrorExceptionDef>.Get("TestDefA").touched);
             Assert.IsTrue(Def.Database<ErrorExceptionDef>.Get("TestDefB").touched);
@@ -408,7 +408,7 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode, expectParseErrors: true);
+            DoBehavior(mode, rewrite_expectParseErrors: true);
 
             Assert.IsTrue(Def.Database<PostLoadErrorExceptionDef>.Get("TestDefA").touched);
             Assert.IsTrue(Def.Database<PostLoadErrorExceptionDef>.Get("TestDefB").touched);
@@ -463,7 +463,7 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode, expectParseErrors: true);
+            DoBehavior(mode, rewrite_expectParseErrors: true);
 
             Assert.IsNotNull(Def.Database<DefMemberDef>.Get("TestDef"));
             Assert.IsNull(Def.Database<DefMemberDef>.Get("TestDef").invalidReference);
@@ -648,7 +648,7 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode, expectWriteErrors: true, expectParseErrors: true);
+            DoBehavior(mode, rewrite_expectWriteErrors: true, rewrite_expectParseErrors: true);
 
             // This behavior is absolutely not guaranteed, for the record.
             Assert.AreEqual(1, Def.Database<ConflictInheritanceDef>.Get("TestDef").value.conflict);

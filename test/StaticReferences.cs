@@ -120,7 +120,7 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode, expectParseErrors: true);
+            DoBehavior(mode, rewrite_expectParseErrors: true);
 
             var result = Def.Database<StubDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -148,7 +148,7 @@ namespace DefTest
                 </Defs>");
             parser.Finish();
 
-            DoBehavior(mode, expectParseErrors: true);
+            DoBehavior(mode, rewrite_expectParseErrors: true);
 
             var result = Def.Database<StubDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -174,7 +174,7 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode, expectParseErrors: true);
+            DoBehavior(mode, rewrite_expectParseErrors: true);
 
             var result = Def.Database<StubDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -203,7 +203,7 @@ namespace DefTest
                 </Defs>");
             parser.Finish();
 
-            DoBehavior(mode, expectParseErrors: true);
+            DoBehavior(mode, rewrite_expectParseErrors: true);
 
             var result = Def.Database<StubDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -230,7 +230,7 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode, expectParseErrors: true);
+            DoBehavior(mode, rewrite_expectParseErrors: true);
         }
 
         [Def.StaticReferences]

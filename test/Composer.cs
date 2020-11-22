@@ -280,7 +280,7 @@ namespace DefTest
 
             Def.Database.Delete(ephemeral);
 
-            DoBehavior(mode, expectWriteErrors: true, expectParseErrors: true);
+            DoBehavior(mode, rewrite_expectWriteErrors: true, rewrite_expectParseErrors: true);
 
             if (mode != BehaviorMode.Bare)
             {
@@ -301,7 +301,7 @@ namespace DefTest
 
             Def.Database.Create<SomeDefs>("Ephemeral");
 
-            DoBehavior(mode, expectWriteErrors: true, expectParseErrors: true);
+            DoBehavior(mode, rewrite_expectWriteErrors: true, rewrite_expectParseErrors: true);
 
             if (mode != BehaviorMode.Bare)
             {

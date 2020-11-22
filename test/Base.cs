@@ -135,7 +135,7 @@ namespace DefTest
             Rewritten,
         }
 
-        public void DoBehavior(BehaviorMode mode, bool expectWriteErrors = false, bool expectParseErrors = false)
+        public void DoBehavior(BehaviorMode mode, bool rewrite_expectWriteErrors = false, bool rewrite_expectParseErrors = false)
         {
             if (mode == BehaviorMode.Bare)
             {
@@ -150,7 +150,7 @@ namespace DefTest
                     data = composer.Compose();
                 }
 
-                if (expectWriteErrors)
+                if (rewrite_expectWriteErrors)
                 {
                     ExpectErrors(() => RunComposer());
                 }
@@ -171,7 +171,7 @@ namespace DefTest
                     parser.Finish();
                 }
 
-                if (expectParseErrors)
+                if (rewrite_expectParseErrors)
                 {
                     ExpectErrors(() => RunParser());
                 }
