@@ -326,7 +326,7 @@ namespace DefTest
             ephemeral.nonSerializedValue = 45;
 
             var writer = new Def.Composer();
-            string data = writer.Compose();
+            string data = writer.ComposeXml();
 
             Assert.IsTrue(data.Contains("serializedValue"));
             Assert.IsFalse(data.Contains("nonSerializedValue"));
@@ -355,7 +355,7 @@ namespace DefTest
             enums.gam = EnumContainer.Enum.Gamma;
 
             var writer = new Def.Composer();
-            string data = writer.Compose();
+            string data = writer.ComposeXml();
 
             Assert.IsTrue(data.Contains("Alpha"));
             Assert.IsTrue(data.Contains("Beta"));

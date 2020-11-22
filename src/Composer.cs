@@ -10,7 +10,7 @@ namespace Def
     /// </remarks>
     public class Composer
     {
-        public string Compose()
+        public string ComposeXml()
         {
             var writerContext = new WriterXmlCompose();
 

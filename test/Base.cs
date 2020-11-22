@@ -147,7 +147,7 @@ namespace DefTest
                 void RunComposer()
                 {
                     var composer = new Def.Composer();
-                    data = composer.Compose();
+                    data = composer.ComposeXml();
                 }
 
                 if (rewrite_expectWriteErrors)
