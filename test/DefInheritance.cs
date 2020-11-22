@@ -5,7 +5,7 @@ namespace DefTest
     using System.Collections.Generic;
 
     [TestFixture]
-    public class Inheritance : Base
+    public class DefInheritance : Base
     {
         public class SimpleDef : Def.Def
         {
