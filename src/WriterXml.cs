@@ -326,18 +326,16 @@ namespace Def
             // Get the def name and be done with it.
             if (value != null)
             {
-                var valueDef = value as Def;
-
-                if (valueDef != Database.Get(valueDef.GetType(), valueDef.DefName))
+                if (value != Database.Get(value.GetType(), value.DefName))
                 {
-                    Dbg.Err("Referenced def {valueDef} no longer exists in the database; serializing an error value instead");
-                    node.Add(new XText($"{valueDef.DefName}_DELETED"));
+                    Dbg.Err($"Referenced def {value} no longer exists in the database; serializing an error value instead");
+                    node.Add(new XText($"{value.DefName}_DELETED"));
 
                     // if you actually have a def named SomePreviouslyExistingDef_DELETED then you need to sort out what you're doing with your life
                 }
                 else
                 {
-                    node.Add(new XText(valueDef.DefName));
+                    node.Add(new XText(value.DefName));
                 }
             }
 
