@@ -72,7 +72,7 @@ namespace Def
         /// Converts an object to a string.
         /// </summary>
         /// <remarks>
-        /// `input` will be one of the types provided in HandledTypes(); it will not be null. Whatever you return should be convertable back to an object by an overridden FromString().
+        /// `input` will be one of the types provided in HandledTypes(); it will not be null. Whatever you return should be convertible back to an object by an overridden FromString().
         ///
         /// In case of error, call Def.Dbg.Err with some appropriately useful message and return null.
         /// </remarks>
@@ -86,7 +86,7 @@ namespace Def
         /// Converts an object to XML.
         /// </summary>
         /// <remarks>
-        /// `input` will be one of the types provided in HandledTypes(); it will not be null. Whatever you return should be convertable back to an object by an overridden FromXml().
+        /// `input` will be one of the types provided in HandledTypes(); it will not be null. Whatever you return should be convertible back to an object by an overridden FromXml().
         ///
         /// If you need to create any attributes, you should prefix them with a unique identifier so they don't conflict with standard def attributes.
         ///

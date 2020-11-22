@@ -10,11 +10,11 @@ namespace DefTest
     {
         public class ConverterRecordable : Def.IRecordable
         {
-            public Converted convertable;
+            public Converted convertible;
 
             public void Record(Def.Recorder record)
             {
-                record.Record(ref convertable, "convertable");
+                record.Record(ref convertible, "convertible");
             }
         }
 
@@ -54,17 +54,17 @@ namespace DefTest
             parser.Finish();
 
             var converted = new ConverterRecordable();
-            converted.convertable = new Converted();
-            converted.convertable.a = 42;
-            converted.convertable.b = 1234;
-            converted.convertable.c = -40;
+            converted.convertible = new Converted();
+            converted.convertible.a = 42;
+            converted.convertible.b = 1234;
+            converted.convertible.c = -40;
 
             string serialized = Def.Recorder.Write(converted, pretty: pretty);
             var deserialized = Def.Recorder.Read<ConverterRecordable>(serialized);
 
-            Assert.AreEqual(converted.convertable.a, deserialized.convertable.a);
-            Assert.AreEqual(converted.convertable.b, deserialized.convertable.b);
-            Assert.AreEqual(converted.convertable.c, deserialized.convertable.c);
+            Assert.AreEqual(converted.convertible.a, deserialized.convertible.a);
+            Assert.AreEqual(converted.convertible.b, deserialized.convertible.b);
+            Assert.AreEqual(converted.convertible.c, deserialized.convertible.c);
         }
 
         public class ConvertedConverterRecord : Def.Converter
@@ -95,28 +95,28 @@ namespace DefTest
             parser.Finish();
 
             var converted = new ConverterRecordable();
-            converted.convertable = new Converted();
-            converted.convertable.a = 42;
-            converted.convertable.b = 1234;
-            converted.convertable.c = -40;
+            converted.convertible = new Converted();
+            converted.convertible.a = 42;
+            converted.convertible.b = 1234;
+            converted.convertible.c = -40;
 
             string serialized = Def.Recorder.Write(converted, pretty: pretty);
             var deserialized = Def.Recorder.Read<ConverterRecordable>(serialized);
 
-            Assert.AreEqual(converted.convertable.a, deserialized.convertable.a);
-            Assert.AreEqual(converted.convertable.b, deserialized.convertable.b);
-            Assert.AreEqual(converted.convertable.c, deserialized.convertable.c);
+            Assert.AreEqual(converted.convertible.a, deserialized.convertible.a);
+            Assert.AreEqual(converted.convertible.b, deserialized.convertible.b);
+            Assert.AreEqual(converted.convertible.c, deserialized.convertible.c);
         }
 
         public class ConverterReplacementRecordable : Def.IRecordable
         {
-            public Converted convertableA;
-            public Converted convertableB;
+            public Converted convertibleA;
+            public Converted convertibleB;
 
             public void Record(Def.Recorder record)
             {
-                record.Record(ref convertableA, "convertableA");
-                record.Record(ref convertableB, "convertableB");
+                record.Record(ref convertibleA, "convertibleA");
+                record.Record(ref convertibleB, "convertibleB");
             }
         }
 
@@ -129,8 +129,8 @@ namespace DefTest
             parser.Finish();
 
             var converted = new ConverterReplacementRecordable();
-            converted.convertableA = new Converted();
-            converted.convertableB = converted.convertableA;
+            converted.convertibleA = new Converted();
+            converted.convertibleB = converted.convertibleA;
 
             string serialized = Def.Recorder.Write(converted, pretty: pretty);
             ConverterReplacementRecordable deserialized = null;
@@ -139,8 +139,8 @@ namespace DefTest
             Assert.IsNotNull(deserialized);
 
             // no guarantees on what exactly they contain, though!
-            Assert.IsNotNull(deserialized.convertableA);
-            Assert.IsNotNull(deserialized.convertableB);
+            Assert.IsNotNull(deserialized.convertibleA);
+            Assert.IsNotNull(deserialized.convertibleB);
         }
 
         [Test]
@@ -152,8 +152,8 @@ namespace DefTest
             parser.Finish();
 
             var converted = new ConverterReplacementRecordable();
-            converted.convertableA = new Converted();
-            converted.convertableB = converted.convertableA;
+            converted.convertibleA = new Converted();
+            converted.convertibleB = converted.convertibleA;
 
             string serialized = Def.Recorder.Write(converted, pretty: pretty);
             ConverterReplacementRecordable deserialized = Def.Recorder.Read<ConverterReplacementRecordable>(serialized);
@@ -161,8 +161,8 @@ namespace DefTest
             Assert.IsNotNull(deserialized);
 
             // no guarantees on what exactly they contain, though!
-            Assert.IsNotNull(deserialized.convertableA);
-            Assert.IsNotNull(deserialized.convertableB);
+            Assert.IsNotNull(deserialized.convertibleA);
+            Assert.IsNotNull(deserialized.convertibleB);
         }
 
         public class ConverterUnsuppliedClass

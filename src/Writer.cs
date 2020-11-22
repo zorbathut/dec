@@ -29,7 +29,7 @@ namespace Def
         public abstract void WriteList(IList value);
         public abstract void WriteDictionary(IDictionary value);
         public abstract void WriteRecord(IRecordable value);
-        public abstract void WriteConvertable(Converter converter, object value, Type fieldType);
+        public abstract void WriteConvertible(Converter converter, object value, Type fieldType);
 
         public abstract void TagClass(Type type);
 

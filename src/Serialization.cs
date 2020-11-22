@@ -627,7 +627,7 @@ namespace Def
                 var converter = Serialization.Converters.TryGetValue(fieldType);
                 if (converter != null)
                 {
-                    node.WriteConvertable(converter, value, fieldType);
+                    node.WriteConvertible(converter, value, fieldType);
                     return;
                 }
             }

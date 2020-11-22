@@ -403,7 +403,7 @@ namespace Def
             writer.RegisterPendingWrite(() => value.Record(new RecorderWriter(this)));
         }
 
-        public override void WriteConvertable(Converter converter, object value, Type fieldType)
+        public override void WriteConvertible(Converter converter, object value, Type fieldType)
         {
             writer.RegisterPendingWrite(() => converter.Record(value, fieldType, new RecorderWriter(this)));
         }
