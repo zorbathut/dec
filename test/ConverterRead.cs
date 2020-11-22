@@ -323,7 +323,7 @@ namespace DefTest
         }
 
         [Test]
-        public void ConverterStruct([Values] BehaviorMode mode)
+        public void ConverterStruct([Values(RecorderMode.Bare, RecorderMode.Pretty)] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ConverterStructDef) }, explicitConverters = new Type[] { typeof(ConverterStructConverter) } };
 

@@ -2,6 +2,7 @@ namespace Def
 {
     using System;
     using System.Collections;
+    using System.Collections.Generic;
     using System.Text;
     using System.Xml.Linq;
 
@@ -9,13 +10,23 @@ namespace Def
     {
         private StringBuilder sb = new StringBuilder();
 
+        internal Dictionary<object, string> referenceLookup = new Dictionary<object, string>();
+        private WriterUtil.PendingWriteCoordinator pendingWriteCoordinator = new WriterUtil.PendingWriteCoordinator();
+
         public void AppendLine(string line)
         {
             sb.AppendLine(line);
         }
 
+        public void RegisterPendingWrite(Action action)
+        {
+            pendingWriteCoordinator.RegisterPendingWrite(action);
+        }
+
         public string Finish()
         {
+            pendingWriteCoordinator.DequeuePendingWrites();
+
             return sb.ToString();
         }
     }
@@ -27,6 +38,16 @@ namespace Def
         public WriterNode StartDef(Type type, string defName)
         {
             return new WriterNodeValidation(this, $"Def.Database<{type.ComposeCSFormatted()}>.Get(\"{defName}\")");
+        }
+    }
+
+    internal class WriterValidationRecord : WriterValidation
+    {
+        public override bool AllowReflection { get => false; }
+
+        public WriterNode StartData()
+        {
+            return new WriterNodeValidation(this, $"input");
         }
     }
 
@@ -142,14 +163,21 @@ namespace Def
 
         public override bool WriteReference(object value)
         {
-            // will have to add to this eventually
-            return false;
+            if (writer.referenceLookup.ContainsKey(value))
+            {
+                writer.AppendLine($"Assert.AreSame({writer.referenceLookup[value]}, {accessor});");
+                return true;
+            }
+            else
+            {
+                writer.referenceLookup[value] = accessor;
+                return false;
+            }
         }
 
         public override void WriteRecord(IRecordable value)
         {
-            // todo?
-            value.Record(new RecorderWriter(this));
+            writer.RegisterPendingWrite(() => value.Record(new RecorderWriter(this)));
         }
 
         public override void WriteArray(Array value)
@@ -189,8 +217,9 @@ namespace Def
 
         public override void WriteConvertible(Converter converter, object value, Type fieldType)
         {
-            // todo?
-            converter.Record(value, fieldType, new RecorderWriter(this));
+            // this isn't really a thing I can implement because the entire point of this is to compare the output to known values
+            // and if we're going through Converter, we don't know what the underlying known values will be
+            throw new NotImplementedException();
         }
     }
 

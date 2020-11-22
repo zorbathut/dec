@@ -274,10 +274,22 @@ namespace DefTest
 
             // Write and read in pretty form.
             Pretty,
+
+            // Generate validation code beforehand, then run that code.
+            Validation,
         }
 
         public T DoRecorderRoundTrip<T>(T input, RecorderMode mode, Action<string> testSerializedResult = null, bool expectWriteErrors = false, bool expectReadErrors = false)
         {
+            if (mode == RecorderMode.Validation)
+            {
+                var code = Def.Recorder.WriteValidation(input);
+
+                var ComposeCSFormatted = Assembly.GetAssembly(typeof(Def.Def)).GetType("Def.UtilType").GetMethod("ComposeCSFormatted", BindingFlags.NonPublic | BindingFlags.Static);
+
+                RunCode($"public static void Test({ComposeCSFormatted.Invoke(null, new object[] { input.GetType() })} input) {{\n{code}\n}}", "Test", new object[] { input });
+            }
+
             string serialized = null;
             void DoSerialize()
             {

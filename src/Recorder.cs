@@ -94,6 +94,18 @@ namespace Def
         }
 
         /// <summary>
+        /// Returns C# validation code starting at an option.
+        /// </summary>
+        public static string WriteValidation<T>(T target)
+        {
+            var writerContext = new WriterValidationRecord();
+
+            Serialization.ComposeElement(writerContext.StartData(), target, target != null ? target.GetType() : typeof(T));
+
+            return writerContext.Finish();
+        }
+
+        /// <summary>
         /// Parses the output of Write, generating an object and all its related serialized data.
         /// </summary>
         public static T Read<T>(string input, string stringName = "input")
