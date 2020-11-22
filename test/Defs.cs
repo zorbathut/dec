@@ -616,5 +616,43 @@ namespace DefTest
             Assert.AreEqual(42, Def.Database<InternalInheritanceDef>.Get("TestDef").value.baseOnly);
             Assert.AreEqual(100, ( (InternalDerived)Def.Database<InternalInheritanceDef>.Get("TestDef").value ).derivedOnly);
         }
+
+        public class ConflictBase
+        {
+            public int conflict = 1;
+        }
+
+        public class ConflictDerived : ConflictBase
+        {
+            public new int conflict = 2;
+        }
+
+        public class ConflictInheritanceDef : Def.Def
+        {
+            public ConflictBase value;
+        }
+
+        [Test]
+        public void ConflictInheritance([Values] BehaviorMode mode)
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ConflictInheritanceDef), typeof(ConflictDerived) } };
+
+            var parser = new Def.Parser();
+            parser.AddString(@"
+                <Defs>
+                    <ConflictInheritanceDef defName=""TestDef"">
+                        <value class=""ConflictDerived"">
+                            <conflict>42</conflict>
+                        </value>
+                     </ConflictInheritanceDef>
+                </Defs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoBehavior(mode, expectWriteErrors: true, expectParseErrors: true);
+
+            // This behavior is absolutely not guaranteed, for the record.
+            Assert.AreEqual(1, Def.Database<ConflictInheritanceDef>.Get("TestDef").value.conflict);
+            Assert.AreEqual(42, ( (ConflictDerived)Def.Database<ConflictInheritanceDef>.Get("TestDef").value ).conflict);
+        }
     }
 }
