@@ -271,7 +271,7 @@ namespace DefTest
         }
 
         [Test]
-        public void ReferenceDeleted([Values] BehaviorMode mode)
+        public void ReferenceDeleted([Values(BehaviorMode.Bare, BehaviorMode.Rewritten)] BehaviorMode mode)
         {
             var ephemeral = Def.Database.Create<SomeDefs>("Ephemeral");
             var stored = Def.Database.Create<SomeDefs>("Stored");
@@ -280,7 +280,7 @@ namespace DefTest
 
             Def.Database.Delete(ephemeral);
 
-            DoBehavior(mode, rewrite_expectWriteErrors: true, rewrite_expectParseErrors: true);
+            DoBehavior(mode, rewrite_expectWriteErrors: true, rewrite_expectParseErrors: true, validation_expectWriteErrors: true);
 
             if (mode != BehaviorMode.Bare)
             {
@@ -290,7 +290,7 @@ namespace DefTest
         }
 
         [Test]
-        public void ReferenceReplaced([Values] BehaviorMode mode)
+        public void ReferenceReplaced([Values(BehaviorMode.Bare, BehaviorMode.Rewritten)] BehaviorMode mode)
         {
             var ephemeral = Def.Database.Create<SomeDefs>("Ephemeral");
             var stored = Def.Database.Create<SomeDefs>("Stored");
@@ -301,7 +301,7 @@ namespace DefTest
 
             Def.Database.Create<SomeDefs>("Ephemeral");
 
-            DoBehavior(mode, rewrite_expectWriteErrors: true, rewrite_expectParseErrors: true);
+            DoBehavior(mode, rewrite_expectWriteErrors: true, rewrite_expectParseErrors: true, validation_expectWriteErrors: true);
 
             if (mode != BehaviorMode.Bare)
             {

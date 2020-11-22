@@ -217,7 +217,7 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode, rewrite_expectWriteErrors: true, rewrite_expectParseErrors: true);
+            DoBehavior(mode, rewrite_expectWriteErrors: true, rewrite_expectParseErrors: true, validation_expectWriteErrors: true);
 
             var result = (DupeChildDef)Def.Database<DupeParentDef>.Get("TestDef");
             Assert.IsNotNull(result);
@@ -648,7 +648,7 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode, rewrite_expectWriteErrors: true, rewrite_expectParseErrors: true);
+            DoBehavior(mode, rewrite_expectWriteErrors: true, rewrite_expectParseErrors: true, validation_expectWriteErrors: true);
 
             // This behavior is absolutely not guaranteed, for the record.
             Assert.AreEqual(1, Def.Database<ConflictInheritanceDef>.Get("TestDef").value.conflict);

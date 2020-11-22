@@ -1,0 +1,265 @@
+namespace Def
+{
+    using System;
+    using System.Collections;
+    using System.Text;
+    using System.Xml.Linq;
+
+    internal abstract class WriterValidation : Writer
+    {
+        private StringBuilder sb = new StringBuilder();
+
+        public void AppendLine(string line)
+        {
+            sb.AppendLine(line);
+        }
+
+        public string Finish()
+        {
+            return sb.ToString();
+        }
+    }
+
+    internal class WriterValidationCompose : WriterValidation
+    {
+        public override bool AllowReflection { get => true; }
+
+        public WriterNode StartDef(Type type, string defName)
+        {
+            return new WriterNodeValidation(this, $"Def.Database<{type.ComposeCSFormatted()}>.Get(\"{defName}\")");
+        }
+    }
+
+    // This is used for things that can be expressed as an easy inline string, which is used as part of the Dictionary-handling code.
+    internal abstract class WriterNodeCS : WriterNode
+    {
+        public abstract void WriteToken(string token);
+
+        public override void WritePrimitive(object value)
+        {
+            if (value.GetType() == typeof(bool))
+            {
+                WriteToken(value.ToString().ToLower());
+            }
+            else if (value.GetType() == typeof(float))
+            {
+                WriteToken(( (float)value ).ToString("G17") + 'f');
+            }
+            else if (value.GetType() == typeof(float))
+            {
+                WriteToken(( (double)value ).ToString("G17") + 'd');
+            }
+            else
+            {
+                WriteToken(value.ToString());
+            }
+        }
+
+        public override void WriteEnum(object value)
+        {
+            WriteToken($"{value.GetType().ComposeCSFormatted()}.{value}");
+        }
+
+        public override void WriteString(string value)
+        {
+            WriteToken($"\"{value}\"");
+        }
+
+        public override void WriteType(Type value)
+        {
+            WriteToken($"typeof({value.ComposeCSFormatted()})");
+        }
+
+        public override void WriteDef(Def value)
+        {
+            if (value != null)
+            {
+                WriteToken($"Def.Database<{value.GetType().ComposeCSFormatted()}>.Get(\"{value.DefName}\")");
+            }
+            else
+            {
+                WriteExplicitNull();
+            }
+        }
+
+        public override XElement GetXElement()
+        {
+            // we don't have one
+            return null;
+        }
+    }
+
+    internal sealed class WriterNodeValidation : WriterNodeCS
+    {
+        private WriterValidation writer;
+        private string accessor;
+
+        public override bool AllowReflection { get => writer.AllowReflection; }
+
+        public WriterNodeValidation(WriterValidation writer, string accessor)
+        {
+            this.writer = writer;
+            this.accessor = accessor;
+        }
+
+        public override WriterNode CreateChild(string label)
+        {
+            return new WriterNodeValidation(writer, $"{accessor}.{label}");
+        }
+
+        public override WriterNode CreateMember(System.Reflection.FieldInfo field)
+        {
+            if (field.IsPublic)
+            {
+                return new WriterNodeValidation(writer, $"{accessor}.{field.Name}");
+            }
+            else
+            {
+                return new WriterNodeValidation(writer, $"(({field.FieldType.ComposeCSFormatted()})typeof({field.DeclaringType.ComposeCSFormatted()}).GetField(\"{field.Name}\", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue({accessor}))");
+            }
+        }
+
+        private void WriteIsEqual(string value)
+        {
+            writer.AppendLine($"Assert.AreEqual({value}, {accessor});");
+        }
+
+        public override void WriteToken(string token)
+        {
+            WriteIsEqual(token);
+        }
+
+        public override void TagClass(Type type)
+        {
+            writer.AppendLine($"Assert.AreEqual(typeof({type.ComposeCSFormatted()}), {accessor}.GetType());");
+            accessor = $"(({type.ComposeCSFormatted()}){accessor})";
+        }
+
+        public override void WriteExplicitNull()
+        {
+            writer.AppendLine($"Assert.IsNull({accessor});");
+        }
+
+        public override bool WriteReference(object value)
+        {
+            // will have to add to this eventually
+            return false;
+        }
+
+        public override void WriteRecord(IRecordable value)
+        {
+            // todo?
+            value.Record(new RecorderWriter(this));
+        }
+
+        public override void WriteArray(Array value)
+        {
+            Type referencedType = value.GetType().GetElementType();
+
+            for (int i = 0; i < value.Length; ++i)
+            {
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}[{i}]"), value.GetValue(i), referencedType);
+            }
+        }
+
+        public override void WriteList(IList value)
+        {
+            Type referencedType = value.GetType().GetGenericArguments()[0];
+
+            for (int i = 0; i < value.Count; ++i)
+            {
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}[{i}]"), value[i], referencedType);
+            }
+        }
+
+        public override void WriteDictionary(IDictionary value)
+        {
+            Type keyType = value.GetType().GetGenericArguments()[0];
+            Type valueType = value.GetType().GetGenericArguments()[1];
+
+            IDictionaryEnumerator iterator = value.GetEnumerator();
+            while (iterator.MoveNext())
+            {
+                var keyNode = new WriterNodeStringize();
+                Serialization.ComposeElement(keyNode, iterator.Key, keyType);
+
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}[{keyNode.SerializedString}]"), iterator.Value, valueType);
+            }
+        }
+
+        public override void WriteConvertible(Converter converter, object value, Type fieldType)
+        {
+            // todo?
+            converter.Record(value, fieldType, new RecorderWriter(this));
+        }
+    }
+
+    // This is used solely for dict keys, because we want to get a reasonably-stringized version of this without having to jump through hideous hoops.
+    internal sealed class WriterNodeStringize : WriterNodeCS
+    {
+        public override bool AllowReflection { get => false; }
+
+        public string SerializedString { get; private set; }
+
+        public override void WriteToken(string token)
+        {
+            if (SerializedString != null)
+            {
+                Dbg.Err("String is already set!");
+            }
+
+            SerializedString = token;
+        }
+
+        public override WriterNode CreateChild(string label)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override WriterNode CreateMember(System.Reflection.FieldInfo field)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void TagClass(Type type)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void WriteExplicitNull()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool WriteReference(object value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void WriteRecord(IRecordable value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void WriteArray(Array value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void WriteList(IList value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void WriteDictionary(IDictionary value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void WriteConvertible(Converter converter, object value, Type fieldType)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}
+

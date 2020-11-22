@@ -21,5 +21,17 @@ namespace Def
 
             return writerContext.Finish();
         }
+
+        public string ComposeValidation()
+        {
+            var writerContext = new WriterValidationCompose();
+
+            foreach (var defObj in Database.List)
+            {
+                Serialization.ComposeElement(writerContext.StartDef(defObj.GetType(), defObj.DefName), defObj, defObj.GetType(), isRootDef: true);
+            }
+
+            return writerContext.Finish();
+        }
     }
 }

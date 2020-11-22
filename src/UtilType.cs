@@ -302,10 +302,10 @@ namespace Def
             return result;
         }
 
-        private static Dictionary<Type, string> ComposeCache = new Dictionary<Type, string>();
+        private static Dictionary<Type, string> ComposeDefCache = new Dictionary<Type, string>();
         internal static string ComposeDefFormatted(this Type type)
         {
-            if (ComposeCache.TryGetValue(type, out string cacheVal))
+            if (ComposeDefCache.TryGetValue(type, out string cacheVal))
             {
                 return cacheVal;
             }
@@ -318,7 +318,7 @@ namespace Def
                     if (type == explicitType)
                     {
                         string result = explicitType.Name;
-                        ComposeCache[type] = result;
+                        ComposeDefCache[type] = result;
                         return result;
                     }
                 }
@@ -360,21 +360,37 @@ namespace Def
                     result = baseTypeString;
                 }
 
-                ComposeCache[type] = result;
+                ComposeDefCache[type] = result;
                 return result;
             }
         }
 
+        private static Dictionary<Type, string> ComposeCSCache = new Dictionary<Type, string>();
+        internal static string ComposeCSFormatted(this Type type)
+        {
+            if (ComposeCSCache.TryGetValue(type, out string cacheVal))
+            {
+                return cacheVal;
+            }
+
+            // We'll have a lot more work to do here . . .
+            string result = type.ToString().Replace('+', '.');
+            ComposeCSCache[type] = result;
+
+            return result;
+        }
+
         internal static void ClearCache()
         {
-            ComposeCache.Clear();
+            ComposeDefCache.Clear();
+            ComposeCSCache.Clear();
             ParseCache.Clear();
             StrippedTypeCache = null;
 
             // Seed with our primitive types
             for (int i = 0; i < PrimitiveTypes.Length; ++i)
             {
-                ComposeCache[PrimitiveTypes[i].type] = PrimitiveTypes[i].str;
+                ComposeDefCache[PrimitiveTypes[i].type] = PrimitiveTypes[i].str;
                 ParseCache[PrimitiveTypes[i].str] = PrimitiveTypes[i].type;
             }
         }

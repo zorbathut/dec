@@ -13,7 +13,7 @@ namespace DefTest
         }
 
         [Test]
-        public void Private([Values] BehaviorMode mode)
+        public void Private([Values(BehaviorMode.Bare, BehaviorMode.Rewritten)] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(PrivateDef) } };
 
@@ -40,7 +40,7 @@ namespace DefTest
         }
 
         [Test]
-        public void Internal([Values] BehaviorMode mode)
+        public void Internal([Values(BehaviorMode.Bare, BehaviorMode.Rewritten)] BehaviorMode mode)
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(InternalDef) } };
 
