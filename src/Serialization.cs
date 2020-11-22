@@ -379,7 +379,7 @@ namespace Def
                     string match = null;
                     string canonicalFieldName = Util.LooseMatchCanonicalize(fieldName);
 
-                    foreach (var testField in type.GetFieldsFromHierarchy())
+                    foreach (var testField in type.GetSerializableFieldsFromHierarchy())
                     {
                         if (Util.LooseMatchCanonicalize(testField.Name) == canonicalFieldName)
                         {
@@ -670,25 +670,8 @@ namespace Def
 
             // We absolutely should not be doing reflection when in recorder mode; that way lies madness.
             
-            foreach (var field in value.GetType().GetFieldsFromHierarchy())
+            foreach (var field in value.GetType().GetSerializableFieldsFromHierarchy())
             {
-                if (field.IsBackingField())
-                {
-                    continue;
-                }
-
-                if (field.GetCustomAttribute<IndexAttribute>() != null)
-                {
-                    // we don't save indices
-                    continue;
-                }
-
-                if (field.GetCustomAttribute<NonSerializedAttribute>() != null)
-                {
-                    // we also don't save nonserialized
-                    continue;
-                }
-
                 ComposeElement(node.CreateChild(field.Name), field.GetValue(value), field.FieldType);
             }
 

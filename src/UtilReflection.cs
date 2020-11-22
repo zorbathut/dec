@@ -34,7 +34,7 @@ namespace Def
             return result;
         }
 
-        internal static IEnumerable<FieldInfo> GetFieldsFromHierarchy(this Type type)
+        internal static IEnumerable<FieldInfo> GetSerializableFieldsFromHierarchy(this Type type)
         {
             // this probably needs to be cached
 
@@ -45,11 +45,31 @@ namespace Def
             {
                 foreach (var field in curType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly))
                 {
-                    if (!seenFields.Contains(field.Name))
+                    if (field.IsBackingField())
                     {
-                        yield return field;
-                        seenFields.Add(field.Name);
+                        continue;
                     }
+
+                    if (field.GetCustomAttribute<IndexAttribute>() != null)
+                    {
+                        // we don't save indices
+                        continue;
+                    }
+
+                    if (field.GetCustomAttribute<NonSerializedAttribute>() != null)
+                    {
+                        // we also don't save nonserialized
+                        continue;
+                    }
+
+                    if (seenFields.Contains(field.Name))
+                    {
+                        Dbg.Err($"Found duplicates of field {field}; base fields will be ignored");
+                        continue;
+                    }
+
+                    yield return field;
+                    seenFields.Add(field.Name);
                 }
                 
                 curType = curType.BaseType;

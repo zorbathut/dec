@@ -197,9 +197,10 @@ namespace DefTest
         public void UtilReflectionDuplicateField()
         {
             var def_utilreflection = GetDefAssembly().GetType("Def.UtilReflection");
-            var getFieldsFromHierarchy = def_utilreflection.GetMethod("GetFieldsFromHierarchy", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
-            var result = getFieldsFromHierarchy.Invoke(null, new[] { typeof(DupeChildDef) }) as IEnumerable<System.Reflection.FieldInfo>;
-            Assert.AreEqual(1, result.Count(field => field.Name == "value"));
+            var getFieldsFromHierarchy = def_utilreflection.GetMethod("GetSerializableFieldsFromHierarchy", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+            System.Reflection.FieldInfo[] fields = null;
+            ExpectErrors(() => fields = (getFieldsFromHierarchy.Invoke(null, new[] { typeof(DupeChildDef) }) as IEnumerable<System.Reflection.FieldInfo>).ToArray());
+            Assert.AreEqual(1, fields.Count(field => field.Name == "value"));
         }
 
         [Test]
@@ -216,7 +217,7 @@ namespace DefTest
                 </Defs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode, expectParseErrors: true);
+            DoBehavior(mode, expectWriteErrors: true, expectParseErrors: true);
 
             var result = (DupeChildDef)Def.Database<DupeParentDef>.Get("TestDef");
             Assert.IsNotNull(result);
