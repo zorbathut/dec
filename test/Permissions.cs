@@ -7,7 +7,7 @@ namespace DefTest
     [TestFixture]
     public class Permissions : Base
     {
-        public class PrivateDef : Def.Def
+        public class PrivateMemberDef : Def.Def
         {
             #pragma warning disable CS0649
             private int value;
@@ -20,28 +20,28 @@ namespace DefTest
         }
 
         [Test]
-	    public void Private([Values] BehaviorMode mode)
+	    public void PrivateMember([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(PrivateDef) } };
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(PrivateMemberDef) } };
 
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
-                    <PrivateDef defName=""TestDef"">
+                    <PrivateMemberDef defName=""TestDef"">
                         <value>20</value>
-                    </PrivateDef>
+                    </PrivateMemberDef>
                 </Defs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var result = Def.Database<PrivateDef>.Get("TestDef");
+            var result = Def.Database<PrivateMemberDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(result.Value(), 20);
 	    }
 
-        public class InternalDef : Def.Def
+        public class InternalMemberDef : Def.Def
         {
             #pragma warning disable CS0649
             internal int value;
@@ -54,28 +54,28 @@ namespace DefTest
         }
 
         [Test]
-	    public void Internal([Values] BehaviorMode mode)
+	    public void InternalMember([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(InternalDef) } };
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(InternalMemberDef) } };
 
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
-                    <InternalDef defName=""TestDef"">
+                    <InternalMemberDef defName=""TestDef"">
                         <value>20</value>
-                    </InternalDef>
+                    </InternalMemberDef>
                 </Defs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var result = Def.Database<InternalDef>.Get("TestDef");
+            var result = Def.Database<InternalMemberDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(result.Value(), 20);
 	    }
 
-        public class ProtectedDef : Def.Def
+        public class ProtectedMemberDef : Def.Def
         {
             protected int value;
 
@@ -86,28 +86,28 @@ namespace DefTest
         }
 
         [Test]
-	    public void Protected([Values] BehaviorMode mode)
+	    public void ProtectedMember([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ProtectedDef) } };
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ProtectedMemberDef) } };
 
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
-                    <ProtectedDef defName=""TestDef"">
+                    <ProtectedMemberDef defName=""TestDef"">
                         <value>20</value>
-                    </ProtectedDef>
+                    </ProtectedMemberDef>
                 </Defs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var result = Def.Database<ProtectedDef>.Get("TestDef");
+            var result = Def.Database<ProtectedMemberDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(result.Value(), 20);
 	    }
 
-        public class PrivateParentDef : Def.Def
+        public class PrivateMemberParentDef : Def.Def
         {
             #pragma warning disable CS0649
             private int value;
@@ -119,28 +119,28 @@ namespace DefTest
             }
         }
 
-        public class PrivateChildDef : PrivateParentDef
+        public class PrivateMemberChildDef : PrivateMemberParentDef
         {
 
         }
 
         [Test]
-	    public void PrivateParent([Values] BehaviorMode mode)
+	    public void PrivateMemberParent([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(PrivateChildDef) } };
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(PrivateMemberChildDef) } };
 
             var parser = new Def.Parser();
             parser.AddString(@"
                 <Defs>
-                    <PrivateChildDef defName=""TestDef"">
+                    <PrivateMemberChildDef defName=""TestDef"">
                         <value>20</value>
-                    </PrivateChildDef>
+                    </PrivateMemberChildDef>
                 </Defs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var result = Def.Database<PrivateParentDef>.Get("TestDef");
+            var result = Def.Database<PrivateMemberParentDef>.Get("TestDef");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(result.Value(), 20);
