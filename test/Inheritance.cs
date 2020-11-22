@@ -305,5 +305,46 @@ namespace DefTest
                 Assert.AreEqual(300, Def.Database<SimpleDef>.Get("Leaf").doubleOverridden);
             }
         }
+
+        public class InternalBase
+        {
+            public int baseOnly;
+        }
+
+        public class InternalDerived : InternalBase
+        {
+            public int derivedOnly;
+        }
+
+        public class InternalInheritanceDef : Def.Def
+        {
+            public InternalBase value;
+        }
+
+        [Test]
+        public void InternalInheritance([Values] BehaviorMode mode)
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(InternalInheritanceDef), typeof(InternalDerived) } };
+
+            var parser = new Def.Parser();
+            parser.AddString(@"
+                <Defs>
+                    <InternalInheritanceDef defName=""TestDef"">
+                        <value class=""InternalDerived"">
+                            <baseOnly>42</baseOnly>
+                            <derivedOnly>100</derivedOnly>
+                        </value>
+                     </InternalInheritanceDef>
+                </Defs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            Assert.AreEqual(typeof(InternalDerived), Def.Database<InternalInheritanceDef>.Get("TestDef").value.GetType());
+
+            Assert.AreEqual(42, Def.Database<InternalInheritanceDef>.Get("TestDef").value.baseOnly);
+            Assert.AreEqual(100, ((InternalDerived)Def.Database<InternalInheritanceDef>.Get("TestDef").value).derivedOnly);
+        }
+
     }
 }
