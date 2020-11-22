@@ -672,7 +672,7 @@ namespace Def
             
             foreach (var field in value.GetType().GetSerializableFieldsFromHierarchy())
             {
-                ComposeElement(node.CreateChild(field.Name), field.GetValue(value), field.FieldType);
+                ComposeElement(node.CreateMember(field), field.GetValue(value), field.FieldType);
             }
 
             return;

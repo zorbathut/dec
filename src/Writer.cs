@@ -17,6 +17,8 @@ namespace Def
         // this needs to be more abstract
         public abstract WriterNode CreateChild(string label);
 
+        public abstract WriterNode CreateMember(System.Reflection.FieldInfo field);
+
         public abstract void WritePrimitive(object value);
         public abstract void WriteEnum(object value);
         public abstract void WriteString(string value);

@@ -279,6 +279,11 @@ namespace Def
             return new WriterNodeXml(writer, node, label);
         }
 
+        public override WriterNode CreateMember(System.Reflection.FieldInfo field)
+        {
+            return new WriterNodeXml(writer, node, field.Name);
+        }
+
         public override void WritePrimitive(object value)
         {
             if (Compat.FloatRoundtripBroken)
