@@ -189,7 +189,10 @@ namespace DefTest
             Bare,
 
             // Write it to .xml, clear the database, and reload it.
-            Rewritten,
+            RewrittenPretty,
+
+            // Same as above, but without nice tab indents.
+            RewrittenBare,
 
             // Run it through the Validation writer, compile that code at runtime, make sure it matches.
             Validation,
@@ -201,13 +204,13 @@ namespace DefTest
             {
                 // we actually have nothing to do here, we're good
             }
-            else if (mode == BehaviorMode.Rewritten)
+            else if (mode == BehaviorMode.RewrittenBare || mode == BehaviorMode.RewrittenPretty)
             {
                 string data = null;
                 void RunComposer()
                 {
                     var composer = new Def.Composer();
-                    data = composer.ComposeXml();
+                    data = composer.ComposeXml(mode == BehaviorMode.RewrittenPretty);
                 }
 
                 if (rewrite_expectWriteErrors)

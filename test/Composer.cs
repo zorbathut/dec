@@ -319,14 +319,14 @@ namespace DefTest
         }
 
         [Test]
-        public void NonSerialized()
+        public void NonSerialized([Values(BehaviorMode.RewrittenBare, BehaviorMode.RewrittenPretty)] BehaviorMode mode)
         {
             var ephemeral = Def.Database.Create<NonSerializedDef>("TestDef");
             ephemeral.serializedValue = 35;
             ephemeral.nonSerializedValue = 45;
 
             var writer = new Def.Composer();
-            string data = writer.ComposeXml();
+            string data = writer.ComposeXml(mode == BehaviorMode.RewrittenPretty);
 
             Assert.IsTrue(data.Contains("serializedValue"));
             Assert.IsFalse(data.Contains("nonSerializedValue"));
@@ -347,7 +347,7 @@ namespace DefTest
         }
 
         [Test]
-        public void Enum()
+        public void Enum([Values(BehaviorMode.RewrittenBare, BehaviorMode.RewrittenPretty)] BehaviorMode mode)
         {
             var enums = Def.Database.Create<EnumContainer>("TestDef");
             enums.alph = EnumContainer.Enum.Alpha;
@@ -355,13 +355,23 @@ namespace DefTest
             enums.gam = EnumContainer.Enum.Gamma;
 
             var writer = new Def.Composer();
-            string data = writer.ComposeXml();
+            string data = writer.ComposeXml(mode == BehaviorMode.RewrittenPretty);
 
             Assert.IsTrue(data.Contains("Alpha"));
             Assert.IsTrue(data.Contains("Beta"));
             Assert.IsTrue(data.Contains("Gamma"));
 
             Assert.IsFalse(data.Contains("__value"));
+        }
+
+        [Test]
+        public void Pretty([Values(BehaviorMode.RewrittenBare, BehaviorMode.RewrittenPretty)] BehaviorMode mode)
+        {
+            Def.Database.Create<StubDef>("Hello");
+
+            var output = new Def.Composer().ComposeXml(mode == BehaviorMode.RewrittenPretty);
+
+            Assert.AreEqual(mode == BehaviorMode.RewrittenPretty, output.Contains("\n"));
         }
     }
 }

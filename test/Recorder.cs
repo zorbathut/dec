@@ -1039,5 +1039,15 @@ namespace DefTest
             Assert.AreEqual("Hello", deserialized.dict[deserialized.referenceA]);
             Assert.AreEqual("Goodbye", deserialized.dict[deserialized.referenceB]);
         }
+
+        [Test]
+        public void Pretty([Values(RecorderMode.Bare, RecorderMode.Pretty)] RecorderMode mode)
+        {
+            var item = new StubRecordable();
+
+            var output = Def.Recorder.Write(item, pretty: mode == RecorderMode.Pretty);
+
+            Assert.AreEqual(mode == RecorderMode.Pretty, output.Contains("\n"));
+        }
     }
 }

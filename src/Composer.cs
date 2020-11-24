@@ -10,7 +10,7 @@ namespace Def
     /// </remarks>
     public class Composer
     {
-        public string ComposeXml()
+        public string ComposeXml(bool pretty)
         {
             var writerContext = new WriterXmlCompose();
 
@@ -19,7 +19,7 @@ namespace Def
                 Serialization.ComposeElement(writerContext.StartDef(defObj.GetType(), defObj.DefName), defObj, defObj.GetType(), isRootDef: true);
             }
 
-            return writerContext.Finish();
+            return writerContext.Finish(pretty);
         }
 
         public string ComposeValidation()

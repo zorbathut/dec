@@ -139,7 +139,7 @@ namespace DefTest
             parseCache.Add("Meta", typeof(Meta));
             Assert.AreEqual(baseSize + 1, parseCache.Count);
 
-            DoBehavior(BehaviorMode.Rewritten);
+            DoBehavior(BehaviorMode.RewrittenBare);
 
             // Hopefully we reset after doing the DoBehavior()!
             Assert.AreEqual(baseSize, parseCache.Count);

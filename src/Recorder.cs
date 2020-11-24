@@ -90,7 +90,7 @@ namespace Def
 
             Serialization.ComposeElement(writerContext.StartData(), target, target != null ? target.GetType() : typeof(T));
 
-            return writerContext.Finish();
+            return writerContext.Finish(pretty);
         }
 
         /// <summary>

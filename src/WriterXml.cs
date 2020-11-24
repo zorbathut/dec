@@ -52,11 +52,11 @@ namespace Def
             return WriterNodeXml.StartDef(this, defs, type.ComposeDefFormatted(), defName);
         }
 
-        public string Finish()
+        public string Finish(bool pretty)
         {
             DequeuePendingWrites();
 
-            return doc.ToString();
+            return doc.ToString(pretty ? SaveOptions.None : SaveOptions.DisableFormatting);
         }
     }
 
@@ -187,7 +187,7 @@ namespace Def
             return node;
         }
 
-        public string Finish()
+        public string Finish(bool pretty)
         {
             // Handle all our pending writes
             DequeuePendingWrites();
@@ -231,7 +231,7 @@ namespace Def
                 refs.Remove();
             }
 
-            return doc.ToString();
+            return doc.ToString(pretty ? SaveOptions.None : SaveOptions.DisableFormatting);
         }
     }
 
