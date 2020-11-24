@@ -1009,5 +1009,35 @@ namespace DefTest
 
             Assert.IsNull(deserialized.recordable);
         }
+
+        public class DictionaryKeyRefDef : Def.IRecordable
+        {
+            public StubRecordable referenceA;
+            public Dictionary<StubRecordable, string> dict = new Dictionary<StubRecordable, string>();
+            public StubRecordable referenceB;
+
+            public void Record(Def.Recorder record)
+            {
+                record.Record(ref referenceA, "referenceA");
+                record.Record(ref dict, "dict");
+                record.Record(ref referenceB, "referenceB");
+            }
+        }
+
+        [Test]
+        public void DictionaryKeyRef([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
+        {
+            var dict = new DictionaryKeyRefDef();
+            dict.referenceA = new StubRecordable();
+            dict.referenceB = new StubRecordable();
+            dict.dict[dict.referenceA] = "Hello";
+            dict.dict[dict.referenceB] = "Goodbye";
+
+            var deserialized = DoRecorderRoundTrip(dict, mode);
+
+            Assert.AreNotSame(deserialized.referenceA, deserialized.referenceB);
+            Assert.AreEqual("Hello", deserialized.dict[deserialized.referenceA]);
+            Assert.AreEqual("Goodbye", deserialized.dict[deserialized.referenceB]);
+        }
     }
 }

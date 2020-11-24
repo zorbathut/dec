@@ -125,8 +125,14 @@ namespace DefTest
             this.errorValidator = null;
         }
 
-        public class StubDef : Def.Def
+        public class Stub { }
+        public class StubDef : Def.Def { }
+        public class StubRecordable : Def.IRecordable
         {
+            public void Record(Def.Recorder record)
+            {
+                // lol
+            }
         }
 
         private void RunCode(string code, string functionName, params object[] param)
