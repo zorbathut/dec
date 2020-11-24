@@ -344,12 +344,14 @@ namespace Def
                     };
                 }
 
+                bool touched = false;
                 foreach (var field in stat.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static))
                 {
                     var def = Database.Get(field.FieldType, field.Name);
                     if (def == null)
                     {
                         Dbg.Err($"Failed to find {field.FieldType} named {field.Name}");
+                        field.SetValue(null, null); // this is unnecessary, but it does kick the static constructor just in case we wouldn't do it otherwise
                     }
                     else if (!field.FieldType.IsAssignableFrom(def.GetType()))
                     {
@@ -360,11 +362,18 @@ namespace Def
                     {
                         field.SetValue(null, def);
                     }
+
+                    touched = true;
                 }
 
                 if (s_StaticReferenceHandler != null)
                 {
-                    Dbg.Err($"Failed to properly register {stat}; you may be missing a call to Def.StaticReferencesAttribute.Initialized() in its static constructor, or the class may already have been initialized elsewhere (this should have thrown an error)");
+                    if (touched)
+                    {
+                        // Otherwise we shouldn't even expect this to have been registered, but at least there's literally no fields in it so it doesn't matter
+                        Dbg.Err($"Failed to properly register {stat}; you may be missing a call to Def.StaticReferencesAttribute.Initialized() in its static constructor, or the class may already have been initialized elsewhere (this should have thrown an error)");
+                    }
+                    
                     s_StaticReferenceHandler = null;
                 }
             }

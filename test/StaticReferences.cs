@@ -365,5 +365,23 @@ namespace DefTest
 
             Assert.IsNotNull(InternalDefs.TestDef);
 	    }
+
+        [Def.StaticReferences]
+        public static class EmptyDefs
+        {
+            static EmptyDefs() { Def.StaticReferencesAttribute.Initialized(); }
+        }
+
+        [Test]
+        public void EmptyRefs()
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { }, explicitStaticRefs = new Type[] { typeof(EmptyDefs) } };
+
+            var parser = new Def.Parser();
+            parser.AddString(@"
+                <Defs>
+                </Defs>");
+            parser.Finish();
+        }
     }
 }
