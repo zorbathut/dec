@@ -364,7 +364,7 @@ namespace Def
 
                 if (s_StaticReferenceHandler != null)
                 {
-                    Dbg.Err($"Failed to properly register {stat}; you may be missing a call to Def.StaticReferences.Initialized() in its static constructor, or the class may already have been initialized elsewhere (this should have thrown an error)");
+                    Dbg.Err($"Failed to properly register {stat}; you may be missing a call to Def.StaticReferencesAttribute.Initialized() in its static constructor, or the class may already have been initialized elsewhere (this should have thrown an error)");
                     s_StaticReferenceHandler = null;
                 }
             }
