@@ -8,13 +8,13 @@ namespace DefTest
     {
         // A lot of the Writer functionality is tested via BehaviorMode.Rewritten in other tests, so these tests mostly handle the Create/Delete/Rename functions.
 
-        public class SomeDefs : Def.Def
+        public class SomeDefsDef : Def.Def
         {
-            public SomeValues values;
-            public SomeDefs defs;
+            public SomeValuesDef values;
+            public SomeDefsDef defs;
         }
 
-        public class SomeValues : Def.Def
+        public class SomeValuesDef : Def.Def
         {
             public int number;
         }
@@ -22,25 +22,25 @@ namespace DefTest
         [Test]
         public void Creation([Values] BehaviorMode mode)
         {
-            Def.Database.Create<SomeValues>("Hello").number = 10;
-            Def.Database.Create<SomeValues>("Goodbye").number = 42;
+            Def.Database.Create<SomeValuesDef>("Hello").number = 10;
+            Def.Database.Create<SomeValuesDef>("Goodbye").number = 42;
 
             DoBehavior(mode);
 
-            Assert.AreEqual(10, Def.Database<SomeValues>.Get("Hello").number);
-            Assert.AreEqual(42, Def.Database<SomeValues>.Get("Goodbye").number);
+            Assert.AreEqual(10, Def.Database<SomeValuesDef>.Get("Hello").number);
+            Assert.AreEqual(42, Def.Database<SomeValuesDef>.Get("Goodbye").number);
         }
 
         [Test]
         public void CreationNonGeneric([Values] BehaviorMode mode)
         {
-            (Def.Database.Create(typeof(SomeValues), "Hello") as SomeValues).number = 10;
-            (Def.Database.Create(typeof(SomeValues), "Goodbye") as SomeValues).number = 42;
+            (Def.Database.Create(typeof(SomeValuesDef), "Hello") as SomeValuesDef).number = 10;
+            (Def.Database.Create(typeof(SomeValuesDef), "Goodbye") as SomeValuesDef).number = 42;
 
             DoBehavior(mode);
 
-            Assert.AreEqual(10, Def.Database<SomeValues>.Get("Hello").number);
-            Assert.AreEqual(42, Def.Database<SomeValues>.Get("Goodbye").number);
+            Assert.AreEqual(10, Def.Database<SomeValuesDef>.Get("Hello").number);
+            Assert.AreEqual(42, Def.Database<SomeValuesDef>.Get("Goodbye").number);
         }
 
         private class NotADef { }
@@ -54,27 +54,27 @@ namespace DefTest
         [Test]
         public void MultiCreation([Values] BehaviorMode mode)
         {
-            Def.Database.Create<SomeDefs>("Defs");
-            Def.Database.Create<SomeValues>("Values");
+            Def.Database.Create<SomeDefsDef>("Defs");
+            Def.Database.Create<SomeValuesDef>("Values");
 
             DoBehavior(mode);
 
-            Assert.IsNotNull(Def.Database<SomeDefs>.Get("Defs"));
-            Assert.IsNull(Def.Database<SomeValues>.Get("Defs"));
+            Assert.IsNotNull(Def.Database<SomeDefsDef>.Get("Defs"));
+            Assert.IsNull(Def.Database<SomeValuesDef>.Get("Defs"));
 
-            Assert.IsNull(Def.Database<SomeDefs>.Get("Values"));
-            Assert.IsNotNull(Def.Database<SomeValues>.Get("Values"));
+            Assert.IsNull(Def.Database<SomeDefsDef>.Get("Values"));
+            Assert.IsNotNull(Def.Database<SomeValuesDef>.Get("Values"));
         }
 
         [Test]
         public void FailedCreation()
         {
-            Def.Database.Create<SomeDefs>("Def");
-            ExpectErrors(() => Def.Database.Create<SomeDefs>("Def"));
-            Def.Database.Delete(Def.Database<SomeDefs>.Get("Def"));
-            Def.Database.Create<SomeDefs>("Def");
-            ExpectErrors(() => Def.Database.Create<SomeDefs>("Def"));
-            ExpectErrors(() => Def.Database.Create<SomeDefs>("Def"));
+            Def.Database.Create<SomeDefsDef>("Def");
+            ExpectErrors(() => Def.Database.Create<SomeDefsDef>("Def"));
+            Def.Database.Delete(Def.Database<SomeDefsDef>.Get("Def"));
+            Def.Database.Create<SomeDefsDef>("Def");
+            ExpectErrors(() => Def.Database.Create<SomeDefsDef>("Def"));
+            ExpectErrors(() => Def.Database.Create<SomeDefsDef>("Def"));
         }
 
         private class RootDef : Def.Def { }
@@ -95,25 +95,25 @@ namespace DefTest
         [Test]
         public void Databases()
         {
-            var selfRef = Def.Database.Create<SomeDefs>("SelfRef");
-            var otherRef = Def.Database.Create<SomeDefs>("OtherRef");
-            var values = Def.Database.Create<SomeValues>("Values");
+            var selfRef = Def.Database.Create<SomeDefsDef>("SelfRef");
+            var otherRef = Def.Database.Create<SomeDefsDef>("OtherRef");
+            var values = Def.Database.Create<SomeValuesDef>("Values");
 
-            Assert.AreSame(selfRef, Def.Database.Get(typeof(SomeDefs), "SelfRef"));
-            Assert.AreSame(otherRef, Def.Database.Get(typeof(SomeDefs), "OtherRef"));
-            Assert.AreSame(values, Def.Database.Get(typeof(SomeValues), "Values"));
+            Assert.AreSame(selfRef, Def.Database.Get(typeof(SomeDefsDef), "SelfRef"));
+            Assert.AreSame(otherRef, Def.Database.Get(typeof(SomeDefsDef), "OtherRef"));
+            Assert.AreSame(values, Def.Database.Get(typeof(SomeValuesDef), "Values"));
 
-            Assert.AreSame(selfRef, Def.Database<SomeDefs>.Get("SelfRef"));
-            Assert.AreSame(otherRef, Def.Database<SomeDefs>.Get("OtherRef"));
-            Assert.AreSame(values, Def.Database<SomeValues>.Get("Values"));
+            Assert.AreSame(selfRef, Def.Database<SomeDefsDef>.Get("SelfRef"));
+            Assert.AreSame(otherRef, Def.Database<SomeDefsDef>.Get("OtherRef"));
+            Assert.AreSame(values, Def.Database<SomeValuesDef>.Get("Values"));
         }
 
         [Test]
         public void References([Values] BehaviorMode mode)
         {
-            var selfRef = Def.Database.Create<SomeDefs>("SelfRef");
-            var otherRef = Def.Database.Create<SomeDefs>("OtherRef");
-            var values = Def.Database.Create<SomeValues>("Values");
+            var selfRef = Def.Database.Create<SomeDefsDef>("SelfRef");
+            var otherRef = Def.Database.Create<SomeDefsDef>("OtherRef");
+            var values = Def.Database.Create<SomeValuesDef>("Values");
 
             selfRef.defs = selfRef;
             selfRef.values = values;
@@ -122,10 +122,10 @@ namespace DefTest
 
             DoBehavior(mode);
 
-            Assert.AreSame(Def.Database<SomeDefs>.Get("SelfRef"), Def.Database<SomeDefs>.Get("SelfRef").defs);
-            Assert.AreSame(Def.Database<SomeValues>.Get("Values"), Def.Database<SomeDefs>.Get("SelfRef").values);
-            Assert.AreSame(Def.Database<SomeDefs>.Get("SelfRef"), Def.Database<SomeDefs>.Get("OtherRef").defs);
-            Assert.AreSame(Def.Database<SomeValues>.Get("Values"), Def.Database<SomeDefs>.Get("OtherRef").values);
+            Assert.AreSame(Def.Database<SomeDefsDef>.Get("SelfRef"), Def.Database<SomeDefsDef>.Get("SelfRef").defs);
+            Assert.AreSame(Def.Database<SomeValuesDef>.Get("Values"), Def.Database<SomeDefsDef>.Get("SelfRef").values);
+            Assert.AreSame(Def.Database<SomeDefsDef>.Get("SelfRef"), Def.Database<SomeDefsDef>.Get("OtherRef").defs);
+            Assert.AreSame(Def.Database<SomeValuesDef>.Get("Values"), Def.Database<SomeDefsDef>.Get("OtherRef").values);
         }
 
         public class IntDef : Def.Def
@@ -273,8 +273,8 @@ namespace DefTest
         [Test]
         public void ReferenceDeleted([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
         {
-            var ephemeral = Def.Database.Create<SomeDefs>("Ephemeral");
-            var stored = Def.Database.Create<SomeDefs>("Stored");
+            var ephemeral = Def.Database.Create<SomeDefsDef>("Ephemeral");
+            var stored = Def.Database.Create<SomeDefsDef>("Stored");
 
             stored.defs = ephemeral;
 
@@ -284,29 +284,29 @@ namespace DefTest
 
             if (mode != BehaviorMode.Bare)
             {
-                Assert.IsNull(Def.Database<SomeDefs>.Get("Stored").defs);
-                Assert.IsNull(Def.Database<SomeDefs>.Get("Ephemeral"));
+                Assert.IsNull(Def.Database<SomeDefsDef>.Get("Stored").defs);
+                Assert.IsNull(Def.Database<SomeDefsDef>.Get("Ephemeral"));
             }
         }
 
         [Test]
         public void ReferenceReplaced([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
         {
-            var ephemeral = Def.Database.Create<SomeDefs>("Ephemeral");
-            var stored = Def.Database.Create<SomeDefs>("Stored");
+            var ephemeral = Def.Database.Create<SomeDefsDef>("Ephemeral");
+            var stored = Def.Database.Create<SomeDefsDef>("Stored");
 
             stored.defs = ephemeral;
 
             Def.Database.Delete(ephemeral);
 
-            Def.Database.Create<SomeDefs>("Ephemeral");
+            Def.Database.Create<SomeDefsDef>("Ephemeral");
 
             DoBehavior(mode, rewrite_expectWriteErrors: true, rewrite_expectParseErrors: true, validation_expectWriteErrors: true);
 
             if (mode != BehaviorMode.Bare)
             {
-                Assert.IsNull(Def.Database<SomeDefs>.Get("Stored").defs);
-                Assert.IsNotNull(Def.Database<SomeDefs>.Get("Ephemeral"));
+                Assert.IsNull(Def.Database<SomeDefsDef>.Get("Stored").defs);
+                Assert.IsNotNull(Def.Database<SomeDefsDef>.Get("Ephemeral"));
             }
         }
 
@@ -332,7 +332,7 @@ namespace DefTest
             Assert.IsFalse(data.Contains("nonSerializedValue"));
         }
 
-        public class EnumContainer : Def.Def
+        public class EnumContainerDef : Def.Def
         {
             public enum Enum
             {
@@ -349,10 +349,10 @@ namespace DefTest
         [Test]
         public void Enum([Values(BehaviorMode.RewrittenBare, BehaviorMode.RewrittenPretty)] BehaviorMode mode)
         {
-            var enums = Def.Database.Create<EnumContainer>("TestDef");
-            enums.alph = EnumContainer.Enum.Alpha;
-            enums.bet = EnumContainer.Enum.Beta;
-            enums.gam = EnumContainer.Enum.Gamma;
+            var enums = Def.Database.Create<EnumContainerDef>("TestDef");
+            enums.alph = EnumContainerDef.Enum.Alpha;
+            enums.bet = EnumContainerDef.Enum.Beta;
+            enums.gam = EnumContainerDef.Enum.Gamma;
 
             var writer = new Def.Composer();
             string data = writer.ComposeXml(mode == BehaviorMode.RewrittenPretty);
