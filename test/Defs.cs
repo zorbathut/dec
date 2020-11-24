@@ -654,5 +654,37 @@ namespace DefTest
             Assert.AreEqual(1, Def.Database<ConflictInheritanceDef>.Get("TestDef").value.conflict);
             Assert.AreEqual(42, ( (ConflictDerived)Def.Database<ConflictInheritanceDef>.Get("TestDef").value ).conflict);
         }
+
+        public class WeirdList : List<int> { }
+        public class WeirdDictionary : Dictionary<string, int> { }
+
+        public class ContainerInheritanceDef : Def.Def
+        {
+            public WeirdList list;
+            public WeirdDictionary dict;
+        }
+
+        [Test]
+        public void ListInheritance([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ContainerInheritanceDef), typeof(WeirdList), typeof(WeirdDictionary) } };
+
+            // Currently providing absolutely no guarantees for how these weird things parse, only that the types will be properly preserved.
+            // Also: Don't do this, yo.
+            var parser = new Def.Parser();
+            parser.AddString(@"
+                <Defs>
+                    <ContainerInheritanceDef defName=""TestDef"">
+                        <list class=""WeirdList"" />
+                        <dict class=""WeirdDictionary"" />
+                     </ContainerInheritanceDef>
+                </Defs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            Assert.AreEqual(typeof(WeirdList), Def.Database<ContainerInheritanceDef>.Get("TestDef").list.GetType());
+            Assert.AreEqual(typeof(WeirdDictionary), Def.Database<ContainerInheritanceDef>.Get("TestDef").dict.GetType());
+        }
     }
 }
