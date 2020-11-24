@@ -191,6 +191,13 @@ namespace Def
             bool hasChildren = element.Elements().Any();
             bool hasText = element.Nodes().OfType<XText>().Any();
 
+            if (hasChildren && hasText)
+            {
+                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Cannot have both text and child nodes in XML (unless it's handled by a Converter and you're doing it yourself)");
+
+                // we'll just fall through and try to parse anyway, though
+            }
+
             if (typeof(Def).IsAssignableFrom(type) && hasChildren && !isRootDef)
             {
                 Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Inline def definitions are not currently supported");
