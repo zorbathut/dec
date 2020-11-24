@@ -614,7 +614,7 @@ namespace DefTest
             Assert.AreEqual(typeof(InternalDerived), Def.Database<InternalInheritanceDef>.Get("TestDef").value.GetType());
 
             Assert.AreEqual(42, Def.Database<InternalInheritanceDef>.Get("TestDef").value.baseOnly);
-            Assert.AreEqual(100, ( (InternalDerived)Def.Database<InternalInheritanceDef>.Get("TestDef").value ).derivedOnly);
+            Assert.AreEqual(100, ((InternalDerived)Def.Database<InternalInheritanceDef>.Get("TestDef").value).derivedOnly);
         }
 
         public class ConflictBase
@@ -652,7 +652,7 @@ namespace DefTest
 
             // This behavior is absolutely not guaranteed, for the record.
             Assert.AreEqual(1, Def.Database<ConflictInheritanceDef>.Get("TestDef").value.conflict);
-            Assert.AreEqual(42, ( (ConflictDerived)Def.Database<ConflictInheritanceDef>.Get("TestDef").value ).conflict);
+            Assert.AreEqual(42, ((ConflictDerived)Def.Database<ConflictInheritanceDef>.Get("TestDef").value).conflict);
         }
 
         public class WeirdList : List<int> { }
