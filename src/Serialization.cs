@@ -188,10 +188,10 @@ namespace Def
 
             // After this point we won't be using a converter in any way, we'll be requiring native Def types (as native as it gets, at least)
 
-            bool hasElements = element.Elements().Any();
+            bool hasChildren = element.Elements().Any();
             bool hasText = element.Nodes().OfType<XText>().Any();
 
-            if (typeof(Def).IsAssignableFrom(type) && hasElements && !isRootDef)
+            if (typeof(Def).IsAssignableFrom(type) && hasChildren && !isRootDef)
             {
                 Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Inline def definitions are not currently supported");
                 return null;
@@ -222,9 +222,9 @@ namespace Def
                 type == typeof(string) ||
                 type.IsPrimitive)
             {
-                if (hasElements)
+                if (hasChildren)
                 {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Elements are not valid when parsing {type}");
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Child nodes are not valid when parsing {type}");
                 }
 
                 return ParseString(element.GetText(), type, model, context.sourceName, element.LineNumber());
