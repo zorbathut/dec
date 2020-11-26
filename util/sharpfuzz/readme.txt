@@ -2,6 +2,8 @@ Support for sharpfuzz/AFL on def.
 
 Setting this up is kind of a pain (and doesn't even work on Windows) so I'm using vagrant/ansible to set up a VM automatically.
 
+----
+
 vagrant up (or vagrant provision if you're just trying to update after code changes)
 
 vagrant ssh
