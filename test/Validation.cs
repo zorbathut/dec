@@ -39,7 +39,14 @@ namespace DefTest
         {
             PrepCwd();
 
-            foreach (var path in Directory.GetDirectories(Path.Combine("data", "validation", "parser")))
+            var targetDir = Path.Combine("data", "validation", "parser");
+
+            if (!Directory.Exists(targetDir))
+            {
+                yield break;
+            }
+
+            foreach (var path in Directory.GetDirectories(targetDir))
             {
                 var id = Path.GetFileName(path);
                 yield return new object[] { id, BehaviorMode.Bare };
