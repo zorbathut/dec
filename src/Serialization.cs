@@ -515,7 +515,7 @@ namespace Def
                 // If we've got text, treat us as an object of appropriate type
                 try
                 {
-                    return TypeDescriptor.GetConverter(type).ConvertFromString(text);
+                    return TypeDescriptor.GetConverter(type).ConvertFromInvariantString(text);
                 }
                 catch (System.Exception e)  // I would normally not catch System.Exception, but TypeConverter is wrapping FormatException in an Exception for some reason
                 {

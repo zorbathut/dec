@@ -535,5 +535,57 @@ namespace DefTest
 
             Assert.AreEqual(typeof(Example), result.type);
 	    }
+
+        public class Ieee754SpecialDef : Def.Def
+        {
+            public float floatNan;
+            public float floatInf;
+            public float floatNinf;
+            public float floatEpsilon;
+            public double doubleNan;
+            public double doubleInf;
+            public double doubleNinf;
+            public double doubleEpsilon;
+        }
+
+        [Test]
+        public void Ieee754Special([Values] BehaviorMode mode)
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(Ieee754SpecialDef) } };
+
+            var parser = new Def.Parser();
+            parser.AddString(@"
+                <Defs>
+                    <Ieee754SpecialDef defName=""TestDef"">
+                        <floatNan>NaN</floatNan>
+                        <floatInf>Infinity</floatInf>
+                        <floatNinf>-Infinity</floatNinf>
+                        <floatEpsilon>1.401298E-45</floatEpsilon>
+                        <doubleNan>NaN</doubleNan>
+                        <doubleInf>Infinity</doubleInf>
+                        <doubleNinf>-Infinity</doubleNinf>
+                        <doubleEpsilon>4.94065645841247E-324</doubleEpsilon>
+                    </Ieee754SpecialDef>
+                </Defs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            var result = Def.Database<Ieee754SpecialDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(float.NaN, result.floatNan);
+            Assert.AreEqual(float.PositiveInfinity, result.floatInf);
+            Assert.AreEqual(float.NegativeInfinity, result.floatNinf);
+            Assert.AreEqual(float.Epsilon, result.floatEpsilon);
+            Assert.AreEqual(double.NaN, result.doubleNan);
+            Assert.AreEqual(double.PositiveInfinity, result.doubleInf);
+            Assert.AreEqual(double.NegativeInfinity, result.doubleNinf);
+            Assert.AreEqual(double.Epsilon, result.doubleEpsilon);
+
+            // We currently don't support NaN-boxed values or signaling NaN.
+            // Maybe someday we will.
+            // (Does C# even accept those?)
+        }
     }
 }

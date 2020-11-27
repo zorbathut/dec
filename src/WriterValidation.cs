@@ -64,11 +64,43 @@ namespace Def
             }
             else if (value.GetType() == typeof(float))
             {
-                WriteToken(( (float)value ).ToString("G17") + 'f');
+                var val = (float)value;
+                if (float.IsNaN(val))
+                {
+                    WriteToken("float.NaN");
+                }
+                else if (float.IsPositiveInfinity(val))
+                {
+                    WriteToken("float.PositiveInfinity");
+                }
+                else if (float.IsNegativeInfinity(val))
+                {
+                    WriteToken("float.NegativeInfinity");
+                }
+                else
+                {
+                    WriteToken(((float)value).ToString("G17") + 'f');
+                }
             }
-            else if (value.GetType() == typeof(float))
+            else if (value.GetType() == typeof(double))
             {
-                WriteToken(( (double)value ).ToString("G17") + 'd');
+                var val = (double)value;
+                if (double.IsNaN(val))
+                {
+                    WriteToken("double.NaN");
+                }
+                else if (double.IsPositiveInfinity(val))
+                {
+                    WriteToken("double.PositiveInfinity");
+                }
+                else if (double.IsNegativeInfinity(val))
+                {
+                    WriteToken("double.NegativeInfinity");
+                }
+                else
+                {
+                    WriteToken(((double)value).ToString("G17") + 'd');
+                }
             }
             else
             {

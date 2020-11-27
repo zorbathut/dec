@@ -274,23 +274,32 @@ namespace Def
 
         public override void WritePrimitive(object value)
         {
-            if (Compat.FloatRoundtripBroken)
+            if (value.GetType() == typeof(double))
             {
-                if (value.GetType() == typeof(double))
+                if (Compat.FloatRoundtripBroken)
                 {
-                    node.Add(new XText(((double)value).ToString("G17")));
-
-                    return;
+                    node.Add(new XText(((double)value).ToString("G17", System.Globalization.CultureInfo.InvariantCulture)));
                 }
-                else if (value.GetType() == typeof(float))
+                else
                 {
-                    node.Add(new XText(((float)value).ToString("G9")));
-
-                    return;
+                    node.Add(new XText(((double)value).ToString(System.Globalization.CultureInfo.InvariantCulture)));
                 }
             }
-
-            node.Add(new XText(value.ToString()));
+            else if (value.GetType() == typeof(float))
+            {
+                if (Compat.FloatRoundtripBroken)
+                {
+                    node.Add(new XText(((float)value).ToString("G9", System.Globalization.CultureInfo.InvariantCulture)));
+                }
+                else
+                {
+                    node.Add(new XText(((float)value).ToString(System.Globalization.CultureInfo.InvariantCulture)));
+                }
+            }
+            else
+            {
+                node.Add(new XText(value.ToString()));
+            }
         }
 
         public override void WriteEnum(object value)
