@@ -57,11 +57,7 @@ namespace Fuzzgen
                 }
                 else
                 {
-                    // It's actually a giant pain to get composite defaults working. I really want to do it, but it's nontrivial to calculate exactly what value something should have.
-                    // (At least, with this layout. Maybe this is a sign my code is structured badly.)
-                    // Anyway, for now, I'm just punting on the matter.
-                    //initialized = new ValueComposite(env, compositeChild);
-                    initialized = null;
+                    initialized = new ValueComposite(env, compositeChild);
                 }
             }
             else if (type == Type.Def)
