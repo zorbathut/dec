@@ -6,9 +6,6 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "def", "src\def.csproj", "{B57A7C73-7542-4F8A-A662-2EB70C2E7C37}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "def-test", "test\def-test.csproj", "{DEBE65A3-0988-4442-9372-72C0E928A985}"
-	ProjectSection(ProjectDependencies) = postProject
-		{3DE7DD9F-E37D-415E-B426-5F8322D605EE} = {3DE7DD9F-E37D-415E-B426-5F8322D605EE}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "def-doc", "doc\def-doc.csproj", "{AB4CCED1-7CF8-4C76-84E6-75AF6ADACAE6}"
 EndProject
@@ -17,14 +14,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "def-sharpfuzz", "util\sharpfuzz\def-sharpfuzz.csproj", "{D9B8BA36-ECA4-4FF0-A3BB-0B6DD3EBD821}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "fuzzgen", "util\fuzzgen\fuzzgen.csproj", "{484AD613-37BF-4EC2-8A26-2505DF6D2717}"
-	ProjectSection(ProjectDependencies) = postProject
-		{3DE7DD9F-E37D-415E-B426-5F8322D605EE} = {3DE7DD9F-E37D-415E-B426-5F8322D605EE}
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "defutillib", "util\defutillib\defutillib.csproj", "{3DE7DD9F-E37D-415E-B426-5F8322D605EE}"
-	ProjectSection(ProjectDependencies) = postProject
-		{B57A7C73-7542-4F8A-A662-2EB70C2E7C37} = {B57A7C73-7542-4F8A-A662-2EB70C2E7C37}
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
