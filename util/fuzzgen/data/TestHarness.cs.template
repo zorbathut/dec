@@ -3,23 +3,18 @@ namespace DefTest
     using System;
     using NUnit.Framework;
 
-    [TestFixture]
-    public class Fuzzgen : Base
+    public static class Harness
     {
-<<COMPOSITES>>
+        <<COMPOSITES>>
 
-        [Test]
-        public void FuzzgenTest([Values] BehaviorMode mode)
+        public static void Setup()
         {
             Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { <<TYPES>> } };
+        }
 
-            var parser = new Def.Parser();
-            parser.AddFile(<<FILENAME>>);
-            parser.Finish();
-
-            DoBehavior(mode);
-
-<<TESTS>>
+        public static void Validate()
+        {
+            <<TESTS>>
         }
     }
 }

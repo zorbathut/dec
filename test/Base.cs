@@ -87,6 +87,11 @@ namespace DefTest
                 Def.Config.ErrorHandler(e.ToString());
             };
 
+            PrepCwd();
+        }
+
+        public static void PrepCwd()
+        {
             // Find our data directory
             while (!Directory.Exists("data"))
             {
@@ -152,7 +157,7 @@ namespace DefTest
             Validation,
         }
 
-        public void DoBehavior(BehaviorMode mode, bool rewrite_expectWriteErrors = false, bool rewrite_expectParseErrors = false, bool validation_expectWriteErrors = false)
+        public void DoBehavior(BehaviorMode mode, bool rewrite_expectWriteErrors = false, bool rewrite_expectParseErrors = false, bool validation_expectWriteErrors = false, Assembly[] validation_assemblies = null)
         {
             if (mode == BehaviorMode.Bare)
             {
@@ -215,7 +220,13 @@ namespace DefTest
                     RunComposer();
                 }
 
-                DefUtilLib.Compilation.CompileAndRun($"public static void Test() {{\n{code}\n}}", new Assembly[] { this.GetType().Assembly }, "Test", null);
+                var assemblies = new Assembly[] { this.GetType().Assembly };
+                if (validation_assemblies != null)
+                {
+                    assemblies = assemblies.Concat(validation_assemblies).ToArray();
+                }
+
+                DefUtilLib.Compilation.CompileAndRun($"public static void Test() {{\n{code}\n}}", assemblies, "Test", null);
             }
             else
             {

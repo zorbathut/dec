@@ -72,7 +72,7 @@ namespace Fuzzgen
                 }
             }
 
-            // Output cs file
+            string GenerateTestHarness(string testData)
             {
                 string testHarness = File.ReadAllText("data/TestHarness.cs.template");
 
@@ -82,25 +82,19 @@ namespace Fuzzgen
                     csComposites.Append(Util.Indent(c.WriteCsharpDefinition(), 2));
                 }
 
-                var tests = new StringBuilder();
-                foreach (var i in env.instances)
-                {
-                    tests.Append(Util.Indent(i.WriteCsharpCompareDef(), 3));
-                }
-
                 var types = string.Join(", ", env.types.Select(c => $"typeof({c.name})"));
                 var filename = "data/Fuzzgen.FuzzgenTest.xml";
 
-                testHarness = testHarness
+                return testHarness
                     .Replace("<<COMPOSITES>>", csComposites.ToString())
                     .Replace("<<TYPES>>", types)
                     .Replace("<<FILENAME>>", $"\"{filename}\"")
-                    .Replace("<<TESTS>>", tests.ToString());
-
-                Dbg.Inf(testHarness);
-
-                File.WriteAllText("../../test/Fuzzgen.cs", testHarness);
+                    .Replace("<<TESTS>>", testData);
             }
+
+            string testCode = GenerateTestHarness("");
+
+            string xmlCode;
 
             // Output xml
             {
@@ -114,9 +108,31 @@ namespace Fuzzgen
 
                 sb.AppendLine("</Defs>");
 
-                Dbg.Inf(sb.ToString());
-                File.WriteAllText("../../test/data/Fuzzgen.FuzzgenTest.xml", sb.ToString());
+                xmlCode = sb.ToString();
             }
+
+            // This is a bit janky; we want to use Def features when doing generation, but now we need to blow it away to generate the .cs code
+            // So I guess maybe it would be nice to have non-global state right now :V
+
+            Def.Database.Clear();
+
+            var bootstrapAssembly = DefUtilLib.Compilation.Compile(testCode, new System.Reflection.Assembly[] { });
+            bootstrapAssembly.GetType("DefTest.Harness").GetMethod("Setup").Invoke(null, null);
+
+            var parser = new Def.Parser();
+            parser.AddString(xmlCode);
+            parser.Finish();
+
+            var composer = new Def.Composer();
+            var tests = composer.ComposeValidation();
+
+            string finalCode = GenerateTestHarness(tests);
+
+            string path = $"../../test/data/validation/parser/{System.DateTimeOffset.Now:yyyyMMddhhmmss}";
+            System.IO.Directory.CreateDirectory(path);
+
+            File.WriteAllText(System.IO.Path.Combine(path, "Harness.cs"), finalCode);
+            File.WriteAllText(System.IO.Path.Combine(path, "data.xml"), xmlCode);
         }
     }
 }

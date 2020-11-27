@@ -3,6 +3,7 @@ namespace DefUtilLib
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -10,6 +11,8 @@ namespace DefUtilLib
 
     public static class Compilation
     {
+        private static Dictionary<Assembly, MemoryStream> AssemblyStreams = new Dictionary<Assembly, MemoryStream>();
+
         public static Assembly Compile(string src, Assembly[] assemblies)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(src);
@@ -22,9 +25,22 @@ namespace DefUtilLib
                     Path.Combine(Path.GetDirectoryName(typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location), "netstandard.dll"),
                     Path.Combine(Path.GetDirectoryName(typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location), "System.Runtime.dll"),
                     Path.Combine(Path.GetDirectoryName(typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location), "System.Collections.dll"),
-                }.Concat(assemblies.Select(asm => asm.Location)).ToArray();
+                };
 
-            var references = refPaths.Select(r => MetadataReference.CreateFromFile(r)).ToArray();
+            var references = refPaths.Select(r => MetadataReference.CreateFromFile(r)).Concat(assemblies.Select(asm =>
+            {
+                if (AssemblyStreams.ContainsKey(asm))
+                {
+                    var stream = AssemblyStreams[asm];
+                    stream.Seek(0, SeekOrigin.Begin);
+                    return MetadataReference.CreateFromStream(stream);
+                }
+                else
+                {
+                    return MetadataReference.CreateFromFile(asm.Location);
+                }
+            })).ToArray();
+                    
 
             var compilation = CSharpCompilation.Create(
                 assemblyName,
@@ -36,12 +52,13 @@ namespace DefUtilLib
             var result = compilation.Emit(ms);
             if (!result.Success)
             {
-                Assert.IsTrue(false, string.Join("\n", result.Diagnostics.Select(err => err.ToString())));
+                Assert.IsTrue(false, string.Join("\n", result.Diagnostics.Take(10).Select(err => err.ToString())));
             }
 
             ms.Seek(0, SeekOrigin.Begin);
 
             var assembly = AssemblyLoadContext.Default.LoadFromStream(ms);
+            AssemblyStreams[assembly] = ms;
             return assembly;
         }
 
