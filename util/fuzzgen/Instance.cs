@@ -28,36 +28,6 @@ namespace Fuzzgen
             }
         }
 
-        public string WriteCsharpCompareDef()
-        {
-            var sb = new StringBuilder();
-
-            sb.AppendLine();
-            sb.AppendLine($"Assert.IsNotNull(Def.Database<{composite.name}>.Get(\"{defName}\"));");
-            sb.Append(WriteCsharpCompareComposite(composite.name, defName, ""));
-
-            return sb.ToString();
-        }
-
-        public string WriteCsharpCompareComposite(string defType, string defName, string prefix)
-        {
-            var sb = new StringBuilder();
-
-            foreach (var val in composite.members)
-            {
-                var contents = values.TryGetValue(val) ?? val.initialized;
-                if (contents == null)
-                {
-                    // a struct composite that hasn't been overridden; we should really be comparing this against null
-                    continue;
-                }
-
-                sb.AppendLine(contents.WriteCsharpCompare(defType, defName, prefix + val.name));
-            }
-
-            return sb.ToString();
-        }
-
         public string WriteCSharpInit()
         {
             var sb = new StringBuilder();

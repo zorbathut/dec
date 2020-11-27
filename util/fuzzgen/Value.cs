@@ -7,7 +7,6 @@ namespace Fuzzgen
     internal abstract class Value
     {
         public abstract string WriteCsharpInit();
-        public abstract string WriteCsharpCompare(string defType, string defName, string path);
         public abstract string WriteXml();
     }
 
@@ -33,11 +32,6 @@ namespace Fuzzgen
             return $" = {valueCs}";
         }
 
-        public override string WriteCsharpCompare(string defType, string defName, string path)
-        {
-            return $"Assert.AreEqual({valueCs}, Def.Database<{defType}>.Get(\"{defName}\").{path});";
-        }
-
         public override string WriteXml()
         {
             return valueXml;
@@ -56,11 +50,6 @@ namespace Fuzzgen
         public override string WriteCsharpInit()
         {
             return instance.WriteCSharpInit();
-        }
-
-        public override string WriteCsharpCompare(string defType, string defName, string path)
-        {
-            return instance.WriteCsharpCompareComposite(defType, defName, path + ".");
         }
 
         public override string WriteXml()
