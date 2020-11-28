@@ -131,8 +131,8 @@ namespace Fuzzgen
             string path = $"../../test/data/validation/parser/{System.DateTimeOffset.Now:yyyyMMddhhmmss}";
             System.IO.Directory.CreateDirectory(path);
 
-            File.WriteAllText(System.IO.Path.Combine(path, "Harness.cs"), finalCode);
-            File.WriteAllText(System.IO.Path.Combine(path, "data.xml"), xmlCode);
+            DefUtilLib.Compress.WriteToFile(System.IO.Path.Combine(path, "Harness.cs"), finalCode);
+            DefUtilLib.Compress.WriteToFile(System.IO.Path.Combine(path, "data.xml"), xmlCode);
         }
     }
 }

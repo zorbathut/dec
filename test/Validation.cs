@@ -19,7 +19,7 @@ namespace DefTest
             if (!AssemblyLookup.TryGetValue(id, out assembly))
             {
                 // gotta load
-                assembly = DefUtilLib.Compilation.Compile(File.ReadAllText(Path.Combine(directory, "Harness.cs")), new Assembly[] { this.GetType().Assembly });
+                assembly = DefUtilLib.Compilation.Compile(DefUtilLib.Compress.ReadFromFile(Path.Combine(directory, "Harness.cs")), new Assembly[] { this.GetType().Assembly });
                 AssemblyLookup[id] = assembly;
             }
 
@@ -27,7 +27,7 @@ namespace DefTest
             type.GetMethod("Setup").Invoke(null, null);
 
             var parser = new Def.Parser();
-            parser.AddDirectory(directory);
+            parser.AddString(DefUtilLib.Compress.ReadFromFile(Path.Combine(directory, "data.xml")));
             parser.Finish();
 
             DoBehavior(mode, validation_assemblies: new Assembly[] { assembly });
