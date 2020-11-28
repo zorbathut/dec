@@ -22,7 +22,19 @@
       <Composite>1</Composite>
       <Def>2</Def>
       <ContainerList>2</ContainerList>
-      <!--<ContainerDictionary>1</ContainerDictionary>-->
+      <ContainerDictionary>1</ContainerDictionary>
+    </elements>
+  </MemberTypeDistributionDef>
+
+  <MemberTypeDistributionDef defName="DictKeyDistribution">
+    <elements>
+      <Short>0.1</Short>
+      <Ushort>0.1</Ushort>
+      <Int>5</Int>
+      <Uint>0.1</Uint>
+      <Long>0.1</Long>
+      <Ulong>0.1</Ulong>
+      <String>1</String>
     </elements>
   </MemberTypeDistributionDef>
 </Defs>

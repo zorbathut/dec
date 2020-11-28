@@ -71,5 +71,12 @@ namespace Fuzzgen
         {
             return (int)(Math.Pow(10, Math.Pow(Rand.Next(1f), 2) * 2) - 1);
         }
+
+        // 0-10, weighted towards 0
+        // and yes the same thing as above
+        public static int WeightedMiniDistribution()
+        {
+            return (int)(Math.Pow(10, Math.Pow(Rand.Next(1f), 1) * 1) - 1);
+        }
     }
 }

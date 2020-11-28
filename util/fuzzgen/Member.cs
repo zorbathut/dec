@@ -24,13 +24,14 @@ namespace Fuzzgen
             Composite,
             Def,
             ContainerList,
-            /*ContainerDictionary,*/
+            ContainerDictionary,
         }
         public readonly Type type;
 
         public readonly Value initialized;
         private Composite compositeChild;
 
+        private Member containerKey;
         private Member containerValue;
 
         public Member(Env env, Composite parent, string name, Type type)
@@ -72,6 +73,12 @@ namespace Fuzzgen
             }
             else if (type == Type.ContainerList)
             {
+                containerValue = new Member(env, parent, null, MemberTypeDistribution.Distribution.Choose());
+                initialized = new ValueSimple("null", "");
+            }
+            else if (type == Type.ContainerDictionary)
+            {
+                containerKey = new Member(env, parent, null, MemberTypeDistribution.DictKeyDistribution.Choose());
                 containerValue = new Member(env, parent, null, MemberTypeDistribution.Distribution.Choose());
                 initialized = new ValueSimple("null", "");
             }
@@ -166,9 +173,9 @@ namespace Fuzzgen
                         }
                     }
                 case Type.ContainerList:
-                    {
-                        return new ValueList(env, () => containerValue.GenerateValue(env));
-                    }
+                    return new ValueList(env, () => containerValue.GenerateValue(env));
+                case Type.ContainerDictionary:
+                    return new ValueDict(env, () => containerKey.GenerateValue(env), () => containerValue.GenerateValue(env));
                 default:
                     Dbg.Err("Unknown member type!");
                     return new ValueSimple("0", "0");
@@ -192,6 +199,7 @@ namespace Fuzzgen
                 case Type.Composite: return compositeChild.name;
                 case Type.Def: return compositeChild.name;
                 case Type.ContainerList: return $"List<{containerValue.TypeToCSharp()}>";
+                case Type.ContainerDictionary: return $"Dictionary<{containerKey.TypeToCSharp()}, {containerValue.TypeToCSharp()}>";
                 default: Dbg.Err("Invalid type!"); return "int";
             }
         }
@@ -217,5 +225,6 @@ namespace Fuzzgen
         static MemberTypeDistribution() { Def.StaticReferencesAttribute.Initialized(); }
 
         internal static MemberTypeDistributionDef Distribution;
+        internal static MemberTypeDistributionDef DictKeyDistribution;
     }
 }
