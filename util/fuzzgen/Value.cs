@@ -1,12 +1,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Fuzzgen
 {
     internal abstract class Value
     {
+        public virtual bool IsValidDictKey { get => false; }
+
         public abstract string WriteCsharpInit();
         public abstract string WriteXml();
     }
@@ -15,6 +18,8 @@ namespace Fuzzgen
     {
         public string valueCs;
         public string valueXml;
+
+        public override bool IsValidDictKey { get => valueCs != "null"; }
 
         public ValueSimple(string value)
         {
@@ -104,6 +109,15 @@ namespace Fuzzgen
             }
 
             // we should really de-duplicate keys, but I'm not right now
+
+            if (keys.Count > 0 && !keys[0].IsValidDictKey)
+            {
+                keys.Clear();
+                values.Clear();
+            }
+
+            keys = keys.Distinct(key => key.WriteXml()).ToList();
+            values.RemoveRange(keys.Count, values.Count - keys.Count);
         }
 
         public override string WriteCsharpInit()

@@ -35,6 +35,7 @@
       <Long>0.1</Long>
       <Ulong>0.1</Ulong>
       <String>1</String>
+      <Def>2</Def>
     </elements>
   </MemberTypeDistributionDef>
 </Defs>

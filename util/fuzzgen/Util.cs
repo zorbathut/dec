@@ -1,4 +1,5 @@
 
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -65,6 +66,21 @@ namespace Fuzzgen
             }
 
             return result;
+        }
+
+        internal static IEnumerable<T> Distinct<T, U>(this IEnumerable<T> input, Func<T, U> func)
+        {
+            var seen = new HashSet<U>();
+
+            foreach (var item in input)
+            {
+                var signature = func(item);
+
+                if (seen.Add(signature))
+                {
+                    yield return item;
+                }
+            }
         }
     }
 }
