@@ -409,5 +409,32 @@ namespace DefTest
             Assert.AreEqual(result.dataB, new Dictionary<string, string> { });
             Assert.AreEqual(result.dataC, new Dictionary<string, string> { ["g"] = "7", ["h"] = "8", ["i"] = "9" });
         }
+
+        [Test]
+        public void DictionaryNullKey([Values] BehaviorMode mode)
+        {
+            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryStringDef) } };
+
+            var parser = new Def.Parser();
+            parser.AddString(@"
+                <Defs>
+                    <DictionaryStringDef defName=""TestDef"">
+                        <data>
+                            <li>
+                                <key null=""true"" />
+                                <value>goodbye</value>
+                            </li>
+                        </data>
+                    </DictionaryStringDef>
+                </Defs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoBehavior(mode);
+
+            var result = Def.Database<DictionaryStringDef>.Get("TestDef");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(0, result.data.Count);
+        }
     }
 }

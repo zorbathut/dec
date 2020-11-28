@@ -325,6 +325,12 @@ namespace Def
 
                         var key = ParseElement(keyNode, keyType, null, context);
 
+                        if (key == null)
+                        {
+                            Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Dictionary includes null key, skipping pair");
+                            continue;
+                        }
+
                         if (dict.Contains(key))
                         {
                             Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Dictionary includes duplicate key {key.ToString()}");
@@ -335,6 +341,13 @@ namespace Def
                     else
                     {
                         var key = ParseString(fieldElement.Name.LocalName, keyType, null, context.sourceName, fieldElement.LineNumber());
+
+                        if (key == null)
+                        {
+                            // it's really rare for this to happen, I think you could do it with a converter but that's it
+                            Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Dictionary includes null key, skipping pair");
+                            continue;
+                        }
 
                         if (dict.Contains(key))
                         {
