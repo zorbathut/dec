@@ -39,7 +39,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../src/dec.csproj" />
-    <ProjectReference Include="../util/defutillib/decutillib.csproj" />
+    <ProjectReference Include="../util/decutillib/decutillib.csproj" />
   </ItemGroup>
 
 </Project>

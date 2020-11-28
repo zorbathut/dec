@@ -12,7 +12,7 @@ The Dec library does not tie itself to any particular engine and works within Go
 
 ## Why should I use dec?
 
-Declaring types of things is a common thing to do in game engines, and the Dec library  is intended as a one-stop-shop to allow defining anything which may need to be defined, from in-game objects like monsters or weapons to conceptual things like actor behaviors.
+Declaring types of things is a common thing to do in game engines, and the Dec library is intended as a one-stop-shop to allow declaring anything which may need to be declared, from in-game objects like monsters or weapons to conceptual things like actor behaviors.
 
 * Declaring new types is easy thanks to reflection-based parsing.
 

@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\dec.csproj" />
-    <ProjectReference Include="..\defutillib\decutillib.csproj" />
+    <ProjectReference Include="..\decutillib\decutillib.csproj" />
   </ItemGroup>
 
 </Project>

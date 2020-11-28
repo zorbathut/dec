@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dec-sharpfuzz", "util\sharp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "fuzzgen", "util\fuzzgen\fuzzgen.csproj", "{484AD613-37BF-4EC2-8A26-2505DF6D2717}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "decutillib", "util\defutillib\decutillib.csproj", "{3DE7DD9F-E37D-415E-B426-5F8322D605EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "decutillib", "util\decutillib\decutillib.csproj", "{3DE7DD9F-E37D-415E-B426-5F8322D605EE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

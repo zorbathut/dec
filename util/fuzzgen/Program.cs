@@ -21,7 +21,7 @@ namespace Fuzzgen
 
             // In most cases, you'll just want to read all the XML files in your data directory, which is easy
             var parser = new Dec.Parser();
-            parser.AddDirectory("data/def");
+            parser.AddDirectory("data/dec");
             parser.Finish();
         }
 
