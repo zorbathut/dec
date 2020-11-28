@@ -1,4 +1,4 @@
-namespace DefTest
+namespace DecTest
 {
     using NUnit.Framework.Interfaces;
     using System;

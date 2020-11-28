@@ -12,7 +12,7 @@ namespace Fuzzgen
         {
             Struct,
             Class,
-            Def,
+            Dec,
         }
         public Type type;
 
@@ -32,8 +32,8 @@ namespace Fuzzgen
                     sb.AppendLine($"public class {name}");
                     break;
 
-                case Type.Def:
-                    sb.AppendLine($"public class {name} : Def.Def");
+                case Type.Dec:
+                    sb.AppendLine($"public class {name} : Dec.Dec");
                     break;
             }
 
@@ -50,13 +50,13 @@ namespace Fuzzgen
         }
     }
 
-    internal class CompositeTypeDistributionDef : Distribution<Composite.Type> { }
+    internal class CompositeTypeDistributionDec : Distribution<Composite.Type> { }
 
-    [Def.StaticReferences]
+    [Dec.StaticReferences]
     internal static class CompositeTypeDistribution
     {
-        static CompositeTypeDistribution() { Def.StaticReferencesAttribute.Initialized(); }
+        static CompositeTypeDistribution() { Dec.StaticReferencesAttribute.Initialized(); }
 
-        internal static CompositeTypeDistributionDef Distribution;
+        internal static CompositeTypeDistributionDec Distribution;
     }
 }

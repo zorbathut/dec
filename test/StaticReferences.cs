@@ -1,4 +1,4 @@
-namespace DefTest
+namespace DecTest
 {
     using NUnit.Framework;
     using System;
@@ -6,253 +6,253 @@ namespace DefTest
     [TestFixture]
     public class StaticReferences : Base
     {
-        [Def.StaticReferences]
-        public static class StaticReferenceDefs
+        [Dec.StaticReferences]
+        public static class StaticReferenceDecs
         {
-            static StaticReferenceDefs() { Def.StaticReferencesAttribute.Initialized(); }
+            static StaticReferenceDecs() { Dec.StaticReferencesAttribute.Initialized(); }
 
-            public static StubDef TestDefA;
-            public static StubDef TestDefB;
+            public static StubDec TestDecA;
+            public static StubDec TestDecB;
         }
 
         [Test]
 	    public void StaticReference([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) }, explicitStaticRefs = new Type[]{ typeof(StaticReferenceDefs) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(StaticReferenceDecs) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <StubDef defName=""TestDefA"" />
-                    <StubDef defName=""TestDefB"" />
-                </Defs>");
+                <Decs>
+                    <StubDec decName=""TestDecA"" />
+                    <StubDec decName=""TestDecB"" />
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var resultA = Def.Database<StubDef>.Get("TestDefA");
-            var resultB = Def.Database<StubDef>.Get("TestDefB");
+            var resultA = Dec.Database<StubDec>.Get("TestDecA");
+            var resultB = Dec.Database<StubDec>.Get("TestDecB");
             Assert.IsNotNull(resultA);
             Assert.IsNotNull(resultB);
 
-            Assert.AreEqual(StaticReferenceDefs.TestDefA, resultA);
-            Assert.AreEqual(StaticReferenceDefs.TestDefB, resultB);
+            Assert.AreEqual(StaticReferenceDecs.TestDecA, resultA);
+            Assert.AreEqual(StaticReferenceDecs.TestDecB, resultB);
 	    }
 
-        public class StubDerivedDef : StubDef
+        public class StubDerivedDec : StubDec
         {
 
         }
 
-        [Def.StaticReferences]
-        public static class PreciseClassDefs
+        [Dec.StaticReferences]
+        public static class PreciseClassDecs
         {
-            static PreciseClassDefs() { Def.StaticReferencesAttribute.Initialized(); }
+            static PreciseClassDecs() { Dec.StaticReferencesAttribute.Initialized(); }
 
-            public static StubDerivedDef TestDef;
+            public static StubDerivedDec TestDec;
         }
 
         [Test]
 	    public void PreciseClass([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDerivedDef) }, explicitStaticRefs = new Type[]{ typeof(PreciseClassDefs) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDerivedDec) }, explicitStaticRefs = new Type[]{ typeof(PreciseClassDecs) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <StubDerivedDef defName=""TestDef"" />
-                </Defs>");
+                <Decs>
+                    <StubDerivedDec decName=""TestDec"" />
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var result = Def.Database<StubDef>.Get("TestDef");
+            var result = Dec.Database<StubDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
-            Assert.AreEqual(PreciseClassDefs.TestDef, result);
+            Assert.AreEqual(PreciseClassDecs.TestDec, result);
 	    }
 
-        [Def.StaticReferences]
-        public static class SuperClassDefs
+        [Dec.StaticReferences]
+        public static class SuperClassDecs
         {
-            static SuperClassDefs() { Def.StaticReferencesAttribute.Initialized(); }
+            static SuperClassDecs() { Dec.StaticReferencesAttribute.Initialized(); }
 
-            public static StubDef TestDef;
+            public static StubDec TestDec;
         }
 
         [Test]
 	    public void SuperClass([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDerivedDef) }, explicitStaticRefs = new Type[]{ typeof(SuperClassDefs) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDerivedDec) }, explicitStaticRefs = new Type[]{ typeof(SuperClassDecs) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <StubDerivedDef defName=""TestDef"" />
-                </Defs>");
+                <Decs>
+                    <StubDerivedDec decName=""TestDec"" />
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var result = Def.Database<StubDef>.Get("TestDef");
+            var result = Dec.Database<StubDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
-            Assert.AreEqual(SuperClassDefs.TestDef, result);
+            Assert.AreEqual(SuperClassDecs.TestDec, result);
 	    }
 
-        [Def.StaticReferences]
-        public static class SubClassDefs
+        [Dec.StaticReferences]
+        public static class SubClassDecs
         {
-            static SubClassDefs() { Def.StaticReferencesAttribute.Initialized(); }
+            static SubClassDecs() { Dec.StaticReferencesAttribute.Initialized(); }
 
-            public static StubDerivedDef TestDef;
+            public static StubDerivedDec TestDec;
         }
 
         [Test]
 	    public void SubClass([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) }, explicitStaticRefs = new Type[]{ typeof(SubClassDefs) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(SubClassDecs) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <StubDef defName=""TestDef"" />
-                </Defs>");
+                <Decs>
+                    <StubDec decName=""TestDec"" />
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode, rewrite_expectParseErrors: true);
 
-            var result = Def.Database<StubDef>.Get("TestDef");
+            var result = Dec.Database<StubDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
-            Assert.IsNull(SubClassDefs.TestDef);
+            Assert.IsNull(SubClassDecs.TestDec);
 	    }
 
-        public static class NoAttributeDefs
+        public static class NoAttributeDecs
         {
-            static NoAttributeDefs() { Def.StaticReferencesAttribute.Initialized(); }
+            static NoAttributeDecs() { Dec.StaticReferencesAttribute.Initialized(); }
 
-            public static StubDef TestDef;
+            public static StubDec TestDec;
         }
 
         [Test]
 	    public void NoAttribute([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDef) }, explicitStaticRefs = new Type[] { typeof(NoAttributeDefs) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) }, explicitStaticRefs = new Type[] { typeof(NoAttributeDecs) } };
 
-            Def.Parser parser = null;
-            ExpectErrors(() => parser = new Def.Parser());
+            Dec.Parser parser = null;
+            ExpectErrors(() => parser = new Dec.Parser());
             parser.AddString(@"
-                <Defs>
-                    <StubDef defName=""TestDef"" />
-                </Defs>");
+                <Decs>
+                    <StubDec decName=""TestDec"" />
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode, rewrite_expectParseErrors: true);
 
-            var result = Def.Database<StubDef>.Get("TestDef");
+            var result = Dec.Database<StubDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
-            Assert.AreEqual(NoAttributeDefs.TestDef, result);
+            Assert.AreEqual(NoAttributeDecs.TestDec, result);
 	    }
 
-        [Def.StaticReferences]
-        public static class NoInitializerDefs
+        [Dec.StaticReferences]
+        public static class NoInitializerDecs
         {
-            public static StubDef TestDef;
+            public static StubDec TestDec;
         }
 
         [Test]
 	    public void NoInitializer([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) }, explicitStaticRefs = new Type[]{ typeof(NoInitializerDefs) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(NoInitializerDecs) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <StubDef defName=""TestDef"" />
-                </Defs>");
+                <Decs>
+                    <StubDec decName=""TestDec"" />
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode, rewrite_expectParseErrors: true);
 
-            var result = Def.Database<StubDef>.Get("TestDef");
+            var result = Dec.Database<StubDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
-            Assert.AreEqual(NoInitializerDefs.TestDef, result);
+            Assert.AreEqual(NoInitializerDecs.TestDec, result);
 	    }
 
-        [Def.StaticReferences]
-        public class NoStaticDefs
+        [Dec.StaticReferences]
+        public class NoStaticDecs
         {
-            static NoStaticDefs() { Def.StaticReferencesAttribute.Initialized(); }
+            static NoStaticDecs() { Dec.StaticReferencesAttribute.Initialized(); }
 
-            public static StubDef TestDef;
+            public static StubDec TestDec;
         }
 
         [Test]
 	    public void NoStatic([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDef) }, explicitStaticRefs = new Type[] { typeof(NoStaticDefs) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) }, explicitStaticRefs = new Type[] { typeof(NoStaticDecs) } };
 
-            Def.Parser parser = null;
-            ExpectErrors(() => parser = new Def.Parser());
+            Dec.Parser parser = null;
+            ExpectErrors(() => parser = new Dec.Parser());
             parser.AddString(@"
-                <Defs>
-                    <StubDef defName=""TestDef"" />
-                </Defs>");
+                <Decs>
+                    <StubDec decName=""TestDec"" />
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode, rewrite_expectParseErrors: true);
 
-            var result = Def.Database<StubDef>.Get("TestDef");
+            var result = Dec.Database<StubDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
-            Assert.AreEqual(NoStaticDefs.TestDef, result);
+            Assert.AreEqual(NoStaticDecs.TestDec, result);
 	    }
 
-        [Def.StaticReferences]
-        public static class MissingDefs
+        [Dec.StaticReferences]
+        public static class MissingDecs
         {
-            static MissingDefs() { Def.StaticReferencesAttribute.Initialized(); }
+            static MissingDecs() { Dec.StaticReferencesAttribute.Initialized(); }
 
-            public static StubDef TestDef;
+            public static StubDec TestDec;
         }
 
         [Test]
 	    public void Missing([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) }, explicitStaticRefs = new Type[]{ typeof(MissingDefs) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(MissingDecs) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                </Defs>");
+                <Decs>
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode, rewrite_expectParseErrors: true);
         }
 
-        [Def.StaticReferences]
-        public static class EarlyTouchDefs
+        [Dec.StaticReferences]
+        public static class EarlyTouchDecs
         {
-            static EarlyTouchDefs() { Def.StaticReferencesAttribute.Initialized(); }
+            static EarlyTouchDecs() { Dec.StaticReferencesAttribute.Initialized(); }
 
-            public static StubDef TestDef;
+            public static StubDec TestDec;
         }
 
         [Test]
 	    public void EarlyTouch()
 	    {
-            ExpectErrors(() => EarlyTouchDefs.TestDef = null);
+            ExpectErrors(() => EarlyTouchDecs.TestDec = null);
 	    }
 
-        [Def.StaticReferences]
-        public static class LateTouchDefs
+        [Dec.StaticReferences]
+        public static class LateTouchDecs
         {
-            static LateTouchDefs() { Def.StaticReferencesAttribute.Initialized(); }
+            static LateTouchDecs() { Dec.StaticReferencesAttribute.Initialized(); }
 
-            public static StubDef TestDef;
+            public static StubDec TestDec;
         }
 
         [Test]
@@ -260,30 +260,30 @@ namespace DefTest
 	    {
             // We avoid BehaviorMode here because the StaticReference error event can happen at most once, which means that we can't run the test twice without the second (and later) tests failing.
             // This also means that test success would depend on test order run, which, no.
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                </Defs>");
+                <Decs>
+                </Decs>");
             parser.Finish();
 
-            ExpectErrors(() => LateTouchDefs.TestDef = null);
+            ExpectErrors(() => LateTouchDecs.TestDec = null);
 	    }
 
-        [Def.StaticReferences]
-        public static class UnexpectedTouchDefs
+        [Dec.StaticReferences]
+        public static class UnexpectedTouchDecs
         {
-            static UnexpectedTouchDefs() { Def.StaticReferencesAttribute.Initialized(); }
+            static UnexpectedTouchDecs() { Dec.StaticReferencesAttribute.Initialized(); }
 
-            public static StubDef TestDef;
+            public static StubDec TestDec;
         }
 
-        public class UnexpectedTouchDef : StubDef
+        public class UnexpectedTouchDec : StubDec
         {
-            public UnexpectedTouchDef()
+            public UnexpectedTouchDec()
             {
-                UnexpectedTouchDefs.TestDef = null;
+                UnexpectedTouchDecs.TestDec = null;
             }
         }
 
@@ -292,33 +292,33 @@ namespace DefTest
 	    {
             // We avoid BehaviorMode here because the StaticReference error event can happen at most once, which means that we can't run the test twice without the second (and later) tests failing.
             // This also means that test success would depend on test order run, which, no.
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(UnexpectedTouchDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(UnexpectedTouchDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             ExpectErrors(() => parser.AddString(@"
-                <Defs>
-                    <UnexpectedTouchDef defName=""TestDef"" />
-                </Defs>"));
+                <Decs>
+                    <UnexpectedTouchDec decName=""TestDec"" />
+                </Decs>"));
             parser.Finish();
 
-            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
+            Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDec"));
 	    }
 
-        [Def.StaticReferences]
-        public static class ConstructorTouchDefs
+        [Dec.StaticReferences]
+        public static class ConstructorTouchDecs
         {
-            static ConstructorTouchDefs() { Def.StaticReferencesAttribute.Initialized(); }
+            static ConstructorTouchDecs() { Dec.StaticReferencesAttribute.Initialized(); }
 
-            public static ConstructorTouchDef TestDef;
+            public static ConstructorTouchDec TestDec;
         }
 
-        public class ConstructorTouchDef : StubDef
+        public class ConstructorTouchDec : StubDec
         {
-            public ConstructorTouchDef member;
+            public ConstructorTouchDec member;
 
-            public ConstructorTouchDef()
+            public ConstructorTouchDec()
             {
-                member = ConstructorTouchDefs.TestDef;
+                member = ConstructorTouchDecs.TestDec;
             }
         }
 
@@ -327,60 +327,60 @@ namespace DefTest
 	    {
             // We avoid BehaviorMode here because the StaticReference error event can happen at most once, which means that we can't run the test twice without the second (and later) tests failing.
             // This also means that test success would depend on test order run, which, no.
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConstructorTouchDef) }, explicitStaticRefs = new Type[]{ typeof(ConstructorTouchDefs) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConstructorTouchDec) }, explicitStaticRefs = new Type[]{ typeof(ConstructorTouchDecs) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             ExpectErrors(() => parser.AddString(@"
-                <Defs>
-                    <ConstructorTouchDef defName=""TestDef"" />
-                </Defs>"));
+                <Decs>
+                    <ConstructorTouchDec decName=""TestDec"" />
+                </Decs>"));
             ExpectErrors(() => parser.Finish());
 
-            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
+            Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDec"));
 	    }
 
-        [Def.StaticReferences]
-        public static class InternalDefs
+        [Dec.StaticReferences]
+        public static class InternalDecs
         {
-            static InternalDefs() { Def.StaticReferencesAttribute.Initialized(); }
+            static InternalDecs() { Dec.StaticReferencesAttribute.Initialized(); }
 
             #pragma warning disable CS0649
-            internal static StubDef TestDef;
+            internal static StubDec TestDec;
             #pragma warning restore CS0649
         }
 
         [Test]
 	    public void Internal([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) }, explicitStaticRefs = new Type[]{ typeof(InternalDefs) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(InternalDecs) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <StubDef defName=""TestDef"" />
-                </Defs>");
+                <Decs>
+                    <StubDec decName=""TestDec"" />
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            Assert.IsNotNull(InternalDefs.TestDef);
+            Assert.IsNotNull(InternalDecs.TestDec);
 	    }
 
-        [Def.StaticReferences]
-        public static class EmptyDefs
+        [Dec.StaticReferences]
+        public static class EmptyDecs
         {
-            static EmptyDefs() { Def.StaticReferencesAttribute.Initialized(); }
+            static EmptyDecs() { Dec.StaticReferencesAttribute.Initialized(); }
         }
 
         [Test]
         public void EmptyRefs()
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { }, explicitStaticRefs = new Type[] { typeof(EmptyDefs) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { }, explicitStaticRefs = new Type[] { typeof(EmptyDecs) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                </Defs>");
+                <Decs>
+                </Decs>");
             parser.Finish();
         }
     }

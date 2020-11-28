@@ -1,4 +1,4 @@
-namespace Def
+namespace Dec
 {
     using System;
     using System.Collections.Generic;
@@ -81,7 +81,7 @@ namespace Def
         }
 
         /// <summary>
-        /// All defs of this type.
+        /// All decs of this type.
         /// </summary>
         public static T[] List
         {
@@ -97,10 +97,10 @@ namespace Def
         }
 
         /// <summary>
-        /// Returns a def of this type by name.
+        /// Returns a dec of this type by name.
         /// </summary>
         /// <remarks>
-        /// Returns null if no such def exists.
+        /// Returns null if no such dec exists.
         /// </remarks>
         public static T Get(int index)
         {

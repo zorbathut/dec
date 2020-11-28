@@ -1,4 +1,4 @@
-namespace DefTest
+namespace DecTest
 {
     using NUnit.Framework;
     using System.Collections.Generic;
@@ -19,15 +19,15 @@ namespace DefTest
             if (!AssemblyLookup.TryGetValue(id, out assembly))
             {
                 // gotta load
-                assembly = DefUtilLib.Compilation.Compile(DefUtilLib.Compress.ReadFromFile(Path.Combine(directory, "Harness.cs")), new Assembly[] { this.GetType().Assembly });
+                assembly = DecUtilLib.Compilation.Compile(DecUtilLib.Compress.ReadFromFile(Path.Combine(directory, "Harness.cs")), new Assembly[] { this.GetType().Assembly });
                 AssemblyLookup[id] = assembly;
             }
 
-            var type = assembly.GetType("DefTest.Harness");
+            var type = assembly.GetType("DecTest.Harness");
             type.GetMethod("Setup").Invoke(null, null);
 
-            var parser = new Def.Parser();
-            parser.AddString(DefUtilLib.Compress.ReadFromFile(Path.Combine(directory, "data.xml")));
+            var parser = new Dec.Parser();
+            parser.AddString(DecUtilLib.Compress.ReadFromFile(Path.Combine(directory, "data.xml")));
             parser.Finish();
 
             DoBehavior(mode, validation_assemblies: new Assembly[] { assembly });

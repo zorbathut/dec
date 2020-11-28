@@ -1,7 +1,7 @@
 # Custom deserialization
 
 ```cs
-public class ColorConverter : Def.Converter
+public class ColorConverter : Dec.Converter
 {
     public override HashSet<Type> HandledTypes()
     {
@@ -21,7 +21,7 @@ public class ColorConverter : Def.Converter
 ```
 
 ```xml
-<ExampleDef defName="Example">
+<ExampleDec decName="Example">
   <tintA>
     <r>0.3</r>
     <g>0.5</g>
@@ -29,7 +29,7 @@ public class ColorConverter : Def.Converter
   </tintA>
   <tintB>(0.3, 0.5, 0.8)</tintB>
   <tintC>#4C7FCC</tintC>
-</ExampleDef>
+</ExampleDec>
 ```
 
-Providing custom deserializers for your own classes, or third-party classes, is as easy as defining classes that derive from [`Def.Converter`](xref:Def.Converter). [`Def.Parser`](xref:Def.Parser) will automatically find them during startup and register them. Please check [`Def.Converter`](xref:Def.Converter) documentation for more details.
+Providing custom deserializers for your own classes, or third-party classes, is as easy as defining classes that derive from [`Dec.Converter`](xref:Dec.Converter). [`Dec.Parser`](xref:Dec.Parser) will automatically find them during startup and register them. Please check [`Dec.Converter`](xref:Dec.Converter) documentation for more details.

@@ -1,4 +1,4 @@
-namespace DefTest
+namespace DecTest
 {
     using NUnit.Framework;
     using System;
@@ -6,17 +6,17 @@ namespace DefTest
     [TestFixture]
     public class Primitives : Base
     {
-        public class IntDef : Def.Def
+        public class IntDec : Dec.Dec
         {
             public int value = 4;
         }
 
-        public class BoolDef : Def.Def
+        public class BoolDec : Dec.Dec
         {
             public bool value = true;
         }
 
-        public class StringDef : Def.Def
+        public class StringDec : Dec.Dec
         {
             public string value = "one";
         }
@@ -24,20 +24,20 @@ namespace DefTest
 	    [Test]
 	    public void EmptyIntParse([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(IntDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(IntDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <IntDef defName=""TestDef"">
+                <Decs>
+                    <IntDec decName=""TestDec"">
                         <value />
-                    </IntDef>
-                </Defs>");
+                    </IntDec>
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode);
 
-            var result = Def.Database<IntDef>.Get("TestDef");
+            var result = Dec.Database<IntDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(4, result.value);
@@ -46,20 +46,20 @@ namespace DefTest
         [Test]
 	    public void FailingIntParse([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(IntDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(IntDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <IntDef defName=""TestDef"">
+                <Decs>
+                    <IntDec decName=""TestDec"">
                         <value>NotAnInt</value>
-                    </IntDef>
-                </Defs>");
+                    </IntDec>
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode);
 
-            var result = Def.Database<IntDef>.Get("TestDef");
+            var result = Dec.Database<IntDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(4, result.value);
@@ -68,20 +68,20 @@ namespace DefTest
         [Test]
 	    public void FailingIntParse2([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(IntDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(IntDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <IntDef defName=""TestDef"">
+                <Decs>
+                    <IntDec decName=""TestDec"">
                         <value>10NotAnInt</value>
-                    </IntDef>
-                </Defs>");
+                    </IntDec>
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode);
 
-            var result = Def.Database<IntDef>.Get("TestDef");
+            var result = Dec.Database<IntDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(4, result.value);
@@ -90,20 +90,20 @@ namespace DefTest
 	    [Test]
 	    public void EmptyBoolParse([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(BoolDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(BoolDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <BoolDef defName=""TestDef"">
+                <Decs>
+                    <BoolDec decName=""TestDec"">
                         <value />
-                    </BoolDef>
-                </Defs>");
+                    </BoolDec>
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode);
 
-            var result = Def.Database<BoolDef>.Get("TestDef");
+            var result = Dec.Database<BoolDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(true, result.value);
@@ -112,20 +112,20 @@ namespace DefTest
 	    [Test]
 	    public void FailingBoolParse([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(BoolDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(BoolDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <BoolDef defName=""TestDef"">
+                <Decs>
+                    <BoolDec decName=""TestDec"">
                         <value>NotABool</value>
-                    </BoolDef>
-                </Defs>");
+                    </BoolDec>
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode);
 
-            var result = Def.Database<BoolDef>.Get("TestDef");
+            var result = Dec.Database<BoolDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(true, result.value);
@@ -134,26 +134,26 @@ namespace DefTest
         [Test]
 	    public void EmptyStringParse([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StringDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StringDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <StringDef defName=""TestDef"">
+                <Decs>
+                    <StringDec decName=""TestDec"">
                         <value />
-                    </StringDef>
-                </Defs>");
+                    </StringDec>
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var result = Def.Database<StringDef>.Get("TestDef");
+            var result = Dec.Database<StringDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.AreEqual("", result.value);
 	    }
 
-        public class BulkParseDef : Def.Def
+        public class BulkParseDec : Dec.Dec
         {
             public int testIntA = 1;
             public int testIntB = 2;
@@ -173,12 +173,12 @@ namespace DefTest
 	    [Test]
 	    public void BulkParse([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(BulkParseDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(BulkParseDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <BulkParseDef defName=""TestDef"">
+                <Decs>
+                    <BulkParseDec decName=""TestDec"">
                         <testIntA>35</testIntA>
                         <testIntB>-20</testIntB>
                         <testFloatA>0.1234</testFloatA>
@@ -188,13 +188,13 @@ namespace DefTest
                         <testStringC>Forsooth</testStringC>
                         <testBoolA>true</testBoolA>
                         <testBoolB>false</testBoolB>
-                    </BulkParseDef>
-                </Defs>");
+                    </BulkParseDec>
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var result = Def.Database<BulkParseDef>.Get("TestDef");
+            var result = Dec.Database<BulkParseDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(35, result.testIntA);
@@ -212,7 +212,7 @@ namespace DefTest
             Assert.AreEqual(false, result.testBoolC);
 	    }
 
-        public class MissingMemberDef : Def.Def
+        public class MissingMemberDec : Dec.Dec
         {
             public int value1;
             public int value3;
@@ -221,22 +221,22 @@ namespace DefTest
         [Test]
 	    public void MissingMember([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(MissingMemberDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(MissingMemberDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <MissingMemberDef defName=""TestDef"">
+                <Decs>
+                    <MissingMemberDec decName=""TestDec"">
                         <value1>9</value1>
                         <value2>99</value2>
                         <value3>999</value3>
-                    </MissingMemberDef>
-                </Defs>");
+                    </MissingMemberDec>
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode);
 
-            var result = Def.Database<MissingMemberDef>.Get("TestDef");
+            var result = Dec.Database<MissingMemberDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(result.value1, 9);
@@ -250,7 +250,7 @@ namespace DefTest
             Three,
         }
 
-        public class EnumDef : Def.Def
+        public class EnumDec : Dec.Dec
         {
             public ExampleEnum value;
         }
@@ -258,20 +258,20 @@ namespace DefTest
         [Test]
 	    public void Enum([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(EnumDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(EnumDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <EnumDef defName=""TestDef"">
+                <Decs>
+                    <EnumDec decName=""TestDec"">
                         <value>Two</value>
-                    </EnumDef>
-                </Defs>");
+                    </EnumDec>
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var result = Def.Database<EnumDef>.Get("TestDef");
+            var result = Dec.Database<EnumDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(result.value, ExampleEnum.Two);
@@ -280,26 +280,26 @@ namespace DefTest
         [Test]
 	    public void InvalidAttribute([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(IntDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(IntDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <IntDef defName=""TestDef"">
+                <Decs>
+                    <IntDec decName=""TestDec"">
                         <value invalid=""yes"">5</value>
-                    </IntDef>
-                </Defs>");
+                    </IntDec>
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode);
 
-            var result = Def.Database<IntDef>.Get("TestDef");
+            var result = Dec.Database<IntDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(result.value, 5);
 	    }
 
-        public class TypeDef : Def.Def
+        public class TypeDec : Dec.Dec
         {
             public Type type;
         }
@@ -314,21 +314,21 @@ namespace DefTest
         [Test]
 	    public void TypeBasic([Values] BehaviorMode mode)
 	    {
-            Def.Config.UsingNamespaces = new string[] { "DefTest.Primitives" };
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDef) } };
+            Dec.Config.UsingNamespaces = new string[] { "DecTest.Primitives" };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <TypeDef defName=""TestDef"">
+                <Decs>
+                    <TypeDec decName=""TestDec"">
                         <type>Example</type>
-                    </TypeDef>
-                </Defs>");
+                    </TypeDec>
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var result = Def.Database<TypeDef>.Get("TestDef");
+            var result = Dec.Database<TypeDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(result.type, typeof(Example));
@@ -337,21 +337,21 @@ namespace DefTest
         [Test]
 	    public void TypeNested([Values] BehaviorMode mode)
 	    {
-            Def.Config.UsingNamespaces = new string[] { "DefTest.Primitives", "DefTest.Primitives.ContainerA", "DefTest.Primitives.ContainerB" };
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDef) } };
+            Dec.Config.UsingNamespaces = new string[] { "DecTest.Primitives", "DecTest.Primitives.ContainerA", "DecTest.Primitives.ContainerB" };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <TypeDef defName=""TestDef"">
+                <Decs>
+                    <TypeDec decName=""TestDec"">
                         <type>NotOverridden</type>
-                    </TypeDef>
-                </Defs>");
+                    </TypeDec>
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var result = Def.Database<TypeDef>.Get("TestDef");
+            var result = Dec.Database<TypeDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(result.type, typeof(ContainerB.NotOverridden));
@@ -360,21 +360,21 @@ namespace DefTest
         [Test]
 	    public void TypeStatic([Values] BehaviorMode mode)
 	    {
-            Def.Config.UsingNamespaces = new string[] { "DefTest.Primitives" };
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDef) } };
+            Dec.Config.UsingNamespaces = new string[] { "DecTest.Primitives" };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <TypeDef defName=""TestDef"">
+                <Decs>
+                    <TypeDec decName=""TestDec"">
                         <type>Static</type>
-                    </TypeDef>
-                </Defs>");
+                    </TypeDec>
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var result = Def.Database<TypeDef>.Get("TestDef");
+            var result = Dec.Database<TypeDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(result.type, typeof(Static));
@@ -383,65 +383,65 @@ namespace DefTest
         [Test]
 	    public void TypeAbstract([Values] BehaviorMode mode)
 	    {
-            Def.Config.UsingNamespaces = new string[] { "DefTest.Primitives" };
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDef) } };
+            Dec.Config.UsingNamespaces = new string[] { "DecTest.Primitives" };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <TypeDef defName=""TestDef"">
+                <Decs>
+                    <TypeDec decName=""TestDec"">
                         <type>Abstract</type>
-                    </TypeDef>
-                </Defs>");
+                    </TypeDec>
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var result = Def.Database<TypeDef>.Get("TestDef");
+            var result = Dec.Database<TypeDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(result.type, typeof(Abstract));
 	    }
 
         [Test]
-	    public void TypeDefRef([Values] BehaviorMode mode)
+	    public void TypeDecRef([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <TypeDef defName=""TestDef"">
-                        <type>TypeDef</type>
-                    </TypeDef>
-                </Defs>");
+                <Decs>
+                    <TypeDec decName=""TestDec"">
+                        <type>TypeDec</type>
+                    </TypeDec>
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var result = Def.Database<TypeDef>.Get("TestDef");
+            var result = Dec.Database<TypeDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
-            Assert.AreEqual(result.type, typeof(TypeDef));
+            Assert.AreEqual(result.type, typeof(TypeDec));
 	    }
 
         [Test]
 	    public void TypeGenericA([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <TypeDef defName=""TestDef"">
+                <Decs>
+                    <TypeDec decName=""TestDec"">
                         <type>Generic</type>
-                    </TypeDef>
-                </Defs>");
+                    </TypeDec>
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode);
 
-            var result = Def.Database<TypeDef>.Get("TestDef");
+            var result = Dec.Database<TypeDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.IsNull(result.type);
@@ -450,20 +450,20 @@ namespace DefTest
         [Test]
 	    public void TypeGenericB([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <TypeDef defName=""TestDef"">
+                <Decs>
+                    <TypeDec decName=""TestDec"">
                         <type>Generic&lt;&gt;</type>
-                    </TypeDef>
-                </Defs>");
+                    </TypeDec>
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode);
 
-            var result = Def.Database<TypeDef>.Get("TestDef");
+            var result = Dec.Database<TypeDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.IsNull(result.type);
@@ -472,20 +472,20 @@ namespace DefTest
         [Test]
 	    public void TypeGenericC([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <TypeDef defName=""TestDef"">
+                <Decs>
+                    <TypeDec decName=""TestDec"">
                         <type>Generic&lt;int&gt;</type>
-                    </TypeDef>
-                </Defs>");
+                    </TypeDec>
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode);
 
-            var result = Def.Database<TypeDef>.Get("TestDef");
+            var result = Dec.Database<TypeDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.IsNull(result.type);
@@ -494,21 +494,21 @@ namespace DefTest
         [Test]
 	    public void TypeOverridden([Values] BehaviorMode mode)
 	    {
-            Def.Config.UsingNamespaces = new string[] { "DefTest.Primitives", "DefTest.Primitives.ContainerA", "DefTest.Primitives.ContainerB" };
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDef) } };
+            Dec.Config.UsingNamespaces = new string[] { "DecTest.Primitives", "DecTest.Primitives.ContainerA", "DecTest.Primitives.ContainerB" };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <TypeDef defName=""TestDef"">
+                <Decs>
+                    <TypeDec decName=""TestDec"">
                         <type>Overridden</type>
-                    </TypeDef>
-                </Defs>");
+                    </TypeDec>
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode, rewrite_expectParseErrors: true);
 
-            var result = Def.Database<TypeDef>.Get("TestDef");
+            var result = Dec.Database<TypeDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.IsNotNull(result.type);
@@ -517,26 +517,26 @@ namespace DefTest
         [Test]
 	    public void TypeComplete([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <TypeDef defName=""TestDef"">
-                        <type>DefTest.Primitives+Example</type> <!-- conveniently tests both namespaces and classes at the same time -->
-                    </TypeDef>
-                </Defs>");
+                <Decs>
+                    <TypeDec decName=""TestDec"">
+                        <type>DecTest.Primitives+Example</type> <!-- conveniently tests both namespaces and classes at the same time -->
+                    </TypeDec>
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var result = Def.Database<TypeDef>.Get("TestDef");
+            var result = Dec.Database<TypeDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(typeof(Example), result.type);
 	    }
 
-        public class Ieee754SpecialDef : Def.Def
+        public class Ieee754SpecialDec : Dec.Dec
         {
             public float floatNan;
             public float floatInf;
@@ -551,12 +551,12 @@ namespace DefTest
         [Test]
         public void Ieee754Special([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(Ieee754SpecialDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(Ieee754SpecialDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <Ieee754SpecialDef defName=""TestDef"">
+                <Decs>
+                    <Ieee754SpecialDec decName=""TestDec"">
                         <floatNan>NaN</floatNan>
                         <floatInf>Infinity</floatInf>
                         <floatNinf>-Infinity</floatNinf>
@@ -565,13 +565,13 @@ namespace DefTest
                         <doubleInf>Infinity</doubleInf>
                         <doubleNinf>-Infinity</doubleNinf>
                         <doubleEpsilon>4.94065645841247E-324</doubleEpsilon>
-                    </Ieee754SpecialDef>
-                </Defs>");
+                    </Ieee754SpecialDec>
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var result = Def.Database<Ieee754SpecialDef>.Get("TestDef");
+            var result = Dec.Database<Ieee754SpecialDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(float.NaN, result.floatNan);

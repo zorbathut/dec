@@ -1,13 +1,13 @@
-<Defs>
-  <CompositeTypeDistributionDef defName="Distribution">
+<Decs>
+  <CompositeTypeDistributionDec decName="Distribution">
     <elements>
-      <Def>3</Def>
+      <Dec>3</Dec>
       <Struct>2</Struct>
       <Class>5</Class>
     </elements>
-  </CompositeTypeDistributionDef>
+  </CompositeTypeDistributionDec>
 
-  <MemberTypeDistributionDef defName="Distribution">
+  <MemberTypeDistributionDec decName="Distribution">
     <elements>
       <Short>0.1</Short>
       <Ushort>0.1</Ushort>
@@ -20,13 +20,13 @@
       <String>1</String>
       <Bool>1</Bool>
       <Composite>1</Composite>
-      <Def>2</Def>
+      <Dec>2</Dec>
       <ContainerList>2</ContainerList>
       <ContainerDictionary>1</ContainerDictionary>
     </elements>
-  </MemberTypeDistributionDef>
+  </MemberTypeDistributionDec>
 
-  <MemberTypeDistributionDef defName="DictKeyDistribution">
+  <MemberTypeDistributionDec decName="DictKeyDistribution">
     <elements>
       <Short>0.1</Short>
       <Ushort>0.1</Ushort>
@@ -35,7 +35,7 @@
       <Long>0.1</Long>
       <Ulong>0.1</Ulong>
       <String>1</String>
-      <Def>2</Def>
+      <Dec>2</Dec>
     </elements>
-  </MemberTypeDistributionDef>
-</Defs>
+  </MemberTypeDistributionDec>
+</Decs>

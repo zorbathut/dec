@@ -1,11 +1,11 @@
-namespace Def
+namespace Dec
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
 
     /// <summary>
-    /// Contains information on all defs that exist.
+    /// Contains information on all decs that exist.
     /// </summary>
     /// <remarks>
     /// This is generally not useful for anything except debug functionality.
@@ -15,11 +15,11 @@ namespace Def
         private static readonly HashSet<Type> Databases = new HashSet<Type>();
 
         // This is redundant with Database<T>, but it's a lot faster than using reflection
-        private static readonly Dictionary<Type, Dictionary<string, Def>> Lookup = new Dictionary<Type, Dictionary<string, Def>>();
-        private static Def[] CachedList = null;
+        private static readonly Dictionary<Type, Dictionary<string, Dec>> Lookup = new Dictionary<Type, Dictionary<string, Dec>>();
+        private static Dec[] CachedList = null;
 
         /// <summary>
-        /// The total number of defs that exist.
+        /// The total number of decs that exist.
         /// </summary>
         public static int Count
         {
@@ -31,12 +31,12 @@ namespace Def
         }
 
         /// <summary>
-        /// All defs.
+        /// All decs.
         /// </summary>
         /// <remarks>
-        /// Defs are listed in no guaranteed or stable order.
+        /// Decs are listed in no guaranteed or stable order.
         /// </remarks>
-        public static IEnumerable<Def> List
+        public static IEnumerable<Dec> List
         {
             get
             {
@@ -46,14 +46,14 @@ namespace Def
         }
 
         /// <summary>
-        /// Retrieves a def by base def type and name.
+        /// Retrieves a dec by base dec type and name.
         /// </summary>
         /// <remarks>
-        /// Returns null if no such def exists.
+        /// Returns null if no such dec exists.
         /// </remarks>
-        public static Def Get(Type type, string name)
+        public static Dec Get(Type type, string name)
         {
-            var typedict = Lookup.TryGetValue(type.GetDefRootType());
+            var typedict = Lookup.TryGetValue(type.GetDecRootType());
             if (typedict == null)
             {
                 return null;
@@ -63,106 +63,106 @@ namespace Def
         }
 
         /// <summary>
-        /// Creates a Def.
+        /// Creates a Dec.
         /// </summary>
         /// <remarks>
-        /// This will be supported for dynamically-generated Defs in the future, but right now exists mostly for the Composer functionality. It is currently not recommended to use this during actual gameplay.
+        /// This will be supported for dynamically-generated Decs in the future, but right now exists mostly for the Composer functionality. It is currently not recommended to use this during actual gameplay.
         ///
         /// At this time, this will not register Indexes. This behavior may change at some point in the future.
         /// </remarks>
-        public static Def Create(Type type, string defName)
+        public static Dec Create(Type type, string decName)
         {
-            if (!typeof(Def).IsAssignableFrom(type))
+            if (!typeof(Dec).IsAssignableFrom(type))
             {
-                Dbg.Err($"Attempting to dynamically create a Def of type {type}, which is not actually a Def");
+                Dbg.Err($"Attempting to dynamically create a Dec of type {type}, which is not actually a Dec");
                 return null;
             }
 
             // This is definitely not the most efficient way to do this.
             var createMethod = typeof(Database).GetMethod("Create", new[] { typeof(string) });
             var madeMethod = createMethod.MakeGenericMethod(new[] { type });
-            return madeMethod.Invoke(null, new[] { defName }) as Def;
+            return madeMethod.Invoke(null, new[] { decName }) as Dec;
         }
 
         /// <summary>
-        /// Creates a Def.
+        /// Creates a Dec.
         /// </summary>
         /// <remarks>
-        /// This will be supported for dynamically-generated Defs in the future, but right now exists mostly for the Composer functionality. It is currently not recommended to use this during actual gameplay.
+        /// This will be supported for dynamically-generated Decs in the future, but right now exists mostly for the Composer functionality. It is currently not recommended to use this during actual gameplay.
         ///
         /// At this time, this will not register Indexes. This behavior may change at some point in the future.
         /// </remarks>
-        public static T Create<T>(string defName) where T : Def, new()
+        public static T Create<T>(string decName) where T : Dec, new()
         {
-            if (Database<T>.Get(defName) != null)
+            if (Database<T>.Get(decName) != null)
             {
-                Dbg.Err($"Attempting to dynamically create {typeof(T)}:{defName} when it already exists");
+                Dbg.Err($"Attempting to dynamically create {typeof(T)}:{decName} when it already exists");
                 return null;
             }
 
-            if (Get(typeof(T).GetDefRootType(), defName) != null)
+            if (Get(typeof(T).GetDecRootType(), decName) != null)
             {
-                Dbg.Err($"Attempting to dynamically create {typeof(T)}:{defName} when a conflicting Def already exists");
+                Dbg.Err($"Attempting to dynamically create {typeof(T)}:{decName} when a conflicting Dec already exists");
                 return null;
             }
 
-            var defInstance = new T();
-            defInstance.DefName = defName;
+            var decInstance = new T();
+            decInstance.DecName = decName;
 
-            Register(defInstance);
+            Register(decInstance);
 
-            return defInstance;
+            return decInstance;
         }
 
         /// <summary>
-        /// Deletes an existing def.
+        /// Deletes an existing dec.
         /// </summary>
         /// <remarks>
         /// This exists mostly for the Composer functionality. It is generally not recommended to use this during actual gameplay.
         ///
         /// At this time, this will not unregister existing Indexes. This behavior may change at some point in the future.
         /// </remarks>
-        public static void Delete(Def def)
+        public static void Delete(Dec dec)
         {
-            if (Get(def.GetType(), def.DefName) != def)
+            if (Get(dec.GetType(), dec.DecName) != dec)
             {
-                Dbg.Err($"Attempting to delete {def} when it either has already been deleted or never existed");
+                Dbg.Err($"Attempting to delete {dec} when it either has already been deleted or never existed");
                 return;
             }
 
-            Unregister(def);
+            Unregister(dec);
         }
 
         /// <summary>
-        /// Renames an existing def.
+        /// Renames an existing dec.
         /// </summary>
         /// <remarks>
         /// This exists mostly for the Composer functionality. It is generally not recommended to use this during actual gameplay.
         /// </remarks>
-        public static void Rename(Def def, string defName)
+        public static void Rename(Dec dec, string decName)
         {
-            if (Get(def.GetType(), def.DefName) != def)
+            if (Get(dec.GetType(), dec.DecName) != dec)
             {
-                Dbg.Err($"Attempting to rename what used to be {def} but is no longer a registered Def");
+                Dbg.Err($"Attempting to rename what used to be {dec} but is no longer a registered Dec");
                 return;
             }
 
-            if (def.DefName != defName && Get(def.GetType().GetDefRootType(), defName) != null)
+            if (dec.DecName != decName && Get(dec.GetType().GetDecRootType(), decName) != null)
             {
-                Dbg.Err($"Attempting to rename {def} to {defName} when it already exists");
+                Dbg.Err($"Attempting to rename {dec} to {decName} when it already exists");
                 return;
             }
 
-            Unregister(def);
-            def.DefName = defName;
-            Register(def);
+            Unregister(dec);
+            dec.DecName = decName;
+            Register(dec);
         }
 
         /// <summary>
-        /// Clears all global def state, preparing the environment for a new Parser run.
+        /// Clears all global dec state, preparing the environment for a new Parser run.
         /// </summary>
         /// <remarks>
-        /// This exists mostly for the sake of unit tests. It is generally not recommended to use this during actual gameplay. Be aware that re-parsing XML files will create an entire new set of Def objects, it will not replace data in existing objects.
+        /// This exists mostly for the sake of unit tests. It is generally not recommended to use this during actual gameplay. Be aware that re-parsing XML files will create an entire new set of Dec objects, it will not replace data in existing objects.
         /// </remarks>
         public static void Clear()
         {
@@ -194,23 +194,23 @@ namespace Def
         {
             if (CachedList == null)
             {
-                CachedList = Lookup.Where(kvp => kvp.Key.GetDefDatabaseStatus() == UtilType.DefDatabaseStatus.Root).SelectMany(kvp => kvp.Value.Values).ToArray();
+                CachedList = Lookup.Where(kvp => kvp.Key.GetDecDatabaseStatus() == UtilType.DecDatabaseStatus.Root).SelectMany(kvp => kvp.Value.Values).ToArray();
             }
         }
 
-        private static Dictionary<string, Def> GetLookupFor(Type type)
+        private static Dictionary<string, Dec> GetLookupFor(Type type)
         {
             var typedict = Lookup.TryGetValue(type);
             if (typedict == null)
             {
-                typedict = new Dictionary<string, Def>();
+                typedict = new Dictionary<string, Dec>();
                 Lookup[type] = typedict;
             }
 
             return typedict;
         }
 
-        internal static void Register(Def instance)
+        internal static void Register(Dec instance)
         {
             CachedList = null;
 
@@ -225,9 +225,9 @@ namespace Def
                 regFunction.Invoke(null, new[] { instance });
 
                 // We'll just rely on Database<T> to generate the relevant errors if we're overwriting something
-                GetLookupFor(registrationType)[instance.DefName] = instance;
+                GetLookupFor(registrationType)[instance.DecName] = instance;
 
-                if (registrationType.GetDefDatabaseStatus() == UtilType.DefDatabaseStatus.Root)
+                if (registrationType.GetDecDatabaseStatus() == UtilType.DecDatabaseStatus.Root)
                 {
                     break;
                 }
@@ -236,7 +236,7 @@ namespace Def
             }
         }
 
-        internal static void Unregister(Def instance)
+        internal static void Unregister(Dec instance)
         {
             CachedList = null;
 
@@ -251,13 +251,13 @@ namespace Def
                 regFunction.Invoke(null, new[] { instance });
 
                 var lookup = GetLookupFor(registrationType);
-                if (lookup.TryGetValue(instance.DefName) == instance)
+                if (lookup.TryGetValue(instance.DecName) == instance)
                 {
                     // It's possible this fails if we've clobbered the database with accidental overwrites from an xml file, but, well, what can you do I guess
-                    lookup.Remove(instance.DefName);
+                    lookup.Remove(instance.DecName);
                 }
 
-                if (registrationType.GetDefDatabaseStatus() == UtilType.DefDatabaseStatus.Root)
+                if (registrationType.GetDecDatabaseStatus() == UtilType.DecDatabaseStatus.Root)
                 {
                     break;
                 }
@@ -268,91 +268,91 @@ namespace Def
     }
 
     /// <summary>
-    /// Contains information on a single type of Def.
+    /// Contains information on a single type of Dec.
     /// </summary>
     /// <remarks>
-    /// This is often used for object types that should function without being explicitly referenced. As an example, a roguelike might have ArtifactWeaponDef, then - when spawning an artifact weapon - simply choose one out of the full database.
+    /// This is often used for object types that should function without being explicitly referenced. As an example, a roguelike might have ArtifactWeaponDec, then - when spawning an artifact weapon - simply choose one out of the full database.
     /// </remarks>
-    public static class Database<T> where T : Def
+    public static class Database<T> where T : Dec
     {
-        private static readonly List<T> DefList = new List<T>();
-        private static T[] DefArray = null;
-        private static readonly Dictionary<string, T> DefLookup = new Dictionary<string, T>();
+        private static readonly List<T> DecList = new List<T>();
+        private static T[] DecArray = null;
+        private static readonly Dictionary<string, T> DecLookup = new Dictionary<string, T>();
 
         /// <summary>
-        /// The number of defs of this type that exist.
+        /// The number of decs of this type that exist.
         /// </summary>
         public static int Count
         {
             get
             {
-                return DefList.Count;
+                return DecList.Count;
             }
         }
 
         /// <summary>
-        /// All defs of this type.
+        /// All decs of this type.
         /// </summary>
         public static T[] List
         {
             get
             {
-                if (DefArray == null)
+                if (DecArray == null)
                 {
-                    DefArray = DefList.ToArray();
+                    DecArray = DecList.ToArray();
                 }
 
-                return DefArray;
+                return DecArray;
             }
         }
 
         /// <summary>
-        /// Returns a def of this type by name.
+        /// Returns a dec of this type by name.
         /// </summary>
         /// <remarks>
-        /// Returns null if no such def exists.
+        /// Returns null if no such dec exists.
         /// </remarks>
         public static T Get(string name)
         {
-            return DefLookup.TryGetValue(name);
+            return DecLookup.TryGetValue(name);
         }
 
         internal static void Register(T instance)
         {
-            DefArray = null;
+            DecArray = null;
 
-            if (DefLookup.ContainsKey(instance.DefName))
+            if (DecLookup.ContainsKey(instance.DecName))
             {
-                Dbg.Err($"Found repeated def {typeof(T)}.{instance.DefName}");
+                Dbg.Err($"Found repeated dec {typeof(T)}.{instance.DecName}");
 
                 // I . . . guess?
-                DefList[DefList.FindIndex(def => def == DefLookup[instance.DefName])] = instance;
-                DefLookup[instance.DefName] = instance;
+                DecList[DecList.FindIndex(dec => dec == DecLookup[instance.DecName])] = instance;
+                DecLookup[instance.DecName] = instance;
 
                 return;
             }
 
-            DefList.Add(instance);
-            DefLookup[instance.DefName] = instance;
+            DecList.Add(instance);
+            DecLookup[instance.DecName] = instance;
         }
 
         internal static void Unregister(T instance)
         {
-            DefArray = null;
+            DecArray = null;
 
-            if (DefLookup.TryGetValue(instance.DefName) == instance)
+            if (DecLookup.TryGetValue(instance.DecName) == instance)
             {
-                DefLookup.Remove(instance.DefName);
+                DecLookup.Remove(instance.DecName);
             }
 
-            DefList.Remove(instance);
+            DecList.Remove(instance);
         }
 
         internal static void Clear()
         {
-            DefList.Clear();
-            DefLookup.Clear();
-            DefArray = null;
+            DecList.Clear();
+            DecLookup.Clear();
+            DecArray = null;
         }
     }
 }

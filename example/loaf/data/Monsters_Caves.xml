@@ -1,58 +1,58 @@
-<Defs>
-  <MonsterDef defName="CavesBase" abstract="true">
+<Decs>
+  <MonsterDec decName="CavesBase" abstract="true">
     <hp>40</hp>
     <damage>2d6</damage>
     <gold>10d100</gold>
-  </MonsterDef>
+  </MonsterDec>
   
-  <MonsterDef defName="AmethystApe" parent="CavesBase">
+  <MonsterDec decName="AmethystApe" parent="CavesBase">
     <name>amethyst ape</name>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="AmberAuroch" parent="CavesBase">
+  <MonsterDec decName="AmberAuroch" parent="CavesBase">
     <name>amber auroch</name>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="EmeraldEttin" parent="CavesBase">
+  <MonsterDec decName="EmeraldEttin" parent="CavesBase">
     <name>emerald ettin</name>
     <loot>JaggedBracer</loot>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="JadeJackal" parent="CavesBase">
+  <MonsterDec decName="JadeJackal" parent="CavesBase">
     <name>jade jackal</name>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="LapisLamia" parent="CavesBase">
+  <MonsterDec decName="LapisLamia" parent="CavesBase">
     <name>lapis lamia</name>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="OpalOgre" parent="CavesBase">
+  <MonsterDec decName="OpalOgre" parent="CavesBase">
     <name>opal ogre</name>
     <loot>JaggedBracer</loot>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="PearlPegasus" parent="CavesBase">
+  <MonsterDec decName="PearlPegasus" parent="CavesBase">
     <name>pearl pegasus</name>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="RubyRevenant" parent="CavesBase">
+  <MonsterDec decName="RubyRevenant" parent="CavesBase">
     <name>ruby revenant</name>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="SapphireSuccubus" parent="CavesBase">
+  <MonsterDec decName="SapphireSuccubus" parent="CavesBase">
     <name>sapphire succubus</name>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="TurquoiseTurtle" parent="CavesBase">
+  <MonsterDec decName="TurquoiseTurtle" parent="CavesBase">
     <name>turquoise turtle</name>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="TopazTiger" parent="CavesBase">
+  <MonsterDec decName="TopazTiger" parent="CavesBase">
     <name>topaz tiger</name>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="DiamondDragon" parent="CavesBase">
+  <MonsterDec decName="DiamondDragon" parent="CavesBase">
     <name>diamond dragon</name>
     <loot>WoodworkerMap</loot>
-  </MonsterDef>
-</Defs>
+  </MonsterDec>
+</Decs>

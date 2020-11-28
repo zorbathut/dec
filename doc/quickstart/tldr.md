@@ -1,25 +1,25 @@
 # Too Long, Didn't Read
 
-## Set up Def and add your XML directory.
+## Set up Dec and add your XML directory.
 
 ```cs
 void CalledOnceDuringGameStartup()
 {
-    Def.Config.DefaultHandlerThrowExceptions = false;
-    Def.Config.UsingNamespaces = new string[] { "YourGame" };
+    Dec.Config.DefaultHandlerThrowExceptions = false;
+    Dec.Config.UsingNamespaces = new string[] { "YourGame" };
 
-    var parser = new Def.Parser();
+    var parser = new Dec.Parser();
     parser.AddDirectory("data");
     parser.Finish();
 }
 ```
 
-## Define some classes derived from [`Def.Def`](xref:Def.Def).
+## Define some classes derived from [`Dec.Dec`](xref:Dec.Dec).
 
 ```cs
-// Here, we're defining a general template for monsters.
+// Here, we're declaring a general template for monsters.
 // This goes somewhere appropriate in your C# game code.
-class MonsterDef : Def.Def
+class MonsterDec : Dec.Dec
 {
   // Most types can be defined as simple fields.
   public float maxHP;
@@ -30,45 +30,45 @@ class MonsterDef : Def.Def
   // Classes and structs can be defined inline.
   public Color tint = Color.White;
   
-  // Defs can reference other defs.
-  public SpriteSheetDef spriteSheet;
+  // Decs can reference other decs.
+  public SpriteSheetDec spriteSheet;
   
-  // Def references are not limited to a tree structures.
-  // Defs can reference other defs in circles, reference other defs of the same type,
+  // Dec references are not limited to a tree structures.
+  // Decs can reference other decs in circles, reference other decs of the same type,
   // and even reference themselves.
-  public MonsterDef evolvedVariant = null;
+  public MonsterDec evolvedVariant = null;
 }
 ```
 
-## Write XML to define our actual objects.
+## Write XML to declare our actual objects.
 
 ```xml
-<Defs>
+<Decs>
   <!-- Here's a basic goblin. -->
   <!-- We've overridden the defaults we want changed and ignored the rest. -->
-  <!-- Every def must be named via the defName attribute. -->
-  <!-- These names must be unique within def type, but can overlap across different types. -->
+  <!-- Every dec must be named via the decName attribute. -->
+  <!-- These names must be unique within dec type, but can overlap across different types. -->
   <!-- They are intended to be human-readable for debug and development purposes, -->
   <!-- but not user-visible. -->
   <!-- They must match the regexp [A-Za-z][A-Za-z0-9_]*. -->
-  <MonsterDef defName="Goblin">
+  <MonsterDec decName="Goblin">
     <maxHP>20</maxHP>
     
-    <!-- This connects MonsterDef.Goblin's spriteSheet to SpriteSheetDef.Goblin. -->
+    <!-- This connects MonsterDec.Goblin's spriteSheet to SpriteSheetDec.Goblin. -->
     <spriteSheet>Goblin</spriteSheet>
-  </MonsterDef>
+  </MonsterDec>
 
   <!-- This is a larger goblin. -->
   <!-- We've given it a new name, a larger render scale, and more health. -->
-  <MonsterDef defName="MegaGoblin">
+  <MonsterDec decName="MegaGoblin">
     <maxHP>100</maxHP>
     <renderScale>3</renderScale>
     <spriteSheet>Goblin</spriteSheet>
-  </MonsterDef>
+  </MonsterDec>
 
   <!-- Here, we've defined a new tint for the DarkGoblin. -->
   <!-- Modifying members of included classes works like you'd expect XML to. -->
-  <MonsterDef defName="DarkGoblin">
+  <MonsterDec decName="DarkGoblin">
     <maxHP>40</maxHP>
     <tint>
       <r>0.3</r>
@@ -76,61 +76,61 @@ class MonsterDef : Def.Def
       <b>0.4</b>
     </tint>
     <spriteSheet>Goblin</spriteSheet>
-  </MonsterDef>
+  </MonsterDec>
 
-  <!-- Referencing other defs is as simple as typing their defName. -->
-  <!-- All def references are validated at load time. -->
-  <MonsterDef defName="AlchemyGoblin">
+  <!-- Referencing other decs is as simple as typing their decName. -->
+  <!-- All dec references are validated at load time. -->
+  <MonsterDec decName="AlchemyGoblin">
     <maxHP>10</maxHP>
     <spriteSheet>Goblin</spriteSheet>
     <evolvedVariant>MegaGoblin</evolvedVariant>
-  </MonsterDef>
+  </MonsterDec>
 
-  <!-- Defs can be referenced before they're defined. XML order is irrelevant. -->
-  <SpriteSheetDef defName="Goblin">
+  <!-- Decs can be referenced before they're declared. XML order is irrelevant. -->
+  <SpriteSheetDec decName="Goblin">
     <filename>goblin.png</filename>
-  </SpriteSheetDef>
-</Defs>
+  </SpriteSheetDec>
+</Decs>
 ```
 
-## Define some static references.
+## Declare some static references.
 
 ```cs
-// The attribute lets def know that it should fill this static class with data.
-[Def.StaticReferences]
-public static class MonsterDefs
+// The attribute lets dec know that it should fill this static class with data.
+[Dec.StaticReferences]
+public static class MonsterDecs
 {
   // This bit of copy-pasted code is required to automatically detect some errors.
-  // def will also detect if you haven't included this code and warn you about it.
-  static MonsterDefs() { Def.StaticReferencesAttribute.Initialized(); }
+  // dec will also detect if you haven't included this code and warn you about it.
+  static MonsterDecs() { Dec.StaticReferencesAttribute.Initialized(); }
 
-  // Include static members for any defs you want to reference directly.
-  public static MonsterDef Goblin;
-  public static MonsterDef DarkGoblin;
+  // Include static members for any decs you want to reference directly.
+  public static MonsterDec Goblin;
+  public static MonsterDec DarkGoblin;
   
-  // You don't have to include all defs here - in fact,
-  // it's recommended that you only include defs that you plan to reference by name.
+  // You don't have to include all decs here - in fact,
+  // it's recommended that you only include decs that you plan to reference by name.
 }
 ```
 
-## Use defs in code.
+## Use decs in code.
 
 ```cs
 // This is an example of an actual monster.
 // There's no requirement that it be named "Monster";
-// def does not care what you do with the data it's generated.
+// dec does not care what you do with the data it's generated.
 public class Monster
 {
-  public Monster(MonsterDef def)
+  public Monster(MonsterDec dec)
   {
-    // It's common for objects to keep a reference to the def that they're created from.
-    this.def = def;
+    // It's common for objects to keep a reference to the dec that they're created from.
+    this.dec = dec;
     
-    // defs are just classes; using things from them is simple.
-    hp = def.maxHP;
+    // decs are just classes; using things from them is simple.
+    hp = dec.maxHP;
   }
   
-  private MonsterDef def;
+  private MonsterDec dec;
   
   private float hp;
 }
@@ -141,8 +141,8 @@ public class GoblinGenerator
   {
     // If you need to use a static reference, just pull it out of the static reference class.
     // (We're assuming that you have an Entity system in this project already.
-    // The details are up to you; def doesn't specify anything about entities.)
-    Entity.Spawn(MonsterDefs.Goblin);
+    // The details are up to you; dec doesn't specify anything about entities.)
+    Entity.Spawn(MonsterDecs.Goblin);
   }
 }
 ```

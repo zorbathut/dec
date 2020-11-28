@@ -1,4 +1,4 @@
-namespace Def
+namespace Dec
 {
     using System;
     using System.Collections.Generic;
@@ -217,7 +217,7 @@ namespace Def
 
                     if (refInstance != refInstanceOutput)
                     {
-                        Dbg.Err($"{stringName}:{reference.LineNumber()}: Something really bizarre has happened and we got the wrong object back. Things are probably irrevocably broken. Please report this as a bug in Def.");
+                        Dbg.Err($"{stringName}:{reference.LineNumber()}: Something really bizarre has happened and we got the wrong object back. Things are probably irrevocably broken. Please report this as a bug in Dec.");
                         continue;
                     }
                 }

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -6,8 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\def.csproj" />
-    <ProjectReference Include="..\defutillib\defutillib.csproj" />
+    <ProjectReference Include="..\..\src\dec.csproj" />
+    <ProjectReference Include="..\defutillib\decutillib.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,7 +1,7 @@
 # Nonserialized fields
 
 ```cs
-class ExampleDef : Def.Def
+class ExampleDec : Dec.Dec
 {
   int value;
   
@@ -20,12 +20,12 @@ class ExampleDef : Def.Def
 ```
 
 ```xml
-<ExampleDef defName="Example">
+<ExampleDec decName="Example">
   <value>3</value>
   
   <!-- Thanks to the [NonSerialized] attribute, this will cause an error! -->
   <cachedDerivedValue>0</cachedDerivedValue>
-</ExampleDef>
+</ExampleDec>
 ```
 
-It's somewhat common to have cached or otherwise derived data within defs. Use the System.NonSerialized attribute to signal that certain fields should not be defined from within XML; doing so will cause an error and prevent the assignment.
+It's somewhat common to have cached or otherwise derived data within decs. Use the System.NonSerialized attribute to signal that certain fields should not be defined from within XML; doing so will cause an error and prevent the assignment.

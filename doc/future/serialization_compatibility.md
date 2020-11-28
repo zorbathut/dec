@@ -4,6 +4,6 @@ Save formats inevitably have to be changed with newer versions of the software. 
 
 A brief list of things we'll want to provide:
 
-* Def renaming, to deal with defs that have changed name from one version to another
+* Dec renaming, to deal with decs that have changed name from one version to another
 * Class renaming, to deal with classes that have changed name from one version to another
 * Some form of data updating, possibly with externally registered Converter-esque update classes

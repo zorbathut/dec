@@ -2,9 +2,9 @@
   href: parsing.md
 - name: Explicit type specification
   href: type.md
-- name: Def inheritance
+- name: Dec inheritance
   href: inheritance.md
-- name: Def hierarchy roots
+- name: Dec hierarchy roots
   href: hierarchy.md
 - name: Indexes
   href: indexes.md

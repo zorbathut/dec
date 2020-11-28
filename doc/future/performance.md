@@ -1,12 +1,12 @@
 # Performance
 
-A lot of the code in def was written with the intent of getting it working. It is *gratuitously* inefficient, simply because at the scale I'm currently working, inefficiencies are undetectable.
+A lot of the code in dec was written with the intent of getting it working. It is *gratuitously* inefficient, simply because at the scale I'm currently working, inefficiencies are undetectable.
 
-If you're using def on a larger-scale project, it's starting to get slow, and you're willing to share your code and XML with me, please get in touch; repro cases are necessary to get actual work done.
+If you're using dec on a larger-scale project, it's starting to get slow, and you're willing to share your code and XML with me, please get in touch; repro cases are necessary to get actual work done.
 
 ## Caching
 
-C#'s reflection API is not terribly fast, and def currently queries it over and over. Simply storing these values before re-requesting them would go a long way to improve performance.
+C#'s reflection API is not terribly fast, and dec currently queries it over and over. Simply storing these values before re-requesting them would go a long way to improve performance.
 
 ## Multithreading
 

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 
 namespace Fuzzgen
 {
-    [Def.Abstract]
-    public abstract class Distribution<T> : Def.Def
+    [Dec.Abstract]
+    public abstract class Distribution<T> : Dec.Dec
     {
         private readonly Dictionary<T, float> elements = new Dictionary<T, float>();
 

@@ -1,4 +1,4 @@
-namespace DefTest
+namespace DecTest
 {
     using NUnit.Framework;
     using System;
@@ -6,7 +6,7 @@ namespace DefTest
     [TestFixture]
     public class Children : Base
     {
-        public class CCRoot : Def.Def
+        public class CCRoot : Dec.Dec
         {
             public CCChild child;
         }
@@ -20,29 +20,29 @@ namespace DefTest
         [Test]
 	    public void ChildClass([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(CCRoot) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(CCRoot) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <CCRoot defName=""TestDef"">
+                <Decs>
+                    <CCRoot decName=""TestDec"">
                         <child>
                             <value>5</value>
                         </child>
                     </CCRoot>
-                </Defs>");
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var result = Def.Database<CCRoot>.Get("TestDef");
+            var result = Dec.Database<CCRoot>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(5, result.child.value);
             Assert.AreEqual(10, result.child.initialized);
 	    }
 
-        public class CCDRoot : Def.Def
+        public class CCDRoot : Dec.Dec
         {
             public CCDChild child = new CCDChild() { initialized = 8 };
         }
@@ -56,29 +56,29 @@ namespace DefTest
         [Test]
 	    public void ChildClassDefaults([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(CCDRoot) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(CCDRoot) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <CCDRoot defName=""TestDef"">
+                <Decs>
+                    <CCDRoot decName=""TestDec"">
                         <child>
                             <value>5</value>
                         </child>
                     </CCDRoot>
-                </Defs>");
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var result = Def.Database<CCDRoot>.Get("TestDef");
+            var result = Dec.Database<CCDRoot>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(5, result.child.value);
             Assert.AreEqual(8, result.child.initialized);
 	    }
 
-        public class CSRoot : Def.Def
+        public class CSRoot : Dec.Dec
         {
             public CSChild child;
         }
@@ -99,12 +99,12 @@ namespace DefTest
         [Test]
 	    public void ChildStruct([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(CSRoot) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(CSRoot) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <CSRoot defName=""TestDef"">
+                <Decs>
+                    <CSRoot decName=""TestDec"">
                         <child>
                             <value>5</value>
                             <child>
@@ -112,12 +112,12 @@ namespace DefTest
                             </child>
                         </child>
                     </CSRoot>
-                </Defs>");
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var result = Def.Database<CSRoot>.Get("TestDef");
+            var result = Dec.Database<CSRoot>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(5, result.child.value);
@@ -125,12 +125,12 @@ namespace DefTest
             Assert.AreEqual(0, result.child.valueZero);
 	    }
 
-        public class ExplicitTypeDef : Def.Def
+        public class ExplicitTypeDec : Dec.Dec
         {
             public ETBase child;
         }
 
-        public class ExplicitTypeDerivedDef : Def.Def
+        public class ExplicitTypeDerivedDec : Dec.Dec
         {
             public ETDerived child;
         }
@@ -153,23 +153,23 @@ namespace DefTest
         [Test]
 	    public void ExplicitType([Values] BehaviorMode mode)
 	    {
-            Def.Config.UsingNamespaces = new string[] { "DefTest.Children" };
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ExplicitTypeDef) } };
+            Dec.Config.UsingNamespaces = new string[] { "DecTest.Children" };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ExplicitTypeDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <ExplicitTypeDef defName=""TestDef"">
+                <Decs>
+                    <ExplicitTypeDec decName=""TestDec"">
                         <child class=""ETDerived"">
                             <value>5</value>
                         </child>
-                    </ExplicitTypeDef>
-                </Defs>");
+                    </ExplicitTypeDec>
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var result = Def.Database<ExplicitTypeDef>.Get("TestDef");
+            var result = Dec.Database<ExplicitTypeDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.IsNotNull(result.child);
@@ -180,23 +180,23 @@ namespace DefTest
         [Test]
 	    public void ExplicitTypeOverspecify([Values] BehaviorMode mode)
 	    {
-            Def.Config.UsingNamespaces = new string[] { "DefTest.Children" };
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ExplicitTypeDef) } };
+            Dec.Config.UsingNamespaces = new string[] { "DecTest.Children" };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ExplicitTypeDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <ExplicitTypeDef defName=""TestDef"">
+                <Decs>
+                    <ExplicitTypeDec decName=""TestDec"">
                         <child class=""ETBase"">
                             
                         </child>
-                    </ExplicitTypeDef>
-                </Defs>");
+                    </ExplicitTypeDec>
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var result = Def.Database<ExplicitTypeDef>.Get("TestDef");
+            var result = Dec.Database<ExplicitTypeDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.IsNotNull(result.child);
@@ -206,22 +206,22 @@ namespace DefTest
         [Test]
 	    public void ExplicitTypeBackwards([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ExplicitTypeDerivedDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ExplicitTypeDerivedDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <ExplicitTypeDerivedDef defName=""TestDef"">
+                <Decs>
+                    <ExplicitTypeDerivedDec decName=""TestDec"">
                         <child class=""ETBase"">
                             
                         </child>
-                    </ExplicitTypeDerivedDef>
-                </Defs>");
+                    </ExplicitTypeDerivedDec>
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode);
 
-            var result = Def.Database<ExplicitTypeDerivedDef>.Get("TestDef");
+            var result = Dec.Database<ExplicitTypeDerivedDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.IsNotNull(result.child);

@@ -1,4 +1,4 @@
-namespace DefTest
+namespace DecTest
 {
     using NUnit.Framework;
     using System;
@@ -24,21 +24,21 @@ namespace DefTest
         [OneTimeSetUp]
         public void CreateCallbacks()
         {
-            var reflectionClass = Assembly.GetAssembly(typeof(Def.Def)).GetType("Def.UtilType");
+            var reflectionClass = Assembly.GetAssembly(typeof(Dec.Dec)).GetType("Dec.UtilType");
 
-            var serialize = reflectionClass.GetMethod("ComposeDefFormatted", BindingFlags.NonPublic | BindingFlags.Static);
+            var serialize = reflectionClass.GetMethod("ComposeDecFormatted", BindingFlags.NonPublic | BindingFlags.Static);
             serializeType = type => (string)serialize.Invoke(null, new object[] { type });
 
-            var parse = reflectionClass.GetMethod("ParseDefFormatted", BindingFlags.NonPublic | BindingFlags.Static);
+            var parse = reflectionClass.GetMethod("ParseDecFormatted", BindingFlags.NonPublic | BindingFlags.Static);
             parseType = str => (Type)parse.Invoke(null, new object[] { str, "XXX", -1 });
         }
 
         [SetUp]
         public void InitEnvironment()
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.Finish();
         }
 
@@ -74,15 +74,15 @@ namespace DefTest
         }
 
         [Test]
-        public void DefName()
+        public void DecName()
         {
-            TypeConversionBidirectional(typeof(Def.Def), "Def.Def");
+            TypeConversionBidirectional(typeof(Dec.Dec), "Dec.Dec");
         }
 
         [Test]
-        public void OutsideDef()
+        public void OutsideDec()
         {
-            Def.Config.UsingNamespaces = new string[] { "DefTest" };
+            Dec.Config.UsingNamespaces = new string[] { "DecTest" };
 
             TypeConversionBidirectional(typeof(Meta), "Meta");
             TypeConversionBidirectional(typeof(TypeSerialization), "TypeSerialization");
@@ -104,7 +104,7 @@ namespace DefTest
         public void Overloaded()
         {
             // I'm not really guaranteed any of these besides System.IO, but this way at least I've got a good shot.
-            Def.Config.UsingNamespaces = new string[] { "System.IO", "System.Internal", "NUnit.VisualStudio.TestAdapter.Dump" };
+            Dec.Config.UsingNamespaces = new string[] { "System.IO", "System.Internal", "NUnit.VisualStudio.TestAdapter.Dump" };
 
             ExpectErrors(() => Assert.IsNotNull(parseType("File")));
         }
@@ -112,7 +112,7 @@ namespace DefTest
         [Test]
         public void GenericContainer()
         {
-            Def.Config.UsingNamespaces = new string[] { "System.Collections.Generic" };
+            Dec.Config.UsingNamespaces = new string[] { "System.Collections.Generic" };
 
             TypeConversionBidirectional(typeof(List<int>), "List<int>");
             TypeConversionBidirectional(typeof(List<List<int>>), "List<List<int>>");
@@ -121,15 +121,15 @@ namespace DefTest
         }
 
         [Test]
-        public void GenericDef()
+        public void GenericDec()
         {
-            Def.Config.UsingNamespaces = new string[] { "System.Collections.Generic" };
+            Dec.Config.UsingNamespaces = new string[] { "System.Collections.Generic" };
 
-            TypeConversionBidirectional(typeof(List<Def.Def>), "List<Def.Def>");
+            TypeConversionBidirectional(typeof(List<Dec.Dec>), "List<Dec.Dec>");
         }
 
         [Test]
-        public void GenericOutsideDef()
+        public void GenericOutsideDec()
         {
             TypeConversionOpaque(typeof(List<Meta>));
         }
@@ -143,7 +143,7 @@ namespace DefTest
         [Test]
         public void GenericMixed()
         {
-            TypeConversionOpaque(typeof(Dictionary<Def.Def, Meta>));
+            TypeConversionOpaque(typeof(Dictionary<Dec.Dec, Meta>));
         }
 
         public class WithinClass { }
@@ -151,15 +151,15 @@ namespace DefTest
         [Test]
         public void UsingNonexistent()
         {
-            TypeConversionBidirectional(typeof(WithinNamespace), "DefTest.WithinNamespace");
-            TypeConversionBidirectional(typeof(WithinNamespace.NestedClass), "DefTest.WithinNamespace.NestedClass");
-            TypeConversionBidirectional(typeof(WithinClass), "DefTest.TypeSerialization.WithinClass");
+            TypeConversionBidirectional(typeof(WithinNamespace), "DecTest.WithinNamespace");
+            TypeConversionBidirectional(typeof(WithinNamespace.NestedClass), "DecTest.WithinNamespace.NestedClass");
+            TypeConversionBidirectional(typeof(WithinClass), "DecTest.TypeSerialization.WithinClass");
         }
 
         [Test]
         public void UsingPartial()
         {
-            Def.Config.UsingNamespaces = new string[] { "DefTest" };
+            Dec.Config.UsingNamespaces = new string[] { "DecTest" };
 
             TypeConversionBidirectional(typeof(WithinNamespace), "WithinNamespace");
             TypeConversionBidirectional(typeof(WithinNamespace.NestedClass), "WithinNamespace.NestedClass");
@@ -169,26 +169,26 @@ namespace DefTest
         [Test]
         public void UsingLeapfrog()
         {
-            Def.Config.UsingNamespaces = new string[] { "DefTest.TypeSerialization" };
+            Dec.Config.UsingNamespaces = new string[] { "DecTest.TypeSerialization" };
 
-            TypeConversionBidirectional(typeof(WithinNamespace), "DefTest.WithinNamespace");
-            TypeConversionBidirectional(typeof(WithinNamespace.NestedClass), "DefTest.WithinNamespace.NestedClass");
+            TypeConversionBidirectional(typeof(WithinNamespace), "DecTest.WithinNamespace");
+            TypeConversionBidirectional(typeof(WithinNamespace.NestedClass), "DecTest.WithinNamespace.NestedClass");
             TypeConversionBidirectional(typeof(WithinClass), "WithinClass");
         }
 
         [Test]
         public void UsingExists()
         {
-            Def.Config.UsingNamespaces = new string[] { "DefTest", "DefTest.TypeSerialization" };
+            Dec.Config.UsingNamespaces = new string[] { "DecTest", "DecTest.TypeSerialization" };
 
             TypeConversionBidirectional(typeof(WithinNamespace), "WithinNamespace");
             TypeConversionBidirectional(typeof(WithinNamespace.NestedClass), "WithinNamespace.NestedClass");
             TypeConversionBidirectional(typeof(WithinClass), "WithinClass");
 
             // Fully specified always has to work
-            Assert.AreEqual(typeof(WithinNamespace), parseType("DefTest.WithinNamespace"));
-            Assert.AreEqual(typeof(WithinNamespace.NestedClass), parseType("DefTest.WithinNamespace.NestedClass"));
-            Assert.AreEqual(typeof(WithinClass), parseType("DefTest.TypeSerialization.WithinClass"));
+            Assert.AreEqual(typeof(WithinNamespace), parseType("DecTest.WithinNamespace"));
+            Assert.AreEqual(typeof(WithinNamespace.NestedClass), parseType("DecTest.WithinNamespace.NestedClass"));
+            Assert.AreEqual(typeof(WithinClass), parseType("DecTest.TypeSerialization.WithinClass"));
         }
 
         public class NestedA
@@ -207,7 +207,7 @@ namespace DefTest
         [Test]
         public void Nesting()
         {
-            Def.Config.UsingNamespaces = new string[] { "DefTest.TypeSerialization" };
+            Dec.Config.UsingNamespaces = new string[] { "DecTest.TypeSerialization" };
 
             TypeConversionBidirectional(typeof(NestedA.NestedB.NestedC.NestedD), "NestedA.NestedB.NestedC.NestedD");
         }
@@ -232,7 +232,7 @@ namespace DefTest
         [Test]
         public void GenericSimple()
         {
-            Def.Config.UsingNamespaces = new string[] { "DefTest.TypeSerialization" };
+            Dec.Config.UsingNamespaces = new string[] { "DecTest.TypeSerialization" };
 
             TypeConversionBidirectional(typeof(Generic<int>), "Generic<int>");
 
@@ -244,7 +244,7 @@ namespace DefTest
         [Test]
         public void GenericMultiple()
         {
-            Def.Config.UsingNamespaces = new string[] { "DefTest.TypeSerialization" };
+            Dec.Config.UsingNamespaces = new string[] { "DecTest.TypeSerialization" };
 
             TypeConversionBidirectional(typeof(Generic2Param<int, double>), "Generic2Param<int, double>");
             Assert.AreEqual(typeof(Generic2Param<int, double>), parseType("Generic2Param<int,double>"));
@@ -256,7 +256,7 @@ namespace DefTest
         [Test]
         public void GenericNestedSimple()
         {
-            Def.Config.UsingNamespaces = new string[] { "DefTest.TypeSerialization" };
+            Dec.Config.UsingNamespaces = new string[] { "DecTest.TypeSerialization" };
 
             TypeConversionBidirectional(typeof(Generic<int>.NestedStandard), "Generic<int>.NestedStandard");
         }
@@ -264,7 +264,7 @@ namespace DefTest
         [Test]
         public void GenericNestedGeneric()
         {
-            Def.Config.UsingNamespaces = new string[] { "DefTest.TypeSerialization" };
+            Dec.Config.UsingNamespaces = new string[] { "DecTest.TypeSerialization" };
 
             TypeConversionBidirectional(typeof(Generic<int>.NestedGeneric<double>), "Generic<int>.NestedGeneric<double>");
         }*/
@@ -272,7 +272,7 @@ namespace DefTest
         [Test]
         public void GenericRecursive()
         {
-            Def.Config.UsingNamespaces = new string[] { "DefTest.TypeSerialization" };
+            Dec.Config.UsingNamespaces = new string[] { "DecTest.TypeSerialization" };
 
             TypeConversionBidirectional(typeof(Generic<Generic<Generic<int>>>), "Generic<Generic<Generic<int>>>");
         }
@@ -280,7 +280,7 @@ namespace DefTest
         [Test]
         public void GenericErrors()
         {
-            Def.Config.UsingNamespaces = new string[] { "DefTest.TypeSerialization" };
+            Dec.Config.UsingNamespaces = new string[] { "DecTest.TypeSerialization" };
 
             // This is just me verifying a bunch of template error behaviors.
             ExpectErrors(() => parseType("int<int>"));
@@ -304,7 +304,7 @@ namespace DefTest
         [Test]
         public void OverloadedNames()
         {
-            Def.Config.UsingNamespaces = new string[] { "DefTest.OverloadedNames" };
+            Dec.Config.UsingNamespaces = new string[] { "DecTest.OverloadedNames" };
 
             // In theory we could handle this one properly; right now, we don't, though, and I want to make sure it does the right thing when it stops generating errors
             ExpectErrors(() => parseType("Foo"));

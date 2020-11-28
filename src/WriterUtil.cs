@@ -1,4 +1,4 @@
-namespace Def.WriterUtil
+namespace Dec.WriterUtil
 {
     using System;
     using System.Collections.Generic;

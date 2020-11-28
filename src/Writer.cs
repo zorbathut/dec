@@ -1,4 +1,4 @@
-namespace Def
+namespace Dec
 {
     using System;
     using System.Collections;
@@ -22,7 +22,7 @@ namespace Def
         public abstract void WriteEnum(object value);
         public abstract void WriteString(string value);
         public abstract void WriteType(Type value);
-        public abstract void WriteDef(Def value);
+        public abstract void WriteDec(Dec value);
         public abstract void WriteExplicitNull();
         public abstract bool WriteReference(object value);
         public abstract void WriteArray(Array value);

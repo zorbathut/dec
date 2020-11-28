@@ -22,7 +22,7 @@ namespace Fuzzgen
             String,
             Bool,
             Composite,
-            Def,
+            Dec,
             ContainerList,
             ContainerDictionary,
         }
@@ -36,7 +36,7 @@ namespace Fuzzgen
 
         public Member(Env env, Composite parent, string name, Type type)
         {
-            // In this function, we must fully define what type we are (important in the case of Def or containers)
+            // In this function, we must fully define what type we are (important in the case of Dec or containers)
             // and also set our default value (if relevant.)
 
             this.parent = parent;
@@ -54,7 +54,7 @@ namespace Fuzzgen
                 }
                 else
                 {
-                    compositeChild = env.types.Where(etype => etype.type != Composite.Type.Def).RandomElement();
+                    compositeChild = env.types.Where(etype => etype.type != Composite.Type.Dec).RandomElement();
                 }
 
                 if (parent.type == Composite.Type.Struct)
@@ -66,9 +66,9 @@ namespace Fuzzgen
                     initialized = new ValueComposite(env, compositeChild);
                 }
             }
-            else if (type == Type.Def)
+            else if (type == Type.Dec)
             {
-                compositeChild = env.types.Where(inst => inst.type == Composite.Type.Def).RandomElement();
+                compositeChild = env.types.Where(inst => inst.type == Composite.Type.Dec).RandomElement();
                 initialized = new ValueSimple("null", "");
             }
             else if (type == Type.ContainerList)
@@ -160,7 +160,7 @@ namespace Fuzzgen
                     }
                 case Type.Composite:
                     return new ValueComposite(env, compositeChild);
-                case Type.Def:
+                case Type.Dec:
                     {
                         var instance = env.instances.Where(inst => inst.composite == compositeChild).RandomElementOr(null);
                         if (instance == null)
@@ -169,7 +169,7 @@ namespace Fuzzgen
                         }
                         else
                         {
-                            return new ValueSimple($"Def.Database<{compositeChild.name}>.Get(\"{instance.defName}\")", instance.defName);
+                            return new ValueSimple($"Dec.Database<{compositeChild.name}>.Get(\"{instance.decName}\")", instance.decName);
                         }
                     }
                 case Type.ContainerList:
@@ -197,7 +197,7 @@ namespace Fuzzgen
                 case Type.String: return "string";
                 case Type.Bool: return "bool";
                 case Type.Composite: return compositeChild.name;
-                case Type.Def: return compositeChild.name;
+                case Type.Dec: return compositeChild.name;
                 case Type.ContainerList: return $"List<{containerValue.TypeToCSharp()}>";
                 case Type.ContainerDictionary: return $"Dictionary<{containerKey.TypeToCSharp()}, {containerValue.TypeToCSharp()}>";
                 default: Dbg.Err("Invalid type!"); return "int";
@@ -217,14 +217,14 @@ namespace Fuzzgen
         }
     }
 
-    internal class MemberTypeDistributionDef : Distribution<Member.Type> { }
+    internal class MemberTypeDistributionDec : Distribution<Member.Type> { }
 
-    [Def.StaticReferences]
+    [Dec.StaticReferences]
     internal static class MemberTypeDistribution
     {
-        static MemberTypeDistribution() { Def.StaticReferencesAttribute.Initialized(); }
+        static MemberTypeDistribution() { Dec.StaticReferencesAttribute.Initialized(); }
 
-        internal static MemberTypeDistributionDef Distribution;
-        internal static MemberTypeDistributionDef DictKeyDistribution;
+        internal static MemberTypeDistributionDec Distribution;
+        internal static MemberTypeDistributionDec DictKeyDistribution;
     }
 }

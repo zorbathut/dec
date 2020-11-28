@@ -1,4 +1,4 @@
-namespace Def
+namespace Dec
 {
     using System;
     using System.Collections;
@@ -31,14 +31,14 @@ namespace Def
         public override bool AllowReflection { get => true; }
 
         private XDocument doc;
-        private XElement defs;
+        private XElement decs;
 
         public WriterXmlCompose()
         {
             doc = new XDocument();
 
-            defs = new XElement("Defs");
-            doc.Add(defs);
+            decs = new XElement("Decs");
+            doc.Add(decs);
         }
 
         public override bool RegisterReference(object referenced, XElement element)
@@ -47,9 +47,9 @@ namespace Def
             return false;
         }
 
-        public WriterNode StartDef(Type type, string defName)
+        public WriterNode StartDec(Type type, string decName)
         {
-            return WriterNodeXml.StartDef(this, defs, type.ComposeDefFormatted(), defName);
+            return WriterNodeXml.StartDec(this, decs, type.ComposeDecFormatted(), decName);
         }
 
         public string Finish(bool pretty)
@@ -150,7 +150,7 @@ namespace Def
                 src.SetAttributeValue("ref", refblock.Value);
 
                 // We may not have had a class to begin with, but we sure need one now!
-                result.SetAttributeValue("class", refblock.Key.GetType().ComposeDefFormatted());
+                result.SetAttributeValue("class", refblock.Key.GetType().ComposeDecFormatted());
 
                 yield return new KeyValuePair<string, XElement>(refblock.Value, result);
             }
@@ -250,16 +250,16 @@ namespace Def
             parent.Add(node);
         }
 
-        public static WriterNodeXml StartDef(WriterXmlCompose writer, XElement defRoot, string type, string defName)
+        public static WriterNodeXml StartDec(WriterXmlCompose writer, XElement decRoot, string type, string decName)
         {
-            var node = new WriterNodeXml(writer, defRoot, type);
-            node.GetXElement().Add(new XAttribute("defName", defName));
+            var node = new WriterNodeXml(writer, decRoot, type);
+            node.GetXElement().Add(new XAttribute("decName", decName));
             return node;
         }
 
-        public static WriterNodeXml StartData(WriterXmlRecord writer, XElement defRoot, string name)
+        public static WriterNodeXml StartData(WriterXmlRecord writer, XElement decRoot, string name)
         {
-            return new WriterNodeXml(writer, defRoot, name);
+            return new WriterNodeXml(writer, decRoot, name);
         }
 
         public override WriterNode CreateChild(string label)
@@ -314,33 +314,33 @@ namespace Def
 
         public override void WriteType(Type value)
         {
-            node.Add(new XText(value.ComposeDefFormatted()));
+            node.Add(new XText(value.ComposeDecFormatted()));
         }
 
-        public override void WriteDef(Def value)
+        public override void WriteDec(Dec value)
         {
-            // Get the def name and be done with it.
+            // Get the dec name and be done with it.
             if (value != null)
             {
-                if (value != Database.Get(value.GetType(), value.DefName))
+                if (value != Database.Get(value.GetType(), value.DecName))
                 {
-                    Dbg.Err($"Referenced def {value} no longer exists in the database; serializing an error value instead");
-                    node.Add(new XText($"{value.DefName}_DELETED"));
+                    Dbg.Err($"Referenced dec {value} no longer exists in the database; serializing an error value instead");
+                    node.Add(new XText($"{value.DecName}_DELETED"));
 
-                    // if you actually have a def named SomePreviouslyExistingDef_DELETED then you need to sort out what you're doing with your life
+                    // if you actually have a dec named SomePreviouslyExistingDec_DELETED then you need to sort out what you're doing with your life
                 }
                 else
                 {
-                    node.Add(new XText(value.DefName));
+                    node.Add(new XText(value.DecName));
                 }
             }
 
-            // "No data" is defined as null for defs, so we just do that
+            // "No data" is defined as null for decs, so we just do that
         }
 
         public override void TagClass(Type type)
         {
-            node.Add(new XAttribute("class", type.ComposeDefFormatted()));
+            node.Add(new XAttribute("class", type.ComposeDecFormatted()));
         }
 
         public override void WriteExplicitNull()

@@ -1,4 +1,4 @@
-namespace DefUtilLib
+namespace DecUtilLib
 {
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -19,7 +19,7 @@ namespace DefUtilLib
             string assemblyName = Path.GetRandomFileName() + ".DynComp.dll";
             var refPaths = new[] {
                     typeof(object).GetTypeInfo().Assembly.Location,
-                    typeof(Def.Def).GetTypeInfo().Assembly.Location,
+                    typeof(Dec.Dec).GetTypeInfo().Assembly.Location,
                     typeof(NUnit.Framework.Assert).GetTypeInfo().Assembly.Location,
                     typeof(Compilation).GetType().GetTypeInfo().Assembly.Location,
                     Path.Combine(Path.GetDirectoryName(typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location), "netstandard.dll"),

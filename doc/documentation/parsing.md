@@ -1,6 +1,6 @@
 # Member parsing
 
-Many types can be parsed natively by def. This page lists them all.
+Many types can be parsed natively by dec. This page lists them all.
 
 Note that more types and formats may work than this page lists, but if it's not listed here, it's not officially supported.
 
@@ -29,9 +29,9 @@ enum Animals
 }
 ```
 ```xml
-<AnimalDef defName="MaineCoon">
+<AnimalDec decName="MaineCoon">
   <type>Cat</type>
-</AnimalDef>
+</AnimalDec>
 ```
 
 ## Lists
@@ -39,7 +39,7 @@ enum Animals
 Lists are entered with &lt;li&gt; sequences.
 
 ```xml
-<NumberListDef defName="Primes">
+<NumberListDec decName="Primes">
   <numbers>
     <li>2</li>
     <li>3</li>
@@ -49,7 +49,7 @@ Lists are entered with &lt;li&gt; sequences.
     <li>13</li>
     <li>17</li>
   </numbers>
-</NumberListDef>
+</NumberListDec>
 ```
 
 ## Dictionaries
@@ -57,22 +57,22 @@ Lists are entered with &lt;li&gt; sequences.
 Dictionaries are normally defined using XML tags as keys.
 
 ```xml
-<MaterialValueDef defName="Medieval">
+<MaterialValueDec decName="Medieval">
   <materials>
     <Iron>1</Iron>
     <Steel>3</Steel>
     <Uranium>0.1</Uranium>
     <Aluminum>20</Aluminum>
   </materials>
-</MaterialValueDef>
+</MaterialValueDec>
 ```
 
- Using this format, you can make dictionaries only with key types that conform to the XML tag requirements; practically, this currently means `enum`, `bool`, `Def`-derived types, and most (but not all) `string`s.
+ Using this format, you can make dictionaries only with key types that conform to the XML tag requirements; practically, this currently means `enum`, `bool`, `Dec`-derived types, and most (but not all) `string`s.
 
- If you need to make a dictionary with looser requirements, you can use &lt;li&gt; sequences and &lt;key&gt;/&lt;value&gt; tags. This allows keys of any type that def can parse.
+ If you need to make a dictionary with looser requirements, you can use &lt;li&gt; sequences and &lt;key&gt;/&lt;value&gt; tags. This allows keys of any type that dec can parse.
 
 ```xml
-<MaterialValueDef defName="Medieval">
+<MaterialValueDec decName="Medieval">
   <materials>
     <li>
       <key>Iron</key>
@@ -91,25 +91,25 @@ Dictionaries are normally defined using XML tags as keys.
       <value>20</value>
     </li>
   </materials>
-</MaterialValueDef>
+</MaterialValueDec>
 ```
 
-## Defs
+## Decs
 
-Defs are defined using the defName as a key.
+Decs are defined using the decName as a key.
 
 ```xml
-<LevelDef defName="Introduction">
+<LevelDec decName="Introduction">
   <nextLevel>Caves</nextLevel>
-</LevelDef>
+</LevelDec>
 
-<LevelDef defName="Caves">
+<LevelDec decName="Caves">
   <nextLevel>Swamp</nextLevel>
-</LevelDef>
+</LevelDec>
 
-<LevelDef defName="Swamp">
+<LevelDec decName="Swamp">
   <nextLevel>MountainPeak</nextLevel>
-</LevelDef>
+</LevelDec>
 ```
 
 ## Types

@@ -10,17 +10,17 @@ namespace Fuzzgen
     {
         private static void Init()
         {
-            // Configure Def's error reporting
-            Def.Config.InfoHandler = str => Dbg.Inf(str);
-            Def.Config.WarningHandler = str => Dbg.Wrn(str);
-            Def.Config.ErrorHandler = str => Dbg.Err(str);
-            Def.Config.ExceptionHandler = e => Dbg.Ex(e);
+            // Configure Dec's error reporting
+            Dec.Config.InfoHandler = str => Dbg.Inf(str);
+            Dec.Config.WarningHandler = str => Dbg.Wrn(str);
+            Dec.Config.ErrorHandler = str => Dbg.Err(str);
+            Dec.Config.ExceptionHandler = e => Dbg.Ex(e);
 
-            // Configure Def's namespaces
-            Def.Config.UsingNamespaces = new string[] { "Fuzzgen" };
+            // Configure Dec's namespaces
+            Dec.Config.UsingNamespaces = new string[] { "Fuzzgen" };
 
             // In most cases, you'll just want to read all the XML files in your data directory, which is easy
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddDirectory("data/def");
             parser.Finish();
         }
@@ -38,9 +38,9 @@ namespace Fuzzgen
                 c.name = Rand.NextString();
 
                 c.type = CompositeTypeDistribution.Distribution.Choose();
-                if (c.type == Composite.Type.Def)
+                if (c.type == Composite.Type.Dec)
                 {
-                    c.name += "Def";
+                    c.name += "Dec";
                 }
 
                 env.types.Add(c);
@@ -60,7 +60,7 @@ namespace Fuzzgen
             // Generate instances
             foreach (var c in env.types)
             {
-                if (c.type != Composite.Type.Def)
+                if (c.type != Composite.Type.Dec)
                 {
                     continue;
                 }
@@ -99,31 +99,31 @@ namespace Fuzzgen
             // Output xml
             {
                 var sb = new StringBuilder();
-                sb.AppendLine("<Defs>");
+                sb.AppendLine("<Decs>");
 
                 foreach (var i in env.instances)
                 {
-                    sb.AppendLine(Util.Indent(i.WriteXmlDef()));
+                    sb.AppendLine(Util.Indent(i.WriteXmlDec()));
                 }
 
-                sb.AppendLine("</Defs>");
+                sb.AppendLine("</Decs>");
 
                 xmlCode = sb.ToString();
             }
 
-            // This is a bit janky; we want to use Def features when doing generation, but now we need to blow it away to generate the .cs code
+            // This is a bit janky; we want to use Dec features when doing generation, but now we need to blow it away to generate the .cs code
             // So I guess maybe it would be nice to have non-global state right now :V
 
-            Def.Database.Clear();
+            Dec.Database.Clear();
 
-            var bootstrapAssembly = DefUtilLib.Compilation.Compile(testCode, new System.Reflection.Assembly[] { });
-            bootstrapAssembly.GetType("DefTest.Harness").GetMethod("Setup").Invoke(null, null);
+            var bootstrapAssembly = DecUtilLib.Compilation.Compile(testCode, new System.Reflection.Assembly[] { });
+            bootstrapAssembly.GetType("DecTest.Harness").GetMethod("Setup").Invoke(null, null);
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(xmlCode);
             parser.Finish();
 
-            var composer = new Def.Composer();
+            var composer = new Dec.Composer();
             var tests = composer.ComposeValidation();
 
             string finalCode = GenerateTestHarness(tests);
@@ -131,8 +131,8 @@ namespace Fuzzgen
             string path = $"../../test/data/validation/parser/{System.DateTimeOffset.Now:yyyyMMddhhmmss}";
             System.IO.Directory.CreateDirectory(path);
 
-            DefUtilLib.Compress.WriteToFile(System.IO.Path.Combine(path, "Harness.cs"), finalCode);
-            DefUtilLib.Compress.WriteToFile(System.IO.Path.Combine(path, "data.xml"), xmlCode);
+            DecUtilLib.Compress.WriteToFile(System.IO.Path.Combine(path, "Harness.cs"), finalCode);
+            DecUtilLib.Compress.WriteToFile(System.IO.Path.Combine(path, "data.xml"), xmlCode);
         }
     }
 }

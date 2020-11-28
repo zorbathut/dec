@@ -1,5 +1,5 @@
-<Defs>
-  <ConfigDef defName="Global">
+<Decs>
+  <ConfigDec decName="Global">
     <baud>1200</baud>
     <crlfDelay>0.2</crlfDelay>
 
@@ -8,5 +8,5 @@
       <li>RustySword</li>
     </startingItems>
     <saveFilename>loaf.sav</saveFilename>
-  </ConfigDef>
-</Defs>
+  </ConfigDec>
+</Decs>

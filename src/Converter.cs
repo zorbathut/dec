@@ -1,4 +1,4 @@
-namespace Def
+namespace Dec
 {
     using System;
     using System.Collections.Generic;
@@ -35,7 +35,7 @@ namespace Def
         /// <remarks>
         /// `type` is set to the expected return type; you can return null, or anything that can be implicitly converted to that type.
         /// 
-        /// In case of error, call Def.Dbg.Err with some appropriately useful message and return null. Message should be formatted as $"{inputName}:{lineNumber}: Something went wrong".
+        /// In case of error, call Dec.Dbg.Err with some appropriately useful message and return null. Message should be formatted as $"{inputName}:{lineNumber}: Something went wrong".
         ///
         /// Note: In the case of empty input (i.e. &lt;member&gt;&lt;/member&gt; or &lt;member /&gt;) this function will be called.
         /// </remarks>
@@ -51,7 +51,7 @@ namespace Def
         /// <remarks>
         /// `type` is set to the expected return type; you can return null, or anything that can be implicitly converted to that type.
         /// 
-        /// In case of error, call Def.Dbg.Err with some appropriately useful message and return null. Message should be formatted as $"{inputName}:{(input as IXmlLineInfo).LineNumber}: Something went wrong".
+        /// In case of error, call Dec.Dbg.Err with some appropriately useful message and return null. Message should be formatted as $"{inputName}:{(input as IXmlLineInfo).LineNumber}: Something went wrong".
         /// </remarks>
         public virtual object FromXml(XElement input, Type type, string inputName)
         {
@@ -74,7 +74,7 @@ namespace Def
         /// <remarks>
         /// `input` will be one of the types provided in HandledTypes(); it will not be null. Whatever you return should be convertible back to an object by an overridden FromString().
         ///
-        /// In case of error, call Def.Dbg.Err with some appropriately useful message and return null.
+        /// In case of error, call Dec.Dbg.Err with some appropriately useful message and return null.
         /// </remarks>
         public virtual string ToString(object input)
         {
@@ -88,11 +88,11 @@ namespace Def
         /// <remarks>
         /// `input` will be one of the types provided in HandledTypes(); it will not be null. Whatever you return should be convertible back to an object by an overridden FromXml().
         ///
-        /// If you need to create any attributes, you should prefix them with a unique identifier so they don't conflict with standard def attributes.
+        /// If you need to create any attributes, you should prefix them with a unique identifier so they don't conflict with standard dec attributes.
         ///
         /// If you add a single XText child, parsing may be done with FromString() instead of FromXml().
         /// 
-        /// In case of error, call Def.Dbg.Err with some appropriately useful message and don't modify context.
+        /// In case of error, call Dec.Dbg.Err with some appropriately useful message and don't modify context.
         /// </remarks>
         public virtual void ToXml(object input, XElement context)
         {
@@ -114,7 +114,7 @@ namespace Def
         ///
         /// `type` indicates the type that the underlying code expects to get back. The object you return must be assignable to that type.
         /// 
-        /// In case of error, call Def.Dbg.Err with some appropriately useful message, then return model.
+        /// In case of error, call Dec.Dbg.Err with some appropriately useful message, then return model.
         ///
         /// In most cases, using Recorder's interface is by far the easiest way to support the requirements of this function. It is expected that you use XML only when absolutely necessary.
         /// </remarks>

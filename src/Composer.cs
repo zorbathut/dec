@@ -1,9 +1,9 @@
-namespace Def
+namespace Dec
 {
     using System.Xml.Linq;
 
     /// <summary>
-    /// Handles writing def structures into files. Generally useful for in-game editors.
+    /// Handles writing dec structures into files. Generally useful for in-game editors.
     /// </summary>
     /// <remarks>
     /// This class is under heavy development and its API is likely to be unstable and undocumented.
@@ -14,9 +14,9 @@ namespace Def
         {
             var writerContext = new WriterXmlCompose();
 
-            foreach (var defObj in Database.List)
+            foreach (var decObj in Database.List)
             {
-                Serialization.ComposeElement(writerContext.StartDef(defObj.GetType(), defObj.DefName), defObj, defObj.GetType(), isRootDef: true);
+                Serialization.ComposeElement(writerContext.StartDec(decObj.GetType(), decObj.DecName), decObj, decObj.GetType(), isRootDec: true);
             }
 
             return writerContext.Finish(pretty);
@@ -26,9 +26,9 @@ namespace Def
         {
             var writerContext = new WriterValidationCompose();
 
-            foreach (var defObj in Database.List)
+            foreach (var decObj in Database.List)
             {
-                Serialization.ComposeElement(writerContext.StartDef(defObj.GetType(), defObj.DefName), defObj, defObj.GetType(), isRootDef: true);
+                Serialization.ComposeElement(writerContext.StartDec(decObj.GetType(), decObj.DecName), decObj, decObj.GetType(), isRootDec: true);
             }
 
             return writerContext.Finish();

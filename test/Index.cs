@@ -1,4 +1,4 @@
-namespace DefTest
+namespace DecTest
 {
     using NUnit.Framework;
     using System;
@@ -8,112 +8,112 @@ namespace DefTest
     [TestFixture]
     public class Index : Base
     {
-        public class IndexBaseDef : Def.Def
+        public class IndexBaseDec : Dec.Dec
         {
-            [Def.Index] public int index;
+            [Dec.Index] public int index;
         }
 
-        public class IndexDerivedDef : IndexBaseDef
+        public class IndexDerivedDec : IndexBaseDec
         {
-            [Def.Index] public new int index;
+            [Dec.Index] public new int index;
         }
 
-        public class IndexLeafDef : StubDef
+        public class IndexLeafDec : StubDec
         {
-            [Def.Index] public int index;
+            [Dec.Index] public int index;
         }
 
         [Test]
         public void IndexBaseList([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndexBaseDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndexBaseDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <IndexBaseDef defName=""TestDefA"" />
-                    <IndexBaseDef defName=""TestDefB"" />
-                    <IndexBaseDef defName=""TestDefC"" />
-                </Defs>");
+                <Decs>
+                    <IndexBaseDec decName=""TestDecA"" />
+                    <IndexBaseDec decName=""TestDecB"" />
+                    <IndexBaseDec decName=""TestDecC"" />
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            Assert.AreSame(Def.Database<IndexBaseDef>.Get("TestDefA"), Def.Index<IndexBaseDef>.Get(Def.Database<IndexBaseDef>.Get("TestDefA").index));
-            Assert.AreSame(Def.Database<IndexBaseDef>.Get("TestDefB"), Def.Index<IndexBaseDef>.Get(Def.Database<IndexBaseDef>.Get("TestDefB").index));
-            Assert.AreSame(Def.Database<IndexBaseDef>.Get("TestDefC"), Def.Index<IndexBaseDef>.Get(Def.Database<IndexBaseDef>.Get("TestDefC").index));
+            Assert.AreSame(Dec.Database<IndexBaseDec>.Get("TestDecA"), Dec.Index<IndexBaseDec>.Get(Dec.Database<IndexBaseDec>.Get("TestDecA").index));
+            Assert.AreSame(Dec.Database<IndexBaseDec>.Get("TestDecB"), Dec.Index<IndexBaseDec>.Get(Dec.Database<IndexBaseDec>.Get("TestDecB").index));
+            Assert.AreSame(Dec.Database<IndexBaseDec>.Get("TestDecC"), Dec.Index<IndexBaseDec>.Get(Dec.Database<IndexBaseDec>.Get("TestDecC").index));
 
-            Assert.AreEqual(3, Def.Index<IndexBaseDef>.Count);
+            Assert.AreEqual(3, Dec.Index<IndexBaseDec>.Count);
         }
 
         [Test]
         public void IndexDerivedList([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndexBaseDef), typeof(IndexDerivedDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndexBaseDec), typeof(IndexDerivedDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <IndexDerivedDef defName=""TestDefA"" />
-                    <IndexBaseDef defName=""TestDefB"" />
-                    <IndexDerivedDef defName=""TestDefC"" />
-                    <IndexBaseDef defName=""TestDefD"" />
-                    <IndexDerivedDef defName=""TestDefE"" />
-                </Defs>");
+                <Decs>
+                    <IndexDerivedDec decName=""TestDecA"" />
+                    <IndexBaseDec decName=""TestDecB"" />
+                    <IndexDerivedDec decName=""TestDecC"" />
+                    <IndexBaseDec decName=""TestDecD"" />
+                    <IndexDerivedDec decName=""TestDecE"" />
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            Assert.AreSame(Def.Database<IndexBaseDef>.Get("TestDefA"), Def.Index<IndexBaseDef>.Get(Def.Database<IndexBaseDef>.Get("TestDefA").index));
-            Assert.AreSame(Def.Database<IndexBaseDef>.Get("TestDefB"), Def.Index<IndexBaseDef>.Get(Def.Database<IndexBaseDef>.Get("TestDefB").index));
-            Assert.AreSame(Def.Database<IndexBaseDef>.Get("TestDefC"), Def.Index<IndexBaseDef>.Get(Def.Database<IndexBaseDef>.Get("TestDefC").index));
-            Assert.AreSame(Def.Database<IndexBaseDef>.Get("TestDefD"), Def.Index<IndexBaseDef>.Get(Def.Database<IndexBaseDef>.Get("TestDefD").index));
-            Assert.AreSame(Def.Database<IndexBaseDef>.Get("TestDefE"), Def.Index<IndexBaseDef>.Get(Def.Database<IndexBaseDef>.Get("TestDefE").index));
+            Assert.AreSame(Dec.Database<IndexBaseDec>.Get("TestDecA"), Dec.Index<IndexBaseDec>.Get(Dec.Database<IndexBaseDec>.Get("TestDecA").index));
+            Assert.AreSame(Dec.Database<IndexBaseDec>.Get("TestDecB"), Dec.Index<IndexBaseDec>.Get(Dec.Database<IndexBaseDec>.Get("TestDecB").index));
+            Assert.AreSame(Dec.Database<IndexBaseDec>.Get("TestDecC"), Dec.Index<IndexBaseDec>.Get(Dec.Database<IndexBaseDec>.Get("TestDecC").index));
+            Assert.AreSame(Dec.Database<IndexBaseDec>.Get("TestDecD"), Dec.Index<IndexBaseDec>.Get(Dec.Database<IndexBaseDec>.Get("TestDecD").index));
+            Assert.AreSame(Dec.Database<IndexBaseDec>.Get("TestDecE"), Dec.Index<IndexBaseDec>.Get(Dec.Database<IndexBaseDec>.Get("TestDecE").index));
 
-            Assert.AreSame(Def.Database<IndexDerivedDef>.Get("TestDefA"), Def.Index<IndexDerivedDef>.Get(Def.Database<IndexDerivedDef>.Get("TestDefA").index));
-            Assert.AreSame(Def.Database<IndexDerivedDef>.Get("TestDefC"), Def.Index<IndexDerivedDef>.Get(Def.Database<IndexDerivedDef>.Get("TestDefC").index));
-            Assert.AreSame(Def.Database<IndexDerivedDef>.Get("TestDefE"), Def.Index<IndexDerivedDef>.Get(Def.Database<IndexDerivedDef>.Get("TestDefE").index));
+            Assert.AreSame(Dec.Database<IndexDerivedDec>.Get("TestDecA"), Dec.Index<IndexDerivedDec>.Get(Dec.Database<IndexDerivedDec>.Get("TestDecA").index));
+            Assert.AreSame(Dec.Database<IndexDerivedDec>.Get("TestDecC"), Dec.Index<IndexDerivedDec>.Get(Dec.Database<IndexDerivedDec>.Get("TestDecC").index));
+            Assert.AreSame(Dec.Database<IndexDerivedDec>.Get("TestDecE"), Dec.Index<IndexDerivedDec>.Get(Dec.Database<IndexDerivedDec>.Get("TestDecE").index));
 
-            Assert.AreEqual(5, Def.Index<IndexBaseDef>.Count);
-            Assert.AreEqual(3, Def.Index<IndexDerivedDef>.Count);
+            Assert.AreEqual(5, Dec.Index<IndexBaseDec>.Count);
+            Assert.AreEqual(3, Dec.Index<IndexDerivedDec>.Count);
         }
 
         [Test]
         public void IndexLeafList([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndexLeafDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndexLeafDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <IndexLeafDef defName=""TestDefA"" />
-                    <IndexLeafDef defName=""TestDefB"" />
-                    <IndexLeafDef defName=""TestDefC"" />
-                </Defs>");
+                <Decs>
+                    <IndexLeafDec decName=""TestDecA"" />
+                    <IndexLeafDec decName=""TestDecB"" />
+                    <IndexLeafDec decName=""TestDecC"" />
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            Assert.AreSame(Def.Database<IndexLeafDef>.Get("TestDefA"), Def.Index<IndexLeafDef>.Get(Def.Database<IndexLeafDef>.Get("TestDefA").index));
-            Assert.AreSame(Def.Database<IndexLeafDef>.Get("TestDefB"), Def.Index<IndexLeafDef>.Get(Def.Database<IndexLeafDef>.Get("TestDefB").index));
-            Assert.AreSame(Def.Database<IndexLeafDef>.Get("TestDefC"), Def.Index<IndexLeafDef>.Get(Def.Database<IndexLeafDef>.Get("TestDefC").index));
+            Assert.AreSame(Dec.Database<IndexLeafDec>.Get("TestDecA"), Dec.Index<IndexLeafDec>.Get(Dec.Database<IndexLeafDec>.Get("TestDecA").index));
+            Assert.AreSame(Dec.Database<IndexLeafDec>.Get("TestDecB"), Dec.Index<IndexLeafDec>.Get(Dec.Database<IndexLeafDec>.Get("TestDecB").index));
+            Assert.AreSame(Dec.Database<IndexLeafDec>.Get("TestDecC"), Dec.Index<IndexLeafDec>.Get(Dec.Database<IndexLeafDec>.Get("TestDecC").index));
             
-            Assert.AreEqual(3, Def.Index<IndexLeafDef>.Count);
+            Assert.AreEqual(3, Dec.Index<IndexLeafDec>.Count);
         }
 
         public class IndependentIndexClass
         {
-            [Def.Index] public int index;
+            [Dec.Index] public int index;
         }
 
         public struct IndependentIndexStruct
         {
-            [Def.Index] public int index;
+            [Dec.Index] public int index;
 
             public int value;
         }
 
-        public class IndependentIndexDef : Def.Def
+        public class IndependentIndexDec : Dec.Dec
         {
             public IndependentIndexClass iicPrefilled = new IndependentIndexClass();
             public IndependentIndexClass iicUnfilled;
@@ -123,26 +123,26 @@ namespace DefTest
         [Test]
         public void IndependentIndex([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndependentIndexDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndependentIndexDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <IndependentIndexDef defName=""TestDefA"">
+                <Decs>
+                    <IndependentIndexDec decName=""TestDecA"">
                         <iicPrefilled />
                         <iicUnfilled />
                         <iis><value>7</value></iis>
-                    </IndependentIndexDef>
-                    <IndependentIndexDef defName=""TestDefB"">
+                    </IndependentIndexDec>
+                    <IndependentIndexDec decName=""TestDecB"">
                         <iicPrefilled />
                         <iis><value>8</value></iis>
-                    </IndependentIndexDef>
-                    <IndependentIndexDef defName=""TestDefC"">
+                    </IndependentIndexDec>
+                    <IndependentIndexDec decName=""TestDecC"">
                         <iicPrefilled />
                         <iicUnfilled />
                         <iis><value>9</value></iis>
-                    </IndependentIndexDef>
-                </Defs>");
+                    </IndependentIndexDec>
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
@@ -155,48 +155,48 @@ namespace DefTest
 
             // *addendum*: I know how to fix this, it's just going to be a pain.
 
-            Assert.AreSame(Def.Database<IndependentIndexDef>.Get("TestDefA").iicPrefilled, Def.Index<IndependentIndexClass>.Get(Def.Database<IndependentIndexDef>.Get("TestDefA").iicPrefilled.index));
-            Assert.AreSame(Def.Database<IndependentIndexDef>.Get("TestDefB").iicPrefilled, Def.Index<IndependentIndexClass>.Get(Def.Database<IndependentIndexDef>.Get("TestDefB").iicPrefilled.index));
-            Assert.AreSame(Def.Database<IndependentIndexDef>.Get("TestDefC").iicPrefilled, Def.Index<IndependentIndexClass>.Get(Def.Database<IndependentIndexDef>.Get("TestDefC").iicPrefilled.index));
+            Assert.AreSame(Dec.Database<IndependentIndexDec>.Get("TestDecA").iicPrefilled, Dec.Index<IndependentIndexClass>.Get(Dec.Database<IndependentIndexDec>.Get("TestDecA").iicPrefilled.index));
+            Assert.AreSame(Dec.Database<IndependentIndexDec>.Get("TestDecB").iicPrefilled, Dec.Index<IndependentIndexClass>.Get(Dec.Database<IndependentIndexDec>.Get("TestDecB").iicPrefilled.index));
+            Assert.AreSame(Dec.Database<IndependentIndexDec>.Get("TestDecC").iicPrefilled, Dec.Index<IndependentIndexClass>.Get(Dec.Database<IndependentIndexDec>.Get("TestDecC").iicPrefilled.index));
 
-            Assert.AreSame(Def.Database<IndependentIndexDef>.Get("TestDefA").iicUnfilled, Def.Index<IndependentIndexClass>.Get(Def.Database<IndependentIndexDef>.Get("TestDefA").iicUnfilled.index));
-            Assert.AreSame(Def.Database<IndependentIndexDef>.Get("TestDefC").iicUnfilled, Def.Index<IndependentIndexClass>.Get(Def.Database<IndependentIndexDef>.Get("TestDefC").iicUnfilled.index));
+            Assert.AreSame(Dec.Database<IndependentIndexDec>.Get("TestDecA").iicUnfilled, Dec.Index<IndependentIndexClass>.Get(Dec.Database<IndependentIndexDec>.Get("TestDecA").iicUnfilled.index));
+            Assert.AreSame(Dec.Database<IndependentIndexDec>.Get("TestDecC").iicUnfilled, Dec.Index<IndependentIndexClass>.Get(Dec.Database<IndependentIndexDec>.Get("TestDecC").iicUnfilled.index));
 
-            Assert.AreEqual(Def.Database<IndependentIndexDef>.Get("TestDefA").iis, Def.Index<IndependentIndexStruct>.Get(Def.Database<IndependentIndexDef>.Get("TestDefA").iis.index));
-            Assert.AreEqual(Def.Database<IndependentIndexDef>.Get("TestDefB").iis, Def.Index<IndependentIndexStruct>.Get(Def.Database<IndependentIndexDef>.Get("TestDefB").iis.index));
-            Assert.AreEqual(Def.Database<IndependentIndexDef>.Get("TestDefC").iis, Def.Index<IndependentIndexStruct>.Get(Def.Database<IndependentIndexDef>.Get("TestDefC").iis.index));
+            Assert.AreEqual(Dec.Database<IndependentIndexDec>.Get("TestDecA").iis, Dec.Index<IndependentIndexStruct>.Get(Dec.Database<IndependentIndexDec>.Get("TestDecA").iis.index));
+            Assert.AreEqual(Dec.Database<IndependentIndexDec>.Get("TestDecB").iis, Dec.Index<IndependentIndexStruct>.Get(Dec.Database<IndependentIndexDec>.Get("TestDecB").iis.index));
+            Assert.AreEqual(Dec.Database<IndependentIndexDec>.Get("TestDecC").iis, Dec.Index<IndependentIndexStruct>.Get(Dec.Database<IndependentIndexDec>.Get("TestDecC").iis.index));
 
-            Assert.AreEqual(5, Def.Index<IndependentIndexClass>.Count);
-            Assert.AreEqual(3, Def.Index<IndependentIndexStruct>.Count);
+            Assert.AreEqual(5, Dec.Index<IndependentIndexClass>.Count);
+            Assert.AreEqual(3, Dec.Index<IndependentIndexStruct>.Count);
         }
 
-        public class ExcessiveIndicesDef : Def.Def
+        public class ExcessiveIndicesDec : Dec.Dec
         {
-            [Def.Index] public int indexA;
-            [Def.Index] public int indexB;
+            [Dec.Index] public int indexA;
+            [Dec.Index] public int indexB;
         }
 
         [Test]
         public void ExcessiveIndices([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExcessiveIndicesDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExcessiveIndicesDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <ExcessiveIndicesDef defName=""TestDefA"" />
-                    <ExcessiveIndicesDef defName=""TestDefB"" />
-                    <ExcessiveIndicesDef defName=""TestDefC"" />
-                </Defs>");
+                <Decs>
+                    <ExcessiveIndicesDec decName=""TestDecA"" />
+                    <ExcessiveIndicesDec decName=""TestDecB"" />
+                    <ExcessiveIndicesDec decName=""TestDecC"" />
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode, rewrite_expectParseErrors: true);
 
-            // It's guaranteed that either indexA or indexB has some behavior that causes 0, 1, and 2 to be distributed among TestDef.
+            // It's guaranteed that either indexA or indexB has some behavior that causes 0, 1, and 2 to be distributed among TestDec.
             // This is a massive over-constraint of allowable behavior; loosen it up if it fails somewhere.
-            Assert.AreEqual(0, Def.Database<ExcessiveIndicesDef>.Get("TestDefA").indexB);
-            Assert.AreEqual(1, Def.Database<ExcessiveIndicesDef>.Get("TestDefB").indexB);
-            Assert.AreEqual(2, Def.Database<ExcessiveIndicesDef>.Get("TestDefC").indexB);
+            Assert.AreEqual(0, Dec.Database<ExcessiveIndicesDec>.Get("TestDecA").indexB);
+            Assert.AreEqual(1, Dec.Database<ExcessiveIndicesDec>.Get("TestDecB").indexB);
+            Assert.AreEqual(2, Dec.Database<ExcessiveIndicesDec>.Get("TestDecC").indexB);
         }
     }
 }

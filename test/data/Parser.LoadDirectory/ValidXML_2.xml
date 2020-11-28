@@ -1,5 +1,5 @@
-<Defs>
-    <IntDef defName="TestDef2">
+<Decs>
+    <IntDec decName="TestDec2">
         <value>80</value>
-    </IntDef>
-</Defs>
+    </IntDec>
+</Decs>

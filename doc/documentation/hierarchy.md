@@ -1,29 +1,29 @@
-# Def hierarchy roots
+# Dec hierarchy roots
 
-Every def type is registered in exactly one category. One def, one category; this rule is immutable. Each category has its own namespace where each Def inside it must be named uniquely, but Defs in different categories can share names.
-
-```
-Def.Def
-  - MineralDef
-  - RenderPassDef
-  - ActorDef
-    - MonsterDef
-    - NPCDef
-  - CosmeticDef
-```
-
-By default, categories are defined as anything directly inheriting from Def.Def In the above inheritance chart, MineralDef, RenderPassDef, ActorDef, and CosmeticDef all define categories; MonsterDef and NPCDef become part of the ActorDef category.
-
-If you want to define a Def type that has several child categories, this can be done with the Def.Abstract attribute. Classes with Def.Abstract applied must also be abstract, with the C# `abstract` keyword.
+Every dec type is registered in exactly one category. One dec, one category; this rule is immutable. Each category has its own namespace where each Dec inside it must be named uniquely, but Decs in different categories can share names.
 
 ```
-Def.Def
-  - [Def.Abstract] MenuItemDef
-    - MainMenuItemDef
-    - GameOverMenuItemDef
-    - [Def.Abstract] IngameMenuItemDef
-        - ShopMenuItemDef
-        - BankerMenuItemDef
+Dec.Dec
+  - MineralDec
+  - RenderPassDec
+  - ActorDec
+    - MonsterDec
+    - NPCDec
+  - CosmeticDec
 ```
 
-This example includes four categories; MainMenuItemDef, GameOverMenuItemDef, ShopMenuItemDef, and BankerMenuItemDef. You could have a four defs named `Exit`, one in each category. You can't make defs of type MenuItemDef or IngameMenuItemDef; they aren't in any category.
+By default, categories are defined as anything directly inheriting from Dec.Dec In the above inheritance chart, MineralDec, RenderPassDec, ActorDec, and CosmeticDec all define categories; MonsterDec and NPCDec become part of the ActorDec category.
+
+If you want to define a Dec type that has several child categories, this can be done with the Dec.Abstract attribute. Classes with Dec.Abstract applied must also be abstract, with the C# `abstract` keyword.
+
+```
+Dec.Dec
+  - [Dec.Abstract] MenuItemDec
+    - MainMenuItemDec
+    - GameOverMenuItemDec
+    - [Dec.Abstract] IngameMenuItemDec
+        - ShopMenuItemDec
+        - BankerMenuItemDec
+```
+
+This example includes four categories; MainMenuItemDec, GameOverMenuItemDec, ShopMenuItemDec, and BankerMenuItemDec. You could have a four decs named `Exit`, one in each category. You can't make decs of type MenuItemDec or IngameMenuItemDec; they aren't in any category.

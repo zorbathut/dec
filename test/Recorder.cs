@@ -1,4 +1,4 @@
-namespace DefTest
+namespace DecTest
 {
     using NUnit.Framework;
     using System;
@@ -8,7 +8,7 @@ namespace DefTest
     [TestFixture]
     public class Recorder : Base
     {
-        public class PrimitivesRecordable : Def.IRecordable
+        public class PrimitivesRecordable : Dec.IRecordable
         {
             public int intValue;
             public float floatValue;
@@ -17,7 +17,7 @@ namespace DefTest
 
             public Type typeValue;
 
-            public void Record(Def.Recorder record)
+            public void Record(Dec.Recorder record)
             {
                 record.Record(ref intValue, "intValue");
                 record.Record(ref floatValue, "floatValue");
@@ -31,9 +31,9 @@ namespace DefTest
         [Test]
 	    public void Primitives([Values] RecorderMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.Finish();
 
             var primitives = new PrimitivesRecordable();
@@ -41,7 +41,7 @@ namespace DefTest
             primitives.floatValue = 0.1234f;
             primitives.boolValue = true;
             primitives.stringValue = "<This is a test string value with some XML-sensitive characters.>";
-            primitives.typeValue = typeof(Def.Def);
+            primitives.typeValue = typeof(Dec.Dec);
 
             var deserialized = DoRecorderRoundTrip(primitives, mode);
 
@@ -50,10 +50,10 @@ namespace DefTest
             Assert.AreEqual(primitives.boolValue, deserialized.boolValue);
             Assert.AreEqual(primitives.stringValue, deserialized.stringValue);
 
-            Assert.AreEqual(primitives.typeValue, typeof(Def.Def));
+            Assert.AreEqual(primitives.typeValue, typeof(Dec.Dec));
         }
 
-        public class EnumRecordable : Def.IRecordable
+        public class EnumRecordable : Dec.IRecordable
         {
             public enum Enum
             {
@@ -66,7 +66,7 @@ namespace DefTest
             public Enum bet;
             public Enum gam;
 
-            public void Record(Def.Recorder record)
+            public void Record(Dec.Recorder record)
             {
                 record.Record(ref alph, "alph");
                 record.Record(ref bet, "bet");
@@ -77,9 +77,9 @@ namespace DefTest
         [Test]
         public void Enum([Values] RecorderMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.Finish();
 
             var enums = new EnumRecordable();
@@ -109,7 +109,7 @@ namespace DefTest
             primitives.floatValue = 0.1234f;
             primitives.boolValue = true;
             primitives.stringValue = "<This is a test string value with some XML-sensitive characters.>";
-            primitives.typeValue = typeof(Def.Def);
+            primitives.typeValue = typeof(Dec.Dec);
 
             var deserialized = DoRecorderRoundTrip(primitives, mode);
 
@@ -118,25 +118,25 @@ namespace DefTest
             Assert.AreEqual(primitives.boolValue, deserialized.boolValue);
             Assert.AreEqual(primitives.stringValue, deserialized.stringValue);
 
-            Assert.AreEqual(primitives.typeValue, typeof(Def.Def));
+            Assert.AreEqual(primitives.typeValue, typeof(Dec.Dec));
         }
 
-        [Def.StaticReferences]
-        public static class StaticReferenceDefs
+        [Dec.StaticReferences]
+        public static class StaticReferenceDecs
         {
-            static StaticReferenceDefs() { Def.StaticReferencesAttribute.Initialized(); }
+            static StaticReferenceDecs() { Dec.StaticReferencesAttribute.Initialized(); }
 
-            public static StubDef TestDefA;
-            public static StubDef TestDefB;
+            public static StubDec TestDecA;
+            public static StubDec TestDecB;
         }
-        public class DefRecordable : Def.IRecordable
+        public class DecRecordable : Dec.IRecordable
         {
-            public StubDef a;
-            public StubDef b;
-            public StubDef empty;
-            public StubDef forceEmpty = StaticReferenceDefs.TestDefA;
+            public StubDec a;
+            public StubDec b;
+            public StubDec empty;
+            public StubDec forceEmpty = StaticReferenceDecs.TestDecA;
 
-            public void Record(Def.Recorder record)
+            public void Record(Dec.Recorder record)
             {
                 record.Record(ref a, "a");
                 record.Record(ref b, "b");
@@ -146,74 +146,74 @@ namespace DefTest
         }
 
         [Test]
-        public void Defs([Values] RecorderMode mode)
+        public void Decs([Values] RecorderMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDef) }, explicitStaticRefs = new Type[] { typeof(StaticReferenceDefs) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) }, explicitStaticRefs = new Type[] { typeof(StaticReferenceDecs) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <StubDef defName=""TestDefA"" />
-                    <StubDef defName=""TestDefB"" />
-                </Defs>");
+                <Decs>
+                    <StubDec decName=""TestDecA"" />
+                    <StubDec decName=""TestDecB"" />
+                </Decs>");
             parser.Finish();
 
-            var defs = new DefRecordable();
-            defs.a = StaticReferenceDefs.TestDefA;
-            defs.b = StaticReferenceDefs.TestDefB;
+            var decs = new DecRecordable();
+            decs.a = StaticReferenceDecs.TestDecA;
+            decs.b = StaticReferenceDecs.TestDecB;
             // leave empty empty, of course
-            defs.forceEmpty = null;
+            decs.forceEmpty = null;
 
-            var deserialized = DoRecorderRoundTrip(defs, mode);
+            var deserialized = DoRecorderRoundTrip(decs, mode);
 
-            Assert.AreEqual(defs.a, deserialized.a);
-            Assert.AreEqual(defs.b, deserialized.b);
-            Assert.AreEqual(defs.empty, deserialized.empty);
-            Assert.AreEqual(defs.forceEmpty, deserialized.forceEmpty);
+            Assert.AreEqual(decs.a, deserialized.a);
+            Assert.AreEqual(decs.b, deserialized.b);
+            Assert.AreEqual(decs.empty, deserialized.empty);
+            Assert.AreEqual(decs.forceEmpty, deserialized.forceEmpty);
         }
 
         [Test]
-        public void DefsRemoved([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
+        public void DecsRemoved([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDef) }, explicitStaticRefs = new Type[] { typeof(StaticReferenceDefs) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) }, explicitStaticRefs = new Type[] { typeof(StaticReferenceDecs) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <StubDef defName=""TestDefA"" />
-                    <StubDef defName=""TestDefB"" />
-                </Defs>");
+                <Decs>
+                    <StubDec decName=""TestDecA"" />
+                    <StubDec decName=""TestDecB"" />
+                </Decs>");
             parser.Finish();
 
-            var defs = new DefRecordable();
-            defs.a = StaticReferenceDefs.TestDefA;
-            defs.b = StaticReferenceDefs.TestDefB;
+            var decs = new DecRecordable();
+            decs.a = StaticReferenceDecs.TestDecA;
+            decs.b = StaticReferenceDecs.TestDecB;
 
-            Def.Database.Delete(StaticReferenceDefs.TestDefA);
+            Dec.Database.Delete(StaticReferenceDecs.TestDecA);
 
-            var deserialized = DoRecorderRoundTrip(defs, mode, expectWriteErrors: true, expectReadErrors: true);
+            var deserialized = DoRecorderRoundTrip(decs, mode, expectWriteErrors: true, expectReadErrors: true);
 
             Assert.IsNull(deserialized.a);
-            Assert.AreEqual(defs.b, deserialized.b);
+            Assert.AreEqual(decs.b, deserialized.b);
         }
 
 
-        public class RefsChildRecordable : Def.IRecordable
+        public class RefsChildRecordable : Dec.IRecordable
         {
-            public void Record(Def.Recorder record)
+            public void Record(Dec.Recorder record)
             {
                 // lol
             }
         }
 
-        public class RefsRootRecordable : Def.IRecordable
+        public class RefsRootRecordable : Dec.IRecordable
         {
             public RefsChildRecordable childAone;
             public RefsChildRecordable childAtwo;
             public RefsChildRecordable childB;
             public RefsChildRecordable childEmpty;
 
-            public void Record(Def.Recorder record)
+            public void Record(Dec.Recorder record)
             {
                 record.Record(ref childAone, "childAone");
                 record.Record(ref childAtwo, "childAtwo");
@@ -225,9 +225,9 @@ namespace DefTest
         [Test]
         public void Refs([Values] RecorderMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.Finish();
 
             var refs = new RefsRootRecordable();
@@ -247,13 +247,13 @@ namespace DefTest
             Assert.AreNotEqual(deserialized.childAone, deserialized.childB);
         }
 
-        public class ContainersRecordable : Def.IRecordable
+        public class ContainersRecordable : Dec.IRecordable
         {
             public List<int> intList = new List<int>();
             public Dictionary<string, string> stringDict = new Dictionary<string, string>();
             public int[] intArray;
 
-            public void Record(Def.Recorder record)
+            public void Record(Dec.Recorder record)
             {
                 record.Record(ref intList, "intList");
                 record.Record(ref stringDict, "stringDict");
@@ -264,9 +264,9 @@ namespace DefTest
         [Test]
         public void Containers([Values] RecorderMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.Finish();
 
             var containers = new ContainersRecordable();
@@ -286,11 +286,11 @@ namespace DefTest
             Assert.AreEqual(containers.intArray, deserialized.intArray);
         }
 
-        public class ContainersNestedRecordable : Def.IRecordable
+        public class ContainersNestedRecordable : Dec.IRecordable
         {
             public List<List<int>> intLL = new List<List<int>>();
 
-            public void Record(Def.Recorder record)
+            public void Record(Dec.Recorder record)
             {
                 record.Record(ref intLL, "intLL");
             }
@@ -299,9 +299,9 @@ namespace DefTest
         [Test]
         public void ContainersNested([Values] RecorderMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.Finish();
 
             var nested = new ContainersNestedRecordable();
@@ -318,22 +318,22 @@ namespace DefTest
             Assert.AreEqual(nested.intLL, deserialized.intLL);
         }
 
-        public class RecursiveParent : Def.IRecordable
+        public class RecursiveParent : Dec.IRecordable
         {
             public List<RecursiveNode> children = new List<RecursiveNode>();
 
-            public void Record(Def.Recorder record)
+            public void Record(Dec.Recorder record)
             {
                 record.Record(ref children, "children");
             }
         }
 
-        public class RecursiveNode : Def.IRecordable
+        public class RecursiveNode : Dec.IRecordable
         {
             public RecursiveNode childA;
             public RecursiveNode childB;
 
-            public void Record(Def.Recorder record)
+            public void Record(Dec.Recorder record)
             {
                 record.Record(ref childA, "childA");
                 record.Record(ref childB, "childB");
@@ -343,9 +343,9 @@ namespace DefTest
         [Test]
         public void ContainerRecursive([Values] RecorderMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.Finish();
 
             var parent = new RecursiveParent();
@@ -379,13 +379,13 @@ namespace DefTest
 
         }
 
-        public class MisparseRecordable : Def.IRecordable
+        public class MisparseRecordable : Dec.IRecordable
         {
             // amusingly, if this is "null", it works fine, because it just says "well it's null I'll mark as a null, done"
             // I'm not sure I want to guarantee that behavior but I'm also not gonna make it an error, at least for now
             public Unparseable unparseable = new Unparseable();
 
-            public void Record(Def.Recorder record)
+            public void Record(Dec.Recorder record)
             {
                 record.Record(ref unparseable, "unparseable");
             }
@@ -394,9 +394,9 @@ namespace DefTest
         [Test]
         public void Misparse([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.Finish();
 
             var misparse = new MisparseRecordable();
@@ -409,12 +409,12 @@ namespace DefTest
             Assert.IsNotNull(deserialized.unparseable);
         }
 
-        public class RecursiveSquaredRecorder : Def.IRecordable
+        public class RecursiveSquaredRecorder : Dec.IRecordable
         {
             public RecursiveSquaredRecorder left;
             public RecursiveSquaredRecorder right;
 
-            public void Record(Def.Recorder record)
+            public void Record(Dec.Recorder record)
             {
                 record.Record(ref left, "left");
                 record.Record(ref right, "right");
@@ -424,9 +424,9 @@ namespace DefTest
         [Test]
         public void RecursiveSquared([Values] RecorderMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.Finish();
 
             var root = new RecursiveSquaredRecorder();
@@ -468,9 +468,9 @@ namespace DefTest
         [Test]
         public void RecursiveSquaredRoot([Values] RecorderMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.Finish();
 
             var root = new RecursiveSquaredRecorder();
@@ -515,9 +515,9 @@ namespace DefTest
         [Test]
         public void RootPrimitive([Values] RecorderMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.Finish();
 
             int value = 4;
@@ -528,12 +528,12 @@ namespace DefTest
             Assert.AreEqual(value, deserialized);
         }
 
-        private class DoubleLinkedRecorder : Def.IRecordable
+        private class DoubleLinkedRecorder : Dec.IRecordable
         {
             public DoubleLinkedRecorder a;
             public DoubleLinkedRecorder b;
 
-            public void Record(Def.Recorder record)
+            public void Record(Dec.Recorder record)
             {
                 record.Record(ref a, "a");
                 record.Record(ref b, "b");
@@ -549,9 +549,9 @@ namespace DefTest
             // I'm choosing 10000 because it's well into the Doesn't Work territory, but it also doesn't take forever to run.
             const int depth = 10000;
 
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.Finish();
 
             var root = new DoubleLinkedRecorder();
@@ -591,9 +591,9 @@ namespace DefTest
             // We use single links so we don't generate refs, we actually embed objects.
             const int depth = 10_000;
 
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.Finish();
 
             var root = new DoubleLinkedRecorder();
@@ -629,11 +629,11 @@ namespace DefTest
             }
         }
 
-        public class BaseRecordable : Def.IRecordable
+        public class BaseRecordable : Dec.IRecordable
         {
             public int baseVal = 0;
 
-            public virtual void Record(Def.Recorder record)
+            public virtual void Record(Dec.Recorder record)
             {
                 record.Record(ref baseVal, "baseVal");
             }
@@ -643,7 +643,7 @@ namespace DefTest
         {
             public int derivedVal = 0;
 
-            public override void Record(Def.Recorder record)
+            public override void Record(Dec.Recorder record)
             {
                 base.Record(record);
 
@@ -651,11 +651,11 @@ namespace DefTest
             }
         }
 
-        public class RecordableContainer : Def.IRecordable
+        public class RecordableContainer : Dec.IRecordable
         {
             public BaseRecordable baseContainer;
 
-            public void Record(Def.Recorder record)
+            public void Record(Dec.Recorder record)
             {
                 record.Record(ref baseContainer, "baseContainer");
             }
@@ -664,9 +664,9 @@ namespace DefTest
         [Test]
         public void DerivedRecordables([Values] RecorderMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.Finish();
 
             var root = new RecordableContainer();
@@ -689,7 +689,7 @@ namespace DefTest
                 <Record>
                   <recordFormatVersion>1</recordFormatVersion>
                   <refs>
-                    <Raf id=""ref00000"" class=""DefTest.Recorder.RefsChildRecordable"" />
+                    <Raf id=""ref00000"" class=""DecTest.Recorder.RefsChildRecordable"" />
                   </refs>
                   <data>
                     <childAone ref=""ref00000"" />
@@ -699,7 +699,7 @@ namespace DefTest
                   </data>
                 </Record>";
             RefsRootRecordable deserialized = null;
-            ExpectWarnings(() => deserialized = Def.Recorder.Read<RefsRootRecordable>(serialized));
+            ExpectWarnings(() => deserialized = Dec.Recorder.Read<RefsRootRecordable>(serialized));
 
             Assert.IsNotNull(deserialized.childAone);
             Assert.IsNotNull(deserialized.childAtwo);
@@ -717,8 +717,8 @@ namespace DefTest
                 <Record>
                   <recordFormatVersion>1</recordFormatVersion>
                   <refs>
-                    <Ref class=""DefTest.Recorder.RefsChildRecordable"" />
-                    <Ref id=""ref00000"" class=""DefTest.Recorder.RefsChildRecordable"" />
+                    <Ref class=""DecTest.Recorder.RefsChildRecordable"" />
+                    <Ref id=""ref00000"" class=""DecTest.Recorder.RefsChildRecordable"" />
                   </refs>
                   <data>
                     <childAone ref=""ref00000"" />
@@ -728,7 +728,7 @@ namespace DefTest
                   </data>
                 </Record>";
             RefsRootRecordable deserialized = null;
-            ExpectErrors(() => deserialized = Def.Recorder.Read<RefsRootRecordable>(serialized));
+            ExpectErrors(() => deserialized = Dec.Recorder.Read<RefsRootRecordable>(serialized));
 
             Assert.IsNotNull(deserialized.childAone);
             Assert.IsNotNull(deserialized.childAtwo);
@@ -747,7 +747,7 @@ namespace DefTest
                   <recordFormatVersion>1</recordFormatVersion>
                   <refs>
                     <Ref id=""PLACE"" />
-                    <Ref id=""ref00000"" class=""DefTest.Recorder.RefsChildRecordable"" />
+                    <Ref id=""ref00000"" class=""DecTest.Recorder.RefsChildRecordable"" />
                   </refs>
                   <data>
                     <childAone ref=""ref00000"" />
@@ -757,7 +757,7 @@ namespace DefTest
                   </data>
                 </Record>";
             RefsRootRecordable deserialized = null;
-            ExpectErrors(() => deserialized = Def.Recorder.Read<RefsRootRecordable>(serialized));
+            ExpectErrors(() => deserialized = Dec.Recorder.Read<RefsRootRecordable>(serialized));
 
             Assert.IsNotNull(deserialized.childAone);
             Assert.IsNotNull(deserialized.childAtwo);
@@ -777,8 +777,8 @@ namespace DefTest
                 <Record>
                   <recordFormatVersion>1</recordFormatVersion>
                   <refs>
-                    <Ref id=""PLACE"" class=""DefTest.Recorder.AStruct"" />
-                    <Ref id=""ref00000"" class=""DefTest.Recorder.RefsChildRecordable"" />
+                    <Ref id=""PLACE"" class=""DecTest.Recorder.AStruct"" />
+                    <Ref id=""ref00000"" class=""DecTest.Recorder.RefsChildRecordable"" />
                   </refs>
                   <data>
                     <childAone ref=""ref00000"" />
@@ -788,7 +788,7 @@ namespace DefTest
                   </data>
                 </Record>";
             RefsRootRecordable deserialized = null;
-            ExpectErrors(() => deserialized = Def.Recorder.Read<RefsRootRecordable>(serialized));
+            ExpectErrors(() => deserialized = Dec.Recorder.Read<RefsRootRecordable>(serialized));
 
             Assert.IsNotNull(deserialized.childAone);
             Assert.IsNotNull(deserialized.childAtwo);
@@ -808,8 +808,8 @@ namespace DefTest
                 <Record>
                   <recordFormatVersion>1</recordFormatVersion>
                   <refs>
-                    <Ref id=""PLACE"" class=""DefTest.Recorder.RefsChildRecordable"" />
-                    <Ref id=""ref00000"" class=""DefTest.Recorder.RefsChildRecordable"" />
+                    <Ref id=""PLACE"" class=""DecTest.Recorder.RefsChildRecordable"" />
+                    <Ref id=""ref00000"" class=""DecTest.Recorder.RefsChildRecordable"" />
                   </refs>
                   <data>
                     <childAone ref=""ref00000"" />
@@ -818,7 +818,7 @@ namespace DefTest
                     <childEmpty null=""true"" />
                   </data>
                 </Record>";
-            RefsRootRecordable deserialized = Def.Recorder.Read<RefsRootRecordable>(serialized);
+            RefsRootRecordable deserialized = Dec.Recorder.Read<RefsRootRecordable>(serialized);
 
             Assert.IsNotNull(deserialized.childAone);
             Assert.IsNotNull(deserialized.childAtwo);
@@ -829,13 +829,13 @@ namespace DefTest
             Assert.AreNotEqual(deserialized.childAone, deserialized.childB);
         }
 
-        public class AttributeRecordable : Def.IRecordable
+        public class AttributeRecordable : Dec.IRecordable
         {
             public string attributing = "";
 
-            public void Record(Def.Recorder record)
+            public void Record(Dec.Recorder record)
             {
-                if (record.Mode == Def.Recorder.Direction.Read)
+                if (record.Mode == Dec.Recorder.Direction.Read)
                 {
                     attributing = record.Xml.Attributes().Single(attr => attr.Name == "converted").Value;
                 }
@@ -846,13 +846,13 @@ namespace DefTest
             }
         }
 
-        public class AttributeHolder : Def.IRecordable
+        public class AttributeHolder : Dec.IRecordable
         {
             public AttributeRecordable a;
             public AttributeRecordable b;
             public AttributeRecordable c;
 
-            public void Record(Def.Recorder record)
+            public void Record(Dec.Recorder record)
             {
                 record.Record(ref a, "a");
                 record.Record(ref b, "b");
@@ -892,12 +892,12 @@ namespace DefTest
             Assert.AreSame(holder.a, holder.c);
         }
 
-        public class MultiRecordRec : Def.IRecordable
+        public class MultiRecordRec : Dec.IRecordable
         {
             public int x;
             public int y;
 
-            public void Record(Def.Recorder record)
+            public void Record(Dec.Recorder record)
             {
                 record.Record(ref x, "x");
                 record.Record(ref y, "x");  // oops!
@@ -917,11 +917,11 @@ namespace DefTest
             // y's value is left undefined
         }
 
-        public class PrimitivesContainer : Def.IRecordable
+        public class PrimitivesContainer : Dec.IRecordable
         {
             public PrimitivesRecordable recordable;
 
-            public void Record(Def.Recorder record)
+            public void Record(Dec.Recorder record)
             {
                 record.Record(ref recordable, "recordable");
             }
@@ -936,14 +936,14 @@ namespace DefTest
                 <Record>
                   <recordFormatVersion>1</recordFormatVersion>
                   <refs>
-                    <Ref id=""ref00000"" class=""DefTest.Recorder.PrimitivesRecordable"" />
+                    <Ref id=""ref00000"" class=""DecTest.Recorder.PrimitivesRecordable"" />
                   </refs>
                   <data>
                     <recordable ref=""ref00000"" null=""true""/>
                   </data>
                 </Record>";
             PrimitivesContainer deserialized = null;
-            ExpectErrors(() => deserialized = Def.Recorder.Read<PrimitivesContainer>(serialized));
+            ExpectErrors(() => deserialized = Dec.Recorder.Read<PrimitivesContainer>(serialized));
 
             Assert.IsNull(deserialized.recordable);
         }
@@ -957,7 +957,7 @@ namespace DefTest
                 <Record>
                   <recordFormatVersion>1</recordFormatVersion>
                   <refs>
-                    <Ref id=""ref00000"" class=""DefTest.Recorder.PrimitivesRecordable"">
+                    <Ref id=""ref00000"" class=""DecTest.Recorder.PrimitivesRecordable"">
                         <intValue>42</intValue>
                     </Ref>
                   </refs>
@@ -966,7 +966,7 @@ namespace DefTest
                   </data>
                 </Record>";
             PrimitivesContainer deserialized = null;
-            ExpectErrors(() => deserialized = Def.Recorder.Read<PrimitivesContainer>(serialized));
+            ExpectErrors(() => deserialized = Dec.Recorder.Read<PrimitivesContainer>(serialized));
 
             Assert.AreEqual(42, deserialized.recordable.intValue);
         }
@@ -984,7 +984,7 @@ namespace DefTest
                   </data>
                 </Record>";
             PrimitivesContainer deserialized = null;
-            ExpectErrors(() => deserialized = Def.Recorder.Read<PrimitivesContainer>(serialized));
+            ExpectErrors(() => deserialized = Dec.Recorder.Read<PrimitivesContainer>(serialized));
 
             Assert.IsNull(deserialized.recordable);
         }
@@ -998,25 +998,25 @@ namespace DefTest
                 <Record>
                   <recordFormatVersion>1</recordFormatVersion>
                   <refs>
-                    <Ref id=""ref00000"" class=""DefTest.Recorder.PrimitivesContainer"" />
+                    <Ref id=""ref00000"" class=""DecTest.Recorder.PrimitivesContainer"" />
                   </refs>
                   <data>
                     <recordable ref=""ref00000"" />
                   </data>
                 </Record>";
             PrimitivesContainer deserialized = null;
-            ExpectErrors(() => deserialized = Def.Recorder.Read<PrimitivesContainer>(serialized));
+            ExpectErrors(() => deserialized = Dec.Recorder.Read<PrimitivesContainer>(serialized));
 
             Assert.IsNull(deserialized.recordable);
         }
 
-        public class DictionaryKeyRefDef : Def.IRecordable
+        public class DictionaryKeyRefDec : Dec.IRecordable
         {
             public StubRecordable referenceA;
             public Dictionary<StubRecordable, string> dict = new Dictionary<StubRecordable, string>();
             public StubRecordable referenceB;
 
-            public void Record(Def.Recorder record)
+            public void Record(Dec.Recorder record)
             {
                 record.Record(ref referenceA, "referenceA");
                 record.Record(ref dict, "dict");
@@ -1027,7 +1027,7 @@ namespace DefTest
         [Test]
         public void DictionaryKeyRef([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
-            var dict = new DictionaryKeyRefDef();
+            var dict = new DictionaryKeyRefDec();
             dict.referenceA = new StubRecordable();
             dict.referenceB = new StubRecordable();
             dict.dict[dict.referenceA] = "Hello";
@@ -1045,7 +1045,7 @@ namespace DefTest
         {
             var item = new StubRecordable();
 
-            var output = Def.Recorder.Write(item, pretty: mode == RecorderMode.Pretty);
+            var output = Dec.Recorder.Write(item, pretty: mode == RecorderMode.Pretty);
 
             Assert.AreEqual(mode == RecorderMode.Pretty, output.Contains("\n"));
         }

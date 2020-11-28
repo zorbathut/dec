@@ -62,25 +62,25 @@
     command: rsync -a --exclude='/.git' --filter=':- .gitignore' /vagrant/ /vagrant_build
     become: yes
     
-  - name: Build and instrument def
+  - name: Build and instrument dec
     block:
-    - name: Build def
+    - name: Build dec
       command:
-        cmd: dotnet build src/def.csproj
+        cmd: dotnet build src/dec.csproj
         chdir: /vagrant_build
-    - name: Copy def
+    - name: Copy dec
       copy:
-        src: /vagrant_build/src/bin/Debug/netstandard2.0/def.dll
+        src: /vagrant_build/src/bin/Debug/netstandard2.0/dec.dll
         remote_src: yes
-        dest: /vagrant_build/util/sharpfuzz/def.dll
-    - name: Instrument def
+        dest: /vagrant_build/util/sharpfuzz/dec.dll
+    - name: Instrument dec
       command:
-        cmd: /home/vagrant/.dotnet/tools/sharpfuzz util/sharpfuzz/def.dll # This should be in the path but I don't know how to get ansible to recognize a path change, since it's only added to the path when we install dotnet tools.
+        cmd: /home/vagrant/.dotnet/tools/sharpfuzz util/sharpfuzz/dec.dll # This should be in the path but I don't know how to get ansible to recognize a path change, since it's only added to the path when we install dotnet tools.
         chdir: /vagrant_build
   
-  - name: Build DefSharpFuzz
+  - name: Build DecSharpFuzz
     command:
-      cmd: dotnet build util/sharpfuzz/def-sharpfuzz.csproj
+      cmd: dotnet build util/sharpfuzz/dec-sharpfuzz.csproj
       chdir: /vagrant_build
   
   - name: Disable core dump notifications

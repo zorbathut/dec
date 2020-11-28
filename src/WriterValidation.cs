@@ -1,4 +1,4 @@
-namespace Def
+namespace Dec
 {
     using System;
     using System.Collections;
@@ -35,9 +35,9 @@ namespace Def
     {
         public override bool AllowReflection { get => true; }
 
-        public WriterNode StartDef(Type type, string defName)
+        public WriterNode StartDec(Type type, string decName)
         {
-            return new WriterNodeValidation(this, $"Def.Database<{type.ComposeCSFormatted()}>.Get(\"{defName}\")");
+            return new WriterNodeValidation(this, $"Dec.Database<{type.ComposeCSFormatted()}>.Get(\"{decName}\")");
         }
     }
 
@@ -123,11 +123,11 @@ namespace Def
             WriteToken($"typeof({value.ComposeCSFormatted()})");
         }
 
-        public override void WriteDef(Def value)
+        public override void WriteDec(Dec value)
         {
             if (value != null)
             {
-                WriteToken($"Def.Database<{value.GetType().ComposeCSFormatted()}>.Get(\"{value.DefName}\")");
+                WriteToken($"Dec.Database<{value.GetType().ComposeCSFormatted()}>.Get(\"{value.DecName}\")");
             }
             else
             {

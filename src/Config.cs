@@ -1,4 +1,4 @@
-namespace Def
+namespace Dec
 {
     using System;
     using System.Collections.Generic;
@@ -40,7 +40,7 @@ namespace Def
         /// <remarks>
         /// This should be made unmissably visible to developers and testers, ideally with a popup or a modal dialog.
         /// 
-        /// Can be made to throw an exception. If it does, the exception will propagate to the caller. Otherwise, def will attempt to recover from the error.
+        /// Can be made to throw an exception. If it does, the exception will propagate to the caller. Otherwise, dec will attempt to recover from the error.
         ///
         /// If you're using any multithreading, this must be threadsafe.
         /// </remarks>
@@ -52,7 +52,7 @@ namespace Def
         /// <remarks>
         /// This should be made unmissably visible to developers and testers, ideally with a popup or a modal dialog.
         /// 
-        /// Can be made to rethrow the exception or throw a new exception. If it does, the exception will propagate to the caller. Otherwise, def will attempt to recover from the error.
+        /// Can be made to rethrow the exception or throw a new exception. If it does, the exception will propagate to the caller. Otherwise, dec will attempt to recover from the error.
         ///
         /// If you're using any multithreading, this must be threadsafe.
         /// </remarks>
@@ -71,7 +71,7 @@ namespace Def
         /// <remarks>
         /// Ignored if you're not using the default handlers.
         ///
-        /// Def is intended to work without exceptions; it's good at recovering from errors. This is very important if you have mods, as mods frequently have minor conflicts.
+        /// Dec is intended to work without exceptions; it's good at recovering from errors. This is very important if you have mods, as mods frequently have minor conflicts.
         ///
         /// However, many developers don't configure the error reporting when first installing the library, often running into bizarre issues because of it.
         ///
@@ -88,7 +88,7 @@ namespace Def
         public static bool DefaultHandlerShowConfigOnException = true;
 
         /// <summary>
-        /// The list of namespaces that def can access transparently.
+        /// The list of namespaces that dec can access transparently.
         /// </summary>
         /// <remarks>
         /// Generally this should consist of your project's primary namespace. If your project lives in multiple namespaces, you may wish to include them all.
@@ -126,7 +126,7 @@ namespace Def
             {
                 if (DefaultHandlerShowConfigOnException)
                 {
-                    return "\nThis error-handling behavior (as well as this message) can be modified in Def.Config.";
+                    return "\nThis error-handling behavior (as well as this message) can be modified in Dec.Config.";
                 }
                 else
                 {

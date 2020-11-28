@@ -3,13 +3,13 @@ namespace Loaf
 {
     using System.Linq;
 
-    // Recommend reading the LocationDef documentation for more information.
+    // Recommend reading the LocationDec documentation for more information.
     //
-    // When creating a builder like this, I recommend passing the Def in as a constructor parameter.
-    // The constructor can always ignore it, but if there's any relevant data, the constructor will need access to the Def.
-    public class DungeonDef : LocationDef
+    // When creating a builder like this, I recommend passing the Dec in as a constructor parameter.
+    // The constructor can always ignore it, but if there's any relevant data, the constructor will need access to the Dec.
+    public class DungeonDec : LocationDec
     {
-        public RollTable<MonsterDef> monsters;
+        public RollTable<MonsterDec> monsters;
 
         public override Location Create()
         {
@@ -19,53 +19,53 @@ namespace Loaf
 
     public class Dungeon : Location
     {
-        // Def has no trouble with classes that are members of other classes, so we can make a little specialized Def hierarchy here just for the sake of dungeon choices.
+        // Dec has no trouble with classes that are members of other classes, so we can make a little specialized Dec hierarchy here just for the sake of dungeon choices.
         // In fact, we can make *two* little specialized hierarchies.
-        [Def.StaticReferences]
+        [Dec.StaticReferences]
         private static class DungeonChoices
         {
             static DungeonChoices()
             {
-                Def.StaticReferencesAttribute.Initialized();
+                Dec.StaticReferencesAttribute.Initialized();
             }
 
-            public static FightChoiceDef Fight;
-            public static FightChoiceDef Run;
+            public static FightChoiceDec Fight;
+            public static FightChoiceDec Run;
 
-            public static DungeonChoiceDef FindMore;
-            public static DungeonChoiceDef Leave;
+            public static DungeonChoiceDec FindMore;
+            public static DungeonChoiceDec Leave;
         }
-        private class FightChoiceDef : Cns.ChoiceDef { }
-        private class DungeonChoiceDef : Cns.ChoiceDef { }
+        private class FightChoiceDec : Cns.ChoiceDec { }
+        private class DungeonChoiceDec : Cns.ChoiceDec { }
 
         // It's tempting to combine this with Location.Outcomes, since they contain most of the same elements.
-        // It's so cheap and easy to make another Def type that I recommend avoiding this instinct; keep your types separate.
-        [Def.StaticReferences]
+        // It's so cheap and easy to make another Dec type that I recommend avoiding this instinct; keep your types separate.
+        [Dec.StaticReferences]
         public new static class Outcomes
         {
             static Outcomes()
             {
-                Def.StaticReferencesAttribute.Initialized();
+                Dec.StaticReferencesAttribute.Initialized();
             }
 
-            public static OutcomeDef Victory;
-            public static OutcomeDef Death;
-            public static OutcomeDef Fled;
+            public static OutcomeDec Victory;
+            public static OutcomeDec Death;
+            public static OutcomeDec Fled;
         }
-        public new class OutcomeDef : Def.Def { }
+        public new class OutcomeDec : Dec.Dec { }
 
-        private DungeonDef def;
+        private DungeonDec dec;
 
-        public Dungeon(DungeonDef def)
+        public Dungeon(DungeonDec dec)
         {
-            this.def = def;
+            this.dec = dec;
         }
 
-        public override Location.OutcomeDef Visit()
+        public override Location.OutcomeDec Visit()
         {
             while (true)
             {
-                var result = Fight(def.monsters.Roll());
+                var result = Fight(dec.monsters.Roll());
                 if (result == Outcomes.Death)
                 {
                     return Location.Outcomes.Death;
@@ -76,7 +76,7 @@ namespace Loaf
                     return Location.Outcomes.Return;
                 }
 
-                var choice = Cns.Choice<DungeonChoiceDef>();
+                var choice = Cns.Choice<DungeonChoiceDec>();
                 if (choice == DungeonChoices.Leave)
                 {
                     return Location.Outcomes.Return;
@@ -84,7 +84,7 @@ namespace Loaf
             }
         }
 
-        private static OutcomeDef Fight(MonsterDef monster)
+        private static OutcomeDec Fight(MonsterDec monster)
         {
             int playerHp = Config.Global.playerHp;
             int monsterHp = monster.hp;
@@ -100,11 +100,11 @@ namespace Loaf
                 Cns.Out($"{monsterHp,4} / {monster.hp,4}: The monster's health");
                 Cns.Out($"");
 
-                var choice = Cns.Choice<FightChoiceDef>();
+                var choice = Cns.Choice<FightChoiceDec>();
                 if (choice == DungeonChoices.Fight)
                 {
                     int attack = monster.damage.Roll();
-                    int defense = Player.Instance.Inventory.OfType<ArmorDef>().Select(armor => armor.armor.Roll()).Sum();
+                    int defense = Player.Instance.Inventory.OfType<ArmorDec>().Select(armor => armor.armor.Roll()).Sum();
 
                     if (attack > defense)
                     {
@@ -139,8 +139,8 @@ namespace Loaf
                 {
                     Cns.Out($"You find a {monster.loot.name}!", color: System.ConsoleColor.Cyan);
 
-                    // You could also make this a virtual function on ItemDef with an override on ArmorDef, maybe named OnPickup().
-                    if (monster.loot is ArmorDef)
+                    // You could also make this a virtual function on ItemDec with an override on ArmorDec, maybe named OnPickup().
+                    if (monster.loot is ArmorDec)
                     {
                         Cns.Out($"You put it on. It fits perfectly.", color: System.ConsoleColor.Cyan);
                     }

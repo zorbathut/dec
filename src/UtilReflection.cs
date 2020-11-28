@@ -1,4 +1,4 @@
-namespace Def
+namespace Dec
 {
     using System;
     using System.Collections.Generic;
@@ -125,7 +125,7 @@ namespace Def
         internal static bool ReflectionSetForbidden(FieldInfo field)
         {
             // Alright, this isn't exactly complicated right now
-            if (field.DeclaringType == typeof(Def))
+            if (field.DeclaringType == typeof(Dec))
             {
                 return true;
             }

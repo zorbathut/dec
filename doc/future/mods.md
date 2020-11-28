@@ -1,60 +1,60 @@
 # Mod functionality
 
-As a text-based format, def XMLs are very conducive to making user-authored mods. However, at the moment there's no good way for those user-authored mods to interact with core functionality.
+As a text-based format, dec XMLs are very conducive to making user-authored mods. However, at the moment there's no good way for those user-authored mods to interact with core functionality.
 
 Assume these examples are an attempt to mod this XML:
 
 ```xml
-<ExampleDef defName="Example">
+<ExampleDec decName="Example">
   <value>4</value>
   <listOfStrings>
     <li>Yabba</li>
     <li>Dabba</li>
     <li>Doo</li>
   </listOfStrings>
-</ExampleDef>
+</ExampleDec>
 
 ## Overriding
 
 ```xml
-<ExampleDef defName="Example" mode="replace">
+<ExampleDec decName="Example" mode="replace">
   <value>10</value>
   <listOfStrings>
     <li>Abra</li>
     <li>Cadabra</li>
   </listOfStrings>
-</ExampleDef>
+</ExampleDec>
 ```
 
-It's easy to allow mods to simply nuke-and-rewrite existing defs. This isn't the most powerful technique available, but it's effective in many situations.
+It's easy to allow mods to simply nuke-and-rewrite existing decs. This isn't the most powerful technique available, but it's effective in many situations.
 
 ## Splicing
 
 ```xml
-<ExampleDef defName="Example" mode="modify">
+<ExampleDec decName="Example" mode="modify">
   <value>10</value>
-</ExampleDef>
+</ExampleDec>
 ```
 
-Alternatively, or additionally, we could allow for per-field overriding. This would behave similar to if the original def is a Parent.
+Alternatively, or additionally, we could allow for per-field overriding. This would behave similar to if the original dec is a Parent.
 
 Lists make things more difficult. Some behaviors seem easy:
 
 ```xml
-<ExampleDef defName="Example" mode="modify">
+<ExampleDec decName="Example" mode="modify">
   <listOfStrings mode="append">
     <li>And more!</li>
   </listOfStrings>
-</ExampleDef>
+</ExampleDec>
 ```
 
 ```xml
-<ExampleDef defName="Example" mode="modify">
+<ExampleDec decName="Example" mode="modify">
   <listOfStrings mode="replace">
     <li>Alla</li>
     <li>Khazam</li>
   </listOfStrings>
-</ExampleDef>
+</ExampleDec>
 ```
 
 but others may require a heavier-weight approach.

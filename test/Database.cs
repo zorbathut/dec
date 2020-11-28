@@ -1,4 +1,4 @@
-namespace DefTest
+namespace DecTest
 {
     using NUnit.Framework;
     using System;
@@ -11,41 +11,41 @@ namespace DefTest
         [Test]
         public void DatabaseList([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <StubDef defName=""TestDefA"" />
-                    <StubDef defName=""TestDefB"" />
-                    <StubDef defName=""TestDefC"" />
-                </Defs>");
+                <Decs>
+                    <StubDec decName=""TestDecA"" />
+                    <StubDec decName=""TestDecB"" />
+                    <StubDec decName=""TestDecC"" />
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDefA"));
-            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDefB"));
-            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDefC"));
+            Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDecA"));
+            Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDecB"));
+            Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDecC"));
 
-            Assert.AreEqual(3, Def.Database<StubDef>.List.Length);
+            Assert.AreEqual(3, Dec.Database<StubDec>.List.Length);
 
-            Assert.IsTrue(Def.Database<StubDef>.List.Contains(Def.Database<StubDef>.Get("TestDefA")));
-            Assert.IsTrue(Def.Database<StubDef>.List.Contains(Def.Database<StubDef>.Get("TestDefB")));
-            Assert.IsTrue(Def.Database<StubDef>.List.Contains(Def.Database<StubDef>.Get("TestDefC")));
+            Assert.IsTrue(Dec.Database<StubDec>.List.Contains(Dec.Database<StubDec>.Get("TestDecA")));
+            Assert.IsTrue(Dec.Database<StubDec>.List.Contains(Dec.Database<StubDec>.Get("TestDecB")));
+            Assert.IsTrue(Dec.Database<StubDec>.List.Contains(Dec.Database<StubDec>.Get("TestDecC")));
         }
 
-        private class RootDef : Def.Def
+        private class RootDec : Dec.Dec
         {
 
         }
 
-        private class ParentDef : RootDef
+        private class ParentDec : RootDec
         {
 
         }
 
-        private class ChildDef : ParentDef
+        private class ChildDec : ParentDec
         {
 
         }
@@ -53,43 +53,43 @@ namespace DefTest
         [Test]
         public void DatabaseHierarchy([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(RootDef), typeof(ParentDef), typeof(ChildDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(RootDec), typeof(ParentDec), typeof(ChildDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <RootDef defName=""RootDef"" />
-                    <ParentDef defName=""ParentDef"" />
-                    <ChildDef defName=""ChildDef"" />
-                </Defs>");
+                <Decs>
+                    <RootDec decName=""RootDec"" />
+                    <ParentDec decName=""ParentDec"" />
+                    <ChildDec decName=""ChildDec"" />
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var root = Def.Database<RootDef>.Get("RootDef");
-            var parent = Def.Database<ParentDef>.Get("ParentDef");
-            var child = Def.Database<ChildDef>.Get("ChildDef");
+            var root = Dec.Database<RootDec>.Get("RootDec");
+            var parent = Dec.Database<ParentDec>.Get("ParentDec");
+            var child = Dec.Database<ChildDec>.Get("ChildDec");
 
-            Assert.IsTrue(Def.Database<RootDef>.List.Contains(root));
-            Assert.IsTrue(Def.Database<RootDef>.List.Contains(parent));
-            Assert.IsTrue(Def.Database<RootDef>.List.Contains(child));
-            Assert.IsTrue(Def.Database<ParentDef>.List.Contains(parent));
-            Assert.IsTrue(Def.Database<ParentDef>.List.Contains(child));
-            Assert.IsTrue(Def.Database<ChildDef>.List.Contains(child));
+            Assert.IsTrue(Dec.Database<RootDec>.List.Contains(root));
+            Assert.IsTrue(Dec.Database<RootDec>.List.Contains(parent));
+            Assert.IsTrue(Dec.Database<RootDec>.List.Contains(child));
+            Assert.IsTrue(Dec.Database<ParentDec>.List.Contains(parent));
+            Assert.IsTrue(Dec.Database<ParentDec>.List.Contains(child));
+            Assert.IsTrue(Dec.Database<ChildDec>.List.Contains(child));
 
-            Assert.AreEqual(3, Def.Database<RootDef>.Count);
-            Assert.AreEqual(2, Def.Database<ParentDef>.Count);
-            Assert.AreEqual(1, Def.Database<ChildDef>.Count);
+            Assert.AreEqual(3, Dec.Database<RootDec>.Count);
+            Assert.AreEqual(2, Dec.Database<ParentDec>.Count);
+            Assert.AreEqual(1, Dec.Database<ChildDec>.Count);
 
-            Assert.AreEqual(3, Def.Database.Count);
-            Assert.AreEqual(3, Def.Database.List.Count());
+            Assert.AreEqual(3, Dec.Database.Count);
+            Assert.AreEqual(3, Dec.Database.List.Count());
 
-            Assert.Contains(root, Def.Database.List.ToArray());
-            Assert.Contains(parent, Def.Database.List.ToArray());
-            Assert.Contains(child, Def.Database.List.ToArray());
+            Assert.Contains(root, Dec.Database.List.ToArray());
+            Assert.Contains(parent, Dec.Database.List.ToArray());
+            Assert.Contains(child, Dec.Database.List.ToArray());
         }
 
-        private class NotActuallyADef
+        private class NotActuallyADec
         {
 
         }
@@ -97,103 +97,103 @@ namespace DefTest
         [Test]
         public void DatabaseErrorQuery()
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.Finish();
 
-            ExpectErrors(() => Assert.IsNull(Def.Database.Get(typeof(NotActuallyADef), "Fake")));
+            ExpectErrors(() => Assert.IsNull(Dec.Database.Get(typeof(NotActuallyADec), "Fake")));
         }
 
-        private Func<Type, Type> getDefRootType;
+        private Func<Type, Type> getDecRootType;
 
         [OneTimeSetUp]
         public void CreateCallbacks()
         {
-            var reflectionClass = Assembly.GetAssembly(typeof(Def.Def)).GetType("Def.UtilType");
+            var reflectionClass = Assembly.GetAssembly(typeof(Dec.Dec)).GetType("Dec.UtilType");
 
-            var serialize = reflectionClass.GetMethod("GetDefRootType", BindingFlags.NonPublic | BindingFlags.Static);
-            getDefRootType = type => (Type)serialize.Invoke(null, new object[] { type });
+            var serialize = reflectionClass.GetMethod("GetDecRootType", BindingFlags.NonPublic | BindingFlags.Static);
+            getDecRootType = type => (Type)serialize.Invoke(null, new object[] { type });
         }
 
-        abstract class CppAbstractTypeDef : Def.Def
+        abstract class CppAbstractTypeDec : Dec.Dec
         {
         }
 
-        class CppAbstractTypeDerivedDef : CppAbstractTypeDef
+        class CppAbstractTypeDerivedDec : CppAbstractTypeDec
         {
         }
 
-        class CppAbstractTypeDerived2Def : CppAbstractTypeDerivedDef
+        class CppAbstractTypeDerived2Dec : CppAbstractTypeDerivedDec
         {
         }
 
-        [Def.Abstract]
-        class DefAbstractTypeDef : Def.Def
+        [Dec.Abstract]
+        class DecAbstractTypeDec : Dec.Dec
         {
         }
 
-        class DefAbstractTypeDerivedDef : DefAbstractTypeDef
+        class DecAbstractTypeDerivedDec : DecAbstractTypeDec
         {
         }
 
-        class DefAbstractTypeDerived2Def : DefAbstractTypeDerivedDef
+        class DecAbstractTypeDerived2Dec : DecAbstractTypeDerivedDec
         {
         }
 
-        [Def.Abstract]
-        abstract class FullAbstractTypeDef : Def.Def
+        [Dec.Abstract]
+        abstract class FullAbstractTypeDec : Dec.Dec
         {
         }
 
-        class FullAbstractTypeDerivedDef : FullAbstractTypeDef
+        class FullAbstractTypeDerivedDec : FullAbstractTypeDec
         {
         }
 
-        class FullAbstractTypeDerived2Def : FullAbstractTypeDerivedDef
+        class FullAbstractTypeDerived2Dec : FullAbstractTypeDerivedDec
         {
         }
 
-        [Def.Abstract]
-        abstract class FullAbstractTypeDerived3ADef : FullAbstractTypeDerived2Def
+        [Dec.Abstract]
+        abstract class FullAbstractTypeDerived3ADec : FullAbstractTypeDerived2Dec
         {
         }
 
-        class FullAbstractTypeDerived4ADef : FullAbstractTypeDerived3ADef
+        class FullAbstractTypeDerived4ADec : FullAbstractTypeDerived3ADec
         {
         }
 
-        [Def.Abstract]
-        abstract class FullAbstractTypeDerived3BDef : FullAbstractTypeDerived2Def
+        [Dec.Abstract]
+        abstract class FullAbstractTypeDerived3BDec : FullAbstractTypeDerived2Dec
         {
         }
 
-        class FullAbstractTypeDerived4BDef : FullAbstractTypeDerived3BDef
+        class FullAbstractTypeDerived4BDec : FullAbstractTypeDerived3BDec
         {
         }
 
 
         [Test]
-        public void DefRootTypeTests()
+        public void DecRootTypeTests()
         {
-            Assert.AreEqual(typeof(CppAbstractTypeDef), getDefRootType(typeof(CppAbstractTypeDerivedDef)));
-            Assert.AreEqual(typeof(CppAbstractTypeDef), getDefRootType(typeof(CppAbstractTypeDef)));
+            Assert.AreEqual(typeof(CppAbstractTypeDec), getDecRootType(typeof(CppAbstractTypeDerivedDec)));
+            Assert.AreEqual(typeof(CppAbstractTypeDec), getDecRootType(typeof(CppAbstractTypeDec)));
 
-            Assert.AreEqual(typeof(FullAbstractTypeDerivedDef), getDefRootType(typeof(FullAbstractTypeDerivedDef)));
+            Assert.AreEqual(typeof(FullAbstractTypeDerivedDec), getDecRootType(typeof(FullAbstractTypeDerivedDec)));
 
             // now for some errors
-            ExpectErrors(() => Assert.IsNull(getDefRootType(typeof(FullAbstractTypeDef))));
-            ExpectErrors(() => Assert.IsNull(getDefRootType(typeof(DefAbstractTypeDef))));
+            ExpectErrors(() => Assert.IsNull(getDecRootType(typeof(FullAbstractTypeDec))));
+            ExpectErrors(() => Assert.IsNull(getDecRootType(typeof(DecAbstractTypeDec))));
 
-            // We've already errored once on DefAbstract, so it's currently not required to happen again (but it's allowed to.)
-            Assert.AreEqual(typeof(DefAbstractTypeDerivedDef), getDefRootType(typeof(DefAbstractTypeDerivedDef)));
+            // We've already errored once on DecAbstract, so it's currently not required to happen again (but it's allowed to.)
+            Assert.AreEqual(typeof(DecAbstractTypeDerivedDec), getDecRootType(typeof(DecAbstractTypeDerivedDec)));
 
-            Assert.AreEqual(typeof(CppAbstractTypeDef), getDefRootType(typeof(CppAbstractTypeDerived2Def)));
-            Assert.AreEqual(typeof(DefAbstractTypeDerivedDef), getDefRootType(typeof(DefAbstractTypeDerived2Def)));
-            Assert.AreEqual(typeof(FullAbstractTypeDerivedDef), getDefRootType(typeof(FullAbstractTypeDerived2Def)));
+            Assert.AreEqual(typeof(CppAbstractTypeDec), getDecRootType(typeof(CppAbstractTypeDerived2Dec)));
+            Assert.AreEqual(typeof(DecAbstractTypeDerivedDec), getDecRootType(typeof(DecAbstractTypeDerived2Dec)));
+            Assert.AreEqual(typeof(FullAbstractTypeDerivedDec), getDecRootType(typeof(FullAbstractTypeDerived2Dec)));
 
-            ExpectErrors(() => Assert.IsNull(getDefRootType(typeof(FullAbstractTypeDerived3ADef))));
-            ExpectErrors(() => Assert.AreEqual(typeof(FullAbstractTypeDerived4BDef), getDefRootType(typeof(FullAbstractTypeDerived4BDef))));
+            ExpectErrors(() => Assert.IsNull(getDecRootType(typeof(FullAbstractTypeDerived3ADec))));
+            ExpectErrors(() => Assert.AreEqual(typeof(FullAbstractTypeDerived4BDec), getDecRootType(typeof(FullAbstractTypeDerived4BDec))));
         }
     }
 }

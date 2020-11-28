@@ -1,4 +1,4 @@
-namespace DefTest
+namespace DecTest
 {
     using NUnit.Framework;
     using NUnit.Framework.Internal;
@@ -9,13 +9,13 @@ namespace DefTest
     [TestFixture]
     public class Compat : Base
     {
-        public class DoubleRec : Def.IRecordable
+        public class DoubleRec : Dec.IRecordable
         {
             public double a;
             public double b;
             public float c;
 
-            public void Record(Def.Recorder record)
+            public void Record(Dec.Recorder record)
             {
                 record.Record(ref a, "a");
                 record.Record(ref b, "b");

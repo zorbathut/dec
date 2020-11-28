@@ -1,5 +1,5 @@
 
-namespace Def
+namespace Dec
 {
     internal static class Compat
     {

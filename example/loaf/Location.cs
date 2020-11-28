@@ -3,20 +3,20 @@ namespace Loaf
 {
     using System;
 
-    // Locations, in this game, are defined with subclasses of a class called LocationDef. This demonstrates a few different ways to create classes on demand.
+    // Locations, in this game, are declared with subclasses of a class called LocationDec. This demonstrates a few different ways to create classes on demand.
     //
-    // The DungeonDef subclass has information tied to that type, and creates an instance type hardcoded into the DungeonDef code.
+    // The DungeonDec subclass has information tied to that type, and creates an instance type hardcoded into the DungeonDec code.
     // This approach works well for objects that are heavily data-driven; in this project, we create three separate Dungeons, distinguished dolrlu by the monster list.
     //
-    // The LocationTypeDef subclass has a Def member which represents the type to create.
-    // This approach works well for objects that are entirely code-driven, without a significant data component. We have four separate Typed locations, none of which require Def data.
-    // We *could* create four separate Def classes inheriting from LocationDef, but that's a lot of extra syntax for not much gain.
+    // The LocationTypeDec subclass has a Dec member which represents the type to create.
+    // This approach works well for objects that are entirely code-driven, without a significant data component. We have four separate Typed locations, none of which require Dec data.
+    // We *could* create four separate Dec classes inheriting from LocationDec, but that's a lot of extra syntax for not much gain.
     //
-    // If you have an object that includes a lot of data and also custom code, I recommend just making a Def subclass.
+    // If you have an object that includes a lot of data and also custom code, I recommend just making a Dec subclass.
     // Having the data expressed in XML is generally the right approach for ease of moddability and designer tweaking, but there's no sense in reimplementing C# in XML.
-    public abstract class LocationDef : Cns.ChoiceDef
+    public abstract class LocationDec : Cns.ChoiceDec
     {
-        public ItemDef requiredItem;
+        public ItemDec requiredItem;
 
         public abstract Location Create();
     }
@@ -25,28 +25,28 @@ namespace Loaf
     // But it's a good example for larger projects.
     public abstract class Location
     {
-        [Def.StaticReferences]
+        [Dec.StaticReferences]
         public static class Outcomes
         {
             static Outcomes()
             {
-                Def.StaticReferencesAttribute.Initialized();
+                Dec.StaticReferencesAttribute.Initialized();
             }
 
-            public static OutcomeDef Return;
-            public static OutcomeDef Death;
-            public static OutcomeDef Victory;
+            public static OutcomeDec Return;
+            public static OutcomeDec Death;
+            public static OutcomeDec Victory;
         }
-        public class OutcomeDef : Def.Def { }
+        public class OutcomeDec : Dec.Dec { }
 
-        public abstract OutcomeDef Visit();
+        public abstract OutcomeDec Visit();
     }
 
-    // Recommend reading the LocationDef documentation for more information.
+    // Recommend reading the LocationDec documentation for more information.
     //
-    // When creating a builder like this, I recommend passing the Def in as a constructor parameter.
-    // The constructor can always ignore it, but if there's any relevant data, the constructor will need access to the Def.
-    public class LocationTypedDef : LocationDef
+    // When creating a builder like this, I recommend passing the Dec in as a constructor parameter.
+    // The constructor can always ignore it, but if there's any relevant data, the constructor will need access to the Dec.
+    public class LocationTypedDec : LocationDec
     {
         private Type type;
 

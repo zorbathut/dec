@@ -1,7 +1,7 @@
 using System;
 using SharpFuzz;
 
-namespace DefSharpFuzz
+namespace DecSharpFuzz
 {
     class Program
     {
@@ -9,8 +9,8 @@ namespace DefSharpFuzz
         {
             Fuzzer.Run(str =>
             {
-                Def.Config.DefaultHandlerThrowExceptions = Def.Config.DefaultExceptionBehavior.Never;
-                var parser = new Def.Parser();
+                Dec.Config.DefaultHandlerThrowExceptions = Dec.Config.DefaultExceptionBehavior.Never;
+                var parser = new Dec.Parser();
                 parser.AddString(str);
                 parser.Finish();
             });
@@ -18,8 +18,8 @@ namespace DefSharpFuzz
     }
 }
 
-// We need to provide some def types it can work with.
-class SimpleDef : Def.Def
+// We need to provide some dec types it can work with.
+class SimpleDec : Dec.Dec
 {
     int value;
 }

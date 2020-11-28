@@ -1,4 +1,4 @@
-namespace Def
+namespace Dec
 {
     using System;
     using System.Collections.Generic;
@@ -11,7 +11,7 @@ namespace Def
     using System.Xml.Linq;
     
     /// <summary>
-    /// Handles all parsing and initialization of def structures.
+    /// Handles all parsing and initialization of dec structures.
     /// </summary>
     public class Parser
     {
@@ -42,7 +42,7 @@ namespace Def
         // A list of inheritance-based work that still has to be resolved
         private struct InheritanceJob
         {
-            public Def target;
+            public Dec target;
             public XElement xml;
             public ReaderContext context;
             public string parent;
@@ -102,7 +102,7 @@ namespace Def
             Serialization.Initialize();
         }
 
-        private static readonly Regex DefNameValidator = new Regex(@"^[A-Za-z_][A-Za-z0-9_]*$", RegexOptions.Compiled);
+        private static readonly Regex DecNameValidator = new Regex(@"^[A-Za-z_][A-Za-z0-9_]*$", RegexOptions.Compiled);
 
         /// <summary>
         /// Pass an XML document string in for processing.
@@ -143,47 +143,47 @@ namespace Def
 
             foreach (var rootElement in doc.Elements())
             {
-                if (rootElement.Name.LocalName != "Defs")
+                if (rootElement.Name.LocalName != "Decs")
                 {
-                    Dbg.Wrn($"{stringName}:{rootElement.LineNumber()}: Found root element with name \"{rootElement.Name.LocalName}\" when it should be \"Defs\"");
+                    Dbg.Wrn($"{stringName}:{rootElement.LineNumber()}: Found root element with name \"{rootElement.Name.LocalName}\" when it should be \"Decs\"");
                 }
 
-                foreach (var defElement in rootElement.Elements())
+                foreach (var decElement in rootElement.Elements())
                 {
-                    string typeName = defElement.Name.LocalName;
+                    string typeName = decElement.Name.LocalName;
 
-                    Type typeHandle = UtilType.ParseDefFormatted(typeName, stringName, defElement.LineNumber());
-                    if (typeHandle == null || !typeof(Def).IsAssignableFrom(typeHandle))
+                    Type typeHandle = UtilType.ParseDecFormatted(typeName, stringName, decElement.LineNumber());
+                    if (typeHandle == null || !typeof(Dec).IsAssignableFrom(typeHandle))
                     {
-                        Dbg.Err($"{stringName}:{defElement.LineNumber()}: {typeName} is not a valid root Def type");
+                        Dbg.Err($"{stringName}:{decElement.LineNumber()}: {typeName} is not a valid root Dec type");
                         continue;
                     }
 
-                    if (defElement.Attribute("defName") == null)
+                    if (decElement.Attribute("decName") == null)
                     {
-                        Dbg.Err($"{stringName}:{defElement.LineNumber()}: No def name provided");
+                        Dbg.Err($"{stringName}:{decElement.LineNumber()}: No dec name provided");
                         continue;
                     }
 
-                    string defName = defElement.Attribute("defName").Value;
-                    if (!DefNameValidator.IsMatch(defName))
+                    string decName = decElement.Attribute("decName").Value;
+                    if (!DecNameValidator.IsMatch(decName))
                     {
-                        Dbg.Err($"{stringName}:{defElement.LineNumber()}: Def name \"{defName}\" doesn't match regex pattern \"{DefNameValidator}\"");
+                        Dbg.Err($"{stringName}:{decElement.LineNumber()}: Dec name \"{decName}\" doesn't match regex pattern \"{DecNameValidator}\"");
                         continue;
                     }
 
-                    // Consume defName so we know it's not hanging around
-                    defElement.Attribute("defName").Remove();
+                    // Consume decName so we know it's not hanging around
+                    decElement.Attribute("decName").Remove();
 
                     // Check to see if we're abstract
                     bool abstrct = false;
                     {
-                        var abstractAttribute = defElement.Attribute("abstract");
+                        var abstractAttribute = decElement.Attribute("abstract");
                         if (abstractAttribute != null)
                         {
                             if (!bool.TryParse(abstractAttribute.Value, out abstrct))
                             {
-                                Dbg.Err($"{stringName}:{defElement.LineNumber()}: Error encountered when parsing abstract attribute");
+                                Dbg.Err($"{stringName}:{decElement.LineNumber()}: Error encountered when parsing abstract attribute");
                             }
 
                             abstractAttribute.Remove();
@@ -193,7 +193,7 @@ namespace Def
                     // Get our parent info
                     string parent = null;
                     {
-                        var parentAttribute = defElement.Attribute("parent");
+                        var parentAttribute = decElement.Attribute("parent");
                         if (parentAttribute != null)
                         {
                             parent = parentAttribute.Value;
@@ -204,34 +204,34 @@ namespace Def
 
                     // Register ourselves as an available parenting object
                     {
-                        var identifier = Tuple.Create(typeHandle.GetDefRootType(), defName);
+                        var identifier = Tuple.Create(typeHandle.GetDecRootType(), decName);
                         if (potentialParents.ContainsKey(identifier))
                         {
-                            Dbg.Err($"{stringName}:{defElement.LineNumber()}: Def {identifier.Item1}:{identifier:Item2} redefined");
+                            Dbg.Err($"{stringName}:{decElement.LineNumber()}: Dec {identifier.Item1}:{identifier:Item2} redefined");
                         }
                         else
                         {
-                            potentialParents[identifier] = new Parent { xml = defElement, context = readerContext, parent = parent };
+                            potentialParents[identifier] = new Parent { xml = decElement, context = readerContext, parent = parent };
                         }
                     }
 
                     if (!abstrct)
                     {
                         // Not abstract, so create our instance
-                        var defInstance = (Def)Activator.CreateInstance(typeHandle);
-                        defInstance.DefName = defName;
+                        var defInstance = (Dec)Activator.CreateInstance(typeHandle);
+                        defInstance.DecName = decName;
 
                         Database.Register(defInstance);
 
                         if (parent == null)
                         {
                             // Non-parent objects are simple; we just handle them here in order to avoid unnecessary GC churn
-                            finishWork.Add(() => Serialization.ParseElement(defElement, typeHandle, defInstance, readerContext, isRootDef: true));
+                            finishWork.Add(() => Serialization.ParseElement(decElement, typeHandle, defInstance, readerContext, isRootDec: true));
                         }
                         else
                         {
                             // Add an inheritance resolution job; we'll take care of this soon
-                            inheritanceJobs.Add(new InheritanceJob { target = defInstance, xml = defElement, context = readerContext, parent = parent });
+                            inheritanceJobs.Add(new InheritanceJob { target = defInstance, xml = decElement, context = readerContext, parent = parent });
                         }
                     }
                 }
@@ -284,33 +284,33 @@ namespace Def
                 // The final parse is listed first, then all the children up to the final point
                 var actions = new List<Action>();
 
-                actions.Add(() => Serialization.ParseElement(work.xml, work.target.GetType(), work.target, work.context, isRootDef: true));
+                actions.Add(() => Serialization.ParseElement(work.xml, work.target.GetType(), work.target, work.context, isRootDec: true));
 
-                string currentDefName = work.target.DefName;
+                string currentDecName = work.target.DecName;
                 XElement currentXml = work.xml;
                 ReaderContext currentContext = work.context;
 
-                string parentDefName = work.parent;
-                while (parentDefName != null)
+                string parentDecName = work.parent;
+                while (parentDecName != null)
                 {
-                    var parentData = potentialParents.TryGetValue(Tuple.Create(work.target.GetType().GetDefRootType(), parentDefName));
+                    var parentData = potentialParents.TryGetValue(Tuple.Create(work.target.GetType().GetDecRootType(), parentDecName));
 
                     // This is a struct for the sake of performance, so child itself won't be null
                     if (parentData.xml == null)
                     {
-                        Dbg.Err($"{currentContext.sourceName}:{currentXml.LineNumber()}: Def {currentDefName} is attempting to use parent {parentDefName}, but no such def exists");
+                        Dbg.Err($"{currentContext.sourceName}:{currentXml.LineNumber()}: Dec {currentDecName} is attempting to use parent {parentDecName}, but no such dec exists");
 
                         // Not much more we can do here.
                         break;
                     }
 
-                    actions.Add(() => Serialization.ParseElement(parentData.xml, work.target.GetType(), work.target, parentData.context, isRootDef: true));
+                    actions.Add(() => Serialization.ParseElement(parentData.xml, work.target.GetType(), work.target, parentData.context, isRootDec: true));
 
-                    currentDefName = parentDefName;
+                    currentDecName = parentDecName;
                     currentXml = parentData.xml;
                     currentContext = parentData.context;
 
-                    parentDefName = parentData.parent;
+                    parentDecName = parentData.parent;
                 }
 
                 finishWork.Add(() =>
@@ -347,20 +347,20 @@ namespace Def
                 bool touched = false;
                 foreach (var field in stat.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static))
                 {
-                    var def = Database.Get(field.FieldType, field.Name);
-                    if (def == null)
+                    var dec = Database.Get(field.FieldType, field.Name);
+                    if (dec == null)
                     {
                         Dbg.Err($"Failed to find {field.FieldType} named {field.Name}");
                         field.SetValue(null, null); // this is unnecessary, but it does kick the static constructor just in case we wouldn't do it otherwise
                     }
-                    else if (!field.FieldType.IsAssignableFrom(def.GetType()))
+                    else if (!field.FieldType.IsAssignableFrom(dec.GetType()))
                     {
-                        Dbg.Err($"Static reference {field.FieldType} {stat}.{field.Name} is not compatible with {def.GetType()} {def}");
+                        Dbg.Err($"Static reference {field.FieldType} {stat}.{field.Name} is not compatible with {dec.GetType()} {dec}");
                         field.SetValue(null, null); // this is unnecessary, but it does kick the static constructor just in case we wouldn't do it otherwise
                     }
                     else
                     {
-                        field.SetValue(null, def);
+                        field.SetValue(null, dec);
                     }
 
                     touched = true;
@@ -371,7 +371,7 @@ namespace Def
                     if (touched)
                     {
                         // Otherwise we shouldn't even expect this to have been registered, but at least there's literally no fields in it so it doesn't matter
-                        Dbg.Err($"Failed to properly register {stat}; you may be missing a call to Def.StaticReferencesAttribute.Initialized() in its static constructor, or the class may already have been initialized elsewhere (this should have thrown an error)");
+                        Dbg.Err($"Failed to properly register {stat}; you may be missing a call to Dec.StaticReferencesAttribute.Initialized() in its static constructor, or the class may already have been initialized elsewhere (this should have thrown an error)");
                     }
                     
                     s_StaticReferenceHandler = null;
@@ -384,11 +384,11 @@ namespace Def
             }
             s_Status = Status.Finalizing;
 
-            foreach (var def in Database.List)
+            foreach (var dec in Database.List)
             {
                 try
                 {
-                    def.ConfigErrors(err => Dbg.Err($"{def.GetType()} {def}: {err}"));
+                    dec.ConfigErrors(err => Dbg.Err($"{dec.GetType()} {dec}: {err}"));
                 }
                 catch (Exception e)
                 {
@@ -396,11 +396,11 @@ namespace Def
                 }
             }
 
-            foreach (var def in Database.List)
+            foreach (var dec in Database.List)
             {
                 try
                 {
-                    def.PostLoad(err => Dbg.Err($"{def.GetType()} {def}: {err}"));
+                    dec.PostLoad(err => Dbg.Err($"{dec.GetType()} {dec}: {err}"));
                 }
                 catch (Exception e)
                 {

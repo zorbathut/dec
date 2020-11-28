@@ -1,13 +1,13 @@
-<Defs>
-  <Dungeon.FightChoiceDef defName="Fight" />
-  <Dungeon.FightChoiceDef defName="Run" />
+<Decs>
+  <Dungeon.FightChoiceDec decName="Fight" />
+  <Dungeon.FightChoiceDec decName="Run" />
 
-  <Dungeon.DungeonChoiceDef defName="FindMore">
+  <Dungeon.DungeonChoiceDec decName="FindMore">
     <label>Find more</label>
-  </Dungeon.DungeonChoiceDef>
-  <Dungeon.DungeonChoiceDef defName="Leave" />
+  </Dungeon.DungeonChoiceDec>
+  <Dungeon.DungeonChoiceDec decName="Leave" />
 
-  <Dungeon.OutcomeDef defName="Victory" />
-  <Dungeon.OutcomeDef defName="Death" />
-  <Dungeon.OutcomeDef defName="Fled" />
-</Defs>
+  <Dungeon.OutcomeDec decName="Victory" />
+  <Dungeon.OutcomeDec decName="Death" />
+  <Dungeon.OutcomeDec decName="Fled" />
+</Decs>

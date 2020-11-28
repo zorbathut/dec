@@ -27,7 +27,7 @@ namespace Loaf
             return accumulator;
         }
 
-        private class DiceConverter : Def.Converter
+        private class DiceConverter : Dec.Converter
         {
             public override HashSet<Type> HandledTypes()
             {

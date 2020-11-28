@@ -3,7 +3,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace DefUtilLib
+namespace DecUtilLib
 {
     public static class Compress
     {

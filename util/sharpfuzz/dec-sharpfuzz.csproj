@@ -1,9 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <RootNamespace>DefSharpFuzz</RootNamespace>
+    <RootNamespace>DecSharpFuzz</RootNamespace>
     
     <!-- I actually have no idea why these are necessary, see https://stackoverflow.com/questions/61997928/errorcs0579duplicate-globalsystem-runtime-versioning-targetframeworkattribu -->
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
@@ -15,8 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="def">
-      <HintPath>def.dll</HintPath>
+    <Reference Include="dec">
+      <HintPath>dec.dll</HintPath>
     </Reference>
   </ItemGroup>
 

@@ -8,14 +8,14 @@ namespace Fuzzgen
 {
     internal class Instance
     {
-        public string defName { get; private set; }
+        public string decName { get; private set; }
 
         public Composite composite { get; private set; }
         private Dictionary<Member, Value> values = new Dictionary<Member, Value>();
 
         public Instance(Env env, Composite composite)
         {
-            this.defName = Rand.NextString();
+            this.decName = Rand.NextString();
             this.composite = composite;
 
             float chance = Rand.Next(1f);
@@ -55,11 +55,11 @@ namespace Fuzzgen
             return sb.ToString();
         }
 
-        public string WriteXmlDef()
+        public string WriteXmlDec()
         {
             var sb = new StringBuilder();
 
-            sb.AppendLine($"<{composite.name} defName=\"{defName}\">");
+            sb.AppendLine($"<{composite.name} decName=\"{decName}\">");
             sb.AppendLine(WriteXmlComposite());
             sb.AppendLine($"</{composite.name}>");
 

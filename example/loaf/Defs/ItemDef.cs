@@ -1,18 +1,18 @@
 
 namespace Loaf
 {
-    public class ItemDef : Def.Def
+    public class ItemDec : Dec.Dec
     {
         public string name;
     }
 
-    public class WeaponDef : ItemDef
+    public class WeaponDec : ItemDec
     {
         public Dice damage;
         public int price;
     }
 
-    public class ArmorDef : ItemDef
+    public class ArmorDec : ItemDec
     {
         public Dice armor;
     }

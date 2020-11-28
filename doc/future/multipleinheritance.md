@@ -1,33 +1,33 @@
-# Def inheritance
+# Dec inheritance
 
 ```xml
-<ObjectDef defName="FurnitureBase" abstract="true">
+<ObjectDec decName="FurnitureBase" abstract="true">
   <price>50</price>
   <ownership>PerCharacter</ownership>
-</ObjectDef>
+</ObjectDec>
 
-<ObjectDef defName="Table" parent="FurnitureBase">
+<ObjectDec decName="Table" parent="FurnitureBase">
   <!-- Derives from FurnitureBase, so we get the price and ownership automatically -->
   <usableFor>Eating</usableFor>
-</ObjectDef>
+</ObjectDec>
 
 
-<ObjectDef defName="StorageContainerBase" abstract="true">
+<ObjectDec decName="StorageContainerBase" abstract="true">
   <price>20</price>
   <storageType>RandomAccess</storageType>
-</ObjectDef>
+</ObjectDec>
 
-<ObjectDef defName="Shelves" parent="StorageContainerBase">
+<ObjectDec decName="Shelves" parent="StorageContainerBase">
   <!-- Derives from StorageContainerBase, so we get the price and storageType automatically -->
   <capacity>4</capacity>
-</ObjectDef>
+</ObjectDec>
 
 
-<ObjectDef defName="Closet" parent="FurnitureBase, StorageContainerBase">
+<ObjectDec decName="Closet" parent="FurnitureBase, StorageContainerBase">
   <!-- Closets are both furniture and storage containers, so we inherit from both; we get price, ownership, and storageType automatically -->
   <!-- It's unclear which price we should inherit; we'd need to make a decision -->
   <capacity>6</capacity>
-</ObjectDef>
+</ObjectDec>
 ```
 
 When doing inheritance, a standard single-inheritance structure is not always sufficient; it should allow arbitrary numbers of mixins with an arbitrary amount of depth.

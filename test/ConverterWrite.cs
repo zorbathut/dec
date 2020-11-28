@@ -1,4 +1,4 @@
-namespace DefTest
+namespace DecTest
 {
     using NUnit.Framework;
     using System;
@@ -8,11 +8,11 @@ namespace DefTest
     [TestFixture]
     public class ConverterWrite : Base
     {
-        public class ConverterRecordable : Def.IRecordable
+        public class ConverterRecordable : Dec.IRecordable
         {
             public Converted convertible;
 
-            public void Record(Def.Recorder record)
+            public void Record(Dec.Recorder record)
             {
                 record.Record(ref convertible, "convertible");
             }
@@ -25,7 +25,7 @@ namespace DefTest
             public int c;
         }
 
-        public class ConvertedConverterSimple : Def.Converter
+        public class ConvertedConverterSimple : Dec.Converter
         {
             public override HashSet<Type> HandledTypes()
             {
@@ -48,9 +48,9 @@ namespace DefTest
         [Test]
         public void ConverterSimple([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterSimple) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterSimple) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.Finish();
 
             var converted = new ConverterRecordable();
@@ -66,14 +66,14 @@ namespace DefTest
             Assert.AreEqual(converted.convertible.c, deserialized.convertible.c);
         }
 
-        public class ConvertedConverterRecord : Def.Converter
+        public class ConvertedConverterRecord : Dec.Converter
         {
             public override HashSet<Type> HandledTypes()
             {
                 return new HashSet<Type> { typeof(Converted) };
             }
 
-            public override object Record(object model, Type type, Def.Recorder recorder)
+            public override object Record(object model, Type type, Dec.Recorder recorder)
             {
                 var converted = model as Converted ?? new Converted();
 
@@ -88,9 +88,9 @@ namespace DefTest
         [Test]
         public void ConverterRecord([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterRecord) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterRecord) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.Finish();
 
             var converted = new ConverterRecordable();
@@ -106,12 +106,12 @@ namespace DefTest
             Assert.AreEqual(converted.convertible.c, deserialized.convertible.c);
         }
 
-        public class ConverterReplacementRecordable : Def.IRecordable
+        public class ConverterReplacementRecordable : Dec.IRecordable
         {
             public Converted convertibleA;
             public Converted convertibleB;
 
-            public void Record(Def.Recorder record)
+            public void Record(Dec.Recorder record)
             {
                 record.Record(ref convertibleA, "convertibleA");
                 record.Record(ref convertibleB, "convertibleB");
@@ -121,9 +121,9 @@ namespace DefTest
         [Test]
         public void ConverterReplacementDetection([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterSimple) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterSimple) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.Finish();
 
             var converted = new ConverterReplacementRecordable();
@@ -142,9 +142,9 @@ namespace DefTest
         [Test]
         public void ConverterReplacementWorking([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterRecord) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterRecord) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.Finish();
 
             var converted = new ConverterReplacementRecordable();
@@ -165,7 +165,7 @@ namespace DefTest
             public int x;
         }
 
-        public class ConverterUnsuppliedConverter : Def.Converter
+        public class ConverterUnsuppliedConverter : Dec.Converter
         {
             public override HashSet<Type> HandledTypes()
             {
@@ -183,9 +183,9 @@ namespace DefTest
         [Test]
         public void ConverterUnsupplied([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConverterUnsuppliedConverter) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConverterUnsuppliedConverter) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.Finish();
 
             var root = new ConverterUnsuppliedClass();

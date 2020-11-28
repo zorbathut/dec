@@ -9,20 +9,20 @@ namespace Loaf
     // The Cns class handles console output for Loaf. This consists of two pieces of functionality.
     //
     // Cns.Out prints lines and does the slow-modem-transfer effect.
-    // Cns.Choice is much more interesting; it uses the Def system to make it easy to print out prompts.
+    // Cns.Choice is much more interesting; it uses the Dec system to make it easy to print out prompts.
     //
-    // Using the Def system for prompt elements seems like massive overkill, but it has advantages.
+    // Using the Dec system for prompt elements seems like massive overkill, but it has advantages.
     // First, it makes prompts very easy to mod.
-    // Def doesn't (yet) support mods, but Locations could be modded by just making more LocationDef's, while other UI elements could be modded with use of new Def's and with Harmony.
+    // Dec doesn't (yet) support mods, but Locations could be modded by just making more LocationDec's, while other UI elements could be modded with use of new Dec's and with Harmony.
     // Second, it allows you to attach information to prompts easily.
     // During the development of Loaf, I added custom labels and keypresses to prompts; on a GUI game, one could easily add tooltips or other scriptable elements.
     public static class Cns
     {
         // This is our base Choice class.
-        // Note that it's tagged Def.Abstract so that choices for different UI elements end up in different Def hierarchies and can share DefNames.
-        // Otherwise you'd need a unique name for every item that inherits from ChoiceDef.
-        [Def.Abstract]
-        public abstract class ChoiceDef : Def.Def
+        // Note that it's tagged Dec.Abstract so that choices for different UI elements end up in different Dec hierarchies and can share DecNames.
+        // Otherwise you'd need a unique name for every item that inherits from ChoiceDec.
+        [Dec.Abstract]
+        public abstract class ChoiceDec : Dec.Dec
         {
             private string label;
             private char key = '\0';
@@ -31,7 +31,7 @@ namespace Loaf
             {
                 get
                 {
-                    return label ?? DefName;
+                    return label ?? DecName;
                 }
             }
 
@@ -44,11 +44,11 @@ namespace Loaf
             }
         }
 
-        // I also want to support choices for things that aren't ChoiceDefs, so this is a thin adapter to make ChoiceDefs work transparently.
-        // Note that, if it isn't given an explicit list of items, it just yanks every possible item out of the Def database.
-        internal static T Choice<T>(T[] items = null, bool longForm = false) where T : ChoiceDef
+        // I also want to support choices for things that aren't ChoiceDecs, so this is a thin adapter to make ChoiceDecs work transparently.
+        // Note that, if it isn't given an explicit list of items, it just yanks every possible item out of the Dec database.
+        internal static T Choice<T>(T[] items = null, bool longForm = false) where T : ChoiceDec
         {
-            return Choice(items ?? Def.Database<T>.List, choice => choice.Label, key: choice => choice.Key, longForm: longForm);
+            return Choice(items ?? Dec.Database<T>.List, choice => choice.Label, key: choice => choice.Key, longForm: longForm);
         }
 
         internal static T Choice<T>(T[] items, Func<T, string> label, Func<T, char> key = null, bool longForm = false)

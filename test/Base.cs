@@ -1,4 +1,4 @@
-namespace DefTest
+namespace DecTest
 {
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -19,7 +19,7 @@ namespace DefTest
             // we turn on error handling so that Clear can work even if we're in the wrong mode
             handlingErrors = true;
 
-            Def.Database.Clear();
+            Dec.Database.Clear();
 
             handlingWarnings = false;
             handledWarning = false;
@@ -27,7 +27,7 @@ namespace DefTest
             handlingErrors = false;
             handledError = false;
 
-            Def.Config.UsingNamespaces = new string[0];
+            Dec.Config.UsingNamespaces = new string[0];
         }
 
         private bool handlingWarnings = false;
@@ -40,13 +40,13 @@ namespace DefTest
         [OneTimeSetUp]
         public void PrepHooks()
         {
-            Def.Config.InfoHandler = str =>
+            Dec.Config.InfoHandler = str =>
             {
                 System.Diagnostics.Debug.Print(str);
                 Console.WriteLine(str);
             };
 
-            Def.Config.WarningHandler = str =>
+            Dec.Config.WarningHandler = str =>
             {
                 System.Diagnostics.Debug.Print(str);
                 Console.WriteLine(str);
@@ -62,7 +62,7 @@ namespace DefTest
                 }
             };
 
-            Def.Config.ErrorHandler = str =>
+            Dec.Config.ErrorHandler = str =>
             {
                 System.Diagnostics.Debug.Print(str);
                 Console.WriteLine(str);
@@ -82,9 +82,9 @@ namespace DefTest
                 }
             };
 
-            Def.Config.ExceptionHandler = e =>
+            Dec.Config.ExceptionHandler = e =>
             {
-                Def.Config.ErrorHandler(e.ToString());
+                Dec.Config.ErrorHandler(e.ToString());
             };
 
             PrepCwd();
@@ -131,10 +131,10 @@ namespace DefTest
         }
 
         public class Stub { }
-        public class StubDef : Def.Def { }
-        public class StubRecordable : Def.IRecordable
+        public class StubDec : Dec.Dec { }
+        public class StubRecordable : Dec.IRecordable
         {
-            public void Record(Def.Recorder record)
+            public void Record(Dec.Recorder record)
             {
                 // lol
             }
@@ -168,7 +168,7 @@ namespace DefTest
                 string data = null;
                 void RunComposer()
                 {
-                    var composer = new Def.Composer();
+                    var composer = new Dec.Composer();
                     data = composer.ComposeXml(mode == BehaviorMode.RewrittenPretty);
                 }
 
@@ -181,14 +181,14 @@ namespace DefTest
                     RunComposer();
                 }
 
-                Def.Database.Clear();
+                Dec.Database.Clear();
 
                 // This is a janky hack; it resets the type caches so we also generate errors again properly.
-                Def.Config.UsingNamespaces = Def.Config.UsingNamespaces;
+                Dec.Config.UsingNamespaces = Dec.Config.UsingNamespaces;
 
                 void RunParser()
                 {
-                    var parser = new Def.Parser();
+                    var parser = new Dec.Parser();
                     parser.AddString(data);
                     parser.Finish();
                 }
@@ -207,7 +207,7 @@ namespace DefTest
                 string code = null;
                 void RunComposer()
                 {
-                    var composer = new Def.Composer();
+                    var composer = new Dec.Composer();
                     code = composer.ComposeValidation();
                 }
 
@@ -226,7 +226,7 @@ namespace DefTest
                     assemblies = assemblies.Concat(validation_assemblies).ToArray();
                 }
 
-                DefUtilLib.Compilation.CompileAndRun($"public static void Test() {{\n{code}\n}}", assemblies, "Test", null);
+                DecUtilLib.Compilation.CompileAndRun($"public static void Test() {{\n{code}\n}}", assemblies, "Test", null);
             }
             else
             {
@@ -234,9 +234,9 @@ namespace DefTest
             }
         }
 
-        public System.Reflection.Assembly GetDefAssembly()
+        public System.Reflection.Assembly GetDecAssembly()
         {
-            return AppDomain.CurrentDomain.GetAssemblies().Single(asm => asm.ManifestModule.Name == "def.dll");
+            return AppDomain.CurrentDomain.GetAssemblies().Single(asm => asm.ManifestModule.Name == "dec.dll");
         }
 
         // Everything after here is designed for the Recorder tests, where we run tests in a variety of ways to test serialization.
@@ -257,17 +257,17 @@ namespace DefTest
         {
             if (mode == RecorderMode.Validation)
             {
-                var code = Def.Recorder.WriteValidation(input);
+                var code = Dec.Recorder.WriteValidation(input);
 
-                var ComposeCSFormatted = Assembly.GetAssembly(typeof(Def.Def)).GetType("Def.UtilType").GetMethod("ComposeCSFormatted", BindingFlags.NonPublic | BindingFlags.Static);
+                var ComposeCSFormatted = Assembly.GetAssembly(typeof(Dec.Dec)).GetType("Dec.UtilType").GetMethod("ComposeCSFormatted", BindingFlags.NonPublic | BindingFlags.Static);
 
-                DefUtilLib.Compilation.CompileAndRun($"public static void Test({ComposeCSFormatted.Invoke(null, new object[] { input.GetType() })} input) {{\n{code}\n}}", new Assembly[] { this.GetType().Assembly }, "Test", new object[] { input });
+                DecUtilLib.Compilation.CompileAndRun($"public static void Test({ComposeCSFormatted.Invoke(null, new object[] { input.GetType() })} input) {{\n{code}\n}}", new Assembly[] { this.GetType().Assembly }, "Test", new object[] { input });
             }
 
             string serialized = null;
             void DoSerialize()
             {
-                serialized = Def.Recorder.Write(input, pretty: mode == RecorderMode.Pretty);
+                serialized = Dec.Recorder.Write(input, pretty: mode == RecorderMode.Pretty);
             }
             if (expectWriteErrors)
             {
@@ -287,7 +287,7 @@ namespace DefTest
             T deserialized = default;
             void DoDeserialize()
             {
-                deserialized = Def.Recorder.Read<T>(serialized);
+                deserialized = Dec.Recorder.Read<T>(serialized);
             }
             if (expectReadErrors)
             {

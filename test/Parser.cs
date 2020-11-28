@@ -1,4 +1,4 @@
-namespace DefTest
+namespace DecTest
 {
     using NUnit.Framework;
     using System;
@@ -9,29 +9,29 @@ namespace DefTest
         [Test]
         public void ConflictingParsers()
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters();
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters();
 
-            var parserA = new Def.Parser();
-            ExpectErrors(() => new Def.Parser());
+            var parserA = new Dec.Parser();
+            ExpectErrors(() => new Dec.Parser());
         }
 
         [Test]
         public void LateAddition()
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters();
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters();
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.Finish();
 
-            ExpectErrors(() => parser.AddString("<Defs />"));
+            ExpectErrors(() => parser.AddString("<Decs />"));
         }
 
         [Test]
         public void MultiFinish()
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters();
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters();
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.Finish();
 
             ExpectErrors(() => parser.Finish());
@@ -40,39 +40,39 @@ namespace DefTest
         [Test]
         public void PostFinish()
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters();
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters();
 
-            var parserA = new Def.Parser();
+            var parserA = new Dec.Parser();
             parserA.Finish();
 
-            ExpectErrors(() => new Def.Parser());
+            ExpectErrors(() => new Dec.Parser());
         }
 
         [Test]
         public void PostClear()
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters();
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters();
 
-            var parserA = new Def.Parser();
+            var parserA = new Dec.Parser();
             parserA.Finish();
 
-            Def.Database.Clear();
+            Dec.Database.Clear();
 
-            var parserB = new Def.Parser();
+            var parserB = new Dec.Parser();
             parserB.Finish();
         }
 
         [Test]
         public void PartialClear()
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters();
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters();
 
-            var parserA = new Def.Parser();
+            var parserA = new Dec.Parser();
 
-            ExpectErrors(() => Def.Database.Clear());
+            ExpectErrors(() => Dec.Database.Clear());
         }
 
-        public class IntDef : Def.Def
+        public class IntDec : Dec.Dec
         {
             public int value = 42;
 
@@ -83,56 +83,56 @@ namespace DefTest
         [Test]
         public void NonSerializablePositive([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <IntDef defName=""TestDef"">
+                <Decs>
+                    <IntDec decName=""TestDec"">
                         <value>55</value>
-                    </IntDef>
-                </Defs>");
+                    </IntDec>
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            Assert.AreEqual(55, Def.Database<IntDef>.Get("TestDef").value);
-            Assert.AreEqual(70, Def.Database<IntDef>.Get("TestDef").nonSerializedValue);
+            Assert.AreEqual(55, Dec.Database<IntDec>.Get("TestDec").value);
+            Assert.AreEqual(70, Dec.Database<IntDec>.Get("TestDec").nonSerializedValue);
         }
 
         [Test]
         public void NonSerializableNegative([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <IntDef defName=""TestDef"">
+                <Decs>
+                    <IntDec decName=""TestDec"">
                         <value>60</value>
                         <nonSerializedValue>65</nonSerializedValue>
-                    </IntDef>
-                </Defs>");
+                    </IntDec>
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode);
 
-            Assert.AreEqual(60, Def.Database<IntDef>.Get("TestDef").value);
-            Assert.AreEqual(70, Def.Database<IntDef>.Get("TestDef").nonSerializedValue);
+            Assert.AreEqual(60, Dec.Database<IntDec>.Get("TestDec").value);
+            Assert.AreEqual(70, Dec.Database<IntDec>.Get("TestDec").nonSerializedValue);
         }
 
-        [Def.AbstractAttribute]
-        public abstract class AbstractRootDef : Def.Def
+        [Dec.AbstractAttribute]
+        public abstract class AbstractRootDec : Dec.Dec
         {
             public int absInt = 0;
         }
 
-        public class ConcreteChildADef : AbstractRootDef
+        public class ConcreteChildADec : AbstractRootDec
         {
             public int ccaInt = 0;
         }
 
-        public class ConcreteChildBDef : AbstractRootDef
+        public class ConcreteChildBDec : AbstractRootDec
         {
             public int ccbInt = 0;
         }
@@ -140,71 +140,71 @@ namespace DefTest
         [Test]
         public void AbstractRoot([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ConcreteChildADef), typeof(ConcreteChildBDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ConcreteChildADec), typeof(ConcreteChildBDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <ConcreteChildADef defName=""TestDef"">
+                <Decs>
+                    <ConcreteChildADec decName=""TestDec"">
                         <absInt>20</absInt>
                         <ccaInt>30</ccaInt>
-                    </ConcreteChildADef>
-                    <ConcreteChildBDef defName=""TestDef"">
+                    </ConcreteChildADec>
+                    <ConcreteChildBDec decName=""TestDec"">
                         <absInt>40</absInt>
                         <ccbInt>50</ccbInt>
-                    </ConcreteChildBDef>
-                </Defs>");
+                    </ConcreteChildBDec>
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            Assert.AreEqual(20, Def.Database<ConcreteChildADef>.Get("TestDef").absInt);
-            Assert.AreEqual(30, Def.Database<ConcreteChildADef>.Get("TestDef").ccaInt);
-            Assert.AreEqual(40, Def.Database<ConcreteChildBDef>.Get("TestDef").absInt);
-            Assert.AreEqual(50, Def.Database<ConcreteChildBDef>.Get("TestDef").ccbInt);
+            Assert.AreEqual(20, Dec.Database<ConcreteChildADec>.Get("TestDec").absInt);
+            Assert.AreEqual(30, Dec.Database<ConcreteChildADec>.Get("TestDec").ccaInt);
+            Assert.AreEqual(40, Dec.Database<ConcreteChildBDec>.Get("TestDec").absInt);
+            Assert.AreEqual(50, Dec.Database<ConcreteChildBDec>.Get("TestDec").ccbInt);
         }
 
         [Test]
         public void LoadFile([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddFile("data/Parser.LoadFile.xml");
             parser.Finish();
 
             DoBehavior(mode);
 
-            Assert.AreEqual(55, Def.Database<IntDef>.Get("TestDef").value);
+            Assert.AreEqual(55, Dec.Database<IntDec>.Get("TestDec").value);
         }
 
         [Test]
         public void LoadFileError([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddFile("data/Parser.LoadFileError.xml");
             ExpectErrors(() => parser.Finish(), str => str.Contains("Parser.LoadFileError"));
 
             DoBehavior(mode);
 
-            Assert.IsNotNull(Def.Database<IntDef>.Get("TestDef"));
+            Assert.IsNotNull(Dec.Database<IntDec>.Get("TestDec"));
         }
 
         [Test]
         public void LoadDirectory([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddDirectory("data/Parser.LoadDirectory");
             parser.Finish();
 
             DoBehavior(mode);
 
-            Assert.AreEqual(40, Def.Database<IntDef>.Get("TestDef1").value);
-            Assert.AreEqual(80, Def.Database<IntDef>.Get("TestDef2").value);
+            Assert.AreEqual(40, Dec.Database<IntDec>.Get("TestDec1").value);
+            Assert.AreEqual(80, Dec.Database<IntDec>.Get("TestDec2").value);
         }
     }
 }

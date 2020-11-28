@@ -1,4 +1,4 @@
-namespace Def
+namespace Dec
 {
     using System;
 

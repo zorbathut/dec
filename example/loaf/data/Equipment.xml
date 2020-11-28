@@ -1,39 +1,39 @@
-<Defs>
-  <WeaponDef defName="RustySword">
+<Decs>
+  <WeaponDec decName="RustySword">
     <name>Rusty Sword</name>
     <damage>2d4</damage>
-  </WeaponDef>
+  </WeaponDec>
 
-  <WeaponDef defName="RustlessSword">
+  <WeaponDec decName="RustlessSword">
     <name>Rustless Sword</name>
     <damage>3d8</damage>
     <price>200</price>
-  </WeaponDef>
+  </WeaponDec>
 
-  <WeaponDef defName="DiamondScourge">
+  <WeaponDec decName="DiamondScourge">
     <name>Diamond Scourge</name>
     <damage>4d12</damage>
     <price>4000</price>
-  </WeaponDef>
+  </WeaponDec>
 
-  <WeaponDef defName="Couchbane">
+  <WeaponDec decName="Couchbane">
     <name>Couchbane</name>
     <damage>5d20</damage>
     <price>60000</price>
-  </WeaponDef>
+  </WeaponDec>
 
-  <ArmorDef defName="StinkySocks">
+  <ArmorDec decName="StinkySocks">
     <name>Stinky Socks</name>
     <armor>1d4</armor>
-  </ArmorDef>
+  </ArmorDec>
   
-  <ArmorDef defName="JaggedBracer">
+  <ArmorDec decName="JaggedBracer">
     <name>Jagged Bracer</name>
     <armor>2d6</armor>
-  </ArmorDef>
+  </ArmorDec>
   
-  <ArmorDef defName="Breastslab">
+  <ArmorDec decName="Breastslab">
     <name>Breastslab</name>
     <armor>3d8</armor>
-  </ArmorDef>
-</Defs>
+  </ArmorDec>
+</Decs>

@@ -1,5 +1,5 @@
-<Defs>
-  <DungeonDef defName="Sewers">
+<Decs>
+  <DungeonDec decName="Sewers">
     <monsters>
       <items>
         <MoistRat>1</MoistRat>
@@ -13,9 +13,9 @@
         <SoggySlime>1</SoggySlime>
       </items>
     </monsters>
-  </DungeonDef>
+  </DungeonDec>
 
-  <DungeonDef defName="CrystalCaves">
+  <DungeonDec decName="CrystalCaves">
     <label>Crystal Caves</label>
     <requiredItem>CaveMap</requiredItem>
     <monsters>
@@ -34,9 +34,9 @@
         <DiamondDragon>1</DiamondDragon>
       </items>
     </monsters>
-  </DungeonDef>
+  </DungeonDec>
   
-  <DungeonDef defName="WoodworkersHut">
+  <DungeonDec decName="WoodworkersHut">
     <label>Woodworker's Hut</label>
     <requiredItem>WoodworkerMap</requiredItem>
     <monsters>
@@ -56,5 +56,5 @@
         <VanityElemental>1</VanityElemental>
       </items>
     </monsters>
-  </DungeonDef>
-</Defs>
+  </DungeonDec>
+</Decs>

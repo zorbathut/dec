@@ -1,6 +1,6 @@
 # Invalid database warnings
 
-Right now Database<T> only requires that T inherit from Def.Def. It's perfectly valid to try accessing a database consisting of Def.Def itself, or of a subclass that doesn't define a hierarchy.
+Right now Database<T> only requires that T inherit from Dec.Dec. It's perfectly valid to try accessing a database consisting of Dec.Dec itself, or of a subclass that doesn't define a hierarchy.
 
 We should probably yell really loudly at the user whenever this happens.
 

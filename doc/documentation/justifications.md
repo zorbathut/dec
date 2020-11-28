@@ -14,7 +14,7 @@ On top of that, it's more typed than I prefer; I'd like to keep typing data in e
 
 ### JSON5
 
-JSON5 is basically "JSON, with trailing commas and comments". It's definitely better than JSON, but support is lacking; as of today there's a single C# implementation with almost no usage and less documentation than def. It also shares the typing issues of JSON.
+JSON5 is basically "JSON, with trailing commas and comments". It's definitely better than JSON, but support is lacking; as of today there's a single C# implementation with almost no usage and less documentation than dec. It also shares the typing issues of JSON.
 
 ### YAML
 

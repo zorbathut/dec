@@ -1,4 +1,4 @@
-namespace DefTest
+namespace DecTest
 {
     using NUnit.Framework;
     using System;
@@ -6,40 +6,40 @@ namespace DefTest
     [TestFixture]
     public class References : Base
     {
-        public class RefTargetDef : Def.Def
+        public class RefTargetDec : Dec.Dec
         {
 
         }
 
-        public class RefSourceDef : Def.Def
+        public class RefSourceDec : Dec.Dec
         {
-            public RefTargetDef target;
+            public RefTargetDec target;
         }
 
-        public class RefCircularDef : Def.Def
+        public class RefCircularDec : Dec.Dec
         {
-            public RefCircularDef target;
+            public RefCircularDec target;
         }
 
         [Test]
 	    public void Basic([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDec), typeof(RefSourceDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <RefTargetDef defName=""Target"" />
-                    <RefSourceDef defName=""Source"">
+                <Decs>
+                    <RefTargetDec decName=""Target"" />
+                    <RefSourceDec decName=""Source"">
                         <target>Target</target>
-                    </RefSourceDef>
-                </Defs>");
+                    </RefSourceDec>
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var target = Def.Database<RefTargetDef>.Get("Target");
-            var source = Def.Database<RefSourceDef>.Get("Source");
+            var target = Dec.Database<RefTargetDec>.Get("Target");
+            var source = Dec.Database<RefSourceDec>.Get("Source");
             Assert.IsNotNull(target);
             Assert.IsNotNull(source);
 
@@ -49,22 +49,22 @@ namespace DefTest
         [Test]
 	    public void Reversed([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDec), typeof(RefSourceDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <RefSourceDef defName=""Source"">
+                <Decs>
+                    <RefSourceDec decName=""Source"">
                         <target>Target</target>
-                    </RefSourceDef>
-                    <RefTargetDef defName=""Target"" />
-                </Defs>");
+                    </RefSourceDec>
+                    <RefTargetDec decName=""Target"" />
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var target = Def.Database<RefTargetDef>.Get("Target");
-            var source = Def.Database<RefSourceDef>.Get("Source");
+            var target = Dec.Database<RefTargetDec>.Get("Target");
+            var source = Dec.Database<RefSourceDec>.Get("Source");
             Assert.IsNotNull(target);
             Assert.IsNotNull(source);
 
@@ -74,25 +74,25 @@ namespace DefTest
         [Test]
 	    public void Multistring([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDef), typeof(RefSourceDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDec), typeof(RefSourceDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <RefSourceDef defName=""Source"">
+                <Decs>
+                    <RefSourceDec decName=""Source"">
                         <target>Target</target>
-                    </RefSourceDef>
-                </Defs>");
+                    </RefSourceDec>
+                </Decs>");
             parser.AddString(@"
-                <Defs>
-                    <RefTargetDef defName=""Target"" />
-                </Defs>");
+                <Decs>
+                    <RefTargetDec decName=""Target"" />
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var target = Def.Database<RefTargetDef>.Get("Target");
-            var source = Def.Database<RefSourceDef>.Get("Source");
+            var target = Dec.Database<RefTargetDec>.Get("Target");
+            var source = Dec.Database<RefSourceDec>.Get("Source");
             Assert.IsNotNull(target);
             Assert.IsNotNull(source);
 
@@ -100,46 +100,46 @@ namespace DefTest
 	    }
 
         [Test]
-	    public void Refdef([Values] BehaviorMode mode)
+	    public void Refdec([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefSourceDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefSourceDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <RefSourceDef defName=""Source"">
+                <Decs>
+                    <RefSourceDec decName=""Source"">
                         Source
-                    </RefSourceDef>
-                </Defs>");
+                    </RefSourceDec>
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode);
 
-            var source = Def.Database<RefSourceDef>.Get("Source");
+            var source = Dec.Database<RefSourceDec>.Get("Source");
             Assert.IsNotNull(source);
 	    }
 
         [Test]
 	    public void Circular([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefCircularDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefCircularDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <RefCircularDef defName=""Alpha"">
+                <Decs>
+                    <RefCircularDec decName=""Alpha"">
                         <target>Beta</target>
-                    </RefCircularDef>
-                    <RefCircularDef defName=""Beta"">
+                    </RefCircularDec>
+                    <RefCircularDec decName=""Beta"">
                         <target>Alpha</target>
-                    </RefCircularDef>
-                </Defs>");
+                    </RefCircularDec>
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var alpha = Def.Database<RefCircularDef>.Get("Alpha");
-            var beta = Def.Database<RefCircularDef>.Get("Beta");
+            var alpha = Dec.Database<RefCircularDec>.Get("Alpha");
+            var beta = Dec.Database<RefCircularDec>.Get("Beta");
             Assert.IsNotNull(alpha);
             Assert.IsNotNull(beta);
 
@@ -150,20 +150,20 @@ namespace DefTest
         [Test]
 	    public void CircularTight([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefCircularDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefCircularDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <RefCircularDef defName=""TestDef"">
-                        <target>TestDef</target>
-                    </RefCircularDef>
-                </Defs>");
+                <Decs>
+                    <RefCircularDec decName=""TestDec"">
+                        <target>TestDec</target>
+                    </RefCircularDec>
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var result = Def.Database<RefCircularDef>.Get("TestDef");
+            var result = Dec.Database<RefCircularDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(result.target, result);
@@ -173,21 +173,21 @@ namespace DefTest
 	    public void NullRef([Values] BehaviorMode mode)
 	    {
             // This is a little wonky; we have to test it by duplicating a tag, which is technically an error
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefCircularDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefCircularDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <RefCircularDef defName=""TestDef"">
-                        <target>TestDef</target>
+                <Decs>
+                    <RefCircularDec decName=""TestDec"">
+                        <target>TestDec</target>
                         <target></target>
-                    </RefCircularDef>
-                </Defs>");
+                    </RefCircularDec>
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode);
 
-            var result = Def.Database<RefCircularDef>.Get("TestDef");
+            var result = Dec.Database<RefCircularDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.IsNull(result.target);
@@ -196,47 +196,47 @@ namespace DefTest
         [Test]
 	    public void FailedLookup([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefSourceDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefSourceDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <RefSourceDef defName=""TestDef"">
-                        <target>MissingDef</target>
-                    </RefSourceDef>
-                </Defs>");
+                <Decs>
+                    <RefSourceDec decName=""TestDec"">
+                        <target>MissingDec</target>
+                    </RefSourceDec>
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode);
 
-            var result = Def.Database<RefSourceDef>.Get("TestDef");
+            var result = Dec.Database<RefSourceDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.IsNull(result.target);
 	    }
 
-        public class BareDefDef : Def.Def
+        public class BareDecDec : Dec.Dec
         {
-            public Def.Def target;
+            public Dec.Dec target;
         }
 
         [Test]
-	    public void BareDef([Values] BehaviorMode mode)
+	    public void BareDec([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(BareDefDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(BareDecDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <BareDefDef defName=""TestDef"">
-                        <target>TestDef</target>
-                    </BareDefDef>
-                </Defs>");
+                <Decs>
+                    <BareDecDec decName=""TestDec"">
+                        <target>TestDec</target>
+                    </BareDecDec>
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode, rewrite_expectParseErrors: true);
 
-            var result = Def.Database<BareDefDef>.Get("TestDef");
+            var result = Dec.Database<BareDecDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.IsNull(result.target);

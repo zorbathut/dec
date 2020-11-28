@@ -11,9 +11,9 @@ namespace Loaf.Locations
 
     public class YourBedroom : Location
     {
-        public YourBedroom(LocationDef locationDef) { }
+        public YourBedroom(LocationDec locationDec) { }
 
-        public override OutcomeDef Visit()
+        public override OutcomeDec Visit()
         {
             Cns.Out("You visit your bedroom.");
             Cns.Out("You take a quick nap.");
@@ -23,7 +23,7 @@ namespace Loaf.Locations
 
             Cns.Out("");
             Cns.Out("You are carrying:");
-            foreach (var item in Player.Instance.Inventory.Where(item => !(item is ArmorDef)))
+            foreach (var item in Player.Instance.Inventory.Where(item => !(item is ArmorDec)))
             {
                 Cns.Out($"  {item.name}");
             }
@@ -32,11 +32,11 @@ namespace Loaf.Locations
                 Cns.Out($"  {Player.Instance.Gold} gold");
             }
 
-            if (Player.Instance.Inventory.Any(item => item is ArmorDef))
+            if (Player.Instance.Inventory.Any(item => item is ArmorDec))
             {
                 Cns.Out("");
                 Cns.Out("You are wearing:");
-                foreach (var item in Player.Instance.Inventory.Where(item => item is ArmorDef))
+                foreach (var item in Player.Instance.Inventory.Where(item => item is ArmorDec))
                 {
                     Cns.Out($"  {item.name}");
                 }
@@ -53,9 +53,9 @@ namespace Loaf.Locations
 
     public class FairyGrotto : Location
     {
-        public FairyGrotto(LocationDef locationDef) { }
+        public FairyGrotto(LocationDec locationDec) { }
 
-        public override OutcomeDef Visit()
+        public override OutcomeDec Visit()
         {
             Cns.Out("For some reason, you decide to visit the Fairy Grotto.");
             Cns.Out("The Fairy of the Grotto offers to save your game!");
@@ -66,7 +66,7 @@ namespace Loaf.Locations
 
             // This seems like an appropriate time to do this.
             // Check out Player.Record() for the implementation of Player serialization.
-            File.WriteAllText(Config.Global.saveFilename, Def.Recorder.Write(Player.Instance));
+            File.WriteAllText(Config.Global.saveFilename, Dec.Recorder.Write(Player.Instance));
 
             Cns.Out("The Fairy cheerfully informs you that your game has been saved.");
             Cns.Out("Come back any time!");
@@ -77,9 +77,9 @@ namespace Loaf.Locations
 
     public class Shop : Location
     {
-        public Shop(LocationDef locationDef) { }
+        public Shop(LocationDec locationDec) { }
 
-        public override OutcomeDef Visit()
+        public override OutcomeDec Visit()
         {
             Cns.Out("Welcome to Armor's Shop!");
             Cns.Out("I'm Armor, the owner of this fine joint. We're the national leader in weapons!");
@@ -90,10 +90,10 @@ namespace Loaf.Locations
             Cns.Out($"By the size of your wallet, I can see you have {Player.Instance.Gold} gold. See anything you want to buy?");
             Cns.Out("");
 
-            var choices = Def.Database<WeaponDef>.List.Where(weapon => weapon.price > 0 && !Player.Instance.Inventory.Contains(weapon)).OrderBy(weapon => weapon.price).ToList();
+            var choices = Dec.Database<WeaponDec>.List.Where(weapon => weapon.price > 0 && !Player.Instance.Inventory.Contains(weapon)).OrderBy(weapon => weapon.price).ToList();
             choices.Add(null);  // we'll use this for the "nothing" option
 
-            var choice = Cns.Choice<WeaponDef>(choices.ToArray(), weapon =>
+            var choice = Cns.Choice<WeaponDec>(choices.ToArray(), weapon =>
             {
                 if (weapon == null)
                 {
@@ -123,9 +123,9 @@ namespace Loaf.Locations
 
     public class Futon : Location
     {
-        public Futon(LocationDef locationDef) { }
+        public Futon(LocationDec locationDec) { }
 
-        public override OutcomeDef Visit()
+        public override OutcomeDec Visit()
         {
             Cns.Out("You've finally tracked down the Emerald Futon!");
             Cns.Out("It was in your living room all along!");

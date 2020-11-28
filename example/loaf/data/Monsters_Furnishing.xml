@@ -1,62 +1,62 @@
-<Defs>
-  <MonsterDef defName="FurnishingBase" abstract="true">
+<Decs>
+  <MonsterDec decName="FurnishingBase" abstract="true">
     <hp>100</hp>
     <damage>3d8</damage>
     <gold>20d600</gold>
-  </MonsterDef>
+  </MonsterDec>
   
-  <MonsterDef defName="OttomanSoldier" parent="FurnishingBase">
+  <MonsterDec decName="OttomanSoldier" parent="FurnishingBase">
     <name>ottoman soldier</name>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="KnightStand" parent="FurnishingBase">
+  <MonsterDec decName="KnightStand" parent="FurnishingBase">
     <name>knightstand</name>
     <loot>Breastslab</loot>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="Chairiot" parent="FurnishingBase">
+  <MonsterDec decName="Chairiot" parent="FurnishingBase">
     <name>chairiot</name>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="ArmoireKnight" parent="FurnishingBase">
+  <MonsterDec decName="ArmoireKnight" parent="FurnishingBase">
     <name>armoire knight</name>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="BureauAgent" parent="FurnishingBase">
+  <MonsterDec decName="BureauAgent" parent="FurnishingBase">
     <name>bureau agent</name>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="ChestyWarrior" parent="FurnishingBase">
+  <MonsterDec decName="ChestyWarrior" parent="FurnishingBase">
     <name>chesty warrior</name>
     <loot>Breastslab</loot>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="Bearcubby" parent="FurnishingBase">
+  <MonsterDec decName="Bearcubby" parent="FurnishingBase">
     <name>bearcubby</name>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="MirrorChampion" parent="FurnishingBase">
+  <MonsterDec decName="MirrorChampion" parent="FurnishingBase">
     <name>knightstand</name>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="Nightstandstalker" parent="FurnishingBase">
+  <MonsterDec decName="Nightstandstalker" parent="FurnishingBase">
     <name>nightstandstalker</name>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="Secretary" parent="FurnishingBase">
+  <MonsterDec decName="Secretary" parent="FurnishingBase">
     <name>secretary</name>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="SofaKing" parent="FurnishingBase">
+  <MonsterDec decName="SofaKing" parent="FurnishingBase">
     <name>sofa king</name>
     <loot>FutonMap</loot>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="HotelValet" parent="FurnishingBase">
+  <MonsterDec decName="HotelValet" parent="FurnishingBase">
     <name>hotel valet</name>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="VanityElemental" parent="FurnishingBase">
+  <MonsterDec decName="VanityElemental" parent="FurnishingBase">
     <name>vanity elemental</name>
-  </MonsterDef>
-</Defs>
+  </MonsterDec>
+</Decs>

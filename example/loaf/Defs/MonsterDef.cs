@@ -1,13 +1,13 @@
 
 namespace Loaf
 {
-    public class MonsterDef : Def.Def
+    public class MonsterDec : Dec.Dec
     {
         public string name;
         public int hp;
         public Dice damage;
         public Dice gold;
 
-        public ItemDef loot;
+        public ItemDec loot;
     }
 }

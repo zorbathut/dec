@@ -4,9 +4,9 @@
   href: installation.md
 - name: Setup
   href: setup.md
-- name: Def types and instances
-  href: defs.md
-- name: Using Defs from your code
+- name: Dec types and instances
+  href: decs.md
+- name: Using Decs from your code
   href: using.md
 - name: TL;DR
   href: tldr.md

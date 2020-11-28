@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Configurations>Debug 2.1;Release 2.1;Debug 3.0;Release 3.0</Configurations>
@@ -38,8 +38,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../src/def.csproj" />
-    <ProjectReference Include="../util/defutillib/defutillib.csproj" />
+    <ProjectReference Include="../src/dec.csproj" />
+    <ProjectReference Include="../util/defutillib/decutillib.csproj" />
   </ItemGroup>
 
 </Project>

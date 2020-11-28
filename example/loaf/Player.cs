@@ -7,9 +7,9 @@ namespace Loaf
 
     // For the sake of this example, we're just using a player singleton.
     // It's marked IRecordable so we can save our game. 
-    public class Player : SingletonManual<Player>, Def.IRecordable
+    public class Player : SingletonManual<Player>, Dec.IRecordable
     {
-        private List<ItemDef> inventory = new List<ItemDef>();
+        private List<ItemDec> inventory = new List<ItemDec>();
         private int gold = 0;
 
         public int Gold
@@ -17,17 +17,17 @@ namespace Loaf
             get => gold;
         }
 
-        public IEnumerable<ItemDef> Inventory
+        public IEnumerable<ItemDec> Inventory
         {
             get => inventory;
         }
 
-        public WeaponDef CurrentWeapon
+        public WeaponDec CurrentWeapon
         {
-            get => inventory.OfType<WeaponDef>().MaxOfOrDefault(weapon => weapon.damage.Average);
+            get => inventory.OfType<WeaponDec>().MaxOfOrDefault(weapon => weapon.damage.Average);
         }
 
-        public void AcquireItem(ItemDef item)
+        public void AcquireItem(ItemDec item)
         {
             if (!inventory.Contains(item))
             {
@@ -61,9 +61,9 @@ namespace Loaf
         //
         // It isn't, though. It really is this simple.
         //
-        // Recorder handles primitive types, collections, Def references, class references, non-tree structures, and circular structures automatically.
+        // Recorder handles primitive types, collections, Dec references, class references, non-tree structures, and circular structures automatically.
         // In most cases all you need to do is list your fields and Recorder will do the rest.
-        public void Record(Def.Recorder recorder)
+        public void Record(Dec.Recorder recorder)
         {
             recorder.Record(ref inventory, "inventory");
             recorder.Record(ref gold, "gold");

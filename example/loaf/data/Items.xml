@@ -1,17 +1,17 @@
-<Defs>
-  <ItemDef defName="ArmorShopMap">
+<Decs>
+  <ItemDec decName="ArmorShopMap">
     <name>Steel Map</name>
-  </ItemDef>
+  </ItemDec>
 
-  <ItemDef defName="CaveMap">
+  <ItemDec decName="CaveMap">
     <name>Crystalline Map</name>
-  </ItemDef>
+  </ItemDec>
 
-  <ItemDef defName="WoodworkerMap">
+  <ItemDec decName="WoodworkerMap">
     <name>Carved Map</name>
-  </ItemDef>
+  </ItemDec>
 
-  <ItemDef defName="FutonMap">
+  <ItemDec decName="FutonMap">
     <name>Velvet Map</name>
-  </ItemDef>
-</Defs>
+  </ItemDec>
+</Decs>

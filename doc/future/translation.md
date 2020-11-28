@@ -1,23 +1,23 @@
 # Translation
 
 ```xml
-<ExampleDef defName="Example">
+<ExampleDec decName="Example">
   <visibleName>cow</visibleName>
-</ExampleDef>
+</ExampleDec>
 ```
 
 ```xml
 <LanguageData language="es">
-  <ExampleDef.Example.visibleName>vaca</ExampleDef.Example.visibleName>
+  <ExampleDec.Example.visibleName>vaca</ExampleDec.Example.visibleName>
 </LanguageData>
 ```
 
 ```xml
 <LanguageData language="ru">
-  <ExampleDef.Example.visibleName>корова</ExampleDef.Example.visibleName>
+  <ExampleDec.Example.visibleName>корова</ExampleDec.Example.visibleName>
 </LanguageData>
 ```
 
-Translation and internationalization are a big problem in game development. It can be assumed that people will, at some point, put English text in defs; a standard framework to support translation would be very beneficial.
+Translation and internationalization are a big problem in game development. It can be assumed that people will, at some point, put English text in decs; a standard framework to support translation would be very beneficial.
 
-It's possible this should be provided by a standalone library that connects to def via some API, but then the API needs to be developed too.
+It's possible this should be provided by a standalone library that connects to dec via some API, but then the API needs to be developed too.

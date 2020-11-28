@@ -1,47 +1,47 @@
-<Defs>
-  <MonsterDef defName="SewerBase" abstract="true">
+<Decs>
+  <MonsterDec decName="SewerBase" abstract="true">
     <hp>20</hp>
     <damage>2d4</damage>
     <gold>4d10</gold>
-  </MonsterDef>
+  </MonsterDec>
   
-  <MonsterDef defName="MoistRat" parent="SewerBase">
+  <MonsterDec decName="MoistRat" parent="SewerBase">
     <name>moist rat</name>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="SaturatedGoblin" parent="SewerBase">
+  <MonsterDec decName="SaturatedGoblin" parent="SewerBase">
     <name>saturated goblin</name>
     <loot>ArmorShopMap</loot>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="SoakedBugbear" parent="SewerBase">
+  <MonsterDec decName="SoakedBugbear" parent="SewerBase">
     <name>soaked bugbear</name>
     <loot>StinkySocks</loot>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="SoddenGremlin" parent="SewerBase">
+  <MonsterDec decName="SoddenGremlin" parent="SewerBase">
     <name>sodden gremlin</name>
     <loot>StinkySocks</loot>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="WaterloggedOrc" parent="SewerBase">
+  <MonsterDec decName="WaterloggedOrc" parent="SewerBase">
     <name>waterlogged orc</name>
     <loot>CaveMap</loot>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="DrippingBat" parent="SewerBase">
+  <MonsterDec decName="DrippingBat" parent="SewerBase">
     <name>dripping bat</name>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="DrenchedOgre" parent="SewerBase">
+  <MonsterDec decName="DrenchedOgre" parent="SewerBase">
     <name>drenched ogre</name>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="SoppingSpider" parent="SewerBase">
+  <MonsterDec decName="SoppingSpider" parent="SewerBase">
     <name>sopping spider</name>
-  </MonsterDef>
+  </MonsterDec>
 
-  <MonsterDef defName="SoggySlime" parent="SewerBase">
+  <MonsterDec decName="SoggySlime" parent="SewerBase">
     <name>soggy slime</name>
-  </MonsterDef>
-</Defs>
+  </MonsterDec>
+</Decs>

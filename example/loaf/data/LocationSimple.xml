@@ -1,10 +1,10 @@
-<Defs>
-  <Location.OutcomeDef defName="Return" />
-  <Location.OutcomeDef defName="Death" />
-  <Location.OutcomeDef defName="Victory" />
+<Decs>
+  <Location.OutcomeDec decName="Return" />
+  <Location.OutcomeDec decName="Death" />
+  <Location.OutcomeDec decName="Victory" />
 
-  <Game.StartGameChoiceDef defName="NewGame">
+  <Game.StartGameChoiceDec decName="NewGame">
     <label>New game</label>
-  </Game.StartGameChoiceDef>
-  <Game.StartGameChoiceDef defName="Load" />
-</Defs>
+  </Game.StartGameChoiceDec>
+  <Game.StartGameChoiceDec decName="Load" />
+</Decs>

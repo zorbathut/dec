@@ -1,4 +1,4 @@
-namespace DefTest
+namespace DecTest
 {
     using NUnit.Framework;
     using System;
@@ -14,12 +14,12 @@ namespace DefTest
             public int number = 0;
         }
 
-        public class ConverterDef : Def.Def
+        public class ConverterDec : Dec.Dec
         {
             public ConverterTestPayload payload;
         }
 
-        public class ConverterBasicTest : Def.Converter
+        public class ConverterBasicTest : Dec.Converter
         {
             public override HashSet<Type> HandledTypes()
             {
@@ -47,27 +47,27 @@ namespace DefTest
         [Test]
 	    public void BasicFunctionality([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterDef) }, explicitConverters = new Type[]{ typeof(ConverterBasicTest) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterDec) }, explicitConverters = new Type[]{ typeof(ConverterBasicTest) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <ConverterDef defName=""TestDefA"">
+                <Decs>
+                    <ConverterDec decName=""TestDecA"">
                         <payload>4</payload>
-                    </ConverterDef>
-                    <ConverterDef defName=""TestDefB"">
+                    </ConverterDec>
+                    <ConverterDec decName=""TestDecB"">
                         <payload><cargo>8</cargo></payload>
-                    </ConverterDef>
-                </Defs>");
+                    </ConverterDec>
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            Assert.AreEqual(4, Def.Database<ConverterDef>.Get("TestDefA").payload.number);
-            Assert.AreEqual(8, Def.Database<ConverterDef>.Get("TestDefB").payload.number);
+            Assert.AreEqual(4, Dec.Database<ConverterDec>.Get("TestDecA").payload.number);
+            Assert.AreEqual(8, Dec.Database<ConverterDec>.Get("TestDecB").payload.number);
 	    }
 
-        public class EmptyConverter : Def.Converter
+        public class EmptyConverter : Dec.Converter
         {
             public override HashSet<Type> HandledTypes()
             {
@@ -78,14 +78,14 @@ namespace DefTest
         [Test]
 	    public void EmptyConverterErr()
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(EmptyConverter) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(EmptyConverter) } };
 
-            Def.Parser parser = null;
-            ExpectErrors(() => parser = new Def.Parser());
+            Dec.Parser parser = null;
+            ExpectErrors(() => parser = new Dec.Parser());
             parser.Finish();
 	    }
 
-        public class StrConv1 : Def.Converter
+        public class StrConv1 : Dec.Converter
         {
             public override HashSet<Type> HandledTypes()
             {
@@ -93,7 +93,7 @@ namespace DefTest
             }
         }
 
-        public class StrConv2 : Def.Converter
+        public class StrConv2 : Dec.Converter
         {
             public override HashSet<Type> HandledTypes()
             {
@@ -104,10 +104,10 @@ namespace DefTest
         [Test]
 	    public void OverlappingConverters()
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(StrConv1), typeof(StrConv2) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(StrConv1), typeof(StrConv2) } };
 
-            Def.Parser parser = null;
-            ExpectErrors(() => parser = new Def.Parser());
+            Dec.Parser parser = null;
+            ExpectErrors(() => parser = new Dec.Parser());
             parser.Finish();
 	    }
 
@@ -116,7 +116,7 @@ namespace DefTest
             public string payload;
         }
 
-        public class ConverterDictTest : Def.Converter
+        public class ConverterDictTest : Dec.Converter
         {
             public override HashSet<Type> HandledTypes()
             {
@@ -134,7 +134,7 @@ namespace DefTest
             }
         }
 
-        public class ConverterDictDef : Def.Def
+        public class ConverterDictDec : Dec.Dec
         {
             public Dictionary<ConverterStringPayload, int> payload;
         }
@@ -142,31 +142,31 @@ namespace DefTest
         [Test]
 	    public void ConverterDict([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterDictDef) }, explicitConverters = new Type[]{ typeof(ConverterDictTest) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterDictDec) }, explicitConverters = new Type[]{ typeof(ConverterDictTest) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <ConverterDictDef defName=""TestDef"">
+                <Decs>
+                    <ConverterDictDec decName=""TestDec"">
                         <payload>
                             <yabba>1</yabba>
                             <dabba>4</dabba>
                             <doo>9</doo>
                         </payload>
-                    </ConverterDictDef>
-                </Defs>");
+                    </ConverterDictDec>
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var testDef = Def.Database<ConverterDictDef>.Get("TestDef");
+            var testDec = Dec.Database<ConverterDictDec>.Get("TestDec");
 
-            Assert.AreEqual(1, testDef.payload.Where(kvp => kvp.Key.payload == "yabba").First().Value);
-            Assert.AreEqual(4, testDef.payload.Where(kvp => kvp.Key.payload == "dabba").First().Value);
-            Assert.AreEqual(9, testDef.payload.Where(kvp => kvp.Key.payload == "doo").First().Value);
+            Assert.AreEqual(1, testDec.payload.Where(kvp => kvp.Key.payload == "yabba").First().Value);
+            Assert.AreEqual(4, testDec.payload.Where(kvp => kvp.Key.payload == "dabba").First().Value);
+            Assert.AreEqual(9, testDec.payload.Where(kvp => kvp.Key.payload == "doo").First().Value);
 	    }
 
-        public class ConverterStringDef : Def.Def
+        public class ConverterStringDec : Dec.Dec
         {
             public ConverterStringPayload payload;
         }
@@ -174,25 +174,25 @@ namespace DefTest
         [Test]
         public void EmptyInputConverter([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterStringDef) }, explicitConverters = new Type[]{ typeof(ConverterDictTest) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterStringDec) }, explicitConverters = new Type[]{ typeof(ConverterDictTest) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <ConverterStringDef defName=""TestDef"">
+                <Decs>
+                    <ConverterStringDec decName=""TestDec"">
                         <payload></payload>
-                    </ConverterStringDef>
-                </Defs>");
+                    </ConverterStringDec>
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var testDef = Def.Database<ConverterStringDef>.Get("TestDef");
+            var testDec = Dec.Database<ConverterStringDec>.Get("TestDec");
 
-            Assert.AreEqual("", testDef.payload.payload);
+            Assert.AreEqual("", testDec.payload.payload);
         }
 
-        public class DefaultFailureConverter : Def.Converter
+        public class DefaultFailureConverter : Dec.Converter
         {
             public override HashSet<Type> HandledTypes()
             {
@@ -203,49 +203,49 @@ namespace DefTest
         [Test]
         public void DefaultFailureTestString([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterStringDef) }, explicitConverters = new Type[]{ typeof(DefaultFailureConverter) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterStringDec) }, explicitConverters = new Type[]{ typeof(DefaultFailureConverter) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <ConverterStringDef defName=""TestDef"">
+                <Decs>
+                    <ConverterStringDec decName=""TestDec"">
                         <payload>stringfail</payload>
-                    </ConverterStringDef>
-                </Defs>");
+                    </ConverterStringDec>
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode);
 
-            var testDef = Def.Database<ConverterStringDef>.Get("TestDef");
-            Assert.IsNull(testDef.payload);
+            var testDec = Dec.Database<ConverterStringDec>.Get("TestDec");
+            Assert.IsNull(testDec.payload);
         }
 
         [Test]
         public void DefaultFailureTestXml([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterStringDef) }, explicitConverters = new Type[]{ typeof(DefaultFailureConverter) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterStringDec) }, explicitConverters = new Type[]{ typeof(DefaultFailureConverter) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <ConverterStringDef defName=""TestDef"">
+                <Decs>
+                    <ConverterStringDec decName=""TestDec"">
                         <payload><xmlfail></xmlfail></payload>
-                    </ConverterStringDef>
-                </Defs>");
+                    </ConverterStringDec>
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode);
 
-            var testDef = Def.Database<ConverterStringDef>.Get("TestDef");
-            Assert.IsNull(testDef.payload);
+            var testDec = Dec.Database<ConverterStringDec>.Get("TestDec");
+            Assert.IsNull(testDec.payload);
         }
 
-        public class NonEmptyPayloadDef : Def.Def
+        public class NonEmptyPayloadDec : Dec.Dec
         {
             public ConverterStringPayload payload = new ConverterStringPayload();
         }
 
-        public class DefaultNullConverter : Def.Converter
+        public class DefaultNullConverter : Dec.Converter
         {
             public override HashSet<Type> HandledTypes()
             {
@@ -264,21 +264,21 @@ namespace DefTest
         [Test]
         public void ConvertToNull()
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(NonEmptyPayloadDef) }, explicitConverters = new Type[]{ typeof(DefaultNullConverter) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(NonEmptyPayloadDec) }, explicitConverters = new Type[]{ typeof(DefaultNullConverter) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <NonEmptyPayloadDef defName=""TestDefault"">
-                    </NonEmptyPayloadDef>
-                    <NonEmptyPayloadDef defName=""TestNull"">
+                <Decs>
+                    <NonEmptyPayloadDec decName=""TestDefault"">
+                    </NonEmptyPayloadDec>
+                    <NonEmptyPayloadDec decName=""TestNull"">
                         <payload>makemenull</payload>
-                    </NonEmptyPayloadDef>
-                </Defs>");
+                    </NonEmptyPayloadDec>
+                </Decs>");
             parser.Finish();
 
-            Assert.IsNotNull(Def.Database<NonEmptyPayloadDef>.Get("TestDefault").payload);
-            Assert.IsNull(Def.Database<NonEmptyPayloadDef>.Get("TestNull").payload);
+            Assert.IsNotNull(Dec.Database<NonEmptyPayloadDec>.Get("TestDefault").payload);
+            Assert.IsNull(Dec.Database<NonEmptyPayloadDec>.Get("TestNull").payload);
         }
 
         public struct ConverterStructObj
@@ -287,7 +287,7 @@ namespace DefTest
             public int intB;
         }
 
-        public class ConverterStructDef : Def.Def
+        public class ConverterStructDec : Dec.Dec
         {
             public ConverterStructObj replacedDefault;
             public ConverterStructObj initializedUntouched = new ConverterStructObj { intA = 1, intB = 2 };
@@ -295,14 +295,14 @@ namespace DefTest
             public ConverterStructObj initializedTouched = new ConverterStructObj { intA = 5, intB = 6 };
         }
 
-        public class ConverterStructConverter : Def.Converter
+        public class ConverterStructConverter : Dec.Converter
         {
             public override HashSet<Type> HandledTypes()
             {
                 return new HashSet<Type>() { typeof(ConverterStructObj) };
             }
 
-            public override object Record(object model, Type type, Def.Recorder recorder)
+            public override object Record(object model, Type type, Dec.Recorder recorder)
             {
                 ConverterStructObj cso;
 
@@ -325,12 +325,12 @@ namespace DefTest
         [Test]
         public void ConverterStruct([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ConverterStructDef) }, explicitConverters = new Type[] { typeof(ConverterStructConverter) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ConverterStructDec) }, explicitConverters = new Type[] { typeof(ConverterStructConverter) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <ConverterStructDef defName=""TestDef"">
+                <Decs>
+                    <ConverterStructDec decName=""TestDec"">
                         <replacedDefault>
                             <intA>20</intA>
                             <intB>21</intB>
@@ -342,25 +342,25 @@ namespace DefTest
                         <initializedTouched>
                             <intA>24</intA>
                         </initializedTouched>
-                    </ConverterStructDef>
-                </Defs>");
+                    </ConverterStructDec>
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var testDef = Def.Database<ConverterStructDef>.Get("TestDef");
+            var testDec = Dec.Database<ConverterStructDec>.Get("TestDec");
 
-            Assert.AreEqual(20, testDef.replacedDefault.intA);
-            Assert.AreEqual(21, testDef.replacedDefault.intB);
+            Assert.AreEqual(20, testDec.replacedDefault.intA);
+            Assert.AreEqual(21, testDec.replacedDefault.intB);
 
-            Assert.AreEqual(1, testDef.initializedUntouched.intA);
-            Assert.AreEqual(2, testDef.initializedUntouched.intB);
+            Assert.AreEqual(1, testDec.initializedUntouched.intA);
+            Assert.AreEqual(2, testDec.initializedUntouched.intB);
 
-            Assert.AreEqual(22, testDef.initializedReplaced.intA);
-            Assert.AreEqual(23, testDef.initializedReplaced.intB);
+            Assert.AreEqual(22, testDec.initializedReplaced.intA);
+            Assert.AreEqual(23, testDec.initializedReplaced.intB);
 
-            Assert.AreEqual(24, testDef.initializedTouched.intA);
-            Assert.AreEqual(6, testDef.initializedTouched.intB);
+            Assert.AreEqual(24, testDec.initializedTouched.intA);
+            Assert.AreEqual(6, testDec.initializedTouched.intB);
         }
 
         public class FallbackPayload
@@ -368,12 +368,12 @@ namespace DefTest
             public int number = 0;
         }
 
-        public class FallbackDef : Def.Def
+        public class FallbackDec : Dec.Dec
         {
             public FallbackPayload payload;
         }
 
-        public class FallbackConverter : Def.Converter
+        public class FallbackConverter : Dec.Converter
         {
             public override HashSet<Type> HandledTypes()
             {
@@ -394,23 +394,23 @@ namespace DefTest
         [Test]
         public void Fallback([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(FallbackDef) }, explicitConverters = new Type[] { typeof(FallbackConverter) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(FallbackDec) }, explicitConverters = new Type[] { typeof(FallbackConverter) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <FallbackDef defName=""TestDef"">
+                <Decs>
+                    <FallbackDec decName=""TestDec"">
                         <payload>
                             4
                             <garbage />
                         </payload>
-                    </FallbackDef>
-                </Defs>");
+                    </FallbackDec>
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode);
 
-            Assert.AreEqual(4, Def.Database<FallbackDef>.Get("TestDef").payload.number);
+            Assert.AreEqual(4, Dec.Database<FallbackDec>.Get("TestDec").payload.number);
         }
 
         public class ExceptionPayload
@@ -418,7 +418,7 @@ namespace DefTest
 
         }
 
-        public class ExceptionDef : Def.Def
+        public class ExceptionDec : Dec.Dec
         {
             public ExceptionPayload payload;
 
@@ -426,7 +426,7 @@ namespace DefTest
             public int after;
         }
 
-        public class ExceptionConverter : Def.Converter
+        public class ExceptionConverter : Dec.Converter
         {
             public override HashSet<Type> HandledTypes()
             {
@@ -447,30 +447,30 @@ namespace DefTest
         [Test]
         public void Exception([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExceptionDef) }, explicitConverters = new Type[] { typeof(ExceptionConverter) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExceptionDec) }, explicitConverters = new Type[] { typeof(ExceptionConverter) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <ExceptionDef defName=""TestDefA"">
+                <Decs>
+                    <ExceptionDec decName=""TestDecA"">
                         <before>1</before>
                         <payload />
                         <after>2</after>
-                    </ExceptionDef>
-                    <ExceptionDef defName=""TestDefB"">
+                    </ExceptionDec>
+                    <ExceptionDec decName=""TestDecB"">
                         <before>3</before>
                         <payload />
                         <after>4</after>
-                    </ExceptionDef>
-                </Defs>");
+                    </ExceptionDec>
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode);
 
-            Assert.AreEqual(1, Def.Database<ExceptionDef>.Get("TestDefA").before);
-            Assert.AreEqual(2, Def.Database<ExceptionDef>.Get("TestDefA").after);
-            Assert.AreEqual(3, Def.Database<ExceptionDef>.Get("TestDefB").before);
-            Assert.AreEqual(4, Def.Database<ExceptionDef>.Get("TestDefB").after);
+            Assert.AreEqual(1, Dec.Database<ExceptionDec>.Get("TestDecA").before);
+            Assert.AreEqual(2, Dec.Database<ExceptionDec>.Get("TestDecA").after);
+            Assert.AreEqual(3, Dec.Database<ExceptionDec>.Get("TestDecB").before);
+            Assert.AreEqual(4, Dec.Database<ExceptionDec>.Get("TestDecB").after);
         }
     }
 }

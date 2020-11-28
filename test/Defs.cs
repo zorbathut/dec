@@ -1,4 +1,4 @@
-namespace DefTest
+namespace DecTest
 {
     using NUnit.Framework;
     using System;
@@ -6,99 +6,99 @@ namespace DefTest
     using System.Linq;
 
     [TestFixture]
-    public class Defs : Base
+    public class Decs : Base
     {
         [Test]
 	    public void TrivialParse([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <StubDef defName=""TestDef"">
-                    </StubDef>
-                </Defs>");
+                <Decs>
+                    <StubDec decName=""TestDec"">
+                    </StubDec>
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
+            Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDec"));
 	    }
 
         [Test]
 	    public void TrivialEmptyParse([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <StubDef defName=""TestDef"" />
-                </Defs>");
+                <Decs>
+                    <StubDec decName=""TestDec"" />
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
+            Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDec"));
 	    }
 
         [Test]
-	    public void MissingDefType([Values] BehaviorMode mode)
+	    public void MissingDecType([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             ExpectErrors(() => parser.AddString(@"
-                <Defs>
-                    <NonexistentDef defName=""TestDefA"" />
-                    <StubDef defName=""TestDefB"" />
-                </Defs>"));
+                <Decs>
+                    <NonexistentDec decName=""TestDecA"" />
+                    <StubDec decName=""TestDecB"" />
+                </Decs>"));
             parser.Finish();
 
             DoBehavior(mode);
 
-            Assert.IsNull(Def.Database<StubDef>.Get("TestDefA"));
-            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDefB"));
+            Assert.IsNull(Dec.Database<StubDec>.Get("TestDecA"));
+            Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDecB"));
 	    }
 
         [Test]
-	    public void MissingDefName([Values] BehaviorMode mode)
+	    public void MissingDecName([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             ExpectErrors(() => parser.AddString(@"
-                <Defs>
-                    <StubDef />
-                </Defs>"));
+                <Decs>
+                    <StubDec />
+                </Decs>"));
             parser.Finish();
 
             DoBehavior(mode);
         }
 
         [Test]
-	    public void InvalidDefName([Values] BehaviorMode mode)
+	    public void InvalidDecName([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             ExpectErrors(() => parser.AddString(@"
-                <Defs>
-                    <StubDef defName=""1NumberPrefix"" />
-                    <StubDef defName=""Contains Spaces"" />
-                    <StubDef defName=""HasPunctuation!"" />
-                </Defs>"));
+                <Decs>
+                    <StubDec decName=""1NumberPrefix"" />
+                    <StubDec decName=""Contains Spaces"" />
+                    <StubDec decName=""HasPunctuation!"" />
+                </Decs>"));
             parser.Finish();
 
             DoBehavior(mode);
 
-            Assert.IsNull(Def.Database<StubDef>.Get("1NumberPrefix"));
-            Assert.IsNull(Def.Database<StubDef>.Get("Contains Spaces"));
-            Assert.IsNull(Def.Database<StubDef>.Get("HasPunctuation!"));
+            Assert.IsNull(Dec.Database<StubDec>.Get("1NumberPrefix"));
+            Assert.IsNull(Dec.Database<StubDec>.Get("Contains Spaces"));
+            Assert.IsNull(Dec.Database<StubDec>.Get("HasPunctuation!"));
 	    }
 
-        public class IntDef : Def.Def
+        public class IntDec : Dec.Dec
         {
             public int value = 4;
         }
@@ -106,57 +106,57 @@ namespace DefTest
         [Test]
 	    public void DuplicateField([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(IntDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(IntDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <IntDef defName=""TestDef"">
+                <Decs>
+                    <IntDec decName=""TestDec"">
                         <value>3</value>
                         <value>6</value>
-                    </IntDef>
-                </Defs>");
+                    </IntDec>
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode);
 
-            var result = Def.Database<IntDef>.Get("TestDef");
+            var result = Dec.Database<IntDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(6, result.value);
 	    }
 
         [Test]
-	    public void DuplicateDef([Values] BehaviorMode mode)
+	    public void DuplicateDec([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(IntDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(IntDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             ExpectErrors(() => parser.AddString(@"
-                <Defs>
-                    <IntDef defName=""TestDef"">
+                <Decs>
+                    <IntDec decName=""TestDec"">
                         <value>10</value>
-                    </IntDef>
-                    <IntDef defName=""TestDef"">
+                    </IntDec>
+                    <IntDec decName=""TestDec"">
                         <value>20</value>
-                    </IntDef>
-                </Defs>"));
+                    </IntDec>
+                </Decs>"));
             parser.Finish();
 
             DoBehavior(mode);
 
-            var result = Def.Database<IntDef>.Get("TestDef");
+            var result = Dec.Database<IntDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(20, result.value);
 	    }
 
-        public class DeepParentDef : Def.Def
+        public class DeepParentDec : Dec.Dec
         {
             public int value = 4;
         }
 
-        public class DeepChildDef : DeepParentDef
+        public class DeepChildDec : DeepParentDec
         {
             
         }
@@ -164,31 +164,31 @@ namespace DefTest
         [Test]
 	    public void HierarchyDeepField([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(DeepChildDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(DeepChildDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <DeepChildDef defName=""TestDef"">
+                <Decs>
+                    <DeepChildDec decName=""TestDec"">
                         <value>12</value>
-                    </DeepChildDef>
-                </Defs>");
+                    </DeepChildDec>
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            var result = Def.Database<DeepParentDef>.Get("TestDef");
+            var result = Dec.Database<DeepParentDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(12, result.value);
 	    }
 
-        public class DupeParentDef : Def.Def
+        public class DupeParentDec : Dec.Dec
         {
             public int value = 4;
         }
 
-        public class DupeChildDef : DupeParentDef
+        public class DupeChildDec : DupeParentDec
         {
             new public int value = 8;
         }
@@ -196,59 +196,59 @@ namespace DefTest
         [Test]
         public void UtilReflectionDuplicateField()
         {
-            var def_utilreflection = GetDefAssembly().GetType("Def.UtilReflection");
-            var getFieldsFromHierarchy = def_utilreflection.GetMethod("GetSerializableFieldsFromHierarchy", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+            var dec_utilreflection = GetDecAssembly().GetType("Dec.UtilReflection");
+            var getFieldsFromHierarchy = dec_utilreflection.GetMethod("GetSerializableFieldsFromHierarchy", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
             System.Reflection.FieldInfo[] fields = null;
-            ExpectErrors(() => fields = (getFieldsFromHierarchy.Invoke(null, new[] { typeof(DupeChildDef) }) as IEnumerable<System.Reflection.FieldInfo>).ToArray());
+            ExpectErrors(() => fields = (getFieldsFromHierarchy.Invoke(null, new[] { typeof(DupeChildDec) }) as IEnumerable<System.Reflection.FieldInfo>).ToArray());
             Assert.AreEqual(1, fields.Count(field => field.Name == "value"));
         }
 
         [Test]
 	    public void HierarchyDuplicateField([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(DupeChildDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(DupeChildDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <DupeChildDef defName=""TestDef"">
+                <Decs>
+                    <DupeChildDec decName=""TestDec"">
                         <value>12</value>
-                    </DupeChildDef>
-                </Defs>");
+                    </DupeChildDec>
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode, rewrite_expectWriteErrors: true, rewrite_expectParseErrors: true, validation_expectWriteErrors: true);
 
-            var result = (DupeChildDef)Def.Database<DupeParentDef>.Get("TestDef");
+            var result = (DupeChildDec)Dec.Database<DupeParentDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
             Assert.AreEqual(12, result.value);
-            Assert.AreEqual(4, ((DupeParentDef)result).value);
+            Assert.AreEqual(4, ((DupeParentDec)result).value);
 	    }
 
         [Test]
 	    public void ExtraAttribute([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <StubDef defName=""TestDef"" invalidAttribute=""hello"" />
-                </Defs>");
+                <Decs>
+                    <StubDec decName=""TestDec"" invalidAttribute=""hello"" />
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode);
 
-            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
+            Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDec"));
 	    }
 
-        public class StubBetaDef : Def.Def
+        public class StubBetaDec : Dec.Dec
         {
 
         }
 
-        public class StubChildDef : StubDef
+        public class StubChildDec : StubDec
         {
 
         }
@@ -256,23 +256,23 @@ namespace DefTest
         [Test]
 	    public void DebugPrint([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <StubDef defName=""TestDef"" />
-                </Defs>");
+                <Decs>
+                    <StubDec decName=""TestDec"" />
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
+            Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDec"));
 
-            Assert.AreEqual(Def.Database<StubDef>.Get("TestDef").ToString(), "TestDef");
+            Assert.AreEqual(Dec.Database<StubDec>.Get("TestDec").ToString(), "TestDec");
         }
 
-        public class ErrorDef : Def.Def
+        public class ErrorDec : Dec.Dec
         {
             public bool touchedBefore = false;
             public bool touchedAfter = false;
@@ -289,7 +289,7 @@ namespace DefTest
             }
         }
 
-        public class PostLoadErrorDef : Def.Def
+        public class PostLoadErrorDec : Dec.Dec
         {
             public bool touchedBefore = false;
             public bool touchedAfter = false;
@@ -306,7 +306,7 @@ namespace DefTest
             }
         }
 
-        public class ErrorExceptionDef : Def.Def
+        public class ErrorExceptionDec : Dec.Dec
         {
             public bool touched = false;
 
@@ -320,7 +320,7 @@ namespace DefTest
             }
         }
 
-        public class PostLoadErrorExceptionDef : Def.Def
+        public class PostLoadErrorExceptionDec : Dec.Dec
         {
             public bool touched = false;
 
@@ -337,84 +337,84 @@ namespace DefTest
         [Test]
 	    public void ConfigErrors([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ErrorDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ErrorDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <ErrorDef defName=""TestDefA"" />
-                    <ErrorDef defName=""TestDefB"" />
-                </Defs>");
+                <Decs>
+                    <ErrorDec decName=""TestDecA"" />
+                    <ErrorDec decName=""TestDecB"" />
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode, rewrite_expectParseErrors: true);
 
-            Assert.IsTrue(Def.Database<ErrorDef>.Get("TestDefA").touchedBefore);
-            Assert.IsTrue(Def.Database<ErrorDef>.Get("TestDefA").touchedAfter);
-            Assert.IsTrue(Def.Database<ErrorDef>.Get("TestDefB").touchedBefore);
-            Assert.IsTrue(Def.Database<ErrorDef>.Get("TestDefB").touchedAfter);
+            Assert.IsTrue(Dec.Database<ErrorDec>.Get("TestDecA").touchedBefore);
+            Assert.IsTrue(Dec.Database<ErrorDec>.Get("TestDecA").touchedAfter);
+            Assert.IsTrue(Dec.Database<ErrorDec>.Get("TestDecB").touchedBefore);
+            Assert.IsTrue(Dec.Database<ErrorDec>.Get("TestDecB").touchedAfter);
         }
 
         [Test]
         public void PostLoadErrors([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(PostLoadErrorDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(PostLoadErrorDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <PostLoadErrorDef defName=""TestDefA"" />
-                    <PostLoadErrorDef defName=""TestDefB"" />
-                </Defs>");
+                <Decs>
+                    <PostLoadErrorDec decName=""TestDecA"" />
+                    <PostLoadErrorDec decName=""TestDecB"" />
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode, rewrite_expectParseErrors: true);
 
-            Assert.IsTrue(Def.Database<PostLoadErrorDef>.Get("TestDefA").touchedBefore);
-            Assert.IsTrue(Def.Database<PostLoadErrorDef>.Get("TestDefA").touchedAfter);
-            Assert.IsTrue(Def.Database<PostLoadErrorDef>.Get("TestDefB").touchedBefore);
-            Assert.IsTrue(Def.Database<PostLoadErrorDef>.Get("TestDefB").touchedAfter);
+            Assert.IsTrue(Dec.Database<PostLoadErrorDec>.Get("TestDecA").touchedBefore);
+            Assert.IsTrue(Dec.Database<PostLoadErrorDec>.Get("TestDecA").touchedAfter);
+            Assert.IsTrue(Dec.Database<PostLoadErrorDec>.Get("TestDecB").touchedBefore);
+            Assert.IsTrue(Dec.Database<PostLoadErrorDec>.Get("TestDecB").touchedAfter);
         }
 
         [Test]
         public void ConfigExceptionErrors([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ErrorExceptionDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ErrorExceptionDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <ErrorExceptionDef defName=""TestDefA"" />
-                    <ErrorExceptionDef defName=""TestDefB"" />
-                </Defs>");
+                <Decs>
+                    <ErrorExceptionDec decName=""TestDecA"" />
+                    <ErrorExceptionDec decName=""TestDecB"" />
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode, rewrite_expectParseErrors: true);
 
-            Assert.IsTrue(Def.Database<ErrorExceptionDef>.Get("TestDefA").touched);
-            Assert.IsTrue(Def.Database<ErrorExceptionDef>.Get("TestDefB").touched);
+            Assert.IsTrue(Dec.Database<ErrorExceptionDec>.Get("TestDecA").touched);
+            Assert.IsTrue(Dec.Database<ErrorExceptionDec>.Get("TestDecB").touched);
         }
 
         [Test]
         public void PostLoadExceptionErrors([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(PostLoadErrorExceptionDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(PostLoadErrorExceptionDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <PostLoadErrorExceptionDef defName=""TestDefA"" />
-                    <PostLoadErrorExceptionDef defName=""TestDefB"" />
-                </Defs>");
+                <Decs>
+                    <PostLoadErrorExceptionDec decName=""TestDecA"" />
+                    <PostLoadErrorExceptionDec decName=""TestDecB"" />
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode, rewrite_expectParseErrors: true);
 
-            Assert.IsTrue(Def.Database<PostLoadErrorExceptionDef>.Get("TestDefA").touched);
-            Assert.IsTrue(Def.Database<PostLoadErrorExceptionDef>.Get("TestDefB").touched);
+            Assert.IsTrue(Dec.Database<PostLoadErrorExceptionDec>.Get("TestDecA").touched);
+            Assert.IsTrue(Dec.Database<PostLoadErrorExceptionDec>.Get("TestDecB").touched);
         }
 
-        public class PostLoadDef : Def.Def
+        public class PostLoadDec : Dec.Dec
         {
             public bool initted = false;
 
@@ -429,72 +429,72 @@ namespace DefTest
         [Test]
 	    public void PostLoad([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(PostLoadDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(PostLoadDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <PostLoadDef defName=""TestDef"" />
-                </Defs>");
+                <Decs>
+                    <PostLoadDec decName=""TestDec"" />
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            Assert.IsNotNull(Def.Database<PostLoadDef>.Get("TestDef"));
-            Assert.IsTrue(Def.Database<PostLoadDef>.Get("TestDef").initted);
+            Assert.IsNotNull(Dec.Database<PostLoadDec>.Get("TestDec"));
+            Assert.IsTrue(Dec.Database<PostLoadDec>.Get("TestDec").initted);
         }
 
-        public class DefMemberDef : Def.Def
+        public class DecMemberDec : Dec.Dec
         {
-            public Def.Def invalidReference;
+            public Dec.Dec invalidReference;
         }
 
         [Test]
-        public void DefMember([Values] BehaviorMode mode)
+        public void DecMember([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DefMemberDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DecMemberDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <DefMemberDef defName=""TestDef"">
-                        <invalidReference>TestDef</invalidReference>
-                    </DefMemberDef>
-                </Defs>");
+                <Decs>
+                    <DecMemberDec decName=""TestDec"">
+                        <invalidReference>TestDec</invalidReference>
+                    </DecMemberDec>
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode, rewrite_expectParseErrors: true);
 
-            Assert.IsNotNull(Def.Database<DefMemberDef>.Get("TestDef"));
-            Assert.IsNull(Def.Database<DefMemberDef>.Get("TestDef").invalidReference);
+            Assert.IsNotNull(Dec.Database<DecMemberDec>.Get("TestDec"));
+            Assert.IsNull(Dec.Database<DecMemberDec>.Get("TestDec").invalidReference);
         }
 
-        public class SelfReferentialDef : Def.Def
+        public class SelfReferentialDec : Dec.Dec
         {
-            public SelfReferentialDef recursive;
+            public SelfReferentialDec recursive;
         }
 
         [Test]
         public void SelfReferential([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SelfReferentialDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SelfReferentialDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <SelfReferentialDef defName=""TestDef"">
-                        <recursive>TestDef</recursive>
-                    </SelfReferentialDef>
-                </Defs>");
+                <Decs>
+                    <SelfReferentialDec decName=""TestDec"">
+                        <recursive>TestDec</recursive>
+                    </SelfReferentialDec>
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            Assert.IsNotNull(Def.Database<SelfReferentialDef>.Get("TestDef"));
-            Assert.AreSame(Def.Database<SelfReferentialDef>.Get("TestDef"), Def.Database<SelfReferentialDef>.Get("TestDef").recursive);
+            Assert.IsNotNull(Dec.Database<SelfReferentialDec>.Get("TestDec"));
+            Assert.AreSame(Dec.Database<SelfReferentialDec>.Get("TestDec"), Dec.Database<SelfReferentialDec>.Get("TestDec").recursive);
         }
 
-        public class LooseMatchDef : Def.Def
+        public class LooseMatchDec : Dec.Dec
         {
             public string cat;
             public string snake_case;
@@ -504,15 +504,15 @@ namespace DefTest
         [Test]
         public void LooseMatchCapitalization([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(LooseMatchDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(LooseMatchDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <LooseMatchDef defName=""TestDef"">
+                <Decs>
+                    <LooseMatchDec decName=""TestDec"">
                         <Cat>words</Cat>
-                    </LooseMatchDef>
-                </Defs>");
+                    </LooseMatchDec>
+                </Decs>");
             ExpectErrors(() => parser.Finish(), err => err.Contains("cat"));
 
             DoBehavior(mode);
@@ -521,15 +521,15 @@ namespace DefTest
         [Test]
         public void LooseMatchSnakeToCamel([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(LooseMatchDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(LooseMatchDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <LooseMatchDef defName=""TestDef"">
+                <Decs>
+                    <LooseMatchDec decName=""TestDec"">
                         <snakeCase>words</snakeCase>
-                    </LooseMatchDef>
-                </Defs>");
+                    </LooseMatchDec>
+                </Decs>");
             ExpectErrors(() => parser.Finish(), err => err.Contains("snake_case"));
 
             DoBehavior(mode);
@@ -538,15 +538,15 @@ namespace DefTest
         [Test]
         public void LooseMatchCamelToSnake([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(LooseMatchDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(LooseMatchDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <LooseMatchDef defName=""TestDef"">
+                <Decs>
+                    <LooseMatchDec decName=""TestDec"">
                         <camel_case>words</camel_case>
-                    </LooseMatchDef>
-                </Defs>");
+                    </LooseMatchDec>
+                </Decs>");
             ExpectErrors(() => parser.Finish(), err => err.Contains("camelCase"));
 
             DoBehavior(mode);
@@ -555,26 +555,26 @@ namespace DefTest
         [Test]
         public void ForbiddenField([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
 
-            // This is a little silly because, as of this writing, DefName is a property and we don't even support writing to properties.
+            // This is a little silly because, as of this writing, DecName is a property and we don't even support writing to properties.
             // So we're not really testing forbidden fields here. We're really just double-checking the fact that properties can't be written to.
             // But someday I'll probably support properties, and then this had better work.
             parser.AddString(@"
-                <Defs>
-                    <StubDef defName=""TestDef"">
-                        <DefName>NotTestDef</DefName>
-                    </StubDef>
-                </Defs>");
+                <Decs>
+                    <StubDec decName=""TestDec"">
+                        <DecName>NotTestDec</DecName>
+                    </StubDec>
+                </Decs>");
 
             // Just in case I rename it back to lowercase, make sure we don't just get a spelling mismatch error here.
-            ExpectErrors(() => parser.Finish(), err => !err.Contains("defName"));
+            ExpectErrors(() => parser.Finish(), err => !err.Contains("decName"));
 
             DoBehavior(mode);
 
-            Assert.AreEqual("TestDef", Def.Database<StubDef>.Get("TestDef").DefName);
+            Assert.AreEqual("TestDec", Dec.Database<StubDec>.Get("TestDec").DecName);
         }
 
         public class InternalBase
@@ -587,7 +587,7 @@ namespace DefTest
             public int derivedOnly;
         }
 
-        public class InternalInheritanceDef : Def.Def
+        public class InternalInheritanceDec : Dec.Dec
         {
             public InternalBase value;
         }
@@ -595,26 +595,26 @@ namespace DefTest
         [Test]
         public void InternalInheritance([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(InternalInheritanceDef), typeof(InternalDerived) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(InternalInheritanceDec), typeof(InternalDerived) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <InternalInheritanceDef defName=""TestDef"">
+                <Decs>
+                    <InternalInheritanceDec decName=""TestDec"">
                         <value class=""InternalDerived"">
                             <baseOnly>42</baseOnly>
                             <derivedOnly>100</derivedOnly>
                         </value>
-                     </InternalInheritanceDef>
-                </Defs>");
+                     </InternalInheritanceDec>
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            Assert.AreEqual(typeof(InternalDerived), Def.Database<InternalInheritanceDef>.Get("TestDef").value.GetType());
+            Assert.AreEqual(typeof(InternalDerived), Dec.Database<InternalInheritanceDec>.Get("TestDec").value.GetType());
 
-            Assert.AreEqual(42, Def.Database<InternalInheritanceDef>.Get("TestDef").value.baseOnly);
-            Assert.AreEqual(100, ((InternalDerived)Def.Database<InternalInheritanceDef>.Get("TestDef").value).derivedOnly);
+            Assert.AreEqual(42, Dec.Database<InternalInheritanceDec>.Get("TestDec").value.baseOnly);
+            Assert.AreEqual(100, ((InternalDerived)Dec.Database<InternalInheritanceDec>.Get("TestDec").value).derivedOnly);
         }
 
         public class ConflictBase
@@ -627,7 +627,7 @@ namespace DefTest
             public new int conflict = 2;
         }
 
-        public class ConflictInheritanceDef : Def.Def
+        public class ConflictInheritanceDec : Dec.Dec
         {
             public ConflictBase value;
         }
@@ -635,30 +635,30 @@ namespace DefTest
         [Test]
         public void ConflictInheritance([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ConflictInheritanceDef), typeof(ConflictDerived) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ConflictInheritanceDec), typeof(ConflictDerived) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <ConflictInheritanceDef defName=""TestDef"">
+                <Decs>
+                    <ConflictInheritanceDec decName=""TestDec"">
                         <value class=""ConflictDerived"">
                             <conflict>42</conflict>
                         </value>
-                     </ConflictInheritanceDef>
-                </Defs>");
+                     </ConflictInheritanceDec>
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             DoBehavior(mode, rewrite_expectWriteErrors: true, rewrite_expectParseErrors: true, validation_expectWriteErrors: true);
 
             // This behavior is absolutely not guaranteed, for the record.
-            Assert.AreEqual(1, Def.Database<ConflictInheritanceDef>.Get("TestDef").value.conflict);
-            Assert.AreEqual(42, ((ConflictDerived)Def.Database<ConflictInheritanceDef>.Get("TestDef").value).conflict);
+            Assert.AreEqual(1, Dec.Database<ConflictInheritanceDec>.Get("TestDec").value.conflict);
+            Assert.AreEqual(42, ((ConflictDerived)Dec.Database<ConflictInheritanceDec>.Get("TestDec").value).conflict);
         }
 
         public class WeirdList : List<int> { }
         public class WeirdDictionary : Dictionary<string, int> { }
 
-        public class ContainerInheritanceDef : Def.Def
+        public class ContainerInheritanceDec : Dec.Dec
         {
             public WeirdList list;
             public WeirdDictionary dict;
@@ -667,24 +667,24 @@ namespace DefTest
         [Test]
         public void ListInheritance([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ContainerInheritanceDef), typeof(WeirdList), typeof(WeirdDictionary) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ContainerInheritanceDec), typeof(WeirdList), typeof(WeirdDictionary) } };
 
             // Currently providing absolutely no guarantees for how these weird things parse, only that the types will be properly preserved.
             // Also: Don't do this, yo.
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <ContainerInheritanceDef defName=""TestDef"">
+                <Decs>
+                    <ContainerInheritanceDec decName=""TestDec"">
                         <list class=""WeirdList"" />
                         <dict class=""WeirdDictionary"" />
-                     </ContainerInheritanceDef>
-                </Defs>");
+                     </ContainerInheritanceDec>
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            Assert.AreEqual(typeof(WeirdList), Def.Database<ContainerInheritanceDef>.Get("TestDef").list.GetType());
-            Assert.AreEqual(typeof(WeirdDictionary), Def.Database<ContainerInheritanceDef>.Get("TestDef").dict.GetType());
+            Assert.AreEqual(typeof(WeirdList), Dec.Database<ContainerInheritanceDec>.Get("TestDec").list.GetType());
+            Assert.AreEqual(typeof(WeirdDictionary), Dec.Database<ContainerInheritanceDec>.Get("TestDec").dict.GetType());
         }
     }
 }

@@ -1,4 +1,4 @@
-namespace Def
+namespace Dec
 {
     using System;
     using System.Collections.Generic;
@@ -41,9 +41,9 @@ namespace Def
             new PrimitiveTypeLookup { type = typeof(string), str = "string" },
         };
 
-        private static bool MatchesWithGeneric(string typeName, string defType)
+        private static bool MatchesWithGeneric(string typeName, string decType)
         {
-            return typeName.StartsWith(defType) && typeName[defType.Length] == '`';
+            return typeName.StartsWith(decType) && typeName[decType.Length] == '`';
         }
 
         private static Regex GenericParameterMatcher = new Regex("`[0-9]+", RegexOptions.Compiled);
@@ -146,7 +146,7 @@ namespace Def
                 var parsedTypes = new List<Type>();
                 void AddParsedType(string type)
                 {
-                    parsedTypes.Add(ParseDefFormatted(type.Trim(), inputLine, lineNumber));
+                    parsedTypes.Add(ParseDecFormatted(type.Trim(), inputLine, lineNumber));
                 }
 
                 int tokenStart = 1;
@@ -255,7 +255,7 @@ namespace Def
         }
 
         private static Dictionary<string, Type> ParseCache = new Dictionary<string, Type>();
-        internal static Type ParseDefFormatted(string text, string inputLine, int lineNumber)
+        internal static Type ParseDecFormatted(string text, string inputLine, int lineNumber)
         {
             if (ParseCache.TryGetValue(text, out Type cacheVal))
             {
@@ -302,10 +302,10 @@ namespace Def
             return result;
         }
 
-        private static Dictionary<Type, string> ComposeDefCache = new Dictionary<Type, string>();
-        internal static string ComposeDefFormatted(this Type type)
+        private static Dictionary<Type, string> ComposeDecCache = new Dictionary<Type, string>();
+        internal static string ComposeDecFormatted(this Type type)
         {
-            if (ComposeDefCache.TryGetValue(type, out string cacheVal))
+            if (ComposeDecCache.TryGetValue(type, out string cacheVal))
             {
                 return cacheVal;
             }
@@ -318,7 +318,7 @@ namespace Def
                     if (type == explicitType)
                     {
                         string result = explicitType.Name;
-                        ComposeDefCache[type] = result;
+                        ComposeDecCache[type] = result;
                         return result;
                     }
                 }
@@ -352,7 +352,7 @@ namespace Def
                 if (type.IsConstructedGenericType)
                 {
                     // Assemble the generic types on top of this
-                    string genericTypes = string.Join(", ", type.GenericTypeArguments.Select(t => t.ComposeDefFormatted()));
+                    string genericTypes = string.Join(", ", type.GenericTypeArguments.Select(t => t.ComposeDecFormatted()));
                     result = $"{baseTypeString}<{genericTypes}>";
                 }
                 else
@@ -360,7 +360,7 @@ namespace Def
                     result = baseTypeString;
                 }
 
-                ComposeDefCache[type] = result;
+                ComposeDecCache[type] = result;
                 return result;
             }
         }
@@ -382,7 +382,7 @@ namespace Def
 
         internal static void ClearCache()
         {
-            ComposeDefCache.Clear();
+            ComposeDecCache.Clear();
             ComposeCSCache.Clear();
             ParseCache.Clear();
             StrippedTypeCache = null;
@@ -390,7 +390,7 @@ namespace Def
             // Seed with our primitive types
             for (int i = 0; i < PrimitiveTypes.Length; ++i)
             {
-                ComposeDefCache[PrimitiveTypes[i].type] = PrimitiveTypes[i].str;
+                ComposeDecCache[PrimitiveTypes[i].type] = PrimitiveTypes[i].str;
                 ParseCache[PrimitiveTypes[i].str] = PrimitiveTypes[i].type;
             }
         }
@@ -401,66 +401,66 @@ namespace Def
             ClearCache();
         }
 
-        internal enum DefDatabaseStatus
+        internal enum DecDatabaseStatus
         {
             Invalid,
             Abstract,
             Root,
             Branch,
         }
-        private static Dictionary<Type, DefDatabaseStatus> GetDefDatabaseStatusCache = new Dictionary<Type, DefDatabaseStatus>();
-        internal static DefDatabaseStatus GetDefDatabaseStatus(this Type type)
+        private static Dictionary<Type, DecDatabaseStatus> GetDecDatabaseStatusCache = new Dictionary<Type, DecDatabaseStatus>();
+        internal static DecDatabaseStatus GetDecDatabaseStatus(this Type type)
         {
-            if (!GetDefDatabaseStatusCache.TryGetValue(type, out var result))
+            if (!GetDecDatabaseStatusCache.TryGetValue(type, out var result))
             {
-                if (!typeof(Def).IsAssignableFrom(type))
+                if (!typeof(Dec).IsAssignableFrom(type))
                 {
-                    Dbg.Err($"Queried the def hierarchy status of a type {type} that doesn't even inherit from Def.");
+                    Dbg.Err($"Queried the dec hierarchy status of a type {type} that doesn't even inherit from Dec.");
 
-                    result = DefDatabaseStatus.Invalid;
+                    result = DecDatabaseStatus.Invalid;
                 }
                 else if (type.GetCustomAttribute<AbstractAttribute>(false) != null)
                 {
                     if (!type.IsAbstract)
                     {
-                        Dbg.Err($"Type {type} is tagged Def.Abstract, but is not abstract.");
+                        Dbg.Err($"Type {type} is tagged Dec.Abstract, but is not abstract.");
                     }
 
-                    if (type.BaseType != typeof(object) && GetDefDatabaseStatus(type.BaseType) > DefDatabaseStatus.Abstract)
+                    if (type.BaseType != typeof(object) && GetDecDatabaseStatus(type.BaseType) > DecDatabaseStatus.Abstract)
                     {
-                        Dbg.Err($"Type {type} is tagged Def.Abstract, but inherits from {type.BaseType} which is within the database.");
+                        Dbg.Err($"Type {type} is tagged Dec.Abstract, but inherits from {type.BaseType} which is within the database.");
                     }
 
-                    result = DefDatabaseStatus.Abstract;
+                    result = DecDatabaseStatus.Abstract;
                 }
                 else if (type.BaseType.GetCustomAttribute<AbstractAttribute>(false) != null)
                 {
                     // We do this just to validate everything beneath this. It'd better return Abstract! More importantly, it goes through all parents and makes sure they're consistent.
-                    GetDefDatabaseStatus(type.BaseType);
+                    GetDecDatabaseStatus(type.BaseType);
 
-                    result = DefDatabaseStatus.Root;
+                    result = DecDatabaseStatus.Root;
                 }
                 else
                 {
                     // Further validation. This time we really hope it returns Abstract or Root. More importantly, it goes through all parents and makes sure they're consistent.
-                    GetDefDatabaseStatus(type.BaseType);
+                    GetDecDatabaseStatus(type.BaseType);
 
                     // Our parent isn't NotDatabaseRootAttribute. We are not a database root, but we also can't say anything meaningful about our parents.
-                    result = DefDatabaseStatus.Branch;
+                    result = DecDatabaseStatus.Branch;
                 }
 
-                GetDefDatabaseStatusCache.Add(type, result);
+                GetDecDatabaseStatusCache.Add(type, result);
             }
 
             return result;
         }
 
-        private static Dictionary<Type, Type> GetDefRootTypeCache = new Dictionary<Type, Type>();
-        internal static Type GetDefRootType(this Type type)
+        private static Dictionary<Type, Type> GetDecRootTypeCache = new Dictionary<Type, Type>();
+        internal static Type GetDecRootType(this Type type)
         {
-            if (!GetDefRootTypeCache.TryGetValue(type, out var result))
+            if (!GetDecRootTypeCache.TryGetValue(type, out var result))
             {
-                if (GetDefDatabaseStatus(type) <= DefDatabaseStatus.Abstract)
+                if (GetDecDatabaseStatus(type) <= DecDatabaseStatus.Abstract)
                 {
                     Dbg.Err($"{type} does not exist within a database hierarchy.");
                     result = null;
@@ -468,7 +468,7 @@ namespace Def
                 else
                 {
                     Type currentType = type;
-                    while (GetDefDatabaseStatus(currentType) == DefDatabaseStatus.Branch)
+                    while (GetDecDatabaseStatus(currentType) == DecDatabaseStatus.Branch)
                     {
                         currentType = currentType.BaseType;
                     }
@@ -476,7 +476,7 @@ namespace Def
                     result = currentType;
                 }
 
-                GetDefRootTypeCache.Add(type, result);
+                GetDecRootTypeCache.Add(type, result);
             }
 
             return result;

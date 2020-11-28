@@ -4,7 +4,7 @@
   href: translation.md
 - name: In-place data updating
   href: inplace.md
-- name: Dynamic def creation
+- name: Dynamic dec creation
   href: dynamic.md
 - name: Invalid database warnings
   href: invdatabase.md

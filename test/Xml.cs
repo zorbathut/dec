@@ -1,4 +1,4 @@
-namespace DefTest
+namespace DecTest
 {
     using NUnit.Framework;
     using System;
@@ -9,51 +9,51 @@ namespace DefTest
         [Test]
 	    public void DTDParse([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"<?xml version=""1.0"" encoding=""UTF-8"" ?>
-                <Defs>
-                    <StubDef defName=""TestDef"">
-                    </StubDef>
-                </Defs>");
+                <Decs>
+                    <StubDec decName=""TestDec"">
+                    </StubDec>
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
+            Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDec"));
 	    }
 
         [Test]
 	    public void IncorrectRoot([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             ExpectWarnings(() => parser.AddString(@"
-                <NotDefs>
-                    <StubDef defName=""TestDef"" />
-                </NotDefs>"));
+                <NotDecs>
+                    <StubDec decName=""TestDec"" />
+                </NotDecs>"));
             parser.Finish();
 
             DoBehavior(mode);
 
-            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDef"));
+            Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDec"));
 	    }
 
         [Test]
 	    public void MultipleRoot([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             ExpectErrors(() => parser.AddString(@"
-                <Defs>
-                    <StubDef defName=""TestDefA"" />
-                </Defs>
-                <Defs>
-                    <StubDef defName=""TestDefB"" />
-                </Defs>"));
+                <Decs>
+                    <StubDec decName=""TestDecA"" />
+                </Decs>
+                <Decs>
+                    <StubDec decName=""TestDecB"" />
+                </Decs>"));
             parser.Finish();
 
             DoBehavior(mode);
@@ -64,31 +64,31 @@ namespace DefTest
         [Test]
 	    public void MultiXml([Values] BehaviorMode mode)
 	    {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             parser.AddString(@"
-                <Defs>
-                    <StubDef defName=""TestDefA"" />
-                </Defs>");
+                <Decs>
+                    <StubDec decName=""TestDecA"" />
+                </Decs>");
             parser.AddString(@"
-                <Defs>
-                    <StubDef defName=""TestDefB"" />
-                </Defs>");
+                <Decs>
+                    <StubDec decName=""TestDecB"" />
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDefA"));
-            Assert.IsNotNull(Def.Database<StubDef>.Get("TestDefB"));
+            Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDecA"));
+            Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDecB"));
 	    }
 
         [Test]
         public void ProvidedFilenameForXml([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDef) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) } };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             ExpectErrors(() => parser.AddString(@"test.xml"));
             parser.Finish();
 
@@ -98,13 +98,13 @@ namespace DefTest
         [Test]
         public void ProperStringName([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
 
-            var parser = new Def.Parser();
+            var parser = new Dec.Parser();
             ExpectErrors(() => parser.AddString(@"
-                <Defs>
-                    <StubDef defName=""TestDefA"" />
-                </Defs>", "TestStringName"), str => str.StartsWith("TestStringName"));
+                <Decs>
+                    <StubDec decName=""TestDecA"" />
+                </Decs>", "TestStringName"), str => str.StartsWith("TestStringName"));
             parser.Finish();
 
             DoBehavior(mode);
@@ -113,10 +113,10 @@ namespace DefTest
         [Test]
         public void Garbage([Values] BehaviorMode mode)
         {
-            Def.Config.TestParameters = new Def.Config.UnitTestParameters { };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
 
-            var parser = new Def.Parser();
-            ExpectErrors(() => parser.AddString(@"�SimpleDef defName=""Hello""><value>3</value></SimpleDef>"));
+            var parser = new Dec.Parser();
+            ExpectErrors(() => parser.AddString(@"�SimpleDec decName=""Hello""><value>3</value></SimpleDec>"));
             parser.Finish();
 
             DoBehavior(mode);
