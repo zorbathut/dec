@@ -16,7 +16,7 @@ namespace DefUtilLib
         public static Assembly Compile(string src, Assembly[] assemblies)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(src);
-            string assemblyName = Path.GetRandomFileName();
+            string assemblyName = Path.GetRandomFileName() + ".DynComp.dll";
             var refPaths = new[] {
                     typeof(object).GetTypeInfo().Assembly.Location,
                     typeof(Def.Def).GetTypeInfo().Assembly.Location,
