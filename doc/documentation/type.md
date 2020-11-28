@@ -9,7 +9,7 @@ class ExampleDef : Def.Def
 }
 ```
 ```xml
-<ExampleDef defType="Example">
+<ExampleDef defName="Example">
   <data class="DerivedClass">
     <innerData>Kittens</innerData>
   </data>
@@ -25,7 +25,7 @@ class ExampleDef : Def.Def
 }
 ```
 ```xml
-<ExampleDef defType="Example">
+<ExampleDef defName="Example">
   <data class="DerivedClass"> <!-- this is an error; must be BaseClass, or omitted -->
   </data>
 </ExampleDef>
