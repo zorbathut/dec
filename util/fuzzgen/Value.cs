@@ -1,5 +1,6 @@
 
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Fuzzgen
@@ -55,6 +56,36 @@ namespace Fuzzgen
         public override string WriteXml()
         {
             return instance.WriteXmlComposite();
+        }
+    }
+
+    internal class ValueList : Value
+    {
+        private List<Value> values = new List<Value>();
+
+        public ValueList(Env env, Func<Value> generateValue)
+        {
+            int count = Rand.WeightedDistribution();
+            for (int i = 0; i < count; ++i)
+            {
+                values.Add(generateValue());
+            }
+        }
+
+        public override string WriteCsharpInit()
+        {
+            // no, for now
+            return " = null";
+        }
+
+        public override string WriteXml()
+        {
+            var sb = new StringBuilder();
+            foreach (var val in values)
+            {
+                sb.AppendLine($"<li>{val.WriteXml()}</li>");
+            }
+            return sb.ToString();
         }
     }
 }

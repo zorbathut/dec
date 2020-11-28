@@ -1,4 +1,5 @@
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,6 +19,10 @@ namespace Fuzzgen
             this.composite = composite;
 
             float chance = Rand.Next(1f);
+
+            // cut down on infinite loops
+            chance /= Math.Max(env.instances.Count / 1000f, 1);
+
             foreach (var member in composite.members)
             {
                 if (Rand.Next(1f) < chance)

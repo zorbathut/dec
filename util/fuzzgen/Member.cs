@@ -23,16 +23,21 @@ namespace Fuzzgen
             Bool,
             Composite,
             Def,
-            /*ContainerList,
-            ContainerDictionary,*/
+            ContainerList,
+            /*ContainerDictionary,*/
         }
         public readonly Type type;
 
         public readonly Value initialized;
         private Composite compositeChild;
 
+        private Member containerValue;
+
         public Member(Env env, Composite parent, string name, Type type)
         {
+            // In this function, we must fully define what type we are (important in the case of Def or containers)
+            // and also set our default value (if relevant.)
+
             this.parent = parent;
             this.name = name;
             this.type = type;
@@ -63,6 +68,11 @@ namespace Fuzzgen
             else if (type == Type.Def)
             {
                 compositeChild = env.types.Where(inst => inst.type == Composite.Type.Def).RandomElement();
+                initialized = new ValueSimple("null", "");
+            }
+            else if (type == Type.ContainerList)
+            {
+                containerValue = new Member(env, parent, null, MemberTypeDistribution.Distribution.Choose());
                 initialized = new ValueSimple("null", "");
             }
             else if (parent.type == Composite.Type.Struct)
@@ -155,6 +165,10 @@ namespace Fuzzgen
                             return new ValueSimple($"Def.Database<{compositeChild.name}>.Get(\"{instance.defName}\")", instance.defName);
                         }
                     }
+                case Type.ContainerList:
+                    {
+                        return new ValueList(env, () => containerValue.GenerateValue(env));
+                    }
                 default:
                     Dbg.Err("Unknown member type!");
                     return new ValueSimple("0", "0");
@@ -177,6 +191,7 @@ namespace Fuzzgen
                 case Type.Bool: return "bool";
                 case Type.Composite: return compositeChild.name;
                 case Type.Def: return compositeChild.name;
+                case Type.ContainerList: return $"List<{containerValue.TypeToCSharp()}>";
                 default: Dbg.Err("Invalid type!"); return "int";
             }
         }
