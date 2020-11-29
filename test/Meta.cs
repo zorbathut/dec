@@ -19,7 +19,7 @@ namespace DecTest
 	    [Test]
 	    public void Clear()
 	    {
-            Assert.IsNull(Dec.Database<StubDec>.Get("TestDec"));
+            ExpectWarnings(() => Assert.IsNull(Dec.Database<StubDec>.Get("TestDec")));
             // we don't test StubDecs.TestDec here because if we do, we'll kick off the detection
 
             {
@@ -38,7 +38,7 @@ namespace DecTest
 
             Dec.Database.Clear();
 
-            Assert.IsNull(Dec.Database<StubDec>.Get("TestDec"));
+            ExpectWarnings(() => Assert.IsNull(Dec.Database<StubDec>.Get("TestDec")));
             Assert.IsNull(StubDecs.TestDec);
 
             {
@@ -57,7 +57,7 @@ namespace DecTest
 
             Dec.Database.Clear();
 
-            Assert.IsNull(Dec.Database<StubDec>.Get("TestDec"));
+            ExpectWarnings(() => Assert.IsNull(Dec.Database<StubDec>.Get("TestDec")));
             Assert.IsNull(StubDecs.TestDec);
 	    }
 
@@ -139,7 +139,7 @@ namespace DecTest
             parseCache.Add("Meta", typeof(Meta));
             Assert.AreEqual(baseSize + 1, parseCache.Count);
 
-            DoBehavior(BehaviorMode.RewrittenBare);
+            ExpectWarnings(() => DoBehavior(BehaviorMode.RewrittenBare));
 
             // Hopefully we reset after doing the DoBehavior()!
             Assert.AreEqual(baseSize, parseCache.Count);

@@ -277,6 +277,9 @@ namespace Dec
             }
             s_Status = Status.Processing;
 
+            // We've successfully hit the Finish call, so let's stop spitting out empty warnings.
+            Database.SuppressEmptyWarning();
+
             // Resolve all our inheritance jobs
             foreach (var work in inheritanceJobs)
             {

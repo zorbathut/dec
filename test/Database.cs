@@ -172,7 +172,6 @@ namespace DecTest
         {
         }
 
-
         [Test]
         public void DecRootTypeTests()
         {
@@ -194,6 +193,22 @@ namespace DecTest
 
             ExpectErrors(() => Assert.IsNull(getDecRootType(typeof(FullAbstractTypeDerived3ADec))));
             ExpectErrors(() => Assert.AreEqual(typeof(FullAbstractTypeDerived4BDec), getDecRootType(typeof(FullAbstractTypeDerived4BDec))));
+        }
+
+
+        [Test]
+        public void EmptyDatabaseWarning()
+        {
+            int x = 0;
+
+            Dec.Database.Clear();
+            ExpectWarnings(() => Dec.Database.Get(typeof(CppAbstractTypeDec), "MissingDef"));
+
+            Dec.Database.Clear();
+            ExpectWarnings(() => x = Dec.Database.List.Count());
+
+            Dec.Database.Clear();
+            ExpectWarnings(() => x = Dec.Database.Count);
         }
     }
 }

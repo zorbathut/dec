@@ -56,6 +56,7 @@ namespace Dec
             var typedict = Lookup.TryGetValue(type.GetDecRootType());
             if (typedict == null)
             {
+                WarnOnEmpty();
                 return null;
             }
 
@@ -72,6 +73,9 @@ namespace Dec
         /// </remarks>
         public static Dec Create(Type type, string decName)
         {
+            // Anyone using these functions hopefully knows what they're doing
+            SuppressEmptyWarning();
+
             if (!typeof(Dec).IsAssignableFrom(type))
             {
                 Dbg.Err($"Attempting to dynamically create a Dec of type {type}, which is not actually a Dec");
@@ -94,6 +98,9 @@ namespace Dec
         /// </remarks>
         public static T Create<T>(string decName) where T : Dec, new()
         {
+            // Anyone using these functions hopefully knows what they're doing
+            SuppressEmptyWarning();
+
             if (Database<T>.Get(decName) != null)
             {
                 Dbg.Err($"Attempting to dynamically create {typeof(T)}:{decName} when it already exists");
@@ -124,6 +131,9 @@ namespace Dec
         /// </remarks>
         public static void Delete(Dec dec)
         {
+            // Anyone using these functions hopefully knows what they're doing
+            SuppressEmptyWarning();
+
             if (Get(dec.GetType(), dec.DecName) != dec)
             {
                 Dbg.Err($"Attempting to delete {dec} when it either has already been deleted or never existed");
@@ -141,6 +151,9 @@ namespace Dec
         /// </remarks>
         public static void Rename(Dec dec, string decName)
         {
+            // Anyone using these functions hopefully knows what they're doing
+            SuppressEmptyWarning();
+
             if (Get(dec.GetType(), dec.DecName) != dec)
             {
                 Dbg.Err($"Attempting to rename what used to be {dec} but is no longer a registered Dec");
@@ -188,6 +201,8 @@ namespace Dec
             Index.Clear();
 
             UtilReflection.IndexInfoCached.Clear();
+
+            SuppressEmptyWarningFlag = false;
         }
 
         private static void BuildCaches()
@@ -195,6 +210,8 @@ namespace Dec
             if (CachedList == null)
             {
                 CachedList = Lookup.Where(kvp => kvp.Key.GetDecDatabaseStatus() == UtilType.DecDatabaseStatus.Root).SelectMany(kvp => kvp.Value.Values).ToArray();
+
+                WarnOnEmpty();
             }
         }
 
@@ -213,6 +230,7 @@ namespace Dec
         internal static void Register(Dec instance)
         {
             CachedList = null;
+            SuppressEmptyWarning();
 
             Type registrationType = instance.GetType();
 
@@ -265,6 +283,23 @@ namespace Dec
                 registrationType = registrationType.BaseType;
             }
         }
+
+        private static bool SuppressEmptyWarningFlag = false;
+        internal static void WarnOnEmpty()
+        {
+            if (SuppressEmptyWarningFlag)
+            {
+                return;
+            }
+
+            SuppressEmptyWarning();
+            Dbg.Wrn("You are trying to query the Dec database with no Decs loaded. Perhaps your Parser load step isn't working properly? Recommend reading https://zorbathut.github.io/dec/quickstart/setup.html.");
+        }
+
+        internal static void SuppressEmptyWarning()
+        {
+            SuppressEmptyWarningFlag = true;
+        }
     }
 
     /// <summary>
@@ -286,6 +321,7 @@ namespace Dec
         {
             get
             {
+                Database.WarnOnEmpty();
                 return DecList.Count;
             }
         }
@@ -300,6 +336,7 @@ namespace Dec
                 if (DecArray == null)
                 {
                     DecArray = DecList.ToArray();
+                    Database.WarnOnEmpty();
                 }
 
                 return DecArray;
@@ -314,7 +351,13 @@ namespace Dec
         /// </remarks>
         public static T Get(string name)
         {
-            return DecLookup.TryGetValue(name);
+            var result = DecLookup.TryGetValue(name);
+            if (result == null)
+            {
+                Database.WarnOnEmpty();
+            }
+
+            return result;
         }
 
         internal static void Register(T instance)
