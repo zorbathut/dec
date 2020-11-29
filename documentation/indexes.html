@@ -8,7 +8,7 @@
     <title>Indexes </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Indexes ">
-    <meta name="generator" content="docfx 2.48.0.0">
+    <meta name="generator" content="docfx 2.56.5.0">
     
     <link rel="shortcut icon" href="../favicon.ico">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -69,35 +69,35 @@
             <article class="content wrap" id="_content" data-uid="">
 <h1 id="indexes">Indexes</h1>
 
-<p>Sometimes it's useful to have integer IDs for a class of objects. Def supports indices both for Defs themselves, and for members within the Def system.</p>
-<pre><code class="lang-cs">public class IndexedDef : Def.Def
+<p>Sometimes it's useful to have integer IDs for a class of objects. Dec supports indices both for Decs themselves, and for members within the Dec system.</p>
+<pre><code class="lang-cs">public class IndexedDec : Dec.Dec
 {
-    [Def.Index] public int index;
+    [Dec.Index] public int index;
 }
 
-public class IndexedNonDefClass
+public class IndexedNonDecClass
 {
-    [Def.Index] public int index;
+    [Dec.Index] public int index;
 }
 
-// Generate a temporary array with exactly the number of elements as there are IndexedDef's.
-int[] tempArray = new int[Index&lt;IndexedDef&gt;.Count];
+// Generate a temporary array with exactly the number of elements as there are IndexedDec's.
+int[] tempArray = new int[Index&lt;IndexedDec&gt;.Count];
 
-// Iterate over IndexedDef's and calculate values, storing the results in the temp array.
-for (int i = 0; i &lt; Index&lt;IndexedDef&gt;.Count; ++i)
+// Iterate over IndexedDec's and calculate values, storing the results in the temp array.
+for (int i = 0; i &lt; Index&lt;IndexedDec&gt;.Count; ++i)
 {
-    tempArray[i] = Index&lt;IndexedDef&gt;.Get(i).CalculateImportantValue();
+    tempArray[i] = Index&lt;IndexedDec&gt;.Get(i).CalculateImportantValue();
 }
 
 // Modify them to get final results.
 ModifyValuesInSomeWayThatRequiresHavingThemAllAvailable(tempArray);
 
-// Get the highest value out of the temp array, then use Index to look up which def it refers to.
-IndexedDef best = Index&lt;IndexedDef&gt;.Get(IndexOfMax(tempArray));
+// Get the highest value out of the temp array, then use Index to look up which dec it refers to.
+IndexedDec best = Index&lt;IndexedDec&gt;.Get(IndexOfMax(tempArray));
 </code></pre>
-<p>Make an <code>int</code> member with the Def.Index attribute. All instances of that object, whether it be a Def, a non-Def class, or a struct, will be given a unique integer index. The full list will also be stored in Index&lt;T&gt;.</p>
+<p>Make an <code>int</code> member with the Dec.Index attribute. All instances of that object, whether it be a Dec, a non-Dec class, or a struct, will be given a unique integer index. The full list will also be stored in Index&lt;T&gt;.</p>
 <p>These values are not consistent between execution runs - don't use them as part of serializing savegames!</p>
-<p>Indices may not be set properly on objects that are created as defaults and that are never explicitly defined in defs. This may be solved in the future; consider this a first revision of this feature.</p>
+<p>Indices may not be set properly on objects that are created as defaults and that are never explicitly defined in decs. This may be solved in the future; consider this a first revision of this feature.</p>
 </article>
           </div>
           
@@ -106,12 +106,13 @@ IndexedDef best = Index&lt;IndexedDef&gt;.Get(IndexOfMax(tempArray));
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/zorbathut/def/blob/master/doc/documentation/indexes.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/zorbathut/dec/blob/master/doc/documentation/indexes.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>

@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Def hierarchy roots </title>
+    <title>Dec hierarchy roots </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Def hierarchy roots ">
-    <meta name="generator" content="docfx 2.48.0.0">
+    <meta name="title" content="Dec hierarchy roots ">
+    <meta name="generator" content="docfx 2.56.5.0">
     
     <link rel="shortcut icon" href="../favicon.ico">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -67,28 +67,28 @@
         <div class="article row grid-right">
           <div class="col-md-10">
             <article class="content wrap" id="_content" data-uid="">
-<h1 id="def-hierarchy-roots">Def hierarchy roots</h1>
+<h1 id="dec-hierarchy-roots">Dec hierarchy roots</h1>
 
-<p>Every def type is registered in exactly one category. One def, one category; this rule is immutable. Each category has its own namespace where each Def inside it must be named uniquely, but Defs in different categories can share names.</p>
-<pre><code>Def.Def
-  - MineralDef
-  - RenderPassDef
-  - ActorDef
-    - MonsterDef
-    - NPCDef
-  - CosmeticDef
+<p>Every dec type is registered in exactly one category. One dec, one category; this rule is immutable. Each category has its own namespace where each Dec inside it must be named uniquely, but Decs in different categories can share names.</p>
+<pre><code>Dec.Dec
+  - MineralDec
+  - RenderPassDec
+  - ActorDec
+    - MonsterDec
+    - NPCDec
+  - CosmeticDec
 </code></pre>
-<p>By default, categories are defined as anything directly inheriting from Def.Def In the above inheritance chart, MineralDef, RenderPassDef, ActorDef, and CosmeticDef all define categories; MonsterDef and NPCDef become part of the ActorDef category.</p>
-<p>If you want to define a Def type that has several child categories, this can be done with the Def.Abstract attribute. Classes with Def.Abstract applied must also be abstract, with the C# <code>abstract</code> keyword.</p>
-<pre><code>Def.Def
-  - [Def.Abstract] MenuItemDef
-    - MainMenuItemDef
-    - GameOverMenuItemDef
-    - [Def.Abstract] IngameMenuItemDef
-        - ShopMenuItemDef
-        - BankerMenuItemDef
+<p>By default, categories are defined as anything directly inheriting from Dec.Dec In the above inheritance chart, MineralDec, RenderPassDec, ActorDec, and CosmeticDec all define categories; MonsterDec and NPCDec become part of the ActorDec category.</p>
+<p>If you want to define a Dec type that has several child categories, this can be done with the Dec.Abstract attribute. Classes with Dec.Abstract applied must also be abstract, with the C# <code>abstract</code> keyword.</p>
+<pre><code>Dec.Dec
+  - [Dec.Abstract] MenuItemDec
+    - MainMenuItemDec
+    - GameOverMenuItemDec
+    - [Dec.Abstract] IngameMenuItemDec
+        - ShopMenuItemDec
+        - BankerMenuItemDec
 </code></pre>
-<p>This example includes four categories; MainMenuItemDef, GameOverMenuItemDef, ShopMenuItemDef, and BankerMenuItemDef. You could have a four defs named <code>Exit</code>, one in each category. You can't make defs of type MenuItemDef or IngameMenuItemDef; they aren't in any category.</p>
+<p>This example includes four categories; MainMenuItemDec, GameOverMenuItemDec, ShopMenuItemDec, and BankerMenuItemDec. You could have a four decs named <code>Exit</code>, one in each category. You can't make decs of type MenuItemDec or IngameMenuItemDec; they aren't in any category.</p>
 </article>
           </div>
           
@@ -97,12 +97,13 @@
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/zorbathut/def/blob/master/doc/documentation/hierarchy.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/zorbathut/dec/blob/master/doc/documentation/hierarchy.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>

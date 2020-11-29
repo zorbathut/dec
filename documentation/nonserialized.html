@@ -8,7 +8,7 @@
     <title>Nonserialized fields </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Nonserialized fields ">
-    <meta name="generator" content="docfx 2.48.0.0">
+    <meta name="generator" content="docfx 2.56.5.0">
     
     <link rel="shortcut icon" href="../favicon.ico">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -69,7 +69,7 @@
             <article class="content wrap" id="_content" data-uid="">
 <h1 id="nonserialized-fields">Nonserialized fields</h1>
 
-<pre><code class="lang-cs">class ExampleDef : Def.Def
+<pre><code class="lang-cs">class ExampleDec : Dec.Dec
 {
   int value;
   
@@ -86,14 +86,14 @@
   }
 }
 </code></pre>
-<pre><code class="lang-xml">&lt;ExampleDef defName=&quot;Example&quot;&gt;
+<pre><code class="lang-xml">&lt;ExampleDec decName=&quot;Example&quot;&gt;
   &lt;value&gt;3&lt;/value&gt;
   
   &lt;!-- Thanks to the [NonSerialized] attribute, this will cause an error! --&gt;
   &lt;cachedDerivedValue&gt;0&lt;/cachedDerivedValue&gt;
-&lt;/ExampleDef&gt;
+&lt;/ExampleDec&gt;
 </code></pre>
-<p>It's somewhat common to have cached or otherwise derived data within defs. Use the System.NonSerialized attribute to signal that certain fields should not be defined from within XML; doing so will cause an error and prevent the assignment.</p>
+<p>It's somewhat common to have cached or otherwise derived data within decs. Use the System.NonSerialized attribute to signal that certain fields should not be defined from within XML; doing so will cause an error and prevent the assignment.</p>
 </article>
           </div>
           
@@ -102,12 +102,13 @@
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/zorbathut/def/blob/master/doc/documentation/nonserialized.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/zorbathut/dec/blob/master/doc/documentation/nonserialized.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>

@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Dynamic def creation </title>
+    <title>Dynamic dec creation </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Dynamic def creation ">
-    <meta name="generator" content="docfx 2.48.0.0">
+    <meta name="title" content="Dynamic dec creation ">
+    <meta name="generator" content="docfx 2.56.5.0">
     
     <link rel="shortcut icon" href="../favicon.ico">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -67,10 +67,10 @@
         <div class="article row grid-right">
           <div class="col-md-10">
             <article class="content wrap" id="_content" data-uid="">
-<h1 id="dynamic-def-creation">Dynamic def creation</h1>
+<h1 id="dynamic-dec-creation">Dynamic dec creation</h1>
 
-<p>Creating new defs at runtime is rarely the technically-best solution, but sometimes it's a whole lot easier than the &quot;best&quot; solution, and game development is all about tradeoffs.</p>
-<p>We'll need to provide a point in the setup process where a callback can return code-generated defs. This will need to go through extensive validation to ensure that we're not overriding defNames. In addition, it's currently unclear how this should work relative to StaticReferences; certainly many StaticReferences will be necessary for building defs, but then we'll need to evaluate StaticReferences again to link those defs in. In fact, we may need to do this several times.</p>
+<p>Creating new decs at runtime is rarely the technically-best solution, but sometimes it's a whole lot easier than the &quot;best&quot; solution, and game development is all about tradeoffs.</p>
+<p>We'll need to provide a point in the setup process where a callback can return code-generated decs. This will need to go through extensive validation to ensure that we're not overriding defNames. In addition, it's currently unclear how this should work relative to StaticReferences; certainly many StaticReferences will be necessary for building decs, but then we'll need to evaluate StaticReferences again to link those decs in. In fact, we may need to do this several times.</p>
 <p>Doing this efficiently isn't trivial, and coming up with an interface for it is similarly awkward. This feature is likely to wait until someone actually needs it. (If that's you, please let me know!)</p>
 </article>
           </div>
@@ -80,12 +80,13 @@
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/zorbathut/def/blob/master/doc/future/dynamic.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/zorbathut/dec/blob/master/doc/future/dynamic.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>

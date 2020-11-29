@@ -8,7 +8,7 @@
     <title>Custom deserialization </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Custom deserialization ">
-    <meta name="generator" content="docfx 2.48.0.0">
+    <meta name="generator" content="docfx 2.56.5.0">
     
     <link rel="shortcut icon" href="../favicon.ico">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -69,7 +69,7 @@
             <article class="content wrap" id="_content" data-uid="">
 <h1 id="custom-deserialization">Custom deserialization</h1>
 
-<pre><code class="lang-cs">public class ColorConverter : Def.Converter
+<pre><code class="lang-cs">public class ColorConverter : Dec.Converter
 {
     public override HashSet&lt;Type&gt; HandledTypes()
     {
@@ -87,7 +87,7 @@
     }
 }
 </code></pre>
-<pre><code class="lang-xml">&lt;ExampleDef defName=&quot;Example&quot;&gt;
+<pre><code class="lang-xml">&lt;ExampleDec decName=&quot;Example&quot;&gt;
   &lt;tintA&gt;
     &lt;r&gt;0.3&lt;/r&gt;
     &lt;g&gt;0.5&lt;/g&gt;
@@ -95,9 +95,9 @@
   &lt;/tintA&gt;
   &lt;tintB&gt;(0.3, 0.5, 0.8)&lt;/tintB&gt;
   &lt;tintC&gt;#4C7FCC&lt;/tintC&gt;
-&lt;/ExampleDef&gt;
+&lt;/ExampleDec&gt;
 </code></pre>
-<p>Providing custom deserializers for your own classes, or third-party classes, is as easy as defining classes that derive from <a class="xref" href="../api/Def.Converter.html"><code>Def.Converter</code></a>. <a class="xref" href="../api/Def.Parser.html"><code>Def.Parser</code></a> will automatically find them during startup and register them. Please check <a class="xref" href="../api/Def.Converter.html"><code>Def.Converter</code></a> documentation for more details.</p>
+<p>Providing custom deserializers for your own classes, or third-party classes, is as easy as defining classes that derive from <a class="xref" href="../api/Dec.Converter.html"><code>Dec.Converter</code></a>. <a class="xref" href="../api/Dec.Parser.html"><code>Dec.Parser</code></a> will automatically find them during startup and register them. Please check <a class="xref" href="../api/Dec.Converter.html"><code>Dec.Converter</code></a> documentation for more details.</p>
 </article>
           </div>
           
@@ -106,12 +106,13 @@
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/zorbathut/def/blob/master/doc/documentation/custom.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/zorbathut/dec/blob/master/doc/documentation/custom.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>

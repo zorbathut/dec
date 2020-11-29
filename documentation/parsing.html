@@ -8,7 +8,7 @@
     <title>Member parsing </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Member parsing ">
-    <meta name="generator" content="docfx 2.48.0.0">
+    <meta name="generator" content="docfx 2.56.5.0">
     
     <link rel="shortcut icon" href="../favicon.ico">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -69,7 +69,7 @@
             <article class="content wrap" id="_content" data-uid="">
 <h1 id="member-parsing">Member parsing</h1>
 
-<p>Many types can be parsed natively by def. This page lists them all.</p>
+<p>Many types can be parsed natively by dec. This page lists them all.</p>
 <p>Note that more types and formats may work than this page lists, but if it's not listed here, it's not officially supported.</p>
 <h2 id="numeric-types">Numeric types</h2>
 <p><code>short</code>, <code>ushort</code>, <code>int</code>, <code>uint</code>, <code>long</code>, <code>ulong</code>, <code>float</code>, <code>double</code>: All of these parse from text representations in the way you'd expect, deferring to the C# implementation.</p>
@@ -86,13 +86,13 @@
   Fish,
 }
 </code></pre>
-<pre><code class="lang-xml">&lt;AnimalDef defName=&quot;MaineCoon&quot;&gt;
+<pre><code class="lang-xml">&lt;AnimalDec decName=&quot;MaineCoon&quot;&gt;
   &lt;type&gt;Cat&lt;/type&gt;
-&lt;/AnimalDef&gt;
+&lt;/AnimalDec&gt;
 </code></pre>
 <h2 id="lists">Lists</h2>
 <p>Lists are entered with &lt;li&gt; sequences.</p>
-<pre><code class="lang-xml">&lt;NumberListDef defName=&quot;Primes&quot;&gt;
+<pre><code class="lang-xml">&lt;NumberListDec decName=&quot;Primes&quot;&gt;
   &lt;numbers&gt;
     &lt;li&gt;2&lt;/li&gt;
     &lt;li&gt;3&lt;/li&gt;
@@ -102,22 +102,22 @@
     &lt;li&gt;13&lt;/li&gt;
     &lt;li&gt;17&lt;/li&gt;
   &lt;/numbers&gt;
-&lt;/NumberListDef&gt;
+&lt;/NumberListDec&gt;
 </code></pre>
 <h2 id="dictionaries">Dictionaries</h2>
 <p>Dictionaries are normally defined using XML tags as keys.</p>
-<pre><code class="lang-xml">&lt;MaterialValueDef defName=&quot;Medieval&quot;&gt;
+<pre><code class="lang-xml">&lt;MaterialValueDec decName=&quot;Medieval&quot;&gt;
   &lt;materials&gt;
     &lt;Iron&gt;1&lt;/Iron&gt;
     &lt;Steel&gt;3&lt;/Steel&gt;
     &lt;Uranium&gt;0.1&lt;/Uranium&gt;
     &lt;Aluminum&gt;20&lt;/Aluminum&gt;
   &lt;/materials&gt;
-&lt;/MaterialValueDef&gt;
+&lt;/MaterialValueDec&gt;
 </code></pre>
-<p>Using this format, you can make dictionaries only with key types that conform to the XML tag requirements; practically, this currently means <code>enum</code>, <code>bool</code>, <code>Def</code>-derived types, and most (but not all) <code>string</code>s.</p>
-<p>If you need to make a dictionary with looser requirements, you can use &lt;li&gt; sequences and &lt;key&gt;/&lt;value&gt; tags. This allows keys of any type that def can parse.</p>
-<pre><code class="lang-xml">&lt;MaterialValueDef defName=&quot;Medieval&quot;&gt;
+<p>Using this format, you can make dictionaries only with key types that conform to the XML tag requirements; practically, this currently means <code>enum</code>, <code>bool</code>, <code>Dec</code>-derived types, and most (but not all) <code>string</code>s.</p>
+<p>If you need to make a dictionary with looser requirements, you can use &lt;li&gt; sequences and &lt;key&gt;/&lt;value&gt; tags. This allows keys of any type that dec can parse.</p>
+<pre><code class="lang-xml">&lt;MaterialValueDec decName=&quot;Medieval&quot;&gt;
   &lt;materials&gt;
     &lt;li&gt;
       &lt;key&gt;Iron&lt;/key&gt;
@@ -136,21 +136,21 @@
       &lt;value&gt;20&lt;/value&gt;
     &lt;/li&gt;
   &lt;/materials&gt;
-&lt;/MaterialValueDef&gt;
+&lt;/MaterialValueDec&gt;
 </code></pre>
-<h2 id="defs">Defs</h2>
-<p>Defs are defined using the defName as a key.</p>
-<pre><code class="lang-xml">&lt;LevelDef defName=&quot;Introduction&quot;&gt;
+<h2 id="decs">Decs</h2>
+<p>Decs are defined using the decName as a key.</p>
+<pre><code class="lang-xml">&lt;LevelDec decName=&quot;Introduction&quot;&gt;
   &lt;nextLevel&gt;Caves&lt;/nextLevel&gt;
-&lt;/LevelDef&gt;
+&lt;/LevelDec&gt;
 
-&lt;LevelDef defName=&quot;Caves&quot;&gt;
+&lt;LevelDec decName=&quot;Caves&quot;&gt;
   &lt;nextLevel&gt;Swamp&lt;/nextLevel&gt;
-&lt;/LevelDef&gt;
+&lt;/LevelDec&gt;
 
-&lt;LevelDef defName=&quot;Swamp&quot;&gt;
+&lt;LevelDec decName=&quot;Swamp&quot;&gt;
   &lt;nextLevel&gt;MountainPeak&lt;/nextLevel&gt;
-&lt;/LevelDef&gt;
+&lt;/LevelDec&gt;
 </code></pre>
 <h2 id="types">Types</h2>
 <p>Types can currently be defined using either the class name alone (if unambiguous), or the entire class name with namespaces. Generic types are currently not supported.</p>
@@ -163,12 +163,13 @@
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/zorbathut/def/blob/master/doc/documentation/parsing.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/zorbathut/dec/blob/master/doc/documentation/parsing.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>

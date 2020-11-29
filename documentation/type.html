@@ -8,7 +8,7 @@
     <title>Explicit type specification </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Explicit type specification ">
-    <meta name="generator" content="docfx 2.48.0.0">
+    <meta name="generator" content="docfx 2.56.5.0">
     
     <link rel="shortcut icon" href="../favicon.ico">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -70,27 +70,27 @@
 <h1 id="explicit-type-specification">Explicit type specification</h1>
 
 <p>Sometimes you may want to explicitly specify the type of a member. This can be done with the &quot;class&quot; attribute.</p>
-<pre><code class="lang-cs">class ExampleDef : Def.Def
+<pre><code class="lang-cs">class ExampleDec : Dec.Dec
 {
   BaseClass data;
 }
 </code></pre>
-<pre><code class="lang-xml">&lt;ExampleDef defType=&quot;Example&quot;&gt;
+<pre><code class="lang-xml">&lt;ExampleDec decName=&quot;Example&quot;&gt;
   &lt;data class=&quot;DerivedClass&quot;&gt;
     &lt;innerData&gt;Kittens&lt;/innerData&gt;
   &lt;/data&gt;
-&lt;/ExampleDef&gt;
+&lt;/ExampleDec&gt;
 </code></pre>
 <p>Your class must match the already-provided instance if you've provided a default value:</p>
-<pre><code class="lang-cs">class ExampleDef : Def.Def
+<pre><code class="lang-cs">class ExampleDec : Dec.Dec
 {
   BaseClass data = new BaseClass();
 }
 </code></pre>
-<pre><code class="lang-xml">&lt;ExampleDef defType=&quot;Example&quot;&gt;
+<pre><code class="lang-xml">&lt;ExampleDec decName=&quot;Example&quot;&gt;
   &lt;data class=&quot;DerivedClass&quot;&gt; &lt;!-- this is an error; must be BaseClass, or omitted --&gt;
   &lt;/data&gt;
-&lt;/ExampleDef&gt;
+&lt;/ExampleDec&gt;
 </code></pre>
 <p>Types are described using the same conventions listed under <a href="parsing.html">type member parsing</a>.</p>
 </article>
@@ -101,12 +101,13 @@
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/zorbathut/def/blob/master/doc/documentation/type.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/zorbathut/dec/blob/master/doc/documentation/type.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>

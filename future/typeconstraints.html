@@ -8,7 +8,7 @@
     <title>Type constraints </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Type constraints ">
-    <meta name="generator" content="docfx 2.48.0.0">
+    <meta name="generator" content="docfx 2.56.5.0">
     
     <link rel="shortcut icon" href="../favicon.ico">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -69,13 +69,13 @@
             <article class="content wrap" id="_content" data-uid="">
 <h1 id="type-constraints">Type constraints</h1>
 
-<pre><code class="lang-cs">class MonsterDef : Def.Def
+<pre><code class="lang-cs">class MonsterDec : Dec.Dec
 {
   [TypeConstraint(MonsterAI)]
   Type aiWorker;
 }
 </code></pre>
-<p>It's common to use Type members in Defs as a way of selecting complicated behaviors. However, right now <em>any</em> Type can be entered into there, requiring further manual validation.</p>
+<p>It's common to use Type members in Decs as a way of selecting complicated behaviors. However, right now <em>any</em> Type can be entered into there, requiring further manual validation.</p>
 <p>It would be easy to introduce a TypeConstraintAttribute to solve this common issue.</p>
 </article>
           </div>
@@ -85,12 +85,13 @@
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/zorbathut/def/blob/master/doc/future/typeconstraints.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/zorbathut/dec/blob/master/doc/future/typeconstraints.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>

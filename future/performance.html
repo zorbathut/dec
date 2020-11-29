@@ -8,7 +8,7 @@
     <title>Performance </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Performance ">
-    <meta name="generator" content="docfx 2.48.0.0">
+    <meta name="generator" content="docfx 2.56.5.0">
     
     <link rel="shortcut icon" href="../favicon.ico">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -69,10 +69,10 @@
             <article class="content wrap" id="_content" data-uid="">
 <h1 id="performance">Performance</h1>
 
-<p>A lot of the code in def was written with the intent of getting it working. It is <em>gratuitously</em> inefficient, simply because at the scale I'm currently working, inefficiencies are undetectable.</p>
-<p>If you're using def on a larger-scale project, it's starting to get slow, and you're willing to share your code and XML with me, please get in touch; repro cases are necessary to get actual work done.</p>
+<p>A lot of the code in dec was written with the intent of getting it working. It is <em>gratuitously</em> inefficient, simply because at the scale I'm currently working, inefficiencies are undetectable.</p>
+<p>If you're using dec on a larger-scale project, it's starting to get slow, and you're willing to share your code and XML with me, please get in touch; repro cases are necessary to get actual work done.</p>
 <h2 id="caching">Caching</h2>
-<p>C#'s reflection API is not terribly fast, and def currently queries it over and over. Simply storing these values before re-requesting them would go a long way to improve performance.</p>
+<p>C#'s reflection API is not terribly fast, and dec currently queries it over and over. Simply storing these values before re-requesting them would go a long way to improve performance.</p>
 <h2 id="multithreading">Multithreading</h2>
 <p>Much of the parsing process is designed so it can be split into multiple tasks in a thread pool with little-to-no interference. Modern computers usually have 4 cores or more, and this would roughly quadruple loading speed.</p>
 <h2 id="baking">Baking</h2>
@@ -85,12 +85,13 @@
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/zorbathut/def/blob/master/doc/future/performance.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/zorbathut/dec/blob/master/doc/future/performance.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>

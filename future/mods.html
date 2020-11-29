@@ -8,7 +8,7 @@
     <title>Mod functionality </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Mod functionality ">
-    <meta name="generator" content="docfx 2.48.0.0">
+    <meta name="generator" content="docfx 2.56.5.0">
     
     <link rel="shortcut icon" href="../favicon.ico">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -69,48 +69,48 @@
             <article class="content wrap" id="_content" data-uid="">
 <h1 id="mod-functionality">Mod functionality</h1>
 
-<p>As a text-based format, def XMLs are very conducive to making user-authored mods. However, at the moment there's no good way for those user-authored mods to interact with core functionality.</p>
+<p>As a text-based format, dec XMLs are very conducive to making user-authored mods. However, at the moment there's no good way for those user-authored mods to interact with core functionality.</p>
 <p>Assume these examples are an attempt to mod this XML:</p>
-<pre><code class="lang-xml">&lt;ExampleDef defName=&quot;Example&quot;&gt;
+<pre><code class="lang-xml">&lt;ExampleDec decName=&quot;Example&quot;&gt;
   &lt;value&gt;4&lt;/value&gt;
   &lt;listOfStrings&gt;
     &lt;li&gt;Yabba&lt;/li&gt;
     &lt;li&gt;Dabba&lt;/li&gt;
     &lt;li&gt;Doo&lt;/li&gt;
   &lt;/listOfStrings&gt;
-&lt;/ExampleDef&gt;
+&lt;/ExampleDec&gt;
 
 ## Overriding
 
 ```xml
-&lt;ExampleDef defName=&quot;Example&quot; mode=&quot;replace&quot;&gt;
+&lt;ExampleDec decName=&quot;Example&quot; mode=&quot;replace&quot;&gt;
   &lt;value&gt;10&lt;/value&gt;
   &lt;listOfStrings&gt;
     &lt;li&gt;Abra&lt;/li&gt;
     &lt;li&gt;Cadabra&lt;/li&gt;
   &lt;/listOfStrings&gt;
-&lt;/ExampleDef&gt;
+&lt;/ExampleDec&gt;
 </code></pre>
-<p>It's easy to allow mods to simply nuke-and-rewrite existing defs. This isn't the most powerful technique available, but it's effective in many situations.</p>
+<p>It's easy to allow mods to simply nuke-and-rewrite existing decs. This isn't the most powerful technique available, but it's effective in many situations.</p>
 <h2 id="splicing">Splicing</h2>
-<pre><code class="lang-xml">&lt;ExampleDef defName=&quot;Example&quot; mode=&quot;modify&quot;&gt;
+<pre><code class="lang-xml">&lt;ExampleDec decName=&quot;Example&quot; mode=&quot;modify&quot;&gt;
   &lt;value&gt;10&lt;/value&gt;
-&lt;/ExampleDef&gt;
+&lt;/ExampleDec&gt;
 </code></pre>
-<p>Alternatively, or additionally, we could allow for per-field overriding. This would behave similar to if the original def is a Parent.</p>
+<p>Alternatively, or additionally, we could allow for per-field overriding. This would behave similar to if the original dec is a Parent.</p>
 <p>Lists make things more difficult. Some behaviors seem easy:</p>
-<pre><code class="lang-xml">&lt;ExampleDef defName=&quot;Example&quot; mode=&quot;modify&quot;&gt;
+<pre><code class="lang-xml">&lt;ExampleDec decName=&quot;Example&quot; mode=&quot;modify&quot;&gt;
   &lt;listOfStrings mode=&quot;append&quot;&gt;
     &lt;li&gt;And more!&lt;/li&gt;
   &lt;/listOfStrings&gt;
-&lt;/ExampleDef&gt;
+&lt;/ExampleDec&gt;
 </code></pre>
-<pre><code class="lang-xml">&lt;ExampleDef defName=&quot;Example&quot; mode=&quot;modify&quot;&gt;
+<pre><code class="lang-xml">&lt;ExampleDec decName=&quot;Example&quot; mode=&quot;modify&quot;&gt;
   &lt;listOfStrings mode=&quot;replace&quot;&gt;
     &lt;li&gt;Alla&lt;/li&gt;
     &lt;li&gt;Khazam&lt;/li&gt;
   &lt;/listOfStrings&gt;
-&lt;/ExampleDef&gt;
+&lt;/ExampleDec&gt;
 </code></pre>
 <p>but others may require a heavier-weight approach.</p>
 <h2 id="patching">Patching</h2>
@@ -124,12 +124,13 @@
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/zorbathut/def/blob/master/doc/future/mods.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/zorbathut/dec/blob/master/doc/future/mods.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
