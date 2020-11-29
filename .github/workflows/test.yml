@@ -12,22 +12,22 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '2.1.x'
-    - name: Setup 3.0
+    - name: Setup 3.1
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '3.0.x'
+        dotnet-version: '3.1.x'
     - name: Setup tooling
       run: dotnet tool install -g coveralls.net --version 1.0.0
     - name: Setup environment
       run: dotnet restore
     - name: Build 2.1
       run: dotnet build --configuration "Debug 2.1"
-    - name: Build 3.0
-      run: dotnet build --configuration "Debug 3.0"
+    - name: Build 3.1
+      run: dotnet build --configuration "Debug 3.1"
     - name: Test 2.1
       run: dotnet test -c "Debug 2.1" --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
-    - name: Test 3.0
-      run: dotnet test -c "Debug 3.0" --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+    - name: Test 3.1
+      run: dotnet test -c "Debug 3.1" --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
     - name: Submit coverage data
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}

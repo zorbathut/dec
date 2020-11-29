@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Configurations>Debug 2.1;Release 2.1;Debug 3.0;Release 3.0</Configurations>
+    <Configurations>Debug 2.1;Release 2.1;Debug 3.1;Release 3.1</Configurations>
     
     <!-- 0649: "is never assigned to, and will always have its default value null". This is obviously pointless with such a reflection-heavy library. -->
     <NoWarn>0649</NoWarn>
@@ -13,8 +13,8 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
   
-  <PropertyGroup Condition="$(Configuration.Contains('3.0'))">
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+  <PropertyGroup Condition="$(Configuration.Contains('3.1'))">
+    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
   
   <PropertyGroup Condition="$(Configuration.Contains('Debug'))">
