@@ -33,7 +33,7 @@ class MonsterDec : Dec.Dec
   // Decs can reference other decs.
   public SpriteSheetDec spriteSheet;
   
-  // Dec references are not limited to a tree structures.
+  // Dec references are not limited to tree structures.
   // Decs can reference other decs in circles, reference other decs of the same type,
   // and even reference themselves.
   public MonsterDec evolvedVariant = null;
