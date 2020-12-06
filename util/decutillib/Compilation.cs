@@ -9,6 +9,7 @@ namespace DecUtilLib
     using System.Reflection;
     using System.Runtime.Loader;
 
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public static class Compilation
     {
         private static Dictionary<Assembly, MemoryStream> AssemblyStreams = new Dictionary<Assembly, MemoryStream>();

@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace DecUtilLib
 {
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public static class Compress
     {
         public static void WriteToFile(string filename, string data)
