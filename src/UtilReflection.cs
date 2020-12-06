@@ -212,13 +212,21 @@ namespace Dec
             }
             else
             {
-                var result = Activator.CreateInstance(type);
-                if (result == null)
+                try
                 {
-                    // This is difficult to test; there are very few things that can get CreateInstance to return null, and right now the type system doesn't support them (int? for example)
-                    Dbg.Err($"{errorPrefix()}: {errorType} of type {type} was not properly created; this will cause issues");
+                    var result = Activator.CreateInstance(type);
+                    if (result == null)
+                    {
+                        // This is difficult to test; there are very few things that can get CreateInstance to return null, and right now the type system doesn't support them (int? for example)
+                        Dbg.Err($"{errorPrefix()}: {errorType} of type {type} was not properly created; this will cause issues");
+                    }
+                    return result;
                 }
-                return result;
+                catch (TargetInvocationException e)
+                {
+                    Dbg.Ex(e);
+                    return null;
+                }
             }
         }
     }

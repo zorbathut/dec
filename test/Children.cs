@@ -238,10 +238,16 @@ namespace DecTest
             public ChildParameter(int x) { }
         }
 
+        public class ChildException
+        {
+            public ChildException() { throw new Exception(); }
+        }
+
         public class ContainerDec : Dec.Dec
         {
             public ChildPrivate childPrivate;
             public ChildParameter childParameter;
+            public ChildException childException;
         }
 
         [Test]
@@ -286,6 +292,28 @@ namespace DecTest
             Assert.IsNotNull(result);
 
             Assert.IsNull(result.childParameter);
+        }
+
+        [Test]
+        public void Exception([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ContainerDec) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <ContainerDec decName=""TestDec"">
+                        <childException />
+                    </ContainerDec>
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoBehavior(mode);
+
+            var result = Dec.Database<ContainerDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.IsNull(result.childException);
         }
     }
 }
