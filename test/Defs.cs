@@ -88,7 +88,8 @@ namespace DecTest
                     <StubDec decName=""1NumberPrefix"" />
                     <StubDec decName=""Contains Spaces"" />
                     <StubDec decName=""HasPunctuation!"" />
-                    <StubDec decName=""\""Quotes\"""" />
+                    <StubDec decName=""&quot;Quotes&quot;"" />
+                    <StubDec decName=""ActuallyAValidDecName"" />
                 </Decs>"));
             parser.Finish();
 
@@ -97,7 +98,8 @@ namespace DecTest
             Assert.IsNull(Dec.Database<StubDec>.Get("1NumberPrefix"));
             Assert.IsNull(Dec.Database<StubDec>.Get("Contains Spaces"));
             Assert.IsNull(Dec.Database<StubDec>.Get("HasPunctuation!"));
-            Assert.IsNull(Dec.Database<StubDec>.Get("\"HasPunctuation!\""));
+            Assert.IsNull(Dec.Database<StubDec>.Get("\"Quotes\""));
+            Assert.IsNotNull(Dec.Database<StubDec>.Get("ActuallyAValidDecName"));
         }
 
         public class IntDec : Dec.Dec
