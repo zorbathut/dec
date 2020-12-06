@@ -227,5 +227,65 @@ namespace DecTest
             Assert.IsNotNull(result.child);
             Assert.AreEqual(typeof(ETDerived), result.child.GetType());
 	    }
+
+        public class ChildPrivate
+        {
+            private ChildPrivate() { }
+        }
+
+        public class ChildParameter
+        {
+            public ChildParameter(int x) { }
+        }
+
+        public class ContainerDec : Dec.Dec
+        {
+            public ChildPrivate childPrivate;
+            public ChildParameter childParameter;
+        }
+
+        [Test]
+        public void Private([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ContainerDec) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <ContainerDec decName=""TestDec"">
+                        <childPrivate />
+                    </ContainerDec>
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoBehavior(mode);
+
+            var result = Dec.Database<ContainerDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.IsNull(result.childPrivate);
+        }
+
+        [Test]
+        public void Parameter([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ContainerDec) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <ContainerDec decName=""TestDec"">
+                        <childParameter />
+                    </ContainerDec>
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoBehavior(mode);
+
+            var result = Dec.Database<ContainerDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.IsNull(result.childParameter);
+        }
     }
 }

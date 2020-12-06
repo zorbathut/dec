@@ -1073,5 +1073,87 @@ namespace DecTest
 
             Assert.AreEqual(mode == RecorderMode.Pretty, output.Contains("\n"));
         }
+
+        public class RecordablePrivate : Dec.IRecordable
+        {
+            internal RecordablePrivate() { }
+
+            public void Record(Dec.Recorder record)
+            {
+
+            }
+        }
+
+        [Test]
+        public void Private([Values] RecorderMode mode)
+        {
+            var item = new RecordablePrivate();
+
+            var output = DoRecorderRoundTrip(item, mode, expectReadErrors: true);
+
+            Assert.IsNull(output);
+        }
+
+        [Test]
+        public void PrivateRef()
+        {
+            // Turn it into null.
+
+            string serialized = @"
+                <Record>
+                  <recordFormatVersion>1</recordFormatVersion>
+                  <refs>
+                    <Ref id=""ref00000"" class=""DecTest.Recorder.RecordablePrivate"" />
+                  </refs>
+                  <data>
+                    <recordable ref=""ref00000"" />
+                  </data>
+                </Record>";
+            StubRecordable deserialized = null;
+            ExpectErrors(() => deserialized = Dec.Recorder.Read<StubRecordable>(serialized));
+
+            Assert.IsNotNull(deserialized);
+        }
+
+        public class RecordableParameter : Dec.IRecordable
+        {
+            public RecordableParameter(int x) { }
+
+            public void Record(Dec.Recorder record)
+            {
+
+            }
+        }
+
+        [Test]
+        public void Parameter([Values] RecorderMode mode)
+        {
+            var item = new RecordableParameter(3);
+
+            var output = DoRecorderRoundTrip(item, mode, expectReadErrors: true);
+
+            Assert.IsNull(output);
+        }
+
+        [Test]
+        public void ParameterRef()
+        {
+            // Turn it into null.
+
+            string serialized = @"
+                <Record>
+                  <recordFormatVersion>1</recordFormatVersion>
+                  <refs>
+                    <Ref id=""ref00000"" class=""DecTest.Recorder.RecordableParameter"" />
+                  </refs>
+                  <data>
+                    <recordable ref=""ref00000"" />
+                  </data>
+                </Record>";
+            StubRecordable deserialized = null;
+            ExpectErrors(() => deserialized = Dec.Recorder.Read<StubRecordable>(serialized));
+
+            Assert.IsNotNull(deserialized);
+        }
     }
 }

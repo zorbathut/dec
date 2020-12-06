@@ -197,5 +197,29 @@ namespace Dec
             // I wish I could find something more authoritative on this.
             return field.Name.StartsWith("<");
         }
+
+        internal static object CreateInstanceSafe(this Type type, string errorType, Func<string> errorPrefix)
+        {
+            if (type.IsAbstract)
+            {
+                Dbg.Err($"{errorPrefix()}: Attempting to create {errorType} of abstract type {type}");
+                return null;    // thankfully all abstract types can accept being null
+            }
+            else if (type.GetConstructor(new Type[] { }) == null)
+            {
+                Dbg.Err($"{errorPrefix()}: Attempting to create {errorType} of type {type} without a public no-argument constructor");
+                return null;    // similarly, anything that is capable of not having a public no-argument constructor can accept being null
+            }
+            else
+            {
+                var result = Activator.CreateInstance(type);
+                if (result == null)
+                {
+                    // This is difficult to test; there are very few things that can get CreateInstance to return null, and right now the type system doesn't support them (int? for example)
+                    Dbg.Err($"{errorPrefix()}: {errorType} of type {type} was not properly created; this will cause issues");
+                }
+                return result;
+            }
+        }
     }
 }

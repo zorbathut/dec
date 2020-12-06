@@ -183,13 +183,8 @@ namespace Dec
                     }
 
                     // Create a stub so other things can reference it later
-                    readerContext.refs[id] = Activator.CreateInstance(possibleType);
-                    if (readerContext.refs[id] == null)
-                    {
-                        // This is difficult to test; there are very few things that can get CreateInstance to return null, and right now the type system doesn't support them (int? for example)
-                        Dbg.Err($"{stringName}:{reference.LineNumber()}: Reference of type {possibleType} was not properly created; this will cause issues");
-                        continue;
-                    }
+                    readerContext.refs[id] = possibleType.CreateInstanceSafe("object", () => $"{stringName}:{reference.LineNumber()}");
+                    // Might be null; that's okay, CreateInstanceSafe has done the error reporting
                 }
 
                 // Now that all the refs exist, we can run through them again and actually parse them

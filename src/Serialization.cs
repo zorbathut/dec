@@ -37,21 +37,25 @@ namespace Dec
 
             foreach (var type in conversionTypes)
             {
-                var converter = (Converter)System.Activator.CreateInstance(type);
-                var convertedTypes = converter.HandledTypes();
-                if (convertedTypes.Count == 0)
-                {
-                    Dbg.Err($"{type} is a Dec.Converter, but doesn't convert anything");
-                }
+                var converter = (Converter)type.CreateInstanceSafe("converter", () => "converter");
 
-                foreach (var convertedType in convertedTypes)
+                if (converter != null)
                 {
-                    if (Converters.ContainsKey(convertedType))
+                    var convertedTypes = converter.HandledTypes();
+                    if (convertedTypes.Count == 0)
                     {
-                        Dbg.Err($"Converters {Converters[convertedType].GetType()} and {type} both generate result {convertedType}");
+                        Dbg.Err($"{type} is a Dec.Converter, but doesn't convert anything");
                     }
 
-                    Converters[convertedType] = converter;
+                    foreach (var convertedType in convertedTypes)
+                    {
+                        if (Converters.ContainsKey(convertedType))
+                        {
+                            Dbg.Err($"Converters {Converters[convertedType].GetType()} and {type} both generate result {convertedType}");
+                        }
+
+                        Converters[convertedType] = converter;
+                    }
                 }
             }
         }
@@ -207,11 +211,14 @@ namespace Dec
             // Special case: IRecordables
             if (typeof(IRecordable).IsAssignableFrom(type))
             {
-                var recordable = (IRecordable)(model ?? Activator.CreateInstance(type));
+                var recordable = (IRecordable)(model ?? type.CreateInstanceSafe("recordable", () => $"{context.sourceName}:{element.LineNumber()}"));
 
-                recordable.Record(new RecorderReader(element, context));
+                if (recordable != null)
+                {
+                    recordable.Record(new RecorderReader(element, context));
 
-                // TODO: support indices if this is within the Dec system?
+                    // TODO: support indices if this is within the Dec system?
+                }
 
                 return recordable;
             }
@@ -377,7 +384,13 @@ namespace Dec
             // If we haven't been given a template class from our parent, go ahead and init to defaults
             if (model == null)
             {
-                model = Activator.CreateInstance(type);
+                model = type.CreateInstanceSafe("object", () => $"{context.sourceName}:{element.LineNumber()}");
+
+                if (model == null)
+                {
+                    // error already reported
+                    return model;
+                }
             }
 
             var setFields = new HashSet<string>();

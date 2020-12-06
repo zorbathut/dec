@@ -690,5 +690,71 @@ namespace DecTest
             Assert.AreEqual(typeof(WeirdList), Dec.Database<ContainerInheritanceDec>.Get("TestDec").list.GetType());
             Assert.AreEqual(typeof(WeirdDictionary), Dec.Database<ContainerInheritanceDec>.Get("TestDec").dict.GetType());
         }
+
+        public abstract class AbstractDec : Dec.Dec { }
+        public class ConcreteDec : AbstractDec { }
+
+        [Test]
+        public void Abstract([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(AbstractDec), typeof(ConcreteDec) } };
+
+            var parser = new Dec.Parser();
+            ExpectErrors(() => parser.AddString(@"
+                <Decs>
+                    <AbstractDec decName=""Abstract"" />
+                    <ConcreteDec decName=""Concrete"" />
+                </Decs>"));
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            Assert.IsNull(Dec.Database<AbstractDec>.Get("Abstract"));
+            Assert.IsNotNull(Dec.Database<AbstractDec>.Get("Concrete"));
+        }
+
+        public class ConstructorPrivateDec : Dec.Dec
+        {
+            private ConstructorPrivateDec() { }
+        }
+
+        [Test]
+        public void ConstructorPrivate([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ConstructorPrivateDec) } };
+
+            var parser = new Dec.Parser();
+            ExpectErrors(() => parser.AddString(@"
+                <Decs>
+                    <ConstructorPrivateDec decName=""TestDec"" />
+                </Decs>"));
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            Assert.IsNull(Dec.Database<ConstructorPrivateDec>.Get("TestDec"));
+        }
+
+        public class ConstructorParameterDec : Dec.Dec
+        {
+            public ConstructorParameterDec(int x) { }
+        }
+
+        [Test]
+        public void ConstructorParameter([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ConstructorParameterDec) } };
+
+            var parser = new Dec.Parser();
+            ExpectErrors(() => parser.AddString(@"
+                <Decs>
+                    <ConstructorParameterDec decName=""TestDec"" />
+                </Decs>"));
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            Assert.IsNull(Dec.Database<ConstructorParameterDec>.Get("TestDec"));
+        }
     }
 }

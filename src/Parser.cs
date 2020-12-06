@@ -231,21 +231,26 @@ namespace Dec
 
                     if (!abstrct)
                     {
-                        // Not abstract, so create our instance
-                        var defInstance = (Dec)Activator.CreateInstance(typeHandle);
-                        defInstance.DecName = decName;
+                        // Not an abstract dec instance, so create our instance
+                        var defInstance = (Dec)typeHandle.CreateInstanceSafe("dec", () => $"{stringName}:{decElement.LineNumber()}");
 
-                        Database.Register(defInstance);
+                        // Error reporting happens within CreateInstanceSafe; if we get null out, we just need to clean up elegantly
+                        if (defInstance != null)
+                        {
+                            defInstance.DecName = decName;
 
-                        if (parent == null)
-                        {
-                            // Non-parent objects are simple; we just handle them here in order to avoid unnecessary GC churn
-                            finishWork.Add(() => Serialization.ParseElement(decElement, typeHandle, defInstance, readerContext, isRootDec: true));
-                        }
-                        else
-                        {
-                            // Add an inheritance resolution job; we'll take care of this soon
-                            inheritanceJobs.Add(new InheritanceJob { target = defInstance, xml = decElement, context = readerContext, parent = parent });
+                            Database.Register(defInstance);
+
+                            if (parent == null)
+                            {
+                                // Non-parent objects are simple; we just handle them here in order to avoid unnecessary GC churn
+                                finishWork.Add(() => Serialization.ParseElement(decElement, typeHandle, defInstance, readerContext, isRootDec: true));
+                            }
+                            else
+                            {
+                                // Add an inheritance resolution job; we'll take care of this soon
+                                inheritanceJobs.Add(new InheritanceJob { target = defInstance, xml = decElement, context = readerContext, parent = parent });
+                            }
                         }
                     }
                 }
