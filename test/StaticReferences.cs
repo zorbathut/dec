@@ -16,8 +16,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void StaticReference([Values] BehaviorMode mode)
-	    {
+        public void StaticReference([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(StaticReferenceDecs) } };
 
             var parser = new Dec.Parser();
@@ -37,7 +37,7 @@ namespace DecTest
 
             Assert.AreEqual(StaticReferenceDecs.TestDecA, resultA);
             Assert.AreEqual(StaticReferenceDecs.TestDecB, resultB);
-	    }
+        }
 
         public class StubDerivedDec : StubDec
         {
@@ -53,8 +53,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void PreciseClass([Values] BehaviorMode mode)
-	    {
+        public void PreciseClass([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDerivedDec) }, explicitStaticRefs = new Type[]{ typeof(PreciseClassDecs) } };
 
             var parser = new Dec.Parser();
@@ -70,7 +70,7 @@ namespace DecTest
             Assert.IsNotNull(result);
 
             Assert.AreEqual(PreciseClassDecs.TestDec, result);
-	    }
+        }
 
         [Dec.StaticReferences]
         public static class SuperClassDecs
@@ -81,8 +81,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void SuperClass([Values] BehaviorMode mode)
-	    {
+        public void SuperClass([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDerivedDec) }, explicitStaticRefs = new Type[]{ typeof(SuperClassDecs) } };
 
             var parser = new Dec.Parser();
@@ -98,7 +98,7 @@ namespace DecTest
             Assert.IsNotNull(result);
 
             Assert.AreEqual(SuperClassDecs.TestDec, result);
-	    }
+        }
 
         [Dec.StaticReferences]
         public static class SubClassDecs
@@ -109,8 +109,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void SubClass([Values] BehaviorMode mode)
-	    {
+        public void SubClass([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(SubClassDecs) } };
 
             var parser = new Dec.Parser();
@@ -126,7 +126,7 @@ namespace DecTest
             Assert.IsNotNull(result);
 
             Assert.IsNull(SubClassDecs.TestDec);
-	    }
+        }
 
         public static class NoAttributeDecs
         {
@@ -136,8 +136,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void NoAttribute([Values] BehaviorMode mode)
-	    {
+        public void NoAttribute([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) }, explicitStaticRefs = new Type[] { typeof(NoAttributeDecs) } };
 
             Dec.Parser parser = null;
@@ -154,7 +154,7 @@ namespace DecTest
             Assert.IsNotNull(result);
 
             Assert.AreEqual(NoAttributeDecs.TestDec, result);
-	    }
+        }
 
         [Dec.StaticReferences]
         public static class NoInitializerDecs
@@ -163,8 +163,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void NoInitializer([Values] BehaviorMode mode)
-	    {
+        public void NoInitializer([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(NoInitializerDecs) } };
 
             var parser = new Dec.Parser();
@@ -180,7 +180,7 @@ namespace DecTest
             Assert.IsNotNull(result);
 
             Assert.AreEqual(NoInitializerDecs.TestDec, result);
-	    }
+        }
 
         [Dec.StaticReferences]
         public class NoStaticDecs
@@ -191,8 +191,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void NoStatic([Values] BehaviorMode mode)
-	    {
+        public void NoStatic([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) }, explicitStaticRefs = new Type[] { typeof(NoStaticDecs) } };
 
             Dec.Parser parser = null;
@@ -209,7 +209,7 @@ namespace DecTest
             Assert.IsNotNull(result);
 
             Assert.AreEqual(NoStaticDecs.TestDec, result);
-	    }
+        }
 
         [Dec.StaticReferences]
         public static class MissingDecs
@@ -220,8 +220,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void Missing([Values] BehaviorMode mode)
-	    {
+        public void Missing([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(MissingDecs) } };
 
             var parser = new Dec.Parser();
@@ -242,10 +242,10 @@ namespace DecTest
         }
 
         [Test]
-	    public void EarlyTouch()
-	    {
+        public void EarlyTouch()
+        {
             ExpectErrors(() => EarlyTouchDecs.TestDec = null);
-	    }
+        }
 
         [Dec.StaticReferences]
         public static class LateTouchDecs
@@ -256,8 +256,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void LateTouch()
-	    {
+        public void LateTouch()
+        {
             // We avoid BehaviorMode here because the StaticReference error event can happen at most once, which means that we can't run the test twice without the second (and later) tests failing.
             // This also means that test success would depend on test order run, which, no.
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
@@ -269,7 +269,7 @@ namespace DecTest
             parser.Finish();
 
             ExpectErrors(() => LateTouchDecs.TestDec = null);
-	    }
+        }
 
         [Dec.StaticReferences]
         public static class UnexpectedTouchDecs
@@ -288,8 +288,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void UnexpectedTouch()
-	    {
+        public void UnexpectedTouch()
+        {
             // We avoid BehaviorMode here because the StaticReference error event can happen at most once, which means that we can't run the test twice without the second (and later) tests failing.
             // This also means that test success would depend on test order run, which, no.
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(UnexpectedTouchDec) } };
@@ -302,7 +302,7 @@ namespace DecTest
             parser.Finish();
 
             Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDec"));
-	    }
+        }
 
         [Dec.StaticReferences]
         public static class ConstructorTouchDecs
@@ -323,8 +323,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void ConstructorTouch()
-	    {
+        public void ConstructorTouch()
+        {
             // We avoid BehaviorMode here because the StaticReference error event can happen at most once, which means that we can't run the test twice without the second (and later) tests failing.
             // This also means that test success would depend on test order run, which, no.
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConstructorTouchDec) }, explicitStaticRefs = new Type[]{ typeof(ConstructorTouchDecs) } };
@@ -337,7 +337,7 @@ namespace DecTest
             ExpectErrors(() => parser.Finish());
 
             Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDec"));
-	    }
+        }
 
         [Dec.StaticReferences]
         public static class InternalDecs
@@ -350,8 +350,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void Internal([Values] BehaviorMode mode)
-	    {
+        public void Internal([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(InternalDecs) } };
 
             var parser = new Dec.Parser();
@@ -364,7 +364,7 @@ namespace DecTest
             DoBehavior(mode);
 
             Assert.IsNotNull(InternalDecs.TestDec);
-	    }
+        }
 
         [Dec.StaticReferences]
         public static class EmptyDecs

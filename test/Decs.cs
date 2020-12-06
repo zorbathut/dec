@@ -9,8 +9,8 @@ namespace DecTest
     public class Decs : Base
     {
         [Test]
-	    public void TrivialParse([Values] BehaviorMode mode)
-	    {
+        public void TrivialParse([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
 
             var parser = new Dec.Parser();
@@ -24,11 +24,11 @@ namespace DecTest
             DoBehavior(mode);
 
             Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDec"));
-	    }
+        }
 
         [Test]
-	    public void TrivialEmptyParse([Values] BehaviorMode mode)
-	    {
+        public void TrivialEmptyParse([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
 
             var parser = new Dec.Parser();
@@ -41,11 +41,11 @@ namespace DecTest
             DoBehavior(mode);
 
             Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDec"));
-	    }
+        }
 
         [Test]
-	    public void MissingDecType([Values] BehaviorMode mode)
-	    {
+        public void MissingDecType([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
 
             var parser = new Dec.Parser();
@@ -60,11 +60,11 @@ namespace DecTest
 
             Assert.IsNull(Dec.Database<StubDec>.Get("TestDecA"));
             Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDecB"));
-	    }
+        }
 
         [Test]
-	    public void MissingDecName([Values] BehaviorMode mode)
-	    {
+        public void MissingDecName([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
 
             var parser = new Dec.Parser();
@@ -78,8 +78,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void InvalidDecName([Values] BehaviorMode mode)
-	    {
+        public void InvalidDecName([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
 
             var parser = new Dec.Parser();
@@ -108,8 +108,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void DuplicateField([Values] BehaviorMode mode)
-	    {
+        public void DuplicateField([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(IntDec) } };
 
             var parser = new Dec.Parser();
@@ -128,11 +128,11 @@ namespace DecTest
             Assert.IsNotNull(result);
 
             Assert.AreEqual(6, result.value);
-	    }
+        }
 
         [Test]
-	    public void DuplicateDec([Values] BehaviorMode mode)
-	    {
+        public void DuplicateDec([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(IntDec) } };
 
             var parser = new Dec.Parser();
@@ -153,7 +153,7 @@ namespace DecTest
             Assert.IsNotNull(result);
 
             Assert.AreEqual(20, result.value);
-	    }
+        }
 
         public class DeepParentDec : Dec.Dec
         {
@@ -166,8 +166,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void HierarchyDeepField([Values] BehaviorMode mode)
-	    {
+        public void HierarchyDeepField([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(DeepChildDec) } };
 
             var parser = new Dec.Parser();
@@ -185,7 +185,7 @@ namespace DecTest
             Assert.IsNotNull(result);
 
             Assert.AreEqual(12, result.value);
-	    }
+        }
 
         public class DupeParentDec : Dec.Dec
         {
@@ -208,8 +208,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void HierarchyDuplicateField([Values] BehaviorMode mode)
-	    {
+        public void HierarchyDuplicateField([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(DupeChildDec) } };
 
             var parser = new Dec.Parser();
@@ -228,11 +228,11 @@ namespace DecTest
 
             Assert.AreEqual(12, result.value);
             Assert.AreEqual(4, ((DupeParentDec)result).value);
-	    }
+        }
 
         [Test]
-	    public void ExtraAttribute([Values] BehaviorMode mode)
-	    {
+        public void ExtraAttribute([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
 
             var parser = new Dec.Parser();
@@ -245,7 +245,7 @@ namespace DecTest
             DoBehavior(mode);
 
             Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDec"));
-	    }
+        }
 
         public class StubBetaDec : Dec.Dec
         {
@@ -258,7 +258,7 @@ namespace DecTest
         }
 
         [Test]
-	    public void DebugPrint([Values] BehaviorMode mode)
+        public void DebugPrint([Values] BehaviorMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
 
@@ -339,7 +339,7 @@ namespace DecTest
         }
 
         [Test]
-	    public void ConfigErrors([Values] BehaviorMode mode)
+        public void ConfigErrors([Values] BehaviorMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ErrorDec) } };
 
@@ -431,7 +431,7 @@ namespace DecTest
         }
 
         [Test]
-	    public void PostLoad([Values] BehaviorMode mode)
+        public void PostLoad([Values] BehaviorMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(PostLoadDec) } };
 

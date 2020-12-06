@@ -45,8 +45,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void BasicFunctionality([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
-	    {
+        public void BasicFunctionality([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterDec) }, explicitConverters = new Type[]{ typeof(ConverterBasicTest) } };
 
             var parser = new Dec.Parser();
@@ -65,7 +65,7 @@ namespace DecTest
 
             Assert.AreEqual(4, Dec.Database<ConverterDec>.Get("TestDecA").payload.number);
             Assert.AreEqual(8, Dec.Database<ConverterDec>.Get("TestDecB").payload.number);
-	    }
+        }
 
         public class EmptyConverter : Dec.Converter
         {
@@ -76,14 +76,14 @@ namespace DecTest
         }
 
         [Test]
-	    public void EmptyConverterErr()
-	    {
+        public void EmptyConverterErr()
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(EmptyConverter) } };
 
             Dec.Parser parser = null;
             ExpectErrors(() => parser = new Dec.Parser());
             parser.Finish();
-	    }
+        }
 
         public class StrConv1 : Dec.Converter
         {
@@ -102,14 +102,14 @@ namespace DecTest
         }
 
         [Test]
-	    public void OverlappingConverters()
-	    {
+        public void OverlappingConverters()
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(StrConv1), typeof(StrConv2) } };
 
             Dec.Parser parser = null;
             ExpectErrors(() => parser = new Dec.Parser());
             parser.Finish();
-	    }
+        }
 
         public class ConverterStringPayload
         {
@@ -140,8 +140,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void ConverterDict([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
-	    {
+        public void ConverterDict([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterDictDec) }, explicitConverters = new Type[]{ typeof(ConverterDictTest) } };
 
             var parser = new Dec.Parser();
@@ -164,7 +164,7 @@ namespace DecTest
             Assert.AreEqual(1, testDec.payload.Where(kvp => kvp.Key.payload == "yabba").First().Value);
             Assert.AreEqual(4, testDec.payload.Where(kvp => kvp.Key.payload == "dabba").First().Value);
             Assert.AreEqual(9, testDec.payload.Where(kvp => kvp.Key.payload == "doo").First().Value);
-	    }
+        }
 
         public class ConverterStringDec : Dec.Dec
         {

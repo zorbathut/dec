@@ -16,9 +16,9 @@ namespace DecTest
             public static StubDec TestDec;
         }
 
-	    [Test]
-	    public void Clear()
-	    {
+        [Test]
+        public void Clear()
+        {
             ExpectWarnings(() => Assert.IsNull(Dec.Database<StubDec>.Get("TestDec")));
             // we don't test StubDecs.TestDec here because if we do, we'll kick off the detection
 
@@ -59,7 +59,7 @@ namespace DecTest
 
             ExpectWarnings(() => Assert.IsNull(Dec.Database<StubDec>.Get("TestDec")));
             Assert.IsNull(StubDecs.TestDec);
-	    }
+        }
 
         public class RefTargetDec : Dec.Dec
         {
@@ -72,8 +72,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void ClearRef()
-	    {
+        public void ClearRef()
+        {
             // Had a bug where Dec.Database.Clear() wasn't properly clearing the lookup table used for references
             // This double-checks it
 
@@ -123,7 +123,7 @@ namespace DecTest
 
                 Assert.IsNull(source.target);
             }
-	    }
+        }
 
         [Test]
         public void ClassCacheReset()

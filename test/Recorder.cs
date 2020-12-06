@@ -29,8 +29,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void Primitives([Values] RecorderMode mode)
-	    {
+        public void Primitives([Values] RecorderMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
 
             var parser = new Dec.Parser();

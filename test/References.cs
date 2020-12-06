@@ -22,8 +22,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void Basic([Values] BehaviorMode mode)
-	    {
+        public void Basic([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDec), typeof(RefSourceDec) } };
 
             var parser = new Dec.Parser();
@@ -44,11 +44,11 @@ namespace DecTest
             Assert.IsNotNull(source);
 
             Assert.AreEqual(source.target, target);
-	    }
+        }
 
         [Test]
-	    public void Reversed([Values] BehaviorMode mode)
-	    {
+        public void Reversed([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDec), typeof(RefSourceDec) } };
 
             var parser = new Dec.Parser();
@@ -69,11 +69,11 @@ namespace DecTest
             Assert.IsNotNull(source);
 
             Assert.AreEqual(source.target, target);
-	    }
+        }
 
         [Test]
-	    public void Multistring([Values] BehaviorMode mode)
-	    {
+        public void Multistring([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDec), typeof(RefSourceDec) } };
 
             var parser = new Dec.Parser();
@@ -97,11 +97,11 @@ namespace DecTest
             Assert.IsNotNull(source);
 
             Assert.AreEqual(source.target, target);
-	    }
+        }
 
         [Test]
-	    public void Refdec([Values] BehaviorMode mode)
-	    {
+        public void Refdec([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefSourceDec) } };
 
             var parser = new Dec.Parser();
@@ -117,11 +117,11 @@ namespace DecTest
 
             var source = Dec.Database<RefSourceDec>.Get("Source");
             Assert.IsNotNull(source);
-	    }
+        }
 
         [Test]
-	    public void Circular([Values] BehaviorMode mode)
-	    {
+        public void Circular([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefCircularDec) } };
 
             var parser = new Dec.Parser();
@@ -145,11 +145,11 @@ namespace DecTest
 
             Assert.AreEqual(alpha.target, beta);
             Assert.AreEqual(beta.target, alpha);
-	    }
+        }
 
         [Test]
-	    public void CircularTight([Values] BehaviorMode mode)
-	    {
+        public void CircularTight([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefCircularDec) } };
 
             var parser = new Dec.Parser();
@@ -167,11 +167,11 @@ namespace DecTest
             Assert.IsNotNull(result);
 
             Assert.AreEqual(result.target, result);
-	    }
+        }
 
         [Test]
-	    public void NullRef([Values] BehaviorMode mode)
-	    {
+        public void NullRef([Values] BehaviorMode mode)
+        {
             // This is a little wonky; we have to test it by duplicating a tag, which is technically an error
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefCircularDec) } };
 
@@ -191,11 +191,11 @@ namespace DecTest
             Assert.IsNotNull(result);
 
             Assert.IsNull(result.target);
-	    }
+        }
 
         [Test]
-	    public void FailedLookup([Values] BehaviorMode mode)
-	    {
+        public void FailedLookup([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefSourceDec) } };
 
             var parser = new Dec.Parser();
@@ -213,7 +213,7 @@ namespace DecTest
             Assert.IsNotNull(result);
 
             Assert.IsNull(result.target);
-	    }
+        }
 
         public class BareDecDec : Dec.Dec
         {
@@ -221,8 +221,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void BareDec([Values] BehaviorMode mode)
-	    {
+        public void BareDec([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(BareDecDec) } };
 
             var parser = new Dec.Parser();
@@ -240,6 +240,6 @@ namespace DecTest
             Assert.IsNotNull(result);
 
             Assert.IsNull(result.target);
-	    }
+        }
     }
 }

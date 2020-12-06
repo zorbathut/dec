@@ -10,8 +10,8 @@ namespace DecTest
     public class RecorderV1 : Base
     {
         [Test]
-	    public void Core()
-	    {
+        public void Core()
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
 
             var parser = new Dec.Parser();

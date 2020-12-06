@@ -60,8 +60,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void Primitives()
-	    {
+        public void Primitives()
+        {
             TypeConversionBidirectional(typeof(int), "int");
             TypeConversionBidirectional(typeof(float), "float");
             TypeConversionBidirectional(typeof(char), "char");

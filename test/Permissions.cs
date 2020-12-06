@@ -74,8 +74,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void PrivateMember([Values] BehaviorMode mode)
-	    {
+        public void PrivateMember([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(PrivateMemberDec) } };
 
             var parser = new Dec.Parser();
@@ -93,7 +93,7 @@ namespace DecTest
             Assert.IsNotNull(result);
 
             Assert.AreEqual(result.Value(), 20);
-	    }
+        }
 
         public class InternalMemberDec : Dec.Dec
         {
@@ -108,8 +108,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void InternalMember([Values] BehaviorMode mode)
-	    {
+        public void InternalMember([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(InternalMemberDec) } };
 
             var parser = new Dec.Parser();
@@ -127,7 +127,7 @@ namespace DecTest
             Assert.IsNotNull(result);
 
             Assert.AreEqual(result.Value(), 20);
-	    }
+        }
 
         public class ProtectedMemberDec : Dec.Dec
         {
@@ -140,8 +140,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void ProtectedMember([Values] BehaviorMode mode)
-	    {
+        public void ProtectedMember([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ProtectedMemberDec) } };
 
             var parser = new Dec.Parser();
@@ -159,7 +159,7 @@ namespace DecTest
             Assert.IsNotNull(result);
 
             Assert.AreEqual(result.Value(), 20);
-	    }
+        }
 
         public class PrivateMemberParentDec : Dec.Dec
         {
@@ -179,8 +179,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void PrivateMemberParent([Values] BehaviorMode mode)
-	    {
+        public void PrivateMemberParent([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(PrivateMemberChildDec) } };
 
             var parser = new Dec.Parser();
@@ -198,6 +198,6 @@ namespace DecTest
             Assert.IsNotNull(result);
 
             Assert.AreEqual(result.Value(), 20);
-	    }
+        }
     }
 }

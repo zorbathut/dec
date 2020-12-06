@@ -7,8 +7,8 @@ namespace DecTest
     public class Xml : Base
     {
         [Test]
-	    public void DTDParse([Values] BehaviorMode mode)
-	    {
+        public void DTDParse([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
 
             var parser = new Dec.Parser();
@@ -22,11 +22,11 @@ namespace DecTest
             DoBehavior(mode);
 
             Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDec"));
-	    }
+        }
 
         [Test]
-	    public void IncorrectRoot([Values] BehaviorMode mode)
-	    {
+        public void IncorrectRoot([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
 
             var parser = new Dec.Parser();
@@ -39,11 +39,11 @@ namespace DecTest
             DoBehavior(mode);
 
             Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDec"));
-	    }
+        }
 
         [Test]
-	    public void MultipleRoot([Values] BehaviorMode mode)
-	    {
+        public void MultipleRoot([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
 
             var parser = new Dec.Parser();
@@ -62,8 +62,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void MultiXml([Values] BehaviorMode mode)
-	    {
+        public void MultiXml([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
 
             var parser = new Dec.Parser();
@@ -81,7 +81,7 @@ namespace DecTest
 
             Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDecA"));
             Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDecB"));
-	    }
+        }
 
         [Test]
         public void ProvidedFilenameForXml([Values] BehaviorMode mode)

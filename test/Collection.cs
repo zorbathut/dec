@@ -14,8 +14,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void Array([Values] BehaviorMode mode)
-	    {
+        public void Array([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ArrayDec) } };
 
             var parser = new Dec.Parser();
@@ -47,7 +47,7 @@ namespace DecTest
 
             Assert.AreEqual(result.dataEmpty, new[] { 10, 9, 8, 7, 6 });
             Assert.AreEqual(result.dataProvided, new[] { 10, 9, 8, 7, 6 });
-	    }
+        }
 
         [Test]
         public void ArrayAsStringError([Values] BehaviorMode mode)
@@ -164,8 +164,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void List([Values] BehaviorMode mode)
-	    {
+        public void List([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ListDec) } };
 
             var parser = new Dec.Parser();
@@ -189,7 +189,7 @@ namespace DecTest
             Assert.IsNotNull(result);
 
             Assert.AreEqual(result.data, new[] { 10, 9, 8, 7, 6 });
-	    }
+        }
 
         public class ListOverrideDec : Dec.Dec
         {
@@ -231,8 +231,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void Nested([Values] BehaviorMode mode)
-	    {
+        public void Nested([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(NestedDec) } };
 
             var parser = new Dec.Parser();
@@ -259,7 +259,7 @@ namespace DecTest
             Assert.IsNotNull(result);
 
             Assert.AreEqual(result.data, new[] { new[] { 8, 16 }, new[] { 9, 81 } });
-	    }
+        }
 
         public class DictionaryStringDec : Dec.Dec
         {
@@ -267,8 +267,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void DictionaryString([Values] BehaviorMode mode)
-	    {
+        public void DictionaryString([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(DictionaryStringDec) } };
 
             var parser = new Dec.Parser();
@@ -289,7 +289,7 @@ namespace DecTest
             Assert.IsNotNull(result);
 
             Assert.AreEqual(result.data, new Dictionary<string, string> { { "hello", "goodbye" }, { "Nothing", "" } });
-	    }
+        }
 
         [Test]
         public void DictionaryLi([Values] BehaviorMode mode)
@@ -351,8 +351,8 @@ namespace DecTest
         }
 
         [Test]
-	    public void DictionaryDuplicate([Values] BehaviorMode mode)
-	    {
+        public void DictionaryDuplicate([Values] BehaviorMode mode)
+        {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(DictionaryStringDec) } };
 
             var parser = new Dec.Parser();
@@ -373,7 +373,7 @@ namespace DecTest
             Assert.IsNotNull(result);
 
             Assert.AreEqual(result.data, new Dictionary<string, string> { { "dupe", "10" } });
-	    }
+        }
 
         public class DictionaryStringOverrideDec : Dec.Dec
         {

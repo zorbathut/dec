@@ -18,9 +18,9 @@ namespace DecTest
         }
 
         [Test]
-	    public void ChildClass([Values] BehaviorMode mode)
-	    {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(CCRoot) } };
+        public void ChildClass([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(CCRoot) } };
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -40,7 +40,7 @@ namespace DecTest
 
             Assert.AreEqual(5, result.child.value);
             Assert.AreEqual(10, result.child.initialized);
-	    }
+        }
 
         public class CCDRoot : Dec.Dec
         {
@@ -54,9 +54,9 @@ namespace DecTest
         }
 
         [Test]
-	    public void ChildClassDefaults([Values] BehaviorMode mode)
-	    {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(CCDRoot) } };
+        public void ChildClassDefaults([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(CCDRoot) } };
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -76,7 +76,7 @@ namespace DecTest
 
             Assert.AreEqual(5, result.child.value);
             Assert.AreEqual(8, result.child.initialized);
-	    }
+        }
 
         public class CSRoot : Dec.Dec
         {
@@ -97,9 +97,9 @@ namespace DecTest
         }
 
         [Test]
-	    public void ChildStruct([Values] BehaviorMode mode)
-	    {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(CSRoot) } };
+        public void ChildStruct([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(CSRoot) } };
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -123,7 +123,7 @@ namespace DecTest
             Assert.AreEqual(5, result.child.value);
             Assert.AreEqual(8, result.child.child.value);
             Assert.AreEqual(0, result.child.valueZero);
-	    }
+        }
 
         public class ExplicitTypeDec : Dec.Dec
         {
@@ -137,7 +137,7 @@ namespace DecTest
 
         public class ETBase
         {
-            
+
         }
 
         public class ETDerived : ETBase
@@ -147,14 +147,14 @@ namespace DecTest
 
         public class ETNotDerived
         {
-            
+
         }
 
         [Test]
-	    public void ExplicitType([Values] BehaviorMode mode)
-	    {
+        public void ExplicitType([Values] BehaviorMode mode)
+        {
             Dec.Config.UsingNamespaces = new string[] { "DecTest.Children" };
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ExplicitTypeDec) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExplicitTypeDec) } };
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -174,14 +174,14 @@ namespace DecTest
 
             Assert.IsNotNull(result.child);
             Assert.AreEqual(typeof(ETDerived), result.child.GetType());
-            Assert.AreEqual(5, (result.child as ETDerived).value);
-	    }
+            Assert.AreEqual(5, ( result.child as ETDerived ).value);
+        }
 
         [Test]
-	    public void ExplicitTypeOverspecify([Values] BehaviorMode mode)
-	    {
+        public void ExplicitTypeOverspecify([Values] BehaviorMode mode)
+        {
             Dec.Config.UsingNamespaces = new string[] { "DecTest.Children" };
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ExplicitTypeDec) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExplicitTypeDec) } };
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -201,12 +201,12 @@ namespace DecTest
 
             Assert.IsNotNull(result.child);
             Assert.AreEqual(typeof(ETBase), result.child.GetType());
-	    }
+        }
 
         [Test]
-	    public void ExplicitTypeBackwards([Values] BehaviorMode mode)
-	    {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ExplicitTypeDerivedDec) } };
+        public void ExplicitTypeBackwards([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExplicitTypeDerivedDec) } };
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -226,7 +226,7 @@ namespace DecTest
 
             Assert.IsNotNull(result.child);
             Assert.AreEqual(typeof(ETDerived), result.child.GetType());
-	    }
+        }
 
         public class ChildPrivate
         {
