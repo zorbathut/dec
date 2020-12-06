@@ -315,5 +315,53 @@ namespace DecTest
 
             Assert.IsNull(result.childException);
         }
+
+        public class ObjectHolderDec : Dec.Dec
+        {
+            public object child;
+        }
+
+        [Test]
+        public void Object([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ObjectHolderDec), typeof(ETBase) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <ObjectHolderDec decName=""ETDec"">
+                        <child class=""ETBase"" />
+                    </ObjectHolderDec>
+                </Decs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            Assert.IsInstanceOf(typeof(ETBase), Dec.Database<ObjectHolderDec>.Get("ETDec").child);
+        }
+
+        [Test]
+        public void ObjectUnspecified([Values] BehaviorMode mode)
+        {
+            // so it turns out you can just be all "new object" and C# is like "okiedokie you're the boss"
+            // wasn't really expecting that
+
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ObjectHolderDec) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <ObjectHolderDec decName=""TestDec"">
+                        <child />
+                    </ObjectHolderDec>
+                </Decs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            var result = Dec.Database<ObjectHolderDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+            Assert.IsNotNull(result.child);
+        }
     }
 }
