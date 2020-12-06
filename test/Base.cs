@@ -44,12 +44,20 @@ namespace DecTest
             {
                 System.Diagnostics.Debug.Print(str);
                 Console.WriteLine(str);
+
+                // we forgot to do the string interpolation correctly
+                Assert.IsFalse(str.Contains("{"));
+                Assert.IsFalse(str.Contains("}"));
             };
 
             Dec.Config.WarningHandler = str =>
             {
                 System.Diagnostics.Debug.Print(str);
                 Console.WriteLine(str);
+
+                // we forgot to do the string interpolation correctly
+                Assert.IsFalse(str.Contains("{"));
+                Assert.IsFalse(str.Contains("}"));
 
                 if (handlingWarnings)
                 {
@@ -66,6 +74,10 @@ namespace DecTest
             {
                 System.Diagnostics.Debug.Print(str);
                 Console.WriteLine(str);
+
+                // we forgot to do the string interpolation correctly
+                Assert.IsFalse(str.Contains("{"));
+                Assert.IsFalse(str.Contains("}"));
 
                 // Check to see if this is considered a "valid" error.
                 Assert.IsTrue(errorValidator == null || errorValidator(str));
