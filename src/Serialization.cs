@@ -643,6 +643,14 @@ namespace Dec
                 node.TagClass(value.GetType());
             }
 
+            // If this is a System.Int32, or similar, we actually want to consider it a primitive. But we potentially have to wait this long to get the class tag set up.
+            if (value.GetType().IsPrimitive)
+            {
+                node.WritePrimitive(value);
+
+                return;
+            }
+
             if (fieldType.IsArray)
             {
                 node.WriteArray(value as Array);

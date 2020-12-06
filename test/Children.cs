@@ -363,5 +363,24 @@ namespace DecTest
             Assert.IsNotNull(result);
             Assert.IsNotNull(result.child);
         }
+
+        [Test]
+        public void ObjectInt([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ObjectHolderDec) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <ObjectHolderDec decName=""TestDec"">
+                        <child class=""int"">42</child>
+                    </ObjectHolderDec>
+                </Decs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            Assert.AreEqual(42, Dec.Database<ObjectHolderDec>.Get("TestDec").child);
+        }
     }
 }
