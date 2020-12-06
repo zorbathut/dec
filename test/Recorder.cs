@@ -651,6 +651,11 @@ namespace DecTest
             }
         }
 
+        public class DerivedBareRecordable : BaseRecordable
+        {
+
+        }
+
         public class RecordableContainer : Dec.IRecordable
         {
             public BaseRecordable baseContainer;
@@ -679,7 +684,26 @@ namespace DecTest
             Assert.AreEqual(typeof(DerivedRecordable), deserialized.baseContainer.GetType());
 
             Assert.AreEqual(42, deserialized.baseContainer.baseVal);
-            Assert.AreEqual(81, ( root.baseContainer as DerivedRecordable ).derivedVal);
+            Assert.AreEqual(81, (root.baseContainer as DerivedRecordable).derivedVal);
+        }
+
+        [Test]
+        public void DerivedBareRecordables([Values] RecorderMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
+
+            var parser = new Dec.Parser();
+            parser.Finish();
+
+            var root = new RecordableContainer();
+            root.baseContainer = new DerivedBareRecordable();
+            root.baseContainer.baseVal = 42;
+
+            var deserialized = DoRecorderRoundTrip(root, mode);
+
+            Assert.AreEqual(typeof(DerivedBareRecordable), deserialized.baseContainer.GetType());
+
+            Assert.AreEqual(42, deserialized.baseContainer.baseVal);
         }
 
         [Test]
