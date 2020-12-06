@@ -505,7 +505,23 @@ namespace Dec
                     Dec result = Database.Get(type, text);
                     if (result == null)
                     {
-                        Dbg.Err($"{inputName}:{lineNumber}: Couldn't find {type} named {text}");
+                        // This feels very hardcoded, but these are also *by far* the most common errors I've seen, and I haven't come up with a better and more general solution
+                        if (text.Contains(" "))
+                        {
+                            Dbg.Err($"{inputName}:{lineNumber}: Dec name \"{text}\" is not a valid identifier; consider removing spaces");
+                        }
+                        else if (text.Contains("\""))
+                        {
+                            Dbg.Err($"{inputName}:{lineNumber}: Dec name \"{text}\" is not a valid identifier; consider removing quotes");
+                        }
+                        else if (!Parser.DecNameValidator.IsMatch(text))
+                        {
+                            Dbg.Err($"{inputName}:{lineNumber}: Dec name \"{text}\" is not a valid identifier; dec identifiers must be valid C# identifiers");
+                        }
+                        else
+                        {
+                            Dbg.Err($"{inputName}:{lineNumber}: Couldn't find {type} named {text}");
+                        }
                     }
                     return result;
                 }

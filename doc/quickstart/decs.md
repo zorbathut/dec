@@ -35,7 +35,7 @@ Once you have a Dec type, you can start writing Dec instances. Here's a few exam
 
 <Decs>
   <!-- Here's a basic goblin. We've overridden the defaults we want changed and ignored the rest. -->
-  <!-- Every dec must be named via the decName attribute. These names must be unique within dec type, but can overlap across different types. They are intended to be human-readable for debug and development purposes, but not user-visible. They must match the regexp [A-Za-z][A-Za-z0-9_]*. -->
+  <!-- Every dec must be named via the decName attribute. These names must be unique within dec type, but can overlap across different types. They are intended to be human-readable for debug and development purposes, but not user-visible. They must be valid C# identifiers (unicode accepted.) -->
   <MonsterDec decName="Goblin">
     <maxHP>20</maxHP>
     

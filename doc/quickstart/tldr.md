@@ -50,7 +50,7 @@ class MonsterDec : Dec.Dec
   <!-- These names must be unique within dec type, but can overlap across different types. -->
   <!-- They are intended to be human-readable for debug and development purposes, -->
   <!-- but not user-visible. -->
-  <!-- They must match the regexp [A-Za-z][A-Za-z0-9_]*. -->
+  <!-- They must be valid C# identifiers (unicode accepted.) -->
   <MonsterDec decName="Goblin">
     <maxHP>20</maxHP>
     

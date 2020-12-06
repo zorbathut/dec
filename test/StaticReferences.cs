@@ -383,5 +383,69 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
         }
+
+        [Dec.StaticReferences]
+        public static class UnicodeDecs
+        {
+            static UnicodeDecs() { Dec.StaticReferencesAttribute.Initialized(); }
+
+            public static StubDec Brød;
+            public static StubDec ขนมปัง;
+            public static StubDec パン;
+            public static StubDec 餧;
+            public static StubDec 麵包;
+            public static StubDec خبز;
+            public static StubDec 빵;
+            public static StubDec לחם;
+            public static StubDec ပေါင်မုန့်;
+            public static StubDec ബ്രെഡ്;
+        }
+
+        [Test]
+        public void Unicode([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) }, explicitStaticRefs = new Type[] { typeof(UnicodeDecs) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <StubDec decName=""Brød"" />
+                    <StubDec decName=""ขนมปัง"" />
+                    <StubDec decName=""パン"" />
+                    <StubDec decName=""餧"" />
+                    <StubDec decName=""麵包"" />
+                    <StubDec decName=""خبز"" />
+                    <StubDec decName=""빵"" />
+                    <StubDec decName=""לחם"" />
+                    <StubDec decName=""ပေါင်မုန့်"" />
+                    <StubDec decName=""ബ്രെഡ്"" />
+                </Decs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            Assert.IsNotNull(Dec.Database<StubDec>.Get("Brød"));
+            Assert.IsNotNull(Dec.Database<StubDec>.Get("ขนมปัง"));
+            Assert.IsNotNull(Dec.Database<StubDec>.Get("パン"));
+            Assert.IsNotNull(Dec.Database<StubDec>.Get("餧"));
+            Assert.IsNotNull(Dec.Database<StubDec>.Get("麵包"));
+            Assert.IsNotNull(Dec.Database<StubDec>.Get("خبز"));
+            Assert.IsNotNull(Dec.Database<StubDec>.Get("빵"));
+            Assert.IsNotNull(Dec.Database<StubDec>.Get("לחם"));
+            Assert.IsNotNull(Dec.Database<StubDec>.Get("ပေါင်မုန့်"));
+            Assert.IsNotNull(Dec.Database<StubDec>.Get("ബ്രെഡ്"));
+
+            Assert.AreSame(Dec.Database<StubDec>.Get("Brød"), UnicodeDecs.Brød);
+            Assert.AreSame(Dec.Database<StubDec>.Get("ขนมปัง"), UnicodeDecs.ขนมปัง);
+            Assert.AreSame(Dec.Database<StubDec>.Get("パン"), UnicodeDecs.パン);
+            Assert.AreSame(Dec.Database<StubDec>.Get("餧"), UnicodeDecs.餧);
+            Assert.AreSame(Dec.Database<StubDec>.Get("麵包"), UnicodeDecs.麵包);
+            Assert.AreSame(Dec.Database<StubDec>.Get("خبز"), UnicodeDecs.خبز);
+            Assert.AreSame(Dec.Database<StubDec>.Get("빵"), UnicodeDecs.빵);
+            Assert.AreSame(Dec.Database<StubDec>.Get("לחם"), UnicodeDecs.לחם);
+            Assert.AreSame(Dec.Database<StubDec>.Get("ပေါင်မုန့်"), UnicodeDecs.ပေါင်မုန့်);
+            Assert.AreSame(Dec.Database<StubDec>.Get("ബ്രെഡ്"), UnicodeDecs.ബ്രെഡ്);
+        }
+
     }
 }

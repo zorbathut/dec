@@ -102,7 +102,8 @@ namespace Dec
             Serialization.Initialize();
         }
 
-        private static readonly Regex DecNameValidator = new Regex(@"^[A-Za-z_][A-Za-z0-9_]*$", RegexOptions.Compiled);
+        // this should really be yanked out of here
+        internal static readonly Regex DecNameValidator = new Regex(@"^[\p{Lu}\p{Ll}\p{Lt}\p{Lm}\p{Lo}\p{Nl}][\p{Lu}\p{Ll}\p{Lt}\p{Lm}\p{Lo}\p{Nl}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\p{Cf}]*$", RegexOptions.Compiled);
 
         /// <summary>
         /// Pass an XML document string in for processing.
@@ -168,7 +169,20 @@ namespace Dec
                     string decName = decElement.Attribute("decName").Value;
                     if (!DecNameValidator.IsMatch(decName))
                     {
-                        Dbg.Err($"{stringName}:{decElement.LineNumber()}: Dec name \"{decName}\" doesn't match regex pattern \"{DecNameValidator}\"");
+                        // This feels very hardcoded, but these are also *by far* the most common errors I've seen, and I haven't come up with a better and more general solution
+                        if (decName.Contains(" "))
+                        {
+                            Dbg.Err($"{stringName}:{decElement.LineNumber()}: Dec name \"{decName}\" is not a valid identifier; consider removing spaces");
+                        }
+                        else if (decName.Contains("\""))
+                        {
+                            Dbg.Err($"{stringName}:{decElement.LineNumber()}: Dec name \"{decName}\" is not a valid identifier; consider removing quotes");
+                        }
+                        else
+                        {
+                            Dbg.Err($"{stringName}:{decElement.LineNumber()}: Dec name \"{decName}\" is not a valid identifier; dec identifiers must be valid C# identifiers");
+                        }
+                        
                         continue;
                     }
 
