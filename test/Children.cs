@@ -382,5 +382,29 @@ namespace DecTest
 
             Assert.AreEqual(42, Dec.Database<ObjectHolderDec>.Get("TestDec").child);
         }
+
+        public class Int32Dec : Dec.Dec
+        {
+            public System.Int32 i32; // why would you do this
+        }
+
+        [Test]
+        public void Int32([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(Int32Dec) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <Int32Dec decName=""TestDec"">
+                        <i32>42</i32>
+                    </Int32Dec>
+                </Decs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            Assert.AreEqual(42, Dec.Database<Int32Dec>.Get("TestDec").i32);
+        }
     }
 }
