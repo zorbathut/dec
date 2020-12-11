@@ -1,0 +1,49 @@
+name: Package
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - v0.*
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: Setup variables
+      run: |
+        echo "FILE_PATH=dec-${GITHUB_REF##*/}" >> $GITHUB_ENV
+        echo "FILE_NAME=dec-${GITHUB_REF##*/}.zip" >> $GITHUB_ENV
+    - name: Assemble package
+      run: |
+        mkdir ${{ env.FILE_PATH }}
+        cp src/*.cs ${{ env.FILE_PATH }}
+        cp LICENSE* ${{ env.FILE_PATH }}
+        cp README.md CHANGELOG.md ${{ env.FILE_PATH }}
+        zip -9 -r ${{ env.FILE_NAME }} ${{ env.FILE_PATH }}
+    - name: Generate changelog snippet
+      run: python util/changelog_extract.py > CHANGELOG.snippet.md
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body_path: CHANGELOG.snippet.md
+        draft: true
+        prerelease: true
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./${{ env.FILE_NAME }}
+        asset_name: ${{ env.FILE_NAME }}
+        asset_content_type: application/zip
