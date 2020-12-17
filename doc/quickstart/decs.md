@@ -15,7 +15,7 @@ class MonsterDec : Dec.Dec
   // Fields can have default values.
   public float renderScale = 1;
   
-  // Classes and structs can be defined inline.
+  // Classes and structs can also have defaults.
   public Color tint = Color.White;
   
   // Decs can reference other decs.
