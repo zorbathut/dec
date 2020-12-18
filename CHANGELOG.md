@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Documentation
+Various small documentation improvements and error message improvements.
+
 ## [v0.1.0]
 ### Added
 Initial release.

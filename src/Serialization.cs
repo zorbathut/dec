@@ -204,7 +204,7 @@ namespace Dec
 
             if (typeof(Dec).IsAssignableFrom(type) && hasChildren && !isRootDec)
             {
-                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Inline decs are not currently supported");
+                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Defining members of an item of type {type}, derived from Dec.Dec, is not supported within an outer Dec. Either reference a {type} defined independently or remove {type}'s inheritance from Dec.");
                 return null;
             }
 
