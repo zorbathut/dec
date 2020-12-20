@@ -68,7 +68,7 @@ Once you have a Dec type, you can start writing Dec instances. Here's a few exam
     <evolvedVariant>MegaGoblin</evolvedVariant>
   </MonsterDec>
 
-  <!-- Decs can be referenced before they're declared. XML order is irrelevant. -->
+  <!-- Decs can be referenced before they're declared, or even from other files. XML order is irrelevant. -->
   <SpriteSheetDec decName="Goblin">
     <filename>goblin.png</filename>
   </SpriteSheetDec>

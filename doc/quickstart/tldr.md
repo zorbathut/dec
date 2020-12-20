@@ -86,7 +86,8 @@ class MonsterDec : Dec.Dec
     <evolvedVariant>MegaGoblin</evolvedVariant>
   </MonsterDec>
 
-  <!-- Decs can be referenced before they're declared. XML order is irrelevant. -->
+  <!-- Decs can be referenced before they're declared, or even from other files. -->
+  <!-- XML order is irrelevant. -->
   <SpriteSheetDec decName="Goblin">
     <filename>goblin.png</filename>
   </SpriteSheetDec>
