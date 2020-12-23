@@ -205,8 +205,10 @@ namespace Dec
                 Dbg.Err($"{errorPrefix()}: Attempting to create {errorType} of abstract type {type}");
                 return null;    // thankfully all abstract types can accept being null
             }
-            else if (type.GetConstructor(new Type[] { }) == null)
+            else if (!type.IsValueType && type.GetConstructor(new Type[] { }) == null)
             {
+                // Note: Structs don't have constructors. I actually can't tell if ints do, I'm kind of bypassing that system.
+
                 Dbg.Err($"{errorPrefix()}: Attempting to create {errorType} of type {type} without a public no-argument constructor");
                 return null;    // similarly, anything that is capable of not having a public no-argument constructor can accept being null
             }

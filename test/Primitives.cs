@@ -2,6 +2,7 @@ namespace DecTest
 {
     using NUnit.Framework;
     using System;
+    using System.Collections.Generic;
 
     [TestFixture]
     public class Primitives : Base
@@ -24,7 +25,7 @@ namespace DecTest
         [Test]
         public void EmptyIntParse([Values] BehaviorMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(IntDec) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -46,7 +47,7 @@ namespace DecTest
         [Test]
         public void FailingIntParse([Values] BehaviorMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(IntDec) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -68,7 +69,7 @@ namespace DecTest
         [Test]
         public void FailingIntParse2([Values] BehaviorMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(IntDec) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -90,7 +91,7 @@ namespace DecTest
         [Test]
         public void EmptyBoolParse([Values] BehaviorMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(BoolDec) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(BoolDec) } };
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -112,7 +113,7 @@ namespace DecTest
         [Test]
         public void FailingBoolParse([Values] BehaviorMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(BoolDec) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(BoolDec) } };
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -134,7 +135,7 @@ namespace DecTest
         [Test]
         public void EmptyStringParse([Values] BehaviorMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StringDec) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StringDec) } };
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -173,7 +174,7 @@ namespace DecTest
         [Test]
         public void BulkParse([Values] BehaviorMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(BulkParseDec) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(BulkParseDec) } };
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -221,7 +222,7 @@ namespace DecTest
         [Test]
         public void MissingMember([Values] BehaviorMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(MissingMemberDec) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(MissingMemberDec) } };
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -258,7 +259,7 @@ namespace DecTest
         [Test]
         public void Enum([Values] BehaviorMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(EnumDec) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(EnumDec) } };
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -280,7 +281,7 @@ namespace DecTest
         [Test]
         public void InvalidAttribute([Values] BehaviorMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(IntDec) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -315,7 +316,7 @@ namespace DecTest
         public void TypeBasic([Values] BehaviorMode mode)
         {
             Dec.Config.UsingNamespaces = new string[] { "DecTest.Primitives" };
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDec) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(TypeDec) } };
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -338,7 +339,7 @@ namespace DecTest
         public void TypeNested([Values] BehaviorMode mode)
         {
             Dec.Config.UsingNamespaces = new string[] { "DecTest.Primitives", "DecTest.Primitives.ContainerA", "DecTest.Primitives.ContainerB" };
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDec) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(TypeDec) } };
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -361,7 +362,7 @@ namespace DecTest
         public void TypeStatic([Values] BehaviorMode mode)
         {
             Dec.Config.UsingNamespaces = new string[] { "DecTest.Primitives" };
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDec) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(TypeDec) } };
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -384,7 +385,7 @@ namespace DecTest
         public void TypeAbstract([Values] BehaviorMode mode)
         {
             Dec.Config.UsingNamespaces = new string[] { "DecTest.Primitives" };
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDec) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(TypeDec) } };
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -406,7 +407,7 @@ namespace DecTest
         [Test]
         public void TypeDecRef([Values] BehaviorMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDec) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(TypeDec) } };
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -428,7 +429,7 @@ namespace DecTest
         [Test]
         public void TypeGenericA([Values] BehaviorMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDec) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(TypeDec) } };
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -450,7 +451,7 @@ namespace DecTest
         [Test]
         public void TypeGenericB([Values] BehaviorMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDec) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(TypeDec) } };
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -472,7 +473,7 @@ namespace DecTest
         [Test]
         public void TypeGenericC([Values] BehaviorMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDec) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(TypeDec) } };
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -495,7 +496,7 @@ namespace DecTest
         public void TypeOverridden([Values] BehaviorMode mode)
         {
             Dec.Config.UsingNamespaces = new string[] { "DecTest.Primitives", "DecTest.Primitives.ContainerA", "DecTest.Primitives.ContainerB" };
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDec) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(TypeDec) } };
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -517,7 +518,7 @@ namespace DecTest
         [Test]
         public void TypeComplete([Values] BehaviorMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(TypeDec) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(TypeDec) } };
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -586,6 +587,115 @@ namespace DecTest
             // We currently don't support NaN-boxed values or signaling NaN.
             // Maybe someday we will.
             // (Does C# even accept those?)
+        }
+
+        public class StructConstructionDec : Dec.Dec
+        {
+            public List<StructData> directList;
+            public List<IStructPointer> interfaceList;
+            public List<object> objectList;
+        }
+
+        public interface IStructPointer { }
+
+        public struct StructData
+        {
+            public int value;
+        }
+
+        public struct StructDataFromInterface : IStructPointer
+        {
+            public int value;
+        }
+
+        [Test]
+        public void StructConstructionDirect([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StructConstructionDec) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <StructConstructionDec decName=""TestDec"">
+                        <directList>
+                            <li><value>42</value></li>
+                            <li><value>100</value></li>
+                            <li><value>8</value></li>
+                        </directList>
+                    </StructConstructionDec>
+                </Decs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            var result = Dec.Database<StructConstructionDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(3, result.directList.Count);
+
+            Assert.AreEqual(42, result.directList[0].value);
+            Assert.AreEqual(100, result.directList[1].value);
+            Assert.AreEqual(8, result.directList[2].value);
+        }
+
+        [Test]
+        public void StructConstructionInterface([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StructConstructionDec), typeof(StructDataFromInterface) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <StructConstructionDec decName=""TestDec"">
+                        <interfaceList>
+                            <li class=""StructDataFromInterface""><value>42</value></li>
+                            <li class=""StructDataFromInterface""><value>100</value></li>
+                            <li class=""StructDataFromInterface""><value>8</value></li>
+                        </interfaceList>
+                    </StructConstructionDec>
+                </Decs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            var result = Dec.Database<StructConstructionDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(3, result.interfaceList.Count);
+
+            Assert.AreEqual(42, ((StructDataFromInterface)result.interfaceList[0]).value);
+            Assert.AreEqual(100, ((StructDataFromInterface)result.interfaceList[1]).value);
+            Assert.AreEqual(8, ((StructDataFromInterface)result.interfaceList[2]).value);
+        }
+
+        [Test]
+        public void PrimitiveConstructionObject([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StructConstructionDec) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <StructConstructionDec decName=""TestDec"">
+                        <objectList>
+                            <li class=""int"">42</li>
+                            <li class=""int"">100</li>
+                            <li class=""int"">8</li>
+                        </objectList>
+                    </StructConstructionDec>
+                </Decs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            var result = Dec.Database<StructConstructionDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(3, result.objectList.Count);
+
+            Assert.AreEqual(42, (int)result.objectList[0]);
+            Assert.AreEqual(100, (int)result.objectList[1]);
+            Assert.AreEqual(8, (int)result.objectList[2]);
         }
     }
 }

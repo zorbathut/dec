@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Fixed
 Parser.AddDirectory was not reading recursively.
+structs could not be created via constructor (which happens if you have a List<> of them.)
 
 ### Changed
 If you relied on Parser.AddDirectory not being recursive, your code will break.
