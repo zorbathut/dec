@@ -273,13 +273,13 @@ namespace Dec
         }
 
         /// <summary>
-        /// Pass a directory in for processing.
+        /// Pass a directory in for recursive processing.
         /// </summary>
         /// <param name="directory">The directory to look for files in.</param>
         /// <param name="pattern">The filename glob pattern to match.</param>
         public void AddDirectory(string directory, string pattern = "*.xml")
         {
-            foreach (var file in Directory.GetFiles(directory, pattern))
+            foreach (var file in Directory.GetFiles(directory, pattern, SearchOption.AllDirectories))
             {
                 AddFile(file);
             }
