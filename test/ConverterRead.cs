@@ -415,6 +415,11 @@ namespace DecTest
 
         public class ExceptionPayload
         {
+            public int value = 0;
+        }
+
+        public struct ExceptionPayloadStruct
+        {
 
         }
 
@@ -430,7 +435,7 @@ namespace DecTest
         {
             public override HashSet<Type> HandledTypes()
             {
-                return new HashSet<Type>() { typeof(ExceptionPayload) };
+                return new HashSet<Type>() { typeof(ExceptionPayload), typeof(ExceptionPayloadStruct) };
             }
 
             public override object FromString(string input, Type type, string inputName, int lineNumber)
@@ -471,6 +476,72 @@ namespace DecTest
             Assert.AreEqual(2, Dec.Database<ExceptionDec>.Get("TestDecA").after);
             Assert.AreEqual(3, Dec.Database<ExceptionDec>.Get("TestDecB").before);
             Assert.AreEqual(4, Dec.Database<ExceptionDec>.Get("TestDecB").after);
+        }
+
+        public class ExceptionRecoveryDec : Dec.Dec
+        {
+            public ExceptionPayload payloadNull;
+            public ExceptionPayload payloadNonNull = new ExceptionPayload() { value = 42 };
+            public List<ExceptionPayloadStruct> payloadStruct;  // needs to be a list because that's the only way to make it null
+        }
+
+        [Test]
+        public void ExceptionRecoveryNull()
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExceptionRecoveryDec) }, explicitConverters = new Type[] { typeof(ExceptionConverter) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <ExceptionRecoveryDec decName=""TestDec"">
+                        <payloadNull>cube</payloadNull>
+                    </ExceptionRecoveryDec>
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoBehavior(BehaviorMode.Bare);
+
+            Assert.IsNull(Dec.Database<ExceptionRecoveryDec>.Get("TestDec").payloadNull);
+        }
+
+        [Test]
+        public void ExceptionRecoveryNonNull()
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExceptionRecoveryDec) }, explicitConverters = new Type[] { typeof(ExceptionConverter) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <ExceptionRecoveryDec decName=""TestDec"">
+                        <payloadNonNull>cube</payloadNonNull>
+                    </ExceptionRecoveryDec>
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoBehavior(BehaviorMode.Bare);
+
+            // won't overwrite it
+            Assert.AreEqual(42, Dec.Database<ExceptionRecoveryDec>.Get("TestDec").payloadNonNull.value);
+        }
+
+        [Test]
+        public void ExceptionRecoveryStruct()
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExceptionRecoveryDec) }, explicitConverters = new Type[] { typeof(ExceptionConverter) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <ExceptionRecoveryDec decName=""TestDec"">
+                        <payloadStruct><li>cube</li></payloadStruct>
+                    </ExceptionRecoveryDec>
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoBehavior(BehaviorMode.Bare);
+
+            // won't overwrite it
+            Assert.AreEqual(1, Dec.Database<ExceptionRecoveryDec>.Get("TestDec").payloadStruct.Count);
         }
     }
 }
