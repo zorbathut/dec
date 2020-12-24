@@ -228,6 +228,42 @@ namespace DecTest
             Assert.AreEqual(typeof(ETDerived), result.child.GetType());
         }
 
+        public class ExplicitTypeConflictDec : Dec.Dec
+        {
+            public ETBase child = new ETDerived();
+        }
+
+        public class ETDerivedAlt : ETBase
+        {
+
+        }
+
+        [Test]
+        public void ExplicitTypeConflict([Values] BehaviorMode mode)
+        {
+            Dec.Config.UsingNamespaces = new string[] { "DecTest.Children" };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExplicitTypeConflictDec) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <ExplicitTypeConflictDec decName=""TestDec"">
+                        <child class=""ETDerivedAlt"" />
+                    </ExplicitTypeConflictDec>
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoBehavior(mode);
+
+            var result = Dec.Database<ExplicitTypeConflictDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.IsNotNull(result.child);
+
+            // I'm not really sure this is the right outcome - maybe it should be ETDerivedAlt - but it also kind of doesn't matter, this shouldn't happen
+            Assert.AreEqual(typeof(ETDerived), result.child.GetType());
+        }
+
         public class ChildPrivate
         {
             private ChildPrivate() { }
