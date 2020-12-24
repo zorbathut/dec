@@ -151,6 +151,22 @@ namespace Dec
                 // context might be null; that's OK at the moment
                 object result;
 
+                object GenerateResultFallback()
+                {
+                    if (model != null)
+                    {
+                        return model;
+                    }
+                    else if (type.IsValueType)
+                    {
+                        return Activator.CreateInstance(type);
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+
                 try
                 {
                     result = Converters[type].Record(model, type, new RecorderReader(element, context));
@@ -159,18 +175,7 @@ namespace Dec
                 {
                     Dbg.Ex(e);
 
-                    if (model != null)
-                    {
-                        result = model;
-                    }
-                    else if (type.IsValueType)
-                    {
-                        result = Activator.CreateInstance(type);
-                    }
-                    else
-                    {
-                        result = null;
-                    }
+                    result = GenerateResultFallback();
                 }
 
                 // This is an important check if we have a referenced type, because if we've changed the result, references won't link up to it properly.
@@ -184,7 +189,8 @@ namespace Dec
                 if (result != null && !type.IsAssignableFrom(result.GetType()))
                 {
                     Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Converter {Converters[type].GetType()} for {type} returned unexpected type {result.GetType()}");
-                    return null;
+                    result = GenerateResultFallback();
+                    return result;
                 }
 
                 return result;

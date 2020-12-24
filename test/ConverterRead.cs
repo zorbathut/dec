@@ -543,5 +543,72 @@ namespace DecTest
             // won't overwrite it
             Assert.AreEqual(1, Dec.Database<ExceptionRecoveryDec>.Get("TestDec").payloadStruct.Count);
         }
+
+        public class IntendedPayload
+        {
+
+        }
+
+        public class UnintendedPayload
+        {
+
+        }
+
+        public class IncorrectConverterDec : Dec.Dec
+        {
+            public IntendedPayload payloadNull;
+            public IntendedPayload payloadNonNull = new IntendedPayload();
+        }
+
+        public class IncorrectConverter : Dec.Converter
+        {
+            public override HashSet<Type> HandledTypes()
+            {
+                return new HashSet<Type>() { typeof(IntendedPayload) };
+            }
+
+            public override object FromString(string input, Type type, string inputName, int lineNumber)
+            {
+                return new UnintendedPayload();
+            }
+        }
+
+        [Test]
+        public void IncorrectConverterNull()
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IncorrectConverterDec) }, explicitConverters = new Type[] { typeof(IncorrectConverter) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <IncorrectConverterDec decName=""TestDec"">
+                        <payloadNull>beefs</payloadNull>
+                    </IncorrectConverterDec>
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoBehavior(BehaviorMode.Bare);
+
+            Assert.IsNull(Dec.Database<IncorrectConverterDec>.Get("TestDec").payloadNull);
+        }
+
+        [Test]
+        public void IncorrectConverterNonNull()
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IncorrectConverterDec) }, explicitConverters = new Type[] { typeof(IncorrectConverter) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <IncorrectConverterDec decName=""TestDec"">
+                        <payloadNonNull>beefs</payloadNonNull>
+                    </IncorrectConverterDec>
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoBehavior(BehaviorMode.Bare);
+
+            Assert.IsNotNull(Dec.Database<IncorrectConverterDec>.Get("TestDec").payloadNonNull);
+        }
     }
 }

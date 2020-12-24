@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 Parser.AddDirectory was not reading recursively.
 structs could not be created via constructor (which happens if you have a List<> of them.)
+A Converter returning an incompatible type would result in a null field even if a valid default existed.
 
 ### Changed
 If you relied on Parser.AddDirectory not being recursive, your code will break.
