@@ -206,6 +206,7 @@ namespace DecTest
         [Test]
         public void ExplicitTypeBackwards([Values] BehaviorMode mode)
         {
+            Dec.Config.UsingNamespaces = new string[] { "DecTest.Children" };
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExplicitTypeDerivedDec) } };
 
             var parser = new Dec.Parser();
