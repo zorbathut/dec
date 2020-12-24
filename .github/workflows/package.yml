@@ -31,10 +31,8 @@ jobs:
        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
       with:
         tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
+        release_name: Dec ${{ github.ref }}
         body_path: CHANGELOG.snippet.md
-        draft: true
-        prerelease: true
     - name: Upload Release Asset
       id: upload-release-asset 
       uses: actions/upload-release-asset@v1
