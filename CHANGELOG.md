@@ -22,6 +22,7 @@ StaticReferences will no longer work if your project is named "dec" or "netstand
 Various small documentation improvements and error message improvements.
 
 ### Testing
+Significant improvements to Validation testing on containers.
 Added lots of small tests.
 
 

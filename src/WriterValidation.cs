@@ -216,20 +216,32 @@ namespace Dec
         {
             Type referencedType = value.GetType().GetElementType();
 
+            // Maybe this should just be a giant AreEqual with a dynamically allocated array?
+            writer.AppendLine($"Assert.AreEqual({accessor}.Length, {value.Length});");
+            writer.AppendLine($"if ({accessor}.Length == {value.Length}) {{");
+
             for (int i = 0; i < value.Length; ++i)
             {
                 Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}[{i}]"), value.GetValue(i), referencedType);
             }
+
+            writer.AppendLine($"}}");
         }
 
         public override void WriteList(IList value)
         {
             Type referencedType = value.GetType().GetGenericArguments()[0];
 
+            // Maybe this should just be a giant AreEqual with a dynamically allocated list?
+            writer.AppendLine($"Assert.AreEqual({accessor}.Count, {value.Count});");
+            writer.AppendLine($"if ({accessor}.Count == {value.Count}) {{");
+
             for (int i = 0; i < value.Count; ++i)
             {
                 Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}[{i}]"), value[i], referencedType);
             }
+
+            writer.AppendLine($"}}");
         }
 
         public override void WriteDictionary(IDictionary value)
@@ -237,13 +249,19 @@ namespace Dec
             Type keyType = value.GetType().GetGenericArguments()[0];
             Type valueType = value.GetType().GetGenericArguments()[1];
 
+            writer.AppendLine($"Assert.AreEqual({accessor}.Count, {value.Count});");
+
             IDictionaryEnumerator iterator = value.GetEnumerator();
             while (iterator.MoveNext())
             {
                 var keyNode = new WriterNodeStringize();
                 Serialization.ComposeElement(keyNode, iterator.Key, keyType);
 
+                writer.AppendLine($"if ({accessor}.ContainsKey({keyNode.SerializedString})) {{");
                 Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}[{keyNode.SerializedString}]"), iterator.Value, valueType);
+                writer.AppendLine($"}} else {{");
+                writer.AppendLine($"Assert.IsTrue({accessor}.ContainsKey({keyNode.SerializedString}));");   // this is unnecessary - it could just be .Fail() - but this gives you a *much* better error message
+                writer.AppendLine($"}}");
             }
         }
 
@@ -251,6 +269,7 @@ namespace Dec
         {
             Type keyType = value.GetType().GetGenericArguments()[0];
 
+            int count = 0;
             IEnumerator iterator = value.GetEnumerator();
             while (iterator.MoveNext())
             {
@@ -259,7 +278,11 @@ namespace Dec
 
                 // You might think "Assert.Contains" would do what we want, but it doesn't - it requires an ICollection and HashSet isn't an ICollection.
                 writer.AppendLine($"Assert.IsTrue({accessor}.Contains({keyNode.SerializedString}));");
+
+                ++count;
             }
+
+            writer.AppendLine($"Assert.AreEqual({accessor}.Count, {count});");
         }
 
         public override void WriteConvertible(Converter converter, object value, Type fieldType)

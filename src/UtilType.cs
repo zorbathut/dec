@@ -373,8 +373,25 @@ namespace Dec
                 return cacheVal;
             }
 
-            // We'll have a lot more work to do here . . .
-            string result = type.ToString().Replace('+', '.');
+            string result;
+            if (type.IsConstructedGenericType)
+            {
+                result = type.GetGenericTypeDefinition().ToString();
+                result = result.Substring(0, result.IndexOf('`'));
+            }
+            else
+            {
+                result = type.ToString();
+            }
+
+            // strip out the namespace/class distinction
+            result = result.Replace('+', '.');
+
+            if (type.IsConstructedGenericType)
+            {
+                result += "<" + string.Join(", ", type.GetGenericArguments().Select(arg => ComposeCSFormatted(arg))) + ">";
+            }
+
             ComposeCSCache[type] = result;
 
             return result;

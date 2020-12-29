@@ -28,6 +28,8 @@ namespace DecTest
             handledError = false;
 
             Dec.Config.UsingNamespaces = new string[0];
+
+            AssertWrapper.Assert.FailureCallback = null;
         }
 
         private bool handlingWarnings = false;
