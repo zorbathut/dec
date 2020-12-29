@@ -1,6 +1,7 @@
 namespace DecTest
 {
     using NUnit.Framework;
+    using System;
     using System.Collections.Generic;
     using System.Reflection;
 
@@ -168,6 +169,18 @@ namespace DecTest
             Assert.AreEqual(new string[] {
                 "loaf, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null",
             }, ApplyUserAssemblyFilter(input));
+        }
+
+        [Test]
+        public void CreatedNull()
+        {
+            var CreateInstanceSafeHandle = Assembly.GetAssembly(typeof(Dec.Dec)).GetType("Dec.UtilReflection").GetMethod("CreateInstanceSafe", BindingFlags.Static | BindingFlags.NonPublic);
+            object CreateInstanceSafe(Type type, string errorType, Func<string> errorPrefix)
+            {
+                return CreateInstanceSafeHandle.Invoke(null, new object[] { type, errorType, errorPrefix });
+            }
+
+            ExpectErrors(() => Assert.AreEqual(null, CreateInstanceSafe(typeof(int?), "object", () => "(testing)")));
         }
     }
 }
