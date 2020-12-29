@@ -374,6 +374,84 @@ namespace Dec
                 return dict;
             }
 
+            // Special case: HashSet
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(HashSet<>))
+            {
+                // HashSet<> handling
+                // This is a gigantic pain because HashSet<> doesn't inherit from any non-generic interface that provides the functionality we want
+                // So we're stuck doing it all through object and reflection
+                // Thanks, HashSet
+                // This might be a performance problem and we'll . . . deal with it later I guess?
+                // This might actually be a good first place to use IL generation.
+
+                Type keyType = type.GetGenericArguments()[0];
+
+                var set = model ?? Activator.CreateInstance(type);
+
+                var clearFunction = set.GetType().GetMethod("Clear");
+                var containsFunction = set.GetType().GetMethod("Contains");
+                var addFunction = set.GetType().GetMethod("Add");
+
+                // If you have a default set, but specify it in XML, we assume this is a full override. Clear the original set.
+                // Did you know there's no non-generic interface that HashSet<> supports that includes a Clear function?
+                // Fun fact:
+                // That thing I just wrote!
+                clearFunction.Invoke(set, null);
+
+                foreach (var fieldElement in element.Elements())
+                {
+                    // There's a potential bit of ambiguity here if someone does <li /> and expects that to be an actual string named "li".
+                    // Practically, I think this is less likely than someone doing <li></li> and expecting that to be the empty string.
+                    // And there's no other way to express the empty string.
+                    // So . . . we treat that like the empty string.
+                    if (fieldElement.Name.LocalName == "li")
+                    {
+                        // Treat this like a full node
+                        var key = ParseElement(fieldElement, keyType, null, context);
+                        var keyParam = new object[] { key };
+
+                        if (key == null)
+                        {
+                            Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: HashSet includes null key, skipping");
+                            continue;
+                        }
+
+                        if ((bool)containsFunction.Invoke(set, keyParam))
+                        {
+                            Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: HashSet includes duplicate key {key.ToString()}");
+                        }
+
+                        addFunction.Invoke(set, keyParam);
+                    }
+                    else
+                    {
+                        if (fieldElement.HasElements)
+                        {
+                            Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: HashSet non-li member includes data, ignoring");
+                        }
+
+                        var key = ParseString(fieldElement.Name.LocalName, keyType, null, context.sourceName, fieldElement.LineNumber());
+                        var keyParam = new object[] { key };
+
+                        if (key == null)
+                        {
+                            // it's really rare for this to happen, I think you could do it with a converter but that's it
+                            Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: HashSet includes null key, skipping pair");
+                            continue;
+                        }
+
+                        if ((bool)containsFunction.Invoke(set, keyParam))
+                        {
+                            Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: HashSet includes duplicate key {fieldElement.Name.LocalName}");
+                        }
+
+                        addFunction.Invoke(set, keyParam);
+                    }
+                }
+
+                return set;
+            }
+
             // At this point, we're either a class or a struct, and we need to do the reflection thing
 
             // If we have refs, something has gone wrong; we should never be doing reflection inside a Record system.
@@ -674,6 +752,13 @@ namespace Dec
             if (fieldType.IsGenericType && fieldType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
             {
                 node.WriteDictionary(value as IDictionary);
+
+                return;
+            }
+
+            if (fieldType.IsGenericType && fieldType.GetGenericTypeDefinition() == typeof(HashSet<>))
+            {
+                node.WriteHashSet(value as IEnumerable);
 
                 return;
             }

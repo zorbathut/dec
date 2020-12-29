@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 
 
 ## [Unreleased]
+### Added
+Implemented HashSet support in both Dec and Record.
+
 ### Fixed
 Parser.AddDirectory was not reading recursively.
 structs could not be created via constructor (which happens if you have a List<> of them.)

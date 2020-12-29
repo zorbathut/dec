@@ -392,6 +392,21 @@ namespace Dec
             }
         }
 
+        public override void WriteHashSet(IEnumerable value)
+        {
+            Type keyType = value.GetType().GetGenericArguments()[0];
+
+            // I really want some way to canonicalize this ordering
+            IEnumerator iterator = value.GetEnumerator();
+            while (iterator.MoveNext())
+            {
+                // In theory, some sets support inline format, not li format. Inline format is cleaner and smaller and we should be using it when possible.
+                // In practice, it's hard and I'm lazy and this always works, and we're not providing any guarantees about cleanliness of serialized output.
+                // Revisit this later when someone (possibly myself) really wants it improved.
+                Serialization.ComposeElement(CreateChild("li"), iterator.Current, keyType);
+            }
+        }
+
         public override void WriteRecord(IRecordable value)
         {
             writer.RegisterPendingWrite(() => value.Record(new RecorderWriter(this)));

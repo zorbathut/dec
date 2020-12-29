@@ -247,6 +247,21 @@ namespace Dec
             }
         }
 
+        public override void WriteHashSet(IEnumerable value)
+        {
+            Type keyType = value.GetType().GetGenericArguments()[0];
+
+            IEnumerator iterator = value.GetEnumerator();
+            while (iterator.MoveNext())
+            {
+                var keyNode = new WriterNodeStringize();
+                Serialization.ComposeElement(keyNode, iterator.Current, keyType);
+
+                // You might think "Assert.Contains" would do what we want, but it doesn't - it requires an ICollection and HashSet isn't an ICollection.
+                writer.AppendLine($"Assert.IsTrue({accessor}.Contains({keyNode.SerializedString}));");
+            }
+        }
+
         public override void WriteConvertible(Converter converter, object value, Type fieldType)
         {
             // this isn't really a thing I can implement because the entire point of this is to compare the output to known values
@@ -313,6 +328,11 @@ namespace Dec
         }
 
         public override void WriteDictionary(IDictionary value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void WriteHashSet(IEnumerable value)
         {
             throw new NotImplementedException();
         }
