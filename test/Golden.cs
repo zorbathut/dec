@@ -6,14 +6,14 @@ namespace DecTest
     using System.Reflection;
 
     [TestFixture]
-    public class Validation : Base
+    public class Golden : Base
     {
         private static Dictionary<string, Assembly> AssemblyLookup = new Dictionary<string, Assembly>();
 
         [Test, TestCaseSource(nameof(GenerateValidationParser))]
         public void Parser(string id, [Values] BehaviorMode mode)
         {
-            string directory = Path.Combine("data", "validation", "parser", id);
+            string directory = Path.Combine("data", "golden", "parser", id);
 
             Assembly assembly;
             if (!AssemblyLookup.TryGetValue(id, out assembly))
@@ -39,7 +39,7 @@ namespace DecTest
         {
             PrepCwd();
 
-            var targetDir = Path.Combine("data", "validation", "parser");
+            var targetDir = Path.Combine("data", "golden", "parser");
 
             if (!Directory.Exists(targetDir))
             {
