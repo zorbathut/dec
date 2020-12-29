@@ -62,22 +62,5 @@ namespace DecUtilLib
             AssemblyStreams[assembly] = ms;
             return assembly;
         }
-
-        public static object CompileAndRun(string code, Assembly[] assemblies, string functionName, params object[] param)
-        {
-            string source = @"
-                    using NUnit.Framework;
-
-                    public static class TestClass
-                    {
-                        " + code + @"
-                    }";
-
-            var assembly = Compile(source, assemblies);
-            var t = assembly.GetType("TestClass");
-            var m = t.GetMethod(functionName);
-
-            return m.Invoke(null, param);
-        }
     }
 }

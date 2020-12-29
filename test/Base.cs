@@ -152,6 +152,23 @@ namespace DecTest
             }
         }
 
+        public static object CompileAndRun(string code, Assembly[] assemblies, string functionName, params object[] param)
+        {
+            string source = @"
+                    using DecTest.AssertWrapper;
+
+                    public static class TestClass
+                    {
+                        " + code + @"
+                    }";
+
+            var assembly = DecUtilLib.Compilation.Compile(source, assemblies);
+            var t = assembly.GetType("TestClass");
+            var m = t.GetMethod(functionName);
+
+            return m.Invoke(null, param);
+        }
+
         // Everything after here is designed for the Behavior tests, where we run tests in a variety of ways to test serialization.
 
         public enum BehaviorMode
@@ -238,7 +255,7 @@ namespace DecTest
                     assemblies = assemblies.Concat(validation_assemblies).ToArray();
                 }
 
-                DecUtilLib.Compilation.CompileAndRun($"public static void Test() {{\n{code}\n}}", assemblies, "Test", null);
+                CompileAndRun($"public static void Test() {{\n{code}\n}}", assemblies, "Test", null);
             }
             else
             {
@@ -273,7 +290,7 @@ namespace DecTest
 
                 var ComposeCSFormatted = Assembly.GetAssembly(typeof(Dec.Dec)).GetType("Dec.UtilType").GetMethod("ComposeCSFormatted", BindingFlags.NonPublic | BindingFlags.Static);
 
-                DecUtilLib.Compilation.CompileAndRun($"public static void Test({ComposeCSFormatted.Invoke(null, new object[] { input.GetType() })} input) {{\n{code}\n}}", new Assembly[] { this.GetType().Assembly }, "Test", new object[] { input });
+                CompileAndRun($"public static void Test({ComposeCSFormatted.Invoke(null, new object[] { input.GetType() })} input) {{\n{code}\n}}", new Assembly[] { this.GetType().Assembly }, "Test", new object[] { input });
             }
 
             string serialized = null;
