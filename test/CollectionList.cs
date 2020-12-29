@@ -13,7 +13,7 @@ namespace DecTest
         }
 
         [Test]
-        public void List([Values] BehaviorMode mode)
+        public void Basic([Values] BehaviorMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ListDec) } };
 
@@ -48,7 +48,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ListOverride([Values] BehaviorMode mode)
+        public void Override([Values] BehaviorMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ListOverrideDec) } };
 

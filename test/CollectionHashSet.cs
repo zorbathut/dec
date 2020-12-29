@@ -13,7 +13,7 @@ namespace DecTest
         }
 
         [Test]
-        public void HashSetString([Values] BehaviorMode mode)
+        public void String([Values] BehaviorMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetStringDec) } };
 
@@ -38,7 +38,7 @@ namespace DecTest
         }
 
         [Test]
-        public void HashSetDuplicate([Values] BehaviorMode mode)
+        public void Duplicate([Values] BehaviorMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetStringDec) } };
 
@@ -72,7 +72,7 @@ namespace DecTest
         }
 
         [Test]
-        public void HashSetOverrideString([Values] BehaviorMode mode)
+        public void OverrideString([Values] BehaviorMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetStringOverrideDec) } };
 
@@ -99,7 +99,7 @@ namespace DecTest
         }
 
         [Test]
-        public void HashSetEmptyString([Values] BehaviorMode mode)
+        public void EmptyString([Values] BehaviorMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetStringDec) } };
 

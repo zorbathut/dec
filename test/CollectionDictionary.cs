@@ -13,7 +13,7 @@ namespace DecTest
         }
 
         [Test]
-        public void DictionaryString([Values] BehaviorMode mode)
+        public void String([Values] BehaviorMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(DictionaryStringDec) } };
 
@@ -38,7 +38,7 @@ namespace DecTest
         }
 
         [Test]
-        public void DictionaryLi([Values] BehaviorMode mode)
+        public void Li([Values] BehaviorMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryStringDec) } };
 
@@ -69,7 +69,7 @@ namespace DecTest
         }
 
         [Test]
-        public void DictionaryHybrid([Values] BehaviorMode mode)
+        public void Hybrid([Values] BehaviorMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryStringDec) } };
 
@@ -97,7 +97,7 @@ namespace DecTest
         }
 
         [Test]
-        public void DictionaryDuplicate([Values] BehaviorMode mode)
+        public void Duplicate([Values] BehaviorMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(DictionaryStringDec) } };
 
@@ -129,7 +129,7 @@ namespace DecTest
         }
 
         [Test]
-        public void DictionaryOverrideString([Values] BehaviorMode mode)
+        public void OverrideString([Values] BehaviorMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryStringOverrideDec) } };
 
@@ -157,7 +157,7 @@ namespace DecTest
         }
 
         [Test]
-        public void DictionaryNullKey([Values] BehaviorMode mode)
+        public void NullKey([Values] BehaviorMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryStringDec) } };
 

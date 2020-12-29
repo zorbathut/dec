@@ -14,7 +14,7 @@ namespace DecTest
         }
 
         [Test]
-        public void Array([Values] BehaviorMode mode)
+        public void Basic([Values] BehaviorMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ArrayDec) } };
 
@@ -50,7 +50,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ArrayAsStringError([Values] BehaviorMode mode)
+        public void AsStringError([Values] BehaviorMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } };
 
@@ -75,7 +75,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ArrayZero([Values] BehaviorMode mode)
+        public void Zero([Values] BehaviorMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } };
 
@@ -99,7 +99,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ArrayNull([Values] BehaviorMode mode)
+        public void Null([Values] BehaviorMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } };
 
@@ -123,7 +123,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ArrayElementMisparse([Values] BehaviorMode mode)
+        public void ElementMisparse([Values] BehaviorMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } };
 
