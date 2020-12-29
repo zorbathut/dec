@@ -14,6 +14,10 @@ The Dec library does not tie itself to any particular engine and works within Go
 Dual-licensed under MIT or the [Unlicense](http://unlicense.org).
 
 
+### Releases
+
+* [Latest](https://github.com/zorbathut/dec/releases/latest)
+
 ### Documentation
 
 * [Frontpage](https://zorbathut.github.io/dec/)
