@@ -8,8 +8,12 @@ Parser.AddDirectory was not reading recursively.
 structs could not be created via constructor (which happens if you have a List<> of them.)
 A Converter returning an incompatible type would result in a null field even if a valid default existed.
 
-### Changed
-If you relied on Parser.AddDirectory not being recursive, your code will break.
+### Improved
+Filtered out more non-user assemblies for a minor startup performance gain.
+
+### Breaking
+Parser.AddDirectory is now recursive.
+StaticReferences will no longer work if your project is named "dec" or "netstandard".
 
 ### Documentation
 Various small documentation improvements and error message improvements.

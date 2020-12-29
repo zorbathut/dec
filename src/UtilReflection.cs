@@ -86,7 +86,7 @@ namespace Dec
             var name = asm.FullName;
 
             // Filter out system libraries
-            if (name.StartsWith("mscorlib,") || name.StartsWith("System,") || name.StartsWith("System."))
+            if (name.StartsWith("mscorlib,") || name.StartsWith("System,") || name.StartsWith("System.") || name.StartsWith("netstandard"))
             {
                 return false;
             }
@@ -104,7 +104,13 @@ namespace Dec
             }
 
             // Filter out Unity
-            if (name.StartsWith("Unity.") || name.StartsWith("UnityEngine,") || name.StartsWith("UnityEngine.") || name.StartsWith("UnityEditor,") || name.StartsWith("UnityEditor."))
+            if (name.StartsWith("Unity.") || name.StartsWith("UnityEngine,") || name.StartsWith("UnityEngine.") || name.StartsWith("UnityEditor,") || name.StartsWith("UnityEditor.") || name.StartsWith("ExCSS.Unity,"))
+            {
+                return false;
+            }
+
+            // Filter out dec
+            if (name.StartsWith("dec,"))
             {
                 return false;
             }
