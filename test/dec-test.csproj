@@ -6,7 +6,7 @@
     <!-- 0649: "is never assigned to, and will always have its default value null". This is obviously pointless with such a reflection-heavy library. -->
     <NoWarn>0649</NoWarn>
     
-    <DefaultItemExcludes>$(DefaultItemExcludes);TestResults/**;data/validation/**</DefaultItemExcludes>
+    <DefaultItemExcludes>$(DefaultItemExcludes);TestResults/**;data/golden/**</DefaultItemExcludes>
   </PropertyGroup>
   
   <PropertyGroup Condition="$(Configuration.Contains('2.1'))">
