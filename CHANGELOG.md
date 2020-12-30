@@ -23,6 +23,7 @@ Various small documentation improvements and error message improvements.
 
 ### Testing
 Significant improvements to Validation testing on containers.
+Significant improvements to Dec testing on containers.
 Added lots of small tests.
 
 
