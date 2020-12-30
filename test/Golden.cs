@@ -11,7 +11,7 @@ namespace DecTest
         private static Dictionary<string, Assembly> AssemblyLookup = new Dictionary<string, Assembly>();
 
         [Test, TestCaseSource(nameof(GenerateValidationParser))]
-        public void Parser(string id, [Values] BehaviorMode mode)
+        public void Validation(string id, [Values] BehaviorMode mode)
         {
             string directory = Path.Combine("data", "golden", "parser", id);
 
