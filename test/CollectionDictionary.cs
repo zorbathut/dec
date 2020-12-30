@@ -182,5 +182,84 @@ namespace DecTest
 
             Assert.AreEqual(0, result.data.Count);
         }
+
+        public class DictionaryEnumDec : Dec.Dec
+        {
+            public Dictionary<GenericEnum, string> data;
+        }
+
+        [Test]
+        public void EnumKey([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryEnumDec) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <DictionaryEnumDec decName=""TestDec"">
+                        <data>
+                            <Alpha>Alpha</Alpha>
+                            <Beta>Bravo</Beta>
+                            <Gamma>Charlie</Gamma>
+                            <Delta>Delta</Delta>
+                        </data>
+                    </DictionaryEnumDec>
+                </Decs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            var result = Dec.Database<DictionaryEnumDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(result.data, new Dictionary<GenericEnum, string> {
+                { GenericEnum.Alpha, "Alpha" },
+                { GenericEnum.Beta, "Bravo" },
+                { GenericEnum.Gamma, "Charlie" },
+                { GenericEnum.Delta, "Delta" },
+            });
+        }
+
+        public class DictionaryDecDec : Dec.Dec
+        {
+            public Dictionary<StubDec, string> data;
+        }
+
+        [Test]
+        public void DecKey([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryDecDec), typeof(StubDec) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <StubDec decName=""Alpha"" />
+                    <StubDec decName=""Beta"" />
+                    <StubDec decName=""Gamma"" />
+                    <StubDec decName=""Delta"" />
+
+                    <DictionaryDecDec decName=""TestDec"">
+                        <data>
+                            <Alpha>Alpha</Alpha>
+                            <Beta>Bravo</Beta>
+                            <Gamma>Charlie</Gamma>
+                            <Delta>Delta</Delta>
+                        </data>
+                    </DictionaryDecDec>
+                </Decs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            var result = Dec.Database<DictionaryDecDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(result.data, new Dictionary<StubDec, string> {
+                { Dec.Database<StubDec>.Get("Alpha"), "Alpha" },
+                { Dec.Database<StubDec>.Get("Beta"), "Bravo" },
+                { Dec.Database<StubDec>.Get("Gamma"), "Charlie" },
+                { Dec.Database<StubDec>.Get("Delta"), "Delta" },
+            });
+        }
     }
 }

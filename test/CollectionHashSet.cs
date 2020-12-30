@@ -122,5 +122,84 @@ namespace DecTest
 
             Assert.AreEqual(result.data, new HashSet<string> { "", "four" });
         }
+
+        public class HashSetEnumDec : Dec.Dec
+        {
+            public HashSet<GenericEnum> data;
+        }
+
+        [Test]
+        public void EnumKey([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetEnumDec) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <HashSetEnumDec decName=""TestDec"">
+                        <data>
+                            <Alpha />
+                            <Beta />
+                            <Gamma />
+                            <Delta />
+                        </data>
+                    </HashSetEnumDec>
+                </Decs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            var result = Dec.Database<HashSetEnumDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(result.data, new HashSet<GenericEnum> {
+                GenericEnum.Alpha,
+                GenericEnum.Beta,
+                GenericEnum.Gamma,
+                GenericEnum.Delta,
+            });
+        }
+
+        public class HashSetDecDec : Dec.Dec
+        {
+            public HashSet<StubDec> data;
+        }
+
+        [Test]
+        public void DecKey([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetDecDec), typeof(StubDec) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <StubDec decName=""Alpha"" />
+                    <StubDec decName=""Beta"" />
+                    <StubDec decName=""Gamma"" />
+                    <StubDec decName=""Delta"" />
+
+                    <HashSetDecDec decName=""TestDec"">
+                        <data>
+                            <Alpha />
+                            <Beta />
+                            <Gamma />
+                            <Delta />
+                        </data>
+                    </HashSetDecDec>
+                </Decs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            var result = Dec.Database<HashSetDecDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(result.data, new HashSet<StubDec> {
+                Dec.Database<StubDec>.Get("Alpha"),
+                Dec.Database<StubDec>.Get("Beta"),
+                Dec.Database<StubDec>.Get("Gamma"),
+                Dec.Database<StubDec>.Get("Delta"),
+            });
+        }
     }
 }

@@ -144,6 +144,8 @@ namespace DecTest
             this.errorValidator = null;
         }
 
+        // Some stubs and universally-useful tools
+
         public class Stub { }
         public class StubDec : Dec.Dec { }
         public class StubRecordable : Dec.IRecordable
@@ -152,6 +154,14 @@ namespace DecTest
             {
                 // lol
             }
+        }
+
+        public enum GenericEnum
+        {
+            Alpha,
+            Beta,
+            Gamma,
+            Delta,
         }
 
         public static object CompileAndRun(string code, Assembly[] assemblies, string functionName, params object[] param)
