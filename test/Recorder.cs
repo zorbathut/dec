@@ -1238,5 +1238,34 @@ namespace DecTest
             Assert.AreEqual(obj.dictRef, deserialized.dictRef);
             Assert.AreEqual(obj.hashRef, deserialized.hashRef);
         }
+
+        public class StringEmptyNullRecordable : Dec.IRecordable
+        {
+            public string stringContains;
+            public string stringEmpty;
+            public string stringNull;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref stringContains, "stringContains");
+                record.Record(ref stringEmpty, "stringEmpty");
+                record.Record(ref stringNull, "stringNull");
+            }
+        }
+
+        [Test]
+        public void StringEmptyNull([Values] RecorderMode mode)
+        {
+            var senr = new StringEmptyNullRecordable();
+            senr.stringContains = "Contains";
+            senr.stringEmpty = "";
+            senr.stringNull = null;
+
+            var deserialized = DoRecorderRoundTrip(senr, mode);
+
+            Assert.AreEqual(senr.stringContains, deserialized.stringContains);
+            Assert.AreEqual(senr.stringEmpty, deserialized.stringEmpty);
+            Assert.AreEqual(senr.stringNull, deserialized.stringNull);
+        }
     }
 }
