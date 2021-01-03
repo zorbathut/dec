@@ -128,7 +128,7 @@ namespace Fuzzgen
 
             string finalCode = GenerateTestHarness(tests);
 
-            string path = $"../../test/data/validation/parser/{System.DateTimeOffset.Now:yyyyMMddhhmmss}";
+            string path = $"../../test/data/golden/parser/{System.DateTimeOffset.Now:yyyyMMddhhmmss}";
             System.IO.Directory.CreateDirectory(path);
 
             DecUtilLib.Compress.WriteToFile(System.IO.Path.Combine(path, "Harness.cs"), finalCode);
