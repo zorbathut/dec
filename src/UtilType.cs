@@ -275,6 +275,12 @@ namespace Dec
                 }
             }
 
+            bool isArray = text.EndsWith("[]");
+            if (isArray)
+            {
+                text = text.Substring(0, text.Length - 2);
+            }
+
             // We need to find a class that matches the least number of tokens. Namespaces can't be templates so at most this continues until we hit a namespace.
             var possibleTypes = Config.UsingNamespaces
                 .Select(ns => ParseWithNamespace($"{ns}.{text}", inputLine, lineNumber))
@@ -296,6 +302,12 @@ namespace Dec
             else
             {
                 result = possibleTypes[0];
+            }
+
+            if (isArray)
+            {
+                // TODO: multiple-dimension arrays?
+                result = result.MakeArrayType();
             }
 
             ParseCache[text] = result;

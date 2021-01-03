@@ -184,7 +184,17 @@ namespace Dec
 
         public override void TagClass(Type type)
         {
-            writer.AppendLine($"Assert.AreEqual(typeof({type.ComposeCSFormatted()}), {accessor}.GetType());");
+            if (type == typeof(Type))
+            {
+                // Special case: Sometimes we convert System.RuntimeType to System.Type, because System.RuntimeType is a compatible C# implementation detail that we don't want to preserve.
+                // We handle that conversion here as well.
+                writer.AppendLine($"Assert.IsTrue({accessor} is System.Type);");
+            }
+            else
+            {
+                writer.AppendLine($"Assert.AreEqual(typeof({type.ComposeCSFormatted()}), {accessor}.GetType());");
+            }
+
             accessor = $"(({type.ComposeCSFormatted()}){accessor})";
         }
 

@@ -662,17 +662,78 @@ namespace Dec
             }
         }
 
+        internal static Type TypeSystemRuntimeType = Type.GetType("System.RuntimeType");
         internal static void ComposeElement(WriterNode node, object value, Type fieldType, bool isRootDec = false)
         {
+            // Handle Dec types, if this isn't a root (otherwise we'd just reference ourselves and that's kind of pointless)
+            if (!isRootDec && value is Dec)
+            {
+                // Dec types are special in a few ways.
+                // First off, they don't include their type data, because we assume it's of a type provided by the structure.
+                // Second, we represent null values as an empty string, not as a null tag.
+                // (We'll accept the null tag if you insist, we just have a cleaner special case.)
+                // Null tag stuff is done further down, in the null check.
+
+                var rootType = value.GetType().GetDecRootType();
+                if (!rootType.IsAssignableFrom(fieldType))
+                {
+                    // fieldType isn't a root type that we expect.
+                    // We could put our root type here so we could re-parse it later on. But this is actually a huge problem.
+                    // What if we move the Dec to another hierarchy entirely? Or just rename a hierarchy?
+                    // We won't be able to find it given the root type. Do we search *all* Decs for it? This is a nightmare case.
+                    // So instead we yell at the user and tell them this won't work (then save it anyway.)
+                    Dbg.Err($"Attempting to save {value} into type {fieldType}, which is not a valid Dec root type");
+                    node.TagClass(rootType);
+                }
+                
+                node.WriteDec(value as Dec);
+
+                return;
+            }
+
+            // Everything represents "null" with an explicit XML tag, so let's just do that
+            // Maybe at some point we want to special-case this for the empty Dec link
+            if (value == null)
+            {
+                if (typeof(Dec).IsAssignableFrom(fieldType))
+                {
+                    node.WriteDec(null);
+                }
+                else
+                {
+                    node.WriteExplicitNull();
+                }
+
+                return;
+            }
+
+            var valType = value.GetType();
+
+            // This is our value's type, but we may need a little bit of tinkering to make it useful.
+            // The current case I know of is System.RuntimeType, which appears if we call .GetType() on a Type.
+            // I assume there is a complicated internal reason for this; good news, we can ignore it and just pretend it's a System.Type.
+            // Bad news: it's actually really hard to detect this case because System.RuntimeType is private.
+            // That's why we have the annoying `static` up above.
+            if (valType == TypeSystemRuntimeType)
+            {
+                valType = typeof(Type);
+            }
+
+            // If we have a type that isn't the expected type, tag it. We need to do this before any further handling because everything fits in `object`.
+            if (valType != fieldType)
+            {
+                node.TagClass(valType);
+            }
+
             // Do all our unreferencables first
-            if (fieldType.IsPrimitive)
+            if (valType.IsPrimitive)
             {
                 node.WritePrimitive(value);
 
                 return;
             }
 
-            if (typeof(System.Enum).IsAssignableFrom(fieldType))
+            if (value is System.Enum)
             {
                 node.WriteEnum(value);
 
@@ -693,24 +754,8 @@ namespace Dec
                 return;
             }
 
-            // Handle Dec types, if this isn't a root (otherwise we'd just reference ourselves and that's kind of pointless)
-            if (!isRootDec && typeof(Dec).IsAssignableFrom(fieldType))
-            {
-                node.WriteDec(value as Dec);
-
-                return;
-            }
-
-            // Everything after this represents "null" with an explicit XML tag, so let's just do that
-            if (value == null)
-            {
-                node.WriteExplicitNull();
-                
-                return;
-            }
-
             // Check to see if we should make this into a ref
-            if (!fieldType.IsValueType)
+            if (!valType.IsValueType)
             {
                 if (node.WriteReference(value))
                 {
@@ -721,49 +766,35 @@ namespace Dec
                 // Either this isn't a reference yet, or we don't even support references in this mode. So keep on processing.
             }
 
-            // This is also where we need to start being concerned about types. If we have a type that isn't the expected type, tag it.
-            if (value.GetType() != fieldType)
-            {
-                node.TagClass(value.GetType());
-            }
-
-            // If this is a System.Int32, or similar, we actually want to consider it a primitive. But we potentially have to wait this long to get the class tag set up.
-            if (value.GetType().IsPrimitive)
-            {
-                node.WritePrimitive(value);
-
-                return;
-            }
-
-            if (fieldType.IsArray)
+            if (valType.IsArray)
             {
                 node.WriteArray(value as Array);
 
                 return;
             }
 
-            if (fieldType.IsGenericType && fieldType.GetGenericTypeDefinition() == typeof(List<>))
+            if (valType.IsGenericType && valType.GetGenericTypeDefinition() == typeof(List<>))
             {
                 node.WriteList(value as IList);
 
                 return;
             }
 
-            if (fieldType.IsGenericType && fieldType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+            if (valType.IsGenericType && valType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
             {
                 node.WriteDictionary(value as IDictionary);
 
                 return;
             }
 
-            if (fieldType.IsGenericType && fieldType.GetGenericTypeDefinition() == typeof(HashSet<>))
+            if (valType.IsGenericType && valType.GetGenericTypeDefinition() == typeof(HashSet<>))
             {
                 node.WriteHashSet(value as IEnumerable);
 
                 return;
             }
 
-            if (typeof(IRecordable).IsAssignableFrom(fieldType))
+            if (value is IRecordable)
             {
                 node.WriteRecord(value as IRecordable);
 
@@ -788,7 +819,7 @@ namespace Dec
 
             // We absolutely should not be doing reflection when in recorder mode; that way lies madness.
             
-            foreach (var field in value.GetType().GetSerializableFieldsFromHierarchy())
+            foreach (var field in valType.GetSerializableFieldsFromHierarchy())
             {
                 ComposeElement(node.CreateMember(field), field.GetValue(value), field.FieldType);
             }

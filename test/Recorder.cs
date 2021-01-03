@@ -1155,5 +1155,88 @@ namespace DecTest
 
             Assert.IsNotNull(deserialized);
         }
+
+        public class IntContainerClass : Dec.IRecordable
+        {
+            public int value;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref value, "value");
+            }
+        }
+
+        public struct IntContainerStruct : Dec.IRecordable
+        {
+            public int value;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref value, "value");
+            }
+        }
+
+        public class ObjectRefsRecordable : Dec.IRecordable
+        {
+            public object intRef;
+            public object enumRef;
+            public object stringRef;
+            public object typeRef;
+            public object nullRef;
+            public object classRef;
+            public object structRef;
+            public object arrayRef;
+            public object listRef;
+            public object dictRef;
+            public object hashRef;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref intRef, "intRef");
+                record.Record(ref enumRef, "enumRef");
+                record.Record(ref stringRef, "stringRef");
+                record.Record(ref typeRef, "typeRef");
+                record.Record(ref nullRef, "nullRef");
+                record.Record(ref classRef, "classRef");
+                record.Record(ref structRef, "structRef");
+                record.Record(ref arrayRef, "arrayRef");
+                record.Record(ref listRef, "listRef");
+                record.Record(ref dictRef, "dictRef");
+                record.Record(ref hashRef, "hashRef");
+            }
+        }
+
+        [Test]
+        public void ObjectRefs([Values] RecorderMode mode)
+        {
+            var obj = new ObjectRefsRecordable();
+            obj.intRef = 42;
+            obj.enumRef = GenericEnum.Gamma;
+            obj.stringRef = "Hello, I am a string";
+            obj.typeRef = typeof(Recorder);
+            obj.nullRef = null; // redundant, obviously
+            obj.classRef = new IntContainerClass() { value = 10 };
+            obj.structRef = new IntContainerStruct() { value = -10 };
+            obj.arrayRef = new int[] { 1, 1, 2, 3, 5, 8, 11 };
+            obj.listRef = new List<int>() { 2, 3, 5, 7, 11, 13, 17 };
+            obj.dictRef = new Dictionary<int, string>() { { 1, "one" }, { 2, "two" }, { 4, "four" }, { 8, "eight" } };
+            obj.hashRef = new HashSet<int>() { 1, 6, 21, 107 };
+
+            var deserialized = DoRecorderRoundTrip(obj, mode);
+
+            Assert.AreEqual(obj.intRef, deserialized.intRef);
+            Assert.AreEqual(obj.enumRef, deserialized.enumRef);
+            Assert.AreEqual(obj.stringRef, deserialized.stringRef);
+            Assert.AreEqual(obj.typeRef, deserialized.typeRef);
+            Assert.AreEqual(obj.nullRef, deserialized.nullRef);
+            Assert.AreEqual(obj.classRef.GetType(), deserialized.classRef.GetType());
+            Assert.AreEqual(((IntContainerClass)obj.classRef).value, ((IntContainerClass)deserialized.classRef).value);
+            Assert.AreEqual(obj.structRef.GetType(), deserialized.structRef.GetType());
+            Assert.AreEqual(((IntContainerStruct)obj.structRef).value, ((IntContainerStruct)deserialized.structRef).value);
+            Assert.AreEqual(obj.arrayRef, deserialized.arrayRef);
+            Assert.AreEqual(obj.listRef, deserialized.listRef);
+            Assert.AreEqual(obj.dictRef, deserialized.dictRef);
+            Assert.AreEqual(obj.hashRef, deserialized.hashRef);
+        }
     }
 }
