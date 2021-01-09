@@ -225,7 +225,7 @@ namespace Dec
                     var result = Activator.CreateInstance(type);
                     if (result == null)
                     {
-                        // This is difficult to test; there are very few things that can get CreateInstance to return null, and right now the Def type system doesn't support them (int? for example)
+                        // This is difficult to test; there are very few things that can get CreateInstance to return null, and right now the Dec type system doesn't support them (int? for example)
                         // Right now we're just hardcode testing this for laughs.
                         // *need more coverage*
                         Dbg.Err($"{errorPrefix()}: {errorType} of type {type} was not properly created; this will cause issues");

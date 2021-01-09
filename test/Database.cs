@@ -202,7 +202,7 @@ namespace DecTest
             int x = 0;
 
             Dec.Database.Clear();
-            ExpectWarnings(() => Dec.Database.Get(typeof(CppAbstractTypeDec), "MissingDef"));
+            ExpectWarnings(() => Dec.Database.Get(typeof(CppAbstractTypeDec), "MissingDec"));
 
             Dec.Database.Clear();
             ExpectWarnings(() => x = Dec.Database.List.Count());

@@ -232,24 +232,24 @@ namespace Dec
                     if (!abstrct)
                     {
                         // Not an abstract dec instance, so create our instance
-                        var defInstance = (Dec)typeHandle.CreateInstanceSafe("dec", () => $"{stringName}:{decElement.LineNumber()}");
+                        var decInstance = (Dec)typeHandle.CreateInstanceSafe("dec", () => $"{stringName}:{decElement.LineNumber()}");
 
                         // Error reporting happens within CreateInstanceSafe; if we get null out, we just need to clean up elegantly
-                        if (defInstance != null)
+                        if (decInstance != null)
                         {
-                            defInstance.DecName = decName;
+                            decInstance.DecName = decName;
 
-                            Database.Register(defInstance);
+                            Database.Register(decInstance);
 
                             if (parent == null)
                             {
                                 // Non-parent objects are simple; we just handle them here in order to avoid unnecessary GC churn
-                                finishWork.Add(() => Serialization.ParseElement(decElement, typeHandle, defInstance, readerContext, isRootDec: true));
+                                finishWork.Add(() => Serialization.ParseElement(decElement, typeHandle, decInstance, readerContext, isRootDec: true));
                             }
                             else
                             {
                                 // Add an inheritance resolution job; we'll take care of this soon
-                                inheritanceJobs.Add(new InheritanceJob { target = defInstance, xml = decElement, context = readerContext, parent = parent });
+                                inheritanceJobs.Add(new InheritanceJob { target = decInstance, xml = decElement, context = readerContext, parent = parent });
                             }
                         }
                     }
