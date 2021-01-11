@@ -121,5 +121,17 @@ namespace DecTest
 
             DoBehavior(mode);
         }
+
+        [Test]
+        public void Empty([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
+
+            var parser = new Dec.Parser();
+            ExpectErrors(() => parser.AddString(@""));
+            parser.Finish();
+
+            DoBehavior(mode);
+        }
     }
 }

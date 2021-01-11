@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 
 
+## [Unreleased]
+
+### Testing
+Add small tests.
+
+
 ## [v0.2.0]
 ### Added
 Implemented HashSet support in both Dec and Record.
