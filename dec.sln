@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "fuzzgen", "util\fuzzgen\fuz
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "decutillib", "util\decutillib\decutillib.csproj", "{3DE7DD9F-E37D-415E-B426-5F8322D605EE}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dec-test-integration", "test\integration\dec-test-integration.csproj", "{BA87E222-8AEE-4EF8-90F5-ED92533CFBE4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug 2.1|Any CPU = Debug 2.1|Any CPU
@@ -73,6 +75,14 @@ Global
 		{3DE7DD9F-E37D-415E-B426-5F8322D605EE}.Release 2.1|Any CPU.Build.0 = Release|Any CPU
 		{3DE7DD9F-E37D-415E-B426-5F8322D605EE}.Release 3.1|Any CPU.ActiveCfg = Release|Any CPU
 		{3DE7DD9F-E37D-415E-B426-5F8322D605EE}.Release 3.1|Any CPU.Build.0 = Release|Any CPU
+		{BA87E222-8AEE-4EF8-90F5-ED92533CFBE4}.Debug 2.1|Any CPU.ActiveCfg = Debug 2.1|Any CPU
+		{BA87E222-8AEE-4EF8-90F5-ED92533CFBE4}.Debug 2.1|Any CPU.Build.0 = Debug 2.1|Any CPU
+		{BA87E222-8AEE-4EF8-90F5-ED92533CFBE4}.Debug 3.1|Any CPU.ActiveCfg = Debug 3.1|Any CPU
+		{BA87E222-8AEE-4EF8-90F5-ED92533CFBE4}.Debug 3.1|Any CPU.Build.0 = Debug 3.1|Any CPU
+		{BA87E222-8AEE-4EF8-90F5-ED92533CFBE4}.Release 2.1|Any CPU.ActiveCfg = Release 2.1|Any CPU
+		{BA87E222-8AEE-4EF8-90F5-ED92533CFBE4}.Release 2.1|Any CPU.Build.0 = Release 2.1|Any CPU
+		{BA87E222-8AEE-4EF8-90F5-ED92533CFBE4}.Release 3.1|Any CPU.ActiveCfg = Release 3.1|Any CPU
+		{BA87E222-8AEE-4EF8-90F5-ED92533CFBE4}.Release 3.1|Any CPU.Build.0 = Release 3.1|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
