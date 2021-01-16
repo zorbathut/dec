@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30503.244
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dec", "src\dec.csproj", "{B57A7C73-7542-4F8A-A662-2EB70C2E7C37}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dec-test", "test\dec-test.csproj", "{DEBE65A3-0988-4442-9372-72C0E928A985}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dec-test-unit", "test\unit\dec-test-unit.csproj", "{DEBE65A3-0988-4442-9372-72C0E928A985}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dec-doc", "doc\dec-doc.csproj", "{AB4CCED1-7CF8-4C76-84E6-75AF6ADACAE6}"
 EndProject

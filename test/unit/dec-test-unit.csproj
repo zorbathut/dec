@@ -38,8 +38,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../src/dec.csproj" />
-    <ProjectReference Include="../util/decutillib/decutillib.csproj" />
+    <ProjectReference Include="../../src/dec.csproj" />
+    <ProjectReference Include="../../util/decutillib/decutillib.csproj" />
   </ItemGroup>
 
 </Project>
