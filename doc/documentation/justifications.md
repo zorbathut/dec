@@ -12,9 +12,9 @@ JSON is designed as a computer-to-computer descriptive language, not a human-fac
 
 On top of that, it's more typed than I prefer; I'd like to keep typing data in exactly one place, and that's the C# class definitions. JSON understands strings, integers, booleans, lists, and dictionaries, and that's about three more things than I want it to know about.
 
-### JSON5
+### JSON5/JSONC
 
-JSON5 is basically "JSON, with trailing commas and comments". It's definitely better than JSON, but support is lacking; as of today there's a single C# implementation with almost no usage and less documentation than dec. It also shares the typing issues of JSON.
+JSON5 and JSONC are basically "JSON, with trailing commas and comments". They're definitely better than JSON, but support is lacking; as of today there's a single C# implementation with almost no usage and less documentation than dec. They also share the typing issues of JSON.
 
 ### YAML
 
@@ -26,9 +26,13 @@ Similar to the JSON5/JSON comparison, StrictYAML is a modified version of YAML, 
 
 It shares the whitespace-sensitive behavior of YAML.
 
-### .ini format
+### .ini
 
 Classic Windows INIs are an untyped configuration language. They're actually rather nice for simple configurations, but they don't have native support for nested structures, which makes them somewhat unusable for this application.
+
+### TOML
+
+TOML is basically a better .ini. It's great for simple configurations (or even slightly-less-simple configurations) but is not suited for deeply nested data.
 
 ### Custom-written format
 
