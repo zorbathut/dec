@@ -219,6 +219,9 @@ namespace Dec
 
         public override void WriteRecord(IRecordable value)
         {
+            // For performance's sake we shouldn't always be doing this.
+            // But the validation layer is already incredibly slow and none of this is relevant in terms of performance anyway.
+            // So, whatever.
             writer.RegisterPendingWrite(() => value.Record(new RecorderWriter(this)));
         }
 

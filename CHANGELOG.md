@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Improved
+5-10% performance improvement for Recorder serialization.
+
 ### Testing
 Add small tests.
 

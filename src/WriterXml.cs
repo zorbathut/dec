@@ -240,11 +240,18 @@ namespace Dec
         private WriterXml writer;
         private XElement node;
 
+        // Represents only the *active* depth in the program stack.
+        // This is kind of painfully hacky, because when it's created, we don't know if it's going to represent a new stack start.
+        // So we just kinda adjust it as we go.
+        private int depth;
+        private const int MaxRecursionDepth = 100;
+
         public override bool AllowReflection { get => writer.AllowReflection; }
 
-        private WriterNodeXml(WriterXml writer, XElement parent, string label)
+        private WriterNodeXml(WriterXml writer, XElement parent, string label, int depth)
         {
             this.writer = writer;
+            this.depth = depth;
 
             node = new XElement(label);
             parent.Add(node);
@@ -252,24 +259,24 @@ namespace Dec
 
         public static WriterNodeXml StartDec(WriterXmlCompose writer, XElement decRoot, string type, string decName)
         {
-            var node = new WriterNodeXml(writer, decRoot, type);
+            var node = new WriterNodeXml(writer, decRoot, type, 0);
             node.GetXElement().Add(new XAttribute("decName", decName));
             return node;
         }
 
         public static WriterNodeXml StartData(WriterXmlRecord writer, XElement decRoot, string name)
         {
-            return new WriterNodeXml(writer, decRoot, name);
+            return new WriterNodeXml(writer, decRoot, name, 0);
         }
 
         public override WriterNode CreateChild(string label)
         {
-            return new WriterNodeXml(writer, node, label);
+            return new WriterNodeXml(writer, node, label, depth + 1);
         }
 
         public override WriterNode CreateMember(System.Reflection.FieldInfo field)
         {
-            return new WriterNodeXml(writer, node, field.Name);
+            return new WriterNodeXml(writer, node, field.Name, depth + 1);
         }
 
         public override void WritePrimitive(object value)
@@ -409,12 +416,32 @@ namespace Dec
 
         public override void WriteRecord(IRecordable value)
         {
-            writer.RegisterPendingWrite(() => value.Record(new RecorderWriter(this)));
+            if (depth < MaxRecursionDepth)
+            {
+                // This is somewhat faster than a full pending write (5-10% faster in one test case, though with a lot of noise), so we do it whenever we can.
+                value.Record(new RecorderWriter(this));
+            }
+            else
+            {
+                // Reset depth because this will be run only when the pending writes are ready.
+                depth = 0;
+                writer.RegisterPendingWrite(() => value.Record(new RecorderWriter(this)));
+            }
         }
 
         public override void WriteConvertible(Converter converter, object value, Type fieldType)
         {
-            writer.RegisterPendingWrite(() => converter.Record(value, fieldType, new RecorderWriter(this)));
+            if (depth < MaxRecursionDepth)
+            {
+                // This is somewhat faster than a full pending write (5-10% faster in one test case, though with a lot of noise), so we do it whenever we can.
+                converter.Record(value, fieldType, new RecorderWriter(this));
+            }
+            else
+            {
+                // Reset depth because this will be run only when the pending writes are ready.
+                depth = 0;
+                writer.RegisterPendingWrite(() => converter.Record(value, fieldType, new RecorderWriter(this)));
+            }
         }
 
         public override XElement GetXElement()
