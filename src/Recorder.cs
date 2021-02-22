@@ -100,14 +100,6 @@ namespace Dec
         public abstract Direction Mode { get; }
 
         /// <summary>
-        /// Returns the XML element that is being read or written to.
-        /// </summary>
-        /// <remarks>
-        /// Generally not necessary to use; this is intended for when you're doing hand-written serialization and deserialization work.
-        /// </remarks>
-        public abstract XElement Xml { get; }
-
-        /// <summary>
         /// Returns a fully-formed XML document starting at an object.
         /// </summary>
         public static string Write<T>(T target, bool pretty = true)
@@ -303,7 +295,6 @@ namespace Dec
             Serialization.ComposeElement(node.CreateChild(label), value, typeof(T));
         }
 
-        public override XElement Xml { get => node.GetXElement(); }
         public override Direction Mode { get => Direction.Write; }
     }
 
@@ -367,7 +358,6 @@ namespace Dec
             value = (T)Serialization.ParseElement(recorded, typeof(T), value, context);
         }
 
-        public override XElement Xml { get => element; }
         public override Direction Mode { get => Direction.Read; }
     }
 }

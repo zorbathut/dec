@@ -177,7 +177,7 @@ namespace DecTest
                 return new ConverterUnsuppliedClass();
             }
 
-            // whoops we forgot to write a ToString function
+            // whoops we forgot to write a ToString function! how silly
         }
 
         [Test]

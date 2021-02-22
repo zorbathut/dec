@@ -134,12 +134,6 @@ namespace Dec
                 WriteExplicitNull();
             }
         }
-
-        public override XElement GetXElement()
-        {
-            // we don't have one
-            return null;
-        }
     }
 
     internal sealed class WriterNodeValidation : WriterNodeCS

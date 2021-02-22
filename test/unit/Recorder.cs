@@ -499,69 +499,6 @@ namespace DecTest
             Assert.AreEqual(42, deserialized.baseContainer.baseVal);
         }
 
-        public class AttributeRecordable : Dec.IRecordable
-        {
-            public string attributing = "";
-
-            public void Record(Dec.Recorder record)
-            {
-                if (record.Mode == Dec.Recorder.Direction.Read)
-                {
-                    attributing = record.Xml.Attributes().Single(attr => attr.Name == "converted").Value;
-                }
-                else
-                {
-                    record.Xml.SetAttributeValue("converted", attributing);
-                }
-            }
-        }
-
-        public class AttributeHolder : Dec.IRecordable
-        {
-            public AttributeRecordable a;
-            public AttributeRecordable b;
-            public AttributeRecordable c;
-
-            public void Record(Dec.Recorder record)
-            {
-                record.Record(ref a, "a");
-                record.Record(ref b, "b");
-                record.Record(ref c, "c");
-            }
-        }
-
-        [Test]
-        public void Attributes([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
-        {
-            var holder = new AttributeHolder();
-
-            holder.a = new AttributeRecordable { attributing = "hello_an_attribute" };
-            holder.b = new AttributeRecordable { attributing = "<XML-SENSITIVE>" };
-            holder.c = new AttributeRecordable { attributing = "I guess I'll write some more text here?" };
-
-            var deserialized = DoRecorderRoundTrip(holder, mode);
-
-            Assert.AreEqual(holder.a.attributing, deserialized.a.attributing);
-            Assert.AreEqual(holder.b.attributing, deserialized.b.attributing);
-            Assert.AreEqual(holder.c.attributing, deserialized.c.attributing);
-        }
-
-        [Test]
-        public void AttributeRef([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
-        {
-            var holder = new AttributeHolder();
-
-            holder.a = new AttributeRecordable { attributing = "I am being referenced!" };
-            holder.b = holder.a;
-            holder.c = holder.a;
-
-            var deserialized = DoRecorderRoundTrip(holder, mode);
-
-            Assert.AreEqual(holder.a.attributing, deserialized.a.attributing);
-            Assert.AreSame(holder.a, holder.b);
-            Assert.AreSame(holder.a, holder.c);
-        }
-
         public class MultiRecordRec : Dec.IRecordable
         {
             public int x;

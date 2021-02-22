@@ -33,8 +33,5 @@ namespace Dec
         public abstract void WriteConvertible(Converter converter, object value, Type fieldType);
 
         public abstract void TagClass(Type type);
-
-        // get rid of me
-        public abstract XElement GetXElement();
     }
 }

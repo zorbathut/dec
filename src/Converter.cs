@@ -11,9 +11,9 @@ namespace Dec
     /// <remarks>
     /// This is a standalone class to allow implementation of converters of third-party types.
     ///
-    /// Inherit from this, fill out an appropriate HandledTypes() function, then implement at least one of FromString(), FromXml(), or Record().
+    /// Inherit from this, fill out an appropriate HandledTypes() function, then implement either Record() or FromString().
     ///
-    /// If you want to be able to write things with Recorder, you'll need to implement at least one of ToString(), ToXml(), or Record().
+    /// If you want to be able to write things with Recorder, you'll need to implement either Record() or ToString().
     /// </remarks>
     public abstract class Converter
     {
@@ -46,29 +46,6 @@ namespace Dec
         }
 
         /// <summary>
-        /// Converts an XML element to a suitable object type.
-        /// </summary>
-        /// <remarks>
-        /// `type` is set to the expected return type; you can return null, or anything that can be implicitly converted to that type.
-        /// 
-        /// In case of error, call Dec.Dbg.Err with some appropriately useful message and return null. Message should be formatted as $"{inputName}:{(input as IXmlLineInfo).LineNumber}: Something went wrong".
-        /// </remarks>
-        public virtual object FromXml(XElement input, Type type, string inputName)
-        {
-            Dbg.Err($"{inputName}:{input.LineNumber()}: Failed to parse XML when attempting to parse {type}");
-
-            string text = input.GetText();
-            if (text != null)
-            {
-                // try to fall back to string?
-                return FromString(text, type, inputName, input.LineNumber());
-            }
-
-            // oh well
-            return null;
-        }
-
-        /// <summary>
         /// Converts an object to a string.
         /// </summary>
         /// <remarks>
@@ -79,29 +56,7 @@ namespace Dec
         public virtual string ToString(object input)
         {
             Dbg.Err($"Failed to generate a string when attempting to record {input.GetType()}");
-            return null;
-        }
-
-        /// <summary>
-        /// Converts an object to XML.
-        /// </summary>
-        /// <remarks>
-        /// `input` will be one of the types provided in HandledTypes(); it will not be null. Whatever you return should be convertible back to an object by an overridden FromXml().
-        ///
-        /// If you need to create any attributes, you should prefix them with a unique identifier so they don't conflict with standard dec attributes.
-        ///
-        /// If you add a single XText child, parsing may be done with FromString() instead of FromXml().
-        /// 
-        /// In case of error, call Dec.Dbg.Err with some appropriately useful message and don't modify context.
-        /// </remarks>
-        public virtual void ToXml(object input, XElement context)
-        {
-            // If we don't get anything valid from ToString(), just don't bother to add a node
-            var str = ToString(input);
-            if (str != null)
-            {
-                context.Add(new XText(str));
-            }
+            return ""; // "" is kind of a more neutral result than `null`, and this is what we'll default to if they haven't filled something out
         }
 
         /// <summary>
@@ -141,23 +96,18 @@ namespace Dec
             switch (recorder.Mode)
             {
                 case Recorder.Direction.Read:
-                {
-                    var sourceName = (recorder as RecorderReader).SourceName;
-                    var element = recorder.Xml;
-
-                    if (element.Elements().Any())
                     {
-                        return FromXml(recorder.Xml, type, sourceName);
-                    }
-                    else
-                    {
-                        return FromString(element.GetText() ?? "", type, sourceName, element.LineNumber());
-                    }
-                }    
+                        string text = null;
+                        recorder.RecordAsThis(ref text);
+                        return FromString(text, type, (recorder as RecorderReader).SourceName, 0);
+                    }    
 
                 case Recorder.Direction.Write:
-                    ToXml(model, recorder.Xml);
-                    return model;
+                    {
+                        string text = ToString(model);
+                        recorder.RecordAsThis(ref text);
+                        return model;
+                    }
 
                 default:
                     // what have you done

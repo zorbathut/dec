@@ -444,7 +444,7 @@ namespace Dec
             }
         }
 
-        public override XElement GetXElement()
+        internal XElement GetXElement()
         {
             return node;
         }

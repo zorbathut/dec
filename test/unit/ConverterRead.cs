@@ -31,13 +31,6 @@ namespace DecTest
                 return new ConverterTestPayload() { number = int.Parse(input) };
             }
 
-            public override object FromXml(XElement input, Type type, string inputName)
-            {
-                return new ConverterTestPayload() { number = int.Parse(input.Elements().First().Value) };
-            }
-
-            // This doesn't 100% preserve the original format because there's no way to tell if it should be contained in cargo or not
-            // But honestly that's fine, I don't care for this purpose
             public override string ToString(object input)
             {
                 return (input as ConverterTestPayload).number.ToString();
@@ -55,16 +48,12 @@ namespace DecTest
                     <ConverterDec decName=""TestDecA"">
                         <payload>4</payload>
                     </ConverterDec>
-                    <ConverterDec decName=""TestDecB"">
-                        <payload><cargo>8</cargo></payload>
-                    </ConverterDec>
                 </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
             Assert.AreEqual(4, Dec.Database<ConverterDec>.Get("TestDecA").payload.number);
-            Assert.AreEqual(8, Dec.Database<ConverterDec>.Get("TestDecB").payload.number);
         }
 
         public class EmptyConverter : Dec.Converter
