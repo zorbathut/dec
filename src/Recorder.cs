@@ -50,6 +50,11 @@ namespace Dec
     /// </remarks>
     public abstract class Recorder
     {
+        internal struct Parameters
+        {
+            internal bool asThis;
+        }
+
         /// <summary>
         /// Serialize or deserialize a member of a class.
         /// </summary>
@@ -58,7 +63,28 @@ namespace Dec
         ///
         /// In most cases, you don't need to do anything different for read vs. write; this function will figure out the details and do the right thing.
         /// </remarks>
-        public abstract void Record<T>(ref T value, string label);
+        public void Record<T>(ref T value, string label)
+        {
+            Record(ref value, label, new Parameters());
+        }
+
+        /// <summary>
+        /// Serialize or deserialize a member of a class as if it were this class.
+        /// </summary>
+        /// <remarks>
+        /// This function serializes or deserializes a class member as if it were the entire class. Call it with a reference to the member.
+        ///
+        /// This is intended for cases where a class's contents are a single method and where an extra level of indirection in XML files isn't desired.
+        /// See https://github.com/zorbathut/dec/blob/master/example/loaf/RollTable.cs for an example.
+        ///
+        /// In most cases, you don't need to do anything different for read vs. write; this function will figure out the details and do the right thing.
+        /// </remarks>
+        public void RecordAsThis<T>(ref T value)
+        {
+            Record(ref value, "", new Parameters() { asThis = true });
+        }
+
+        internal abstract void Record<T>(ref T value, string label, Parameters parameters);
 
         /// <summary>
         /// Indicates whether this Recorder is being used for reading or writing.
@@ -234,6 +260,7 @@ namespace Dec
 
     internal class RecorderWriter : Recorder
     {
+        private bool asThis = false;
         private readonly HashSet<string> fields = new HashSet<string>();
         private readonly WriterNode node;
 
@@ -242,8 +269,29 @@ namespace Dec
             this.node = node;
         }
 
-        public override void Record<T>(ref T value, string label)
+        internal override void Record<T>(ref T value, string label, Parameters parameters)
         {
+            if (asThis)
+            {
+                Dbg.Err($"Attempting to write a second field after a RecordAsThis call");
+                return;
+            }
+
+            if (parameters.asThis)
+            {
+                if (fields.Count > 0)
+                {
+                    Dbg.Err($"Attempting to make a RecordAsThis call after writing a field");
+                    return;
+                }
+
+                asThis = true;
+
+                Serialization.ComposeElement(node, value, typeof(T));
+
+                return;
+            }
+
             if (fields.Contains(label))
             {
                 Dbg.Err($"Field '{label}' written multiple times");
@@ -279,6 +327,7 @@ namespace Dec
 
     internal class RecorderReader : Recorder
     {
+        private bool asThis = false;
         private readonly XElement element;
         private readonly ReaderContext context;
 
@@ -290,8 +339,24 @@ namespace Dec
             this.context = context;
         }
 
-        public override void Record<T>(ref T value, string label)
+        internal override void Record<T>(ref T value, string label, Parameters parameters)
         {
+            if (asThis)
+            {
+                Dbg.Err($"Attempting to read a second field after a RecordAsThis call");
+                return;
+            }
+
+            if (parameters.asThis)
+            {
+                asThis = true;
+
+                // Explicit cast here because we want an error if we have the wrong type!
+                value = (T)Serialization.ParseElement(element, typeof(T), value, context);
+
+                return;
+            }
+
             var recorded = element.ElementNamed(label);
             if (recorded == null)
             {

@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 
 
 ## [Unreleased]
+### Added
+Added Recorder.RecordAsThis(), which allows objects to turn over their entire node to a child object.
 
 ### Improved
 5-10% performance improvement for Recorder serialization.
