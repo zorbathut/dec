@@ -46,7 +46,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ConverterSimple([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
+        public void ConverterSimple([ValuesExcept(RecorderMode.Validation, RecorderMode.Null)] RecorderMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterSimple) } };
 
@@ -119,7 +119,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ConverterReplacementDetection([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
+        public void ConverterReplacementDetection([ValuesExcept(RecorderMode.Validation, RecorderMode.Null)] RecorderMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterSimple) } };
 
@@ -181,7 +181,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ConverterUnsupplied([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
+        public void ConverterUnsupplied([ValuesExcept(RecorderMode.Validation, RecorderMode.Null)] RecorderMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConverterUnsuppliedConverter) } };
 

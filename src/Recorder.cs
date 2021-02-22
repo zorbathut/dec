@@ -124,6 +124,16 @@ namespace Dec
         }
 
         /// <summary>
+        /// Runs the Null writer, which is mostly useful for performance testing.
+        /// </summary>
+        public static void WriteNull<T>(T target)
+        {
+            var writerContext = new WriterNull(false);
+
+            Serialization.ComposeElement(WriterNodeNull.Start(writerContext), target, target != null ? target.GetType() : typeof(T));
+        }
+
+        /// <summary>
         /// Parses the output of Write, generating an object and all its related serialized data.
         /// </summary>
         public static T Read<T>(string input, string stringName = "input")

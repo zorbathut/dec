@@ -33,5 +33,15 @@ namespace Dec
 
             return writerContext.Finish();
         }
+
+        public void ComposeNull()
+        {
+            var writerContext = new WriterNull(true);
+
+            foreach (var decObj in Database.List)
+            {
+                Serialization.ComposeElement(WriterNodeNull.Start(writerContext), decObj, decObj.GetType(), isRootDec: true);
+            }
+        }
     }
 }

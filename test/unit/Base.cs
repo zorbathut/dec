@@ -196,6 +196,9 @@ namespace DecTest
 
             // Run it through the Validation writer, compile that code at runtime, make sure it matches.
             Validation,
+
+            // Run it through the Null writer
+            Null,
         }
 
         public void DoBehavior(BehaviorMode mode, bool rewrite_expectWriteErrors = false, bool rewrite_expectParseErrors = false, bool validation_expectWriteErrors = false, Assembly[] validation_assemblies = null)
@@ -269,6 +272,31 @@ namespace DecTest
 
                 CompileAndRun($"public static void Test() {{\n{code}\n}}", assemblies, "Test", null);
             }
+            else if (mode == BehaviorMode.Null)
+            {
+                void RunComposer()
+                {
+                    var composer = new Dec.Composer();
+                    composer.ComposeNull();
+                }
+
+                if (rewrite_expectWriteErrors)
+                {
+                    // We don't really insist on an error, but we tolerate one.
+                    ExpectErrors(() =>
+                    {
+                        RunComposer();
+                        handledError = true; // good enough, just continue
+                    });
+                }
+                else
+                {
+                    RunComposer();
+                }
+
+                // may as well just stop here
+                Assert.Pass();
+            }
             else
             {
                 Assert.IsTrue(false, "Bad case for behavior mode!");
@@ -292,6 +320,9 @@ namespace DecTest
 
             // Generate validation code beforehand, then run that code.
             Validation,
+
+            // Just verifies that the Null process works
+            Null,
         }
 
         public T DoRecorderRoundTrip<T>(T input, RecorderMode mode, Action<string> testSerializedResult = null, bool expectWriteErrors = false, bool expectReadErrors = false)
@@ -303,6 +334,30 @@ namespace DecTest
                 var ComposeCSFormatted = Assembly.GetAssembly(typeof(Dec.Dec)).GetType("Dec.UtilType").GetMethod("ComposeCSFormatted", BindingFlags.NonPublic | BindingFlags.Static);
 
                 CompileAndRun($"public static void Test({ComposeCSFormatted.Invoke(null, new object[] { input.GetType() })} input) {{\n{code}\n}}", new Assembly[] { this.GetType().Assembly }, "Test", new object[] { input });
+            }
+            else if (mode == RecorderMode.Null)
+            {
+                void DoWriteNull()
+                {
+                    Dec.Recorder.WriteNull(input);
+                }
+
+                if (expectWriteErrors)
+                {
+                    // We don't really insist on an error, but we tolerate one.
+                    ExpectErrors(() =>
+                    {
+                        DoWriteNull();
+                        handledError = true; // good enough, just continue
+                    });
+                }
+                else
+                {
+                    DoSerialize();
+                }
+
+                // may as well just stop here
+                Assert.Pass();
             }
 
             string serialized = null;

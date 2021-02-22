@@ -8,18 +8,24 @@ namespace DecTest
     [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false, Inherited = false)]
     public class ValuesExceptAttribute : System.Attribute, IParameterDataSource
     {
-        Enum arg1;
+        List<Enum> excepts = new List<Enum>();
 
         public ValuesExceptAttribute(object arg1)
         {
-            this.arg1 = (Enum)arg1;
+            excepts.Add((Enum)arg1);
+        }
+
+        public ValuesExceptAttribute(object arg1, object arg2)
+        {
+            excepts.Add((Enum)arg1);
+            excepts.Add((Enum)arg2);
         }
 
         public IEnumerable GetData(IParameterInfo parameter)
         {
             foreach (var value in Enum.GetValues(parameter.ParameterType))
             {
-                if (value.Equals(arg1))
+                if (excepts.Contains((Enum)value))
                 {
                     continue;
                 }
