@@ -97,9 +97,10 @@ namespace Dec
             {
                 case Recorder.Direction.Read:
                     {
+                        var rr = recorder as RecorderReader;
                         string text = null;
                         recorder.RecordAsThis(ref text);
-                        return FromString(text, type, (recorder as RecorderReader).SourceName, 0);
+                        return FromString(text, type, rr.SourceName, rr.SourceLine);
                     }    
 
                 case Recorder.Direction.Write:

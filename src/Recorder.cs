@@ -333,6 +333,7 @@ namespace Dec
         private readonly ReaderContext context;
 
         public string SourceName { get => context.sourceName; }
+        public int SourceLine { get => element.LineNumber(); }
 
         internal RecorderReader(XElement element, ReaderContext context)
         {
