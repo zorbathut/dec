@@ -7,9 +7,9 @@ namespace Fuzzgen
 {
     internal static class Rand
     {
-        private static Random rand = new Random();
+        private static readonly Random RandObj = new Random();
 
-        private static string[] AnimalWords;
+        private static readonly string[] AnimalWords;
 
         static Rand()
         {
@@ -18,23 +18,25 @@ namespace Fuzzgen
 
         public static int Next(int max)
         {
-            return rand.Next(max);
+            return RandObj.Next(max);
         }
 
         public static float Next(float max)
         {
-            return (float)(rand.NextDouble() * max);
+            return (float)(RandObj.NextDouble() * max);
         }
 
         public static int NextInt()
         {
-            return rand.Next(int.MinValue, int.MaxValue);
+            return RandObj.Next(int.MinValue, int.MaxValue);
         }
 
         public static long NextLong()
         {
             // this distribution is probably weird but it's good enough
-            return (long)((ulong)NextInt() | ((ulong)NextInt() << 32));
+            ulong low = (ulong)NextInt();
+            ulong high = (ulong)NextInt() << 32;
+            return (long)(low | high);
         }
 
         public static string NextString()
@@ -43,7 +45,7 @@ namespace Fuzzgen
 
             for (int i = 0; i < 3; ++i)
             {
-                name += AnimalWords[Rand.Next(AnimalWords.Length)];
+                name += AnimalWords[Fuzzgen.Rand.Next(AnimalWords.Length)];
             }
 
             return name;
@@ -69,14 +71,14 @@ namespace Fuzzgen
         // yes alright this is very adhoc
         public static int WeightedDistribution()
         {
-            return (int)(Math.Pow(10, Math.Pow(Rand.Next(1f), 2) * 2) - 1);
+            return (int)( Math.Pow(10, Math.Pow(Fuzzgen.Rand.Next(1f), 2) * 2) - 1);
         }
 
         // 0-10, weighted towards 0
         // and yes the same thing as above
         public static int WeightedMiniDistribution()
         {
-            return (int)(Math.Pow(10, Math.Pow(Rand.Next(1f), 1) * 1) - 1);
+            return (int)( Math.Pow(10, Math.Pow(Fuzzgen.Rand.Next(1f), 1) * 1) - 1);
         }
     }
 }
