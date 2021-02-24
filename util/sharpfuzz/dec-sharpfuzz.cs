@@ -3,9 +3,9 @@ using SharpFuzz;
 
 namespace DecSharpFuzz
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             Fuzzer.Run(str =>
             {
@@ -19,7 +19,7 @@ namespace DecSharpFuzz
 }
 
 // We need to provide some dec types it can work with.
-class SimpleDec : Dec.Dec
+public class SimpleDec : Dec.Dec
 {
-    int value;
+    public int value;
 }
