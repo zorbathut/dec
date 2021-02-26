@@ -221,7 +221,7 @@ namespace Dec
                         var identifier = Tuple.Create(typeHandle.GetDecRootType(), decName);
                         if (potentialParents.ContainsKey(identifier))
                         {
-                            Dbg.Err($"{stringName}:{decElement.LineNumber()}: Dec {identifier.Item1}:{identifier:Item2} redefined");
+                            Dbg.Err($"{stringName}:{decElement.LineNumber()}: Dec {identifier.Item1}:{identifier.Item2} defined twice");
                         }
                         else
                         {

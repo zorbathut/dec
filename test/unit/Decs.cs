@@ -147,7 +147,7 @@ namespace DecTest
                 </Decs>"));
             parser.Finish();
 
-            DoBehavior(mode);
+            DoBehavior(mode, errorValidator: err => err.Contains("IntDec:TestDec"));
 
             var result = Dec.Database<IntDec>.Get("TestDec");
             Assert.IsNotNull(result);

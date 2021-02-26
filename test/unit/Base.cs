@@ -201,7 +201,12 @@ namespace DecTest
             Null,
         }
 
-        public void DoBehavior(BehaviorMode mode, bool rewrite_expectWriteErrors = false, bool rewrite_expectParseErrors = false, bool validation_expectWriteErrors = false, Assembly[] validation_assemblies = null)
+        public void DoBehavior(BehaviorMode mode,
+            bool rewrite_expectWriteErrors = false,
+            bool rewrite_expectParseErrors = false,
+            bool validation_expectWriteErrors = false,
+            Assembly[] validation_assemblies = null,
+            Func<string, bool> errorValidator = null)
         {
             if (mode == BehaviorMode.Bare)
             {
@@ -218,7 +223,7 @@ namespace DecTest
 
                 if (rewrite_expectWriteErrors)
                 {
-                    ExpectErrors(() => RunComposer());
+                    ExpectErrors(() => RunComposer(), errorValidator: errorValidator);
                 }
                 else
                 {
@@ -239,7 +244,7 @@ namespace DecTest
 
                 if (rewrite_expectParseErrors)
                 {
-                    ExpectErrors(() => RunParser());
+                    ExpectErrors(() => RunParser(), errorValidator: errorValidator);
                 }
                 else
                 {
@@ -257,7 +262,7 @@ namespace DecTest
 
                 if (validation_expectWriteErrors)
                 {
-                    ExpectErrors(() => RunComposer());
+                    ExpectErrors(() => RunComposer(), errorValidator: errorValidator);
                 }
                 else
                 {
@@ -287,7 +292,7 @@ namespace DecTest
                     {
                         RunComposer();
                         handledError = true; // good enough, just continue
-                    });
+                    }, errorValidator: errorValidator);
                 }
                 else
                 {
