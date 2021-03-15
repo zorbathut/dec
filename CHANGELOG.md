@@ -10,10 +10,10 @@ Added Recorder.RecordAsThis(), which allows objects to turn over their entire no
 Incorrect error message on duplicate decs.
 
 ### Improved
-5-10% performance improvement for Recorder serialization.
+10-20% performance improvement for Recorder serialization.
 
 ### Breaking
-Removed user-facing XML exposure, including Converter.ToXml, Converter.FromXml, and Recorder.Xml. This functionality wasn't being used by anyone I could find and was seriously complicating development. There is currently no replacement planned.
+Removed user-facing XML exposure, including Converter.ToXml, Converter.FromXml, and Recorder.Xml. This functionality wasn't being used by anyone I could find, was reducing performance, and was seriously complicating development. There is currently no replacement planned.
 
 ### Testing
 Add small tests.
