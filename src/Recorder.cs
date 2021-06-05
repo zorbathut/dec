@@ -106,7 +106,7 @@ namespace Dec
         {
             var writerContext = new WriterXmlRecord();
 
-            Serialization.ComposeElement(writerContext.StartData(), target, target != null ? target.GetType() : typeof(T));
+            Serialization.ComposeElement(writerContext.StartData(), target, typeof(T));
 
             return writerContext.Finish(pretty);
         }
@@ -118,7 +118,7 @@ namespace Dec
         {
             var writerContext = new WriterValidationRecord();
 
-            Serialization.ComposeElement(writerContext.StartData(), target, target != null ? target.GetType() : typeof(T));
+            Serialization.ComposeElement(writerContext.StartData(), target, typeof(T));
 
             return writerContext.Finish();
         }

@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 
 
+## [Unreleased]
+### Fixed
+Passing derived classes to Recorder.Write() resulted in the wrong type when deserialized.
+
+
 ## [v0.3.0]
 ### Added
 Added Recorder.RecordAsThis(), which allows objects to turn over their entire node to a child object.

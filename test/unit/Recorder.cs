@@ -830,5 +830,30 @@ namespace DecTest
 
             Assert.AreEqual(lat.data, deserialized.data);
         }
+
+        public class BaseType : Dec.IRecordable
+        {
+            public void Record(Dec.Recorder recorder)
+            {
+
+            }
+        }
+
+        public class DerivedType : BaseType, Dec.IRecordable
+        {
+            public void Record(Dec.Recorder recorder)
+            {
+                base.Record(recorder);
+            }
+        }
+
+        [Test]
+        public void PolymorphicRoot([Values] RecorderMode mode)
+        {
+            BaseType root = new DerivedType();
+            var deserialized = DoRecorderRoundTrip(root, mode);
+
+            Assert.AreEqual(root.GetType(), deserialized.GetType());
+        }
     }
 }
