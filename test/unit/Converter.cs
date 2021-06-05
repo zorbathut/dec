@@ -48,5 +48,14 @@ namespace DecTest
             ExpectErrors(() => parser = new Dec.Parser());
             parser.Finish();
         }
+
+        public class MissingComposer { }
+
+        [Test]
+        public void MissingTypeError([Values] BehaviorMode mode)
+        {
+            object cmp = new MissingComposer();
+            ExpectErrors(() => Dec.Recorder.Write(cmp), err => err.Contains("MissingComposer"));
+        }
     }
 }
