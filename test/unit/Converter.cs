@@ -57,5 +57,35 @@ namespace DecTest
             object cmp = new MissingComposer();
             ExpectErrors(() => Dec.Recorder.Write(cmp), err => err.Contains("MissingComposer"));
         }
+
+        public class BaseType { }
+        public class DerivedType : BaseType { }
+
+        public class DerivedConverter : Dec.Converter
+        {
+            public override HashSet<Type> HandledTypes()
+            {
+                return new HashSet<Type> { typeof(DerivedType) };
+            }
+
+            public override object Record(object model, Type type, Dec.Recorder recorder)
+            {
+                return model ?? new DerivedType();
+            }
+        }
+
+        [Test]
+        public void DerivedConverterTest([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(DerivedConverter) } };
+
+            // we're only doing this to kick off the converter init
+            new Dec.Parser().Finish();
+
+            BaseType root = new DerivedType();
+            var deserialized = DoRecorderRoundTrip(root, mode);
+
+            Assert.AreEqual(root.GetType(), deserialized.GetType());
+        }
     }
 }

@@ -292,7 +292,7 @@ namespace Dec
             writer.AppendLine($"Assert.AreEqual({accessor}.Count, {count});");
         }
 
-        public override void WriteConvertible(Converter converter, object value, Type fieldType)
+        public override void WriteConvertible(Converter converter, object value)
         {
             // this isn't really a thing I can implement because the entire point of this is to compare the output to known values
             // and if we're going through Converter, we don't know what the underlying known values will be
@@ -367,7 +367,7 @@ namespace Dec
             throw new NotImplementedException();
         }
 
-        public override void WriteConvertible(Converter converter, object value, Type fieldType)
+        public override void WriteConvertible(Converter converter, object value)
         {
             throw new NotImplementedException();
         }

@@ -803,10 +803,10 @@ namespace Dec
 
             {
                 // Look for a converter; that's the only way to handle this before we fall back to reflection
-                var converter = Serialization.Converters.TryGetValue(fieldType);
+                var converter = Serialization.Converters.TryGetValue(valType);
                 if (converter != null)
                 {
-                    node.WriteConvertible(converter, value, fieldType);
+                    node.WriteConvertible(converter, value);
                     return;
                 }
             }

@@ -30,7 +30,7 @@ namespace Dec
         public abstract void WriteDictionary(IDictionary value);
         public abstract void WriteHashSet(IEnumerable value);
         public abstract void WriteRecord(IRecordable value);
-        public abstract void WriteConvertible(Converter converter, object value, Type fieldType);
+        public abstract void WriteConvertible(Converter converter, object value);
 
         public abstract void TagClass(Type type);
     }

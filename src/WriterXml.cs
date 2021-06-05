@@ -429,18 +429,18 @@ namespace Dec
             }
         }
 
-        public override void WriteConvertible(Converter converter, object value, Type fieldType)
+        public override void WriteConvertible(Converter converter, object value)
         {
             if (depth < MaxRecursionDepth)
             {
                 // This is somewhat faster than a full pending write (5-10% faster in one test case, though with a lot of noise), so we do it whenever we can.
-                converter.Record(value, fieldType, new RecorderWriter(this));
+                converter.Record(value, value.GetType(), new RecorderWriter(this));
             }
             else
             {
                 // Reset depth because this will be run only when the pending writes are ready.
                 depth = 0;
-                writer.RegisterPendingWrite(() => converter.Record(value, fieldType, new RecorderWriter(this)));
+                writer.RegisterPendingWrite(() => converter.Record(value, value.GetType(), new RecorderWriter(this)));
             }
         }
 

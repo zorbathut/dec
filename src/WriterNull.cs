@@ -138,9 +138,9 @@ namespace Dec
             value.Record(new RecorderWriter(this));
         }
 
-        public override void WriteConvertible(Converter converter, object value, Type fieldType)
+        public override void WriteConvertible(Converter converter, object value)
         {
-            converter.Record(value, fieldType, new RecorderWriter(this));
+            converter.Record(value, value.GetType(), new RecorderWriter(this));
         }
     }
 }
