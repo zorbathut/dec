@@ -839,12 +839,9 @@ namespace DecTest
             }
         }
 
-        public class DerivedType : BaseType, Dec.IRecordable
+        public class DerivedType : BaseType
         {
-            public void Record(Dec.Recorder recorder)
-            {
-                base.Record(recorder);
-            }
+            
         }
 
         [Test]
