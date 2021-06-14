@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 
-## [Unreleased]
+## [v0.3.1]
 ### Fixed
 Passing derived classes to Recorder.Write() resulted in the wrong type when deserialized.
 Misleading error messages when attempting to Record an unsupported derived class.
