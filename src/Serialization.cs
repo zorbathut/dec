@@ -203,7 +203,7 @@ namespace Dec
 
             if (hasChildren && hasText)
             {
-                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Cannot have both text and child nodes in XML (unless it's handled by a Converter and you're doing it yourself) - this is probably a typo, maybe you have the wrong number of close tags or added text somewhere you didn't mean to?");
+                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Cannot have both text and child nodes in XML - this is probably a typo, maybe you have the wrong number of close tags or added text somewhere you didn't mean to?");
 
                 // we'll just fall through and try to parse anyway, though
             }
