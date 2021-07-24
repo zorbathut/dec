@@ -72,7 +72,7 @@ namespace Dec
         /// Serialize or deserialize a member of a class as if it were this class.
         /// </summary>
         /// <remarks>
-        /// This function serializes or deserializes a class member as if it were the entire class. Call it with a reference to the member.
+        /// This function serializes or deserializes a class member as if it were this entire class. Call it with a reference to the member.
         ///
         /// This is intended for cases where a class's contents are a single method and where an extra level of indirection in XML files isn't desired.
         /// See https://github.com/zorbathut/dec/blob/master/example/loaf/RollTable.cs for an example.
