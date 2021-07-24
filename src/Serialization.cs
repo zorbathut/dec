@@ -145,7 +145,7 @@ namespace Dec
                 return refObject;
             }
 
-            // Converters may do their own processing, so we'll just defer off to them now; hell, you can even have both elements and text, if that's your jam
+            // Converters may do their own processing, so we'll just defer off to them now
             if (Converters.ContainsKey(type))
             {
                 // context might be null; that's OK at the moment
