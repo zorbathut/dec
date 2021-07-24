@@ -40,6 +40,13 @@ namespace Dec
         void Record(Recorder recorder);
     }
 
+    // This exists solely to ensure I always remember to add the right functions both to Parameter and Recorder.
+    internal interface IRecorder
+    {
+        void Record<T>(ref T value, string label);
+        void RecordAsThis<T>(ref T value);
+    }
+
     /// <summary>
     /// Main class for the serialization/deserialization system.
     /// </summary>
@@ -48,11 +55,37 @@ namespace Dec
     ///
     /// To start serializing or deserializing an object, see Recorder.Read and Recorder.Write.
     /// </remarks>
-    public abstract class Recorder
+    public abstract class Recorder : IRecorder
     {
-        internal struct Parameters
+        public struct Parameters : IRecorder
         {
+            internal Recorder recorder;
+
             internal bool asThis;
+
+            /// <summary>
+            /// Serialize or deserialize a member of a class.
+            /// </summary>
+            /// <remarks>
+            /// See [`Dec.Recorder.Record`](xref:Dec.Recorder.Record*) for details.
+            /// </remarks>
+            public void Record<T>(ref T value, string label)
+            {
+                recorder.Record(ref value, label, this);
+            }
+
+            /// <summary>
+            /// Serialize or deserialize a member of a class as if it were this class.
+            /// </summary>
+            /// <remarks>
+            /// See [`Dec.Recorder.RecordAsThis`](xref:Dec.Recorder.RecordAsThis*) for details.
+            /// </remarks>
+            public void RecordAsThis<T>(ref T value)
+            {
+                Parameters parameters = this;
+                parameters.asThis = true;
+                recorder.Record(ref value, "", parameters);
+            }
         }
 
         /// <summary>
@@ -81,7 +114,7 @@ namespace Dec
         /// </remarks>
         public void RecordAsThis<T>(ref T value)
         {
-            Record(ref value, "", new Parameters() { asThis = true });
+            Record(ref value, "", new Parameters() { recorder = this, asThis = true });
         }
 
         internal abstract void Record<T>(ref T value, string label, Parameters parameters);
