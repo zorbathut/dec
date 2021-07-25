@@ -334,7 +334,21 @@ namespace DecTest
         {
             if (mode == RecorderMode.Validation)
             {
-                var code = Dec.Recorder.WriteValidation(input);
+                string code = "";
+
+                if (expectWriteErrors)
+                {
+                    // We don't really insist on an error, but we tolerate one.
+                    ExpectErrors(() =>
+                    {
+                        code = Dec.Recorder.WriteValidation(input);
+                        handledError = true; // good enough, just continue
+                    });
+                }
+                else
+                {
+                    code = Dec.Recorder.WriteValidation(input);
+                }
 
                 var ComposeCSFormatted = Assembly.GetAssembly(typeof(Dec.Dec)).GetType("Dec.UtilType").GetMethod("ComposeCSFormatted", BindingFlags.NonPublic | BindingFlags.Static);
 
