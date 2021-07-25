@@ -358,7 +358,7 @@ namespace DecTest
                 }
                 else
                 {
-                    DoSerialize();
+                    DoWriteNull();
                 }
 
                 // may as well just stop here
