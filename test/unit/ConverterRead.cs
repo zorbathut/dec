@@ -38,7 +38,7 @@ namespace DecTest
         }
 
         [Test]
-        public void BasicFunctionality([ValuesExcept(BehaviorMode.Validation, BehaviorMode.Null)] BehaviorMode mode)
+        public void BasicFunctionality([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterDec) }, explicitConverters = new Type[]{ typeof(ConverterBasicTest) } };
 
@@ -129,7 +129,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ConverterDict([ValuesExcept(BehaviorMode.Validation, BehaviorMode.Null)] BehaviorMode mode)
+        public void ConverterDict([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterDictDec) }, explicitConverters = new Type[]{ typeof(ConverterDictTest) } };
 
@@ -161,7 +161,7 @@ namespace DecTest
         }
 
         [Test]
-        public void EmptyInputConverter([ValuesExcept(BehaviorMode.Validation, BehaviorMode.Null)] BehaviorMode mode)
+        public void EmptyInputConverter([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterStringDec) }, explicitConverters = new Type[]{ typeof(ConverterDictTest) } };
 
@@ -381,7 +381,7 @@ namespace DecTest
         }
 
         [Test]
-        public void Fallback([ValuesExcept(BehaviorMode.Validation, BehaviorMode.Null)] BehaviorMode mode)
+        public void Fallback([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(FallbackDec) }, explicitConverters = new Type[] { typeof(FallbackConverter) } };
 
