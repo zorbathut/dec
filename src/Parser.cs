@@ -244,7 +244,7 @@ namespace Dec
                             if (parent == null)
                             {
                                 // Non-parent objects are simple; we just handle them here in order to avoid unnecessary GC churn
-                                finishWork.Add(() => Serialization.ParseElement(decElement, typeHandle, decInstance, readerContext, isRootDec: true));
+                                finishWork.Add(() => Serialization.ParseElement(decElement, typeHandle, decInstance, readerContext, new Recorder.Context(), isRootDec: true));
                             }
                             else
                             {
@@ -306,7 +306,7 @@ namespace Dec
                 // The final parse is listed first, then all the children up to the final point
                 var actions = new List<Action>();
 
-                actions.Add(() => Serialization.ParseElement(work.xml, work.target.GetType(), work.target, work.context, isRootDec: true));
+                actions.Add(() => Serialization.ParseElement(work.xml, work.target.GetType(), work.target, work.context, new Recorder.Context(), isRootDec: true));
 
                 string currentDecName = work.target.DecName;
                 XElement currentXml = work.xml;
@@ -326,7 +326,7 @@ namespace Dec
                         break;
                     }
 
-                    actions.Add(() => Serialization.ParseElement(parentData.xml, work.target.GetType(), work.target, parentData.context, isRootDec: true));
+                    actions.Add(() => Serialization.ParseElement(parentData.xml, work.target.GetType(), work.target, parentData.context, new Recorder.Context(), isRootDec: true));
 
                     currentDecName = parentDecName;
                     currentXml = parentData.xml;

@@ -13,7 +13,7 @@ namespace Dec
         // The inheritance tree is kind of messed up right now and should be fixed.
         private WriterUtil.PendingWriteCoordinator pendingWriteCoordinator = new WriterUtil.PendingWriteCoordinator();
 
-        public abstract bool RegisterReference(object referenced, XElement element);
+        public abstract bool RegisterReference(object referenced, XElement element, Recorder.Context recContext);
 
         public void RegisterPendingWrite(Action action)
         {
@@ -41,7 +41,7 @@ namespace Dec
             doc.Add(decs);
         }
 
-        public override bool RegisterReference(object referenced, XElement element)
+        public override bool RegisterReference(object referenced, XElement element, Recorder.Context recContext)
         {
             // We never register references in Compose mode.
             return false;
@@ -93,16 +93,41 @@ namespace Dec
             record.Add(refs);
         }
 
-        public override bool RegisterReference(object referenced, XElement element)
+        public override bool RegisterReference(object referenced, XElement element, Recorder.Context recContext)
         {
-            if (!refToElement.ContainsKey(referenced))
+            if (!refToElement.TryGetValue(referenced, out var xelement))
             {
-                // Insert it into our refToElement mapping
-                refToElement[referenced] = element;
-                elementToRef[element] = referenced;
+                if (recContext.Referenceable)
+                {
+                    // Insert it into our refToElement mapping
+                    refToElement[referenced] = element;
+                    elementToRef[element] = referenced;
+                }
+                else
+                {
+                    // Cannot be referenced, so we insert a fake null entry
+                    refToElement[referenced] = null;
+
+                    // Note: It is important not to add an elementToRef entry because this is later used to split long hierarchies
+                    // and if you split a long hierarchy around a non-referencable barrier, everything breaks!
+                }
 
                 // We still need this to be generated, so we'll just let that happen now
                 return false;
+            }
+
+            if (xelement == null)
+            {
+                // This is an unreferencable object! We are in trouble.
+                Dbg.Err("Attempt to create a new reference to an unreferenceable object. Will be left with default values.");
+                return true;
+            }
+
+            // We have a referencable target, but do *we* allow a reference?
+            if (!recContext.Referenceable)
+            {
+                Dbg.Err("Attempt to create a new unreferenceable recording of a referenceable object. Will be left with default values.");
+                return true;
             }
 
             var refId = refToString.TryGetValue(referenced);
@@ -248,7 +273,7 @@ namespace Dec
 
         public override bool AllowReflection { get => writer.AllowReflection; }
 
-        private WriterNodeXml(WriterXml writer, XElement parent, string label, int depth)
+        private WriterNodeXml(WriterXml writer, XElement parent, string label, int depth, Recorder.Context context) : base(context)
         {
             this.writer = writer;
             this.depth = depth;
@@ -259,24 +284,24 @@ namespace Dec
 
         public static WriterNodeXml StartDec(WriterXmlCompose writer, XElement decRoot, string type, string decName)
         {
-            var node = new WriterNodeXml(writer, decRoot, type, 0);
+            var node = new WriterNodeXml(writer, decRoot, type, 0, new Recorder.Context());
             node.GetXElement().Add(new XAttribute("decName", decName));
             return node;
         }
 
         public static WriterNodeXml StartData(WriterXmlRecord writer, XElement decRoot, string name)
         {
-            return new WriterNodeXml(writer, decRoot, name, 0);
+            return new WriterNodeXml(writer, decRoot, name, 0, new Recorder.Context());
         }
 
-        public override WriterNode CreateChild(string label)
+        public override WriterNode CreateChild(string label, Recorder.Context context)
         {
-            return new WriterNodeXml(writer, node, label, depth + 1);
+            return new WriterNodeXml(writer, node, label, depth + 1, context);
         }
 
-        public override WriterNode CreateMember(System.Reflection.FieldInfo field)
+        public override WriterNode CreateMember(System.Reflection.FieldInfo field, Recorder.Context context)
         {
-            return new WriterNodeXml(writer, node, field.Name, depth + 1);
+            return new WriterNodeXml(writer, node, field.Name, depth + 1, context);
         }
 
         public override void WritePrimitive(object value)
@@ -357,7 +382,7 @@ namespace Dec
 
         public override bool WriteReference(object value)
         {
-            return writer.RegisterReference(value, node);
+            return writer.RegisterReference(value, node, context);
         }
 
         public override void WriteArray(Array value)
@@ -366,7 +391,7 @@ namespace Dec
 
             for (int i = 0; i < value.Length; ++i)
             {
-                Serialization.ComposeElement(CreateChild("li"), value.GetValue(i), referencedType);
+                Serialization.ComposeElement(CreateChild("li", context), value.GetValue(i), referencedType, context);
             }
         }
 
@@ -376,7 +401,7 @@ namespace Dec
 
             for (int i = 0; i < value.Count; ++i)
             {
-                Serialization.ComposeElement(CreateChild("li"), value[i], referencedType);
+                Serialization.ComposeElement(CreateChild("li", context), value[i], referencedType, context);
             }
         }
 
@@ -392,10 +417,10 @@ namespace Dec
                 // In theory, some dicts support inline format, not li format. Inline format is cleaner and smaller and we should be using it when possible.
                 // In practice, it's hard and I'm lazy and this always works, and we're not providing any guarantees about cleanliness of serialized output.
                 // Revisit this later when someone (possibly myself) really wants it improved.
-                var li = CreateChild("li");
+                var li = CreateChild("li", context);
 
-                Serialization.ComposeElement(li.CreateChild("key"), iterator.Key, keyType);
-                Serialization.ComposeElement(li.CreateChild("value"), iterator.Value, valueType);
+                Serialization.ComposeElement(li.CreateChild("key", context), iterator.Key, keyType, context);
+                Serialization.ComposeElement(li.CreateChild("value", context), iterator.Value, valueType, context);
             }
         }
 
@@ -410,7 +435,7 @@ namespace Dec
                 // In theory, some sets support inline format, not li format. Inline format is cleaner and smaller and we should be using it when possible.
                 // In practice, it's hard and I'm lazy and this always works, and we're not providing any guarantees about cleanliness of serialized output.
                 // Revisit this later when someone (possibly myself) really wants it improved.
-                Serialization.ComposeElement(CreateChild("li"), iterator.Current, keyType);
+                Serialization.ComposeElement(CreateChild("li", context), iterator.Current, keyType, context);
             }
         }
 

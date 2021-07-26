@@ -16,7 +16,7 @@ namespace Dec
 
             foreach (var decObj in Database.List)
             {
-                Serialization.ComposeElement(writerContext.StartDec(decObj.GetType(), decObj.DecName), decObj, decObj.GetType(), isRootDec: true);
+                Serialization.ComposeElement(writerContext.StartDec(decObj.GetType(), decObj.DecName), decObj, decObj.GetType(), new Recorder.Context(), isRootDec: true);
             }
 
             return writerContext.Finish(pretty);
@@ -28,7 +28,7 @@ namespace Dec
 
             foreach (var decObj in Database.List)
             {
-                Serialization.ComposeElement(writerContext.StartDec(decObj.GetType(), decObj.DecName), decObj, decObj.GetType(), isRootDec: true);
+                Serialization.ComposeElement(writerContext.StartDec(decObj.GetType(), decObj.DecName), decObj, decObj.GetType(), new Recorder.Context(), isRootDec: true);
             }
 
             return writerContext.Finish();

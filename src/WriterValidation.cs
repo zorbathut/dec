@@ -54,6 +54,10 @@ namespace Dec
     // This is used for things that can be expressed as an easy inline string, which is used as part of the Dictionary-handling code.
     internal abstract class WriterNodeCS : WriterNode
     {
+        public WriterNodeCS() : base(new Recorder.Context())
+        {
+        }
+
         public abstract void WriteToken(string token);
 
         public override void WritePrimitive(object value)
@@ -149,12 +153,12 @@ namespace Dec
             this.accessor = accessor;
         }
 
-        public override WriterNode CreateChild(string label)
+        public override WriterNode CreateChild(string label, Recorder.Context context)
         {
             return new WriterNodeValidation(writer, $"{accessor}.{label}");
         }
 
-        public override WriterNode CreateMember(System.Reflection.FieldInfo field)
+        public override WriterNode CreateMember(System.Reflection.FieldInfo field, Recorder.Context context)
         {
             if (field.IsPublic)
             {
@@ -229,7 +233,7 @@ namespace Dec
 
             for (int i = 0; i < value.Length; ++i)
             {
-                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}[{i}]"), value.GetValue(i), referencedType);
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}[{i}]"), value.GetValue(i), referencedType, context);
             }
 
             writer.AppendLine($"}}");
@@ -245,7 +249,7 @@ namespace Dec
 
             for (int i = 0; i < value.Count; ++i)
             {
-                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}[{i}]"), value[i], referencedType);
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}[{i}]"), value[i], referencedType, context);
             }
 
             writer.AppendLine($"}}");
@@ -262,10 +266,10 @@ namespace Dec
             while (iterator.MoveNext())
             {
                 var keyNode = new WriterNodeStringize();
-                Serialization.ComposeElement(keyNode, iterator.Key, keyType);
+                Serialization.ComposeElement(keyNode, iterator.Key, keyType, context);
 
                 writer.AppendLine($"if ({accessor}.ContainsKey({keyNode.SerializedString})) {{");
-                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}[{keyNode.SerializedString}]"), iterator.Value, valueType);
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}[{keyNode.SerializedString}]"), iterator.Value, valueType, context);
                 writer.AppendLine($"}} else {{");
                 writer.AppendLine($"Assert.IsTrue({accessor}.ContainsKey({keyNode.SerializedString}));");   // this is unnecessary - it could just be .Fail() - but this gives you a *much* better error message
                 writer.AppendLine($"}}");
@@ -281,7 +285,7 @@ namespace Dec
             while (iterator.MoveNext())
             {
                 var keyNode = new WriterNodeStringize();
-                Serialization.ComposeElement(keyNode, iterator.Current, keyType);
+                Serialization.ComposeElement(keyNode, iterator.Current, keyType, context);
 
                 // You might think "Assert.Contains" would do what we want, but it doesn't - it requires an ICollection and HashSet isn't an ICollection.
                 writer.AppendLine($"Assert.IsTrue({accessor}.Contains({keyNode.SerializedString}));");
@@ -317,12 +321,12 @@ namespace Dec
             SerializedString = token;
         }
 
-        public override WriterNode CreateChild(string label)
+        public override WriterNode CreateChild(string label, Recorder.Context context)
         {
             throw new NotImplementedException();
         }
 
-        public override WriterNode CreateMember(System.Reflection.FieldInfo field)
+        public override WriterNode CreateMember(System.Reflection.FieldInfo field, Recorder.Context context)
         {
             throw new NotImplementedException();
         }

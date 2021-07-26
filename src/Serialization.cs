@@ -60,7 +60,7 @@ namespace Dec
             }
         }
 
-        internal static object ParseElement(XElement element, Type type, object model, ReaderContext context, bool isRootDec = false, bool hasReferenceId = false)
+        internal static object ParseElement(XElement element, Type type, object model, ReaderContext context, Recorder.Context recContext, bool isRootDec = false, bool hasReferenceId = false)
         {
             // The first thing we do is parse all our attributes. This is because we want to verify that there are no attributes being ignored.
             // Don't return anything until we do our element.HasAtttributes check!
@@ -121,6 +121,11 @@ namespace Dec
                 if (element.HasAttributes)
                 {
                     Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Has unconsumed attributes");
+                }
+
+                if (!recContext.Referenceable)
+                {
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Found a reference in a non-referenceable context, using it anyway");
                 }
 
                 if (context == null)
@@ -217,7 +222,66 @@ namespace Dec
             // Special case: IRecordables
             if (typeof(IRecordable).IsAssignableFrom(type))
             {
-                var recordable = (IRecordable)(model ?? type.CreateInstanceSafe("recordable", () => $"{context.sourceName}:{element.LineNumber()}"));
+                IRecordable recordable = null;
+
+                if (model != null)
+                {
+                    recordable = (IRecordable)model;
+                }
+                else if (recContext.factories == null)
+                {
+                    recordable = (IRecordable)type.CreateInstanceSafe("recordable", () => $"{context.sourceName}:{element.LineNumber()}");
+                }
+                else
+                {
+                    // Iterate back to the appropriate type.
+                    Type targetType = type;
+                    Func<Type, object> maker = null;
+                    while (true)
+                    {
+                        if (recContext.factories.TryGetValue(targetType, out maker))
+                        {
+                            break;
+                        }
+
+                        targetType = targetType.BaseType;
+                    }
+
+                    if (maker == null)
+                    {
+                        recordable = (IRecordable)type.CreateInstanceSafe("recordable", () => $"{context.sourceName}:{element.LineNumber()}");
+                    }
+                    else
+                    {
+                        // want to propogate this throughout the factories list to save on time later
+                        // we're actually doing the same BaseType thing again, starting from scratch
+                        Type writeType = type;
+                        while (writeType != targetType)
+                        {
+                            recContext.factories[writeType] = maker;
+                            writeType = writeType.BaseType;
+                        }
+
+                        // oh right and I guess we should actually make the thing too
+                        var obj = maker(type);
+
+                        if (obj == null)
+                        {
+                            // fall back to default behavior
+                            recordable = (IRecordable)type.CreateInstanceSafe("recordable", () => $"{context.sourceName}:{element.LineNumber()}");
+                        }
+                        else if (!type.IsAssignableFrom(obj.GetType()))
+                        {
+                            Dbg.Err($"Custom factory generated {obj.GetType()} when {type} was expected; falling back on a default object");
+                            recordable = (IRecordable)type.CreateInstanceSafe("recordable", () => $"{context.sourceName}:{element.LineNumber()}");
+                        }
+                        else
+                        {
+                            // now that we've checked this is of the right type
+                            recordable = (IRecordable)obj;
+                        }
+                    }
+                }
 
                 if (recordable != null)
                 {
@@ -274,7 +338,7 @@ namespace Dec
                         Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                     }
 
-                    list.Add(ParseElement(fieldElement, referencedType, null, context));
+                    list.Add(ParseElement(fieldElement, referencedType, null, context, recContext));
                 }
 
                 return list;
@@ -298,7 +362,7 @@ namespace Dec
                         Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                     }
 
-                    array.SetValue(ParseElement(fieldElement, referencedType, null, context), i);
+                    array.SetValue(ParseElement(fieldElement, referencedType, null, context, recContext), i);
                 }
 
                 return array;
@@ -336,7 +400,7 @@ namespace Dec
                             continue;
                         }
 
-                        var key = ParseElement(keyNode, keyType, null, context);
+                        var key = ParseElement(keyNode, keyType, null, context, recContext);
 
                         if (key == null)
                         {
@@ -349,7 +413,7 @@ namespace Dec
                             Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Dictionary includes duplicate key {key.ToString()}");
                         }
 
-                        dict[key] = ParseElement(valueNode, valueType, null, context);
+                        dict[key] = ParseElement(valueNode, valueType, null, context, recContext);
                     }
                     else
                     {
@@ -367,7 +431,7 @@ namespace Dec
                             Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Dictionary includes duplicate key {fieldElement.Name.LocalName}");
                         }
 
-                        dict[key] = ParseElement(fieldElement, valueType, null, context);
+                        dict[key] = ParseElement(fieldElement, valueType, null, context, recContext);
                     }
                 }
 
@@ -407,7 +471,7 @@ namespace Dec
                     if (fieldElement.Name.LocalName == "li")
                     {
                         // Treat this like a full node
-                        var key = ParseElement(fieldElement, keyType, null, context);
+                        var key = ParseElement(fieldElement, keyType, null, context, recContext);
                         var keyParam = new object[] { key };
 
                         if (key == null)
@@ -538,7 +602,7 @@ namespace Dec
                     continue;
                 }
 
-                fieldInfo.SetValue(model, ParseElement(fieldElement, fieldInfo.FieldType, fieldInfo.GetValue(model), context));
+                fieldInfo.SetValue(model, ParseElement(fieldElement, fieldInfo.FieldType, fieldInfo.GetValue(model), context, recContext));
             }
 
 
@@ -663,7 +727,7 @@ namespace Dec
         }
 
         internal static Type TypeSystemRuntimeType = Type.GetType("System.RuntimeType");
-        internal static void ComposeElement(WriterNode node, object value, Type fieldType, bool isRootDec = false)
+        internal static void ComposeElement(WriterNode node, object value, Type fieldType, Recorder.Context recContext, bool isRootDec = false)
         {
             // Handle Dec types, if this isn't a root (otherwise we'd just reference ourselves and that's kind of pointless)
             if (!isRootDec && value is Dec)
@@ -821,7 +885,7 @@ namespace Dec
             
             foreach (var field in valType.GetSerializableFieldsFromHierarchy())
             {
-                ComposeElement(node.CreateMember(field), field.GetValue(value), field.FieldType);
+                ComposeElement(node.CreateMember(field, recContext), field.GetValue(value), field.FieldType, recContext);
             }
 
             return;

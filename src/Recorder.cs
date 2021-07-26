@@ -45,6 +45,8 @@ namespace Dec
     {
         void Record<T>(ref T value, string label);
         void RecordAsThis<T>(ref T value);
+
+        Recorder.Parameters WithFactory(Dictionary<Type, Func<Type, object>> factories);
     }
 
     /// <summary>
@@ -62,6 +64,8 @@ namespace Dec
             internal Recorder recorder;
 
             internal bool asThis;
+
+            internal Dictionary<Type, Func<Type, object>> factories;
 
             /// <summary>
             /// Serialize or deserialize a member of a class.
@@ -85,6 +89,41 @@ namespace Dec
                 Parameters parameters = this;
                 parameters.asThis = true;
                 recorder.Record(ref value, "", parameters);
+            }
+
+            /// <summary>
+            /// Add a factory layer to objects created during this call.
+            /// </summary>
+            /// <remarks>
+            /// See [`Dec.Recorder.WithFactory`](xref:Dec.Recorder.WithFactory) for details.
+            /// </remarks>
+            public Parameters WithFactory(Dictionary<Type, Func<Type, object>> factories)
+            {
+                Parameters parameters = this;
+                if (parameters.factories != null)
+                {
+                    Dbg.Err("Recorder.WithFactory() called on Recorder.Parameters that already has factories. This is undefined results; currently replacing the old factory dictionary with the new one.");
+                }
+                
+                parameters.factories = factories;
+
+                return parameters;
+            }
+
+            internal Context CreateContext()
+            {
+                return new Context() { factories = factories };
+            }
+        }
+
+        // This is used for passing data to the Parse and Compose functions.
+        internal struct Context
+        {
+            public Dictionary<Type, Func<Type, object>> factories;
+
+            public bool Referenceable
+            {
+                get => factories == null;
             }
         }
 
@@ -120,6 +159,29 @@ namespace Dec
         internal abstract void Record<T>(ref T value, string label, Parameters parameters);
 
         /// <summary>
+        /// Add a factory layer to objects created during this call.
+        /// </summary>
+        /// <remarks>
+        /// This allows you to create your own object initializer for things deserialized during this call. Standard Recorder functionality will apply on the object returned.
+        /// This is sometimes a convenient way to set per-object defaults when deserializing.
+        ///
+        /// The initializer layout takes the form of a dictionary from Type to Func&lt;Type, object&gt;.
+        /// When creating a new object, Dec will first look for a dictionary key of that type, then continue checking base types iteratively until it either finds a callback or passes `object`.
+        /// That callback will be given a desired type and must return either an object of that type, an object of a type derived from that type, or `null`.
+        /// On `null`, Dec will fall back to its default behavior. In each other case, it will then be deserialized as usual.
+        ///
+        /// The factory callback will persist until the next Recorder is called; recursive calls past that will be reset to default behavior.
+        /// This means that it will effectively tunnel through supported containers such as List&lt;&gt; and Dictionary&lt;&gt;, allowing you to control the constructor of `CustomType` in ` List&lt;CustomType&gt;`.
+        ///
+        /// Be aware that any classes created with a factory callback added *cannot* be referenced from multiple places in Record hierarchy - the normal ref structure does not function with them.
+        /// Also, be aware that excessively deep hierarchies full of factory callbacks may result in performance issues when writing pretty-print XML; this is not likely to be a problem in normal code, however.
+        /// </remarks>
+        public Parameters WithFactory(Dictionary<Type, Func<Type, object>> factories)
+        {
+            return new Parameters() { recorder = this, factories = factories };
+        }
+
+        /// <summary>
         /// Indicates whether this Recorder is being used for reading or writing.
         /// </summary>
         public enum Direction
@@ -139,7 +201,7 @@ namespace Dec
         {
             var writerContext = new WriterXmlRecord();
 
-            Serialization.ComposeElement(writerContext.StartData(), target, typeof(T));
+            Serialization.ComposeElement(writerContext.StartData(), target, typeof(T), new Recorder.Context());
 
             return writerContext.Finish(pretty);
         }
@@ -151,7 +213,7 @@ namespace Dec
         {
             var writerContext = new WriterValidationRecord();
 
-            Serialization.ComposeElement(writerContext.StartData(), target, typeof(T));
+            Serialization.ComposeElement(writerContext.StartData(), target, typeof(T), new Recorder.Context());
 
             return writerContext.Finish();
         }
@@ -259,7 +321,7 @@ namespace Dec
                     }
 
                     // Do our actual parsing
-                    var refInstanceOutput = Serialization.ParseElement(reference, refInstance.GetType(), refInstance, readerContext, hasReferenceId: true);
+                    var refInstanceOutput = Serialization.ParseElement(reference, refInstance.GetType(), refInstance, readerContext, new Recorder.Context(), hasReferenceId: true);
 
                     if (refInstance != refInstanceOutput)
                     {
@@ -279,7 +341,7 @@ namespace Dec
 
             // And now, we can finally parse our actual root element!
             // (which accounts for a tiny percentage of things that need to be parsed)
-            return (T)Serialization.ParseElement(data, typeof(T), null, readerContext);
+            return (T)Serialization.ParseElement(data, typeof(T), null, readerContext, new Recorder.Context());
         }
     }
 
@@ -312,7 +374,7 @@ namespace Dec
 
                 asThis = true;
 
-                Serialization.ComposeElement(node, value, typeof(T));
+                Serialization.ComposeElement(node, value, typeof(T), parameters.CreateContext());
 
                 return;
             }
@@ -325,7 +387,7 @@ namespace Dec
 
             fields.Add(label);
 
-            Serialization.ComposeElement(node.CreateChild(label), value, typeof(T));
+            Serialization.ComposeElement(node.CreateChild(label, parameters.CreateContext()), value, typeof(T), parameters.CreateContext());
         }
 
         public override Direction Mode { get => Direction.Write; }
@@ -377,7 +439,7 @@ namespace Dec
                 asThis = true;
 
                 // Explicit cast here because we want an error if we have the wrong type!
-                value = (T)Serialization.ParseElement(element, typeof(T), value, context);
+                value = (T)Serialization.ParseElement(element, typeof(T), value, context, parameters.CreateContext());
 
                 return;
             }
@@ -389,7 +451,7 @@ namespace Dec
             }
 
             // Explicit cast here because we want an error if we have the wrong type!
-            value = (T)Serialization.ParseElement(recorded, typeof(T), value, context);
+            value = (T)Serialization.ParseElement(recorded, typeof(T), value, context, parameters.CreateContext());
         }
 
         public override Direction Mode { get => Direction.Read; }

@@ -11,12 +11,18 @@ namespace Dec
 
     internal abstract class WriterNode
     {
+        protected Recorder.Context context;
+        public WriterNode(Recorder.Context context)
+        {
+            this.context = context;
+        }
+
         public abstract bool AllowReflection { get; }
 
         // this needs to be more abstract
-        public abstract WriterNode CreateChild(string label);
+        public abstract WriterNode CreateChild(string label, Recorder.Context context);
 
-        public abstract WriterNode CreateMember(System.Reflection.FieldInfo field);
+        public abstract WriterNode CreateMember(System.Reflection.FieldInfo field, Recorder.Context context);
 
         public abstract void WritePrimitive(object value);
         public abstract void WriteEnum(object value);
