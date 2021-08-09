@@ -667,5 +667,30 @@ namespace DecTest
                 }
             }
         }
+
+        public class SidestepCore : Dec.IRecordable
+        {
+            public Factoried one;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder
+                    .WithFactory(new Dictionary<Type, Func<Type, object>>() { { typeof(FactoriedDerived), _ => new FactoriedDerived() { value = 1 } } })
+                    .Record(ref one, "one");
+            }
+        }
+
+        [Test]
+        public void Sidestep([Values] RecorderMode mode)
+        {
+            var element = new SidestepCore();
+
+            element.one = new FactoriedDerivedSibling();
+
+            var deserialized = DoRecorderRoundTrip(element, mode);
+
+            Assert.IsInstanceOf(typeof(FactoriedDerivedSibling), element.one);
+            Assert.AreEqual(0, deserialized.one.value);
+        }
     }
 }

@@ -237,7 +237,7 @@ namespace Dec
                     // Iterate back to the appropriate type.
                     Type targetType = type;
                     Func<Type, object> maker = null;
-                    while (true)
+                    while (targetType != null)
                     {
                         if (recContext.factories.TryGetValue(targetType, out maker))
                         {
