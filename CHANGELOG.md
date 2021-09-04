@@ -2,6 +2,20 @@
 All notable changes to this project will be documented in this file.
 
 
+## [Unreleased]
+### Added
+Added an optional factory callback for Recorder functionality, allowing contextual default options for deserialization.
+
+### Documentation
+Various small documentation improvements and error message improvements.
+
+### Breaking
+Removed the Null writer, which was intended for benchmarking and testing but which was a giant pain and frankly not worth the effort.
+
+### Testing
+Fix several test bugs that could generate false passes (but weren't.)
+
+
 ## [v0.3.1]
 ### Fixed
 Passing derived classes to Recorder.Write() resulted in the wrong type when deserialized.
