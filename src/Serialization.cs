@@ -60,6 +60,22 @@ namespace Dec
             }
         }
 
+        private static object GenerateResultFallback(object model, Type type)
+        {
+            if (model != null)
+            {
+                return model;
+            }
+            else if (type.IsValueType)
+            {
+                return Activator.CreateInstance(type);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         internal static object ParseElement(XElement element, Type type, object model, ReaderContext context, Recorder.Context recContext, bool isRootDec = false, bool hasReferenceId = false)
         {
             // The first thing we do is parse all our attributes. This is because we want to verify that there are no attributes being ignored.
@@ -156,22 +172,6 @@ namespace Dec
                 // context might be null; that's OK at the moment
                 object result;
 
-                object GenerateResultFallback()
-                {
-                    if (model != null)
-                    {
-                        return model;
-                    }
-                    else if (type.IsValueType)
-                    {
-                        return Activator.CreateInstance(type);
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }
-
                 try
                 {
                     result = Converters[type].Record(model, type, new RecorderReader(element, context));
@@ -180,7 +180,7 @@ namespace Dec
                 {
                     Dbg.Ex(e);
 
-                    result = GenerateResultFallback();
+                    result = GenerateResultFallback(model, type);
                 }
 
                 // This is an important check if we have a referenced type, because if we've changed the result, references won't link up to it properly.
@@ -194,7 +194,7 @@ namespace Dec
                 if (result != null && !type.IsAssignableFrom(result.GetType()))
                 {
                     Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Converter {Converters[type].GetType()} for {type} returned unexpected type {result.GetType()}");
-                    result = GenerateResultFallback();
+                    result = GenerateResultFallback(model, type);
                     return result;
                 }
 
