@@ -35,6 +35,8 @@ namespace Dec
         public abstract void WriteList(IList value);
         public abstract void WriteDictionary(IDictionary value);
         public abstract void WriteHashSet(IEnumerable value);
+        public abstract void WriteTuple(object value);
+        public abstract void WriteValueTuple(object value);
         public abstract void WriteRecord(IRecordable value);
         public abstract void WriteConvertible(Converter converter, object value);
 

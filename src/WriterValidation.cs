@@ -296,6 +296,30 @@ namespace Dec
             writer.AppendLine($"Assert.AreEqual({accessor}.Count, {count});");
         }
 
+        public override void WriteTuple(object value)
+        {
+            var args = value.GetType().GenericTypeArguments;
+            var length = args.Length;
+
+            for (int i = 0; i < length; ++i)
+            {
+                var propertyName = $"Item{i + 1}";
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}.{propertyName}"), value.GetType().GetProperty(propertyName).GetValue(value), args[i], context);
+            }
+        }
+
+        public override void WriteValueTuple(object value)
+        {
+            var args = value.GetType().GenericTypeArguments;
+            var length = args.Length;
+
+            for (int i = 0; i < length; ++i)
+            {
+                var propertyName = $"Item{i + 1}";
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}.{propertyName}"), value.GetType().GetField(propertyName).GetValue(value), args[i], context);
+            }
+        }
+
         public override void WriteConvertible(Converter converter, object value)
         {
             // this isn't really a thing I can implement because the entire point of this is to compare the output to known values
@@ -367,6 +391,16 @@ namespace Dec
         }
 
         public override void WriteHashSet(IEnumerable value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void WriteTuple(object value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void WriteValueTuple(object value)
         {
             throw new NotImplementedException();
         }

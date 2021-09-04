@@ -439,6 +439,30 @@ namespace Dec
             }
         }
 
+        public override void WriteTuple(object value)
+        {
+            var args = value.GetType().GenericTypeArguments;
+            var length = args.Length;
+
+            for (int i = 0; i < length; ++i)
+            {
+                var propertyName = $"Item{i + 1}";
+                Serialization.ComposeElement(CreateChild("li", context), value.GetType().GetProperty(propertyName).GetValue(value), args[i], context);
+            }
+        }
+
+        public override void WriteValueTuple(object value)
+        {
+            var args = value.GetType().GenericTypeArguments;
+            var length = args.Length;
+
+            for (int i = 0; i < length; ++i)
+            {
+                var propertyName = $"Item{i + 1}";
+                Serialization.ComposeElement(CreateChild("li", context), value.GetType().GetField(propertyName).GetValue(value), args[i], context);
+            }
+        }
+
         public override void WriteRecord(IRecordable value)
         {
             if (depth < MaxRecursionDepth)

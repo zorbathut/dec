@@ -517,6 +517,60 @@ namespace Dec
                 return set;
             }
 
+            // Special case: A bucket of tuples
+            // These are all basically identical, but AFAIK there's no good way to test them all in a better way.
+            if (type.IsGenericType && (
+                    type.GetGenericTypeDefinition() == typeof(Tuple<>) ||
+                    type.GetGenericTypeDefinition() == typeof(Tuple<,>) ||
+                    type.GetGenericTypeDefinition() == typeof(Tuple<,,>) ||
+                    type.GetGenericTypeDefinition() == typeof(Tuple<,,,>) ||
+                    type.GetGenericTypeDefinition() == typeof(Tuple<,,,,>) ||
+                    type.GetGenericTypeDefinition() == typeof(Tuple<,,,,,>) ||
+                    type.GetGenericTypeDefinition() == typeof(Tuple<,,,,,,>) ||
+                    type.GetGenericTypeDefinition() == typeof(Tuple<,,,,,,,>) ||
+                    type.GetGenericTypeDefinition() == typeof(ValueTuple<>) ||
+                    type.GetGenericTypeDefinition() == typeof(ValueTuple<,>) ||
+                    type.GetGenericTypeDefinition() == typeof(ValueTuple<,,>) ||
+                    type.GetGenericTypeDefinition() == typeof(ValueTuple<,,,>) ||
+                    type.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,>) ||
+                    type.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,,>) ||
+                    type.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,,,>) ||
+                    type.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,,,,>)
+                    ))
+            {
+                int expectedCount = type.GenericTypeArguments.Length;
+
+                object[] parameters = new object[expectedCount];
+                var elements = element.Elements().ToList();
+
+                foreach (var elementField in elements)
+                {
+                    if (elementField.Name.LocalName != "li")
+                    {
+                        Dbg.Err($"{context.sourceName}:{elementField.LineNumber()}: Tuple field should be named 'li' but is named {elementField.Name.LocalName} instead");
+                    }
+                }
+
+                if (elements.Count != parameters.Length)
+                {
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Tuple expects {expectedCount} parameters but got {elements.Count}");
+                }
+
+                for (int i = 0; i < Math.Min(parameters.Length, elements.Count); ++i)
+                {
+                    parameters[i] = ParseElement(elements[i], type.GenericTypeArguments[i], null, context, recContext);
+                }
+
+                // fill in anything missing
+                for (int i = Math.Min(parameters.Length, elements.Count); i < parameters.Length; ++i)
+                {
+                    parameters[i] = GenerateResultFallback(null, type.GenericTypeArguments[i]);
+                }
+
+                // construct!
+                return Activator.CreateInstance(type, parameters);
+            }
+
             // At this point, we're either a class or a struct, and we need to do the reflection thing
 
             // If we have refs, something has gone wrong; we should never be doing reflection inside a Record system.
@@ -855,6 +909,38 @@ namespace Dec
             if (valType.IsGenericType && valType.GetGenericTypeDefinition() == typeof(HashSet<>))
             {
                 node.WriteHashSet(value as IEnumerable);
+
+                return;
+            }
+
+            if (valType.IsGenericType && (
+                    valType.GetGenericTypeDefinition() == typeof(Tuple<>) ||
+                    valType.GetGenericTypeDefinition() == typeof(Tuple<,>) ||
+                    valType.GetGenericTypeDefinition() == typeof(Tuple<,,>) ||
+                    valType.GetGenericTypeDefinition() == typeof(Tuple<,,,>) ||
+                    valType.GetGenericTypeDefinition() == typeof(Tuple<,,,,>) ||
+                    valType.GetGenericTypeDefinition() == typeof(Tuple<,,,,,>) ||
+                    valType.GetGenericTypeDefinition() == typeof(Tuple<,,,,,,>) ||
+                    valType.GetGenericTypeDefinition() == typeof(Tuple<,,,,,,,>)
+                ))
+            {
+                node.WriteTuple(value);
+
+                return;
+            }
+
+            if (valType.IsGenericType && (
+                    valType.GetGenericTypeDefinition() == typeof(ValueTuple<>) ||
+                    valType.GetGenericTypeDefinition() == typeof(ValueTuple<,>) ||
+                    valType.GetGenericTypeDefinition() == typeof(ValueTuple<,,>) ||
+                    valType.GetGenericTypeDefinition() == typeof(ValueTuple<,,,>) ||
+                    valType.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,>) ||
+                    valType.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,,>) ||
+                    valType.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,,,>) ||
+                    valType.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,,,,>)
+                ))
+            {
+                node.WriteValueTuple(value);
 
                 return;
             }

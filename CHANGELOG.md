@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 Added an optional factory callback for Recorder functionality, allowing contextual default options for deserialization.
+Added native Tuple and ValueTuple support.
 
 ### Documentation
 Various small documentation improvements and error message improvements.
