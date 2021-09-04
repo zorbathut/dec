@@ -68,6 +68,7 @@ namespace Dec
             }
             else if (type.IsValueType)
             {
+                // We don't need Safe here because all value types are required to have a default constructor.
                 return Activator.CreateInstance(type);
             }
             else
