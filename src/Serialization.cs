@@ -525,7 +525,7 @@ namespace Dec
             // And the full reflection system is probably impossible to secure, whereas the Record system should be secureable.
             if (context.RecorderMode)
             {
-                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Falling back to reflection within a Record system; this is currently not allowed for security reasons");
+                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Falling back to reflection within a Record system while parsing a {type}; this is currently not allowed for security reasons. Do you need a Converter?");
                 return model;
             }
 
