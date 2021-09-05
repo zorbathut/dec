@@ -296,27 +296,31 @@ namespace Dec
             writer.AppendLine($"Assert.AreEqual({accessor}.Count, {count});");
         }
 
-        public override void WriteTuple(object value)
+        public override void WriteTuple(object value, System.Runtime.CompilerServices.TupleElementNamesAttribute names)
         {
             var args = value.GetType().GenericTypeArguments;
             var length = args.Length;
 
+            var nameArray = names?.TransformNames ?? Util.DefaultTupleNames;
+
             for (int i = 0; i < length; ++i)
             {
-                var propertyName = $"Item{i + 1}";
-                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}.{propertyName}"), value.GetType().GetProperty(propertyName).GetValue(value), args[i], context);
+                var propertyName = nameArray[i];
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}.{propertyName}"), value.GetType().GetProperty(Util.DefaultTupleNames[i]).GetValue(value), args[i], context);
             }
         }
 
-        public override void WriteValueTuple(object value)
+        public override void WriteValueTuple(object value, System.Runtime.CompilerServices.TupleElementNamesAttribute names)
         {
             var args = value.GetType().GenericTypeArguments;
             var length = args.Length;
 
+            var nameArray = names?.TransformNames ?? Util.DefaultTupleNames;
+
             for (int i = 0; i < length; ++i)
             {
-                var propertyName = $"Item{i + 1}";
-                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}.{propertyName}"), value.GetType().GetField(propertyName).GetValue(value), args[i], context);
+                var propertyName = nameArray[i];
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}.{propertyName}"), value.GetType().GetField(Util.DefaultTupleNames[i]).GetValue(value), args[i], context);
             }
         }
 
@@ -395,12 +399,12 @@ namespace Dec
             throw new NotImplementedException();
         }
 
-        public override void WriteTuple(object value)
+        public override void WriteTuple(object value, System.Runtime.CompilerServices.TupleElementNamesAttribute names)
         {
             throw new NotImplementedException();
         }
 
-        public override void WriteValueTuple(object value)
+        public override void WriteValueTuple(object value, System.Runtime.CompilerServices.TupleElementNamesAttribute names)
         {
             throw new NotImplementedException();
         }

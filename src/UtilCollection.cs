@@ -1,5 +1,6 @@
 namespace Dec
 {
+    using System;
     using System.Collections.Generic;
 
     internal static class UtilCollection
@@ -65,6 +66,24 @@ namespace Dec
             }
 
             yield return element;
+        }
+
+        internal static int FirstIndexOf<T>(this IEnumerable<T> enumerable, Func<T, bool> func)
+        {
+            int index = 0;
+            var enumerator = enumerable.GetEnumerator();
+
+            while (enumerator.MoveNext())
+            {
+                if (func(enumerator.Current))
+                {
+                    return index;
+                }
+
+                ++index;
+            }
+
+            return -1;
         }
     }
 }

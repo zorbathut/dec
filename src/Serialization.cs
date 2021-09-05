@@ -77,7 +77,7 @@ namespace Dec
             }
         }
 
-        internal static object ParseElement(XElement element, Type type, object model, ReaderContext context, Recorder.Context recContext, bool isRootDec = false, bool hasReferenceId = false)
+        internal static object ParseElement(XElement element, Type type, object model, ReaderContext context, Recorder.Context recContext, FieldInfo fieldInfo = null, bool isRootDec = false, bool hasReferenceId = false)
         {
             // The first thing we do is parse all our attributes. This is because we want to verify that there are no attributes being ignored.
             // Don't return anything until we do our element.HasAtttributes check!
@@ -543,28 +543,81 @@ namespace Dec
                 object[] parameters = new object[expectedCount];
                 var elements = element.Elements().ToList();
 
+                bool hasNonLi = false;
                 foreach (var elementField in elements)
                 {
                     if (elementField.Name.LocalName != "li")
                     {
-                        Dbg.Err($"{context.sourceName}:{elementField.LineNumber()}: Tuple field should be named 'li' but is named {elementField.Name.LocalName} instead");
+                        hasNonLi = true;
                     }
                 }
 
-                if (elements.Count != parameters.Length)
+                if (!hasNonLi)
                 {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Tuple expects {expectedCount} parameters but got {elements.Count}");
-                }
+                    // Treat it like an indexed array
 
-                for (int i = 0; i < Math.Min(parameters.Length, elements.Count); ++i)
-                {
-                    parameters[i] = ParseElement(elements[i], type.GenericTypeArguments[i], null, context, recContext);
-                }
+                    if (elements.Count != parameters.Length)
+                    {
+                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Tuple expects {expectedCount} parameters but got {elements.Count}");
+                    }
 
-                // fill in anything missing
-                for (int i = Math.Min(parameters.Length, elements.Count); i < parameters.Length; ++i)
+                    for (int i = 0; i < Math.Min(parameters.Length, elements.Count); ++i)
+                    {
+                        parameters[i] = ParseElement(elements[i], type.GenericTypeArguments[i], null, context, recContext);
+                    }
+
+                    // fill in anything missing
+                    for (int i = Math.Min(parameters.Length, elements.Count); i < parameters.Length; ++i)
+                    {
+                        parameters[i] = GenerateResultFallback(null, type.GenericTypeArguments[i]);
+                    }
+                }
+                else
                 {
-                    parameters[i] = GenerateResultFallback(null, type.GenericTypeArguments[i]);
+                    // We're doing named lookups instead
+                    var names = fieldInfo?.GetCustomAttribute<System.Runtime.CompilerServices.TupleElementNamesAttribute>()?.TransformNames;
+                    if (names == null)
+                    {
+                        names = Util.DefaultTupleNames;
+                    }
+
+                    if (names.Count < expectedCount)
+                    {
+                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Not enough tuple names (this honestly shouldn't even be possible)");
+
+                        // TODO: handle it
+                    }
+
+                    bool[] seen = new bool[expectedCount];
+                    foreach (var elementItem in elements)
+                    {
+                        int index = names.FirstIndexOf(n => n == elementItem.Name.LocalName);
+
+                        if (index == -1)
+                        {
+                            Dbg.Err($"{context.sourceName}:{elementItem.LineNumber()}: Found field with unexpected name {elementItem.Name.LocalName}");
+                            continue;
+                        }
+
+                        if (seen[index])
+                        {
+                            Dbg.Err($"{context.sourceName}:{elementItem.LineNumber()}: Found duplicate of field {elementItem.Name.LocalName}");
+                        }
+
+                        seen[index] = true;
+                        parameters[index] = ParseElement(elementItem, type.GenericTypeArguments[index], null, context, recContext);
+                    }
+
+                    for (int i = 0; i < seen.Length; ++i)
+                    {
+                        if (!seen[i])
+                        {
+                            Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Missing field with name {names[i]}");
+
+                            // Patch it up as best we can
+                            parameters[i] = GenerateResultFallback(null, type.GenericTypeArguments[i]);
+                        }
+                    }
                 }
 
                 // construct!
@@ -608,8 +661,8 @@ namespace Dec
                 }
                 setFields.Add(fieldName);
 
-                var fieldInfo = type.GetFieldFromHierarchy(fieldName);
-                if (fieldInfo == null)
+                var fieldElementInfo = type.GetFieldFromHierarchy(fieldName);
+                if (fieldElementInfo == null)
                 {
                     // Try to find a close match, if we can, just for a better error message
                     string match = null;
@@ -638,26 +691,26 @@ namespace Dec
                     continue;
                 }
 
-                if (fieldInfo.GetCustomAttribute<IndexAttribute>() != null)
+                if (fieldElementInfo.GetCustomAttribute<IndexAttribute>() != null)
                 {
                     Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Attempting to set index field {fieldName}; these are generated by the dec system");
                     continue;
                 }
 
-                if (fieldInfo.GetCustomAttribute<NonSerializedAttribute>() != null)
+                if (fieldElementInfo.GetCustomAttribute<NonSerializedAttribute>() != null)
                 {
                     Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Attempting to set nonserialized field {fieldName}");
                     continue;
                 }
 
                 // Check for fields we're not allowed to set
-                if (UtilReflection.ReflectionSetForbidden(fieldInfo))
+                if (UtilReflection.ReflectionSetForbidden(fieldElementInfo))
                 {
                     Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Field {fieldName} is not allowed to be set through reflection");
                     continue;
                 }
 
-                fieldInfo.SetValue(model, ParseElement(fieldElement, fieldInfo.FieldType, fieldInfo.GetValue(model), context, recContext));
+                fieldElementInfo.SetValue(model, ParseElement(fieldElement, fieldElementInfo.FieldType, fieldElementInfo.GetValue(model), context, recContext, fieldInfo: fieldElementInfo));
             }
 
 
@@ -782,7 +835,7 @@ namespace Dec
         }
 
         internal static Type TypeSystemRuntimeType = Type.GetType("System.RuntimeType");
-        internal static void ComposeElement(WriterNode node, object value, Type fieldType, Recorder.Context recContext, bool isRootDec = false)
+        internal static void ComposeElement(WriterNode node, object value, Type fieldType, Recorder.Context recContext, FieldInfo fieldInfo = null, bool isRootDec = false)
         {
             // Handle Dec types, if this isn't a root (otherwise we'd just reference ourselves and that's kind of pointless)
             if (!isRootDec && value is Dec)
@@ -924,7 +977,7 @@ namespace Dec
                     valType.GetGenericTypeDefinition() == typeof(Tuple<,,,,,,,>)
                 ))
             {
-                node.WriteTuple(value);
+                node.WriteTuple(value, fieldInfo?.GetCustomAttribute<System.Runtime.CompilerServices.TupleElementNamesAttribute>());
 
                 return;
             }
@@ -940,7 +993,7 @@ namespace Dec
                     valType.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,,,,>)
                 ))
             {
-                node.WriteValueTuple(value);
+                node.WriteValueTuple(value, fieldInfo?.GetCustomAttribute<System.Runtime.CompilerServices.TupleElementNamesAttribute>());
 
                 return;
             }
@@ -972,7 +1025,7 @@ namespace Dec
             
             foreach (var field in valType.GetSerializableFieldsFromHierarchy())
             {
-                ComposeElement(node.CreateMember(field, recContext), field.GetValue(value), field.FieldType, recContext);
+                ComposeElement(node.CreateMember(field, recContext), field.GetValue(value), field.FieldType, recContext, fieldInfo: field);
             }
 
             return;

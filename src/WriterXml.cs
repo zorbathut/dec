@@ -439,27 +439,29 @@ namespace Dec
             }
         }
 
-        public override void WriteTuple(object value)
+        public override void WriteTuple(object value, System.Runtime.CompilerServices.TupleElementNamesAttribute names)
         {
             var args = value.GetType().GenericTypeArguments;
             var length = args.Length;
 
+            var nameArray = names?.TransformNames;
+
             for (int i = 0; i < length; ++i)
             {
-                var propertyName = $"Item{i + 1}";
-                Serialization.ComposeElement(CreateChild("li", context), value.GetType().GetProperty(propertyName).GetValue(value), args[i], context);
+                Serialization.ComposeElement(CreateChild(nameArray != null ? nameArray[i] : "li", context), value.GetType().GetProperty(Util.DefaultTupleNames[i]).GetValue(value), args[i], context);
             }
         }
 
-        public override void WriteValueTuple(object value)
+        public override void WriteValueTuple(object value, System.Runtime.CompilerServices.TupleElementNamesAttribute names)
         {
             var args = value.GetType().GenericTypeArguments;
             var length = args.Length;
 
+            var nameArray = names?.TransformNames;
+
             for (int i = 0; i < length; ++i)
             {
-                var propertyName = $"Item{i + 1}";
-                Serialization.ComposeElement(CreateChild("li", context), value.GetType().GetField(propertyName).GetValue(value), args[i], context);
+                Serialization.ComposeElement(CreateChild(nameArray != null ? nameArray[i] : "li", context), value.GetType().GetField(Util.DefaultTupleNames[i]).GetValue(value), args[i], context);
             }
         }
 

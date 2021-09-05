@@ -293,7 +293,235 @@ namespace DecTest
             var result = Dec.Database<QuadDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
+            Assert.AreEqual(Tuple.Create(0, 0, 0, 0), result.tuple);
+        }
+
+        [Test]
+        public void ForcedNames([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(QuadDec) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <QuadDec decName=""TestDec"">
+                        <tuple>
+                            <Item1>1</Item1>
+                            <Item2>2</Item2>
+                            <Item3>3</Item3>
+                            <Item4>4</Item4>
+                        </tuple>
+                    </QuadDec>
+                </Decs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            var result = Dec.Database<QuadDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
             Assert.AreEqual(Tuple.Create(1, 2, 3, 4), result.tuple);
+        }
+
+        public class NamedDec : Dec.Dec
+        {
+            public (int klaatu, int barada, int nikto) kbn;
+        }
+
+        [Test]
+        public void Named([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(NamedDec) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <NamedDec decName=""TestDec"">
+                        <kbn>
+                            <klaatu>61</klaatu>
+                            <barada>62</barada>
+                            <nikto>63</nikto>
+                        </kbn>
+                    </NamedDec>
+                </Decs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            var result = Dec.Database<NamedDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(61, result.kbn.klaatu);
+            Assert.AreEqual(62, result.kbn.barada);
+            Assert.AreEqual(63, result.kbn.nikto);
+        }
+
+        [Test]
+        public void NamedReordered([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(NamedDec) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <NamedDec decName=""TestDec"">
+                        <kbn>
+                            <klaatu>61</klaatu>
+                            <nikto>63</nikto>
+                            <barada>62</barada>
+                        </kbn>
+                    </NamedDec>
+                </Decs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            var result = Dec.Database<NamedDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(61, result.kbn.klaatu);
+            Assert.AreEqual(62, result.kbn.barada);
+            Assert.AreEqual(63, result.kbn.nikto);
+        }
+
+        [Test]
+        public void NamedLi([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(NamedDec) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <NamedDec decName=""TestDec"">
+                        <kbn>
+                            <li>61</li>
+                            <li>62</li>
+                            <li>63</li>
+                        </kbn>
+                    </NamedDec>
+                </Decs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            var result = Dec.Database<NamedDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(61, result.kbn.klaatu);
+            Assert.AreEqual(62, result.kbn.barada);
+            Assert.AreEqual(63, result.kbn.nikto);
+        }
+
+        [Test]
+        public void NamedPartial([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(NamedDec) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <NamedDec decName=""TestDec"">
+                        <kbn>
+                            <klaatu>61</klaatu>
+                            <nikto>63</nikto>
+                        </kbn>
+                    </NamedDec>
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoBehavior(mode);
+
+            var result = Dec.Database<NamedDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(61, result.kbn.klaatu);
+            Assert.AreEqual(0, result.kbn.barada);
+            Assert.AreEqual(63, result.kbn.nikto);
+        }
+
+        public class NamedAsLiDec : Dec.Dec
+        {
+            public (int klaatu, int li, int nikto) kbn;
+        }
+
+        [Test]
+        public void NamedAsLiList([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(NamedAsLiDec) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <NamedAsLiDec decName=""TestDec"">
+                        <kbn>
+                            <li>61</li>
+                            <li>62</li>
+                            <li>63</li>
+                        </kbn>
+                    </NamedAsLiDec>
+                </Decs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            var result = Dec.Database<NamedAsLiDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(61, result.kbn.klaatu);
+            Assert.AreEqual(62, result.kbn.li);
+            Assert.AreEqual(63, result.kbn.nikto);
+        }
+
+        [Test]
+        public void NamedAsLiNames([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(NamedAsLiDec) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <NamedAsLiDec decName=""TestDec"">
+                        <kbn>
+                            <klaatu>61</klaatu>
+                            <li>62</li>
+                            <nikto>63</nikto>
+                        </kbn>
+                    </NamedAsLiDec>
+                </Decs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            var result = Dec.Database<NamedAsLiDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(61, result.kbn.klaatu);
+            Assert.AreEqual(62, result.kbn.li);
+            Assert.AreEqual(63, result.kbn.nikto);
+        }
+
+        [Test]
+        public void NamedAsLiSingle([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(NamedAsLiDec) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <NamedAsLiDec decName=""TestDec"">
+                        <kbn>
+                            <li>61</li>
+                        </kbn>
+                    </NamedAsLiDec>
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoBehavior(mode);
+
+            var result = Dec.Database<NamedAsLiDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            // I don't even care what the result is, this is your own fault you horrible person
         }
     }
 }
