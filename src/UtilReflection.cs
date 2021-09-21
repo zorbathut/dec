@@ -128,17 +128,6 @@ namespace Dec
             return GetAllUserAssemblies().SelectMany(a => a.GetTypes());
         }
 
-        internal static bool ReflectionSetForbidden(FieldInfo field)
-        {
-            // Alright, this isn't exactly complicated right now
-            if (field.DeclaringType == typeof(Dec))
-            {
-                return true;
-            }
-
-            return false;
-        }
-
         internal struct IndexInfo
         {
             public Type type;

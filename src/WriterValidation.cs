@@ -188,6 +188,11 @@ namespace Dec
                 // We handle that conversion here as well.
                 writer.AppendLine($"Assert.IsTrue({accessor} is System.Type);");
             }
+            else if (typeof(Dec).IsAssignableFrom(type))
+            {
+                // Decs are a little weird; sometimes we specify the root of a dec hierarchy with full expectation that it'll grab a child in that hierarchy.
+                writer.AppendLine($"Assert.IsTrue(typeof({type.ComposeCSFormatted()}).IsAssignableFrom({accessor}.GetType()));");
+            }
             else
             {
                 writer.AppendLine($"Assert.AreEqual(typeof({type.ComposeCSFormatted()}), {accessor}.GetType());");

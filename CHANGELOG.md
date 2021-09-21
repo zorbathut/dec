@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 
 
 ## [Unreleased]
+### Improved
+Proper support for fields with abstract Dec types.
+
 ### Documentation
 Various small error message improvements.
 

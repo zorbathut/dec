@@ -703,13 +703,6 @@ namespace Dec
                     continue;
                 }
 
-                // Check for fields we're not allowed to set
-                if (UtilReflection.ReflectionSetForbidden(fieldElementInfo))
-                {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Field {fieldName} is not allowed to be set through reflection");
-                    continue;
-                }
-
                 fieldElementInfo.SetValue(model, ParseElement(fieldElement, fieldElementInfo.FieldType, fieldElementInfo.GetValue(model), context, recContext, fieldInfo: fieldElementInfo));
             }
 
@@ -758,19 +751,19 @@ namespace Dec
             // Special case: decs
             if (typeof(Dec).IsAssignableFrom(type))
             {
-                if (type.GetDecRootType() == null)
-                {
-                    Dbg.Err($"{inputName}:{lineNumber}: Non-hierarchy decs cannot be used as references");
-                    return null;
-                }
-
                 if (text == "" || text == null)
                 {
-                    // you reference nothing, you get the null
+                    // you reference nothing, you get the null (even if this isn't a specified type; null is null, after all)
                     return null;
                 }
                 else
                 {
+                    if (type.GetDecRootType() == null)
+                    {
+                        Dbg.Err($"{inputName}:{lineNumber}: Non-hierarchy decs cannot be used as references");
+                        return null;
+                    }
+
                     Dec result = Database.Get(type, text);
                     if (result == null)
                     {
@@ -849,12 +842,11 @@ namespace Dec
                 var rootType = value.GetType().GetDecRootType();
                 if (!rootType.IsAssignableFrom(fieldType))
                 {
-                    // fieldType isn't a root type that we expect.
-                    // We could put our root type here so we could re-parse it later on. But this is actually a huge problem.
-                    // What if we move the Dec to another hierarchy entirely? Or just rename a hierarchy?
-                    // We won't be able to find it given the root type. Do we search *all* Decs for it? This is a nightmare case.
-                    // So instead we yell at the user and tell them this won't work (then save it anyway.)
-                    Dbg.Err($"Attempting to save {value} into type {fieldType}, which is not a valid Dec root type");
+                    // The user has a Dec.Dec or similar, and it has a Dec assigned to it.
+                    // This is a bit weird and is something we're not happy with; this means we need to include the Dec type along with it.
+                    // But we're OK with that, honestly. We just do that.
+                    // If you're saving something like this you don't get to rename Dec classes later on, but, hey, deal with it.
+                    // We do, however, tag it with the root type, not the derived type; this is the most general type that still lets us search things in the future.
                     node.TagClass(rootType);
                 }
                 

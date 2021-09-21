@@ -467,7 +467,7 @@ namespace DecTest
                 </Decs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode, rewrite_expectParseErrors: true);
+            DoBehavior(mode);
 
             Assert.IsNotNull(Dec.Database<DecMemberDec>.Get("TestDec"));
             Assert.IsNull(Dec.Database<DecMemberDec>.Get("TestDec").invalidReference);
@@ -711,6 +711,91 @@ namespace DecTest
 
             Assert.IsNull(Dec.Database<AbstractDec>.Get("Abstract"));
             Assert.IsNotNull(Dec.Database<AbstractDec>.Get("Concrete"));
+        }
+
+        public class RawMemberDec : Dec.Dec
+        {
+            public Dec.Dec member;
+        }
+
+        public class AbstractMemberDec : Dec.Dec
+        {
+            public TrueAbstractDec member;
+        }
+
+        [Dec.Abstract] public abstract class TrueAbstractDec : Dec.Dec { }
+        public class TrueConcreteDec : TrueAbstractDec { }
+
+        [Test]
+        public void RawMember([Values] BehaviorMode mode, [Values] bool classSpecified)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(RawMemberDec), typeof(TrueConcreteDec) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString($@"
+                <Decs>
+                    <RawMemberDec decName=""Missing"">
+                        <member {(classSpecified ? "class=\"TrueConcreteDec\"" : "")}>Concrete</member>
+                    </RawMemberDec>
+                    <TrueConcreteDec decName=""Concrete"" />
+                </Decs>");
+            if (!classSpecified)
+            {
+                ExpectErrors(() => parser.Finish());
+            }
+            else
+            {
+                parser.Finish();
+            }
+
+            DoBehavior(mode);
+
+            Assert.IsNotNull(Dec.Database<RawMemberDec>.Get("Missing"));
+            Assert.IsNotNull(Dec.Database<TrueConcreteDec>.Get("Concrete"));
+            if (classSpecified)
+            {
+                Assert.AreSame(Dec.Database<RawMemberDec>.Get("Missing").member, Dec.Database<TrueConcreteDec>.Get("Concrete"));
+            }
+            else
+            {
+                Assert.IsNull(Dec.Database<RawMemberDec>.Get("Missing").member);
+            }
+        }
+
+        [Test]
+        public void AbstractMember([Values] BehaviorMode mode, [Values] bool classSpecified)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(AbstractMemberDec), typeof(TrueConcreteDec) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString($@"
+                <Decs>
+                    <AbstractMemberDec decName=""Missing"">
+                        <member {( classSpecified ? "class=\"TrueConcreteDec\"" : "" )}>Concrete</member>
+                    </AbstractMemberDec>
+                    <TrueConcreteDec decName=""Concrete"" />
+                </Decs>");
+            if (!classSpecified)
+            {
+                ExpectErrors(() => parser.Finish());
+            }
+            else
+            {
+                parser.Finish();
+            }
+
+            DoBehavior(mode);
+
+            Assert.IsNotNull(Dec.Database<AbstractMemberDec>.Get("Missing"));
+            Assert.IsNotNull(Dec.Database<TrueConcreteDec>.Get("Concrete"));
+            if (classSpecified)
+            {
+                Assert.AreSame(Dec.Database<AbstractMemberDec>.Get("Missing").member, Dec.Database<TrueConcreteDec>.Get("Concrete"));
+            }
+            else
+            {
+                Assert.IsNull(Dec.Database<AbstractMemberDec>.Get("Missing").member);
+            }
         }
 
         public class ConstructorPrivateDec : Dec.Dec

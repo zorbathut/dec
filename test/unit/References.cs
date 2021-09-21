@@ -234,7 +234,7 @@ namespace DecTest
                 </Decs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode, rewrite_expectParseErrors: true);
+            DoBehavior(mode);
 
             var result = Dec.Database<BareDecDec>.Get("TestDec");
             Assert.IsNotNull(result);
