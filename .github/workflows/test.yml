@@ -32,4 +32,4 @@ jobs:
       if: github.ref == 'refs/heads/master'
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-      run: csmacnz.Coveralls --useRelativePaths --multiple -i "$(find test/*/TestResults -type f | sed s/^/opencover=/ | sed ':a;N;$!ba;s/\n/;/g')" --serviceName github-ci --jobId $GITHUB_RUN_ID --commitId $(git rev-parse HEAD) --commitBranch "${GITHUB_REF:-none}" --commitAuthor "$(git log -1 --pretty=format:'%an')" --commitEmail "$(git log -1 --pretty=format:'%ae')" --commitMessage "$(git log -1 --pretty='%s')" --repoToken $COVERALLS_REPO_TOKEN
+      run: csmacnz.Coveralls --useRelativePaths --multiple -i "$(find test/*/TestResults -type f | sed s/^/opencover=/ | sed ':a;N;$!ba;s/\n/;/g')" --serviceName github-ci --jobId $GITHUB_RUN_ID --commitId $(git rev-parse HEAD) --commitBranch "${GITHUB_REF:-none}" --commitAuthor "$(git log -1 --pretty=format:'%an')" --commitEmail "$(git log -1 --pretty=format:'%ae')" --commitMessage "$(git log -1 --pretty='%s')" --repoToken $COVERALLS_REPO_TOKEN || true
