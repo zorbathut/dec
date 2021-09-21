@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 
 
+## [Unreleased]
+### Documentation
+Various small error message improvements.
+
+
 ## [v0.3.2]
 ### Added
 Added an optional factory callback for Recorder functionality, allowing contextual default options for deserialization.
