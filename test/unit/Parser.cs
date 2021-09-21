@@ -121,7 +121,7 @@ namespace DecTest
             Assert.AreEqual(70, Dec.Database<IntDec>.Get("TestDec").nonSerializedValue);
         }
 
-        [Dec.AbstractAttribute]
+        [Dec.Abstract]
         public abstract class AbstractRootDec : Dec.Dec
         {
             public int absInt = 0;

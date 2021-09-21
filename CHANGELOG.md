@@ -6,6 +6,9 @@ All notable changes to this project will be documented in this file.
 ### Documentation
 Various small error message improvements.
 
+### Testing
+Minor test cleanup.
+
 
 ## [v0.3.2]
 ### Added
