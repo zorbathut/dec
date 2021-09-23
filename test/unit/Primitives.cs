@@ -697,5 +697,67 @@ namespace DecTest
             Assert.AreEqual(100, (int)result.objectList[1]);
             Assert.AreEqual(8, (int)result.objectList[2]);
         }
+
+        public class NullDec : Dec.Dec
+        {
+            public Stub initialized = new Stub();
+            public Stub setToNull = null;
+        }
+
+        [Test]
+        public void Null([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(NullDec) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <NullDec decName=""LeaveDefault"" />
+                    <NullDec decName=""TargetNull"">
+                        <initialized null=""true"" />
+                        <setToNull null=""true"" />
+                    </NullDec>
+                    <NullDec decName=""TargetFilled"">
+                        <initialized />
+                        <setToNull />
+                    </NullDec>
+                    <NullDec decName=""ParseExercise"">
+                        <initialized null=""True""/>
+                        <setToNull null=""TRUE""/>
+                    </NullDec>
+                    <NullDec decName=""ExplicitFalse"">
+                        <initialized null=""false""/>
+                        <setToNull null=""False""/>
+                    </NullDec>
+                </Decs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            var leaveDefault = Dec.Database<NullDec>.Get("LeaveDefault");
+            Assert.IsNotNull(leaveDefault);
+            Assert.IsNotNull(leaveDefault.initialized);
+            Assert.IsNull(leaveDefault.setToNull);
+
+            var targetNull = Dec.Database<NullDec>.Get("TargetNull");
+            Assert.IsNotNull(targetNull);
+            Assert.IsNull(targetNull.initialized);
+            Assert.IsNull(targetNull.setToNull);
+
+            var targetFilled = Dec.Database<NullDec>.Get("TargetFilled");
+            Assert.IsNotNull(targetFilled);
+            Assert.IsNotNull(targetFilled.initialized);
+            Assert.IsNotNull(targetFilled.setToNull);
+
+            var parseExercise = Dec.Database<NullDec>.Get("ParseExercise");
+            Assert.IsNotNull(parseExercise);
+            Assert.IsNull(parseExercise.initialized);
+            Assert.IsNull(parseExercise.setToNull);
+
+            var explicitFalse = Dec.Database<NullDec>.Get("ExplicitFalse");
+            Assert.IsNotNull(explicitFalse);
+            Assert.IsNotNull(explicitFalse.initialized);
+            Assert.IsNotNull(explicitFalse.setToNull);
+        }
     }
 }

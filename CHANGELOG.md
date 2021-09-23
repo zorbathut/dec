@@ -11,6 +11,7 @@ Various small error message improvements.
 
 ### Testing
 Minor test cleanup.
+Improved code coverage.
 
 
 ## [v0.3.2]
