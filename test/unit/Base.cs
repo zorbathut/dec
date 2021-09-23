@@ -203,7 +203,8 @@ namespace DecTest
             bool rewrite_expectParseErrors = false,
             bool validation_expectWriteErrors = false,
             Assembly[] validation_assemblies = null,
-            Func<string, bool> errorValidator = null)
+            Func<string, bool> errorValidator = null,
+            Func<string, bool> xmlValidator = null)
         {
             if (mode == BehaviorMode.Bare)
             {
@@ -226,6 +227,8 @@ namespace DecTest
                 {
                     RunComposer();
                 }
+
+                Assert.IsTrue(xmlValidator == null || xmlValidator(data));
 
                 Dec.Database.Clear();
 

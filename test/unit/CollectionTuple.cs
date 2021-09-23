@@ -288,7 +288,7 @@ namespace DecTest
                 </Decs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode);
+            DoBehavior(mode, xmlValidator: xml => xml.Contains("li") && !xml.Contains("groot"));
 
             var result = Dec.Database<QuadDec>.Get("TestDec");
             Assert.IsNotNull(result);
@@ -346,7 +346,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoBehavior(mode, xmlValidator: xml => xml.Contains("klaatu") && xml.Contains("barada") && xml.Contains("nikto"));
 
             var result = Dec.Database<NamedDec>.Get("TestDec");
             Assert.IsNotNull(result);
