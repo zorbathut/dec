@@ -82,63 +82,39 @@ namespace Dec
             // The first thing we do is parse all our attributes. This is because we want to verify that there are no attributes being ignored.
             // Don't return anything until we do our element.HasAtttributes check!
 
-            // Figure out our intended type, if it's been overridden
-            if (element.Attribute("class") != null)
-            {
-                var className = element.Attribute("class").Value;
-                var possibleType = (Type)ParseString(className, typeof(Type), null, context.sourceName, element.LineNumber());
-                if (!type.IsAssignableFrom(possibleType))
-                {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Explicit type {className} cannot be assigned to expected type {type}");
-                }
-                else if (model != null && model.GetType() != possibleType)
-                {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Explicit type {className} does not match already-provided instance {type}");
-                }
-                else
-                {
-                    type = possibleType;
-                }
+            // Exactly one of these may be valid!
+            string classAttribute = element.ConsumeAttribute("class");
+            string nullAttribute = element.ConsumeAttribute("null");
+            string refAttribute = element.ConsumeAttribute("ref");
 
-                element.Attribute("class").Remove();
+            if (nullAttribute != null)
+            {
+                if (!bool.TryParse(nullAttribute, out bool result))
+                {
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Invalid `null` attribute");
+                    nullAttribute = null;
+                }
+                else if (!result)
+                {
+                    // why did you specify this >:(
+                    nullAttribute = null;
+                }
             }
 
-            bool shouldBeNull = bool.Parse(element.ConsumeAttribute("null") ?? "false");
-            string refId = element.ConsumeAttribute("ref");
-
-            if (shouldBeNull && refId != null)
+            int validAttributes = (classAttribute != null ? 1 : 0) + (nullAttribute != null ? 1 : 0) + (refAttribute != null ? 1 : 0);
+            if (validAttributes > 1)
             {
-                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Element cannot be both null and a reference at the same time");
-
-                // There's no good answer here, but we're sticking with the null because it feels like an error-handling path that the user is more likely to properly support.
-                refId = null;
+                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Conflicting attributes; guessing at priority");
             }
 
-            // See if we just want to return null
-            if (shouldBeNull)
+            if (element.HasAttributes)
             {
-                // No remaining attributes are allowed in nulls
-                if (element.HasAttributes)
-                {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Has unconsumed attributes");
-                }
-
-                // okay
-                return null;
-
-                // Note: It may seem wrong that we can return null along with a non-null model.
-                // The problem is that this is meant to be able to override defaults. If the default if an object, explicitly setting it to null *should* clear the object out.
-                // If we actually need a specific object to be returned, for whatever reason, the caller has to do the comparison.
+                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Has unknown attributes");
             }
 
-            // See if we can get a ref out of it
-            if (refId != null)
+            if (refAttribute != null)
             {
-                // No remaining attributes are allowed in refs
-                if (element.HasAttributes)
-                {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Has unconsumed attributes");
-                }
+                // Ref is the highest priority, largely because I think it's cool
 
                 if (!recContext.Referenceable)
                 {
@@ -151,20 +127,45 @@ namespace Dec
                     return model;
                 }
 
-                if (!context.refs.ContainsKey(refId))
+                if (!context.refs.ContainsKey(refAttribute))
                 {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Found a reference object {refId} without a valid reference mapping");
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Found a reference object {refAttribute} without a valid reference mapping");
                     return model;
                 }
 
-                object refObject = context.refs[refId];
+                object refObject = context.refs[refAttribute];
                 if (!type.IsAssignableFrom(refObject.GetType()))
                 {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Reference object {refId} is of type {refObject.GetType()}, which cannot be converted to expected type {type}");
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Reference object {refAttribute} is of type {refObject.GetType()}, which cannot be converted to expected type {type}");
                     return model;
                 }
 
                 return refObject;
+            }
+            else if (nullAttribute != null)
+            {
+                // guaranteed to be true at this point
+                return null;
+
+                // Note: It may seem wrong that we can return null along with a non-null model.
+                // The problem is that this is meant to be able to override defaults. If the default if an object, explicitly setting it to null *should* clear the object out.
+                // If we actually need a specific object to be returned, for whatever reason, the caller has to do the comparison.
+            }
+            else if (classAttribute != null)
+            {
+                var possibleType = (Type)ParseString(classAttribute, typeof(Type), null, context.sourceName, element.LineNumber());
+                if (!type.IsAssignableFrom(possibleType))
+                {
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Explicit type {classAttribute} cannot be assigned to expected type {type}");
+                }
+                else if (model != null && model.GetType() != possibleType)
+                {
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Explicit type {classAttribute} does not match already-provided instance {type}");
+                }
+                else
+                {
+                    type = possibleType;
+                }
             }
 
             // Converters may do their own processing, so we'll just defer off to them now

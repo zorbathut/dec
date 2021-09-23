@@ -380,7 +380,7 @@ namespace DecTest
             Recorder.PrimitivesContainer deserialized = null;
             ExpectErrors(() => deserialized = Dec.Recorder.Read<Recorder.PrimitivesContainer>(serialized));
 
-            Assert.IsNull(deserialized.recordable);
+            Assert.IsNotNull(deserialized.recordable);
         }
 
         [Test]
