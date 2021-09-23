@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 
 
 ## [Unreleased]
+### Fixed
+Internal parser error when encountering refs in Parser XML.
+
 ### Improved
 Proper support for fields with abstract Dec types.
 

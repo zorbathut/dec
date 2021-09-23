@@ -121,13 +121,7 @@ namespace Dec
                     Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Found a reference in a non-referenceable context, using it anyway");
                 }
 
-                if (context == null)
-                {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Found a reference object outside of record-reader mode");
-                    return model;
-                }
-
-                if (!context.refs.ContainsKey(refAttribute))
+                if (context.refs == null || !context.refs.ContainsKey(refAttribute))
                 {
                     Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Found a reference object {refAttribute} without a valid reference mapping");
                     return model;

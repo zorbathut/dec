@@ -474,5 +474,34 @@ namespace DecTest
             Assert.AreEqual("Hello", deserialized.dict[deserialized.referenceA]);
             Assert.AreEqual("Goodbye", deserialized.dict[deserialized.referenceB]);
         }
+
+        public class ParserRefDec : Dec.Dec
+        {
+            public Stub initialized = new Stub();
+            public Stub setToNull = null;
+        }
+
+        [Test]
+        public void ParserRef([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ParserRefDec) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <ParserRefDec decName=""Test"">
+                        <initialized ref=""invalid"" />
+                        <setToNull ref=""invalid"" />
+                    </ParserRefDec>
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoBehavior(mode);
+
+            var test = Dec.Database<ParserRefDec>.Get("Test");
+            Assert.IsNotNull(test);
+            Assert.IsNotNull(test.initialized);
+            Assert.IsNull(test.setToNull);
+        }
     }
 }
