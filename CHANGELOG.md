@@ -13,7 +13,7 @@ Proper support for fields with abstract Dec types.
 Various small error message improvements.
 
 ### Testing
-Minor test cleanup.
+Minor test cleanup and augmentation.
 Improved code coverage.
 
 

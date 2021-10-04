@@ -535,7 +535,7 @@ namespace DecTest
 
         public class IntendedPayload
         {
-
+            public int value = 0;
         }
 
         public class UnintendedPayload
@@ -546,7 +546,7 @@ namespace DecTest
         public class IncorrectConverterDec : Dec.Dec
         {
             public IntendedPayload payloadNull;
-            public IntendedPayload payloadNonNull = new IntendedPayload();
+            public IntendedPayload payloadNonNull = new IntendedPayload { value = 1 };
         }
 
         public class IncorrectConverter : Dec.Converter
@@ -598,6 +598,7 @@ namespace DecTest
             DoBehavior(BehaviorMode.Bare);
 
             Assert.IsNotNull(Dec.Database<IncorrectConverterDec>.Get("TestDec").payloadNonNull);
+            Assert.AreEqual(1, Dec.Database<IncorrectConverterDec>.Get("TestDec").payloadNonNull.value);
         }
     }
 }
