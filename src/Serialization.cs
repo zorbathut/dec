@@ -77,8 +77,11 @@ namespace Dec
             }
         }
 
-        internal static object ParseElement(XElement element, Type type, object model, ReaderContext context, Recorder.Context recContext, FieldInfo fieldInfo = null, bool isRootDec = false, bool hasReferenceId = false)
+        internal static object ParseElement(XElement element, Type type, object original, ReaderContext context, Recorder.Context recContext, FieldInfo fieldInfo = null, bool isRootDec = false, bool hasReferenceId = false)
         {
+            // We keep the original around in case of error, but do all our manipulation on a result object.
+            object result = original;
+
             // The first thing we do is parse all our attributes. This is because we want to verify that there are no attributes being ignored.
             // Don't return anything until we do our element.HasAtttributes check!
 
@@ -89,12 +92,12 @@ namespace Dec
 
             if (nullAttribute != null)
             {
-                if (!bool.TryParse(nullAttribute, out bool result))
+                if (!bool.TryParse(nullAttribute, out bool nullValue))
                 {
                     Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Invalid `null` attribute");
                     nullAttribute = null;
                 }
-                else if (!result)
+                else if (!nullValue)
                 {
                     // why did you specify this >:(
                     nullAttribute = null;
@@ -124,14 +127,14 @@ namespace Dec
                 if (context.refs == null || !context.refs.ContainsKey(refAttribute))
                 {
                     Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Found a reference object {refAttribute} without a valid reference mapping");
-                    return model;
+                    return result;
                 }
 
                 object refObject = context.refs[refAttribute];
                 if (!type.IsAssignableFrom(refObject.GetType()))
                 {
                     Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Reference object {refAttribute} is of type {refObject.GetType()}, which cannot be converted to expected type {type}");
-                    return model;
+                    return result;
                 }
 
                 return refObject;
@@ -152,7 +155,7 @@ namespace Dec
                 {
                     Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Explicit type {classAttribute} cannot be assigned to expected type {type}");
                 }
-                else if (model != null && model.GetType() != possibleType)
+                else if (result != null && result.GetType() != possibleType)
                 {
                     Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Explicit type {classAttribute} does not match already-provided instance {type}");
                 }
@@ -166,32 +169,29 @@ namespace Dec
             if (Converters.ContainsKey(type))
             {
                 // context might be null; that's OK at the moment
-                object result;
-
                 try
                 {
-                    result = Converters[type].Record(model, type, new RecorderReader(element, context));
+                    result = Converters[type].Record(result, type, new RecorderReader(element, context));
                 }
                 catch (Exception e)
                 {
                     Dbg.Ex(e);
 
-                    result = GenerateResultFallback(model, type);
+                    result = GenerateResultFallback(result, type);
                 }
 
                 // This is an important check if we have a referenced type, because if we've changed the result, references won't link up to it properly.
                 // Outside referenced types, it doesn't matter - we want to give people as much control over modification as possible.
-                if (model != null && hasReferenceId && model != result)
+                if (original != null && hasReferenceId && result != original)
                 {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Converter {Converters[type].GetType()} for {type} ignored the model {model} while reading a referenced object; this may cause lost data");
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Converter {Converters[type].GetType()} for {type} ignored the model {original} while reading a referenced object; this may cause lost data");
                     return result;
                 }
 
                 if (result != null && !type.IsAssignableFrom(result.GetType()))
                 {
                     Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Converter {Converters[type].GetType()} for {type} returned unexpected type {result.GetType()}");
-                    result = GenerateResultFallback(model, type);
-                    return result;
+                    result = GenerateResultFallback(original, type);
                 }
 
                 return result;
@@ -220,9 +220,9 @@ namespace Dec
             {
                 IRecordable recordable = null;
 
-                if (model != null)
+                if (result != null)
                 {
-                    recordable = (IRecordable)model;
+                    recordable = (IRecordable)result;
                 }
                 else if (recContext.factories == null)
                 {
@@ -307,7 +307,7 @@ namespace Dec
                     Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Child nodes are not valid when parsing {type}");
                 }
 
-                return ParseString(element.GetText(), type, model, context.sourceName, element.LineNumber());
+                return ParseString(element.GetText(), type, result, context.sourceName, element.LineNumber());
             }
 
             // Nothing past this point even supports text, so let's just get angry and break stuff.
@@ -322,7 +322,7 @@ namespace Dec
                 // List<> handling
                 Type referencedType = type.GetGenericArguments()[0];
 
-                var list = (IList)(model ?? Activator.CreateInstance(type));
+                var list = (IList)(result ?? Activator.CreateInstance(type));
 
                 // If you have a default list, but specify it in XML, we assume this is a full override. Clear the original list.
                 list.Clear();
@@ -371,7 +371,7 @@ namespace Dec
                 Type keyType = type.GetGenericArguments()[0];
                 Type valueType = type.GetGenericArguments()[1];
 
-                var dict = (IDictionary)(model ?? Activator.CreateInstance(type));
+                var dict = (IDictionary)(result ?? Activator.CreateInstance(type));
 
                 // If you have a default dict, but specify it in XML, we assume this is a full override. Clear the original dict.
                 dict.Clear();
@@ -446,7 +446,7 @@ namespace Dec
 
                 Type keyType = type.GetGenericArguments()[0];
 
-                var set = model ?? Activator.CreateInstance(type);
+                var set = result ?? Activator.CreateInstance(type);
 
                 var clearFunction = set.GetType().GetMethod("Clear");
                 var containsFunction = set.GetType().GetMethod("Contains");
@@ -629,18 +629,18 @@ namespace Dec
             if (context.RecorderMode)
             {
                 Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Falling back to reflection within a Record system while parsing a {type}; this is currently not allowed for security reasons. Either you shouldn't be trying to serialize this, or it should implement Dec.IRecorder (https://zorbathut.github.io/dec/documentation/serialization.html), or you need a Dec.Converter (https://zorbathut.github.io/dec/documentation/custom.html)");
-                return model;
+                return result;
             }
 
             // If we haven't been given a template class from our parent, go ahead and init to defaults
-            if (model == null)
+            if (result == null)
             {
-                model = type.CreateInstanceSafe("object", () => $"{context.sourceName}:{element.LineNumber()}");
+                result = type.CreateInstanceSafe("object", () => $"{context.sourceName}:{element.LineNumber()}");
 
-                if (model == null)
+                if (result == null)
                 {
                     // error already reported
-                    return model;
+                    return result;
                 }
             }
 
@@ -698,17 +698,17 @@ namespace Dec
                     continue;
                 }
 
-                fieldElementInfo.SetValue(model, ParseElement(fieldElement, fieldElementInfo.FieldType, fieldElementInfo.GetValue(model), context, recContext, fieldInfo: fieldElementInfo));
+                fieldElementInfo.SetValue(result, ParseElement(fieldElement, fieldElementInfo.FieldType, fieldElementInfo.GetValue(result), context, recContext, fieldInfo: fieldElementInfo));
             }
 
 
             // Set up our index fields; this has to happen last in case we're a struct
-            Index.Register(ref model);
+            Index.Register(ref result);
 
-            return model;
+            return result;
         }
 
-        internal static object ParseString(string text, Type type, object model, string inputName, int lineNumber)
+        internal static object ParseString(string text, Type type, object original, string inputName, int lineNumber)
         {
             // Special case: Converter override
             // This is redundant if we're being called from ParseElement, but we aren't always.
@@ -806,7 +806,7 @@ namespace Dec
                 catch (System.Exception e)  // I would normally not catch System.Exception, but TypeConverter is wrapping FormatException in an Exception for some reason
                 {
                     Dbg.Err($"{inputName}:{lineNumber}: {e.ToString()}");
-                    return model;
+                    return original;
                 }
             }
             else if (type == typeof(string))
@@ -818,7 +818,7 @@ namespace Dec
             {
                 // If we don't have text, and we've fallen down to this point, that's an error (and return original value I guess)
                 Dbg.Err($"{inputName}:{lineNumber}: Empty field provided for type {type}");
-                return model;
+                return original;
             }
         }
 
