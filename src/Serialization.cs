@@ -289,12 +289,6 @@ namespace Dec
                 return recordable;
             }
 
-            // No remaining attributes are allowed past this point!
-            if (element.HasAttributes)
-            {
-                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Has unconsumed attributes");
-            }
-
             // All our standard text-using options
             if (hasText ||
                 (typeof(Dec).IsAssignableFrom(type) && !isRootDec) ||
