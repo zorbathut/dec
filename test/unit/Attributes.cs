@@ -39,7 +39,7 @@ namespace DecTest
         }
 
         [Test]
-        public void Record([Values] bool classTag, [Values] bool nullTag, [Values] bool refTag)
+        public void Record([Values] bool classTag, [Values] bool nullTag, [Values] bool refTag, [Values] bool modeTag)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(BaseString), typeof(DerivedString) } };
 
@@ -50,14 +50,13 @@ namespace DecTest
                     <Ref id=""ref00000"" class=""BaseString""><value>reffed</value></Ref>
                   </refs>
                   <data>
-                    <member {(classTag ? "class='DerivedString'" : "")} {(nullTag ? "null='true'" : "")} {(refTag ? "ref='ref00000'" : "")}><value>data</value></member>
+                    <member {(classTag ? "class='DerivedString'" : "")} {(nullTag ? "null='true'" : "")} {(refTag ? "ref='ref00000'" : "")} {(modeTag ? "mode='patch'" : "")}><value>data</value></member>
                   </data>
                 </Record>";
 
             StringMemberRecordable deserialized = null;
 
-            int tags = (classTag ? 1 : 0) + (nullTag ? 1 : 0) + (refTag ? 1 : 0);
-
+            int tags = ((classTag || modeTag) ? 1 : 0) + (nullTag ? 1 : 0) + (refTag ? 1 : 0);
             if (tags <= 1)
             {
                 deserialized = Dec.Recorder.Read<StringMemberRecordable>(serialized);
@@ -89,7 +88,7 @@ namespace DecTest
         }
 
         [Test]
-        public void Parser([Values] BehaviorMode mode, [Values] bool classTag, [Values] bool nullTag, [Values] bool refTag)
+        public void Parser([Values] BehaviorMode mode, [Values] bool classTag, [Values] bool nullTag, [Values] bool refTag, [Values] bool modeTag)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StringMemberDec), typeof(DerivedString) } };
 
@@ -97,11 +96,11 @@ namespace DecTest
             parser.AddString($@"
                 <Decs>
                     <StringMemberDec decName=""TestDec"">
-                        <member {(classTag ? "class='DerivedString'" : "")} {(nullTag ? "null='true'" : "")} {(refTag ? "ref='ref00000'" : "")}><value>data</value></member>
+                        <member {(classTag ? "class='DerivedString'" : "")} {(nullTag ? "null='true'" : "")} {(refTag ? "ref='ref00000'" : "")} {(modeTag ? "mode='patch'" : "")}><value>data</value></member>
                     </StringMemberDec>
                 </Decs>");
 
-            int tags = ( classTag ? 1 : 0 ) + ( nullTag ? 1 : 0 ) + ( refTag ? 1 : 0 );
+            int tags = ((classTag || modeTag) ? 1 : 0) + (nullTag ? 1 : 0) + (refTag ? 1 : 0);
             if (tags <= 1 && !refTag)
             {
                 parser.Finish();

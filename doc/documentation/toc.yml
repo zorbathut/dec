@@ -4,6 +4,8 @@
   href: type.md
 - name: Dec inheritance
   href: inheritance.md
+- name: Merge modes
+  href: mergemodes.md
 - name: Dec hierarchy roots
   href: hierarchy.md
 - name: Indexes

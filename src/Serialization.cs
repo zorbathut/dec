@@ -77,6 +77,46 @@ namespace Dec
             }
         }
 
+        internal enum ParseMode
+        {
+            Default,
+            Replace,
+            //ReplaceOrCreate, // NYI
+            Patch,
+            //PatchOrCreate, // NYI
+            //Create, //NYI
+            Append,
+            //Delete, //NYI
+            //ReplaceIfExists, //NYI
+            //PatchIfExists, //NYI
+            //DeleteIfExists, //NYI
+        }
+        internal static ParseMode ParseModeFromString(ReaderContext context, XElement element, string str)
+        {
+            if (str == null)
+            {
+                return ParseMode.Default;
+            }
+            else if (str == "replace")
+            {
+                return ParseMode.Replace;
+            }
+            else if (str == "patch")
+            {
+                return ParseMode.Patch;
+            }
+            else if (str == "append")
+            {
+                return ParseMode.Append;
+            }
+            else
+            {
+                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Invalid `{str}` mode!");
+
+                return ParseMode.Default;
+            }
+        }
+
         internal static object ParseElement(XElement element, Type type, object original, ReaderContext context, Recorder.Context recContext, FieldInfo fieldInfo = null, bool isRootDec = false, bool hasReferenceId = false)
         {
             // We keep the original around in case of error, but do all our manipulation on a result object.
@@ -85,10 +125,11 @@ namespace Dec
             // The first thing we do is parse all our attributes. This is because we want to verify that there are no attributes being ignored.
             // Don't return anything until we do our element.HasAtttributes check!
 
-            // Exactly one of these may be valid!
-            string classAttribute = element.ConsumeAttribute("class");
+            // The interaction between these is complicated!
             string nullAttribute = element.ConsumeAttribute("null");
             string refAttribute = element.ConsumeAttribute("ref");
+            string classAttribute = element.ConsumeAttribute("class");
+            string modeAttribute = element.ConsumeAttribute("mode");
 
             if (nullAttribute != null)
             {
@@ -110,10 +151,24 @@ namespace Dec
                 refAttribute = null;
             }
 
-            int validAttributes = (classAttribute != null ? 1 : 0) + (nullAttribute != null ? 1 : 0) + (refAttribute != null ? 1 : 0);
-            if (validAttributes > 1)
+            ParseMode parseMode = ParseModeFromString(context, element, modeAttribute);
+
+            // Some of these are redundant and that's OK
+            if (nullAttribute != null && (refAttribute != null || classAttribute != null || modeAttribute != null))
             {
-                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Conflicting attributes; guessing at priority");
+                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Null element may not have ref, class, or mode specified; guessing wildly at intentions");
+            }
+            else if (refAttribute != null && (nullAttribute != null || classAttribute != null || modeAttribute != null))
+            {
+                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Ref element may not have null, class, or mode specified; guessing wildly at intentions");
+            }
+            else if (classAttribute != null && (nullAttribute != null || refAttribute != null))
+            {
+                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Class-specified element may not have null or ref specified; guessing wildly at intentions");
+            }
+            else if (modeAttribute != null && (nullAttribute != null || refAttribute != null))
+            {
+                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Mode-specified element may not have null or ref specified; guessing wildly at intentions");
             }
 
             if (element.HasAttributes)
@@ -174,6 +229,18 @@ namespace Dec
             // Converters may do their own processing, so we'll just defer off to them now
             if (Converters.ContainsKey(type))
             {
+                switch (parseMode)
+                {
+                    case ParseMode.Default:
+                    case ParseMode.Patch:
+                        // easy, done
+                        break;
+
+                    default:
+                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Invalid mode {parseMode} provided for a Converter parse, defaulting to Patch");
+                        goto case ParseMode.Patch;
+                }
+
                 // context might be null; that's OK at the moment
                 try
                 {
@@ -224,6 +291,18 @@ namespace Dec
             // Special case: IRecordables
             if (typeof(IRecordable).IsAssignableFrom(type))
             {
+                switch (parseMode)
+                {
+                    case ParseMode.Default:
+                    case ParseMode.Patch:
+                        // easy, done
+                        break;
+
+                    default:
+                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Invalid mode {parseMode} provided for an IRecordable parse, defaulting to Patch");
+                        goto case ParseMode.Patch;
+                }
+
                 IRecordable recordable = null;
 
                 if (result != null)
@@ -302,12 +381,24 @@ namespace Dec
                 type == typeof(string) ||
                 type.IsPrimitive)
             {
+                switch (parseMode)
+                {
+                    case ParseMode.Default:
+                    case ParseMode.Replace:
+                        // easy, done
+                        break;
+
+                    default:
+                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Invalid mode {parseMode} provided for a simple string parse, defaulting to Replace");
+                        goto case ParseMode.Replace;
+                }
+
                 if (hasChildren)
                 {
                     Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Child nodes are not valid when parsing {type}");
                 }
 
-                return ParseString(element.GetText(), type, result, context.sourceName, element.LineNumber());
+                return ParseString(element.GetText(), type, original, context.sourceName, element.LineNumber());
             }
 
             // Nothing past this point even supports text, so let's just get angry and break stuff.
@@ -319,13 +410,32 @@ namespace Dec
             // Special case: Lists
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
             {
+                switch (parseMode)
+                {
+                    case ParseMode.Default:
+                    case ParseMode.Replace:
+                        // If you have a default list, but specify it in XML, we assume this is a full override. Clear the original list to cut down on GC churn.
+                        // TODO: Is some bozo going to store the same "constant" global list on init, then be surprised when we re-use the list instead of creating a new one? Detect this and yell about it I guess.
+                        // If you are reading this because you're the bozo, [insert angry emoji here], but also feel free to be annoyed that I haven't fixed it yet despite realizing it's a problem. Ping me on Discord, I'll take care of it, sorry 'bout that.
+                        if (result != null)
+                        {
+                            ((IList)result).Clear();
+                        }
+                        break;
+
+                    case ParseMode.Append:
+                        // we're good
+                        break;
+
+                    default:
+                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Invalid mode {parseMode} provided for a List parse, defaulting to Replace");
+                        goto case ParseMode.Replace;
+                }
+
                 // List<> handling
                 Type referencedType = type.GetGenericArguments()[0];
 
                 var list = (IList)(result ?? Activator.CreateInstance(type));
-
-                // If you have a default list, but specify it in XML, we assume this is a full override. Clear the original list.
-                list.Clear();
 
                 foreach (var fieldElement in element.Elements())
                 {
@@ -347,8 +457,38 @@ namespace Dec
 
                 var elements = element.Elements().ToArray();
 
-                // We don't bother falling back on model here; we probably need to recreate it anyway with the right length
-                var array = (Array)Activator.CreateInstance(type, new object[] { elements.Length });
+                Array array;
+                int startOffset = 0;
+
+                // This is a bit extra-complicated because we can't append stuff after the fact, we need to figure out what our length is when we create the object.
+                switch (parseMode)
+                {
+                    case ParseMode.Default:
+                    case ParseMode.Replace:
+                        // This is a full override, so we're going to create it here.
+                        // We don't bother falling back on model; we probably need to recreate it anyway with the right length.
+                        array = (Array)Activator.CreateInstance(type, new object[] { elements.Length });
+                        break;
+
+                    case ParseMode.Append:
+                        if (result == null)
+                        {
+                            goto case ParseMode.Replace;
+                        }
+
+                        // This is jankier; we create it here with the intended final length, then copy the elements over, all because arrays can't be resized
+                        // (yes, I know, that's the point of arrays, I'm not complaining, just . . . grumbling a little)
+                        var oldArray = (Array)result;
+                        startOffset = oldArray.Length;
+                        array = (Array)Activator.CreateInstance(type, new object[] { startOffset + elements.Length });
+                        oldArray.CopyTo(array, 0);
+
+                        break;
+
+                    default:
+                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Invalid mode {parseMode} provided for an Array parse, defaulting to Replace");
+                        goto case ParseMode.Replace;
+                }
 
                 for (int i = 0; i < elements.Length; ++i)
                 {
@@ -358,7 +498,7 @@ namespace Dec
                         Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                     }
 
-                    array.SetValue(ParseElement(fieldElement, referencedType, null, context, recContext), i);
+                    array.SetValue(ParseElement(fieldElement, referencedType, null, context, recContext), startOffset + i);
                 }
 
                 return array;
@@ -367,14 +507,47 @@ namespace Dec
             // Special case: Dictionaries
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>))
             {
+                HashSet<object> replaceableElements = null;
+                switch (parseMode)
+                {
+                    case ParseMode.Default:
+                    case ParseMode.Replace:
+                        // If you have a default dict, but specify it in XML, we assume this is a full override. Clear the original list to cut down on GC churn.
+                        // TODO: Is some bozo going to store the same "constant" global dict on init, then be surprised when we re-use the dict instead of creating a new one? Detect this and yell about it I guess.
+                        // If you are reading this because you're the bozo, [insert angry emoji here], but also feel free to be annoyed that I haven't fixed it yet despite realizing it's a problem. Ping me on Discord, I'll take care of it, sorry 'bout that.
+                        if (result != null)
+                        {
+                            ((IDictionary)result).Clear();
+                        }
+                        break;
+
+                    case ParseMode.Patch:
+                        if (original != null)
+                        {
+                            // set up the replaceableElements
+                            replaceableElements = new HashSet<object>();
+                            var originalDict = (IDictionary)original;
+                            foreach (var originalKey in originalDict.Keys)
+                            {
+                                replaceableElements.Add(originalKey);
+                            }
+                        }
+                        break;
+
+                    case ParseMode.Append:
+                        // nothing needs to be done, our existing dupe checking will solve it
+                        break;
+
+                    default:
+                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Invalid mode {parseMode} provided for a Dictionary parse, defaulting to Replace");
+                        goto case ParseMode.Replace;
+                }
+
                 // Dictionary<> handling
                 Type keyType = type.GetGenericArguments()[0];
                 Type valueType = type.GetGenericArguments()[1];
 
                 var dict = (IDictionary)(result ?? Activator.CreateInstance(type));
-
-                // If you have a default dict, but specify it in XML, we assume this is a full override. Clear the original dict.
-                dict.Clear();
 
                 foreach (var fieldElement in element.Elements())
                 {
@@ -404,7 +577,12 @@ namespace Dec
                             continue;
                         }
 
-                        if (dict.Contains(key))
+                        if (replaceableElements != null && replaceableElements.Contains(key))
+                        {
+                            // this can be re-specified only exactly once
+                            replaceableElements.Remove(key);
+                        }
+                        else if (dict.Contains(key))
                         {
                             Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Dictionary includes duplicate key {key.ToString()}");
                         }
@@ -422,7 +600,12 @@ namespace Dec
                             continue;
                         }
 
-                        if (dict.Contains(key))
+                        if (replaceableElements != null && replaceableElements.Contains(key))
+                        {
+                            // this can be re-specified only exactly once
+                            replaceableElements.Remove(key);
+                        }
+                        else if (dict.Contains(key))
                         {
                             Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Dictionary includes duplicate key {fieldElement.Name.LocalName}");
                         }
@@ -444,19 +627,51 @@ namespace Dec
                 // This might be a performance problem and we'll . . . deal with it later I guess?
                 // This might actually be a good first place to use IL generation.
 
+                HashSet<object> replaceableElements = null;
+                switch (parseMode)
+                {
+                    case ParseMode.Default:
+                    case ParseMode.Replace:
+                        // If you have a default set, but specify it in XML, we assume this is a full override. Clear the original set to cut down on GC churn.
+                        // TODO: Is some bozo going to store the same "constant" global set on init, then be surprised when we re-use the set instead of creating a new one? Detect this and yell about it I guess.
+                        // If you are reading this because you're the bozo, [insert angry emoji here], but also feel free to be annoyed that I haven't fixed it yet despite realizing it's a problem. Ping me on Discord, I'll take care of it, sorry 'bout that.
+                        if (result != null)
+                        {
+                            // Did you know there's no non-generic interface that HashSet<> supports that includes a Clear function?
+                            // Fun fact:
+                            // That thing I just wrote!
+                            var clearFunction = result.GetType().GetMethod("Clear");
+                            clearFunction.Invoke(result, null);
+                        }
+                        break;
+
+                    case ParseMode.Patch:
+                        if (original != null)
+                        {
+                            // set up the replaceableElements
+                            replaceableElements = new HashSet<object>();
+                            foreach (var originalElement in (IEnumerable)original)
+                            {
+                                replaceableElements.Add(originalElement);
+                            }
+                        }
+                        break;
+
+                    case ParseMode.Append:
+                        // nothing needs to be done, our existing dupe checking will solve it
+                        break;
+
+                    default:
+                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Invalid mode {parseMode} provided for a HashSet parse, defaulting to Replace");
+                        goto case ParseMode.Replace;
+                }
+
                 Type keyType = type.GetGenericArguments()[0];
 
                 var set = result ?? Activator.CreateInstance(type);
-
-                var clearFunction = set.GetType().GetMethod("Clear");
+                
                 var containsFunction = set.GetType().GetMethod("Contains");
                 var addFunction = set.GetType().GetMethod("Add");
-
-                // If you have a default set, but specify it in XML, we assume this is a full override. Clear the original set.
-                // Did you know there's no non-generic interface that HashSet<> supports that includes a Clear function?
-                // Fun fact:
-                // That thing I just wrote!
-                clearFunction.Invoke(set, null);
 
                 foreach (var fieldElement in element.Elements())
                 {
@@ -468,7 +683,6 @@ namespace Dec
                     {
                         // Treat this like a full node
                         var key = ParseElement(fieldElement, keyType, null, context, recContext);
-                        var keyParam = new object[] { key };
 
                         if (key == null)
                         {
@@ -476,7 +690,14 @@ namespace Dec
                             continue;
                         }
 
-                        if ((bool)containsFunction.Invoke(set, keyParam))
+                        var keyParam = new object[] { key };
+
+                        if (replaceableElements != null && replaceableElements.Contains(key))
+                        {
+                            // this can be re-specified only exactly once
+                            replaceableElements.Remove(key);
+                        }
+                        else if ((bool)containsFunction.Invoke(set, keyParam))
                         {
                             Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: HashSet includes duplicate key {key.ToString()}");
                         }
@@ -491,7 +712,6 @@ namespace Dec
                         }
 
                         var key = ParseString(fieldElement.Name.LocalName, keyType, null, context.sourceName, fieldElement.LineNumber());
-                        var keyParam = new object[] { key };
 
                         if (key == null)
                         {
@@ -500,7 +720,14 @@ namespace Dec
                             continue;
                         }
 
-                        if ((bool)containsFunction.Invoke(set, keyParam))
+                        var keyParam = new object[] { key };
+
+                        if (replaceableElements != null && replaceableElements.Contains(key))
+                        {
+                            // this can be re-specified only exactly once
+                            replaceableElements.Remove(key);
+                        }
+                        else if ((bool)containsFunction.Invoke(set, keyParam))
                         {
                             Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: HashSet includes duplicate key {fieldElement.Name.LocalName}");
                         }
@@ -533,6 +760,18 @@ namespace Dec
                     type.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,,,,>)
                     ))
             {
+                switch (parseMode)
+                {
+                    case ParseMode.Default:
+                    case ParseMode.Replace:
+                        // easy, done
+                        break;
+
+                    default:
+                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Invalid mode {parseMode} provided for a Tuple parse, defaulting to Replace");
+                        goto case ParseMode.Replace;
+                }
+
                 int expectedCount = type.GenericTypeArguments.Length;
 
                 object[] parameters = new object[expectedCount];
@@ -632,6 +871,28 @@ namespace Dec
                 return result;
             }
 
+            if (!isRootDec)
+            {
+                switch (parseMode)
+                {
+                    case ParseMode.Default:
+                    case ParseMode.Patch:
+                        // easy, done
+                        break;
+
+                    default:
+                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Invalid mode {parseMode} provided for a composite reflection parse, defaulting to Patch");
+                        goto case ParseMode.Patch;
+                }
+            }
+            else
+            {
+                if (parseMode != ParseMode.Default)
+                {
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Mode provided for root Dec; this is currently not supported in any form");
+                }
+            }
+
             // If we haven't been given a template class from our parent, go ahead and init to defaults
             if (result == null)
             {
@@ -700,7 +961,6 @@ namespace Dec
 
                 fieldElementInfo.SetValue(result, ParseElement(fieldElement, fieldElementInfo.FieldType, fieldElementInfo.GetValue(result), context, recContext, fieldInfo: fieldElementInfo));
             }
-
 
             // Set up our index fields; this has to happen last in case we're a struct
             Index.Register(ref result);

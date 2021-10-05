@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 
 
 ## [Unreleased]
+### Added
+Added a `mode` attribute that lets you specify how things are updated through inheritance.
+
 ### Fixed
 Internal parser error when encountering refs in Parser XML.
 
