@@ -121,7 +121,7 @@ namespace Dec
 
                 if (!recContext.Referenceable)
                 {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Found a reference in a non-referenceable context, using it anyway");
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Found a reference in a non-referenceable context (most likely within a Recorder.WithFactory(), which disallows shared references), using it anyway");
                 }
 
                 if (context.refs == null || !context.refs.ContainsKey(refAttribute))

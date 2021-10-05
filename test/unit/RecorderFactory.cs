@@ -450,6 +450,8 @@ namespace DecTest
         [Test]
         public void FactoryRefRead()
         {
+            // This is an error because a .WithFactory() method is being called, which precludes references.
+
             string serialized = @"
                 <Record>
                   <recordFormatVersion>1</recordFormatVersion>
