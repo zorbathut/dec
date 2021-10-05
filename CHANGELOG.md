@@ -8,6 +8,7 @@ Internal parser error when encountering refs in Parser XML.
 
 ### Improved
 Proper support for fields with abstract Dec types.
+Slight improvement to error handling behavior when dealing with a ref tag in Parser input.
 
 ### Documentation
 Various small error message improvements.

@@ -501,7 +501,7 @@ namespace DecTest
             var test = Dec.Database<ParserRefDec>.Get("Test");
             Assert.IsNotNull(test);
             Assert.IsNotNull(test.initialized);
-            Assert.IsNull(test.setToNull);
+            Assert.IsNotNull(test.setToNull);
         }
     }
 }

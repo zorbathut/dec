@@ -104,6 +104,12 @@ namespace Dec
                 }
             }
 
+            if (refAttribute != null && !context.RecorderMode)
+            {
+                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Found a reference tag while not evaluating Recorder mode, ignoring it");
+                refAttribute = null;
+            }
+
             int validAttributes = (classAttribute != null ? 1 : 0) + (nullAttribute != null ? 1 : 0) + (refAttribute != null ? 1 : 0);
             if (validAttributes > 1)
             {
