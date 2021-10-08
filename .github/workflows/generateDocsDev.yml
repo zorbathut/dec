@@ -14,7 +14,7 @@ jobs:
       uses: actions/setup-dotnet@v1
     - name: Setup environment
       run: dotnet restore
-    - name: Build Documentation
+    - name: Build documentation
       uses: nikeee/docfx-action@v1.0.0
       with:
         args: doc/docfx.json

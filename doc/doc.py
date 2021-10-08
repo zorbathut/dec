@@ -59,6 +59,7 @@ for f in [ f"doc/_site/{f}" for f in os.listdir("doc/_site") if f != ".git" ]:
 subprocess.check_call([
         "docfx",
         "doc/docfx.json",
+        "--warningAsErrors",
     ])
 
 if args.deploy:
