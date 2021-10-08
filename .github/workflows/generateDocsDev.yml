@@ -6,18 +6,23 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     
     steps:
     - uses: actions/checkout@v2
     - name: Setup dotnet
       uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '5.0.x'
     - name: Setup environment
       run: dotnet restore
-    - name: Build documentation
-      uses: nikeee/docfx-action@v1.0.0
-      with:
-        args: doc/docfx.json
+    - name: Setup tooling
+      run: |
+        sudo apt install nuget
+        nuget install docfx.console
+        dotnet tool install -g coveralls.net --version 1.0.0
+    - name: Test documentation
+      run: docfx.console.*/tools/docfx.exe doc/docfx.json
     - uses: shogo82148/actions-mutex@v1
       with:
         key: documentation
