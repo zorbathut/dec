@@ -36,4 +36,4 @@ jobs:
     - name: Test documentation
       uses: nikeee/docfx-action@v1.0.0
       with:
-        args: doc/docfx.json --warningAsErrors
+        args: doc/docfx.json --warningsAsErrors
