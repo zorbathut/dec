@@ -95,7 +95,7 @@ namespace Dec
             /// Add a factory layer to objects created during this call.
             /// </summary>
             /// <remarks>
-            /// See [`Dec.Recorder.WithFactory`](xref:Dec.Recorder.WithFactory) for details.
+            /// See [`Dec.Recorder.WithFactory`](xref:Dec.Recorder.WithFactory*) for details.
             /// </remarks>
             public Parameters WithFactory(Dictionary<Type, Func<Type, object>> factories)
             {

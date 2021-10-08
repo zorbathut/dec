@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 
 
+## [Unreleased]
+### Fixed
+Documentation crosslink error.
+
+
 ## [v0.3.3]
 ### Added
 Added a `mode` attribute that lets you specify how things are updated through inheritance.
