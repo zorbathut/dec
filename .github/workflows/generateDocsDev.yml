@@ -1,0 +1,43 @@
+name: GenerateDocsDev
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@v1
+    - name: Setup environment
+      run: dotnet restore
+    - name: Build Documentation
+      uses: nikeee/docfx-action@v1.0.0
+      with:
+        args: doc/docfx.json
+    - name: Check out repo shadow copy
+      uses: actions/checkout@v2
+      with:
+        ref: gh-pages
+        path: docwrite
+        fetch-depth: 0
+    - name: Copy documentation over
+      run: |
+        rm -rf docwrite/dev
+        cp -r doc/_site docwrite/dev
+    - name: Check in
+      working-directory: docwrite
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add .
+        git commit -a -m "Update dev documentation"
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        directory: docwrite
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: gh-pages

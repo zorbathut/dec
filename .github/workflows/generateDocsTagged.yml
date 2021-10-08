@@ -1,0 +1,46 @@
+name: GenerateDocsTagged
+
+on:
+  push:
+    tags:
+      - v0.*
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@v1
+    - name: Setup environment
+      run: dotnet restore
+    - name: Build Documentation
+      uses: nikeee/docfx-action@v1.0.0
+      with:
+        args: doc/docfx.json
+    - name: Check out repo shadow copy
+      uses: actions/checkout@v2
+      with:
+        ref: gh-pages
+        path: docwrite
+        fetch-depth: 0
+    - name: Clear old documentation
+      run: |
+        rm -rf docwrite/${GITHUB_REF##*/}
+        cp -r doc/_site docwrite/${GITHUB_REF##*/}
+        rm -rf docwrite/release
+        cp -r doc/_site docwrite/release
+    - name: Check in
+      working-directory: docwrite
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add .
+        git commit -a -m "Update release documentation"
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        directory: docwrite
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: gh-pages
