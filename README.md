@@ -20,11 +20,11 @@ Dual-licensed under MIT or the [Unlicense](http://unlicense.org).
 
 ### Documentation
 
-* [Frontpage](https://zorbathut.github.io/dec/latest/)
+* [Frontpage](https://zorbathut.github.io/dec/release/)
 
-* [Quick start](https://zorbathut.github.io/dec/latest/quickstart/introduction.html)
+* [Quick start](https://zorbathut.github.io/dec/release/quickstart/introduction.html)
 
-* [API reference](https://zorbathut.github.io/dec/latest/api/index.html)
+* [API reference](https://zorbathut.github.io/dec/release/api/index.html)
 
 * [Example project: Legend of the Amethyst Futon](example/loaf)
 

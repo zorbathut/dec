@@ -293,7 +293,7 @@ namespace Dec
             }
 
             SuppressEmptyWarning();
-            Dbg.Wrn("You are trying to query the Dec database with no Decs loaded. Perhaps your Parser load step isn't working properly? Recommend reading https://zorbathut.github.io/dec/quickstart/setup.html.");
+            Dbg.Wrn("You are trying to query the Dec database with no Decs loaded. Perhaps your Parser load step isn't working properly? Recommend reading https://zorbathut.github.io/dec/release/quickstart/setup.html.");
         }
 
         internal static void SuppressEmptyWarning()

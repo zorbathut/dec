@@ -867,7 +867,7 @@ namespace Dec
             // And the full reflection system is probably impossible to secure, whereas the Record system should be secureable.
             if (context.RecorderMode)
             {
-                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Falling back to reflection within a Record system while parsing a {type}; this is currently not allowed for security reasons. Either you shouldn't be trying to serialize this, or it should implement Dec.IRecorder (https://zorbathut.github.io/dec/documentation/serialization.html), or you need a Dec.Converter (https://zorbathut.github.io/dec/documentation/custom.html)");
+                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Falling back to reflection within a Record system while parsing a {type}; this is currently not allowed for security reasons. Either you shouldn't be trying to serialize this, or it should implement Dec.IRecorder (https://zorbathut.github.io/dec/release/documentation/serialization.html), or you need a Dec.Converter (https://zorbathut.github.io/dec/release/documentation/custom.html)");
                 return result;
             }
 
@@ -1264,7 +1264,7 @@ namespace Dec
 
             if (!node.AllowReflection)
             {
-                Dbg.Err($"Couldn't find a composition method for type {valType}; either you shouldn't be trying to serialize it, or it should implement Dec.IRecorder (https://zorbathut.github.io/dec/documentation/serialization.html), or you need a Dec.Converter (https://zorbathut.github.io/dec/documentation/custom.html)");
+                Dbg.Err($"Couldn't find a composition method for type {valType}; either you shouldn't be trying to serialize it, or it should implement Dec.IRecorder (https://zorbathut.github.io/dec/release/documentation/serialization.html), or you need a Dec.Converter (https://zorbathut.github.io/dec/release/documentation/custom.html)");
                 return;
             }
 
