@@ -18,6 +18,9 @@ jobs:
       uses: nikeee/docfx-action@v1.0.0
       with:
         args: doc/docfx.json
+    - uses: shogo82148/actions-mutex@v1
+      with:
+        key: documentation
     - name: Check out repo shadow copy
       uses: actions/checkout@v2
       with:
