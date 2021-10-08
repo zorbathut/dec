@@ -1,0 +1,130 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Justifications </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Justifications ">
+    <meta name="generator" content="docfx 2.56.7.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="justifications">Justifications</h1>
+
+<h2 id="text-formats">Text formats</h2>
+<p>I suspect it's only a matter of time before someone asks me why I'm using XML.</p>
+<p>XML is definitely not perfect, but it has a set of features which I want that other text-based data descriptors don't have. I'll list alternatives and explain why they fall short.</p>
+<h3 id="json">JSON</h3>
+<p>JSON is designed as a computer-to-computer descriptive language, not a human-facing written language. The big dealbreaker here is a lack of comments, which are near-crucial for large human-authored files, but there's other human-antifeatures like a lack of trailing commas in lists.</p>
+<p>On top of that, it's more typed than I prefer; I'd like to keep typing data in exactly one place, and that's the C# class definitions. JSON understands strings, integers, booleans, lists, and dictionaries, and that's about three more things than I want it to know about.</p>
+<h3 id="json5jsonc">JSON5/JSONC</h3>
+<p>JSON5 and JSONC are basically &quot;JSON, with trailing commas and comments&quot;. They're definitely better than JSON, but support is lacking; as of today there's a single C# implementation with almost no usage and less documentation than dec. They also share the typing issues of JSON.</p>
+<h3 id="yaml">YAML</h3>
+<p>YAML includes comments and better human-intended features, but has worse typing issues than JSON, with many documented cases where naive but reasonable input results in completely incorrect data. YAML is also a whitespace-sensitive language; I admit I'm not a fan of that in general, but in my experience it's devastating for data markup languages, where it's common to have <em>extremely</em> large blocks containing a lot of information.</p>
+<h3 id="strictyaml">StrictYAML</h3>
+<p>Similar to the JSON5/JSON comparison, StrictYAML is a modified version of YAML, mostly removing YAML's weird typing behavior. I actually rather like StrictYAML and use it on other projects; however, the only StrictYAML parser that exists today is in Python.</p>
+<p>It shares the whitespace-sensitive behavior of YAML.</p>
+<h3 id="ini">.ini</h3>
+<p>Classic Windows INIs are an untyped configuration language. They're actually rather nice for simple configurations, but they don't have native support for nested structures, which makes them somewhat unusable for this application.</p>
+<h3 id="toml">TOML</h3>
+<p>TOML is basically a better .ini. It's great for simple configurations (or even slightly-less-simple configurations) but is not suited for deeply nested data.</p>
+<h3 id="custom-written-format">Custom-written format</h3>
+<p>I'm not a big fan of reinventing the wheel, especially when I have something that's Good Enough. Why bother when I can just use XML?</p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/zorbathut/dec/blob/9c549a23bde28d7bb844e8b93b8364336bbb9afe/doc/documentation/justifications.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>
