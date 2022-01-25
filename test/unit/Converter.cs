@@ -24,8 +24,7 @@ namespace DecTest
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConverterPrivate) } };
 
-            Dec.Parser parser = null;
-            ExpectErrors(() => parser = new Dec.Parser());
+            Dec.Parser parser = new Dec.Parser();
             parser.Finish();
         }
 

@@ -200,18 +200,18 @@ namespace Dec
                 Dbg.Err($"{errorPrefix()}: Attempting to create {errorType} of abstract type {type}");
                 return null;    // thankfully all abstract types can accept being null
             }
-            else if (!type.IsValueType && type.GetConstructor(new Type[] { }) == null)
+            else if (!type.IsValueType && type.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { }, null) == null)
             {
                 // Note: Structs don't have constructors. I actually can't tell if ints do, I'm kind of bypassing that system.
 
-                Dbg.Err($"{errorPrefix()}: Attempting to create {errorType} of type {type} without a public no-argument constructor");
-                return null;    // similarly, anything that is capable of not having a public no-argument constructor can accept being null
+                Dbg.Err($"{errorPrefix()}: Attempting to create {errorType} of type {type} without a no-argument constructor");
+                return null;    // similarly, anything that is capable of not having a no-argument constructor can accept being null
             }
             else
             {
                 try
                 {
-                    var result = Activator.CreateInstance(type);
+                    var result = Activator.CreateInstance(type, true);
                     if (result == null)
                     {
                         // This is difficult to test; there are very few things that can get CreateInstance to return null, and right now the Dec type system doesn't support them (int? for example)

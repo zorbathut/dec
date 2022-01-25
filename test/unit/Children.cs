@@ -280,11 +280,20 @@ namespace DecTest
             public ChildException() { throw new Exception(); }
         }
 
+        public class ChildValid
+        {
+            
+        }
+
         public class ContainerDec : Dec.Dec
         {
+            public ChildValid childValid1;
             public ChildPrivate childPrivate;
+            public ChildValid childValid2;
             public ChildParameter childParameter;
+            public ChildValid childValid3;
             public ChildException childException;
+            public ChildValid childValid4;
         }
 
         [Test]
@@ -296,7 +305,13 @@ namespace DecTest
             parser.AddString(@"
                 <Decs>
                     <ContainerDec decName=""TestDec"">
+                        <childValid1 />
                         <childPrivate />
+                        <childValid2 />
+                        <childParameter />
+                        <childValid3 />
+                        <childException />
+                        <childValid4 />
                     </ContainerDec>
                 </Decs>");
             ExpectErrors(() => parser.Finish());
@@ -306,7 +321,14 @@ namespace DecTest
             var result = Dec.Database<ContainerDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
-            Assert.IsNull(result.childPrivate);
+            Assert.IsNotNull(result.childPrivate);
+            Assert.IsNull(result.childParameter);
+            Assert.IsNull(result.childException);
+
+            Assert.IsNotNull(result.childValid1);
+            Assert.IsNotNull(result.childValid2);
+            Assert.IsNotNull(result.childValid3);
+            Assert.IsNotNull(result.childValid4);
         }
 
         [Test]

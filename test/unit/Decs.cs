@@ -809,15 +809,15 @@ namespace DecTest
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ConstructorPrivateDec) } };
 
             var parser = new Dec.Parser();
-            ExpectErrors(() => parser.AddString(@"
+            parser.AddString(@"
                 <Decs>
                     <ConstructorPrivateDec decName=""TestDec"" />
-                </Decs>"));
+                </Decs>");
             parser.Finish();
 
             DoBehavior(mode);
 
-            Assert.IsNull(Dec.Database<ConstructorPrivateDec>.Get("TestDec"));
+            Assert.IsNotNull(Dec.Database<ConstructorPrivateDec>.Get("TestDec"));
         }
 
         public class ConstructorParameterDec : Dec.Dec

@@ -6,6 +6,9 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 Documentation crosslink error.
 
+### Changed
+Private constructors are now considered valid to use.
+
 
 ## [v0.3.3]
 ### Added
