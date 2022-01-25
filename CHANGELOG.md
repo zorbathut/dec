@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Fixed
+Recording a referenced derived object results in an invalid (but still readable) file.
 Documentation crosslink error.
 
 ### Changed

@@ -503,5 +503,44 @@ namespace DecTest
             Assert.IsNotNull(test.initialized);
             Assert.IsNotNull(test.setToNull);
         }
+
+        public class BaseRecordable : Dec.IRecordable
+        {
+            public virtual void Record(Dec.Recorder recorder) { }
+        }
+
+        public class DerivedRecordable : BaseRecordable
+        {
+            public override void Record(Dec.Recorder recorder) { }
+        }
+
+        public class RecordableContainer : Dec.IRecordable
+        {
+            public BaseRecordable a;
+            public BaseRecordable b;
+
+            public virtual void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref a, "a");
+                recorder.Record(ref b, "b");
+            }
+        }
+
+        [Test]
+        public void DerivedRefRecordables([Values] RecorderMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
+
+            var root = new RecordableContainer();
+            root.a = new DerivedRecordable();
+            root.b = root.a;
+
+            var deserialized = DoRecorderRoundTrip(root, mode);
+
+            Assert.IsInstanceOf<DerivedRecordable>(deserialized.a);
+            Assert.IsInstanceOf<DerivedRecordable>(deserialized.b);
+
+            Assert.AreSame(deserialized.a, deserialized.b);
+        }
     }
 }

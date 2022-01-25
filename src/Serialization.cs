@@ -1138,43 +1138,38 @@ namespace Dec
                 valType = typeof(Type);
             }
 
-            // If we have a type that isn't the expected type, tag it. We need to do this before any further handling because everything fits in `object`.
-            if (valType != fieldType)
-            {
-                node.TagClass(valType);
-            }
-
             // Do all our unreferencables first
+            bool unreferenceableComplete = false;
+
             if (valType.IsPrimitive)
             {
                 node.WritePrimitive(value);
 
-                return;
+                unreferenceableComplete = true;
             }
-
-            if (value is System.Enum)
+            else if (value is System.Enum)
             {
                 node.WriteEnum(value);
 
-                return;
+                unreferenceableComplete = true;
             }
-
-            if (value is string)
+            else if (value is string)
             {
                 node.WriteString(value as string);
 
-                return;
+                unreferenceableComplete = true;
             }
-
-            if (value is Type)
+            else if (value is Type)
             {
                 node.WriteType(value as Type);
 
-                return;
+                unreferenceableComplete = true;
             }
 
             // Check to see if we should make this into a ref
-            if (!valType.IsValueType)
+            // Do this *before* we do the class tagging, otherwise we may add ref/class tags to a single node, which is invalid.
+            // Note that it's important we don't write a reference if we had an unreferenceable; it's unnecessarily slow and some of our writer types don't support it.
+            if (!valType.IsValueType && !unreferenceableComplete)
             {
                 if (node.WriteReference(value))
                 {
@@ -1182,8 +1177,23 @@ namespace Dec
                     return;
                 }
 
-                // Either this isn't a reference yet, or we don't even support references in this mode. So keep on processing.
+                // If we support references, then this object has not previously shown up in the reference system; keep going so we finish serializing it.
+                // If we don't support references at all then obviously we *really* need to finish serializing it.
             }
+
+            // If we have a type that isn't the expected type, tag it. We may need this even for unreferencable value types because everything fits in an `object`.
+            if (valType != fieldType)
+            {
+                node.TagClass(valType);
+            }
+
+            // Did we actually write our node type? Alright, we're done.
+            if (unreferenceableComplete)
+            {
+                return;
+            }
+
+            // Now we have things that *could* be references, but aren't.
 
             if (valType.IsArray)
             {
