@@ -36,7 +36,6 @@ Dual-licensed under MIT or the [Unlicense](http://unlicense.org).
 ```cs
 void CalledOnceDuringGameStartup()
 {
-    Dec.Config.DefaultHandlerThrowExceptions = false;
     Dec.Config.UsingNamespaces = new string[] { "YourGame" };
 
     var parser = new Dec.Parser();
