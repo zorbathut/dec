@@ -72,6 +72,8 @@
 <h2 id="set-up-dec-and-add-your-xml-directory">Set up Dec and add your XML directory.</h2>
 <pre><code class="lang-cs">void CalledOnceDuringGameStartup()
 {
+    // If your game code isn't in a namespace, you don't need this.
+    // If it is, update this to the appropriate namespace.
     Dec.Config.UsingNamespaces = new string[] { &quot;YourGame&quot; };
 
     var parser = new Dec.Parser();
