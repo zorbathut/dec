@@ -72,7 +72,6 @@
 <h2 id="set-up-dec-and-add-your-xml-directory">Set up Dec and add your XML directory.</h2>
 <pre><code class="lang-cs">void CalledOnceDuringGameStartup()
 {
-    Dec.Config.DefaultHandlerThrowExceptions = false;
     Dec.Config.UsingNamespaces = new string[] { &quot;YourGame&quot; };
 
     var parser = new Dec.Parser();
