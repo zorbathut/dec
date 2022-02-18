@@ -5,6 +5,8 @@
 ```cs
 void CalledOnceDuringGameStartup()
 {
+    // If your game code isn't in a namespace, you don't need this.
+    // If it is, update this to the appropriate namespace.
     Dec.Config.UsingNamespaces = new string[] { "YourGame" };
 
     var parser = new Dec.Parser();
