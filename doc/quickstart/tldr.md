@@ -5,7 +5,6 @@
 ```cs
 void CalledOnceDuringGameStartup()
 {
-    Dec.Config.DefaultHandlerThrowExceptions = false;
     Dec.Config.UsingNamespaces = new string[] { "YourGame" };
 
     var parser = new Dec.Parser();

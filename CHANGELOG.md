@@ -10,6 +10,9 @@ Documentation crosslink error.
 ### Changed
 Private constructors are now considered valid to use.
 
+### Documentation
+Fix incorrect initialization instructions.
+
 
 ## [v0.3.3]
 ### Added
