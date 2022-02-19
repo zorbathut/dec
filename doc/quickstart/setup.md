@@ -41,7 +41,7 @@ Dec.Config.ExceptionHandler = e => YourGame.Logging.LogException(e);
 As mentioned above, Dec attempts to recover from errors whenever possible. However, we've found that new Dec developers often miss error messages and end up very confused. To help with that, Dec's default log handler throws exceptions on warnings and errors, along with an explanatory message about how this can be suppressed; specifically, through [Dec.Config.DefaultHandlerThrowExceptions](xref:Dec.Config.DefaultHandlerThrowExceptions).
 
 ```cs
-Dec.Config.DefaultHandlerThrowExceptions = DefaultExceptionBehavior.Never;
+Dec.Config.DefaultHandlerThrowExceptions = Dec.Config.DefaultExceptionBehavior.Never;
 ```
 
 If you want to keep the exception behavior, but don't want the message, the message alone can be suppressed with [Dec.Config.DefaultHandlerShowConfigOnException](xref:Dec.Config.DefaultHandlerShowConfigOnException).
