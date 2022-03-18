@@ -372,7 +372,7 @@ namespace Dec
                     var dec = Database.Get(field.FieldType, field.Name);
                     if (dec == null)
                     {
-                        Dbg.Err($"Failed to find {field.FieldType} named {field.Name}");
+                        Dbg.Err($"Failed to find {field.FieldType} declaration named {field.Name}");
                         field.SetValue(null, null); // this is unnecessary, but it does kick the static constructor just in case we wouldn't do it otherwise
                     }
                     else if (!field.FieldType.IsAssignableFrom(dec.GetType()))

@@ -7,6 +7,9 @@ All notable changes to this project will be documented in this file.
 Recording a referenced object that would otherwise need a class tag results in an invalid (but still readable) file.
 Documentation crosslink error.
 
+### Improved
+Better error message when failing to find a Dec.
+
 ### Changed
 Private constructors are now considered valid to use.
 
