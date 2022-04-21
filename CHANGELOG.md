@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 
 ### Improved
 * Better error message when failing to find a Dec.
+* Better error messages when failing to load StaticReferences.
 
 ### Changed
 * Private constructors are now considered valid to use.

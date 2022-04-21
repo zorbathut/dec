@@ -372,12 +372,12 @@ namespace Dec
                     var dec = Database.Get(field.FieldType, field.Name);
                     if (dec == null)
                     {
-                        Dbg.Err($"Failed to find {field.FieldType} declaration named {field.Name}");
+                        Dbg.Err($"Static reference class {stat} has member {field.FieldType} {field.Name} that does not correspond to any loaded Dec");
                         field.SetValue(null, null); // this is unnecessary, but it does kick the static constructor just in case we wouldn't do it otherwise
                     }
                     else if (!field.FieldType.IsAssignableFrom(dec.GetType()))
                     {
-                        Dbg.Err($"Static reference {field.FieldType} {stat}.{field.Name} is not compatible with {dec.GetType()} {dec}");
+                        Dbg.Err($"Static reference class {stat} has member {field.FieldType} {field.Name} that is not compatible with actual {dec.GetType()} {dec}");
                         field.SetValue(null, null); // this is unnecessary, but it does kick the static constructor just in case we wouldn't do it otherwise
                     }
                     else
