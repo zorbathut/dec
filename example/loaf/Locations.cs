@@ -127,7 +127,7 @@ namespace Loaf.Locations
 
         public override OutcomeDec Visit()
         {
-            Cns.Out("You've finally tracked down the Emerald Futon!");
+            Cns.Out("You've finally tracked down the Amethyst Futon!");
             Cns.Out("It was in your living room all along!");
             Cns.Out("");
 
