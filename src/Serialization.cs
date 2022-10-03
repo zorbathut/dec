@@ -126,10 +126,11 @@ namespace Dec
             // Don't return anything until we do our element.HasAtttributes check!
 
             // The interaction between these is complicated!
-            string nullAttribute = element.ConsumeAttribute("null");
-            string refAttribute = element.ConsumeAttribute("ref");
-            string classAttribute = element.ConsumeAttribute("class");
-            string modeAttribute = element.ConsumeAttribute("mode");
+            HashSet<string> consumedAttributes = null;
+            string nullAttribute = element.ConsumeAttribute(context.sourceName, "null", ref consumedAttributes);
+            string refAttribute = element.ConsumeAttribute(context.sourceName, "ref", ref consumedAttributes);
+            string classAttribute = element.ConsumeAttribute(context.sourceName, "class", ref consumedAttributes);
+            string modeAttribute = element.ConsumeAttribute(context.sourceName, "mode", ref consumedAttributes);
 
             if (nullAttribute != null)
             {
@@ -173,7 +174,11 @@ namespace Dec
 
             if (element.HasAttributes)
             {
-                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Has unknown attributes");
+                if (consumedAttributes == null || element.Attributes().Select(attr => attr.Name.LocalName).Any(attrname => !consumedAttributes.Contains(attrname)))
+                {
+                    string attrlist = string.Join(", ", element.Attributes().Select(attr => attr.Name.LocalName).Where(attrname => consumedAttributes == null || !consumedAttributes.Contains(attrname)));
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Has unknown attributes {attrlist}");
+                }
             }
 
             if (refAttribute != null)

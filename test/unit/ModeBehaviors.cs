@@ -820,5 +820,46 @@ namespace DecTest
             Assert.AreEqual(60, Dec.Database<CompositeDec>.Get("TestDec").filled.value);
             Assert.AreEqual(20, Dec.Database<CompositeDec>.Get("TestDec").filled.sideValue);
         }
+
+
+        public interface IComponent { }
+        public class ComponentConcrete : IComponent {  }
+
+        public class EntityDec : Dec.Dec
+        {
+            public List<IComponent> components;
+        }
+
+        [Test]
+        public void ComponentAppend([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(EntityDec), typeof(ComponentConcrete) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString($@"
+                <Decs>
+                    <EntityDec decName=""BaseEntity"" abstract=""true"">
+                        <components>
+                            <li class=""ComponentConcrete"" />
+                        </components>
+                    </EntityDec>
+
+                    <EntityDec decName=""ConcreteEntity"" parent=""BaseEntity"">
+                        <components mode=""append"">
+                            <li class=""ComponentConcrete"" />
+                        </components>
+                    </EntityDec>
+
+                    <EntityDec decName=""ConcreteEntityBeta"" parent=""BaseEntity"">
+                        <components mode=""append"">
+                            <li class=""ComponentConcrete"" />
+                        </components>
+                    </EntityDec>
+                </Decs>");
+
+            parser.Finish();
+            
+            Assert.AreEqual(2, Dec.Database<EntityDec>.Get("ConcreteEntity").components.Count);
+        }
     }
 }

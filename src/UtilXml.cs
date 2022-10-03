@@ -1,5 +1,6 @@
 namespace Dec
 {
+    using System.Collections.Generic;
     using System.Linq;
     using System.Xml;
     using System.Xml.Linq;
@@ -32,7 +33,7 @@ namespace Dec
             return element.Nodes().OfType<XText>().FirstOrDefault()?.Value;
         }
 
-        internal static string ConsumeAttribute(this XElement element, string attributeName)
+        internal static string ConsumeAttribute(this XElement element, string stringName, string attributeName, ref HashSet<string> consumedAttributes)
         {
             var attribute = element.Attribute(attributeName);
 
@@ -42,9 +43,19 @@ namespace Dec
             }
             else
             {
-                string result = attribute.Value;
-                attribute.Remove();
-                return result;
+                if (consumedAttributes == null)
+                {
+                    consumedAttributes = new HashSet<string>();
+                }
+
+                if (consumedAttributes.Contains(attributeName))
+                {
+                    Dbg.Err($"{stringName}:{element.LineNumber()}: Attempted to consume the same attribute twice; internal error in Dec, please report!");
+                }
+
+                consumedAttributes.Add(attributeName);
+
+                return attribute.Value;
             }
         }
     }
