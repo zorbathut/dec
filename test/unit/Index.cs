@@ -198,5 +198,44 @@ namespace DecTest
             Assert.AreEqual(1, Dec.Database<ExcessiveIndicesDec>.Get("TestDecB").indexB);
             Assert.AreEqual(2, Dec.Database<ExcessiveIndicesDec>.Get("TestDecC").indexB);
         }
+
+        public class ParentReplaceIndexCarrier
+        {
+            [Dec.Index] public int index;
+        }
+
+        public class ParentReplaceIndexDec : Dec.Dec
+        {
+            public List<ParentReplaceIndexCarrier> list;
+        }
+
+        [Test]
+        [Ignore("Currently broken :(")]
+        public void ParentReplaceIndex([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ParentReplaceIndexDec), typeof(ParentReplaceIndexCarrier) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <ParentReplaceIndexDec decName=""Parent"" abstract=""true"">
+                        <list>
+                            <li />
+                            <li />
+                        </list>
+                    </ParentReplaceIndexDec>
+
+                    <ParentReplaceIndexDec decName=""TestDec"" parent=""Parent"">
+                        <list mode=""replace"">
+                            <li />
+                        </list>
+                    </ParentReplaceIndexDec>
+                </Decs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            Assert.AreEqual(1, Dec.Index<ParentReplaceIndexCarrier>.Count);
+        }
     }
 }
