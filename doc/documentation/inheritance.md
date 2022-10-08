@@ -19,6 +19,7 @@
 
 <MonsterDec decName="GreaterBlob" parent="Tier4Monster">
   <!-- Here, we override a few members piecemeal -->
+  <!-- GreaterBlob still has the same gold, loot, and visuals of the Tier4Monster -->
   <health>120</health>
   <damage>2d6</damage>
 </MonsterDec>
@@ -29,6 +30,7 @@
 
   <!-- Child composite types can be overridden piecemeal as well -->
   <visuals>
+    <!-- The color is changed, but the icon is still `t4monster.png` -->
     <color>#ffff80</color>
   </visuals>
 </MonsterDec>
@@ -38,4 +40,4 @@ When you need many things that are in some way similar, it can be useful to crea
 
 A standard single-inheritance structure is not always sufficient, but [multiple inheritance](/future/multipleinheritance.md) is not yet implemented.
 
-Most members are straight-out replaced if specified in child types. This includes collections, such as List and Dictionary; there is currently no way to append to a base type's collection, though [this functionality is planned](/future/mods.md). Composite types are modified on a per-element basis.
+Most members are straight-out replaced if specified in child types. This includes collections, such as List and Dictionary. More fine-tuned behavior can be accomplished with [merge modes](mergemodes.md).

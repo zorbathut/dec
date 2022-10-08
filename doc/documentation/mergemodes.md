@@ -28,7 +28,7 @@ Frequently, when using [inheritance](inheritance.md), you'll want a behavior for
 </EntityDec>
 ```
 
-This seems like a good idea - animals have a position and biological health behavior, and then you just add that to the squirrel, right?
+This seems like a good idea - animals have a position and biological health behavior, and then you just add a brain to the squirrel, right?
 
 But because `components` is a `List<Component.Base>` in this example, this will, by default, erase the vector in inherited classes. Squirrels will end up not having a world position or health behavior.
 
@@ -52,7 +52,7 @@ This can be solved using `mode` attributes. Example:
 
 The `mode="append"` tag on `components` indicates that this shouldn't replace existing elements in a list, but rather append new elements to that list. This will have to be specified in each EntityDec that inherits from `Animal` - for clarity's sake, it's specified on the child, not the parent.
 
-## Valid Modes
+## Containers and their Valid Modes
 
 `List`: The default `replace` will clear the collection, then add new elements to it. `append` will append new elements to the end of an existing list.
 

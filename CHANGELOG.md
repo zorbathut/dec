@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 ### Documentation
 * Fix incorrect tl;dr instructions.
 * Improve tl;dr instructions.
+* Connect the Inheritance documentation to the Merge Mode documentation.
 
 
 ## [v0.3.3]
