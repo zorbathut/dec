@@ -93,7 +93,7 @@
   &lt;/drops&gt;
 &lt;/EntityDec&gt;
 </code></pre>
-<p>This seems like a good idea - animals have a position and biological health behavior, and then you just add that to the squirrel, right?</p>
+<p>This seems like a good idea - animals have a position and biological health behavior, and then you just add a brain to the squirrel, right?</p>
 <p>But because <code>components</code> is a <code>List&lt;Component.Base&gt;</code> in this example, this will, by default, erase the vector in inherited classes. Squirrels will end up not having a world position or health behavior.</p>
 <h2 id="example">Example</h2>
 <p>This can be solved using <code>mode</code> attributes. Example:</p>
@@ -110,7 +110,7 @@
 &lt;/EntityDec&gt;
 </code></pre>
 <p>The <code>mode=&quot;append&quot;</code> tag on <code>components</code> indicates that this shouldn't replace existing elements in a list, but rather append new elements to that list. This will have to be specified in each EntityDec that inherits from <code>Animal</code> - for clarity's sake, it's specified on the child, not the parent.</p>
-<h2 id="valid-modes">Valid Modes</h2>
+<h2 id="containers-and-their-valid-modes">Containers and their Valid Modes</h2>
 <p><code>List</code>: The default <code>replace</code> will clear the collection, then add new elements to it. <code>append</code> will append new elements to the end of an existing list.</p>
 <p><code>Dictionary</code>/<code>HashSet</code>: The default <code>replace</code> will clear the collection, then add new elements to it. <code>patch</code> will add new items and silently replace any items with an existing key. <code>append</code> will add new items, but error if any existing keys are re-used.</p>
 <p>More options will be added in the future; if you need something specific, please ask on Discord, it may already be planned.</p>

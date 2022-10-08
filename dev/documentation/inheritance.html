@@ -87,6 +87,7 @@
 
 &lt;MonsterDec decName=&quot;GreaterBlob&quot; parent=&quot;Tier4Monster&quot;&gt;
   &lt;!-- Here, we override a few members piecemeal --&gt;
+  &lt;!-- GreaterBlob still has the same gold, loot, and visuals of the Tier4Monster --&gt;
   &lt;health&gt;120&lt;/health&gt;
   &lt;damage&gt;2d6&lt;/damage&gt;
 &lt;/MonsterDec&gt;
@@ -97,13 +98,14 @@
 
   &lt;!-- Child composite types can be overridden piecemeal as well --&gt;
   &lt;visuals&gt;
+    &lt;!-- The color is changed, but the icon is still `t4monster.png` --&gt;
     &lt;color&gt;#ffff80&lt;/color&gt;
   &lt;/visuals&gt;
 &lt;/MonsterDec&gt;
 </code></pre>
 <p>When you need many things that are in some way similar, it can be useful to create a set of default values that can be applied on demand. Abstract decs, determined by the <code>abstract=&quot;true&quot;</code> attribute, won't be included in the Dec database.</p>
 <p>A standard single-inheritance structure is not always sufficient, but <a href="/future/multipleinheritance.md">multiple inheritance</a> is not yet implemented.</p>
-<p>Most members are straight-out replaced if specified in child types. This includes collections, such as List and Dictionary; there is currently no way to append to a base type's collection, though <a href="/future/mods.md">this functionality is planned</a>. Composite types are modified on a per-element basis.</p>
+<p>Most members are straight-out replaced if specified in child types. This includes collections, such as List and Dictionary. More fine-tuned behavior can be accomplished with <a href="mergemodes.html">merge modes</a>.</p>
 </article>
           </div>
           
