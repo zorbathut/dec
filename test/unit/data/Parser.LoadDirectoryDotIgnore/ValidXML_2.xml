@@ -1,0 +1,5 @@
+<Decs>
+    <IntDec decName="TestDec2">
+        <value>80</value>
+    </IntDec>
+</Decs>

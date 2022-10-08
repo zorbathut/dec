@@ -221,5 +221,20 @@ namespace DecTest
             Assert.AreEqual(40, Dec.Database<IntDec>.Get("TestDec1").value);
             Assert.AreEqual(80, Dec.Database<IntDec>.Get("TestDec2").value);
         }
+
+        [Test]
+        public void LoadDirectoryDotIgnore([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
+
+            var parser = new Dec.Parser();
+            parser.AddDirectory("data/Parser.LoadDirectoryRecursive");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            Assert.AreEqual(40, Dec.Database<IntDec>.Get("TestDec1").value);
+            Assert.AreEqual(80, Dec.Database<IntDec>.Get("TestDec2").value);
+        }
     }
 }

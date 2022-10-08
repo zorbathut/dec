@@ -275,13 +275,20 @@ namespace Dec
         /// <summary>
         /// Pass a directory in for recursive processing.
         /// </summary>
+        /// <remarks>
+        /// This function will ignore dot-prefixed directory names and files, which are common for development tools to create.
+        /// </remarks>
         /// <param name="directory">The directory to look for files in.</param>
         /// <param name="pattern">The filename glob pattern to match.</param>
         public void AddDirectory(string directory, string pattern = "*.xml")
         {
             foreach (var file in Directory.GetFiles(directory, pattern, SearchOption.AllDirectories))
             {
-                AddFile(file);
+                // This is not terribly efficient; if it ever becomes a problem, fix it up.
+                if (!file.StartsWith(".") && !file.Contains("/.") && !file.Contains("\\."))
+                {
+                    AddFile(file);
+                }
             }
         }
 
