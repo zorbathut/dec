@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
 * Fix incorrect tl;dr instructions.
 * Improve tl;dr instructions.
 * Connect the Inheritance documentation to the Merge Mode documentation.
+* Rewrite Index documentation.
 
 ### Breaking
 * Parser.LoadDirectory no longer loads files or directories with . prefixes.
