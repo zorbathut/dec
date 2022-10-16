@@ -29,3 +29,5 @@ class ExampleDec : Dec.Dec
 ```
 
 It's somewhat common to have cached or otherwise derived data within decs. Use the System.NonSerialized attribute to signal that certain fields should not be defined from within XML; doing so will cause an error and prevent the assignment.
+
+The Recorder game serialization system doesn't use reflection to figure out what fields to record, it records only the exact fields you tell it to. NonSerialized doesn't apply to this; it's useful only for the initial Dec load.

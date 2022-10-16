@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file.
 * Improve tl;dr instructions.
 * Connect the Inheritance documentation to the Merge Mode documentation.
 * Rewrite Index documentation.
+* Added clarity regarding the interaction between NonSerialized and Recorder.
 
 ### Breaking
 * Parser.LoadDirectory no longer loads files or directories with . prefixes.
