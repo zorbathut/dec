@@ -162,7 +162,7 @@ namespace Dec
 
                     if (decElement.Attribute("decName") == null)
                     {
-                        Dbg.Err($"{stringName}:{decElement.LineNumber()}: No dec name provided");
+                        Dbg.Err($"{stringName}:{decElement.LineNumber()}: No dec name provided, add a `decName=` attribute to the {typeName} tag (example: <{typeName} decName=\"TheNameOfYour{typeName}\">)");
                         continue;
                     }
 
