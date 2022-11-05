@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 
 
 ## [Unreleased]
+
+
+## [v0.3.4]
 ### Fixed
 * Recording a referenced object that would otherwise need a class tag results in an invalid (but still readable) file.
 * Errors when multiple Decs inherit from a Dec with attributes on its members.
