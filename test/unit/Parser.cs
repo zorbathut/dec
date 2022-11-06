@@ -228,7 +228,7 @@ namespace DecTest
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
 
             var parser = new Dec.Parser();
-            parser.AddDirectory("data/Parser.LoadDirectoryRecursive");
+            parser.AddDirectory("data/Parser.LoadDirectoryDotIgnore");
             parser.Finish();
 
             DoBehavior(mode);
