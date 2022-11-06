@@ -282,12 +282,19 @@ namespace Dec
         /// <param name="pattern">The filename glob pattern to match.</param>
         public void AddDirectory(string directory, string pattern = "*.xml")
         {
-            foreach (var file in Directory.GetFiles(directory, pattern, SearchOption.AllDirectories))
+            foreach (var file in Directory.GetFiles(directory, pattern))
             {
-                // This is not terribly efficient; if it ever becomes a problem, fix it up.
-                if (!file.StartsWith(".") && !file.Contains("/.") && !file.Contains("\\."))
+                if (!System.IO.Path.GetFileName(file).StartsWith("."))
                 {
                     AddFile(file);
+                }
+            }
+
+            foreach (var subdir in Directory.GetDirectories(directory))
+            {
+                if (!System.IO.Path.GetFileName(subdir).StartsWith("."))
+                {
+                    AddDirectory(subdir, pattern);
                 }
             }
         }

@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 
 
 ## [Unreleased]
+### Fixed
+* Parser.LoadDirectory's prefix filtering breaks if given a directory that includes `.` or `..`.
 
 
 ## [v0.3.4]
