@@ -294,7 +294,7 @@ namespace Dec
             }
 
             // Special case: IRecordables
-            if (typeof(IRecordable).IsAssignableFrom(type))
+            if (typeof(IRecordable).IsAssignableFrom(type) && (context.RecorderMode || type.GetMethod("Record").GetCustomAttribute<Bespoke.IgnoreRecordDuringParserAttribute>() == null))
             {
                 switch (parseMode)
                 {
@@ -1260,7 +1260,7 @@ namespace Dec
                 return;
             }
 
-            if (value is IRecordable)
+            if (value is IRecordable && (!node.AllowReflection || value.GetType().GetMethod("Record").GetCustomAttribute<Bespoke.IgnoreRecordDuringParserAttribute>() == null))
             {
                 node.WriteRecord(value as IRecordable);
 

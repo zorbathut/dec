@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 
 
 ## [Unreleased]
+### Added
+* Added `Bespoke.IgnoreRecordDuringParserAttribute`, which provides special-purpose functionality that will be rolled into an eventual Converter redesign.
+
 ### Fixed
 * Parser.LoadDirectory's prefix filtering breaks if given a directory that includes `.` or `..`.
 
