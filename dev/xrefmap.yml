@@ -13,6 +13,18 @@ references:
   commentId: T:Dec.AbstractAttribute
   fullName: Dec.AbstractAttribute
   nameWithType: AbstractAttribute
+- uid: Dec.Bespoke
+  name: Dec.Bespoke
+  href: api/Dec.Bespoke.html
+  commentId: N:Dec.Bespoke
+  fullName: Dec.Bespoke
+  nameWithType: Dec.Bespoke
+- uid: Dec.Bespoke.IgnoreRecordDuringParserAttribute
+  name: IgnoreRecordDuringParserAttribute
+  href: api/Dec.Bespoke.IgnoreRecordDuringParserAttribute.html
+  commentId: T:Dec.Bespoke.IgnoreRecordDuringParserAttribute
+  fullName: Dec.Bespoke.IgnoreRecordDuringParserAttribute
+  nameWithType: IgnoreRecordDuringParserAttribute
 - uid: Dec.Composer
   name: Composer
   href: api/Dec.Composer.html

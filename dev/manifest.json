@@ -17,6 +17,30 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Dec.Bespoke.IgnoreRecordDuringParserAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.Bespoke.IgnoreRecordDuringParserAttribute.html",
+          "hash": "5bN/kovuAKDG0+I5DybxdGBHP96Jx/wJyUyq9wAJfj8="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.Bespoke.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.Bespoke.html",
+          "hash": "vOmA7d7x/QtXnWEupdO0ouLYt7UAujBQ7XFrROCpLjg="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Dec.Composer.yml",
       "output": {
         ".html": {
@@ -237,7 +261,7 @@
       "output": {
         ".html": {
           "relative_path": "api/toc.html",
-          "hash": "5yoaaMAZ5xHLuJBa7pLB+p6LqSHIWGQA+hLcHpWqgOQ="
+          "hash": "a+6yXQnYjlbaMtnUEH+H3nZfK2BzEtrf09u8s2lcXa0="
         }
       },
       "is_incremental": false,
@@ -706,7 +730,7 @@
         "ManagedReferenceDocumentProcessor": {
           "can_incremental": false,
           "incrementalPhase": "build",
-          "total_file_count": 18,
+          "total_file_count": 20,
           "skipped_file_count": 0
         },
         "ResourceDocumentProcessor": {
