@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 * Parser.LoadDirectory's prefix filtering breaks if given a directory that includes `.` or `..`.
+* RecordAsThis documentation refers to code that is no longer an example.
 
 
 ## [v0.3.4]
