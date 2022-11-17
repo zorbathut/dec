@@ -352,22 +352,25 @@ namespace Dec
         public override void WriteDec(Dec value)
         {
             // Get the dec name and be done with it.
-            if (value != null)
+            if (value == null)
             {
-                if (value != Database.Get(value.GetType(), value.DecName))
-                {
-                    Dbg.Err($"Referenced dec `{value}` does not exist in the database; serializing an error value instead");
-                    node.Add(new XText($"{value.DecName}_DELETED"));
-
-                    // if you actually have a dec named SomePreviouslyExistingDec_DELETED then you need to sort out what you're doing with your life
-                }
-                else
-                {
-                    node.Add(new XText(value.DecName));
-                }
+                // "No data" is defined as null for decs, so we just do that
             }
+            else if (value.DecName == "" || value.DecName == null)
+            {
+                Dbg.Err($"Attempted to write a Dec that was dynamically created but never registered; this will be left as a null reference. In most cases you shouldn't be dynamically creating Decs anyway, this is likely a malfunctioning deep copy such as a misbehaving ICloneable");
+            }
+            else if (value != Database.Get(value.GetType(), value.DecName))
+            {
+                Dbg.Err($"Referenced dec `{value}` does not exist in the database; serializing an error value instead");
+                node.Add(new XText($"{value.DecName}_DELETED"));
 
-            // "No data" is defined as null for decs, so we just do that
+                // if you actually have a dec named SomePreviouslyExistingDec_DELETED then you need to sort out what you're doing with your life
+            }
+            else
+            {
+                node.Add(new XText(value.DecName));
+            }
         }
 
         public override void TagClass(Type type)
