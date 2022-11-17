@@ -356,7 +356,7 @@ namespace Dec
             {
                 if (value != Database.Get(value.GetType(), value.DecName))
                 {
-                    Dbg.Err($"Referenced dec {value} no longer exists in the database; serializing an error value instead");
+                    Dbg.Err($"Referenced dec `{value}` does not exist in the database; serializing an error value instead");
                     node.Add(new XText($"{value.DecName}_DELETED"));
 
                     // if you actually have a dec named SomePreviouslyExistingDec_DELETED then you need to sort out what you're doing with your life

@@ -291,12 +291,12 @@ namespace Dec
             Type result;
             if (possibleTypes.Length == 0)
             {
-                Dbg.Err($"{inputLine}:{lineNumber}: Couldn't find type named {text}");
+                Dbg.Err($"{inputLine}:{lineNumber}: Couldn't find type named `{text}`");
                 result = null;
             }
             else if (possibleTypes.Length > 1)
             {
-                Dbg.Err($"{inputLine}:{lineNumber}: Found too many types named {text} ({possibleTypes.Select(t => t.FullName).ToCommaString()})");
+                Dbg.Err($"{inputLine}:{lineNumber}: Found too many types named `{text}` ({possibleTypes.Select(t => t.FullName).ToCommaString()})");
                 result = possibleTypes[0];
             }
             else

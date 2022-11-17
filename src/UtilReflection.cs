@@ -25,7 +25,7 @@ namespace Dec
                     }
                     else
                     {
-                        Dbg.Err($"Found multiple examples of field named {name} in type hierarchy {type}; found in {resultType} and {curType}");
+                        Dbg.Err($"Found multiple examples of field named `{name}` in type hierarchy {type}; found in {resultType} and {curType}");
                     }
                 }
 
@@ -64,7 +64,7 @@ namespace Dec
 
                     if (seenFields.Contains(field.Name))
                     {
-                        Dbg.Err($"Found duplicates of field {field}; base fields will be ignored");
+                        Dbg.Err($"Found duplicates of field `{field}`; base fields will be ignored");
                         continue;
                     }
 
@@ -156,7 +156,7 @@ namespace Dec
                 {
                     if (matchedField != null)
                     {
-                        Dbg.Err($"Too many indices in type {type} (found {matchedField} and {field}); only one will be filled");
+                        Dbg.Err($"Too many indices in type {type} (found `{matchedField}` and `{field}`); only one will be filled");
                     }
 
                     matchedField = field;

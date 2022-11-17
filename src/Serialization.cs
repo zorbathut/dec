@@ -589,7 +589,7 @@ namespace Dec
                         }
                         else if (dict.Contains(key))
                         {
-                            Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Dictionary includes duplicate key {key.ToString()}");
+                            Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Dictionary includes duplicate key `{key.ToString()}`");
                         }
 
                         dict[key] = ParseElement(valueNode, valueType, null, context, recContext);
@@ -612,7 +612,7 @@ namespace Dec
                         }
                         else if (dict.Contains(key))
                         {
-                            Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Dictionary includes duplicate key {fieldElement.Name.LocalName}");
+                            Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Dictionary includes duplicate key `{fieldElement.Name.LocalName}`");
                         }
 
                         dict[key] = ParseElement(fieldElement, valueType, null, context, recContext);
@@ -704,7 +704,7 @@ namespace Dec
                         }
                         else if ((bool)containsFunction.Invoke(set, keyParam))
                         {
-                            Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: HashSet includes duplicate key {key.ToString()}");
+                            Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: HashSet includes duplicate key `{key.ToString()}`");
                         }
 
                         addFunction.Invoke(set, keyParam);
@@ -734,7 +734,7 @@ namespace Dec
                         }
                         else if ((bool)containsFunction.Invoke(set, keyParam))
                         {
-                            Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: HashSet includes duplicate key {fieldElement.Name.LocalName}");
+                            Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: HashSet includes duplicate key `{fieldElement.Name.LocalName}`");
                         }
 
                         addFunction.Invoke(set, keyParam);
@@ -834,13 +834,13 @@ namespace Dec
 
                         if (index == -1)
                         {
-                            Dbg.Err($"{context.sourceName}:{elementItem.LineNumber()}: Found field with unexpected name {elementItem.Name.LocalName}");
+                            Dbg.Err($"{context.sourceName}:{elementItem.LineNumber()}: Found field with unexpected name `{elementItem.Name.LocalName}`");
                             continue;
                         }
 
                         if (seen[index])
                         {
-                            Dbg.Err($"{context.sourceName}:{elementItem.LineNumber()}: Found duplicate of field {elementItem.Name.LocalName}");
+                            Dbg.Err($"{context.sourceName}:{elementItem.LineNumber()}: Found duplicate of field `{elementItem.Name.LocalName}`");
                         }
 
                         seen[index] = true;
@@ -851,7 +851,7 @@ namespace Dec
                     {
                         if (!seen[i])
                         {
-                            Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Missing field with name {names[i]}");
+                            Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Missing field with name `{names[i]}`");
 
                             // Patch it up as best we can
                             parameters[i] = GenerateResultFallback(null, type.GenericTypeArguments[i]);
@@ -917,7 +917,7 @@ namespace Dec
                 string fieldName = fieldElement.Name.LocalName;
                 if (setFields.Contains(fieldName))
                 {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Duplicate field {fieldName}");
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Duplicate field `{fieldName}`");
                     // Just allow us to fall through; it's an error, but one with a reasonably obvious handling mechanism
                 }
                 setFields.Add(fieldName);
@@ -942,11 +942,11 @@ namespace Dec
 
                     if (match != null)
                     {
-                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Field {fieldName} does not exist in type {type}; did you mean {match}?");
+                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Field `{fieldName}` does not exist in type {type}; did you mean `{match}`?");
                     }
                     else
                     {
-                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Field {fieldName} does not exist in type {type}");
+                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Field `{fieldName}` does not exist in type {type}");
                     }
                     
                     continue;
@@ -954,13 +954,13 @@ namespace Dec
 
                 if (fieldElementInfo.GetCustomAttribute<IndexAttribute>() != null)
                 {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Attempting to set index field {fieldName}; these are generated by the dec system");
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Attempting to set index field `{fieldName}`; these are generated by the dec system");
                     continue;
                 }
 
                 if (fieldElementInfo.GetCustomAttribute<NonSerializedAttribute>() != null)
                 {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Attempting to set nonserialized field {fieldName}");
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Attempting to set nonserialized field `{fieldName}`");
                     continue;
                 }
 
@@ -1030,19 +1030,19 @@ namespace Dec
                         // This feels very hardcoded, but these are also *by far* the most common errors I've seen, and I haven't come up with a better and more general solution
                         if (text.Contains(" "))
                         {
-                            Dbg.Err($"{inputName}:{lineNumber}: Dec name \"{text}\" is not a valid identifier; consider removing spaces");
+                            Dbg.Err($"{inputName}:{lineNumber}: Dec name `{text}` is not a valid identifier; consider removing spaces");
                         }
                         else if (text.Contains("\""))
                         {
-                            Dbg.Err($"{inputName}:{lineNumber}: Dec name \"{text}\" is not a valid identifier; consider removing quotes");
+                            Dbg.Err($"{inputName}:{lineNumber}: Dec name `{text}` is not a valid identifier; consider removing quotes");
                         }
                         else if (!Parser.DecNameValidator.IsMatch(text))
                         {
-                            Dbg.Err($"{inputName}:{lineNumber}: Dec name \"{text}\" is not a valid identifier; dec identifiers must be valid C# identifiers");
+                            Dbg.Err($"{inputName}:{lineNumber}: Dec name `{text}` is not a valid identifier; dec identifiers must be valid C# identifiers");
                         }
                         else
                         {
-                            Dbg.Err($"{inputName}:{lineNumber}: Couldn't find {type} named {text}");
+                            Dbg.Err($"{inputName}:{lineNumber}: Couldn't find {type} named `{text}`");
                         }
                     }
                     return result;

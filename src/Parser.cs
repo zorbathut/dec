@@ -114,7 +114,7 @@ namespace Dec
             // This is a really easy error to make; we might as well handle it.
             if (input.EndsWith(".xml"))
             {
-                Dbg.Err($"It looks like you've passed the filename {input} to AddString instead of the actual XML file. Either use AddFile() or pass the file contents in.");
+                Dbg.Err($"It looks like you've passed the filename `{input}` to AddString instead of the actual XML file. Either use AddFile() or pass the file contents in.");
             }
 
             if (s_Status != Status.Accumulating)
@@ -146,7 +146,7 @@ namespace Dec
             {
                 if (rootElement.Name.LocalName != "Decs")
                 {
-                    Dbg.Wrn($"{stringName}:{rootElement.LineNumber()}: Found root element with name \"{rootElement.Name.LocalName}\" when it should be \"Decs\"");
+                    Dbg.Wrn($"{stringName}:{rootElement.LineNumber()}: Found root element with name `{rootElement.Name.LocalName}` when it should be `Decs`");
                 }
 
                 foreach (var decElement in rootElement.Elements())
@@ -172,15 +172,15 @@ namespace Dec
                         // This feels very hardcoded, but these are also *by far* the most common errors I've seen, and I haven't come up with a better and more general solution
                         if (decName.Contains(" "))
                         {
-                            Dbg.Err($"{stringName}:{decElement.LineNumber()}: Dec name \"{decName}\" is not a valid identifier; consider removing spaces");
+                            Dbg.Err($"{stringName}:{decElement.LineNumber()}: Dec name `{decName}` is not a valid identifier; consider removing spaces");
                         }
                         else if (decName.Contains("\""))
                         {
-                            Dbg.Err($"{stringName}:{decElement.LineNumber()}: Dec name \"{decName}\" is not a valid identifier; consider removing quotes");
+                            Dbg.Err($"{stringName}:{decElement.LineNumber()}: Dec name `{decName}` is not a valid identifier; consider removing quotes");
                         }
                         else
                         {
-                            Dbg.Err($"{stringName}:{decElement.LineNumber()}: Dec name \"{decName}\" is not a valid identifier; dec identifiers must be valid C# identifiers");
+                            Dbg.Err($"{stringName}:{decElement.LineNumber()}: Dec name `{decName}` is not a valid identifier; dec identifiers must be valid C# identifiers");
                         }
                         
                         continue;
@@ -221,7 +221,7 @@ namespace Dec
                         var identifier = Tuple.Create(typeHandle.GetDecRootType(), decName);
                         if (potentialParents.ContainsKey(identifier))
                         {
-                            Dbg.Err($"{stringName}:{decElement.LineNumber()}: Dec {identifier.Item1}:{identifier.Item2} defined twice");
+                            Dbg.Err($"{stringName}:{decElement.LineNumber()}: Dec [{identifier.Item1}:{identifier.Item2}] defined twice");
                         }
                         else
                         {
@@ -334,7 +334,7 @@ namespace Dec
                     // This is a struct for the sake of performance, so child itself won't be null
                     if (parentData.xml == null)
                     {
-                        Dbg.Err($"{currentContext.sourceName}:{currentXml.LineNumber()}: Dec {currentDecName} is attempting to use parent {parentDecName}, but no such dec exists");
+                        Dbg.Err($"{currentContext.sourceName}:{currentXml.LineNumber()}: Dec `{currentDecName}` is attempting to use parent `{parentDecName}`, but no such dec exists");
 
                         // Not much more we can do here.
                         break;
@@ -386,12 +386,12 @@ namespace Dec
                     var dec = Database.Get(field.FieldType, field.Name);
                     if (dec == null)
                     {
-                        Dbg.Err($"Static reference class {stat} has member {field.FieldType} {field.Name} that does not correspond to any loaded Dec");
+                        Dbg.Err($"Static reference class {stat} has member `{field.FieldType} {field.Name}` that does not correspond to any loaded Dec");
                         field.SetValue(null, null); // this is unnecessary, but it does kick the static constructor just in case we wouldn't do it otherwise
                     }
                     else if (!field.FieldType.IsAssignableFrom(dec.GetType()))
                     {
-                        Dbg.Err($"Static reference class {stat} has member {field.FieldType} {field.Name} that is not compatible with actual {dec.GetType()} {dec}");
+                        Dbg.Err($"Static reference class {stat} has member `{field.FieldType} {field.Name}` that is not compatible with actual {dec.GetType()} {dec}");
                         field.SetValue(null, null); // this is unnecessary, but it does kick the static constructor just in case we wouldn't do it otherwise
                     }
                     else
@@ -424,7 +424,7 @@ namespace Dec
             {
                 try
                 {
-                    dec.ConfigErrors(err => Dbg.Err($"{dec.GetType()} {dec}: {err}"));
+                    dec.ConfigErrors(err => Dbg.Err($"{dec}: {err}"));
                 }
                 catch (Exception e)
                 {
@@ -436,7 +436,7 @@ namespace Dec
             {
                 try
                 {
-                    dec.PostLoad(err => Dbg.Err($"{dec.GetType()} {dec}: {err}"));
+                    dec.PostLoad(err => Dbg.Err($"{dec}: {err}"));
                 }
                 catch (Exception e)
                 {

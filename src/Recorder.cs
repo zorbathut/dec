@@ -245,7 +245,7 @@ namespace Dec
             var record = doc.Elements().First();
             if (record.Name.LocalName != "Record")
             {
-                Dbg.Wrn($"{stringName}:{record.LineNumber()}: Found root element with name \"{record.Name.LocalName}\" when it should be \"Record\"");
+                Dbg.Wrn($"{stringName}:{record.LineNumber()}: Found root element with name `{record.Name.LocalName}` when it should be `Record`");
             }
 
             var recordFormatVersion = record.ElementNamed("recordFormatVersion");
@@ -382,7 +382,7 @@ namespace Dec
 
             if (fields.Contains(label))
             {
-                Dbg.Err($"Field '{label}' written multiple times");
+                Dbg.Err($"Field `{label}` written multiple times");
                 return;
             }
 

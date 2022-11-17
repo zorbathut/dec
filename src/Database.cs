@@ -103,13 +103,13 @@ namespace Dec
 
             if (Database<T>.Get(decName) != null)
             {
-                Dbg.Err($"Attempting to dynamically create {typeof(T)}:{decName} when it already exists");
+                Dbg.Err($"Attempting to dynamically create [{typeof(T)}:{decName}] when it already exists");
                 return null;
             }
 
             if (Get(typeof(T).GetDecRootType(), decName) != null)
             {
-                Dbg.Err($"Attempting to dynamically create {typeof(T)}:{decName} when a conflicting Dec already exists");
+                Dbg.Err($"Attempting to dynamically create [{typeof(T)}:{decName}] when a conflicting Dec already exists");
                 return null;
             }
 
@@ -162,7 +162,7 @@ namespace Dec
 
             if (dec.DecName != decName && Get(dec.GetType().GetDecRootType(), decName) != null)
             {
-                Dbg.Err($"Attempting to rename {dec} to {decName} when it already exists");
+                Dbg.Err($"Attempting to rename {dec} to `{decName}` when it already exists");
                 return;
             }
 
@@ -366,7 +366,7 @@ namespace Dec
 
             if (DecLookup.ContainsKey(instance.DecName))
             {
-                Dbg.Err($"Found repeated dec {typeof(T)}.{instance.DecName}");
+                Dbg.Err($"Found repeated dec {instance}");
 
                 // I . . . guess?
                 DecList[DecList.FindIndex(dec => dec == DecLookup[instance.DecName])] = instance;
