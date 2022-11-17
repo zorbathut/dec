@@ -19,7 +19,8 @@ namespace Dec
 
         public override string ToString()
         {
-            return DecName;
+            // This should probably be getting some kind of dec-namespace-aware string value.
+            return $"[{GetType().Name}:{DecName}]";
         }
 
         /// <summary>

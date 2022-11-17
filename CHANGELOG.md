@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 
 ### Improved
 * Better text quoting among many error messages.
+* Dec.ToString() now returns type data as well.
 
 ### Fixed
 * Parser.LoadDirectory's prefix filtering breaks if given a directory that includes `.` or `..`.

@@ -273,7 +273,7 @@ namespace DecTest
 
             Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDec"));
 
-            Assert.AreEqual(Dec.Database<StubDec>.Get("TestDec").ToString(), "TestDec");
+            Assert.AreEqual("[StubDec:TestDec]", Dec.Database<StubDec>.Get("TestDec").ToString());
         }
 
         public class ErrorDec : Dec.Dec
