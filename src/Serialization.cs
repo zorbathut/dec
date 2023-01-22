@@ -559,18 +559,18 @@ namespace Dec
                     if (fieldElement.Name.LocalName == "li")
                     {
                         // Treat this like a key/value pair
-                        var keyNode = fieldElement.ElementNamed("key");
-                        var valueNode = fieldElement.ElementNamed("value");
+                        var keyNode = fieldElement.ElementNamedWithFallback("key", context.sourceName, fieldElement.LineNumber(), "Dictionary includes li tag without a `key`");
+                        var valueNode = fieldElement.ElementNamedWithFallback("value", context.sourceName, fieldElement.LineNumber(), "Dictionary includes li tag without a `value`");
 
                         if (keyNode == null)
                         {
-                            Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Dictionary includes li tag without a key");
+                            // error has already been generated
                             continue;
                         }
 
                         if (valueNode == null)
                         {
-                            Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Dictionary includes li tag without a value");
+                            // error has already been generated
                             continue;
                         }
 

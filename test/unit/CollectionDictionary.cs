@@ -261,5 +261,45 @@ namespace DecTest
                 { Dec.Database<StubDec>.Get("Delta"), "Delta" },
             });
         }
+
+        [Test]
+        public void CaseProblem([Values] BehaviorMode mode, [Values] bool badKey, [Values] bool badValue)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryStringDec), typeof(StubDec) } };
+
+            string key = badKey ? "Key" : "key";
+            string value = badValue ? "Value" : "value";
+
+            var parser = new Dec.Parser();
+            parser.AddString($@"
+                <Decs>
+                    <DictionaryStringDec decName=""TestDec"">
+                        <data>
+                            <li>
+                                <{key}>Key</{key}>
+                                <{value}>Value</{value}>
+                            </li>
+                        </data>
+                    </DictionaryStringDec>
+                </Decs>");
+
+            if (badKey || badValue)
+            {
+                ExpectErrors(() => parser.Finish());
+            }
+            else
+            {
+                parser.Finish();
+            }
+
+            DoBehavior(mode);
+
+            var result = Dec.Database<DictionaryStringDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(result.data, new Dictionary<string, string> {
+                { "Key", "Value" },
+            });
+        }
     }
 }
