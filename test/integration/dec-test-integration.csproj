@@ -9,6 +9,10 @@
     <DefaultItemExcludes>$(DefaultItemExcludes);TestResults/**;data/golden/**</DefaultItemExcludes>
   </PropertyGroup>
   
+  <PropertyGroup>
+    <TargetFramework>netcoreapp6.0</TargetFramework>
+  </PropertyGroup>
+
   <PropertyGroup Condition="$(Configuration.Contains('2.1'))">
     <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
