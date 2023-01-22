@@ -602,6 +602,13 @@ namespace Dec
                         {
                             // it's really rare for this to happen, I think you could do it with a converter but that's it
                             Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Dictionary includes null key, skipping pair");
+
+                            // just in case . . .
+                            if (string.Compare(fieldElement.Name.LocalName, "li", true, System.Globalization.CultureInfo.InvariantCulture) == 0)
+                            {
+                                Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Did you mean to write `li`? This field is case-sensitive.");
+                            }
+
                             continue;
                         }
 
