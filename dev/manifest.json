@@ -160,12 +160,15 @@
       "version": ""
     },
     {
+      "log_codes": [
+        "InvalidFileLink"
+      ],
       "type": "ManagedReference",
       "source_relative_path": "api/Dec.IndexAttribute.yml",
       "output": {
         ".html": {
           "relative_path": "api/Dec.IndexAttribute.html",
-          "hash": "RPHQds1hXxSI1ZQpjDJeQPlwA8mZLO9SS6F038T3JZQ="
+          "hash": "2Irz/mJ121Fc06vaNxUYz2C0tCZH5jxZmK0Mlxmvyok="
         }
       },
       "is_incremental": false,
