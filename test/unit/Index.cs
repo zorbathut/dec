@@ -237,5 +237,48 @@ namespace DecTest
 
             Assert.AreEqual(1, Dec.Index<ParentReplaceIndexCarrier>.Count);
         }
+
+        [Test]
+        public void Multifile([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndexBaseDec) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <IndexBaseDec decName=""TestDecA"" />
+                    <IndexBaseDec decName=""TestDecB"" />
+                    <IndexBaseDec decName=""TestDecC"" />
+                </Decs>");
+            parser.AddString(@"
+                <Decs>
+                    <IndexBaseDec decName=""TestDecD"" />
+                    <IndexBaseDec decName=""TestDecE"" />
+                    <IndexBaseDec decName=""TestDecF"" />
+                </Decs>");
+            parser.AddString(@"
+                <Decs>
+                    <IndexBaseDec decName=""TestDecG"" />
+                    <IndexBaseDec decName=""TestDecH"" />
+                    <IndexBaseDec decName=""TestDecI"" />
+                </Decs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            var indices = new HashSet<int>();
+            indices.Add(Dec.Database<IndexBaseDec>.Get("TestDecA").index);
+            indices.Add(Dec.Database<IndexBaseDec>.Get("TestDecB").index);
+            indices.Add(Dec.Database<IndexBaseDec>.Get("TestDecC").index);
+            indices.Add(Dec.Database<IndexBaseDec>.Get("TestDecD").index);
+            indices.Add(Dec.Database<IndexBaseDec>.Get("TestDecE").index);
+            indices.Add(Dec.Database<IndexBaseDec>.Get("TestDecF").index);
+            indices.Add(Dec.Database<IndexBaseDec>.Get("TestDecG").index);
+            indices.Add(Dec.Database<IndexBaseDec>.Get("TestDecH").index);
+            indices.Add(Dec.Database<IndexBaseDec>.Get("TestDecI").index);
+
+            Assert.AreEqual(9, indices.Count);
+            Assert.AreEqual(9, Dec.Index<IndexBaseDec>.Count);
+        }
     }
 }
