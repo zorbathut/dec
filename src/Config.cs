@@ -88,6 +88,16 @@ namespace Dec
         public static bool DefaultHandlerShowConfigOnException = true;
 
         /// <summary>
+        /// The culture to use for parsing and writing values.
+        /// </summary>
+        /// <remarks>
+        /// This must be set statically, rather than loaded from the user's system, or parsing might break unpredictably. Recommend leaving this set to `en-US` for compatibility with the general Dec ecosystem; other options may have bugs (but report them and I'll fix them.)
+        ///
+        /// Changing this while Dec is running is undefined behavior. Don't do that. Dec may be unable to read files written under a different CultureInfo.    
+        /// </remarks>
+        public static System.Globalization.CultureInfo CultureInfo = new System.Globalization.CultureInfo("en-US"); 
+
+        /// <summary>
         /// The list of namespaces that dec can access transparently.
         /// </summary>
         /// <remarks>

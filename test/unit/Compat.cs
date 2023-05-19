@@ -26,6 +26,8 @@ namespace DecTest
         [Test]
         public void DotNet21FloatIssue([Values] RecorderMode mode)
         {
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+            
             // Intended to verify that this test doesn't stop working somehow, so we actually test both codepaths . . .
             bool floatSuccess = -8.22272715124268E-63 == double.Parse("-8.22272715124268E-63");
             int[] assemblyVersion = typeof(float)

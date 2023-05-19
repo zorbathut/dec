@@ -806,7 +806,7 @@ namespace DecTest
             var result = Dec.Database<FloatDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
-            Assert.AreEqual(2.34, result.value);
+            Assert.AreEqual(2.34f, result.value);
         }
     }
 }

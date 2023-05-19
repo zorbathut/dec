@@ -200,11 +200,14 @@ namespace Dec
         /// </summary>
         public static string Write<T>(T target, bool pretty = true)
         {
-            var writerContext = new WriterXmlRecord();
+            using (var _ = new CultureInfoScope(Config.CultureInfo))
+            {
+                var writerContext = new WriterXmlRecord();
 
-            Serialization.ComposeElement(writerContext.StartData(), target, typeof(T), new Recorder.Context());
+                Serialization.ComposeElement(writerContext.StartData(), target, typeof(T), new Recorder.Context());
 
-            return writerContext.Finish(pretty);
+                return writerContext.Finish(pretty);
+            }
         }
 
         /// <summary>
@@ -212,11 +215,14 @@ namespace Dec
         /// </summary>
         public static string WriteValidation<T>(T target)
         {
-            var writerContext = new WriterValidationRecord();
+            using (var _ = new CultureInfoScope(Config.CultureInfo))
+            {
+                var writerContext = new WriterValidationRecord();
 
-            Serialization.ComposeElement(writerContext.StartData(), target, typeof(T), new Recorder.Context());
+                Serialization.ComposeElement(writerContext.StartData(), target, typeof(T), new Recorder.Context());
 
-            return writerContext.Finish();
+                return writerContext.Finish();
+            }
         }
 
         /// <summary>
@@ -224,125 +230,128 @@ namespace Dec
         /// </summary>
         public static T Read<T>(string input, string stringName = "input")
         {
-            XDocument doc;
-
-            try
+            using (var _ = new CultureInfoScope(Config.CultureInfo))
             {
-                doc = XDocument.Parse(input, LoadOptions.SetLineInfo);
-            }
-            catch (System.Xml.XmlException e)
-            {
-                Dbg.Ex(e);
-                return default(T);
-            }
+                XDocument doc;
 
-            if (doc.Elements().Count() > 1)
-            {
-                // This isn't testable, unfortunately; XDocument doesn't even support multiple root elements.
-                Dbg.Err($"{stringName}: Found {doc.Elements().Count()} root elements instead of the expected 1");
-            }
-
-            var record = doc.Elements().First();
-            if (record.Name.LocalName != "Record")
-            {
-                Dbg.Wrn($"{stringName}:{record.LineNumber()}: Found root element with name `{record.Name.LocalName}` when it should be `Record`");
-            }
-
-            var recordFormatVersion = record.ElementNamed("recordFormatVersion");
-            if (recordFormatVersion == null)
-            {
-                Dbg.Err($"{stringName}:{record.LineNumber()}: Missing record format version, assuming the data is up-to-date");
-            }
-            else if (recordFormatVersion.GetText() != "1")
-            {
-                Dbg.Err($"{stringName}:{recordFormatVersion.LineNumber()}: Unknown record format version {recordFormatVersion.GetText()}, expected 1 or earlier");
-
-                // I would rather not guess about this
-                return default(T);
-            }
-
-            var refs = record.ElementNamed("refs");
-
-            var readerContext = new ReaderContext(stringName, true);
-
-            if (refs != null)
-            {
-                // First, we need to make the instances for all the references, so they can be crosslinked appropriately
-                foreach (var reference in refs.Elements())
+                try
                 {
-                    if (reference.Name.LocalName != "Ref")
-                    {
-                        Dbg.Wrn($"{stringName}:{reference.LineNumber()}: Reference element should be named 'Ref'");
-                    }
-
-                    var id = reference.Attribute("id")?.Value;
-                    if (id == null)
-                    {
-                        Dbg.Err($"{stringName}:{reference.LineNumber()}: Missing reference ID");
-                        continue;
-                    }
-
-                    var className = reference.Attribute("class")?.Value;
-                    if (className == null)
-                    {
-                        Dbg.Err($"{stringName}:{reference.LineNumber()}: Missing reference class name");
-                        continue;
-                    }
-
-                    var possibleType = (Type)Serialization.ParseString(className, typeof(Type), null, stringName, reference.LineNumber());
-                    if (possibleType.IsValueType)
-                    {
-                        Dbg.Err($"{stringName}:{reference.LineNumber()}: Reference assigned type {possibleType}, which is a value type");
-                        continue;
-                    }
-
-                    // Create a stub so other things can reference it later
-                    readerContext.refs[id] = possibleType.CreateInstanceSafe("object", () => $"{stringName}:{reference.LineNumber()}");
-                    // Might be null; that's okay, CreateInstanceSafe has done the error reporting
+                    doc = XDocument.Parse(input, LoadOptions.SetLineInfo);
+                }
+                catch (System.Xml.XmlException e)
+                {
+                    Dbg.Ex(e);
+                    return default(T);
                 }
 
-                // Now that all the refs exist, we can run through them again and actually parse them
-                foreach (var reference in refs.Elements())
+                if (doc.Elements().Count() > 1)
                 {
-                    var id = reference.Attribute("id")?.Value;
-                    if (id == null)
+                    // This isn't testable, unfortunately; XDocument doesn't even support multiple root elements.
+                    Dbg.Err($"{stringName}: Found {doc.Elements().Count()} root elements instead of the expected 1");
+                }
+
+                var record = doc.Elements().First();
+                if (record.Name.LocalName != "Record")
+                {
+                    Dbg.Wrn($"{stringName}:{record.LineNumber()}: Found root element with name `{record.Name.LocalName}` when it should be `Record`");
+                }
+
+                var recordFormatVersion = record.ElementNamed("recordFormatVersion");
+                if (recordFormatVersion == null)
+                {
+                    Dbg.Err($"{stringName}:{record.LineNumber()}: Missing record format version, assuming the data is up-to-date");
+                }
+                else if (recordFormatVersion.GetText() != "1")
+                {
+                    Dbg.Err($"{stringName}:{recordFormatVersion.LineNumber()}: Unknown record format version {recordFormatVersion.GetText()}, expected 1 or earlier");
+
+                    // I would rather not guess about this
+                    return default(T);
+                }
+
+                var refs = record.ElementNamed("refs");
+
+                var readerContext = new ReaderContext(stringName, true);
+
+                if (refs != null)
+                {
+                    // First, we need to make the instances for all the references, so they can be crosslinked appropriately
+                    foreach (var reference in refs.Elements())
                     {
-                        // Just skip it, we don't have anything useful we can do here
-                        continue;
+                        if (reference.Name.LocalName != "Ref")
+                        {
+                            Dbg.Wrn($"{stringName}:{reference.LineNumber()}: Reference element should be named 'Ref'");
+                        }
+
+                        var id = reference.Attribute("id")?.Value;
+                        if (id == null)
+                        {
+                            Dbg.Err($"{stringName}:{reference.LineNumber()}: Missing reference ID");
+                            continue;
+                        }
+
+                        var className = reference.Attribute("class")?.Value;
+                        if (className == null)
+                        {
+                            Dbg.Err($"{stringName}:{reference.LineNumber()}: Missing reference class name");
+                            continue;
+                        }
+
+                        var possibleType = (Type)Serialization.ParseString(className, typeof(Type), null, stringName, reference.LineNumber());
+                        if (possibleType.IsValueType)
+                        {
+                            Dbg.Err($"{stringName}:{reference.LineNumber()}: Reference assigned type {possibleType}, which is a value type");
+                            continue;
+                        }
+
+                        // Create a stub so other things can reference it later
+                        readerContext.refs[id] = possibleType.CreateInstanceSafe("object", () => $"{stringName}:{reference.LineNumber()}");
+                        // Might be null; that's okay, CreateInstanceSafe has done the error reporting
                     }
 
-                    // The serialization routines don't know how to deal with this, so we'll remove it now
-                    reference.Attribute("id").Remove();
-
-                    var refInstance = readerContext.refs.TryGetValue(id);
-                    if (refInstance == null)
+                    // Now that all the refs exist, we can run through them again and actually parse them
+                    foreach (var reference in refs.Elements())
                     {
-                        // We failed to parse this for some reason, so just skip it now
-                        continue;
-                    }
+                        var id = reference.Attribute("id")?.Value;
+                        if (id == null)
+                        {
+                            // Just skip it, we don't have anything useful we can do here
+                            continue;
+                        }
 
-                    // Do our actual parsing
-                    var refInstanceOutput = Serialization.ParseElement(reference, refInstance.GetType(), refInstance, readerContext, new Recorder.Context(), hasReferenceId: true);
+                        // The serialization routines don't know how to deal with this, so we'll remove it now
+                        reference.Attribute("id").Remove();
 
-                    if (refInstance != refInstanceOutput)
-                    {
-                        Dbg.Err($"{stringName}:{reference.LineNumber()}: Something really bizarre has happened and we got the wrong object back. Things are probably irrevocably broken. Please report this as a bug in Dec.");
-                        continue;
+                        var refInstance = readerContext.refs.TryGetValue(id);
+                        if (refInstance == null)
+                        {
+                            // We failed to parse this for some reason, so just skip it now
+                            continue;
+                        }
+
+                        // Do our actual parsing
+                        var refInstanceOutput = Serialization.ParseElement(reference, refInstance.GetType(), refInstance, readerContext, new Recorder.Context(), hasReferenceId: true);
+
+                        if (refInstance != refInstanceOutput)
+                        {
+                            Dbg.Err($"{stringName}:{reference.LineNumber()}: Something really bizarre has happened and we got the wrong object back. Things are probably irrevocably broken. Please report this as a bug in Dec.");
+                            continue;
+                        }
                     }
                 }
+
+                var data = record.ElementNamed("data");
+                if (data == null)
+                {
+                    Dbg.Err($"{stringName}:{record.LineNumber()}: No data element provided. This is not very recoverable.");
+
+                    return default(T);
+                }
+
+                // And now, we can finally parse our actual root element!
+                // (which accounts for a tiny percentage of things that need to be parsed)
+                return (T)Serialization.ParseElement(data, typeof(T), null, readerContext, new Recorder.Context());
             }
-
-            var data = record.ElementNamed("data");
-            if (data == null)
-            {
-                Dbg.Err($"{stringName}:{record.LineNumber()}: No data element provided. This is not very recoverable.");
-
-                return default(T);
-            }
-
-            // And now, we can finally parse our actual root element!
-            // (which accounts for a tiny percentage of things that need to be parsed)
-            return (T)Serialization.ParseElement(data, typeof(T), null, readerContext, new Recorder.Context());
         }
     }
 

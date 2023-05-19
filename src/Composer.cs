@@ -12,26 +12,32 @@ namespace Dec
     {
         public string ComposeXml(bool pretty)
         {
-            var writerContext = new WriterXmlCompose();
-
-            foreach (var decObj in Database.List)
+            using (var _ = new CultureInfoScope(Config.CultureInfo))
             {
-                Serialization.ComposeElement(writerContext.StartDec(decObj.GetType(), decObj.DecName), decObj, decObj.GetType(), new Recorder.Context(), isRootDec: true);
-            }
+                var writerContext = new WriterXmlCompose();
 
-            return writerContext.Finish(pretty);
+                foreach (var decObj in Database.List)
+                {
+                    Serialization.ComposeElement(writerContext.StartDec(decObj.GetType(), decObj.DecName), decObj, decObj.GetType(), new Recorder.Context(), isRootDec: true);
+                }
+
+                return writerContext.Finish(pretty);
+            }
         }
 
         public string ComposeValidation()
         {
-            var writerContext = new WriterValidationCompose();
-
-            foreach (var decObj in Database.List)
+            using (var _ = new CultureInfoScope(Config.CultureInfo))
             {
-                Serialization.ComposeElement(writerContext.StartDec(decObj.GetType(), decObj.DecName), decObj, decObj.GetType(), new Recorder.Context(), isRootDec: true);
-            }
+                var writerContext = new WriterValidationCompose();
 
-            return writerContext.Finish();
+                foreach (var decObj in Database.List)
+                {
+                    Serialization.ComposeElement(writerContext.StartDec(decObj.GetType(), decObj.DecName), decObj, decObj.GetType(), new Recorder.Context(), isRootDec: true);
+                }
+
+                return writerContext.Finish();
+            }
         }
     }
 }
