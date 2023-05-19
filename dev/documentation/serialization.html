@@ -74,7 +74,7 @@
 <pre><code class="lang-cs">string serializedString = Recorder.Write(anyObject);
 var deserializedObject = Recorder.Read&lt;ObjectType&gt;(serializedString);
 </code></pre>
-<p>Recorder supports the same types that dec does. Decs themselves will be serialized as a reference, not as a fully serialized class. This is true only when referencing the dec itself, not objects contained within the dec's structure; this <a href="/future/serialization_interior.md">may be provided later</a>.</p>
+<p>Recorder supports the same types that dec does. Decs themselves will be serialized as a reference, not as a fully serialized class. This is true only when referencing the dec itself, not objects contained within the dec's structure; this <a href="../future/serialization_interior.html">may be provided later</a>.</p>
 <p>Child objects will be serialized recursively. In addition, Recorder supports non-tree structures and circular references. Recorder doesn't require any explicit ownership semantics; multiply referenced objects will be handled automatically, without any extra effort required by the programmer.</p>
 <h2 id="custom-serialization">Custom serialization</h2>
 <p>Recorder does not support the automatic reflection-based parsing that Dec.Parser does. This is partly for security reasons and partly for practicality reasons; the author's experience is that fully automatic reflection-based game saves rarely work well.</p>
@@ -98,7 +98,7 @@ var deserializedObject = Recorder.Read&lt;ObjectType&gt;(serializedString);
 <h2 id="dec-compatibility">Dec Compatibility</h2>
 <p>While the savegame format is not guaranteed and may change without notice, we plan to support full backwards compatibility for all time. The save format includes a version number that Recorder will read and adjust for whenever necessary.</p>
 <h2 id="game-compatibility">Game Compatibility</h2>
-<p>At the moment, Recorder includes no features to assist with porting old savegames to new versions of a game. This <a href="/future/serialization_compatibility.md">may be provided later</a>.</p>
+<p>At the moment, Recorder includes no features to assist with porting old savegames to new versions of a game. This <a href="../future/serialization_compatibility.html">may be provided later</a>.</p>
 </article>
           </div>
           

@@ -153,16 +153,13 @@
       "output": {
         ".html": {
           "relative_path": "api/Dec.Index-1.html",
-          "hash": "TsZUO5h0OnhzrdEMuCISYisY1BY+6GliTraS0UWI0Lk="
+          "hash": "+yWnRG7Eoq4W4xPtlLgNDj8MEnWTY/T+gg8JXMp8oc8="
         }
       },
       "is_incremental": false,
       "version": ""
     },
     {
-      "log_codes": [
-        "InvalidFileLink"
-      ],
       "type": "ManagedReference",
       "source_relative_path": "api/Dec.IndexAttribute.yml",
       "output": {
@@ -312,7 +309,7 @@
       "output": {
         ".html": {
           "relative_path": "documentation/inheritance.html",
-          "hash": "2jwJHRebZaW6fsZ6VwZqBn8eIsHJ5H2tZWsUoTPnCOc="
+          "hash": "7nb2Vqgc7SRLFB34ziuQbj9TYcfb2PFd6nFE9TRlneQ="
         }
       },
       "is_incremental": false,
@@ -372,7 +369,7 @@
       "output": {
         ".html": {
           "relative_path": "documentation/security.html",
-          "hash": "Rxbaz4OhjIukY88kmUfusE4qZsG1mKtHRfABq11xZR4="
+          "hash": "/YkHGDPj0RE8vyBWpMlDTYi0nIrsbQZlPSADhnEAKKc="
         }
       },
       "is_incremental": false,
@@ -384,7 +381,7 @@
       "output": {
         ".html": {
           "relative_path": "documentation/serialization.html",
-          "hash": "C3bv2aRVMc3lQQthBHjnAWBQh4gr496OO/F5aYmB+DM="
+          "hash": "DJtPijMPy20/MYlhnVRe89NH+yhWwPjAQKKFOyhELfA="
         }
       },
       "is_incremental": false,
