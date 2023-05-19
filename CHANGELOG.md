@@ -12,10 +12,18 @@ All notable changes to this project will be documented in this file.
 * Dec.ToString() now returns type data as well.
 * Better error message if attempting to Record a never-registered Dec.
 * Better error messages and recovery on errors with `key` and `value` elements in <li> Dictionary lists.
+* Better error message for capitalization in <li> tags.
 
 ### Fixed
 * Parser.LoadDirectory's prefix filtering breaks if given a directory that includes `.` or `..`.
 * RecordAsThis documentation refers to code that is no longer an example.
+
+### Documentation
+* Fixed broken relative links.
+* Fixed commandline parameter that docfx originally misspelled and finally dropped support for.
+
+### Testing
+* Added tests for a few edge cases (none of which were actually broken, as it turned out.)
 
 
 ## [v0.3.4]
