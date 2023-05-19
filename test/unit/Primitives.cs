@@ -12,6 +12,11 @@ namespace DecTest
             public int value = 4;
         }
 
+        public class FloatDec : Dec.Dec
+        {
+            public float value = 4;
+        }
+
         public class BoolDec : Dec.Dec
         {
             public bool value = true;
@@ -780,6 +785,28 @@ namespace DecTest
             Assert.IsNotNull(explicitFalse);
             Assert.IsNotNull(explicitFalse.initialized);
             Assert.IsNotNull(explicitFalse.setToNull);
+        }
+
+        [Test]
+        public void FloatLocale([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(FloatDec) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <FloatDec decName=""TestDec"">
+                        <value>2.34</value>
+                    </FloatDec>
+                </Decs>");
+            parser.Finish();
+
+            DoBehavior(mode);
+
+            var result = Dec.Database<FloatDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(2.34, result.value);
         }
     }
 }
