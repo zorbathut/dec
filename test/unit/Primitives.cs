@@ -89,6 +89,28 @@ namespace DecTest
         }
 
         [Test]
+        public void IntRange([Values] BehaviorMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
+
+            var parser = new Dec.Parser();
+            parser.AddString(@"
+                <Decs>
+                    <IntDec decName=""TestDec"">
+                        <value>1234123412341234123412341234123412341234</value>
+                    </IntDec>
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoBehavior(mode);
+
+            var result = Dec.Database<IntDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(4, result.value);
+        }
+
+        [Test]
         public void EmptyBoolParse([Values] BehaviorMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(BoolDec) } };
