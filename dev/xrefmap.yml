@@ -63,6 +63,12 @@ references:
   commentId: T:Dec.Config
   fullName: Dec.Config
   nameWithType: Config
+- uid: Dec.Config.CultureInfo
+  name: CultureInfo
+  href: api/Dec.Config.html#Dec_Config_CultureInfo
+  commentId: F:Dec.Config.CultureInfo
+  fullName: Dec.Config.CultureInfo
+  nameWithType: Config.CultureInfo
 - uid: Dec.Config.DefaultExceptionBehavior
   name: Config.DefaultExceptionBehavior
   href: api/Dec.Config.DefaultExceptionBehavior.html
