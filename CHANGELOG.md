@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 
 
 ## [Unreleased]
+
+
+## [v0.3.5]
 ### Added
 * Added `Bespoke.IgnoreRecordDuringParserAttribute`, which provides special-purpose functionality that will be rolled into an eventual Converter redesign.
 * Added system-wide CultureInfo support so your games stop breaking in France.
