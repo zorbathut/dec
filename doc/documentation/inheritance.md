@@ -38,6 +38,6 @@
 
 When you need many things that are in some way similar, it can be useful to create a set of default values that can be applied on demand. Abstract decs, determined by the `abstract="true"` attribute, won't be included in the Dec database.
 
-A standard single-inheritance structure is not always sufficient, but [multiple inheritance](/future/multipleinheritance.md) is not yet implemented.
+A standard single-inheritance structure is not always sufficient, but [multiple inheritance](~/future/multipleinheritance.md) is not yet implemented.
 
 Most members are straight-out replaced if specified in child types. This includes collections, such as List and Dictionary. More fine-tuned behavior can be accomplished with [merge modes](mergemodes.md).

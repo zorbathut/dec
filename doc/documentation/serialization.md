@@ -9,7 +9,7 @@ string serializedString = Recorder.Write(anyObject);
 var deserializedObject = Recorder.Read<ObjectType>(serializedString);
 ```
 
-Recorder supports the same types that dec does. Decs themselves will be serialized as a reference, not as a fully serialized class. This is true only when referencing the dec itself, not objects contained within the dec's structure; this [may be provided later](/future/serialization_interior.md).
+Recorder supports the same types that dec does. Decs themselves will be serialized as a reference, not as a fully serialized class. This is true only when referencing the dec itself, not objects contained within the dec's structure; this [may be provided later](~/future/serialization_interior.md).
 
 Child objects will be serialized recursively. In addition, Recorder supports non-tree structures and circular references. Recorder doesn't require any explicit ownership semantics; multiply referenced objects will be handled automatically, without any extra effort required by the programmer.
 
@@ -43,4 +43,4 @@ While the savegame format is not guaranteed and may change without notice, we pl
 
 ## Game Compatibility
 
-At the moment, Recorder includes no features to assist with porting old savegames to new versions of a game. This [may be provided later](/future/serialization_compatibility.md).
+At the moment, Recorder includes no features to assist with porting old savegames to new versions of a game. This [may be provided later](~/future/serialization_compatibility.md).
