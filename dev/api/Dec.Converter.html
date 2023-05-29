@@ -85,7 +85,7 @@
   <h6><strong>Assembly</strong>: dec.dll</h6>
   <h5 id="Dec_Converter_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public abstract class Converter</code></pre>
+    <pre><code class="lang-csharp hljs">public abstract class Converter : object</code></pre>
   </div>
   <h5 id="Dec_Converter_remarks"><strong>Remarks</strong></h5>
   <div class="markdown level0 remarks"><p>This is a standalone class to allow implementation of converters of third-party types.</p>
@@ -96,13 +96,13 @@
   </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/zorbathut/dec/new/master/apiSpec/new?filename=Dec_Converter_FromString_System_String_System_Type_System_String_System_Int32_.md&amp;value=---%0Auid%3A%20Dec.Converter.FromString(System.String%2CSystem.Type%2CSystem.String%2CSystem.Int32)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+    <a href="https://github.com/zorbathut/dec/new/master/apiSpec/new?filename=Dec_Converter_FromString_System_String_Type_System_String_System_Int32_.md&amp;value=---%0Auid%3A%20Dec.Converter.FromString(System.String%2CType%2CSystem.String%2CSystem.Int32)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
     <a href="https://github.com/zorbathut/dec/blob/master/src/Converter.cs/#L42">View Source</a>
   </span>
   <a id="Dec_Converter_FromString_" data-uid="Dec.Converter.FromString*"></a>
-  <h4 id="Dec_Converter_FromString_System_String_System_Type_System_String_System_Int32_" data-uid="Dec.Converter.FromString(System.String,System.Type,System.String,System.Int32)">FromString(String, Type, String, Int32)</h4>
+  <h4 id="Dec_Converter_FromString_System_String_Type_System_String_System_Int32_" data-uid="Dec.Converter.FromString(System.String,Type,System.String,System.Int32)">FromString(String, Type, String, Int32)</h4>
   <div class="markdown level1 summary"><p>Converts a string to a suitable object type.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
@@ -126,7 +126,7 @@
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.Type</span></td>
+        <td><span class="xref">Type</span></td>
         <td><span class="parametername">type</span></td>
         <td></td>
       </tr>
@@ -157,7 +157,7 @@
       </tr>
     </tbody>
   </table>
-  <h5 id="Dec_Converter_FromString_System_String_System_Type_System_String_System_Int32__remarks">Remarks</h5>
+  <h5 id="Dec_Converter_FromString_System_String_Type_System_String_System_Int32__remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p><code>type</code> is set to the expected return type; you can return null, or anything that can be implicitly converted to that type.</p>
 <p>In case of error, call Dec.Dbg.Err with some appropriately useful message and return null. Message should be formatted as $&quot;{inputName}:{lineNumber}: Something went wrong&quot;.</p>
 <p>Note: In the case of empty input (i.e. &lt;member&gt;&lt;/member&gt; or &lt;member /&gt;) this function will be called.</p>
@@ -188,7 +188,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Generic.HashSet</span>&lt;<span class="xref">System.Type</span>&gt;</td>
+        <td><span class="xref">HashSet</span>&lt;<span class="xref">Type</span>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -200,13 +200,13 @@
 </div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/zorbathut/dec/new/master/apiSpec/new?filename=Dec_Converter_Record_System_Object_System_Type_Dec_Recorder_.md&amp;value=---%0Auid%3A%20Dec.Converter.Record(System.Object%2CSystem.Type%2CDec.Recorder)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+    <a href="https://github.com/zorbathut/dec/new/master/apiSpec/new?filename=Dec_Converter_Record_System_Object_Type_Dec_Recorder_.md&amp;value=---%0Auid%3A%20Dec.Converter.Record(System.Object%2CType%2CDec.Recorder)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
     <a href="https://github.com/zorbathut/dec/blob/master/src/Converter.cs/#L94">View Source</a>
   </span>
   <a id="Dec_Converter_Record_" data-uid="Dec.Converter.Record*"></a>
-  <h4 id="Dec_Converter_Record_System_Object_System_Type_Dec_Recorder_" data-uid="Dec.Converter.Record(System.Object,System.Type,Dec.Recorder)">Record(Object, Type, Recorder)</h4>
+  <h4 id="Dec_Converter_Record_System_Object_Type_Dec_Recorder_" data-uid="Dec.Converter.Record(System.Object,Type,Dec.Recorder)">Record(Object, Type, Recorder)</h4>
   <div class="markdown level1 summary"><p>Handles serialization and deserialization with support for references.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
@@ -230,7 +230,7 @@
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.Type</span></td>
+        <td><span class="xref">Type</span></td>
         <td><span class="parametername">type</span></td>
         <td></td>
       </tr>
@@ -256,14 +256,14 @@
       </tr>
     </tbody>
   </table>
-  <h5 id="Dec_Converter_Record_System_Object_System_Type_Dec_Recorder__remarks">Remarks</h5>
+  <h5 id="Dec_Converter_Record_System_Object_Type_Dec_Recorder__remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>In read mode, <code>model</code> will be one of the types provided in HandledTypes(); it will not be null. Use recorder or recorder.Xml to serialize its contents, then return model.</p>
 <p>In write mode, <code>model</code> will be one of the types provided in HandledTypes(), or null. If it's null, create an object of an appropriate type. Use recorder or recorder.Xml to fill it, then return it.</p>
 <p><code>type</code> indicates the type that the underlying code expects to get back. The object you return must be assignable to that type.</p>
 <p>In case of error, call Dec.Dbg.Err with some appropriately useful message, then return model.</p>
 <p>In most cases, using Recorder's interface is by far the easiest way to support the requirements of this function. It is expected that you use XML only when absolutely necessary.</p>
 </div>
-  <h5 id="Dec_Converter_Record_System_Object_System_Type_Dec_Recorder__examples">Examples</h5>
+  <h5 id="Dec_Converter_Record_System_Object_Type_Dec_Recorder__examples">Examples</h5>
   <pre><code>    public override object Record(object model, Type type, Recorder recorder)
     {
         // If we&apos;re in read mode, this leaves model untouched. If we&apos;re in write mode, this leaves model untouched unless it&apos;s null.
