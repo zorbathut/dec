@@ -213,11 +213,11 @@ references:
   commentId: T:Dec.Converter
   fullName: Dec.Converter
   nameWithType: Converter
-- uid: Dec.Converter.FromString(System.String,System.Type,System.String,System.Int32)
+- uid: Dec.Converter.FromString(System.String,Type,System.String,System.Int32)
   name: FromString(String, Type, String, Int32)
-  href: api/Dec.Converter.html#Dec_Converter_FromString_System_String_System_Type_System_String_System_Int32_
-  commentId: M:Dec.Converter.FromString(System.String,System.Type,System.String,System.Int32)
-  fullName: Dec.Converter.FromString(System.String, System.Type, System.String, System.Int32)
+  href: api/Dec.Converter.html#Dec_Converter_FromString_System_String_Type_System_String_System_Int32_
+  commentId: M:Dec.Converter.FromString(System.String,Type,System.String,System.Int32)
+  fullName: Dec.Converter.FromString(System.String, Type, System.String, System.Int32)
   nameWithType: Converter.FromString(String, Type, String, Int32)
 - uid: Dec.Converter.FromString*
   name: FromString
@@ -239,11 +239,11 @@ references:
   isSpec: "True"
   fullName: Dec.Converter.HandledTypes
   nameWithType: Converter.HandledTypes
-- uid: Dec.Converter.Record(System.Object,System.Type,Dec.Recorder)
+- uid: Dec.Converter.Record(System.Object,Type,Dec.Recorder)
   name: Record(Object, Type, Recorder)
-  href: api/Dec.Converter.html#Dec_Converter_Record_System_Object_System_Type_Dec_Recorder_
-  commentId: M:Dec.Converter.Record(System.Object,System.Type,Dec.Recorder)
-  fullName: Dec.Converter.Record(System.Object, System.Type, Dec.Recorder)
+  href: api/Dec.Converter.html#Dec_Converter_Record_System_Object_Type_Dec_Recorder_
+  commentId: M:Dec.Converter.Record(System.Object,Type,Dec.Recorder)
+  fullName: Dec.Converter.Record(System.Object, Type, Dec.Recorder)
   nameWithType: Converter.Record(Object, Type, Recorder)
 - uid: Dec.Converter.Record*
   name: Record
@@ -297,11 +297,11 @@ references:
   isSpec: "True"
   fullName: Dec.Database.Count
   nameWithType: Database.Count
-- uid: Dec.Database.Create(System.Type,System.String)
+- uid: Dec.Database.Create(Type,System.String)
   name: Create(Type, String)
-  href: api/Dec.Database.html#Dec_Database_Create_System_Type_System_String_
-  commentId: M:Dec.Database.Create(System.Type,System.String)
-  fullName: Dec.Database.Create(System.Type, System.String)
+  href: api/Dec.Database.html#Dec_Database_Create_Type_System_String_
+  commentId: M:Dec.Database.Create(Type,System.String)
+  fullName: Dec.Database.Create(Type, System.String)
   nameWithType: Database.Create(Type, String)
 - uid: Dec.Database.Create*
   name: Create
@@ -332,11 +332,11 @@ references:
   isSpec: "True"
   fullName: Dec.Database.Delete
   nameWithType: Database.Delete
-- uid: Dec.Database.Get(System.Type,System.String)
+- uid: Dec.Database.Get(Type,System.String)
   name: Get(Type, String)
-  href: api/Dec.Database.html#Dec_Database_Get_System_Type_System_String_
-  commentId: M:Dec.Database.Get(System.Type,System.String)
-  fullName: Dec.Database.Get(System.Type, System.String)
+  href: api/Dec.Database.html#Dec_Database_Get_Type_System_String_
+  commentId: M:Dec.Database.Get(Type,System.String)
+  fullName: Dec.Database.Get(Type, System.String)
   nameWithType: Database.Get(Type, String)
 - uid: Dec.Database.Get*
   name: Get
@@ -437,13 +437,13 @@ references:
   commentId: T:Dec.Dec
   fullName: Dec.Dec
   nameWithType: Dec
-- uid: Dec.Dec.ConfigErrors(System.Action{System.String})
+- uid: Dec.Dec.ConfigErrors(Action{System.String})
   name: ConfigErrors(Action<String>)
-  href: api/Dec.Dec.html#Dec_Dec_ConfigErrors_System_Action_System_String__
-  commentId: M:Dec.Dec.ConfigErrors(System.Action{System.String})
+  href: api/Dec.Dec.html#Dec_Dec_ConfigErrors_Action_System_String__
+  commentId: M:Dec.Dec.ConfigErrors(Action{System.String})
   name.vb: ConfigErrors(Action(Of String))
-  fullName: Dec.Dec.ConfigErrors(System.Action<System.String>)
-  fullName.vb: Dec.Dec.ConfigErrors(System.Action(Of System.String))
+  fullName: Dec.Dec.ConfigErrors(Action<System.String>)
+  fullName.vb: Dec.Dec.ConfigErrors(Action(Of System.String))
   nameWithType: Dec.ConfigErrors(Action<String>)
   nameWithType.vb: Dec.ConfigErrors(Action(Of String))
 - uid: Dec.Dec.ConfigErrors*
@@ -466,13 +466,13 @@ references:
   isSpec: "True"
   fullName: Dec.Dec.DecName
   nameWithType: Dec.DecName
-- uid: Dec.Dec.PostLoad(System.Action{System.String})
+- uid: Dec.Dec.PostLoad(Action{System.String})
   name: PostLoad(Action<String>)
-  href: api/Dec.Dec.html#Dec_Dec_PostLoad_System_Action_System_String__
-  commentId: M:Dec.Dec.PostLoad(System.Action{System.String})
+  href: api/Dec.Dec.html#Dec_Dec_PostLoad_Action_System_String__
+  commentId: M:Dec.Dec.PostLoad(Action{System.String})
   name.vb: PostLoad(Action(Of String))
-  fullName: Dec.Dec.PostLoad(System.Action<System.String>)
-  fullName.vb: Dec.Dec.PostLoad(System.Action(Of System.String))
+  fullName: Dec.Dec.PostLoad(Action<System.String>)
+  fullName.vb: Dec.Dec.PostLoad(Action(Of System.String))
   nameWithType: Dec.PostLoad(Action<String>)
   nameWithType.vb: Dec.PostLoad(Action(Of String))
 - uid: Dec.Dec.PostLoad*
@@ -726,13 +726,13 @@ references:
   fullName.vb: Dec.Recorder.Parameters.RecordAsThis(Of T)(ByRef T)
   nameWithType: Recorder.Parameters.RecordAsThis<T>(ref T)
   nameWithType.vb: Recorder.Parameters.RecordAsThis(Of T)(ByRef T)
-- uid: Dec.Recorder.Parameters.WithFactory(System.Collections.Generic.Dictionary{System.Type,System.Func{System.Type,System.Object}})
+- uid: Dec.Recorder.Parameters.WithFactory(Dictionary{Type,Func{Type,System.Object}})
   name: WithFactory(Dictionary<Type, Func<Type, Object>>)
-  href: api/Dec.Recorder.Parameters.html#Dec_Recorder_Parameters_WithFactory_System_Collections_Generic_Dictionary_System_Type_System_Func_System_Type_System_Object___
-  commentId: M:Dec.Recorder.Parameters.WithFactory(System.Collections.Generic.Dictionary{System.Type,System.Func{System.Type,System.Object}})
+  href: api/Dec.Recorder.Parameters.html#Dec_Recorder_Parameters_WithFactory_Dictionary_Type_Func_Type_System_Object___
+  commentId: M:Dec.Recorder.Parameters.WithFactory(Dictionary{Type,Func{Type,System.Object}})
   name.vb: WithFactory(Dictionary(Of Type, Func(Of Type, Object)))
-  fullName: Dec.Recorder.Parameters.WithFactory(System.Collections.Generic.Dictionary<System.Type, System.Func<System.Type, System.Object>>)
-  fullName.vb: Dec.Recorder.Parameters.WithFactory(System.Collections.Generic.Dictionary(Of System.Type, System.Func(Of System.Type, System.Object)))
+  fullName: Dec.Recorder.Parameters.WithFactory(Dictionary<Type, Func<Type, System.Object>>)
+  fullName.vb: Dec.Recorder.Parameters.WithFactory(Dictionary(Of Type, Func(Of Type, System.Object)))
   nameWithType: Recorder.Parameters.WithFactory(Dictionary<Type, Func<Type, Object>>)
   nameWithType.vb: Recorder.Parameters.WithFactory(Dictionary(Of Type, Func(Of Type, Object)))
 - uid: Dec.Recorder.Parameters.WithFactory*
@@ -790,13 +790,13 @@ references:
   fullName.vb: Dec.Recorder.RecordAsThis(Of T)(ByRef T)
   nameWithType: Recorder.RecordAsThis<T>(ref T)
   nameWithType.vb: Recorder.RecordAsThis(Of T)(ByRef T)
-- uid: Dec.Recorder.WithFactory(System.Collections.Generic.Dictionary{System.Type,System.Func{System.Type,System.Object}})
+- uid: Dec.Recorder.WithFactory(Dictionary{Type,Func{Type,System.Object}})
   name: WithFactory(Dictionary<Type, Func<Type, Object>>)
-  href: api/Dec.Recorder.html#Dec_Recorder_WithFactory_System_Collections_Generic_Dictionary_System_Type_System_Func_System_Type_System_Object___
-  commentId: M:Dec.Recorder.WithFactory(System.Collections.Generic.Dictionary{System.Type,System.Func{System.Type,System.Object}})
+  href: api/Dec.Recorder.html#Dec_Recorder_WithFactory_Dictionary_Type_Func_Type_System_Object___
+  commentId: M:Dec.Recorder.WithFactory(Dictionary{Type,Func{Type,System.Object}})
   name.vb: WithFactory(Dictionary(Of Type, Func(Of Type, Object)))
-  fullName: Dec.Recorder.WithFactory(System.Collections.Generic.Dictionary<System.Type, System.Func<System.Type, System.Object>>)
-  fullName.vb: Dec.Recorder.WithFactory(System.Collections.Generic.Dictionary(Of System.Type, System.Func(Of System.Type, System.Object)))
+  fullName: Dec.Recorder.WithFactory(Dictionary<Type, Func<Type, System.Object>>)
+  fullName.vb: Dec.Recorder.WithFactory(Dictionary(Of Type, Func(Of Type, System.Object)))
   nameWithType: Recorder.WithFactory(Dictionary<Type, Func<Type, Object>>)
   nameWithType.vb: Recorder.WithFactory(Dictionary(Of Type, Func(Of Type, Object)))
 - uid: Dec.Recorder.WithFactory*
