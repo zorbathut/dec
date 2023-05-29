@@ -85,7 +85,7 @@
   <h6><strong>Assembly</strong>: dec.dll</h6>
   <h5 id="Dec_Database_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static class Database : object</code></pre>
+    <pre><code class="lang-csharp hljs">public static class Database</code></pre>
   </div>
   <h5 id="Dec_Database_remarks"><strong>Remarks</strong></h5>
   <div class="markdown level0 remarks"><p>This is generally not useful for anything except debug functionality.</p>
@@ -149,7 +149,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">IEnumerable</span>&lt;<a class="xref" href="Dec.Dec.html">Dec</a>&gt;</td>
+        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="Dec.Dec.html">Dec</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -180,13 +180,13 @@
 </div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/zorbathut/dec/new/master/apiSpec/new?filename=Dec_Database_Create_Type_System_String_.md&amp;value=---%0Auid%3A%20Dec.Database.Create(Type%2CSystem.String)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+    <a href="https://github.com/zorbathut/dec/new/master/apiSpec/new?filename=Dec_Database_Create_System_Type_System_String_.md&amp;value=---%0Auid%3A%20Dec.Database.Create(System.Type%2CSystem.String)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
     <a href="https://github.com/zorbathut/dec/blob/master/src/Database.cs/#L74">View Source</a>
   </span>
   <a id="Dec_Database_Create_" data-uid="Dec.Database.Create*"></a>
-  <h4 id="Dec_Database_Create_Type_System_String_" data-uid="Dec.Database.Create(Type,System.String)">Create(Type, String)</h4>
+  <h4 id="Dec_Database_Create_System_Type_System_String_" data-uid="Dec.Database.Create(System.Type,System.String)">Create(Type, String)</h4>
   <div class="markdown level1 summary"><p>Creates a Dec.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
@@ -205,7 +205,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">Type</span></td>
+        <td><span class="xref">System.Type</span></td>
         <td><span class="parametername">type</span></td>
         <td></td>
       </tr>
@@ -231,7 +231,7 @@
       </tr>
     </tbody>
   </table>
-  <h5 id="Dec_Database_Create_Type_System_String__remarks">Remarks</h5>
+  <h5 id="Dec_Database_Create_System_Type_System_String__remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>This will be supported for dynamically-generated Decs in the future, but right now exists mostly for the Composer functionality. It is currently not recommended to use this during actual gameplay.</p>
 <p>At this time, this will not register Indexes. This behavior may change at some point in the future.</p>
 </div>
@@ -342,13 +342,13 @@
 </div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/zorbathut/dec/new/master/apiSpec/new?filename=Dec_Database_Get_Type_System_String_.md&amp;value=---%0Auid%3A%20Dec.Database.Get(Type%2CSystem.String)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+    <a href="https://github.com/zorbathut/dec/new/master/apiSpec/new?filename=Dec_Database_Get_System_Type_System_String_.md&amp;value=---%0Auid%3A%20Dec.Database.Get(System.Type%2CSystem.String)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
     <a href="https://github.com/zorbathut/dec/blob/master/src/Database.cs/#L54">View Source</a>
   </span>
   <a id="Dec_Database_Get_" data-uid="Dec.Database.Get*"></a>
-  <h4 id="Dec_Database_Get_Type_System_String_" data-uid="Dec.Database.Get(Type,System.String)">Get(Type, String)</h4>
+  <h4 id="Dec_Database_Get_System_Type_System_String_" data-uid="Dec.Database.Get(System.Type,System.String)">Get(Type, String)</h4>
   <div class="markdown level1 summary"><p>Retrieves a dec by base dec type and name.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
@@ -367,7 +367,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">Type</span></td>
+        <td><span class="xref">System.Type</span></td>
         <td><span class="parametername">type</span></td>
         <td></td>
       </tr>
@@ -393,7 +393,7 @@
       </tr>
     </tbody>
   </table>
-  <h5 id="Dec_Database_Get_Type_System_String__remarks">Remarks</h5>
+  <h5 id="Dec_Database_Get_System_Type_System_String__remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>Returns null if no such dec exists.</p>
 </div>
   <span class="small pull-right mobile-hide">

@@ -79,13 +79,15 @@
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><span class="xref">System.Object</span></div>
-    <div class="level1"><span class="xref">StaticReferencesAttribute</span></div>
+    <div class="level1"><span class="xref">System.Attribute</span></div>
+    <div class="level2"><span class="xref">StaticReferencesAttribute</span></div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Dec.html">Dec</a></h6>
   <h6><strong>Assembly</strong>: dec.dll</h6>
   <h5 id="Dec_StaticReferencesAttribute_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class StaticReferencesAttribute : Attribute</code></pre>
+    <pre><code class="lang-csharp hljs">[AttributeUsage(AttributeTargets.Class)]
+public class StaticReferencesAttribute : Attribute</code></pre>
   </div>
   <h5 id="Dec_StaticReferencesAttribute_remarks"><strong>Remarks</strong></h5>
   <div class="markdown level0 remarks"><p>In addition, the class's static constructor should call StaticReferencesAttribute.Initialized().</p>
