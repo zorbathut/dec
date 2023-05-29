@@ -3,7 +3,7 @@ name: Test
 on: [push, pull_request]
 
 jobs:
-  main:
+  code:
     runs-on: ubuntu-22.04
     
     steps:
@@ -26,7 +26,9 @@ jobs:
     - name: Setup environment
       run: dotnet restore
     - name: Build 2.1
-      run: dotnet build --configuration "Debug 2.1"
+      # this seems to fail intermittently so now we're trying it repeatedly *which is terrible* but 2.1 is rapidly bitrotting
+      # my kingdom for unity updating its damn mono implementation
+      run: for i in {1..5}; do dotnet build --configuration "Debug 2.1" && break; done 
     - name: Build 3.1
       run: dotnet build --configuration "Debug 3.1"
     - name: Build 7.0
