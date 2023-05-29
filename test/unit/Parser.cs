@@ -185,7 +185,7 @@ namespace DecTest
 
             var parser = new Dec.Parser();
             parser.AddFile("data/Parser.LoadFileError.xml");
-            ExpectErrors(() => parser.Finish(), str => str.Contains("Parser.LoadFileError"));
+            ExpectErrors(() => parser.Finish(), errorValidator: str => str.Contains("Parser.LoadFileError"));
 
             DoBehavior(mode);
 

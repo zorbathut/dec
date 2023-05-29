@@ -131,7 +131,7 @@ namespace DecTest
         }
 
         // Return "true" if this is the expected error, "false" if this is a bad error
-        protected void ExpectErrors(Action action, Func<string, bool> errorValidator = null)
+        protected void ExpectErrors(Action action, string context = "unlabeled context", Func<string, bool> errorValidator = null)
         {
             Assert.IsFalse(handlingErrors);
             handlingErrors = true;
@@ -141,7 +141,7 @@ namespace DecTest
             action();
 
             Assert.IsTrue(handlingErrors);
-            Assert.IsTrue(handledError, "Expected error but did not generate one");
+            Assert.IsTrue(handledError, $"Expected error in {context} but did not generate one");
             handlingErrors = false;
             handledError = false;
             this.errorValidator = null;
@@ -224,7 +224,7 @@ namespace DecTest
 
                 if (rewrite_expectWriteErrors)
                 {
-                    ExpectErrors(() => RunComposer(), errorValidator: errorValidator);
+                    ExpectErrors(() => RunComposer(), "DoBehavior.Write", errorValidator: errorValidator);
                 }
                 else
                 {
@@ -247,7 +247,7 @@ namespace DecTest
 
                 if (rewrite_expectParseErrors)
                 {
-                    ExpectErrors(() => RunParser(), errorValidator: errorValidator);
+                    ExpectErrors(() => RunParser(), "DoBehavior.Read", errorValidator: errorValidator);
                 }
                 else
                 {
@@ -318,7 +318,7 @@ namespace DecTest
                     {
                         code = Dec.Recorder.WriteValidation(input);
                         handledError = true; // good enough, just continue
-                    });
+                    }, "DoRecorder.Validation.Write");
                 }
                 else
                 {
@@ -337,7 +337,7 @@ namespace DecTest
             }
             if (expectWriteErrors)
             {
-                ExpectErrors(DoSerialize);
+                ExpectErrors(DoSerialize, "DoRecorder.Write");
             }
             else
             {
@@ -357,7 +357,7 @@ namespace DecTest
             }
             if (expectReadErrors)
             {
-                ExpectErrors(DoDeserialize);
+                ExpectErrors(DoDeserialize, "DoRecorder.Read");
             }
             else
             {

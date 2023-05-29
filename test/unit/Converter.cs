@@ -54,7 +54,7 @@ namespace DecTest
         public void MissingTypeError([Values] BehaviorMode mode)
         {
             object cmp = new MissingComposer();
-            ExpectErrors(() => Dec.Recorder.Write(cmp), err => err.Contains("MissingComposer"));
+            ExpectErrors(() => Dec.Recorder.Write(cmp), errorValidator: err => err.Contains("MissingComposer"));
         }
 
         public class BaseType { }

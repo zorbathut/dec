@@ -3,7 +3,8 @@ All notable changes to this project will be documented in this file.
 
 
 ## [Unreleased]
-
+### Testing
+* Better diagnostic output on missing expected errors.
 
 ## [v0.3.5]
 ### Added

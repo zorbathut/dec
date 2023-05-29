@@ -517,7 +517,7 @@ namespace DecTest
                         <Cat>words</Cat>
                     </LooseMatchDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish(), err => err.Contains("cat"));
+            ExpectErrors(() => parser.Finish(), errorValidator: err => err.Contains("cat"));
 
             DoBehavior(mode);
         }
@@ -534,7 +534,7 @@ namespace DecTest
                         <snakeCase>words</snakeCase>
                     </LooseMatchDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish(), err => err.Contains("snake_case"));
+            ExpectErrors(() => parser.Finish(), errorValidator: err => err.Contains("snake_case"));
 
             DoBehavior(mode);
         }
@@ -551,7 +551,7 @@ namespace DecTest
                         <camel_case>words</camel_case>
                     </LooseMatchDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish(), err => err.Contains("camelCase"));
+            ExpectErrors(() => parser.Finish(), errorValidator: err => err.Contains("camelCase"));
 
             DoBehavior(mode);
         }
@@ -574,7 +574,7 @@ namespace DecTest
                 </Decs>");
 
             // Just in case I rename it back to lowercase, make sure we don't just get a spelling mismatch error here.
-            ExpectErrors(() => parser.Finish(), err => !err.Contains("decName"));
+            ExpectErrors(() => parser.Finish(), errorValidator: err => !err.Contains("decName"));
 
             DoBehavior(mode);
 

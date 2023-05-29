@@ -32,10 +32,10 @@ namespace DecTest
         [Test]
         public void ErrorValidator()
         {
-            ExpectErrors(() => Dec.Config.ErrorHandler("Test"), str => str == "Test");
+            ExpectErrors(() => Dec.Config.ErrorHandler("Test"), errorValidator: str => str == "Test");
 
             // Make sure we get a real error if in fact we shouldn't have passed the error
-            Assert.Throws(typeof(NUnit.Framework.AssertionException), () => ExpectErrors(() => Dec.Config.ErrorHandler("Test"), str => str == "Toast"));
+            Assert.Throws(typeof(NUnit.Framework.AssertionException), () => ExpectErrors(() => Dec.Config.ErrorHandler("Test"), errorValidator: str => str == "Toast"));
         }
     }
 }

@@ -104,7 +104,7 @@ namespace DecTest
             ExpectErrors(() => parser.AddString(@"
                 <Decs>
                     <StubDec decName=""TestDecA"" />
-                </Decs>", "TestStringName"), str => str.StartsWith("TestStringName"));
+                </Decs>", "TestStringName"), errorValidator: str => str.StartsWith("TestStringName"));
             parser.Finish();
 
             DoBehavior(mode);
