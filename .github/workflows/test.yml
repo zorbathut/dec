@@ -12,10 +12,10 @@ jobs:
     # Test documentation generating; this should use the same rig as the generateDocs segments
     # For reasons currently unclear, if you run "dotnet restore", this breaks.
     # So we do this first.
-    - name: Setup 5.0
+    - name: Setup 7.0
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '5.0.x'
+        dotnet-version: '7.0.x'
     - name: Test documentation
       run: |
         sudo apt install nuget
