@@ -21,6 +21,28 @@
                 "run",
             ],
             "problemMatcher": "$msCompile"
-        }
+        },
+        { 
+            "label": ".NET Core Test with debugger", 
+            "type": "process", 
+            "isBackground": true, 
+            "command": "dotnet", 
+            "args": [ "test" ], 
+            "options": 
+                { 
+                    "env": 
+                    { 
+                        "VSTEST_HOST_DEBUG": "1" 
+                    }, 
+                }, 
+            "group": "test", "presentation": 
+                { 
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "shared"
+                },
+            "problemMatcher": [] 
+        },
     ]
 }
