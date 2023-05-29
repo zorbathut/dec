@@ -149,6 +149,8 @@ namespace Dec
         /// This is intended for cases where a class's contents are a single method and where an extra level of indirection in XML files isn't desired.
         ///
         /// In most cases, you don't need to do anything different for read vs. write; this function will figure out the details and do the right thing.
+        ///
+        /// This does not work, at all, if any of the classes in the `this` chain are inherited; it needs to be able to fall back on default types.
         /// </remarks>
         public void RecordAsThis<T>(ref T value)
         {
@@ -383,6 +385,12 @@ namespace Dec
                 }
 
                 asThis = true;
+
+                if (!node.FlagAsThis())
+                {
+                    // just give up and skip it
+                    return;
+                }
 
                 Serialization.ComposeElement(node, value, typeof(T), parameters.CreateContext());
 

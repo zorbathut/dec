@@ -375,6 +375,9 @@ namespace Dec
 
         public override void TagClass(Type type)
         {
+            // I guess we just keep going? what's likely to be less damaging here? this may at least be manually reconstructible I suppose?
+            FlagAsClass();
+
             node.Add(new XAttribute("class", type.ComposeDecFormatted()));
         }
 

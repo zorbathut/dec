@@ -41,5 +41,33 @@ namespace Dec
         public abstract void WriteConvertible(Converter converter, object value);
 
         public abstract void TagClass(Type type);
+
+        // general behavior that polymorphics should not reimplement (so far at least?)
+        protected bool flaggedAsClass = false;
+        protected bool flaggedAsThis = false;
+
+        // attempts to flag as self, posts error if it can't
+        public bool FlagAsThis()
+        {
+            if (flaggedAsClass)
+            {
+                Dbg.Err("RecordAsThis() called on a node that was already polymorphic; this does not work, RecordAsThis() can be used only if every class involved in the This() chain is of expected type");
+                return false;
+            }
+
+            flaggedAsThis = true;
+            return true;
+        }
+        protected bool FlagAsClass()
+        {
+            if (flaggedAsThis)
+            {
+                Dbg.Err("Polymorphic Record() detected after a RecordAsThis(); this does not work, RecordAsThis() can be used only if every class involved in the This() chain is of expected type");
+                return false;
+            }
+
+            flaggedAsClass = true;
+            return true;
+        }
     }
 }

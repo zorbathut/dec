@@ -100,5 +100,36 @@ namespace DecTest
 
             Assert.AreEqual(lat.data, deserialized.data);
         }
+
+        public class AsThisReference : Dec.IRecordable
+        {
+            public AsThisRefBase data;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.RecordAsThis(ref data);
+            }
+        }
+
+        public class AsThisRefBase : Dec.IRecordable
+        {
+            public virtual void Record(Dec.Recorder recorder)
+            {
+                
+            }
+        }
+        public class AsThisRefDerived : AsThisRefBase
+        {
+
+        }
+
+        [Test]
+        public void ThisThenClass([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
+        {
+            var item = new AsThisReference();
+            item.data = new AsThisRefDerived();
+
+            var deserialized = DoRecorderRoundTrip(item, mode, expectReadErrors: true, expectWriteErrors: true);
+        }
     }
 }

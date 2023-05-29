@@ -182,6 +182,8 @@ namespace Dec
 
         public override void TagClass(Type type)
         {
+            FlagAsClass();
+            
             if (type == typeof(Type))
             {
                 // Special case: Sometimes we convert System.RuntimeType to System.Type, because System.RuntimeType is a compatible C# implementation detail that we don't want to preserve.

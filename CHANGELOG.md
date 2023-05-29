@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 
 
 ## [Unreleased]
+### Improved
+* RecordAsThis() does not (and currently cannot) work on a polymorphic object; document this and explicitly report it as an error.
+
 ### Testing
 * Better diagnostic output on missing expected errors.
 
