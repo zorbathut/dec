@@ -101,35 +101,53 @@ namespace DecTest
             Assert.AreEqual(lat.data, deserialized.data);
         }
 
-        public class AsThisReference : Dec.IRecordable
+        public class ThisThenClassOuter : Dec.IRecordable
         {
-            public AsThisRefBase data;
+            public ThisThenClassInnerBase data;
 
             public void Record(Dec.Recorder recorder)
             {
                 recorder.RecordAsThis(ref data);
             }
         }
-
-        public class AsThisRefBase : Dec.IRecordable
+        public class ThisThenClassInnerBase : Dec.IRecordable
         {
-            public virtual void Record(Dec.Recorder recorder)
-            {
-                
-            }
+            public void Record(Dec.Recorder recorder) { }
         }
-        public class AsThisRefDerived : AsThisRefBase
-        {
+        public class ThisThenClassInnerDerived : ThisThenClassInnerBase { }
 
-        }
-
+        // This test, as well as ClassThenThis, test for an issue that happens when using RecordAsThis()
+        // RecordAsThis() effectively smooshes multiple parts of a hierarchy together into a single class
+        // however, this precludes class overrides since it wouldn't know which step to apply it to
+        // in theory this can be fixed by using `class` for the last one and inventing new tags, class-1 class-2 etc, for previous steps
+        // in practice I currently do not think this is important enough to mess with.
         [Test]
         public void ThisThenClass([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
-            var item = new AsThisReference();
-            item.data = new AsThisRefDerived();
+            var item = new ThisThenClassOuter();
+            item.data = new ThisThenClassInnerDerived();
 
             var deserialized = DoRecorderRoundTrip(item, mode, expectReadErrors: true, expectWriteErrors: true);
+        }
+
+        public class ClassThenThisOuterBase : Dec.IRecordable
+        {
+            public Stub data;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.RecordAsThis(ref data);
+            }
+        }
+        public class ClassThenThisOuterDerived : ClassThenThisOuterBase { }
+
+        [Test]
+        public void InheritedMember([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
+        {
+            var item = new ClassThenThisOuterDerived();
+            ClassThenThisOuterBase itemBase = item;
+
+            var deserialized = DoRecorderRoundTrip(itemBase, mode, expectReadErrors: true, expectWriteErrors: true);
         }
     }
 }
