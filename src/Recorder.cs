@@ -307,8 +307,12 @@ namespace Dec
                         }
 
                         // Create a stub so other things can reference it later
-                        readerContext.refs[id] = possibleType.CreateInstanceSafe("object", () => $"{stringName}:{reference.LineNumber()}");
-                        // Might be null; that's okay, CreateInstanceSafe has done the error reporting
+                        var refInstance = possibleType.CreateInstanceSafe("object", () => $"{stringName}:{reference.LineNumber()}");
+                        if (refInstance != null)
+                        {
+                            readerContext.refs[id] = refInstance;
+                        }
+                        // If this is null, CreateInstanceSafe has done the error reporting, but we still don't want it in the array because it will break stuff downstream
                     }
 
                     // Now that all the refs exist, we can run through them again and actually parse them

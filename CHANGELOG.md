@@ -6,6 +6,9 @@ All notable changes to this project will be documented in this file.
 ### Improved
 * RecordAsThis() does not (and currently cannot) work on a polymorphic object; document this and explicitly report it as an error.
 
+### Fixed
+* Failed ref instantiations can later cause unhandled exceptions.
+
 ### Testing
 * Better diagnostic output on missing expected errors.
 
