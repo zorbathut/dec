@@ -123,7 +123,7 @@ namespace Dec
                 return true;
             }
 
-            // We have a referencable target, but do *we* allow a reference?
+            // We have a referenceable target, but do *we* allow a reference?
             if (!recContext.Referenceable)
             {
                 Dbg.Err("Attempt to create a new unreferenceable recording of a referenceable object. Will be left with default values.");
