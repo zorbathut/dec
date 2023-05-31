@@ -177,7 +177,7 @@ namespace DecTest
             var CreateInstanceSafeHandle = Assembly.GetAssembly(typeof(Dec.Dec)).GetType("Dec.UtilReflection").GetMethod("CreateInstanceSafe", BindingFlags.Static | BindingFlags.NonPublic);
             object CreateInstanceSafe(Type type, string errorType, Func<string> errorPrefix)
             {
-                return CreateInstanceSafeHandle.Invoke(null, new object[] { type, errorType, errorPrefix });
+                return CreateInstanceSafeHandle.Invoke(null, new object[] { type, errorType, errorPrefix, 0 });
             }
 
             ExpectErrors(() => Assert.AreEqual(null, CreateInstanceSafe(typeof(int?), "object", () => "(testing)")));

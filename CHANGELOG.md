@@ -8,9 +8,11 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 * Failed ref instantiations can later cause unhandled exceptions.
+* Recorder breaks when trying to deal with multiply referenced Array objects.
 
 ### Testing
 * Better diagnostic output on missing expected errors.
+
 
 ## [v0.3.5]
 ### Added

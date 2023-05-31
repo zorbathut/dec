@@ -4,6 +4,7 @@ namespace DecTest
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using static System.Runtime.InteropServices.JavaScript.JSType;
 
     [TestFixture]
     public class Recorder : Base
@@ -737,6 +738,31 @@ namespace DecTest
             var deserialized = DoRecorderRoundTrip(root, mode);
 
             Assert.AreEqual(root.GetType(), deserialized.GetType());
+        }
+
+        public class SharedArrayDec : Dec.IRecordable
+        {
+            public StubRecordable[] data_a;
+            public StubRecordable[] data_b;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref data_a, "data_a");
+                recorder.Record(ref data_b, "data_b");
+            }
+        }
+
+        // This is specifically hard because arrays require a constructor parameter.
+        [Test]
+        public void SharedArray([Values] RecorderMode mode)
+        {
+            var root = new SharedArrayDec();
+            root.data_b = root.data_a = new StubRecordable[10];
+
+            var deserialized = DoRecorderRoundTrip(root, mode);
+
+            Assert.AreEqual(root.data_a.Length, deserialized.data_a.Length);
+            Assert.AreSame(deserialized.data_a, deserialized.data_b);
         }
     }
 }

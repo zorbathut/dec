@@ -307,7 +307,7 @@ namespace Dec
                         }
 
                         // Create a stub so other things can reference it later
-                        var refInstance = possibleType.CreateInstanceSafe("object", () => $"{stringName}:{reference.LineNumber()}");
+                        var refInstance = possibleType.CreateInstanceSafe("object", () => $"{stringName}:{reference.LineNumber()}", children: reference.Elements().Count());
                         if (refInstance != null)
                         {
                             readerContext.refs[id] = refInstance;

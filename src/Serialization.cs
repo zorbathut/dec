@@ -471,8 +471,17 @@ namespace Dec
                     case ParseMode.Default:
                     case ParseMode.Replace:
                         // This is a full override, so we're going to create it here.
-                        // We don't bother falling back on model; we probably need to recreate it anyway with the right length.
-                        array = (Array)Activator.CreateInstance(type, new object[] { elements.Length });
+                        if (result != null && result.GetType() == type && ((Array)result).Length == elements.Length)
+                        {
+                            // It is actually vitally important that we fall back on the model when possible, because the Recorder Ref system requires it.
+                            array = (Array)result;
+                        }
+                        else
+                        {
+                            // Otherwise just make a new one, no harm done.
+                            array = (Array)Activator.CreateInstance(type, new object[] { elements.Length });
+                        }
+                        
                         break;
 
                     case ParseMode.Append:

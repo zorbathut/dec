@@ -193,12 +193,18 @@ namespace Dec
             return field.Name.StartsWith("<");
         }
 
-        internal static object CreateInstanceSafe(this Type type, string errorType, Func<string> errorPrefix)
+        internal static object CreateInstanceSafe(this Type type, string errorType, Func<string> errorPrefix, int children = 0)
         {
             if (type.IsAbstract)
             {
                 Dbg.Err($"{errorPrefix()}: Attempting to create {errorType} of abstract type {type}");
                 return null;    // thankfully all abstract types can accept being null
+            }
+            else if (type.IsArray)
+            {
+                // Special handling, we need a fancy constructor with an int parameter
+                // Conveniently, arrays are really easy to deal with in this pathway :D
+                return Activator.CreateInstance(type, children);
             }
             else if (!type.IsValueType && type.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { }, null) == null)
             {
