@@ -17,6 +17,7 @@ namespace Dec
             this.context = context;
         }
 
+        public Recorder.Context RecorderContext { get { return context; } }
         public abstract bool AllowReflection { get; }
 
         // this needs to be more abstract

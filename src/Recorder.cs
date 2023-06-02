@@ -206,7 +206,7 @@ namespace Dec
             {
                 var writerContext = new WriterXmlRecord();
 
-                Serialization.ComposeElement(writerContext.StartData(), target, typeof(T), new Recorder.Context());
+                Serialization.ComposeElement(writerContext.StartData(), target, typeof(T));
 
                 return writerContext.Finish(pretty);
             }
@@ -221,7 +221,7 @@ namespace Dec
             {
                 var writerContext = new WriterValidationRecord();
 
-                Serialization.ComposeElement(writerContext.StartData(), target, typeof(T), new Recorder.Context());
+                Serialization.ComposeElement(writerContext.StartData(), target, typeof(T));
 
                 return writerContext.Finish();
             }
@@ -396,7 +396,7 @@ namespace Dec
                     return;
                 }
 
-                Serialization.ComposeElement(node, value, typeof(T), parameters.CreateContext());
+                Serialization.ComposeElement(node, value, typeof(T));
 
                 return;
             }
@@ -409,7 +409,7 @@ namespace Dec
 
             fields.Add(label);
 
-            Serialization.ComposeElement(node.CreateChild(label, parameters.CreateContext()), value, typeof(T), parameters.CreateContext());
+            Serialization.ComposeElement(node.CreateChild(label, parameters.CreateContext()), value, typeof(T));
         }
 
         public override Direction Mode { get => Direction.Write; }

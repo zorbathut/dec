@@ -1104,7 +1104,7 @@ namespace Dec
         }
 
         internal static Type TypeSystemRuntimeType = Type.GetType("System.RuntimeType");
-        internal static void ComposeElement(WriterNode node, object value, Type fieldType, Recorder.Context recContext, FieldInfo fieldInfo = null, bool isRootDec = false)
+        internal static void ComposeElement(WriterNode node, object value, Type fieldType, FieldInfo fieldInfo = null, bool isRootDec = false)
         {
             // Handle Dec types, if this isn't a root (otherwise we'd just reference ourselves and that's kind of pointless)
             if (!isRootDec && value is Dec)
@@ -1303,7 +1303,7 @@ namespace Dec
             
             foreach (var field in valType.GetSerializableFieldsFromHierarchy())
             {
-                ComposeElement(node.CreateMember(field, recContext), field.GetValue(value), field.FieldType, recContext, fieldInfo: field);
+                ComposeElement(node.CreateMember(field, node.RecorderContext), field.GetValue(value), field.FieldType, fieldInfo: field);
             }
 
             return;

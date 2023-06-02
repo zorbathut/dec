@@ -397,7 +397,7 @@ namespace Dec
 
             for (int i = 0; i < value.Length; ++i)
             {
-                Serialization.ComposeElement(CreateChild("li", context), value.GetValue(i), referencedType, context);
+                Serialization.ComposeElement(CreateChild("li", context), value.GetValue(i), referencedType);
             }
         }
 
@@ -407,7 +407,7 @@ namespace Dec
 
             for (int i = 0; i < value.Count; ++i)
             {
-                Serialization.ComposeElement(CreateChild("li", context), value[i], referencedType, context);
+                Serialization.ComposeElement(CreateChild("li", context), value[i], referencedType);
             }
         }
 
@@ -425,8 +425,8 @@ namespace Dec
                 // Revisit this later when someone (possibly myself) really wants it improved.
                 var li = CreateChild("li", context);
 
-                Serialization.ComposeElement(li.CreateChild("key", context), iterator.Key, keyType, context);
-                Serialization.ComposeElement(li.CreateChild("value", context), iterator.Value, valueType, context);
+                Serialization.ComposeElement(li.CreateChild("key", context), iterator.Key, keyType);
+                Serialization.ComposeElement(li.CreateChild("value", context), iterator.Value, valueType);
             }
         }
 
@@ -441,7 +441,7 @@ namespace Dec
                 // In theory, some sets support inline format, not li format. Inline format is cleaner and smaller and we should be using it when possible.
                 // In practice, it's hard and I'm lazy and this always works, and we're not providing any guarantees about cleanliness of serialized output.
                 // Revisit this later when someone (possibly myself) really wants it improved.
-                Serialization.ComposeElement(CreateChild("li", context), iterator.Current, keyType, context);
+                Serialization.ComposeElement(CreateChild("li", context), iterator.Current, keyType);
             }
         }
 
@@ -454,7 +454,7 @@ namespace Dec
 
             for (int i = 0; i < length; ++i)
             {
-                Serialization.ComposeElement(CreateChild(nameArray != null ? nameArray[i] : "li", context), value.GetType().GetProperty(Util.DefaultTupleNames[i]).GetValue(value), args[i], context);
+                Serialization.ComposeElement(CreateChild(nameArray != null ? nameArray[i] : "li", context), value.GetType().GetProperty(Util.DefaultTupleNames[i]).GetValue(value), args[i]);
             }
         }
 
@@ -467,7 +467,7 @@ namespace Dec
 
             for (int i = 0; i < length; ++i)
             {
-                Serialization.ComposeElement(CreateChild(nameArray != null ? nameArray[i] : "li", context), value.GetType().GetField(Util.DefaultTupleNames[i]).GetValue(value), args[i], context);
+                Serialization.ComposeElement(CreateChild(nameArray != null ? nameArray[i] : "li", context), value.GetType().GetField(Util.DefaultTupleNames[i]).GetValue(value), args[i]);
             }
         }
 

@@ -240,7 +240,7 @@ namespace Dec
 
             for (int i = 0; i < value.Length; ++i)
             {
-                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}[{i}]"), value.GetValue(i), referencedType, context);
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}[{i}]"), value.GetValue(i), referencedType);
             }
 
             writer.AppendLine($"}}");
@@ -256,7 +256,7 @@ namespace Dec
 
             for (int i = 0; i < value.Count; ++i)
             {
-                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}[{i}]"), value[i], referencedType, context);
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}[{i}]"), value[i], referencedType);
             }
 
             writer.AppendLine($"}}");
@@ -273,10 +273,10 @@ namespace Dec
             while (iterator.MoveNext())
             {
                 var keyNode = new WriterNodeStringize();
-                Serialization.ComposeElement(keyNode, iterator.Key, keyType, context);
+                Serialization.ComposeElement(keyNode, iterator.Key, keyType);
 
                 writer.AppendLine($"if ({accessor}.ContainsKey({keyNode.SerializedString})) {{");
-                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}[{keyNode.SerializedString}]"), iterator.Value, valueType, context);
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}[{keyNode.SerializedString}]"), iterator.Value, valueType);
                 writer.AppendLine($"}} else {{");
                 writer.AppendLine($"Assert.IsTrue({accessor}.ContainsKey({keyNode.SerializedString}));");   // this is unnecessary - it could just be .Fail() - but this gives you a *much* better error message
                 writer.AppendLine($"}}");
@@ -292,7 +292,7 @@ namespace Dec
             while (iterator.MoveNext())
             {
                 var keyNode = new WriterNodeStringize();
-                Serialization.ComposeElement(keyNode, iterator.Current, keyType, context);
+                Serialization.ComposeElement(keyNode, iterator.Current, keyType);
 
                 // You might think "Assert.Contains" would do what we want, but it doesn't - it requires an ICollection and HashSet isn't an ICollection.
                 writer.AppendLine($"Assert.IsTrue({accessor}.Contains({keyNode.SerializedString}));");
@@ -313,7 +313,7 @@ namespace Dec
             for (int i = 0; i < length; ++i)
             {
                 var propertyName = nameArray[i];
-                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}.{propertyName}"), value.GetType().GetProperty(Util.DefaultTupleNames[i]).GetValue(value), args[i], context);
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}.{propertyName}"), value.GetType().GetProperty(Util.DefaultTupleNames[i]).GetValue(value), args[i]);
             }
         }
 
@@ -327,7 +327,7 @@ namespace Dec
             for (int i = 0; i < length; ++i)
             {
                 var propertyName = nameArray[i];
-                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}.{propertyName}"), value.GetType().GetField(Util.DefaultTupleNames[i]).GetValue(value), args[i], context);
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}.{propertyName}"), value.GetType().GetField(Util.DefaultTupleNames[i]).GetValue(value), args[i]);
             }
         }
 
