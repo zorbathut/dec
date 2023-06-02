@@ -211,7 +211,7 @@ namespace Dec
                 return null;
 
                 // Note: It may seem wrong that we can return null along with a non-null model.
-                // The problem is that this is meant to be able to override defaults. If the default if an object, explicitly setting it to null *should* clear the object out.
+                // The problem is that this is meant to be able to override defaults. If the default is an object, explicitly setting it to null *should* clear the object out.
                 // If we actually need a specific object to be returned, for whatever reason, the caller has to do the comparison.
             }
             else if (classAttribute != null)
