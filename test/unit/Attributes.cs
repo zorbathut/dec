@@ -29,7 +29,7 @@ namespace DecTest
 
             public void Record(Dec.Recorder recorder)
             {
-                recorder.Record(ref member, "member");
+                recorder.Shared().Record(ref member, "member");
             }
         }
 

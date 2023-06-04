@@ -113,8 +113,8 @@ namespace DecTest
 
             public void Record(Dec.Recorder record)
             {
-                record.Record(ref convertibleA, "convertibleA");
-                record.Record(ref convertibleB, "convertibleB");
+                record.Shared().Record(ref convertibleA, "convertibleA");
+                record.Shared().Record(ref convertibleB, "convertibleB");
             }
         }
 

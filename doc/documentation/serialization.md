@@ -17,7 +17,7 @@ Child objects will be serialized recursively. In addition, Recorder supports non
 
 Recorder does not support the automatic reflection-based parsing that Dec.Parser does. This is partly for security reasons and partly for practicality reasons; the author's experience is that fully automatic reflection-based game saves rarely work well.
 
-Recorder does support [`Dec.Converter`](xref:Dec.Converter), but this isn't the intended way to handle custom serialization. Most custom serialization should be taken care of by inheriting from [`Dec.IRecordable`](xref:Dec.IRecordable), then overriding [`Dec.IRecordable.Record`](xref:Dec.IRecordable.Record(Dec.Recorder)). This function provides you with a [`Dec.Recorder`](xref:Dec.Recorder), whose most important function is Dec.Recorder.Record. This function can be used to easily serialize any type that Recorder supports.
+Recorder does support [`Dec.Converter`](xref:Dec.Converter), but this isn't the intended way to handle serialization of classes that you authored. Most custom serialization should be taken care of by inheriting from [`Dec.IRecordable`](xref:Dec.IRecordable), then overriding [`Dec.IRecordable.Record`](xref:Dec.IRecordable.Record(Dec.Recorder)). This function provides you with a [`Dec.Recorder`](xref:Dec.Recorder), whose most important function is Dec.Recorder.Record. This function can be used to easily serialize any type that Recorder supports.
 
 ```cs
 public class RecordableExample : Dec.IRecorder
@@ -36,6 +36,24 @@ public class RecordableExample : Dec.IRecorder
     }
 }
 ```
+
+## Shared Instances
+
+Recorder will, by default, re-use any existing data in a field. Unfortunately, this precludes class instances with multiple references to them, i.e. data structures that are not a pure tree. If you want instances with more than one reference, it is necessary to specify `.Shared()` for thse specific instances.
+
+```cs
+public class SharedRecordableExample : Dec.IRecorder
+{
+    SomeSharedClass sharedClassMember;
+    
+    public void Record(Recorder recorder)
+    {
+        recorder.Shared().Record(ref sharedClassMember, "sharedClassMember");
+    }
+}
+```
+
+When using this feature, classes *cannot* be pre-initialized; they must start as `null`.
 
 ## Dec Compatibility
 

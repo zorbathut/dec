@@ -122,7 +122,23 @@ namespace Dec
             // We keep the original around in case of error, but do all our manipulation on a result object.
             object result = original;
 
-            // The first thing we do is parse all our attributes. This is because we want to verify that there are no attributes being ignored.
+            // Verify our Shared flags as the *very* first step to ensure nothing gets past us.
+            // In theory this should be fine with Flexible; Flexible only happens on an outer wrapper that was shared, and therefore was null, and therefore this is default also
+            if (recContext.shared == Recorder.Context.Shared.Allow)
+            {
+                if (!type.CanBeShared())
+                {
+                    // If shared, make sure our input is null and our type is appropriate for sharing
+                    Dbg.Wrn($"{context.sourceName}:{element.LineNumber()}: Value type `{type}` tagged as Shared in recorder, this is meaningless but harmless");
+                }
+                else if (original != null)
+                {
+                    // We need to create objects without context if it's shared, so we kind of panic in this case
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Shared `{type}` provided with non-null default object, this may result in unexpected behavior");
+                }
+            }
+
+            // The next thing we do is parse all our attributes. This is because we want to verify that there are no attributes being ignored.
             // Don't return anything until we do our element.HasAtttributes check!
 
             // The interaction between these is complicated!
@@ -185,9 +201,9 @@ namespace Dec
             {
                 // Ref is the highest priority, largely because I think it's cool
 
-                if (!recContext.Referenceable)
+                if (recContext.shared == Recorder.Context.Shared.Deny)
                 {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Found a reference in a non-referenceable context (most likely within a Recorder.WithFactory(), which disallows shared references), using it anyway");
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Found a reference in a non-.Shared() context, using it anyway but this might produce unexpected results");
                 }
 
                 if (context.refs == null || !context.refs.ContainsKey(refAttribute))
@@ -449,7 +465,7 @@ namespace Dec
                         Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                     }
 
-                    list.Add(ParseElement(fieldElement, referencedType, null, context, recContext));
+                    list.Add(ParseElement(fieldElement, referencedType, null, context, recContext.CreateChild()));
                 }
 
                 return list;
@@ -512,7 +528,7 @@ namespace Dec
                         Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                     }
 
-                    array.SetValue(ParseElement(fieldElement, referencedType, null, context, recContext), startOffset + i);
+                    array.SetValue(ParseElement(fieldElement, referencedType, null, context, recContext.CreateChild()), startOffset + i);
                 }
 
                 return array;
@@ -583,7 +599,7 @@ namespace Dec
                             continue;
                         }
 
-                        var key = ParseElement(keyNode, keyType, null, context, recContext);
+                        var key = ParseElement(keyNode, keyType, null, context, recContext.CreateChild());
 
                         if (key == null)
                         {
@@ -601,7 +617,7 @@ namespace Dec
                             Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Dictionary includes duplicate key `{key.ToString()}`");
                         }
 
-                        dict[key] = ParseElement(valueNode, valueType, null, context, recContext);
+                        dict[key] = ParseElement(valueNode, valueType, null, context, recContext.CreateChild());
                     }
                     else
                     {
@@ -631,7 +647,7 @@ namespace Dec
                             Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Dictionary includes duplicate key `{fieldElement.Name.LocalName}`");
                         }
 
-                        dict[key] = ParseElement(fieldElement, valueType, null, context, recContext);
+                        dict[key] = ParseElement(fieldElement, valueType, null, context, recContext.CreateChild());
                     }
                 }
 
@@ -703,7 +719,7 @@ namespace Dec
                     if (fieldElement.Name.LocalName == "li")
                     {
                         // Treat this like a full node
-                        var key = ParseElement(fieldElement, keyType, null, context, recContext);
+                        var key = ParseElement(fieldElement, keyType, null, context, recContext.CreateChild());
 
                         if (key == null)
                         {
@@ -818,7 +834,7 @@ namespace Dec
 
                     for (int i = 0; i < Math.Min(parameters.Length, elements.Count); ++i)
                     {
-                        parameters[i] = ParseElement(elements[i], type.GenericTypeArguments[i], null, context, recContext);
+                        parameters[i] = ParseElement(elements[i], type.GenericTypeArguments[i], null, context, recContext.CreateChild());
                     }
 
                     // fill in anything missing
@@ -860,7 +876,7 @@ namespace Dec
                         }
 
                         seen[index] = true;
-                        parameters[index] = ParseElement(elementItem, type.GenericTypeArguments[index], null, context, recContext);
+                        parameters[index] = ParseElement(elementItem, type.GenericTypeArguments[index], null, context, recContext.CreateChild());
                     }
 
                     for (int i = 0; i < seen.Length; ++i)
@@ -980,7 +996,7 @@ namespace Dec
                     continue;
                 }
 
-                fieldElementInfo.SetValue(result, ParseElement(fieldElement, fieldElementInfo.FieldType, fieldElementInfo.GetValue(result), context, recContext, fieldInfo: fieldElementInfo));
+                fieldElementInfo.SetValue(result, ParseElement(fieldElement, fieldElementInfo.FieldType, fieldElementInfo.GetValue(result), context, recContext.CreateChild(), fieldInfo: fieldElementInfo));
             }
 
             // Set up our index fields; this has to happen last in case we're a struct
@@ -1106,6 +1122,18 @@ namespace Dec
         internal static Type TypeSystemRuntimeType = Type.GetType("System.RuntimeType");
         internal static void ComposeElement(WriterNode node, object value, Type fieldType, FieldInfo fieldInfo = null, bool isRootDec = false)
         {
+            // Verify our Shared flags as the *very* first step to ensure nothing gets past us.
+            // In theory this should be fine with Flexible; Flexible only happens on an outer wrapper that was shared, and therefore was null, and therefore this is default also
+            if (node.RecorderContext.shared == Recorder.Context.Shared.Allow)
+            {
+                // If this is an `asThis` parameter, then we may not be writing the field type it looks like, and we're just going to trust that they're doing something sensible.
+                if (!fieldType.CanBeShared())
+                {
+                    // If shared, make sure our type is appropriate for sharing
+                    Dbg.Wrn($"Value type `{fieldType}` tagged as Shared in recorder, this is meaningless but harmless");
+                }
+            }
+
             // Handle Dec types, if this isn't a root (otherwise we'd just reference ourselves and that's kind of pointless)
             if (!isRootDec && value is Dec)
             {
@@ -1187,7 +1215,7 @@ namespace Dec
                 unreferenceableComplete = true;
             }
 
-            // Check to see if we should make this into a ref
+            // Check to see if we should make this into a ref (yes, even if we're not tagged as Shared)
             // Do this *before* we do the class tagging, otherwise we may add ref/class tags to a single node, which is invalid.
             // Note that it's important we don't write a reference if we had an unreferenceable; it's unnecessarily slow and some of our writer types don't support it.
             if (!valType.IsValueType && !unreferenceableComplete)

@@ -2,6 +2,7 @@ namespace Dec
 {
     using System;
     using System.Collections;
+    using System.Collections.Generic;
     using System.Xml.Linq;
 
     internal abstract class Writer
@@ -11,7 +12,8 @@ namespace Dec
 
     internal abstract class WriterNode
     {
-        protected Recorder.Context context;
+        private Recorder.Context context;
+
         public WriterNode(Recorder.Context context)
         {
             this.context = context;
@@ -19,6 +21,12 @@ namespace Dec
 
         public Recorder.Context RecorderContext { get { return context; } }
         public abstract bool AllowReflection { get; }
+
+        // I'm not real happy with the existence of this function; it's kind of a hack so that a shared Converter that writes a string or an int can avoid errors
+        public void MakeRecorderContextChild()
+        {
+            context = context.CreateChild();
+        }
 
         // this needs to be more abstract
         public abstract WriterNode CreateChild(string label, Recorder.Context context);

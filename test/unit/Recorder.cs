@@ -311,8 +311,8 @@ namespace DecTest
 
             public void Record(Dec.Recorder record)
             {
-                record.Record(ref left, "left");
-                record.Record(ref right, "right");
+                record.Shared().Record(ref left, "left");
+                record.Shared().Record(ref right, "right");
             }
         }
 
@@ -747,8 +747,8 @@ namespace DecTest
 
             public void Record(Dec.Recorder recorder)
             {
-                recorder.Record(ref data_a, "data_a");
-                recorder.Record(ref data_b, "data_b");
+                recorder.Shared().Record(ref data_a, "data_a");
+                recorder.Shared().Record(ref data_b, "data_b");
             }
         }
 

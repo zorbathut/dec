@@ -25,10 +25,10 @@ namespace DecTest
 
             public void Record(Dec.Recorder record)
             {
-                record.Record(ref childAone, "childAone");
-                record.Record(ref childAtwo, "childAtwo");
-                record.Record(ref childB, "childB");
-                record.Record(ref childEmpty, "childEmpty");
+                record.Shared().Record(ref childAone, "childAone");
+                record.Shared().Record(ref childAtwo, "childAtwo");
+                record.Shared().Record(ref childB, "childB");
+                record.Shared().Record(ref childEmpty, "childEmpty");
             }
         }
 
@@ -59,11 +59,11 @@ namespace DecTest
 
         public class RecursiveParent : Dec.IRecordable
         {
-            public List<RecursiveNode> children = new List<RecursiveNode>();
+            public List<RecursiveNode> children;
 
             public void Record(Dec.Recorder record)
             {
-                record.Record(ref children, "children");
+                record.Shared().Record(ref children, "children");
             }
         }
 
@@ -74,8 +74,8 @@ namespace DecTest
 
             public void Record(Dec.Recorder record)
             {
-                record.Record(ref childA, "childA");
-                record.Record(ref childB, "childB");
+                record.Shared().Record(ref childA, "childA");
+                record.Shared().Record(ref childB, "childB");
             }
         }
 
@@ -88,6 +88,7 @@ namespace DecTest
             parser.Finish();
 
             var parent = new RecursiveParent();
+            parent.children = new List<RecursiveNode>();
             parent.children.Add(new RecursiveNode());
             parent.children.Add(new RecursiveNode());
             parent.children.Add(new RecursiveNode());
@@ -121,8 +122,8 @@ namespace DecTest
 
             public void Record(Dec.Recorder record)
             {
-                record.Record(ref a, "a");
-                record.Record(ref b, "b");
+                record.Shared().Record(ref a, "a");
+                record.Shared().Record(ref b, "b");
             }
         }
 
@@ -204,6 +205,55 @@ namespace DecTest
 
             {
                 var seen = new HashSet<DoubleLinkedRecorder>();
+                var current = deserialized;
+                while (current != null && !seen.Contains(current))
+                {
+                    seen.Add(current);
+                    current = current.a;
+                }
+
+                Assert.AreEqual(depth, seen.Count);
+            }
+        }
+
+        private class UnsharedRecorder : Dec.IRecordable
+        {
+            public UnsharedRecorder a;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref a, "a");
+            }
+        }
+
+        [Test]
+        public void DepthUnshared([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
+        {
+            // We're actually really close to hitting stack overflow here, so we run it with 130 so we can still read it.
+            const int depth = 130;
+
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
+
+            var parser = new Dec.Parser();
+            parser.Finish();
+
+            var root = new UnsharedRecorder();
+
+            {
+                var current = root;
+
+                for (int i = 1; i < depth; ++i)
+                {
+                    var next = new UnsharedRecorder();
+                    current.a = next;
+                    current = next;
+                }
+            }
+
+            var deserialized = DoRecorderRoundTrip(root, mode, expectWriteErrors: true);
+
+            {
+                var seen = new HashSet<UnsharedRecorder>();
                 var current = deserialized;
                 while (current != null && !seen.Contains(current))
                 {
@@ -448,14 +498,14 @@ namespace DecTest
         public class DictionaryKeyRefDec : Dec.IRecordable
         {
             public StubRecordable referenceA;
-            public Dictionary<StubRecordable, string> dict = new Dictionary<StubRecordable, string>();
+            public Dictionary<StubRecordable, string> dict;
             public StubRecordable referenceB;
 
             public void Record(Dec.Recorder record)
             {
-                record.Record(ref referenceA, "referenceA");
-                record.Record(ref dict, "dict");
-                record.Record(ref referenceB, "referenceB");
+                record.Shared().Record(ref referenceA, "referenceA");
+                record.Shared().Record(ref dict, "dict");
+                record.Shared().Record(ref referenceB, "referenceB");
             }
         }
 
@@ -465,6 +515,7 @@ namespace DecTest
             var dict = new DictionaryKeyRefDec();
             dict.referenceA = new StubRecordable();
             dict.referenceB = new StubRecordable();
+            dict.dict = new Dictionary<StubRecordable, string>();
             dict.dict[dict.referenceA] = "Hello";
             dict.dict[dict.referenceB] = "Goodbye";
 
@@ -521,8 +572,8 @@ namespace DecTest
 
             public virtual void Record(Dec.Recorder recorder)
             {
-                recorder.Record(ref a, "a");
-                recorder.Record(ref b, "b");
+                recorder.Shared().Record(ref a, "a");
+                recorder.Shared().Record(ref b, "b");
             }
         }
 

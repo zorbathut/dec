@@ -3,7 +3,9 @@ namespace Dec
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Linq;
+    using System.Threading;
     using System.Xml.Linq;
 
     internal abstract class WriterXml : Writer
@@ -97,7 +99,7 @@ namespace Dec
         {
             if (!refToElement.TryGetValue(referenced, out var xelement))
             {
-                if (recContext.Referenceable)
+                if (recContext.shared != Recorder.Context.Shared.Deny)
                 {
                     // Insert it into our refToElement mapping
                     refToElement[referenced] = element;
@@ -124,7 +126,7 @@ namespace Dec
             }
 
             // We have a referenceable target, but do *we* allow a reference?
-            if (!recContext.Referenceable)
+            if (recContext.shared == Recorder.Context.Shared.Deny)
             {
                 Dbg.Err("Attempt to create a new unreferenceable recording of a referenceable object. Will be left with default values.");
                 return true;
@@ -210,9 +212,9 @@ namespace Dec
             }
         }
 
-        public WriterNodeXml StartData()
+        public WriterNodeXml StartData(Type type)
         {
-            var node = WriterNodeXml.StartData(this, record, "data");
+            var node = WriterNodeXml.StartData(this, record, "data", type);
             rootElement = node.GetXElement();
             return node;
         }
@@ -294,9 +296,9 @@ namespace Dec
             return node;
         }
 
-        public static WriterNodeXml StartData(WriterXmlRecord writer, XElement decRoot, string name)
+        public static WriterNodeXml StartData(WriterXmlRecord writer, XElement decRoot, string name, Type type)
         {
-            return new WriterNodeXml(writer, decRoot, name, 0, new Recorder.Context());
+            return new WriterNodeXml(writer, decRoot, name, 0, new Recorder.Context() { shared = Recorder.Context.Shared.Flexible });
         }
 
         public override WriterNode CreateChild(string label, Recorder.Context context)
@@ -393,7 +395,7 @@ namespace Dec
 
         public override bool WriteReference(object value)
         {
-            return writer.RegisterReference(value, node, context);
+            return writer.RegisterReference(value, node, RecorderContext);
         }
 
         public override void WriteArray(Array value)
@@ -402,7 +404,7 @@ namespace Dec
 
             for (int i = 0; i < value.Length; ++i)
             {
-                Serialization.ComposeElement(CreateChild("li", context), value.GetValue(i), referencedType);
+                Serialization.ComposeElement(CreateChild("li", RecorderContext.CreateChild()), value.GetValue(i), referencedType);
             }
         }
 
@@ -412,7 +414,7 @@ namespace Dec
 
             for (int i = 0; i < value.Count; ++i)
             {
-                Serialization.ComposeElement(CreateChild("li", context), value[i], referencedType);
+                Serialization.ComposeElement(CreateChild("li", RecorderContext.CreateChild()), value[i], referencedType);
             }
         }
 
@@ -428,10 +430,10 @@ namespace Dec
                 // In theory, some dicts support inline format, not li format. Inline format is cleaner and smaller and we should be using it when possible.
                 // In practice, it's hard and I'm lazy and this always works, and we're not providing any guarantees about cleanliness of serialized output.
                 // Revisit this later when someone (possibly myself) really wants it improved.
-                var li = CreateChild("li", context);
+                var li = CreateChild("li", RecorderContext);
 
-                Serialization.ComposeElement(li.CreateChild("key", context), iterator.Key, keyType);
-                Serialization.ComposeElement(li.CreateChild("value", context), iterator.Value, valueType);
+                Serialization.ComposeElement(li.CreateChild("key", RecorderContext.CreateChild()), iterator.Key, keyType);
+                Serialization.ComposeElement(li.CreateChild("value", RecorderContext.CreateChild()), iterator.Value, valueType);
             }
         }
 
@@ -446,7 +448,7 @@ namespace Dec
                 // In theory, some sets support inline format, not li format. Inline format is cleaner and smaller and we should be using it when possible.
                 // In practice, it's hard and I'm lazy and this always works, and we're not providing any guarantees about cleanliness of serialized output.
                 // Revisit this later when someone (possibly myself) really wants it improved.
-                Serialization.ComposeElement(CreateChild("li", context), iterator.Current, keyType);
+                Serialization.ComposeElement(CreateChild("li", RecorderContext.CreateChild()), iterator.Current, keyType);
             }
         }
 
@@ -459,7 +461,7 @@ namespace Dec
 
             for (int i = 0; i < length; ++i)
             {
-                Serialization.ComposeElement(CreateChild(nameArray != null ? nameArray[i] : "li", context), value.GetType().GetProperty(Util.DefaultTupleNames[i]).GetValue(value), args[i]);
+                Serialization.ComposeElement(CreateChild(nameArray != null ? nameArray[i] : "li", RecorderContext.CreateChild()), value.GetType().GetProperty(Util.DefaultTupleNames[i]).GetValue(value), args[i]);
             }
         }
 
@@ -472,7 +474,7 @@ namespace Dec
 
             for (int i = 0; i < length; ++i)
             {
-                Serialization.ComposeElement(CreateChild(nameArray != null ? nameArray[i] : "li", context), value.GetType().GetField(Util.DefaultTupleNames[i]).GetValue(value), args[i]);
+                Serialization.ComposeElement(CreateChild(nameArray != null ? nameArray[i] : "li", RecorderContext.CreateChild()), value.GetType().GetField(Util.DefaultTupleNames[i]).GetValue(value), args[i]);
             }
         }
 
@@ -493,6 +495,9 @@ namespace Dec
 
         public override void WriteConvertible(Converter converter, object value)
         {
+            // Convertibles are kind of a wildcard, so right now we're just changing this to Flexible mode
+            MakeRecorderContextChild();
+
             if (depth < MaxRecursionDepth)
             {
                 // This is somewhat faster than a full pending write (5-10% faster in one test case, though with a lot of noise), so we do it whenever we can.

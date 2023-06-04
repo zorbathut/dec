@@ -210,6 +210,8 @@ namespace Dec
 
         public override bool WriteReference(object value)
         {
+            // We're just going to ignore whether a reference is "allowed" here; this is not the place for metavalidation.
+
             if (writer.referenceLookup.ContainsKey(value))
             {
                 writer.AppendLine($"Assert.AreSame({writer.referenceLookup[value]}, {accessor});");

@@ -64,6 +64,7 @@ namespace Dec
             internal Recorder recorder;
 
             internal bool asThis;
+            internal bool shared;
 
             internal Dictionary<Type, Func<Type, object>> factories;
 
@@ -104,26 +105,66 @@ namespace Dec
                 {
                     Dbg.Err("Recorder.WithFactory() called on Recorder.Parameters that already has factories. This is undefined results; currently replacing the old factory dictionary with the new one.");
                 }
+
+                if (parameters.shared)
+                {
+                    Dbg.Err("Recorder.WithFactory() called on a Shared Recorder.Parameters. This is disallowed; currently overriding Shared with factories.");
+                    parameters.shared = false;
+                }
                 
                 parameters.factories = factories;
 
                 return parameters;
             }
 
+            /// <summary>
+            /// Allow sharing for class objects referenced during this call.
+            /// </summary>
+            /// <remarks>
+            /// See [`Dec.Recorder.Shared`](xref:Dec.Recorder.Shared*) for details.
+            /// </remarks>
+            public Parameters Shared()
+            {
+                Parameters parameters = this;
+
+                if (parameters.factories != null)
+                {
+                    Dbg.Err("Recorder.Shared() called on a WithFactory Recorder.Parameters. This is disallowed; currently erasing the factory and falling back on Shared.");
+                    parameters.factories = null;
+                }
+
+                parameters.shared = true;
+                return parameters;
+            }
+
             internal Context CreateContext()
             {
-                return new Context() { factories = factories };
+                return new Context() { factories = factories, shared = shared ? Context.Shared.Allow : Context.Shared.Deny };
             }
         }
 
         // This is used for passing data to the Parse and Compose functions.
         internal struct Context
         {
-            public Dictionary<Type, Func<Type, object>> factories;
-
-            public bool Referenceable
+            internal enum Shared
             {
-                get => factories == null;
+                Deny,   // "this cannot be shared"
+                Flexible,   // "this is an implicit child of something that had been requested to be shared; let it be shared, but don't warn if it can't be"
+                Allow,  // "this thing has specifically been requested to be shared, spit out a warning if it can't be shared"
+            }
+
+            public Dictionary<Type, Func<Type, object>> factories;
+            public Shared shared;
+
+            public Context CreateChild()
+            {
+                Context rv = this;
+                if (rv.shared == Shared.Allow)
+                {
+                    // Downgrade this in case we have something like a List<int>; we don't want to spit out warnings about int not being sharable
+                    rv.shared = Shared.Flexible;
+                }
+                return rv;
             }
         }
 
@@ -178,10 +219,30 @@ namespace Dec
         /// Also, be aware that excessively deep hierarchies full of factory callbacks may result in performance issues when writing pretty-print XML; this is not likely to be a problem in normal code, however.
         /// For performance's sake, this function does not duplicate `factories` and may modify it for efficiency reasons.
         /// It can be reused, but should not be modified by the user once passed into a function once.
+        ///
+        /// This is incompatible with Shared().
         /// </remarks>
         public Parameters WithFactory(Dictionary<Type, Func<Type, object>> factories)
         {
             return new Parameters() { recorder = this, factories = factories };
+        }
+
+        /// <summary>
+        /// Allow sharing for class objects referenced during this call.
+        /// </summary>
+        /// <remarks>
+        /// Shared objects can be referenced from multiple classes. During serialization, these links will be stored; during deserialization, these links will be recreated.
+        /// This is handy if (for example) your entities need to refer to each other for AI or targeting reasons.
+        ///
+        /// However, when reading, shared Recorder fields *must* be initially set to `null`.
+        ///
+        /// Dec objects are essentially treated as value types, and will be referenced appropriately even without this.
+        ///
+        /// This is incompatible with WithFactory().
+        /// </remarks>
+        public Parameters Shared()
+        {
+            return new Parameters() { recorder = this, shared = true };
         }
 
         /// <summary>
@@ -206,7 +267,7 @@ namespace Dec
             {
                 var writerContext = new WriterXmlRecord();
 
-                Serialization.ComposeElement(writerContext.StartData(), target, typeof(T));
+                Serialization.ComposeElement(writerContext.StartData(typeof(T)), target, typeof(T));
 
                 return writerContext.Finish(pretty);
             }
@@ -356,7 +417,7 @@ namespace Dec
 
                 // And now, we can finally parse our actual root element!
                 // (which accounts for a tiny percentage of things that need to be parsed)
-                return (T)Serialization.ParseElement(data, typeof(T), null, readerContext, new Recorder.Context());
+                return (T)Serialization.ParseElement(data, typeof(T), null, readerContext, new Recorder.Context() { shared = Context.Shared.Flexible });
             }
         }
     }

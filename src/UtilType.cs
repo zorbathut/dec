@@ -510,5 +510,10 @@ namespace Dec
 
             return result;
         }
+
+        internal static bool CanBeShared(this Type type)
+        {
+            return !type.IsValueType && !typeof(Dec).IsAssignableFrom(type) && type != typeof(string) && type != typeof(Type);
+        }
     }
 }
