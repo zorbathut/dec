@@ -193,6 +193,11 @@ namespace Dec
 
                 return true;
             }
+            else if (depthRemaining <= -100)
+            {
+                Dbg.Err("Depth limiter ran into an unshareable node stack that's too deep. Recommend using more `.Shared()` calls to allow for stack splitting. Generated file may not be readable (ask on Discord if you need this) and is likely to be very inefficient.");
+                return false;
+            }
             else
             {
                 bool found = false;
