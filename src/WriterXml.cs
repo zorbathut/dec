@@ -489,7 +489,7 @@ namespace Dec
             {
                 // Reset depth because this will be run only when the pending writes are ready.
                 depth = 0;
-                writer.RegisterPendingWrite(() => value.Record(new RecorderWriter(this)));
+                writer.RegisterPendingWrite(() => WriteRecord(value));
             }
         }
 
@@ -507,7 +507,7 @@ namespace Dec
             {
                 // Reset depth because this will be run only when the pending writes are ready.
                 depth = 0;
-                writer.RegisterPendingWrite(() => converter.Record(value, value.GetType(), new RecorderWriter(this)));
+                writer.RegisterPendingWrite(() => WriteConvertible(converter, value));
             }
         }
 
