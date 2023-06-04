@@ -726,6 +726,19 @@ references:
   fullName.vb: Dec.Recorder.Parameters.RecordAsThis(Of T)(ByRef T)
   nameWithType: Recorder.Parameters.RecordAsThis<T>(ref T)
   nameWithType.vb: Recorder.Parameters.RecordAsThis(Of T)(ByRef T)
+- uid: Dec.Recorder.Parameters.Shared
+  name: Shared()
+  href: api/Dec.Recorder.Parameters.html#Dec_Recorder_Parameters_Shared
+  commentId: M:Dec.Recorder.Parameters.Shared
+  fullName: Dec.Recorder.Parameters.Shared()
+  nameWithType: Recorder.Parameters.Shared()
+- uid: Dec.Recorder.Parameters.Shared*
+  name: Shared
+  href: api/Dec.Recorder.Parameters.html#Dec_Recorder_Parameters_Shared_
+  commentId: Overload:Dec.Recorder.Parameters.Shared
+  isSpec: "True"
+  fullName: Dec.Recorder.Parameters.Shared
+  nameWithType: Recorder.Parameters.Shared
 - uid: Dec.Recorder.Parameters.WithFactory(Dictionary{Type,Func{Type,System.Object}})
   name: WithFactory(Dictionary<Type, Func<Type, Object>>)
   href: api/Dec.Recorder.Parameters.html#Dec_Recorder_Parameters_WithFactory_Dictionary_Type_Func_Type_System_Object___
@@ -790,6 +803,19 @@ references:
   fullName.vb: Dec.Recorder.RecordAsThis(Of T)(ByRef T)
   nameWithType: Recorder.RecordAsThis<T>(ref T)
   nameWithType.vb: Recorder.RecordAsThis(Of T)(ByRef T)
+- uid: Dec.Recorder.Shared
+  name: Shared()
+  href: api/Dec.Recorder.html#Dec_Recorder_Shared
+  commentId: M:Dec.Recorder.Shared
+  fullName: Dec.Recorder.Shared()
+  nameWithType: Recorder.Shared()
+- uid: Dec.Recorder.Shared*
+  name: Shared
+  href: api/Dec.Recorder.html#Dec_Recorder_Shared_
+  commentId: Overload:Dec.Recorder.Shared
+  isSpec: "True"
+  fullName: Dec.Recorder.Shared
+  nameWithType: Recorder.Shared
 - uid: Dec.Recorder.WithFactory(Dictionary{Type,Func{Type,System.Object}})
   name: WithFactory(Dictionary<Type, Func<Type, Object>>)
   href: api/Dec.Recorder.html#Dec_Recorder_WithFactory_Dictionary_Type_Func_Type_System_Object___

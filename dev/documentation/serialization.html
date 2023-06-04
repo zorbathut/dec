@@ -78,7 +78,7 @@ var deserializedObject = Recorder.Read&lt;ObjectType&gt;(serializedString);
 <p>Child objects will be serialized recursively. In addition, Recorder supports non-tree structures and circular references. Recorder doesn't require any explicit ownership semantics; multiply referenced objects will be handled automatically, without any extra effort required by the programmer.</p>
 <h2 id="custom-serialization">Custom serialization</h2>
 <p>Recorder does not support the automatic reflection-based parsing that Dec.Parser does. This is partly for security reasons and partly for practicality reasons; the author's experience is that fully automatic reflection-based game saves rarely work well.</p>
-<p>Recorder does support <a class="xref" href="../api/Dec.Converter.html"><code>Dec.Converter</code></a>, but this isn't the intended way to handle custom serialization. Most custom serialization should be taken care of by inheriting from <a class="xref" href="../api/Dec.IRecordable.html"><code>Dec.IRecordable</code></a>, then overriding <a class="xref" href="../api/Dec.IRecordable.html#Dec_IRecordable_Record_Dec_Recorder_"><code>Dec.IRecordable.Record</code></a>. This function provides you with a <a class="xref" href="../api/Dec.Recorder.html"><code>Dec.Recorder</code></a>, whose most important function is Dec.Recorder.Record. This function can be used to easily serialize any type that Recorder supports.</p>
+<p>Recorder does support <a class="xref" href="../api/Dec.Converter.html"><code>Dec.Converter</code></a>, but this isn't the intended way to handle serialization of classes that you authored. Most custom serialization should be taken care of by inheriting from <a class="xref" href="../api/Dec.IRecordable.html"><code>Dec.IRecordable</code></a>, then overriding <a class="xref" href="../api/Dec.IRecordable.html#Dec_IRecordable_Record_Dec_Recorder_"><code>Dec.IRecordable.Record</code></a>. This function provides you with a <a class="xref" href="../api/Dec.Recorder.html"><code>Dec.Recorder</code></a>, whose most important function is Dec.Recorder.Record. This function can be used to easily serialize any type that Recorder supports.</p>
 <pre><code class="lang-cs">public class RecordableExample : Dec.IRecorder
 {
     int intMember;
@@ -95,6 +95,19 @@ var deserializedObject = Recorder.Read&lt;ObjectType&gt;(serializedString);
     }
 }
 </code></pre>
+<h2 id="shared-instances">Shared Instances</h2>
+<p>Recorder will, by default, re-use any existing data in a field. Unfortunately, this precludes class instances with multiple references to them, i.e. data structures that are not a pure tree. If you want instances with more than one reference, it is necessary to specify <code>.Shared()</code> for thse specific instances.</p>
+<pre><code class="lang-cs">public class SharedRecordableExample : Dec.IRecorder
+{
+    SomeSharedClass sharedClassMember;
+    
+    public void Record(Recorder recorder)
+    {
+        recorder.Shared().Record(ref sharedClassMember, &quot;sharedClassMember&quot;);
+    }
+}
+</code></pre>
+<p>When using this feature, classes <em>cannot</em> be pre-initialized; they must start as <code>null</code>.</p>
 <h2 id="dec-compatibility">Dec Compatibility</h2>
 <p>While the savegame format is not guaranteed and may change without notice, we plan to support full backwards compatibility for all time. The save format includes a version number that Recorder will read and adjust for whenever necessary.</p>
 <h2 id="game-compatibility">Game Compatibility</h2>
