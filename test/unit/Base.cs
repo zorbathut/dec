@@ -116,7 +116,7 @@ namespace DecTest
             }
         }
 
-        protected void ExpectWarnings(Action action)
+        protected void ExpectWarnings(Action action, string context = "unlabeled context")
         {
             Assert.IsFalse(handlingWarnings);
             handlingWarnings = true;
@@ -125,7 +125,7 @@ namespace DecTest
             action();
 
             Assert.IsTrue(handlingWarnings);
-            Assert.IsTrue(handledWarning, "Expected warning but did not generate one");
+            Assert.IsTrue(handledWarning, $"Expected warning in {context} but did not generate one");
             handlingWarnings = false;
             handledWarning = false;
         }
@@ -305,7 +305,7 @@ namespace DecTest
             Validation,
         }
 
-        public T DoRecorderRoundTrip<T>(T input, RecorderMode mode, Action<string> testSerializedResult = null, bool expectWriteErrors = false, bool expectReadErrors = false)
+        public T DoRecorderRoundTrip<T>(T input, RecorderMode mode, Action<string> testSerializedResult = null, bool expectWriteErrors = false, bool expectWriteWarnings = false, bool expectReadErrors = false, bool expectReadWarnings = false)
         {
             if (mode == RecorderMode.Validation)
             {
@@ -335,9 +335,14 @@ namespace DecTest
             {
                 serialized = Dec.Recorder.Write(input, pretty: mode == RecorderMode.Pretty);
             }
+            Assert.IsFalse(expectWriteErrors && expectWriteWarnings); // nyi
             if (expectWriteErrors)
             {
                 ExpectErrors(DoSerialize, "DoRecorder.Write");
+            }
+            else if (expectWriteWarnings)
+            {
+                ExpectWarnings(DoSerialize, "DoRecorder.Write");
             }
             else
             {
@@ -355,9 +360,14 @@ namespace DecTest
             {
                 deserialized = Dec.Recorder.Read<T>(serialized);
             }
+            Assert.IsFalse(expectReadErrors && expectReadWarnings); // nyi
             if (expectReadErrors)
             {
                 ExpectErrors(DoDeserialize, "DoRecorder.Read");
+            }
+            else if (expectReadWarnings)
+            {
+                ExpectWarnings(DoDeserialize, "DoRecorder.Read");
             }
             else
             {
