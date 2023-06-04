@@ -14,7 +14,7 @@ namespace DecTest
         }
 
         [Test]
-        public void Basic([Values] BehaviorMode mode)
+        public void Basic([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ArrayDec) } };
 
@@ -40,7 +40,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             var result = Dec.Database<ArrayDec>.Get("TestDec");
             Assert.IsNotNull(result);
@@ -50,7 +50,7 @@ namespace DecTest
         }
 
         [Test]
-        public void AsStringError([Values] BehaviorMode mode)
+        public void AsStringError([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } };
 
@@ -64,7 +64,7 @@ namespace DecTest
                 </Decs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             var result = Dec.Database<ArrayDec>.Get("TestDec");
             Assert.IsNotNull(result);
@@ -75,7 +75,7 @@ namespace DecTest
         }
 
         [Test]
-        public void Zero([Values] BehaviorMode mode)
+        public void Zero([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } };
 
@@ -89,7 +89,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             var result = Dec.Database<ArrayDec>.Get("TestDec");
             Assert.IsNotNull(result);
@@ -99,7 +99,7 @@ namespace DecTest
         }
 
         [Test]
-        public void Null([Values] BehaviorMode mode)
+        public void Null([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } };
 
@@ -113,7 +113,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             var result = Dec.Database<ArrayDec>.Get("TestDec");
             Assert.IsNotNull(result);
@@ -123,7 +123,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ElementMisparse([Values] BehaviorMode mode)
+        public void ElementMisparse([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } };
 
@@ -149,7 +149,7 @@ namespace DecTest
                 </Decs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             var result = Dec.Database<ArrayDec>.Get("TestDec");
             Assert.IsNotNull(result);

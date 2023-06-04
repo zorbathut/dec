@@ -43,7 +43,7 @@ namespace DecTest
         }
 
         [Test]
-        public void DecMode([Values] BehaviorMode mode, [Values] ParseModesToTest parseMode)
+        public void DecMode([Values] ParserMode mode, [Values] ParseModesToTest parseMode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DecDec) } };
 
@@ -64,7 +64,7 @@ namespace DecTest
                 ExpectErrors(() => parser.Finish());
             }
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(6, Dec.Database<DecDec>.Get("TestDec").value);
         }
@@ -90,7 +90,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ConverterEmpty([Values] BehaviorMode mode, [Values] ParseModesToTest parseMode)
+        public void ConverterEmpty([Values] ParserMode mode, [Values] ParseModesToTest parseMode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ConverterDec) } };
 
@@ -111,7 +111,7 @@ namespace DecTest
                 ExpectErrors(() => parser.Finish());
             }
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(60, Dec.Database<ConverterDec>.Get("TestDec").empty.value);
             Assert.AreEqual(15, Dec.Database<ConverterDec>.Get("TestDec").empty.sideValue);
@@ -121,7 +121,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ConverterFilled([Values] BehaviorMode mode, [Values] ParseModesToTest parseMode)
+        public void ConverterFilled([Values] ParserMode mode, [Values] ParseModesToTest parseMode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ConverterDec) } };
 
@@ -142,7 +142,7 @@ namespace DecTest
                 ExpectErrors(() => parser.Finish());
             }
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.IsNull(Dec.Database<ConverterDec>.Get("TestDec").empty);
 
@@ -169,7 +169,7 @@ namespace DecTest
         }
 
         [Test]
-        public void RecorderEmpty([Values] BehaviorMode mode, [Values] ParseModesToTest parseMode)
+        public void RecorderEmpty([Values] ParserMode mode, [Values] ParseModesToTest parseMode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(RecorderDec) } };
 
@@ -190,7 +190,7 @@ namespace DecTest
                 ExpectErrors(() => parser.Finish());
             }
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(60, Dec.Database<RecorderDec>.Get("TestDec").empty.value);
             Assert.AreEqual(15, Dec.Database<RecorderDec>.Get("TestDec").empty.sideValue);
@@ -200,7 +200,7 @@ namespace DecTest
         }
 
         [Test]
-        public void RecorderFilled([Values] BehaviorMode mode, [Values] ParseModesToTest parseMode)
+        public void RecorderFilled([Values] ParserMode mode, [Values] ParseModesToTest parseMode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(RecorderDec) } };
 
@@ -221,7 +221,7 @@ namespace DecTest
                 ExpectErrors(() => parser.Finish());
             }
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.IsNull(Dec.Database<RecorderDec>.Get("TestDec").empty);
 
@@ -235,7 +235,7 @@ namespace DecTest
         }
 
         [Test]
-        public void Primitive([Values] BehaviorMode mode, [Values] ParseModesToTest parseMode)
+        public void Primitive([Values] ParserMode mode, [Values] ParseModesToTest parseMode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(PrimitiveDec) } };
 
@@ -256,7 +256,7 @@ namespace DecTest
                 ExpectErrors(() => parser.Finish());
             }
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(60, Dec.Database<PrimitiveDec>.Get("TestDec").value);
         }
@@ -268,7 +268,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ListEmpty([Values] BehaviorMode mode, [Values] ParseModesToTest parseMode)
+        public void ListEmpty([Values] ParserMode mode, [Values] ParseModesToTest parseMode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ListDec) } };
 
@@ -293,14 +293,14 @@ namespace DecTest
                 ExpectErrors(() => parser.Finish());
             }
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(new List<int> { 5, 6, 7 }, Dec.Database<ListDec>.Get("TestDec").empty);
             Assert.AreEqual(new List<int> { 1, 2, 3, 4 }, Dec.Database<ListDec>.Get("TestDec").filled);
         }
 
         [Test]
-        public void ListFilled([Values] BehaviorMode mode, [Values] ParseModesToTest parseMode)
+        public void ListFilled([Values] ParserMode mode, [Values] ParseModesToTest parseMode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ListDec) } };
 
@@ -325,7 +325,7 @@ namespace DecTest
                 ExpectErrors(() => parser.Finish());
             }
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.IsNull(Dec.Database<ListDec>.Get("TestDec").empty);
             if (parseMode == ParseModesToTest.Append)
@@ -345,7 +345,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ArrayEmpty([Values] BehaviorMode mode, [Values] ParseModesToTest parseMode)
+        public void ArrayEmpty([Values] ParserMode mode, [Values] ParseModesToTest parseMode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } };
 
@@ -370,14 +370,14 @@ namespace DecTest
                 ExpectErrors(() => parser.Finish());
             }
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(new int[] { 5, 6, 7 }, Dec.Database<ArrayDec>.Get("TestDec").empty);
             Assert.AreEqual(new int[] { 1, 2, 3, 4 }, Dec.Database<ArrayDec>.Get("TestDec").filled);
         }
 
         [Test]
-        public void ArrayFilled([Values] BehaviorMode mode, [Values] ParseModesToTest parseMode)
+        public void ArrayFilled([Values] ParserMode mode, [Values] ParseModesToTest parseMode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } };
 
@@ -402,7 +402,7 @@ namespace DecTest
                 ExpectErrors(() => parser.Finish());
             }
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.IsNull(Dec.Database<ArrayDec>.Get("TestDec").empty);
             if (parseMode == ParseModesToTest.Append)
@@ -422,7 +422,7 @@ namespace DecTest
         }
 
         [Test]
-        public void DictionaryEmpty([Values] BehaviorMode mode, [Values] ParseModesToTest parseMode)
+        public void DictionaryEmpty([Values] ParserMode mode, [Values] ParseModesToTest parseMode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryDec) } };
 
@@ -446,14 +446,14 @@ namespace DecTest
                 ExpectErrors(() => parser.Finish());
             }
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(new Dictionary<string, int> { { "four", 4 }, { "five", 5 } }, Dec.Database<DictionaryDec>.Get("TestDec").empty);
             Assert.AreEqual(new Dictionary<string, int> { { "one", 1 }, { "two", 2 }, { "three", 3 } }, Dec.Database<DictionaryDec>.Get("TestDec").filled);
         }
 
         [Test]
-        public void DictionaryFilled([Values] BehaviorMode mode, [Values] ParseModesToTest parseMode)
+        public void DictionaryFilled([Values] ParserMode mode, [Values] ParseModesToTest parseMode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryDec) } };
 
@@ -477,7 +477,7 @@ namespace DecTest
                 ExpectErrors(() => parser.Finish());
             }
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.IsNull(Dec.Database<DictionaryDec>.Get("TestDec").empty);
             if (parseMode == ParseModesToTest.Patch || parseMode == ParseModesToTest.Append)
@@ -491,7 +491,7 @@ namespace DecTest
         }
 
         [Test]
-        public void DictionaryReplace([Values] BehaviorMode mode, [Values] ParseModesToTest parseMode)
+        public void DictionaryReplace([Values] ParserMode mode, [Values] ParseModesToTest parseMode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryDec) } };
 
@@ -516,7 +516,7 @@ namespace DecTest
                 ExpectErrors(() => parser.Finish());
             }
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.IsNull(Dec.Database<DictionaryDec>.Get("TestDec").empty);
             if (parseMode == ParseModesToTest.Patch || parseMode == ParseModesToTest.Append)
@@ -530,7 +530,7 @@ namespace DecTest
         }
 
         [Test]
-        public void DictionaryDoubleReplace([Values] BehaviorMode mode, [Values] ParseModesToTest parseMode)
+        public void DictionaryDoubleReplace([Values] ParserMode mode, [Values] ParseModesToTest parseMode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryDec) } };
 
@@ -549,7 +549,7 @@ namespace DecTest
 
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.IsNull(Dec.Database<DictionaryDec>.Get("TestDec").empty);
             if (parseMode == ParseModesToTest.Patch || parseMode == ParseModesToTest.Append)
@@ -569,7 +569,7 @@ namespace DecTest
         }
 
         [Test]
-        public void HashSetEmpty([Values] BehaviorMode mode, [Values] ParseModesToTest parseMode)
+        public void HashSetEmpty([Values] ParserMode mode, [Values] ParseModesToTest parseMode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetDec) } };
 
@@ -594,14 +594,14 @@ namespace DecTest
                 ExpectErrors(() => parser.Finish());
             }
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(new HashSet<int> { 5, 6, 7 }, Dec.Database<HashSetDec>.Get("TestDec").empty);
             Assert.AreEqual(new HashSet<int> { 1, 2, 3, 4 }, Dec.Database<HashSetDec>.Get("TestDec").filled);
         }
 
         [Test]
-        public void HashSetFilled([Values] BehaviorMode mode, [Values] ParseModesToTest parseMode)
+        public void HashSetFilled([Values] ParserMode mode, [Values] ParseModesToTest parseMode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetDec) } };
 
@@ -626,7 +626,7 @@ namespace DecTest
                 ExpectErrors(() => parser.Finish());
             }
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.IsNull(Dec.Database<HashSetDec>.Get("TestDec").empty);
             if (parseMode == ParseModesToTest.Append || parseMode == ParseModesToTest.Patch)
@@ -640,7 +640,7 @@ namespace DecTest
         }
 
         [Test]
-        public void HashSetReplace([Values] BehaviorMode mode, [Values] ParseModesToTest parseMode)
+        public void HashSetReplace([Values] ParserMode mode, [Values] ParseModesToTest parseMode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetDec) } };
 
@@ -666,7 +666,7 @@ namespace DecTest
                 ExpectErrors(() => parser.Finish());
             }
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.IsNull(Dec.Database<HashSetDec>.Get("TestDec").empty);
             if (parseMode == ParseModesToTest.Append || parseMode == ParseModesToTest.Patch)
@@ -680,7 +680,7 @@ namespace DecTest
         }
 
         [Test]
-        public void HashSetDoubleReplace([Values] BehaviorMode mode, [Values] ParseModesToTest parseMode)
+        public void HashSetDoubleReplace([Values] ParserMode mode, [Values] ParseModesToTest parseMode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetDec) } };
 
@@ -700,7 +700,7 @@ namespace DecTest
 
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.IsNull(Dec.Database<HashSetDec>.Get("TestDec").empty);
             if (parseMode == ParseModesToTest.Append || parseMode == ParseModesToTest.Patch)
@@ -719,7 +719,7 @@ namespace DecTest
         }
 
         [Test]
-        public void Tuple([Values] BehaviorMode mode, [Values] ParseModesToTest parseMode)
+        public void Tuple([Values] ParserMode mode, [Values] ParseModesToTest parseMode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(TupleDec) } };
 
@@ -743,7 +743,7 @@ namespace DecTest
                 ExpectErrors(() => parser.Finish());
             }
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual((11, 12), Dec.Database<TupleDec>.Get("TestDec").value);
         }
@@ -761,7 +761,7 @@ namespace DecTest
         }
 
         [Test]
-        public void CompositeEmpty([Values] BehaviorMode mode, [Values] ParseModesToTest parseMode)
+        public void CompositeEmpty([Values] ParserMode mode, [Values] ParseModesToTest parseMode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(CompositeDec) } };
 
@@ -782,7 +782,7 @@ namespace DecTest
                 ExpectErrors(() => parser.Finish());
             }
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(60, Dec.Database<CompositeDec>.Get("TestDec").empty.value);
             Assert.AreEqual(15, Dec.Database<CompositeDec>.Get("TestDec").empty.sideValue);
@@ -792,7 +792,7 @@ namespace DecTest
         }
 
         [Test]
-        public void CompositeFilled([Values] BehaviorMode mode, [Values] ParseModesToTest parseMode)
+        public void CompositeFilled([Values] ParserMode mode, [Values] ParseModesToTest parseMode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(CompositeDec) } };
 
@@ -813,7 +813,7 @@ namespace DecTest
                 ExpectErrors(() => parser.Finish());
             }
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.IsNull(Dec.Database<CompositeDec>.Get("TestDec").empty);
 
@@ -831,7 +831,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ComponentAppend([Values] BehaviorMode mode)
+        public void ComponentAppend([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(EntityDec), typeof(ComponentConcrete) } };
 

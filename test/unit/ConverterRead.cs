@@ -38,7 +38,7 @@ namespace DecTest
         }
 
         [Test]
-        public void BasicFunctionality([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
+        public void BasicFunctionality([ValuesExcept(ParserMode.Validation)] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterDec) }, explicitConverters = new Type[]{ typeof(ConverterBasicTest) } };
 
@@ -51,7 +51,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(4, Dec.Database<ConverterDec>.Get("TestDecA").payload.number);
         }
@@ -129,7 +129,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ConverterDict([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
+        public void ConverterDict([ValuesExcept(ParserMode.Validation)] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterDictDec) }, explicitConverters = new Type[]{ typeof(ConverterDictTest) } };
 
@@ -146,7 +146,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             var testDec = Dec.Database<ConverterDictDec>.Get("TestDec");
 
@@ -161,7 +161,7 @@ namespace DecTest
         }
 
         [Test]
-        public void EmptyInputConverter([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
+        public void EmptyInputConverter([ValuesExcept(ParserMode.Validation)] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterStringDec) }, explicitConverters = new Type[]{ typeof(ConverterDictTest) } };
 
@@ -174,7 +174,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             var testDec = Dec.Database<ConverterStringDec>.Get("TestDec");
 
@@ -190,7 +190,7 @@ namespace DecTest
         }
 
         [Test]
-        public void DefaultFailureTestString([Values] BehaviorMode mode)
+        public void DefaultFailureTestString([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterStringDec) }, explicitConverters = new Type[]{ typeof(DefaultFailureConverter) } };
 
@@ -203,14 +203,14 @@ namespace DecTest
                 </Decs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             var testDec = Dec.Database<ConverterStringDec>.Get("TestDec");
             Assert.IsNull(testDec.payload);
         }
 
         [Test]
-        public void DefaultFailureTestXml([Values] BehaviorMode mode)
+        public void DefaultFailureTestXml([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterStringDec) }, explicitConverters = new Type[]{ typeof(DefaultFailureConverter) } };
 
@@ -223,7 +223,7 @@ namespace DecTest
                 </Decs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             var testDec = Dec.Database<ConverterStringDec>.Get("TestDec");
             Assert.IsNull(testDec.payload);
@@ -312,7 +312,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ConverterStruct([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
+        public void ConverterStruct([ValuesExcept(ParserMode.Validation)] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ConverterStructDec) }, explicitConverters = new Type[] { typeof(ConverterStructConverter) } };
 
@@ -335,7 +335,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             var testDec = Dec.Database<ConverterStructDec>.Get("TestDec");
 
@@ -381,7 +381,7 @@ namespace DecTest
         }
 
         [Test]
-        public void Fallback([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
+        public void Fallback([ValuesExcept(ParserMode.Validation)] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(FallbackDec) }, explicitConverters = new Type[] { typeof(FallbackConverter) } };
 
@@ -397,7 +397,7 @@ namespace DecTest
                 </Decs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(4, Dec.Database<FallbackDec>.Get("TestDec").payload.number);
         }
@@ -439,7 +439,7 @@ namespace DecTest
         }
 
         [Test]
-        public void Exception([Values] BehaviorMode mode)
+        public void Exception([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExceptionDec) }, explicitConverters = new Type[] { typeof(ExceptionConverter) } };
 
@@ -459,7 +459,7 @@ namespace DecTest
                 </Decs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(1, Dec.Database<ExceptionDec>.Get("TestDecA").before);
             Assert.AreEqual(2, Dec.Database<ExceptionDec>.Get("TestDecA").after);
@@ -488,7 +488,7 @@ namespace DecTest
                 </Decs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(BehaviorMode.Bare);
+            DoParserTests(ParserMode.Bare);
 
             Assert.IsNull(Dec.Database<ExceptionRecoveryDec>.Get("TestDec").payloadNull);
         }
@@ -507,7 +507,7 @@ namespace DecTest
                 </Decs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(BehaviorMode.Bare);
+            DoParserTests(ParserMode.Bare);
 
             // won't overwrite it
             Assert.AreEqual(42, Dec.Database<ExceptionRecoveryDec>.Get("TestDec").payloadNonNull.value);
@@ -527,7 +527,7 @@ namespace DecTest
                 </Decs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(BehaviorMode.Bare);
+            DoParserTests(ParserMode.Bare);
 
             // won't overwrite it
             Assert.AreEqual(1, Dec.Database<ExceptionRecoveryDec>.Get("TestDec").payloadStruct.Count);
@@ -576,7 +576,7 @@ namespace DecTest
                 </Decs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(BehaviorMode.Bare);
+            DoParserTests(ParserMode.Bare);
 
             Assert.IsNull(Dec.Database<IncorrectConverterDec>.Get("TestDec").payloadNull);
         }
@@ -595,7 +595,7 @@ namespace DecTest
                 </Decs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(BehaviorMode.Bare);
+            DoParserTests(ParserMode.Bare);
 
             Assert.IsNotNull(Dec.Database<IncorrectConverterDec>.Get("TestDec").payloadNonNull);
             Assert.AreEqual(1, Dec.Database<IncorrectConverterDec>.Get("TestDec").payloadNonNull.value);

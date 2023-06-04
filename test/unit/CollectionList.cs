@@ -13,7 +13,7 @@ namespace DecTest
         }
 
         [Test]
-        public void Basic([Values] BehaviorMode mode)
+        public void Basic([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ListDec) } };
 
@@ -32,7 +32,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             var result = Dec.Database<ListDec>.Get("TestDec");
             Assert.IsNotNull(result);
@@ -48,7 +48,7 @@ namespace DecTest
         }
 
         [Test]
-        public void Override([Values] BehaviorMode mode)
+        public void Override([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ListOverrideDec) } };
 
@@ -64,7 +64,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             var result = Dec.Database<ListOverrideDec>.Get("TestDec");
             Assert.IsNotNull(result);

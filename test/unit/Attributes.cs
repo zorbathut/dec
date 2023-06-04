@@ -88,7 +88,7 @@ namespace DecTest
         }
 
         [Test]
-        public void Parser([Values] BehaviorMode mode, [Values] bool classTag, [Values] bool nullTag, [Values] bool refTag, [Values] bool modeTag)
+        public void Parser([Values] ParserMode mode, [Values] bool classTag, [Values] bool nullTag, [Values] bool refTag, [Values] bool modeTag)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StringMemberDec), typeof(DerivedString) } };
 
@@ -110,7 +110,7 @@ namespace DecTest
                 ExpectErrors(() => parser.Finish());
             }
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             if (nullTag)
             {

@@ -7,7 +7,7 @@ namespace DecTest
     public class Xml : Base
     {
         [Test]
-        public void DTDParse([Values] BehaviorMode mode)
+        public void DTDParse([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
 
@@ -19,13 +19,13 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDec"));
         }
 
         [Test]
-        public void IncorrectRoot([Values] BehaviorMode mode)
+        public void IncorrectRoot([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
 
@@ -36,13 +36,13 @@ namespace DecTest
                 </NotDecs>"));
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDec"));
         }
 
         [Test]
-        public void MultipleRoot([Values] BehaviorMode mode)
+        public void MultipleRoot([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
 
@@ -56,13 +56,13 @@ namespace DecTest
                 </Decs>"));
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             // Currently not providing any guarantees on whether these get parsed; I'd actually like for them to get parsed, but doing so is tricky
         }
 
         [Test]
-        public void MultiXml([Values] BehaviorMode mode)
+        public void MultiXml([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
 
@@ -77,14 +77,14 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDecA"));
             Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDecB"));
         }
 
         [Test]
-        public void ProvidedFilenameForXml([Values] BehaviorMode mode)
+        public void ProvidedFilenameForXml([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) } };
 
@@ -92,11 +92,11 @@ namespace DecTest
             ExpectErrors(() => parser.AddString(@"test.xml"));
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
         }
 
         [Test]
-        public void ProperStringName([Values] BehaviorMode mode)
+        public void ProperStringName([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
 
@@ -107,11 +107,11 @@ namespace DecTest
                 </Decs>", "TestStringName"), errorValidator: str => str.StartsWith("TestStringName"));
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
         }
 
         [Test]
-        public void Garbage([Values] BehaviorMode mode)
+        public void Garbage([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
 
@@ -119,11 +119,11 @@ namespace DecTest
             ExpectErrors(() => parser.AddString(@"�SimpleDec decName=""Hello""><value>3</value></SimpleDec>"));
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
         }
 
         [Test]
-        public void Empty([Values] BehaviorMode mode)
+        public void Empty([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
 
@@ -131,7 +131,7 @@ namespace DecTest
             ExpectErrors(() => parser.AddString(@""));
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
         }
     }
 }

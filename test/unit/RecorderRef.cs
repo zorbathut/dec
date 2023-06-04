@@ -533,7 +533,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ParserRef([Values] BehaviorMode mode)
+        public void ParserRef([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ParserRefDec) } };
 
@@ -547,7 +547,7 @@ namespace DecTest
                 </Decs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             var test = Dec.Database<ParserRefDec>.Get("Test");
             Assert.IsNotNull(test);

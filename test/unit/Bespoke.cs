@@ -23,7 +23,7 @@ namespace DecTest
         }
 
         [Test]
-        public void IgnoreRecordDuringParserParser([Values] BehaviorMode mode)
+        public void IgnoreRecordDuringParserParser([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IgnoreRecordDuringParserDec), typeof(IgnoreRecordDuringParserObj) } };
 
@@ -38,7 +38,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode, xmlValidator: xml => {
+            DoParserTests(mode, xmlValidator: xml => {
                 Assert.IsFalse(xml.Contains("recorderMode"));
                 Assert.IsTrue(xml.Contains("parserMode"));
 

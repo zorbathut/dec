@@ -81,7 +81,7 @@ namespace DecTest
         }
 
         [Test]
-        public void NonSerializablePositive([Values] BehaviorMode mode)
+        public void NonSerializablePositive([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
 
@@ -94,14 +94,14 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(55, Dec.Database<IntDec>.Get("TestDec").value);
             Assert.AreEqual(70, Dec.Database<IntDec>.Get("TestDec").nonSerializedValue);
         }
 
         [Test]
-        public void NonSerializableNegative([Values] BehaviorMode mode)
+        public void NonSerializableNegative([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
 
@@ -115,7 +115,7 @@ namespace DecTest
                 </Decs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(60, Dec.Database<IntDec>.Get("TestDec").value);
             Assert.AreEqual(70, Dec.Database<IntDec>.Get("TestDec").nonSerializedValue);
@@ -138,7 +138,7 @@ namespace DecTest
         }
 
         [Test]
-        public void AbstractRoot([Values] BehaviorMode mode)
+        public void AbstractRoot([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ConcreteChildADec), typeof(ConcreteChildBDec) } };
 
@@ -156,7 +156,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(20, Dec.Database<ConcreteChildADec>.Get("TestDec").absInt);
             Assert.AreEqual(30, Dec.Database<ConcreteChildADec>.Get("TestDec").ccaInt);
@@ -165,7 +165,7 @@ namespace DecTest
         }
 
         [Test]
-        public void LoadFile([Values] BehaviorMode mode)
+        public void LoadFile([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
 
@@ -173,13 +173,13 @@ namespace DecTest
             parser.AddFile("data/Parser.LoadFile.xml");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(55, Dec.Database<IntDec>.Get("TestDec").value);
         }
 
         [Test]
-        public void LoadFileError([Values] BehaviorMode mode)
+        public void LoadFileError([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
 
@@ -187,13 +187,13 @@ namespace DecTest
             parser.AddFile("data/Parser.LoadFileError.xml");
             ExpectErrors(() => parser.Finish(), errorValidator: str => str.Contains("Parser.LoadFileError"));
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.IsNotNull(Dec.Database<IntDec>.Get("TestDec"));
         }
 
         [Test]
-        public void LoadDirectory([Values] BehaviorMode mode)
+        public void LoadDirectory([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
 
@@ -201,14 +201,14 @@ namespace DecTest
             parser.AddDirectory("data/Parser.LoadDirectory");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(40, Dec.Database<IntDec>.Get("TestDec1").value);
             Assert.AreEqual(80, Dec.Database<IntDec>.Get("TestDec2").value);
         }
 
         [Test]
-        public void LoadDirectoryRecursive([Values] BehaviorMode mode)
+        public void LoadDirectoryRecursive([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
 
@@ -216,14 +216,14 @@ namespace DecTest
             parser.AddDirectory("data/Parser.LoadDirectoryRecursive");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(40, Dec.Database<IntDec>.Get("TestDec1").value);
             Assert.AreEqual(80, Dec.Database<IntDec>.Get("TestDec2").value);
         }
 
         [Test]
-        public void LoadDirectoryDotIgnore([Values] BehaviorMode mode)
+        public void LoadDirectoryDotIgnore([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
 
@@ -231,14 +231,14 @@ namespace DecTest
             parser.AddDirectory("data/Parser.LoadDirectoryDotIgnore");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(40, Dec.Database<IntDec>.Get("TestDec1").value);
             Assert.AreEqual(80, Dec.Database<IntDec>.Get("TestDec2").value);
         }
 
         [Test]
-        public void LoadDirectoryDotIgnore1Dot([Values] BehaviorMode mode)
+        public void LoadDirectoryDotIgnore1Dot([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
 
@@ -246,14 +246,14 @@ namespace DecTest
             parser.AddDirectory("data/Parser.LoadDirectoryDotIgnore/.");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(40, Dec.Database<IntDec>.Get("TestDec1").value);
             Assert.AreEqual(80, Dec.Database<IntDec>.Get("TestDec2").value);
         }
 
         [Test]
-        public void LoadDirectoryDotIgnore2Dot([Values] BehaviorMode mode)
+        public void LoadDirectoryDotIgnore2Dot([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
 
@@ -261,7 +261,7 @@ namespace DecTest
             parser.AddDirectory("data/Parser.LoadDirectoryDotIgnore/../Parser.LoadDirectoryDotIgnore");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(40, Dec.Database<IntDec>.Get("TestDec1").value);
             Assert.AreEqual(80, Dec.Database<IntDec>.Get("TestDec2").value);

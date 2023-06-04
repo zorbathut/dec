@@ -13,7 +13,7 @@ namespace DecTest
         }
 
         [Test]
-        public void Private([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
+        public void Private([ValuesExcept(ParserMode.Validation)] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(PrivateDec) } };
 
@@ -26,7 +26,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             var result = Dec.Database<PrivateDec>.Get("TestDec");
             Assert.IsNotNull(result);
@@ -40,7 +40,7 @@ namespace DecTest
         }
 
         [Test]
-        public void Internal([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
+        public void Internal([ValuesExcept(ParserMode.Validation)] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(InternalDec) } };
 
@@ -53,7 +53,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             var result = Dec.Database<InternalDec>.Get("TestDec");
             Assert.IsNotNull(result);
@@ -74,7 +74,7 @@ namespace DecTest
         }
 
         [Test]
-        public void PrivateMember([Values] BehaviorMode mode)
+        public void PrivateMember([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(PrivateMemberDec) } };
 
@@ -87,7 +87,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             var result = Dec.Database<PrivateMemberDec>.Get("TestDec");
             Assert.IsNotNull(result);
@@ -108,7 +108,7 @@ namespace DecTest
         }
 
         [Test]
-        public void InternalMember([Values] BehaviorMode mode)
+        public void InternalMember([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(InternalMemberDec) } };
 
@@ -121,7 +121,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             var result = Dec.Database<InternalMemberDec>.Get("TestDec");
             Assert.IsNotNull(result);
@@ -140,7 +140,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ProtectedMember([Values] BehaviorMode mode)
+        public void ProtectedMember([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ProtectedMemberDec) } };
 
@@ -153,7 +153,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             var result = Dec.Database<ProtectedMemberDec>.Get("TestDec");
             Assert.IsNotNull(result);
@@ -179,7 +179,7 @@ namespace DecTest
         }
 
         [Test]
-        public void PrivateMemberParent([Values] BehaviorMode mode)
+        public void PrivateMemberParent([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(PrivateMemberChildDec) } };
 
@@ -192,7 +192,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             var result = Dec.Database<PrivateMemberParentDec>.Get("TestDec");
             Assert.IsNotNull(result);

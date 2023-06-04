@@ -186,7 +186,7 @@ namespace DecTest
 
         // Everything after here is designed for the Behavior tests, where we run tests in a variety of ways to test serialization.
 
-        public enum BehaviorMode
+        public enum ParserMode
         {
              // Don't do anything special; just let it pass through.
             Bare,
@@ -201,7 +201,7 @@ namespace DecTest
             Validation,
         }
 
-        public void DoBehavior(BehaviorMode mode,
+        public void DoParserTests(ParserMode mode,
             bool rewrite_expectWriteErrors = false,
             bool rewrite_expectParseErrors = false,
             bool validation_expectWriteErrors = false,
@@ -209,17 +209,17 @@ namespace DecTest
             Func<string, bool> errorValidator = null,
             Func<string, bool> xmlValidator = null)
         {
-            if (mode == BehaviorMode.Bare)
+            if (mode == ParserMode.Bare)
             {
                 // we actually have nothing to do here, we're good
             }
-            else if (mode == BehaviorMode.RewrittenBare || mode == BehaviorMode.RewrittenPretty)
+            else if (mode == ParserMode.RewrittenBare || mode == ParserMode.RewrittenPretty)
             {
                 string data = null;
                 void RunComposer()
                 {
                     var composer = new Dec.Composer();
-                    data = composer.ComposeXml(mode == BehaviorMode.RewrittenPretty);
+                    data = composer.ComposeXml(mode == ParserMode.RewrittenPretty);
                 }
 
                 if (rewrite_expectWriteErrors)
@@ -254,7 +254,7 @@ namespace DecTest
                     RunParser();
                 }
             }
-            else if (mode == BehaviorMode.Validation)
+            else if (mode == ParserMode.Validation)
             {
                 string code = null;
                 void RunComposer()

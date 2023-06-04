@@ -9,7 +9,7 @@ namespace DecTest
     public class Database : Base
     {
         [Test]
-        public void DatabaseList([Values] BehaviorMode mode)
+        public void DatabaseList([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) } };
 
@@ -22,7 +22,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDecA"));
             Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDecB"));
@@ -51,7 +51,7 @@ namespace DecTest
         }
 
         [Test]
-        public void DatabaseHierarchy([Values] BehaviorMode mode)
+        public void DatabaseHierarchy([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(RootDec), typeof(ParentDec), typeof(ChildDec) } };
 
@@ -64,7 +64,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             var root = Dec.Database<RootDec>.Get("RootDec");
             var parent = Dec.Database<ParentDec>.Get("ParentDec");

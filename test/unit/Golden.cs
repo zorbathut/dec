@@ -11,7 +11,7 @@ namespace DecTest
         private static Dictionary<string, Assembly> AssemblyLookup = new Dictionary<string, Assembly>();
 
         [Test, TestCaseSource(nameof(GenerateValidationParser))]
-        public void Validation(string id, [Values] BehaviorMode mode)
+        public void Validation(string id, [Values] ParserMode mode)
         {
             string directory = Path.Combine("data", "golden", "parser", id);
 
@@ -30,7 +30,7 @@ namespace DecTest
             parser.AddString(DecUtilLib.Compress.ReadFromFile(Path.Combine(directory, "data.xml")));
             parser.Finish();
 
-            DoBehavior(mode, validation_assemblies: new Assembly[] { assembly });
+            DoParserTests(mode, validation_assemblies: new Assembly[] { assembly });
 
             type.GetMethod("Validate").Invoke(null, null);
         }
@@ -49,10 +49,10 @@ namespace DecTest
             foreach (var path in Directory.GetDirectories(targetDir))
             {
                 var id = Path.GetFileName(path);
-                yield return new object[] { id, BehaviorMode.Bare };
-                yield return new object[] { id, BehaviorMode.RewrittenBare };
-                yield return new object[] { id, BehaviorMode.RewrittenPretty };
-                yield return new object[] { id, BehaviorMode.Validation };
+                yield return new object[] { id, ParserMode.Bare };
+                yield return new object[] { id, ParserMode.RewrittenBare };
+                yield return new object[] { id, ParserMode.RewrittenPretty };
+                yield return new object[] { id, ParserMode.Validation };
             }
         }
     }

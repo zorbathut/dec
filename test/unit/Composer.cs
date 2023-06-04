@@ -20,24 +20,24 @@ namespace DecTest
         }
 
         [Test]
-        public void Creation([Values] BehaviorMode mode)
+        public void Creation([Values] ParserMode mode)
         {
             Dec.Database.Create<SomeValuesDec>("Hello").number = 10;
             Dec.Database.Create<SomeValuesDec>("Goodbye").number = 42;
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(10, Dec.Database<SomeValuesDec>.Get("Hello").number);
             Assert.AreEqual(42, Dec.Database<SomeValuesDec>.Get("Goodbye").number);
         }
 
         [Test]
-        public void CreationNonGeneric([Values] BehaviorMode mode)
+        public void CreationNonGeneric([Values] ParserMode mode)
         {
             (Dec.Database.Create(typeof(SomeValuesDec), "Hello") as SomeValuesDec).number = 10;
             (Dec.Database.Create(typeof(SomeValuesDec), "Goodbye") as SomeValuesDec).number = 42;
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(10, Dec.Database<SomeValuesDec>.Get("Hello").number);
             Assert.AreEqual(42, Dec.Database<SomeValuesDec>.Get("Goodbye").number);
@@ -46,18 +46,18 @@ namespace DecTest
         private class NotADec { }
 
         [Test]
-        public void CreationNonGenericNonDec([Values] BehaviorMode mode)
+        public void CreationNonGenericNonDec([Values] ParserMode mode)
         {
             ExpectErrors(() => Dec.Database.Create(typeof(NotADec), "NotADec"));
         }
 
         [Test]
-        public void MultiCreation([Values] BehaviorMode mode)
+        public void MultiCreation([Values] ParserMode mode)
         {
             Dec.Database.Create<SomeDecsDec>("Decs");
             Dec.Database.Create<SomeValuesDec>("Values");
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.IsNotNull(Dec.Database<SomeDecsDec>.Get("Decs"));
             Assert.IsNull(Dec.Database<SomeValuesDec>.Get("Decs"));
@@ -109,7 +109,7 @@ namespace DecTest
         }
 
         [Test]
-        public void References([Values] BehaviorMode mode)
+        public void References([Values] ParserMode mode)
         {
             var selfRef = Dec.Database.Create<SomeDecsDec>("SelfRef");
             var otherRef = Dec.Database.Create<SomeDecsDec>("OtherRef");
@@ -120,7 +120,7 @@ namespace DecTest
             otherRef.decs = selfRef;
             otherRef.values = values;
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreSame(Dec.Database<SomeDecsDec>.Get("SelfRef"), Dec.Database<SomeDecsDec>.Get("SelfRef").decs);
             Assert.AreSame(Dec.Database<SomeValuesDec>.Get("Values"), Dec.Database<SomeDecsDec>.Get("SelfRef").values);
@@ -134,7 +134,7 @@ namespace DecTest
         }
 
         [Test]
-        public void Delete([Values] BehaviorMode mode)
+        public void Delete([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
 
@@ -149,7 +149,7 @@ namespace DecTest
 
             Dec.Database.Delete(Dec.Database<IntDec>.Get("Two"));
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(1, Dec.Database<IntDec>.Get("One").value);
             Assert.IsNull(Dec.Database<IntDec>.Get("Two"));
@@ -157,7 +157,7 @@ namespace DecTest
         }
 
         [Test]
-        public void DoubleDelete([Values] BehaviorMode mode)
+        public void DoubleDelete([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
 
@@ -175,7 +175,7 @@ namespace DecTest
             ExpectErrors(() => Dec.Database.Delete(one));
             Dec.Database.Delete(Dec.Database<IntDec>.Get("Three"));
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.IsNull(Dec.Database<IntDec>.Get("One"));
             Assert.AreEqual(2, Dec.Database<IntDec>.Get("Two").value);
@@ -201,7 +201,7 @@ namespace DecTest
         }
 
         [Test]
-        public void Rename([Values] BehaviorMode mode)
+        public void Rename([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
 
@@ -220,7 +220,7 @@ namespace DecTest
             // yes okay this is confusing
             Dec.Database.Rename(Dec.Database<IntDec>.Get("Two"), "One");
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(1, Dec.Database<IntDec>.Get("OneGamma").value);
             Assert.AreEqual(2, Dec.Database<IntDec>.Get("One").value);
@@ -228,7 +228,7 @@ namespace DecTest
         }
 
         [Test]
-        public void RenameError([Values] BehaviorMode mode)
+        public void RenameError([Values] ParserMode mode)
         {
             var a = Dec.Database.Create<StubDec>("A");
             var b = Dec.Database.Create<StubDec>("B");
@@ -237,7 +237,7 @@ namespace DecTest
             ExpectErrors(() => Dec.Database.Rename(a, "B"));
             Dec.Database.Rename(c, "C");
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.IsNotNull(Dec.Database<StubDec>.Get("A"));
             Assert.IsNotNull(Dec.Database<StubDec>.Get("B"));
@@ -245,7 +245,7 @@ namespace DecTest
         }
 
         [Test]
-        public void RenameDeleted([Values] BehaviorMode mode)
+        public void RenameDeleted([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
 
@@ -262,7 +262,7 @@ namespace DecTest
             Dec.Database.Delete(three);
             ExpectErrors(() => Dec.Database.Rename(three, "ThreePhoenix"));
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(1, Dec.Database<IntDec>.Get("One").value);
             Assert.AreEqual(2, Dec.Database<IntDec>.Get("Two").value);
@@ -271,7 +271,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ReferenceDeleted([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
+        public void ReferenceDeleted([ValuesExcept(ParserMode.Validation)] ParserMode mode)
         {
             var ephemeral = Dec.Database.Create<SomeDecsDec>("Ephemeral");
             var stored = Dec.Database.Create<SomeDecsDec>("Stored");
@@ -280,9 +280,9 @@ namespace DecTest
 
             Dec.Database.Delete(ephemeral);
 
-            DoBehavior(mode, rewrite_expectWriteErrors: true, rewrite_expectParseErrors: true, validation_expectWriteErrors: true);
+            DoParserTests(mode, rewrite_expectWriteErrors: true, rewrite_expectParseErrors: true, validation_expectWriteErrors: true);
 
-            if (mode != BehaviorMode.Bare)
+            if (mode != ParserMode.Bare)
             {
                 Assert.IsNull(Dec.Database<SomeDecsDec>.Get("Stored").decs);
                 Assert.IsNull(Dec.Database<SomeDecsDec>.Get("Ephemeral"));
@@ -290,7 +290,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ReferenceReplaced([ValuesExcept(BehaviorMode.Validation)] BehaviorMode mode)
+        public void ReferenceReplaced([ValuesExcept(ParserMode.Validation)] ParserMode mode)
         {
             var ephemeral = Dec.Database.Create<SomeDecsDec>("Ephemeral");
             var stored = Dec.Database.Create<SomeDecsDec>("Stored");
@@ -301,9 +301,9 @@ namespace DecTest
 
             Dec.Database.Create<SomeDecsDec>("Ephemeral");
 
-            DoBehavior(mode, rewrite_expectWriteErrors: true, rewrite_expectParseErrors: true, validation_expectWriteErrors: true);
+            DoParserTests(mode, rewrite_expectWriteErrors: true, rewrite_expectParseErrors: true, validation_expectWriteErrors: true);
 
-            if (mode != BehaviorMode.Bare)
+            if (mode != ParserMode.Bare)
             {
                 Assert.IsNull(Dec.Database<SomeDecsDec>.Get("Stored").decs);
                 Assert.IsNotNull(Dec.Database<SomeDecsDec>.Get("Ephemeral"));
@@ -319,14 +319,14 @@ namespace DecTest
         }
 
         [Test]
-        public void NonSerialized([Values(BehaviorMode.RewrittenBare, BehaviorMode.RewrittenPretty)] BehaviorMode mode)
+        public void NonSerialized([Values(ParserMode.RewrittenBare, ParserMode.RewrittenPretty)] ParserMode mode)
         {
             var ephemeral = Dec.Database.Create<NonSerializedDec>("TestDec");
             ephemeral.serializedValue = 35;
             ephemeral.nonSerializedValue = 45;
 
             var writer = new Dec.Composer();
-            string data = writer.ComposeXml(mode == BehaviorMode.RewrittenPretty);
+            string data = writer.ComposeXml(mode == ParserMode.RewrittenPretty);
 
             Assert.IsTrue(data.Contains("serializedValue"));
             Assert.IsFalse(data.Contains("nonSerializedValue"));
@@ -347,7 +347,7 @@ namespace DecTest
         }
 
         [Test]
-        public void Enum([Values(BehaviorMode.RewrittenBare, BehaviorMode.RewrittenPretty)] BehaviorMode mode)
+        public void Enum([Values(ParserMode.RewrittenBare, ParserMode.RewrittenPretty)] ParserMode mode)
         {
             var enums = Dec.Database.Create<EnumContainerDec>("TestDec");
             enums.alph = EnumContainerDec.Enum.Alpha;
@@ -355,7 +355,7 @@ namespace DecTest
             enums.gam = EnumContainerDec.Enum.Gamma;
 
             var writer = new Dec.Composer();
-            string data = writer.ComposeXml(mode == BehaviorMode.RewrittenPretty);
+            string data = writer.ComposeXml(mode == ParserMode.RewrittenPretty);
 
             Assert.IsTrue(data.Contains("Alpha"));
             Assert.IsTrue(data.Contains("Beta"));
@@ -365,13 +365,13 @@ namespace DecTest
         }
 
         [Test]
-        public void Pretty([Values(BehaviorMode.RewrittenBare, BehaviorMode.RewrittenPretty)] BehaviorMode mode)
+        public void Pretty([Values(ParserMode.RewrittenBare, ParserMode.RewrittenPretty)] ParserMode mode)
         {
             Dec.Database.Create<StubDec>("Hello");
 
-            var output = new Dec.Composer().ComposeXml(mode == BehaviorMode.RewrittenPretty);
+            var output = new Dec.Composer().ComposeXml(mode == ParserMode.RewrittenPretty);
 
-            Assert.AreEqual(mode == BehaviorMode.RewrittenPretty, output.Contains("\n"));
+            Assert.AreEqual(mode == ParserMode.RewrittenPretty, output.Contains("\n"));
         }
     }
 }

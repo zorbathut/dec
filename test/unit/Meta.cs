@@ -139,7 +139,7 @@ namespace DecTest
             parseCache.Add("Meta", typeof(Meta));
             Assert.AreEqual(baseSize + 1, parseCache.Count);
 
-            ExpectWarnings(() => DoBehavior(BehaviorMode.RewrittenBare));
+            ExpectWarnings(() => DoParserTests(ParserMode.RewrittenBare));
 
             // Hopefully we reset after doing the DoBehavior()!
             Assert.AreEqual(baseSize, parseCache.Count);

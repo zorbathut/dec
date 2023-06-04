@@ -13,7 +13,7 @@ namespace DecTest
         }
 
         [Test]
-        public void Nested([Values] BehaviorMode mode)
+        public void Nested([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(NestedDec) } };
 
@@ -35,7 +35,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             var result = Dec.Database<NestedDec>.Get("TestDec");
             Assert.IsNotNull(result);

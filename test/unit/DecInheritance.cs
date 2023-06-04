@@ -24,7 +24,7 @@ namespace DecTest
         }
 
         [Test]
-        public void Simple([Values] BehaviorMode mode)
+        public void Simple([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SimpleDec) } };
 
@@ -49,7 +49,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             var result = Dec.Database<SimpleDec>.Get("Thing");
             Assert.AreEqual(3, result.defaulted);
@@ -61,7 +61,7 @@ namespace DecTest
         }
 
         [Test]
-        public void List([Values] BehaviorMode mode)
+        public void List([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SimpleDec) } };
 
@@ -83,7 +83,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             var result = Dec.Database<SimpleDec>.Get("Thing");
             Assert.AreEqual(1, result.list.Count);
@@ -93,7 +93,7 @@ namespace DecTest
         }
 
         [Test]
-        public void FromNonAbstract([Values] BehaviorMode mode)
+        public void FromNonAbstract([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SimpleDec) } };
 
@@ -118,7 +118,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             var bas = Dec.Database<SimpleDec>.Get("Base");
             Assert.AreEqual(3, bas.defaulted);
@@ -134,7 +134,7 @@ namespace DecTest
         }
 
         [Test]
-        public void MissingConcrete([Values] BehaviorMode mode)
+        public void MissingConcrete([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SimpleDec) } };
 
@@ -152,13 +152,13 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(0, Dec.Database<SimpleDec>.Count);
         }
 
         [Test]
-        public void MissingBase([Values] BehaviorMode mode)
+        public void MissingBase([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SimpleDec) } };
 
@@ -174,7 +174,7 @@ namespace DecTest
                 </Decs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             var result = Dec.Database<SimpleDec>.Get("Thing");
             Assert.AreEqual(60, result.overridden);
@@ -182,7 +182,7 @@ namespace DecTest
         }
 
         [Test]
-        public void AbstractOverride([Values] BehaviorMode mode)
+        public void AbstractOverride([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SimpleDec) } };
 
@@ -194,13 +194,13 @@ namespace DecTest
                 </Decs>"));
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(0, Dec.Database<SimpleDec>.Count);
         }
 
         [Test]
-        public void AbstractNonabstractClash([Values] BehaviorMode mode)
+        public void AbstractNonabstractClash([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SimpleDec) } };
 
@@ -222,14 +222,14 @@ namespace DecTest
                 </Decs>"));
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(20, Dec.Database<SimpleDec>.Get("Before").overridden);
             Assert.AreEqual(30, Dec.Database<SimpleDec>.Get("After").overridden);
         }
 
         [Test]
-        public void BadAbstractTag([Values] BehaviorMode mode)
+        public void BadAbstractTag([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SimpleDec) } };
 
@@ -242,13 +242,13 @@ namespace DecTest
                 </Decs>"));
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(10, Dec.Database<SimpleDec>.Get("Obj").overridden);
         }
 
         [Test]
-        public void DoubleInheritance([Values] bool trunkAbstract, [Values] bool branchAbstract, [Values] bool leafAbstract, [Values] BehaviorMode mode)
+        public void DoubleInheritance([Values] bool trunkAbstract, [Values] bool branchAbstract, [Values] bool leafAbstract, [Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SimpleDec) } };
 
@@ -270,7 +270,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             if (trunkAbstract)
             {

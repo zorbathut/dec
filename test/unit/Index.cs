@@ -24,7 +24,7 @@ namespace DecTest
         }
 
         [Test]
-        public void IndexBaseList([Values] BehaviorMode mode)
+        public void IndexBaseList([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndexBaseDec) } };
 
@@ -37,7 +37,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreSame(Dec.Database<IndexBaseDec>.Get("TestDecA"), Dec.Index<IndexBaseDec>.Get(Dec.Database<IndexBaseDec>.Get("TestDecA").index));
             Assert.AreSame(Dec.Database<IndexBaseDec>.Get("TestDecB"), Dec.Index<IndexBaseDec>.Get(Dec.Database<IndexBaseDec>.Get("TestDecB").index));
@@ -47,7 +47,7 @@ namespace DecTest
         }
 
         [Test]
-        public void IndexDerivedList([Values] BehaviorMode mode)
+        public void IndexDerivedList([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndexBaseDec), typeof(IndexDerivedDec) } };
 
@@ -62,7 +62,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreSame(Dec.Database<IndexBaseDec>.Get("TestDecA"), Dec.Index<IndexBaseDec>.Get(Dec.Database<IndexBaseDec>.Get("TestDecA").index));
             Assert.AreSame(Dec.Database<IndexBaseDec>.Get("TestDecB"), Dec.Index<IndexBaseDec>.Get(Dec.Database<IndexBaseDec>.Get("TestDecB").index));
@@ -79,7 +79,7 @@ namespace DecTest
         }
 
         [Test]
-        public void IndexLeafList([Values] BehaviorMode mode)
+        public void IndexLeafList([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndexLeafDec) } };
 
@@ -92,7 +92,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreSame(Dec.Database<IndexLeafDec>.Get("TestDecA"), Dec.Index<IndexLeafDec>.Get(Dec.Database<IndexLeafDec>.Get("TestDecA").index));
             Assert.AreSame(Dec.Database<IndexLeafDec>.Get("TestDecB"), Dec.Index<IndexLeafDec>.Get(Dec.Database<IndexLeafDec>.Get("TestDecB").index));
@@ -121,7 +121,7 @@ namespace DecTest
         }
 
         [Test]
-        public void IndependentIndex([Values] BehaviorMode mode)
+        public void IndependentIndex([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndependentIndexDec) } };
 
@@ -145,7 +145,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             // At the moment, the expected behavior is that classes which are explicitly mentioned get indices, classes which default to null and aren't mentioned don't get indices.
             // Classes which default to objects and aren't explicitly mentioned are in a gray area where we currently don't guarantee anything.
@@ -177,7 +177,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ExcessiveIndices([Values] BehaviorMode mode)
+        public void ExcessiveIndices([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExcessiveIndicesDec) } };
 
@@ -190,7 +190,7 @@ namespace DecTest
                 </Decs>");
             ExpectErrors(() => parser.Finish());
 
-            DoBehavior(mode, rewrite_expectParseErrors: true);
+            DoParserTests(mode, rewrite_expectParseErrors: true);
 
             // It's guaranteed that either indexA or indexB has some behavior that causes 0, 1, and 2 to be distributed among TestDec.
             // This is a massive over-constraint of allowable behavior; loosen it up if it fails somewhere.
@@ -211,7 +211,7 @@ namespace DecTest
 
         [Test]
         [Ignore("Currently broken :(")]
-        public void ParentReplaceIndex([Values] BehaviorMode mode)
+        public void ParentReplaceIndex([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ParentReplaceIndexDec), typeof(ParentReplaceIndexCarrier) } };
 
@@ -233,13 +233,13 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             Assert.AreEqual(1, Dec.Index<ParentReplaceIndexCarrier>.Count);
         }
 
         [Test]
-        public void Multifile([Values] BehaviorMode mode)
+        public void Multifile([Values] ParserMode mode)
         {
             Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndexBaseDec) } };
 
@@ -264,7 +264,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            DoBehavior(mode);
+            DoParserTests(mode);
 
             var indices = new HashSet<int>();
             indices.Add(Dec.Database<IndexBaseDec>.Get("TestDecA").index);
