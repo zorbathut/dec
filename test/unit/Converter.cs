@@ -81,5 +81,36 @@ namespace DecTest
 
             Assert.AreEqual(root.GetType(), deserialized.GetType());
         }
+
+        public class RetemplatedConverter<T> : Dec.ConverterRecord<T>
+        {
+            public override void Record(ref T input, Dec.Recorder recorder)
+            {
+
+            }
+        }
+
+        [Test]
+        public void Retemplated()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(RetemplatedConverter<>) } });
+
+            // so what happens here?
+            new Dec.Parser().Finish();
+        }
+
+        public abstract class AbstractConverter : Dec.ConverterRecord<Stub>
+        {
+            
+        }
+
+        [Test]
+        public void Abstract()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(AbstractConverter) } });
+
+            // so what happens here?
+            new Dec.Parser().Finish();
+        }
     }
 }

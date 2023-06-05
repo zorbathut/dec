@@ -60,7 +60,7 @@ namespace Dec
             IEnumerable<Type> conversionTypes;
             if (Config.TestParameters == null)
             {
-                conversionTypes = UtilReflection.GetAllTypes().Where(t => t.IsSubclassOf(typeof(Converter)) && !t.IsAbstract);
+                conversionTypes = UtilReflection.GetAllTypes().Where(t => t.IsSubclassOf(typeof(Converter)));
             }
             else if (Config.TestParameters.explicitConverters != null)
             {
@@ -73,6 +73,13 @@ namespace Dec
 
             foreach (var type in conversionTypes)
             {
+                if (type.IsAbstract || type.IsGenericType)
+                {
+                    // not really valid, just move on
+                    // we could do this up in the linq expression but that would be harder to test
+                    continue;
+                }
+
                 var converter = (Converter)type.CreateInstanceSafe("converter", new InputContext("converter"));
 
                 if (converter != null && (converter is ConverterString || converter is ConverterRecord || converter is ConverterFactory))
