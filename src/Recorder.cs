@@ -89,6 +89,13 @@ namespace Dec
             {
                 Parameters parameters = this;
                 parameters.asThis = true;
+
+                if (parameters.shared)
+                {
+                    Dbg.Err("Recorder.RecordAsThis() called on Recorder.Parameters with sharing enabled. This is disallowed and sharing will be disabled.");
+                    parameters.shared = false;
+                }
+
                 recorder.Record(ref value, "", parameters);
             }
 
@@ -416,7 +423,8 @@ namespace Dec
                                 furtherParsing.Add(() =>
                                 {
                                     // Do our actual parsing
-                                    var refInstanceOutput = Serialization.ParseElement(reference, refInstance.GetType(), refInstance, readerContext, new Recorder.Context(), hasReferenceId: true);
+                                    // We know this *was* shared or it wouldn't be a ref now, so we tag it again in case it's a List<SomeClass> so we can share its children as well.
+                                    var refInstanceOutput = Serialization.ParseElement(reference, refInstance.GetType(), refInstance, readerContext, new Recorder.Context() { shared = Context.Shared.Allow }, hasReferenceId: true);
 
                                     if (refInstance != refInstanceOutput)
                                     {
@@ -498,7 +506,7 @@ namespace Dec
                     return;
                 }
 
-                Serialization.ComposeElement(node, value, typeof(T));
+                Serialization.ComposeElement(node, value, typeof(T), asThis: true);
 
                 return;
             }
@@ -561,7 +569,7 @@ namespace Dec
                 asThis = true;
 
                 // Explicit cast here because we want an error if we have the wrong type!
-                value = (T)Serialization.ParseElement(element, typeof(T), value, readerContext, parameters.CreateContext());
+                value = (T)Serialization.ParseElement(element, typeof(T), value, readerContext, parameters.CreateContext(), asThis: true);
 
                 return;
             }

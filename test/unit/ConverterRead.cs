@@ -515,9 +515,17 @@ namespace DecTest
             dat.listA = dat.listB = new List<int>() { 1, 3, 5, 7, 11 };
 
             var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: true);
-
-            // this actually *can* work because the RefsForThings instance is not, itself, shared
-            Assert.AreEqual(dat.listA, deserialized.listA);
+            
+            if (mode != RecorderMode.RefEverything)
+            {
+                // this actually *can* work because the RefsForThings instance is not, itself, shared
+                Assert.AreEqual(dat.listA, deserialized.listA);
+            }
+            else
+            {
+                Assert.IsNull(deserialized.listA);
+            }
+            
             Assert.AreSame(dat.listA, dat.listB);
         }
 

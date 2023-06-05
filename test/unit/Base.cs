@@ -301,12 +301,17 @@ namespace DecTest
             // Write and read in pretty form.
             Pretty,
 
+            // Make everything possible into a ref.
+            RefEverything,
+
             // Generate validation code beforehand, then run that code.
             Validation,
         }
 
         public T DoRecorderRoundTrip<T>(T input, RecorderMode mode, Action<string> testSerializedResult = null, bool expectWriteErrors = false, bool expectWriteWarnings = false, bool expectReadErrors = false, bool expectReadWarnings = false)
         {
+            Dec.Config.TestRefEverything = mode == RecorderMode.RefEverything;
+
             if (mode == RecorderMode.Validation)
             {
                 string code = "";
@@ -374,6 +379,9 @@ namespace DecTest
                 DoDeserialize();
             }
             Assert.IsNotNull(serialized);
+
+            // reset
+            Dec.Config.TestRefEverything = false;
 
             return deserialized;
         }

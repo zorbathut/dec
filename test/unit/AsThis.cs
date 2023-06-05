@@ -121,13 +121,15 @@ namespace DecTest
         // however, this precludes class overrides since it wouldn't know which step to apply it to
         // in theory this can be fixed by using `class` for the last one and inventing new tags, class-1 class-2 etc, for previous steps
         // in practice I currently do not think this is important enough to mess with.
+        // or maybe doing this in some chained format, so you have `class,class,class`?
+        // eugh that sucks too
         [Test]
         public void ThisThenClass([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
             var item = new ThisThenClassOuter();
             item.data = new ThisThenClassInnerDerived();
 
-            var deserialized = DoRecorderRoundTrip(item, mode, expectReadErrors: true, expectWriteErrors: true);
+            var deserialized = DoRecorderRoundTrip(item, mode, expectWriteErrors: true);
         }
 
         public class ClassThenThisOuterBase : Dec.IRecordable
@@ -148,6 +150,47 @@ namespace DecTest
             ClassThenThisOuterBase itemBase = item;
 
             var deserialized = DoRecorderRoundTrip(itemBase, mode, expectReadErrors: true, expectWriteErrors: true);
+        }
+
+        public class Inner : Dec.IRecordable
+        {
+            public void Record(Dec.Recorder recorder)
+            {
+            }
+        }
+
+        public class Mid : Dec.IRecordable
+        {
+            public Inner inner;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Shared().RecordAsThis(ref inner);
+            }
+        }
+
+        public class Outer : Dec.IRecordable
+        {
+            public Mid mid;
+            public Inner inner;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref mid, "mid");
+                recorder.Shared().Record(ref inner, "inner");
+            }
+        }
+
+        [Test]
+        public void MultiInner([Values] RecorderMode mode)
+        {
+            var item = new Outer();
+            item.mid = new Mid();
+            item.mid.inner = item.inner = new Inner();
+
+            // be sweet if this worked, wouldn't it?
+            // doesn't though
+            var deserialized = DoRecorderRoundTrip(item, mode, expectWriteErrors: true, expectReadErrors: true);
         }
     }
 }

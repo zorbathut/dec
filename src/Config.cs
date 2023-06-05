@@ -130,6 +130,11 @@ namespace Dec
         }
         public static UnitTestParameters TestParameters { get; set; } = null;
 
+        /// <summary>
+        /// Parameters that are intended for unit tests. Not recommended or supported for actual code.
+        /// </summary>
+        public static bool TestRefEverything = false;
+
         static Config()
         {
             string ExceptionSuffix()

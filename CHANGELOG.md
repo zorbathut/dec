@@ -14,12 +14,14 @@ All notable changes to this project will be documented in this file.
 * Failed ref instantiations can later cause unhandled exceptions.
 * Recorder breaks when trying to deal with multiply referenced Array objects.
 * Various problems with both Visual Studio compatibility and VS Code compatibility.
+* Fixed a variety of obscure errors with shared objects.
 
 ### Documentation
 * Fixed typos.
  
 ### Testing
 * Better diagnostic output on missing expected errors.
+* Added more thorough tests for sharing.
 
 
 ## [v0.3.5]

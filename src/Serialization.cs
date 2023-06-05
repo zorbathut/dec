@@ -144,7 +144,7 @@ namespace Dec
             }
         }
 
-        internal static object ParseElement(XElement element, Type type, object original, ReaderContext context, Recorder.Context recContext, FieldInfo fieldInfo = null, bool isRootDec = false, bool hasReferenceId = false)
+        internal static object ParseElement(XElement element, Type type, object original, ReaderContext context, Recorder.Context recContext, FieldInfo fieldInfo = null, bool isRootDec = false, bool hasReferenceId = false, bool asThis = false)
         {
             // We keep the original around in case of error, but do all our manipulation on a result object.
             object result = original;
@@ -161,7 +161,7 @@ namespace Dec
                     // If shared, make sure our input is null and our type is appropriate for sharing
                     Dbg.Wrn($"{inputContext}: Value type `{type}` tagged as Shared in recorder, this is meaningless but harmless");
                 }
-                else if (original != null)
+                else if (original != null && !hasReferenceId)
                 {
                     // We need to create objects without context if it's shared, so we kind of panic in this case
                     Dbg.Err($"{inputContext}: Shared `{type}` provided with non-null default object, this may result in unexpected behavior");
@@ -177,6 +177,12 @@ namespace Dec
             string refAttribute = element.ConsumeAttribute(context.sourceName, "ref", ref consumedAttributes);
             string classAttribute = element.ConsumeAttribute(context.sourceName, "class", ref consumedAttributes);
             string modeAttribute = element.ConsumeAttribute(context.sourceName, "mode", ref consumedAttributes);
+
+            if (asThis)
+            {
+                // ignore the class attribute; this refers to the outer item, not the inner item
+                classAttribute = null;
+            }
 
             if (nullAttribute != null)
             {
@@ -1257,11 +1263,11 @@ namespace Dec
         }
 
         internal static Type TypeSystemRuntimeType = Type.GetType("System.RuntimeType");
-        internal static void ComposeElement(WriterNode node, object value, Type fieldType, FieldInfo fieldInfo = null, bool isRootDec = false)
+        internal static void ComposeElement(WriterNode node, object value, Type fieldType, FieldInfo fieldInfo = null, bool isRootDec = false, bool asThis = false)
         {
             // Verify our Shared flags as the *very* first step to ensure nothing gets past us.
             // In theory this should be fine with Flexible; Flexible only happens on an outer wrapper that was shared, and therefore was null, and therefore this is default also
-            if (node.RecorderContext.shared == Recorder.Context.Shared.Allow)
+            if (node.RecorderContext.shared == Recorder.Context.Shared.Allow && !asThis)
             {
                 // If this is an `asThis` parameter, then we may not be writing the field type it looks like, and we're just going to trust that they're doing something sensible.
                 if (!fieldType.CanBeShared())
@@ -1355,7 +1361,7 @@ namespace Dec
             // Check to see if we should make this into a ref (yes, even if we're not tagged as Shared)
             // Do this *before* we do the class tagging, otherwise we may add ref/class tags to a single node, which is invalid.
             // Note that it's important we don't write a reference if we had an unreferenceable; it's unnecessarily slow and some of our writer types don't support it.
-            if (!valType.IsValueType && !unreferenceableComplete)
+            if (!valType.IsValueType && !unreferenceableComplete && !asThis)
             {
                 if (node.WriteReference(value))
                 {
@@ -1370,7 +1376,15 @@ namespace Dec
             // If we have a type that isn't the expected type, tag it. We may need this even for unreferencable value types because everything fits in an `object`.
             if (valType != fieldType)
             {
-                node.TagClass(valType);
+                if (asThis)
+                {
+                    Dbg.Err($"RecordAsThis() call attempted to add a class tag, which is currently not allowed; AsThis() calls must not be polymorphic (ask the devs for chained class tags if this is a thing you need)");
+                    // . . . I guess we just keep going?
+                }
+                else
+                {
+                    node.TagClass(valType);
+                }
             }
 
             // Did we actually write our node type? Alright, we're done.

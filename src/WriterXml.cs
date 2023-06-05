@@ -6,6 +6,7 @@ namespace Dec
     using System.ComponentModel;
     using System.Linq;
     using System.Threading;
+    using System.Xml;
     using System.Xml.Linq;
 
     internal abstract class WriterXml : Writer
@@ -97,6 +98,8 @@ namespace Dec
 
         public override bool RegisterReference(object referenced, XElement element, Recorder.Context recContext)
         {
+            bool forceProcess = false;
+
             if (!refToElement.TryGetValue(referenced, out var xelement))
             {
                 if (recContext.shared != Recorder.Context.Shared.Deny)
@@ -114,8 +117,16 @@ namespace Dec
                     // and if you split a long hierarchy around a non-referencable barrier, everything breaks!
                 }
 
-                // We still need this to be generated, so we'll just let that happen now
-                return false;
+                if (Config.TestRefEverything && recContext.shared != Recorder.Context.Shared.Deny)
+                {
+                    // Test pathway that should only occur during testing.
+                    xelement = element;
+                    forceProcess = true;
+                }
+                else
+                {
+                    return false;
+                }
             }
 
             if (xelement == null)
@@ -144,7 +155,8 @@ namespace Dec
             element.SetAttributeValue("ref", refId);
 
             // And we're done!
-            return true;
+            // If we're forcing auto-ref'ing, then we allow processing this; otherwise, we tell it to skip because it's already done.
+            return !forceProcess;
         }
 
         public IEnumerable<KeyValuePair<string, XElement>> StripAndOutputReferences()
@@ -164,7 +176,12 @@ namespace Dec
                 foreach (var attribute in src.Attributes().ToArray())
                 {
                     attribute.Remove();
-                    result.Add(attribute);
+
+                    // We will normally not have a ref attribute here, but if we're doing the ref-everything mode, we might.
+                    if (attribute.Name != "ref")
+                    {
+                        result.Add(attribute);
+                    }
                 }
 
                 foreach (var node in src.Nodes().ToArray())
@@ -267,7 +284,7 @@ namespace Dec
             {
                 doc.AddFirst(new XComment("Pretty-print can be enabled as a parameter of the Recorder.Write() call."));
             }
-            doc.AddFirst(new XComment("This file written by Dec, a serialization library designed for the game industry. (https://github.com/zorbathut/dec)"));
+            doc.AddFirst(new XComment("This file was written by Dec, a serialization library designed for game development. (https://github.com/zorbathut/dec)"));
 
             return doc.ToString(pretty ? SaveOptions.None : SaveOptions.DisableFormatting);
         }
