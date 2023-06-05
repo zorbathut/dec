@@ -4,7 +4,7 @@ Grab the latest release [here](https://github.com/zorbathut/dec/releases/latest)
 
 ## Unity
 
-Copy every `.cs` file into Assets/ThirdParty/dec. When you're done, it should look something like this:
+Copy every `.cs` file into Assets/ThirdParty/dec, as well as `Dec.asmdef` and `Dec.asmdef.meta`. When you're done, it should look something like this:
 
 <img src="installation_unity.png">
 

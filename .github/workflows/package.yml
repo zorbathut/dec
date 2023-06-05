@@ -19,6 +19,7 @@ jobs:
       run: |
         mkdir ${{ env.FILE_PATH }}
         cp src/*.cs ${{ env.FILE_PATH }}
+        cp src/Dec.asmdef* ${{ env.FILE_PATH }}
         cp LICENSE* ${{ env.FILE_PATH }}
         cp README.md CHANGELOG.md ${{ env.FILE_PATH }}
         zip -9 -r ${{ env.FILE_NAME }} ${{ env.FILE_PATH }}
