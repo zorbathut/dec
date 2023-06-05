@@ -17,11 +17,12 @@ namespace Dec
     public struct InputContext
     {
         internal string filename;
-        internal System.Xml.Linq.XElement handle = null;
+        internal System.Xml.Linq.XElement handle;
 
         public InputContext(string filename)
         {
             this.filename = filename;
+            this.handle = null;
         }
 
         public InputContext(string filename, System.Xml.Linq.XElement handle)
