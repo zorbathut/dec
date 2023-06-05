@@ -213,58 +213,155 @@ references:
   commentId: T:Dec.Converter
   fullName: Dec.Converter
   nameWithType: Converter
-- uid: Dec.Converter.FromString(System.String,Type,System.String,System.Int32)
-  name: FromString(String, Type, String, Int32)
-  href: api/Dec.Converter.html#Dec_Converter_FromString_System_String_Type_System_String_System_Int32_
-  commentId: M:Dec.Converter.FromString(System.String,Type,System.String,System.Int32)
-  fullName: Dec.Converter.FromString(System.String, Type, System.String, System.Int32)
-  nameWithType: Converter.FromString(String, Type, String, Int32)
-- uid: Dec.Converter.FromString*
-  name: FromString
-  href: api/Dec.Converter.html#Dec_Converter_FromString_
-  commentId: Overload:Dec.Converter.FromString
+- uid: Dec.ConverterFactory
+  name: ConverterFactory
+  href: api/Dec.ConverterFactory.html
+  commentId: T:Dec.ConverterFactory
+  fullName: Dec.ConverterFactory
+  nameWithType: ConverterFactory
+- uid: Dec.ConverterFactory`1
+  name: ConverterFactory<T>
+  href: api/Dec.ConverterFactory-1.html
+  commentId: T:Dec.ConverterFactory`1
+  name.vb: ConverterFactory(Of T)
+  fullName: Dec.ConverterFactory<T>
+  fullName.vb: Dec.ConverterFactory(Of T)
+  nameWithType: ConverterFactory<T>
+  nameWithType.vb: ConverterFactory(Of T)
+- uid: Dec.ConverterFactory`1.Create(Dec.Recorder)
+  name: Create(Recorder)
+  href: api/Dec.ConverterFactory-1.html#Dec_ConverterFactory_1_Create_Dec_Recorder_
+  commentId: M:Dec.ConverterFactory`1.Create(Dec.Recorder)
+  fullName: Dec.ConverterFactory<T>.Create(Dec.Recorder)
+  fullName.vb: Dec.ConverterFactory(Of T).Create(Dec.Recorder)
+  nameWithType: ConverterFactory<T>.Create(Recorder)
+  nameWithType.vb: ConverterFactory(Of T).Create(Recorder)
+- uid: Dec.ConverterFactory`1.Create*
+  name: Create
+  href: api/Dec.ConverterFactory-1.html#Dec_ConverterFactory_1_Create_
+  commentId: Overload:Dec.ConverterFactory`1.Create
   isSpec: "True"
-  fullName: Dec.Converter.FromString
-  nameWithType: Converter.FromString
-- uid: Dec.Converter.HandledTypes
-  name: HandledTypes()
-  href: api/Dec.Converter.html#Dec_Converter_HandledTypes
-  commentId: M:Dec.Converter.HandledTypes
-  fullName: Dec.Converter.HandledTypes()
-  nameWithType: Converter.HandledTypes()
-- uid: Dec.Converter.HandledTypes*
-  name: HandledTypes
-  href: api/Dec.Converter.html#Dec_Converter_HandledTypes_
-  commentId: Overload:Dec.Converter.HandledTypes
+  fullName: Dec.ConverterFactory<T>.Create
+  fullName.vb: Dec.ConverterFactory(Of T).Create
+  nameWithType: ConverterFactory<T>.Create
+  nameWithType.vb: ConverterFactory(Of T).Create
+- uid: Dec.ConverterFactory`1.Read(`0@,Dec.Recorder)
+  name: Read(ref T, Recorder)
+  href: api/Dec.ConverterFactory-1.html#Dec_ConverterFactory_1_Read__0__Dec_Recorder_
+  commentId: M:Dec.ConverterFactory`1.Read(`0@,Dec.Recorder)
+  name.vb: Read(ByRef T, Recorder)
+  fullName: Dec.ConverterFactory<T>.Read(ref T, Dec.Recorder)
+  fullName.vb: Dec.ConverterFactory(Of T).Read(ByRef T, Dec.Recorder)
+  nameWithType: ConverterFactory<T>.Read(ref T, Recorder)
+  nameWithType.vb: ConverterFactory(Of T).Read(ByRef T, Recorder)
+- uid: Dec.ConverterFactory`1.Read*
+  name: Read
+  href: api/Dec.ConverterFactory-1.html#Dec_ConverterFactory_1_Read_
+  commentId: Overload:Dec.ConverterFactory`1.Read
   isSpec: "True"
-  fullName: Dec.Converter.HandledTypes
-  nameWithType: Converter.HandledTypes
-- uid: Dec.Converter.Record(System.Object,Type,Dec.Recorder)
-  name: Record(Object, Type, Recorder)
-  href: api/Dec.Converter.html#Dec_Converter_Record_System_Object_Type_Dec_Recorder_
-  commentId: M:Dec.Converter.Record(System.Object,Type,Dec.Recorder)
-  fullName: Dec.Converter.Record(System.Object, Type, Dec.Recorder)
-  nameWithType: Converter.Record(Object, Type, Recorder)
-- uid: Dec.Converter.Record*
+  fullName: Dec.ConverterFactory<T>.Read
+  fullName.vb: Dec.ConverterFactory(Of T).Read
+  nameWithType: ConverterFactory<T>.Read
+  nameWithType.vb: ConverterFactory(Of T).Read
+- uid: Dec.ConverterFactory`1.Write(`0,Dec.Recorder)
+  name: Write(T, Recorder)
+  href: api/Dec.ConverterFactory-1.html#Dec_ConverterFactory_1_Write__0_Dec_Recorder_
+  commentId: M:Dec.ConverterFactory`1.Write(`0,Dec.Recorder)
+  fullName: Dec.ConverterFactory<T>.Write(T, Dec.Recorder)
+  fullName.vb: Dec.ConverterFactory(Of T).Write(T, Dec.Recorder)
+  nameWithType: ConverterFactory<T>.Write(T, Recorder)
+  nameWithType.vb: ConverterFactory(Of T).Write(T, Recorder)
+- uid: Dec.ConverterFactory`1.Write*
+  name: Write
+  href: api/Dec.ConverterFactory-1.html#Dec_ConverterFactory_1_Write_
+  commentId: Overload:Dec.ConverterFactory`1.Write
+  isSpec: "True"
+  fullName: Dec.ConverterFactory<T>.Write
+  fullName.vb: Dec.ConverterFactory(Of T).Write
+  nameWithType: ConverterFactory<T>.Write
+  nameWithType.vb: ConverterFactory(Of T).Write
+- uid: Dec.ConverterRecord
+  name: ConverterRecord
+  href: api/Dec.ConverterRecord.html
+  commentId: T:Dec.ConverterRecord
+  fullName: Dec.ConverterRecord
+  nameWithType: ConverterRecord
+- uid: Dec.ConverterRecord`1
+  name: ConverterRecord<T>
+  href: api/Dec.ConverterRecord-1.html
+  commentId: T:Dec.ConverterRecord`1
+  name.vb: ConverterRecord(Of T)
+  fullName: Dec.ConverterRecord<T>
+  fullName.vb: Dec.ConverterRecord(Of T)
+  nameWithType: ConverterRecord<T>
+  nameWithType.vb: ConverterRecord(Of T)
+- uid: Dec.ConverterRecord`1.Record(`0@,Dec.Recorder)
+  name: Record(ref T, Recorder)
+  href: api/Dec.ConverterRecord-1.html#Dec_ConverterRecord_1_Record__0__Dec_Recorder_
+  commentId: M:Dec.ConverterRecord`1.Record(`0@,Dec.Recorder)
+  name.vb: Record(ByRef T, Recorder)
+  fullName: Dec.ConverterRecord<T>.Record(ref T, Dec.Recorder)
+  fullName.vb: Dec.ConverterRecord(Of T).Record(ByRef T, Dec.Recorder)
+  nameWithType: ConverterRecord<T>.Record(ref T, Recorder)
+  nameWithType.vb: ConverterRecord(Of T).Record(ByRef T, Recorder)
+- uid: Dec.ConverterRecord`1.Record*
   name: Record
-  href: api/Dec.Converter.html#Dec_Converter_Record_
-  commentId: Overload:Dec.Converter.Record
+  href: api/Dec.ConverterRecord-1.html#Dec_ConverterRecord_1_Record_
+  commentId: Overload:Dec.ConverterRecord`1.Record
   isSpec: "True"
-  fullName: Dec.Converter.Record
-  nameWithType: Converter.Record
-- uid: Dec.Converter.ToString(System.Object)
-  name: ToString(Object)
-  href: api/Dec.Converter.html#Dec_Converter_ToString_System_Object_
-  commentId: M:Dec.Converter.ToString(System.Object)
-  fullName: Dec.Converter.ToString(System.Object)
-  nameWithType: Converter.ToString(Object)
-- uid: Dec.Converter.ToString*
-  name: ToString
-  href: api/Dec.Converter.html#Dec_Converter_ToString_
-  commentId: Overload:Dec.Converter.ToString
+  fullName: Dec.ConverterRecord<T>.Record
+  fullName.vb: Dec.ConverterRecord(Of T).Record
+  nameWithType: ConverterRecord<T>.Record
+  nameWithType.vb: ConverterRecord(Of T).Record
+- uid: Dec.ConverterString
+  name: ConverterString
+  href: api/Dec.ConverterString.html
+  commentId: T:Dec.ConverterString
+  fullName: Dec.ConverterString
+  nameWithType: ConverterString
+- uid: Dec.ConverterString`1
+  name: ConverterString<T>
+  href: api/Dec.ConverterString-1.html
+  commentId: T:Dec.ConverterString`1
+  name.vb: ConverterString(Of T)
+  fullName: Dec.ConverterString<T>
+  fullName.vb: Dec.ConverterString(Of T)
+  nameWithType: ConverterString<T>
+  nameWithType.vb: ConverterString(Of T)
+- uid: Dec.ConverterString`1.Read(System.String,Dec.InputContext)
+  name: Read(String, InputContext)
+  href: api/Dec.ConverterString-1.html#Dec_ConverterString_1_Read_System_String_Dec_InputContext_
+  commentId: M:Dec.ConverterString`1.Read(System.String,Dec.InputContext)
+  fullName: Dec.ConverterString<T>.Read(System.String, Dec.InputContext)
+  fullName.vb: Dec.ConverterString(Of T).Read(System.String, Dec.InputContext)
+  nameWithType: ConverterString<T>.Read(String, InputContext)
+  nameWithType.vb: ConverterString(Of T).Read(String, InputContext)
+- uid: Dec.ConverterString`1.Read*
+  name: Read
+  href: api/Dec.ConverterString-1.html#Dec_ConverterString_1_Read_
+  commentId: Overload:Dec.ConverterString`1.Read
   isSpec: "True"
-  fullName: Dec.Converter.ToString
-  nameWithType: Converter.ToString
+  fullName: Dec.ConverterString<T>.Read
+  fullName.vb: Dec.ConverterString(Of T).Read
+  nameWithType: ConverterString<T>.Read
+  nameWithType.vb: ConverterString(Of T).Read
+- uid: Dec.ConverterString`1.Write(`0)
+  name: Write(T)
+  href: api/Dec.ConverterString-1.html#Dec_ConverterString_1_Write__0_
+  commentId: M:Dec.ConverterString`1.Write(`0)
+  fullName: Dec.ConverterString<T>.Write(T)
+  fullName.vb: Dec.ConverterString(Of T).Write(T)
+  nameWithType: ConverterString<T>.Write(T)
+  nameWithType.vb: ConverterString(Of T).Write(T)
+- uid: Dec.ConverterString`1.Write*
+  name: Write
+  href: api/Dec.ConverterString-1.html#Dec_ConverterString_1_Write_
+  commentId: Overload:Dec.ConverterString`1.Write
+  isSpec: "True"
+  fullName: Dec.ConverterString<T>.Write
+  fullName.vb: Dec.ConverterString(Of T).Write
+  nameWithType: ConverterString<T>.Write
+  nameWithType.vb: ConverterString(Of T).Write
 - uid: Dec.Database
   name: Database
   href: api/Dec.Database.html
@@ -561,6 +658,25 @@ references:
   commentId: T:Dec.IndexAttribute
   fullName: Dec.IndexAttribute
   nameWithType: IndexAttribute
+- uid: Dec.InputContext
+  name: InputContext
+  href: api/Dec.InputContext.html
+  commentId: T:Dec.InputContext
+  fullName: Dec.InputContext
+  nameWithType: InputContext
+- uid: Dec.InputContext.ToString
+  name: ToString()
+  href: api/Dec.InputContext.html#Dec_InputContext_ToString
+  commentId: M:Dec.InputContext.ToString
+  fullName: Dec.InputContext.ToString()
+  nameWithType: InputContext.ToString()
+- uid: Dec.InputContext.ToString*
+  name: ToString
+  href: api/Dec.InputContext.html#Dec_InputContext_ToString_
+  commentId: Overload:Dec.InputContext.ToString
+  isSpec: "True"
+  fullName: Dec.InputContext.ToString
+  nameWithType: InputContext.ToString
 - uid: Dec.IRecordable
   name: IRecordable
   href: api/Dec.IRecordable.html
