@@ -261,7 +261,7 @@ namespace Dec
         /// <summary>
         /// Returns a fully-formed XML document starting at an object.
         /// </summary>
-        public static string Write<T>(T target, bool pretty = true)
+        public static string Write<T>(T target, bool pretty = false)
         {
             using (var _ = new CultureInfoScope(Config.CultureInfo))
             {
