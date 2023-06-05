@@ -263,6 +263,12 @@ namespace Dec
                 refs.Remove();
             }
 
+            if (!pretty)
+            {
+                doc.AddFirst(new XComment("Pretty-print can be enabled as a parameter of the Recorder.Write() call."));
+            }
+            doc.AddFirst(new XComment("This file written by Dec, a serialization library designed for the game industry. (https://github.com/zorbathut/dec)"));
+
             return doc.ToString(pretty ? SaveOptions.None : SaveOptions.DisableFormatting);
         }
     }
