@@ -9,13 +9,13 @@ namespace DecTest
     [TestFixture]
     public class Converter : Base
     {
-        public class ConverterPrivate : Dec.Converter
+        public class ConverterPrivate : Dec.ConverterRecord<Stub>
         {
             private ConverterPrivate() { }
 
-            public override HashSet<Type> HandledTypes()
+            public override void Record(ref Stub input, Dec.Recorder recorder)
             {
-                return new HashSet<Type> { typeof(Converter) };
+                
             }
         }
 
@@ -28,13 +28,13 @@ namespace DecTest
             parser.Finish();
         }
 
-        public class ConverterParameter : Dec.Converter
+        public class ConverterParameter : Dec.ConverterRecord<Stub>
         {
             public ConverterParameter(int x) { }
 
-            public override HashSet<Type> HandledTypes()
+            public override void Record(ref Stub input, Dec.Recorder recorder)
             {
-                return new HashSet<Type> { typeof(Converter) };
+                
             }
         }
 
@@ -60,16 +60,11 @@ namespace DecTest
         public class BaseType { }
         public class DerivedType : BaseType { }
 
-        public class DerivedConverter : Dec.Converter
+        public class DerivedConverter : Dec.ConverterRecord<DerivedType>
         {
-            public override HashSet<Type> HandledTypes()
+            public override void Record(ref DerivedType input, Dec.Recorder recorder)
             {
-                return new HashSet<Type> { typeof(DerivedType) };
-            }
-
-            public override object Record(object model, Type type, Dec.Recorder recorder)
-            {
-                return model ?? new DerivedType();
+                
             }
         }
 

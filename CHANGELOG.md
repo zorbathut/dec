@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Breaking
 * Recorder no longer shares class references by default. The new `.Shared()` recorder decorator can be used to allow this, although it will error on non-null defaults.
+* Converter has been split into ConverterString, ConverterRecord, and ConverterFactory.
 
 ### Improved
 * RecordAsThis() does not (and currently cannot) work on a polymorphic object; document this and explicitly report it as an error.

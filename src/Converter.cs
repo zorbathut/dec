@@ -1,121 +1,189 @@
 namespace Dec
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Xml.Linq;
 
     /// <summary>
-    /// Base class for converting to arbitrary types.
+    /// Internal class for Converter systems.
     /// </summary>
     /// <remarks>
-    /// This is a standalone class to allow implementation of converters of third-party types.
-    ///
-    /// Inherit from this, fill out an appropriate HandledTypes() function, then implement either Record() or FromString().
-    ///
-    /// If you want to be able to write things with Recorder, you'll need to implement either Record() or ToString().
+    /// You probably shouldn't use this for anything - it may vanish without warning or regret, I just haven't figured out how to move it into Internal.
     /// </remarks>
     public abstract class Converter
     {
+        internal abstract Type GetConvertedType();
+    }
+
+    /// <summary>
+    /// Internal class for Converter systems.
+    /// </summary>
+    /// <remarks>
+    /// You probably shouldn't use this for anything - it may vanish without warning or regret, I just haven't figured out how to move it into Internal.
+    /// </remarks>
+    public abstract class ConverterString : Converter
+    {
+        internal abstract string WriteObj(object input);
+        internal abstract object ReadObj(string input, InputContext context);
+    }
+
+    /// <summary>
+    /// Base class for converting to arbitrary types via strings.
+    /// </summary>
+    /// <remarks>
+    /// This is a standalone class to allow implementation of converters of third-party types. It's useful when implementing converters for types that were not created by you (ex: UnityEngine.Mesh).
+    ///
+    /// ConverterString is suitable only for converting to and from independent simple string objects. It does not let you reference other objects within the Recorder hierarchy (see ConverterRecord and ConverterFactory), nor does it allow you to respect default settings pre-provided by an object's constructor, nor does it allow you to build complex hierarchies appropriate for complex objects.
+    ///
+    /// It does allow you to create your own objects as you see fit, or reference objects provided by your framework that have no useful default constructor.
+    ///
+    /// This should likely be your first choice of Converter if reasonably suitable, although if string serialization is complicated, use ConverterRecord instead even if you don't technically have to.
+    /// </remarks>
+    public abstract class ConverterString<T> : ConverterString
+    {
         /// <summary>
-        /// Returns a set of types that it can convert to and from.
+        /// Converts an object to a string.
         /// </summary>
-        /// <remarks>
-        /// When deserializing, conversion functions are not called for subclasses; that is, if a BaseClass is requested, only a converter that promises to return a BaseClass will be called.
-        /// 
-        /// It is an error if any two Conversion-derived non-abstract classes report that they can generate the same type.
-        ///
-        /// This behavior may change someday; please read patch notes if you're relying on it.
-        /// </remarks>
-        public abstract HashSet<Type> HandledTypes();
+        public abstract string Write(T input);
 
         /// <summary>
         /// Converts a string to a suitable object type.
         /// </summary>
         /// <remarks>
-        /// `type` is set to the expected return type; you can return null, or anything that can be implicitly converted to that type.
-        /// 
-        /// In case of error, call Dec.Dbg.Err with some appropriately useful message and return null. Message should be formatted as $"{inputName}:{lineNumber}: Something went wrong".
-        ///
-        /// Note: In the case of empty input (i.e. &lt;member&gt;&lt;/member&gt; or &lt;member /&gt;) this function will be called.
+        /// In case of error, call Dec.Dbg.Err with some appropriately useful message and return default. Message should be formatted as $"{inputName}:{lineNumber}: Something went wrong".
         /// </remarks>
-        public virtual object FromString(string input, Type type, string inputName, int lineNumber)
+        public abstract T Read(string input, InputContext context);
+
+        override internal Type GetConvertedType()
         {
-            Dbg.Err($"{inputName}:{lineNumber}: Failed to parse string when attempting to parse {type}");
-            return null;
+            return typeof(T);
         }
 
+        override internal string WriteObj(object input)
+        {
+            return Write((T)input);
+        }
+        override internal object ReadObj(string input, InputContext context)
+        {
+            return Read(input, context);
+        }
+    }
+
+    /// <summary>
+    /// Internal class for Converter systems.
+    /// </summary>
+    /// <remarks>
+    /// You probably shouldn't use this for anything - it may vanish without warning or regret, I just haven't figured out how to move it into Internal.
+    /// </remarks>
+    public abstract class ConverterRecord : Converter
+    {
+        internal abstract object RecordObj(object input, Recorder recorder);
+    }
+
+    /// <summary>
+    /// Base class for converting to arbitrary types via the Recorder API.
+    /// </summary>
+    /// <remarks>
+    /// This is a standalone class to allow implementation of converters of third-party types. It's useful when implementing converters for types that were not created by you (ex: UnityEngine.Vector).
+    ///
+    /// ConverterRecord is suitable only for converting to and from objects with usable default constructors. It does not allow you to create your own objects or return objects that are provided by your framework (see ConverterString and ConverterFactory).
+    ///
+    /// It does allow you to reference other objects within the Recorder hierarchy. It also allows you to respect pre-set defaults (if not shared) and build complex hierarchies for complicated data types.
+    ///
+    /// This should likely be your second choice of Converter, used only if ConverterString is inappropriate.
+    /// </remarks>
+    public abstract class ConverterRecord<T> : ConverterRecord
+    {
         /// <summary>
-        /// Converts an object to a string.
+        /// Records an object.
         /// </summary>
         /// <remarks>
-        /// `input` will be one of the types provided in HandledTypes(); it will not be null. Whatever you return should be convertible back to an object by an overridden FromString().
-        ///
-        /// In case of error, call Dec.Dbg.Err with some appropriately useful message and return null.
+        /// See [`Dec.IRecordable.Record`](xref:Dec.IRecordable.Record*) for details, although you'll need to use `this` instead of `input`.
         /// </remarks>
-        public virtual string ToString(object input)
+        public abstract void Record(ref T input, Recorder recorder);
+
+        override internal Type GetConvertedType()
         {
-            Dbg.Err($"Failed to generate a string when attempting to record {input.GetType()}");
-            return ""; // "" is kind of a more neutral result than `null`, and this is what we'll default to if they haven't filled something out
+            return typeof(T);
         }
 
+        override internal object RecordObj(object input, Recorder recorder)
+        {
+            T var = (T)input;
+            Record(ref var, recorder);
+            return var;
+        }
+    }
+
+    /// <summary>
+    /// Internal class for Converter systems.
+    /// </summary>
+    /// <remarks>
+    /// You probably shouldn't use this for anything - it may vanish without warning or regret, I just haven't figured out how to move it into Internal.
+    /// </remarks>
+    public abstract class ConverterFactory : Converter
+    {
+        internal abstract void WriteObj(object input, Recorder recorder);
+
+        internal abstract object CreateObj(Recorder recorder);
+        internal abstract object ReadObj(object input, Recorder recorder);
+    }
+
+    /// <summary>
+    /// Base class for converting to arbitrary types via the Recorder API.
+    /// </summary>
+    /// <remarks>
+    /// This is a standalone class to allow implementation of converters of third-party types. It's useful when implementing converters for types that were not created by you (ex: UnityEngine.Vector).
+    ///
+    /// ConverterFactory is suitable for converting to and from objects constructed in whatever way you wish, possibly with custom constructors or provided via your framework. It allows you to reference other objects and build arbitrarily complicated hierarchies.
+    ///
+    /// This is the most complicated Converter to work with, but also the most powerful. This should be your last choice of Converter, used only if neither ConverterString nor ConverterRecord are appropriate. Empirically, this appears to be rarely used . . . but it's available when needed.
+    /// </remarks>
+    public abstract class ConverterFactory<T> : ConverterFactory
+    {
         /// <summary>
-        /// Handles serialization and deserialization with support for references.
+        /// Writes an object.
         /// </summary>
         /// <remarks>
-        /// In read mode, `model` will be one of the types provided in HandledTypes(); it will not be null. Use recorder or recorder.Xml to serialize its contents, then return model.
-        ///
-        /// In write mode, `model` will be one of the types provided in HandledTypes(), or null. If it's null, create an object of an appropriate type. Use recorder or recorder.Xml to fill it, then return it.
-        ///
-        /// `type` indicates the type that the underlying code expects to get back. The object you return must be assignable to that type.
-        /// 
-        /// In case of error, call Dec.Dbg.Err with some appropriately useful message, then return model.
-        ///
-        /// In most cases, using Recorder's interface is by far the easiest way to support the requirements of this function. It is expected that you use XML only when absolutely necessary.
+        /// See [`Dec.IRecordable.Record`](xref:Dec.IRecordable.Record*) for details, although you'll need to use `this` instead of `input`.
         /// </remarks>
-        /// <example>
-        /// <code>
-        ///     public override object Record(object model, Type type, Recorder recorder)
-        ///     {
-        ///         // If we're in read mode, this leaves model untouched. If we're in write mode, this leaves model untouched unless it's null.
-        ///         model = model ?? new ConvertedClass();
+        public abstract void Write(T input, Recorder recorder);
+
+        /// <summary>
+        /// Creates an object.
+        /// </summary>
+        /// <remarks>
+        /// This is similar to [`Dec.IRecordable.Record`](xref:Dec.IRecordable.Record*), although you'll need to use `this` instead of `input`.
         ///
-        ///         // The Recorder interface figures out the right thing based on context.
-        ///         // Any members that are referenced elsewhere will be turned into refs automatically.
-        ///         recorder.Record(ref model.integerMember, "integerMember");
-        ///         recorder.Record(ref model.classMember, "classMember");
-        ///         recorder.Record(ref model.structMember, "structMember");
-        ///         recorder.Record(ref model.collectionMember, "collectionMember");
-        ///
-        ///         return model;
-        ///     }
-        /// </code>
-        /// </example>
-        public virtual object Record(object model, Type type, Recorder recorder)
+        /// This function will not be called if an instance already exists. In addition, you *cannot* reference other shared objects within Create, even transitively. Those must be referenced within Read. It is recommended that you do the bare minimum here to create the necessary object.
+        /// </remarks>
+        public abstract T Create(Recorder recorder);
+
+        /// <summary>
+        /// Reads an object.
+        /// </summary>
+        /// <remarks>
+        /// This is similar to [`Dec.IRecordable.Record`](xref:Dec.IRecordable.Record*), although you'll need to use `this` instead of `input`.
+        /// </remarks>
+        public abstract void Read(ref T input, Recorder recorder);
+
+        override internal Type GetConvertedType()
         {
-            switch (recorder.Mode)
-            {
-                case Recorder.Direction.Read:
-                    {
-                        var rr = recorder as RecorderReader;
-                        string text = null;
-                        recorder.RecordAsThis(ref text);
-                        return FromString(text, type, rr.SourceName, rr.SourceLine);
-                    }    
+            return typeof(T);
+        }
 
-                case Recorder.Direction.Write:
-                    {
-                        string text = ToString(model);
-                        recorder.RecordAsThis(ref text);
-                        return model;
-                    }
+        override internal void WriteObj(object input, Recorder recorder)
+        {
+            Write((T)input, recorder);
+        }
 
-                default:
-                    // what have you done
-                    // *what have you done*
-                    Dbg.Err($"Recorder is somehow in mode {recorder.Mode} which is not valid");
-                    return model;
-            }
+        override internal object CreateObj(Recorder recorder)
+        {
+            return Create(recorder);
+        }
+        override internal object ReadObj(object input, Recorder recorder)
+        {
+            T var = (T)input;
+            Read(ref var, recorder);
+            return var;
         }
     }
 }

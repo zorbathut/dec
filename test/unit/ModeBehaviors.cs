@@ -75,11 +75,12 @@ namespace DecTest
             public int sideValue = 15;
         }
 
-        public class ConvertableConverter : Dec.Converter
+        public class ConvertableConverter : Dec.ConverterRecord<Convertable>
         {
-            public override HashSet<Type> HandledTypes()
+            public override void Record(ref Convertable input, Dec.Recorder recorder)
             {
-                return new HashSet<Type> { typeof(Convertable) };
+                recorder.Record(ref input.value, "value");
+                recorder.Record(ref input.sideValue, "sideValue");
             }
         }
 

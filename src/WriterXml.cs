@@ -500,8 +500,29 @@ namespace Dec
 
             if (depth < MaxRecursionDepth)
             {
-                // This is somewhat faster than a full pending write (5-10% faster in one test case, though with a lot of noise), so we do it whenever we can.
-                converter.Record(value, value.GetType(), new RecorderWriter(this));
+                try
+                {
+                    if (converter is ConverterString converterString)
+                    {
+                        WriteString(converterString.WriteObj(value));
+                    }
+                    else if (converter is ConverterRecord converterRecord)
+                    {
+                        converterRecord.RecordObj(value, new RecorderWriter(this));
+                    }
+                    else if (converter is ConverterFactory converterFactory)
+                    {
+                        converterFactory.WriteObj(value, new RecorderWriter(this));
+                    }
+                    else
+                    {
+                        Dbg.Err($"Somehow ended up with an unsupported converter {converter.GetType()}");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Dbg.Ex(e);
+                }
             }
             else
             {

@@ -9,6 +9,23 @@ namespace Dec
     using System.Xml.Linq;
 
     /// <summary>
+    /// Information on the current cursor position when reading files.
+    /// </summary>
+    /// <remarks>
+    /// Standard output format is $"{inputContext}: Your Error Text Here!". This abstracts out the requirements for generating error text.
+    /// </remarks>
+    public struct InputContext
+    {
+        internal string filename;
+        internal System.Xml.Linq.XElement handle;
+
+        public override string ToString()
+        {
+            return $"{filename}:{( handle != null ? handle.LineNumber().ToString() : "???" )}";
+        }
+    }
+
+    /// <summary>
     /// Internal serialization utilities.
     /// </summary>
     internal static class Serialization
@@ -39,23 +56,15 @@ namespace Dec
             {
                 var converter = (Converter)type.CreateInstanceSafe("converter", () => "converter");
 
-                if (converter != null)
+                if (converter != null && (converter is ConverterString || converter is ConverterRecord || converter is ConverterFactory))
                 {
-                    var convertedTypes = converter.HandledTypes();
-                    if (convertedTypes.Count == 0)
+                    Type convertedType = converter.GetConvertedType();
+                    if (Converters.ContainsKey(convertedType))
                     {
-                        Dbg.Err($"{type} is a Dec.Converter, but doesn't convert anything");
+                        Dbg.Err($"Converters {Converters[convertedType].GetType()} and {type} both generate result {convertedType}");
                     }
 
-                    foreach (var convertedType in convertedTypes)
-                    {
-                        if (Converters.ContainsKey(convertedType))
-                        {
-                            Dbg.Err($"Converters {Converters[convertedType].GetType()} and {type} both generate result {convertedType}");
-                        }
-
-                        Converters[convertedType] = converter;
-                    }
+                    Converters[convertedType] = converter;
                 }
             }
         }
@@ -122,6 +131,9 @@ namespace Dec
             // We keep the original around in case of error, but do all our manipulation on a result object.
             object result = original;
 
+            // Get our input formatting together
+            var inputContext = new InputContext() { filename = context.sourceName, handle = element };
+
             // Verify our Shared flags as the *very* first step to ensure nothing gets past us.
             // In theory this should be fine with Flexible; Flexible only happens on an outer wrapper that was shared, and therefore was null, and therefore this is default also
             if (recContext.shared == Recorder.Context.Shared.Allow)
@@ -162,7 +174,7 @@ namespace Dec
                 }
             }
 
-            if (refAttribute != null && !context.RecorderMode)
+            if (refAttribute != null && !context.recorderMode)
             {
                 Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Found a reference tag while not evaluating Recorder mode, ignoring it");
                 refAttribute = null;
@@ -206,7 +218,13 @@ namespace Dec
                     Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Found a reference in a non-.Shared() context, using it anyway but this might produce unexpected results");
                 }
 
-                if (context.refs == null || !context.refs.ContainsKey(refAttribute))
+                if (context.refs == null)
+                {
+                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Found a reference object {refAttribute} before refs are initialized (is this being used in a ConverterFactory<>.Create()?)");
+                    return result;
+                }
+
+                if (!context.refs.ContainsKey(refAttribute))
                 {
                     Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Found a reference object {refAttribute} without a valid reference mapping");
                     return result;
@@ -247,51 +265,7 @@ namespace Dec
                 }
             }
 
-            // Converters may do their own processing, so we'll just defer off to them now
-            if (Converters.ContainsKey(type))
-            {
-                switch (parseMode)
-                {
-                    case ParseMode.Default:
-                    case ParseMode.Patch:
-                        // easy, done
-                        break;
-
-                    default:
-                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Invalid mode {parseMode} provided for a Converter parse, defaulting to Patch");
-                        goto case ParseMode.Patch;
-                }
-
-                // context might be null; that's OK at the moment
-                try
-                {
-                    result = Converters[type].Record(result, type, new RecorderReader(element, context));
-                }
-                catch (Exception e)
-                {
-                    Dbg.Ex(e);
-
-                    result = GenerateResultFallback(result, type);
-                }
-
-                // This is an important check if we have a referenced type, because if we've changed the result, references won't link up to it properly.
-                // Outside referenced types, it doesn't matter - we want to give people as much control over modification as possible.
-                if (original != null && hasReferenceId && result != original)
-                {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Converter {Converters[type].GetType()} for {type} ignored the model {original} while reading a referenced object; this may cause lost data");
-                    return result;
-                }
-
-                if (result != null && !type.IsAssignableFrom(result.GetType()))
-                {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Converter {Converters[type].GetType()} for {type} returned unexpected type {result.GetType()}");
-                    result = GenerateResultFallback(original, type);
-                }
-
-                return result;
-            }
-
-            // After this point we won't be using a converter in any way, we'll be requiring native Dec types (as native as it gets, at least)
+            // Basic early validation
 
             bool hasChildren = element.Elements().Any();
             bool hasText = element.Nodes().OfType<XText>().Any();
@@ -309,8 +283,139 @@ namespace Dec
                 return null;
             }
 
+            // Defer off to converters, whatever they feel like doing
+            if (Converters.TryGetValue(type, out var converter))
+            {
+                // string converter
+                if (converter is ConverterString converterString)
+                {
+                    switch (parseMode)
+                    {
+                        case ParseMode.Default:
+                        case ParseMode.Replace:
+                            // easy, done
+                            break;
+
+                        default:
+                            Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Invalid mode {parseMode} provided for a ConverterString parse, defaulting to Replace");
+                            goto case ParseMode.Default;
+                    }
+
+                    if (hasChildren)
+                    {
+                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: String converter {converter.GetType()} called with child XML nodes, which will be ignored");
+                    }
+
+                    // We actually accept "no text" here, though, empty-string might be valid!
+
+                    // context might be null; that's OK at the moment
+                    try
+                    {
+                        result = converterString.ReadObj(element.GetText() ?? "", inputContext);
+                    }
+                    catch (Exception e)
+                    {
+                        Dbg.Ex(e);
+
+                        result = GenerateResultFallback(result, type);
+                    }
+                }
+                else if (converter is ConverterRecord converterRecord)
+                {
+                    switch (parseMode)
+                    {
+                        case ParseMode.Default:
+                        case ParseMode.Patch:
+                            // easy, done
+                            break;
+
+                        case ParseMode.Replace:
+                            result = null;
+                            break;
+
+                        default:
+                            Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Invalid mode {parseMode} provided for a ConverterRecord parse, defaulting to Patch");
+                            goto case ParseMode.Default;
+                    }
+
+                    if (result == null)
+                    {
+                        result = type.CreateInstanceSafe("converterrecord", () => $"{context.sourceName}:{element.LineNumber()}");
+                    }
+
+                    // context might be null; that's OK at the moment
+                    if (result != null)
+                    {
+                        try
+                        {
+                            object returnedResult = converterRecord.RecordObj(result, new RecorderReader(element, context));
+
+                            if (!type.IsValueType && result != returnedResult)
+                            {
+                                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Converter {converterRecord.GetType()} changed object instance, this is disallowed");
+                            }
+                            else
+                            {
+                                // for value types, this is fine
+                                result = returnedResult;
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Dbg.Ex(e);
+
+                            // no fallback needed, we already have a result
+                        }
+                    }
+                }
+                else if (converter is ConverterFactory converterFactory)
+                {
+                    switch (parseMode)
+                    {
+                        case ParseMode.Default:
+                        case ParseMode.Patch:
+                            // easy, done
+                            break;
+
+                        case ParseMode.Replace:
+                            result = null;
+                            break;
+
+                        default:
+                            Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Invalid mode {parseMode} provided for a ConverterFactory parse, defaulting to Patch");
+                            goto case ParseMode.Default;
+                    }
+
+                    if (result == null)
+                    {
+                        result = converterFactory.CreateObj(new RecorderReader(element, context, disallowShared: true));
+                    }
+
+                    // context might be null; that's OK at the moment
+                    if (result != null)
+                    {
+                        try
+                        {
+                            result = converterFactory.ReadObj(result, new RecorderReader(element, context));
+                        }
+                        catch (Exception e)
+                        {
+                            Dbg.Ex(e);
+
+                            // no fallback needed, we already have a result
+                        }
+                    }
+                }
+                else
+                {
+                    Dbg.Err($"Somehow ended up with an unsupported converter {converter.GetType()}");
+                }
+
+                return result;
+            }
+
             // Special case: IRecordables
-            if (typeof(IRecordable).IsAssignableFrom(type) && (context.RecorderMode || type.GetMethod("Record").GetCustomAttribute<Bespoke.IgnoreRecordDuringParserAttribute>() == null))
+            if (typeof(IRecordable).IsAssignableFrom(type) && (context.recorderMode || type.GetMethod("Record").GetCustomAttribute<Bespoke.IgnoreRecordDuringParserAttribute>() == null))
             {
                 switch (parseMode)
                 {
@@ -902,7 +1007,7 @@ namespace Dec
             // One big problem here is that I'm OK with security vulnerabilities in dec xmls. Those are either supplied by the developer or by mod authors who are intended to have full code support anyway.
             // I'm less OK with security vulnerabilities in save files. Nobody expects a savefile can compromise their system.
             // And the full reflection system is probably impossible to secure, whereas the Record system should be secureable.
-            if (context.RecorderMode)
+            if (context.recorderMode)
             {
                 Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Falling back to reflection within a Record system while parsing a {type}; this is currently not allowed for security reasons. Either you shouldn't be trying to serialize this, or it should implement Dec.IRecorder (https://zorbathut.github.io/dec/release/documentation/serialization.html), or you need a Dec.Converter (https://zorbathut.github.io/dec/release/documentation/custom.html)");
                 return result;
@@ -1009,32 +1114,39 @@ namespace Dec
         {
             // Special case: Converter override
             // This is redundant if we're being called from ParseElement, but we aren't always.
-            if (Converters.ContainsKey(type))
+            if (Converters.TryGetValue(type, out Converter converter))
             {
-                object result;
+                object result = original;
+                var inputContext = new InputContext() { filename = inputName };
 
                 try
                 {
-                    result = Converters[type].FromString(text, type, inputName, lineNumber);
+                    // string converter
+                    if (converter is ConverterString converterString)
+                    {
+                        // context might be null; that's OK at the moment
+                        result = converterString.ReadObj(text, inputContext);
+                    }
+                    else if (converter is ConverterRecord converterRecord)
+                    {
+                        // string parsing really doesn't apply here, we can't get a full Recorder context out anymore
+                        // in theory this could be done with RecordAsThis() but I'm just going to skip it for now
+                        Dbg.Err($"{inputContext}: Attempt to string-parse with a ConverterRecord, this is currently not supported, contact developers if you need this feature");
+                    }
+                    else if (converter is ConverterFactory converterFactory)
+                    {
+                        // string parsing really doesn't apply here, we can't get a full Recorder context out anymore
+                        // in theory this could be done with RecordAsThis() but I'm just going to skip it for now
+                        Dbg.Err($"{inputContext}: Attempt to string-parse with a ConverterFactory, this is currently not supported, contact developers if you need this feature");
+                    }
+                    else
+                    {
+                        Dbg.Err($"Somehow ended up with an unsupported converter {converter.GetType()}");
+                    }
                 }
                 catch (Exception e)
                 {
                     Dbg.Ex(e);
-
-                    if (type.IsValueType)
-                    {
-                        result = Activator.CreateInstance(type);
-                    }
-                    else
-                    {
-                        result = null;
-                    }
-                }
-
-                if (result != null && !type.IsAssignableFrom(result.GetType()))
-                {
-                    Dbg.Err($"{inputName}:{lineNumber}: Converter {Converters[type].GetType()} for {type} returned unexpected type {result.GetType()}");
-                    return null;
                 }
 
                 return result;

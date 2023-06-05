@@ -335,10 +335,13 @@ namespace Dec
                 var refs = record.ElementNamed("refs");
 
                 var readerContext = new ReaderContext(stringName, true);
+                var refDict = new Dictionary<string, object>();
 
                 if (refs != null)
                 {
                     // First, we need to make the instances for all the references, so they can be crosslinked appropriately
+                    // We'll be doing a second parse to parse *many* of these, but not all
+                    var furtherParsing = new List<Action>();
                     foreach (var reference in refs.Elements())
                     {
                         if (reference.Name.LocalName != "Ref")
@@ -352,6 +355,9 @@ namespace Dec
                             Dbg.Err($"{stringName}:{reference.LineNumber()}: Missing reference ID");
                             continue;
                         }
+
+                        // Further steps don't know how to deal with this, so we just strip it
+                        reference.Attribute("id").Remove();
 
                         var className = reference.Attribute("class")?.Value;
                         if (className == null)
@@ -367,44 +373,77 @@ namespace Dec
                             continue;
                         }
 
-                        // Create a stub so other things can reference it later
-                        var refInstance = possibleType.CreateInstanceSafe("object", () => $"{stringName}:{reference.LineNumber()}", children: reference.Elements().Count());
+                        object refInstance = null;
+                        if (Serialization.Converters.TryGetValue(possibleType, out var converter))
+                        {
+                            if (converter is ConverterString converterString)
+                            {
+                                refInstance = converterString.ReadObj(reference.GetText(), new InputContext() { filename = stringName, handle = reference });
+
+                                // this does not need to be queued for parsing
+                            }
+                            else if (converter is ConverterRecord converterRecord)
+                            {
+                                // create the basic object
+                                refInstance = possibleType.CreateInstanceSafe("object", () => $"{stringName}:{reference.LineNumber()}", children: reference.Elements().Count());
+
+                                // the next parse step
+                                furtherParsing.Add(() => converterRecord.RecordObj(refInstance, new RecorderReader(reference, readerContext)));
+                            }
+                            else if (converter is ConverterFactory converterFactory)
+                            {
+                                // create the basic object
+                                refInstance = converterFactory.CreateObj(new RecorderReader(reference, readerContext, disallowShared: true));
+
+                                // the next parse step
+                                furtherParsing.Add(() => converterFactory.ReadObj(refInstance, new RecorderReader(reference, readerContext)));
+                            }
+                            else
+                            {
+                                Dbg.Err($"Somehow ended up with an unsupported converter {converter.GetType()}");
+                            }
+                        }
+                        else
+                        {
+                            // Create a stub so other things can reference it later
+                            refInstance = possibleType.CreateInstanceSafe("object", () => $"{stringName}:{reference.LineNumber()}", children: reference.Elements().Count());
+
+                            // Whoops, failed to construct somehow. CreateInstanceSafe() has already made a report
+                            if (refInstance != null)
+                            {
+                                furtherParsing.Add(() =>
+                                {
+                                    // Do our actual parsing
+                                    var refInstanceOutput = Serialization.ParseElement(reference, refInstance.GetType(), refInstance, readerContext, new Recorder.Context(), hasReferenceId: true);
+
+                                    if (refInstance != refInstanceOutput)
+                                    {
+                                        Dbg.Err($"{stringName}:{reference.LineNumber()}: Something really bizarre has happened and we got the wrong object back. Things are probably irrevocably broken. Please report this as a bug in Dec.");
+                                    }
+                                });
+                            }
+                        }
+
+                        // If this is null, CreateInstanceSafe has done the error reporting, but we still don't want it in the array because it will break stuff downstream
                         if (refInstance != null)
                         {
-                            readerContext.refs[id] = refInstance;
+                            refDict[id] = refInstance;
                         }
-                        // If this is null, CreateInstanceSafe has done the error reporting, but we still don't want it in the array because it will break stuff downstream
                     }
 
-                    // Now that all the refs exist, we can run through them again and actually parse them
-                    foreach (var reference in refs.Elements())
+                    // link up the ref dict
+                    readerContext.refs = refDict;
+
+                    // finish up our second-stage ref parsing
+                    foreach (var action in furtherParsing)
                     {
-                        var id = reference.Attribute("id")?.Value;
-                        if (id == null)
-                        {
-                            // Just skip it, we don't have anything useful we can do here
-                            continue;
-                        }
-
-                        // The serialization routines don't know how to deal with this, so we'll remove it now
-                        reference.Attribute("id").Remove();
-
-                        var refInstance = readerContext.refs.TryGetValue(id);
-                        if (refInstance == null)
-                        {
-                            // We failed to parse this for some reason, so just skip it now
-                            continue;
-                        }
-
-                        // Do our actual parsing
-                        var refInstanceOutput = Serialization.ParseElement(reference, refInstance.GetType(), refInstance, readerContext, new Recorder.Context(), hasReferenceId: true);
-
-                        if (refInstance != refInstanceOutput)
-                        {
-                            Dbg.Err($"{stringName}:{reference.LineNumber()}: Something really bizarre has happened and we got the wrong object back. Things are probably irrevocably broken. Please report this as a bug in Dec.");
-                            continue;
-                        }
+                        action();
                     }
+                }
+                else
+                {
+                    // empty ref dict, sure
+                    readerContext.refs = new Dictionary<string, object>();
                 }
 
                 var data = record.ElementNamed("data");
@@ -480,17 +519,12 @@ namespace Dec
     {
         public string sourceName;
         public Dictionary<string, object> refs;
+        public bool recorderMode;
 
-        public bool RecorderMode { get => refs != null; }
-
-        public ReaderContext(string sourceName, bool withRefs)
+        public ReaderContext(string sourceName, bool recorderMode)
         {
             this.sourceName = sourceName;
-
-            if (withRefs)
-            {
-                refs = new Dictionary<string, object>();
-            }
+            this.recorderMode = recorderMode;
         }
     }
 
@@ -499,21 +533,23 @@ namespace Dec
         private bool asThis = false;
         private readonly XElement element;
         private readonly ReaderContext context;
+        private bool disallowShared;
 
         public string SourceName { get => context.sourceName; }
         public int SourceLine { get => element.LineNumber(); }
 
-        internal RecorderReader(XElement element, ReaderContext context)
+        internal RecorderReader(XElement element, ReaderContext context, bool disallowShared = false)
         {
             this.element = element;
             this.context = context;
+            this.disallowShared = disallowShared;
         }
 
         internal override void Record<T>(ref T value, string label, Parameters parameters)
         {
             if (asThis)
             {
-                Dbg.Err($"Attempting to read a second field after a RecordAsThis call");
+                Dbg.Err($"{SourceName}:{SourceLine}: Attempting to read a second field after a RecordAsThis call");
                 return;
             }
 
@@ -525,6 +561,11 @@ namespace Dec
                 value = (T)Serialization.ParseElement(element, typeof(T), value, context, parameters.CreateContext());
 
                 return;
+            }
+
+            if (disallowShared && parameters.shared)
+            {
+                Dbg.Err($"{SourceName}:{SourceLine}: Shared object used in a context that disallows shared objects (probably ConverterFactory<>.Create())");
             }
 
             var recorded = element.ElementNamed(label);

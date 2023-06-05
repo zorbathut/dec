@@ -4,7 +4,6 @@ namespace DecTest
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Xml.Linq;
 
     [TestFixture]
     public class ConverterRead : Base
@@ -19,21 +18,16 @@ namespace DecTest
             public ConverterTestPayload payload;
         }
 
-        public class ConverterBasicTest : Dec.Converter
+        public class ConverterBasicTest : Dec.ConverterString<ConverterTestPayload>
         {
-            public override HashSet<Type> HandledTypes()
-            {
-                return new HashSet<Type>() { typeof(ConverterTestPayload) };
-            }
-
-            public override object FromString(string input, Type type, string inputName, int lineNumber)
+            public override ConverterTestPayload Read(string input, Dec.InputContext context)
             {
                 return new ConverterTestPayload() { number = int.Parse(input) };
             }
 
-            public override string ToString(object input)
+            public override string Write(ConverterTestPayload input)
             {
-                return (input as ConverterTestPayload).number.ToString();
+                return input.number.ToString();
             }
         }
 
@@ -56,44 +50,26 @@ namespace DecTest
             Assert.AreEqual(4, Dec.Database<ConverterDec>.Get("TestDecA").payload.number);
         }
 
-        public class EmptyConverter : Dec.Converter
+        public class StubConv1 : Dec.ConverterRecord<Stub>
         {
-            public override HashSet<Type> HandledTypes()
+            public override void Record(ref Stub input, Dec.Recorder recorder)
             {
-                return new HashSet<Type>() { };
+                
             }
         }
 
-        [Test]
-        public void EmptyConverterErr()
+        public class StubConv2 : Dec.ConverterRecord<Stub>
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(EmptyConverter) } };
-
-            Dec.Parser parser = null;
-            ExpectErrors(() => parser = new Dec.Parser());
-            parser.Finish();
-        }
-
-        public class StrConv1 : Dec.Converter
-        {
-            public override HashSet<Type> HandledTypes()
+            public override void Record(ref Stub input, Dec.Recorder recorder)
             {
-                return new HashSet<Type>() { typeof(string) };
-            }
-        }
 
-        public class StrConv2 : Dec.Converter
-        {
-            public override HashSet<Type> HandledTypes()
-            {
-                return new HashSet<Type>() { typeof(string) };
             }
         }
 
         [Test]
         public void OverlappingConverters()
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(StrConv1), typeof(StrConv2) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(StubConv1), typeof(StubConv2) } };
 
             Dec.Parser parser = null;
             ExpectErrors(() => parser = new Dec.Parser());
@@ -105,21 +81,16 @@ namespace DecTest
             public string payload;
         }
 
-        public class ConverterDictTest : Dec.Converter
+        public class ConverterDictTest : Dec.ConverterString<ConverterStringPayload>
         {
-            public override HashSet<Type> HandledTypes()
-            {
-                return new HashSet<Type>() { typeof(ConverterStringPayload) };
-            }
-
-            public override object FromString(string input, Type type, string inputName, int lineNumber)
+            public override ConverterStringPayload Read(string input, Dec.InputContext context)
             {
                 return new ConverterStringPayload() { payload = input };
             }
 
-            public override string ToString(object input)
+            public override string Write(ConverterStringPayload input)
             {
-                return (input as ConverterStringPayload).payload;
+                return input.payload;
             }
         }
 
@@ -181,69 +152,21 @@ namespace DecTest
             Assert.AreEqual("", testDec.payload.payload);
         }
 
-        public class DefaultFailureConverter : Dec.Converter
-        {
-            public override HashSet<Type> HandledTypes()
-            {
-                return new HashSet<Type>() { typeof(ConverterStringPayload) };
-            }
-        }
-
-        [Test]
-        public void DefaultFailureTestString([Values] ParserMode mode)
-        {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterStringDec) }, explicitConverters = new Type[]{ typeof(DefaultFailureConverter) } };
-
-            var parser = new Dec.Parser();
-            parser.AddString(@"
-                <Decs>
-                    <ConverterStringDec decName=""TestDec"">
-                        <payload>stringfail</payload>
-                    </ConverterStringDec>
-                </Decs>");
-            ExpectErrors(() => parser.Finish());
-
-            DoParserTests(mode);
-
-            var testDec = Dec.Database<ConverterStringDec>.Get("TestDec");
-            Assert.IsNull(testDec.payload);
-        }
-
-        [Test]
-        public void DefaultFailureTestXml([Values] ParserMode mode)
-        {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterStringDec) }, explicitConverters = new Type[]{ typeof(DefaultFailureConverter) } };
-
-            var parser = new Dec.Parser();
-            parser.AddString(@"
-                <Decs>
-                    <ConverterStringDec decName=""TestDec"">
-                        <payload><xmlfail></xmlfail></payload>
-                    </ConverterStringDec>
-                </Decs>");
-            ExpectErrors(() => parser.Finish());
-
-            DoParserTests(mode);
-
-            var testDec = Dec.Database<ConverterStringDec>.Get("TestDec");
-            Assert.IsNull(testDec.payload);
-        }
-
         public class NonEmptyPayloadDec : Dec.Dec
         {
             public ConverterStringPayload payload = new ConverterStringPayload();
         }
 
-        public class DefaultNullConverter : Dec.Converter
+        public class DefaultNullConverter : Dec.ConverterString<ConverterStringPayload>
         {
-            public override HashSet<Type> HandledTypes()
-            {
-                return new HashSet<Type>() { typeof(ConverterStringPayload) };
-            }
-
-            public override object FromString(string input, Type type, string inputName, int lineNumber)
+            public override ConverterStringPayload Read(string input, Dec.InputContext context)
             {
                 return null;
+            }
+
+            public override string Write(ConverterStringPayload input)
+            {
+                return "";
             }
         }
 
@@ -284,30 +207,12 @@ namespace DecTest
             public ConverterStructObj initializedTouched = new ConverterStructObj { intA = 5, intB = 6 };
         }
 
-        public class ConverterStructConverter : Dec.Converter
+        public class ConverterStructConverter : Dec.ConverterRecord<ConverterStructObj>
         {
-            public override HashSet<Type> HandledTypes()
+            public override void Record(ref ConverterStructObj cso, Dec.Recorder recorder)
             {
-                return new HashSet<Type>() { typeof(ConverterStructObj) };
-            }
-
-            public override object Record(object model, Type type, Dec.Recorder recorder)
-            {
-                ConverterStructObj cso;
-
-                if (model == null)
-                {
-                    cso = new ConverterStructObj();
-                }
-                else
-                {
-                    cso = (ConverterStructObj)model;
-                }
-
                 recorder.Record(ref cso.intA, "intA");
                 recorder.Record(ref cso.intB, "intB");
-
-                return cso;
             }
         }
 
@@ -362,21 +267,16 @@ namespace DecTest
             public FallbackPayload payload;
         }
 
-        public class FallbackConverter : Dec.Converter
+        public class FallbackConverter : Dec.ConverterString<FallbackPayload>
         {
-            public override HashSet<Type> HandledTypes()
-            {
-                return new HashSet<Type>() { typeof(FallbackPayload) };
-            }
-
-            public override object FromString(string input, Type type, string inputName, int lineNumber)
+            public override FallbackPayload Read(string input, Dec.InputContext inputContext)
             {
                 return new FallbackPayload() { number = int.Parse(input) };
             }
 
-            public override string ToString(object input)
+            public override string Write(FallbackPayload input)
             {
-                return (input as FallbackPayload).number.ToString();
+                return input.number.ToString();
             }
         }
 
@@ -420,19 +320,27 @@ namespace DecTest
             public int after;
         }
 
-        public class ExceptionConverter : Dec.Converter
+        public class ExceptionPayloadConverter : Dec.ConverterString<ExceptionPayload>
         {
-            public override HashSet<Type> HandledTypes()
-            {
-                return new HashSet<Type>() { typeof(ExceptionPayload), typeof(ExceptionPayloadStruct) };
-            }
-
-            public override object FromString(string input, Type type, string inputName, int lineNumber)
+            public override ExceptionPayload Read(string input, Dec.InputContext inputContext)
             {
                 throw new InvalidOperationException();
             }
 
-            public override string ToString(object input)
+            public override string Write(ExceptionPayload input)
+            {
+                throw new InvalidOperationException();
+            }
+        }
+
+        public class ExceptionPayloadStructConverter : Dec.ConverterString<ExceptionPayloadStruct>
+        {
+            public override ExceptionPayloadStruct Read(string input, Dec.InputContext inputContext)
+            {
+                throw new InvalidOperationException();
+            }
+
+            public override string Write(ExceptionPayloadStruct input)
             {
                 throw new InvalidOperationException();
             }
@@ -441,7 +349,7 @@ namespace DecTest
         [Test]
         public void Exception([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExceptionDec) }, explicitConverters = new Type[] { typeof(ExceptionConverter) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExceptionDec) }, explicitConverters = new Type[] { typeof(ExceptionPayloadConverter) } };
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -477,7 +385,7 @@ namespace DecTest
         [Test]
         public void ExceptionRecoveryNull()
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExceptionRecoveryDec) }, explicitConverters = new Type[] { typeof(ExceptionConverter) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExceptionRecoveryDec) }, explicitConverters = new Type[] { typeof(ExceptionPayloadStructConverter) } };
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -496,7 +404,7 @@ namespace DecTest
         [Test]
         public void ExceptionRecoveryNonNull()
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExceptionRecoveryDec) }, explicitConverters = new Type[] { typeof(ExceptionConverter) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExceptionRecoveryDec) }, explicitConverters = new Type[] { typeof(ExceptionPayloadStructConverter) } };
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -516,7 +424,7 @@ namespace DecTest
         [Test]
         public void ExceptionRecoveryStruct()
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExceptionRecoveryDec) }, explicitConverters = new Type[] { typeof(ExceptionConverter) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExceptionRecoveryDec) }, explicitConverters = new Type[] { typeof(ExceptionPayloadStructConverter) } };
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -533,72 +441,133 @@ namespace DecTest
             Assert.AreEqual(1, Dec.Database<ExceptionRecoveryDec>.Get("TestDec").payloadStruct.Count);
         }
 
-        public class IntendedPayload
+        public class RefsForThings
         {
-            public int value = 0;
+            public List<int> listA;
+            public List<int> listB;
         }
 
-        public class UnintendedPayload
+        public class RefsForThingsPair : Dec.IRecordable
         {
+            public RefsForThings a;
+            public RefsForThings b;
 
-        }
-
-        public class IncorrectConverterDec : Dec.Dec
-        {
-            public IntendedPayload payloadNull;
-            public IntendedPayload payloadNonNull = new IntendedPayload { value = 1 };
-        }
-
-        public class IncorrectConverter : Dec.Converter
-        {
-            public override HashSet<Type> HandledTypes()
+            public void Record(Dec.Recorder recorder)
             {
-                return new HashSet<Type>() { typeof(IntendedPayload) };
+                recorder.Shared().Record(ref a, "a");
+                recorder.Shared().Record(ref b, "b");
+            }
+        }
+
+        public class RefsInWrongPlacesConverter : Dec.ConverterFactory<RefsForThings>
+        {
+            public override RefsForThings Create(Dec.Recorder recorder)
+            {
+                var rv = new RefsForThings();
+
+                recorder.Shared().Record(ref rv.listA, "listA");
+                recorder.Shared().Record(ref rv.listB, "listB");
+
+                return rv;
             }
 
-            public override object FromString(string input, Type type, string inputName, int lineNumber)
+            public override void Read(ref RefsForThings input, Dec.Recorder recorder)
             {
-                return new UnintendedPayload();
+                
+            }
+
+            public override void Write(RefsForThings input, Dec.Recorder recorder)
+            {
+                recorder.Shared().Record(ref input.listA, "listA");
+                recorder.Shared().Record(ref input.listB, "listB");
+            }
+        }
+
+        public class RefsInRightPlacesConverter : Dec.ConverterFactory<RefsForThings>
+        {
+            public override RefsForThings Create(Dec.Recorder recorder)
+            {
+                var rv = new RefsForThings();
+
+                return rv;
+            }
+
+            public override void Read(ref RefsForThings input, Dec.Recorder recorder)
+            {
+                recorder.Shared().Record(ref input.listA, "listA");
+                recorder.Shared().Record(ref input.listB, "listB");
+            }
+
+            public override void Write(RefsForThings input, Dec.Recorder recorder)
+            {
+                recorder.Shared().Record(ref input.listA, "listA");
+                recorder.Shared().Record(ref input.listB, "listB");
             }
         }
 
         [Test]
-        public void IncorrectConverterNull()
+        public void RefsInWrongPlaces([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IncorrectConverterDec) }, explicitConverters = new Type[] { typeof(IncorrectConverter) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(RefsInWrongPlacesConverter) } };
+            new Dec.Parser().Finish(); // we're only doing this to kick off the converter init; this is bad and I should fix it
 
-            var parser = new Dec.Parser();
-            parser.AddString(@"
-                <Decs>
-                    <IncorrectConverterDec decName=""TestDec"">
-                        <payloadNull>beefs</payloadNull>
-                    </IncorrectConverterDec>
-                </Decs>");
-            ExpectErrors(() => parser.Finish());
+            var dat = new RefsForThings();
+            dat.listA = dat.listB = new List<int>() { 1, 3, 5, 7, 11 };
 
-            DoParserTests(ParserMode.Bare);
+            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: true);
 
-            Assert.IsNull(Dec.Database<IncorrectConverterDec>.Get("TestDec").payloadNull);
+            // this actually *can* work because the RefsForThings instance is not, itself, shared
+            Assert.AreEqual(dat.listA, deserialized.listA);
+            Assert.AreSame(dat.listA, dat.listB);
         }
 
         [Test]
-        public void IncorrectConverterNonNull()
+        public void RefsInWrongPlacesSubtle([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IncorrectConverterDec) }, explicitConverters = new Type[] { typeof(IncorrectConverter) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(RefsInWrongPlacesConverter) } };
+            new Dec.Parser().Finish(); // we're only doing this to kick off the converter init; this is bad and I should fix it
 
-            var parser = new Dec.Parser();
-            parser.AddString(@"
-                <Decs>
-                    <IncorrectConverterDec decName=""TestDec"">
-                        <payloadNonNull>beefs</payloadNonNull>
-                    </IncorrectConverterDec>
-                </Decs>");
-            ExpectErrors(() => parser.Finish());
+            var dat = new RefsForThings();
+            // these are null, so we'll get the right result, but we want to make sure the errors happen as well
 
-            DoParserTests(ParserMode.Bare);
+            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: true);
 
-            Assert.IsNotNull(Dec.Database<IncorrectConverterDec>.Get("TestDec").payloadNonNull);
-            Assert.AreEqual(1, Dec.Database<IncorrectConverterDec>.Get("TestDec").payloadNonNull.value);
+            Assert.IsNull(deserialized.listA);
+            Assert.IsNull(deserialized.listB);
+        }
+
+        [Test]
+        public void RefsInWrongPlacesBroken([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(RefsInWrongPlacesConverter) } };
+            new Dec.Parser().Finish(); // we're only doing this to kick off the converter init; this is bad and I should fix it
+
+            var dat = new RefsForThingsPair();
+            dat.a = dat.b = new RefsForThings();
+            dat.a.listA = dat.a.listB = new List<int>() { 1, 3, 5, 7, 11 };
+
+            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: true);
+
+            Assert.IsNotNull(deserialized.a);
+            Assert.AreSame(deserialized.a, deserialized.b);
+
+            Assert.IsNull(deserialized.a.listA);
+            Assert.IsNull(deserialized.a.listB);
+        }
+
+        [Test]
+        public void RefsInRightPlaces([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
+        {
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(RefsInRightPlacesConverter) } };
+            new Dec.Parser().Finish(); // we're only doing this to kick off the converter init; this is bad and I should fix it
+
+            var dat = new RefsForThings();
+            dat.listA = dat.listB = new List<int>() { 1, 3, 5, 7, 11 };
+
+            var deserialized = DoRecorderRoundTrip(dat, mode);
+
+            Assert.AreEqual(dat.listA, deserialized.listA);
+            Assert.AreSame(dat.listA, dat.listB);
         }
     }
 }

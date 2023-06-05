@@ -25,30 +25,24 @@ namespace DecTest
             public int c;
         }
 
-        public class ConvertedConverterSimple : Dec.Converter
+        public class ConvertedConverterString : Dec.ConverterString<Converted>
         {
-            public override HashSet<Type> HandledTypes()
-            {
-                return new HashSet<Type> { typeof(Converted) };
-            }
-
-            public override object FromString(string input, Type type, string inputName, int lineNumber)
+            public override Converted Read(string input, Dec.InputContext context)
             {
                 var match = Regex.Match(input, "(-?[0-9]+) (-?[0-9]+) (-?[0-9]+)");
                 return new Converted { a = int.Parse(match.Groups[1].Value), b = int.Parse(match.Groups[2].Value), c = int.Parse(match.Groups[3].Value) };
             }
 
-            public override string ToString(object input)
+            public override string Write(Converted input)
             {
-                var converted = input as Converted;
-                return $"{converted.a} {converted.b} {converted.c}";
+                return $"{input.a} {input.b} {input.c}";
             }
         }
 
         [Test]
-        public void ConverterSimple([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
+        public void ConverterString([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterSimple) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterString) } };
 
             var parser = new Dec.Parser();
             parser.Finish();
@@ -66,22 +60,13 @@ namespace DecTest
             Assert.AreEqual(converted.convertible.c, deserialized.convertible.c);
         }
 
-        public class ConvertedConverterRecord : Dec.Converter
+        public class ConvertedConverterRecord : Dec.ConverterRecord<Converted>
         {
-            public override HashSet<Type> HandledTypes()
+            public override void Record(ref Converted converted, Dec.Recorder recorder)
             {
-                return new HashSet<Type> { typeof(Converted) };
-            }
-
-            public override object Record(object model, Type type, Dec.Recorder recorder)
-            {
-                var converted = model as Converted ?? new Converted();
-
                 recorder.Record(ref converted.a, "a");
                 recorder.Record(ref converted.b, "b");
                 recorder.Record(ref converted.c, "c");
-
-                return converted;
             }
         }
 
@@ -119,9 +104,9 @@ namespace DecTest
         }
 
         [Test]
-        public void ConverterReplacementDetection([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
+        public void ConverterStringRef([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterSimple) } };
+            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterString) } };
 
             var parser = new Dec.Parser();
             parser.Finish();
@@ -130,13 +115,20 @@ namespace DecTest
             converted.convertibleA = new Converted();
             converted.convertibleB = converted.convertibleA;
 
-            var deserialized = DoRecorderRoundTrip(converted, mode, expectReadErrors: true);
+            converted.convertibleA.a = 42;
+            converted.convertibleA.b = 1234;
+            converted.convertibleA.c = -40;
+
+            var deserialized = DoRecorderRoundTrip(converted, mode);
 
             Assert.IsNotNull(deserialized);
 
+            Assert.AreEqual(converted.convertibleA.a, deserialized.convertibleA.a);
+            Assert.AreEqual(converted.convertibleA.b, deserialized.convertibleA.b);
+            Assert.AreEqual(converted.convertibleA.c, deserialized.convertibleA.c);
+
             // no guarantees on what exactly they contain, though!
-            Assert.IsNotNull(deserialized.convertibleA);
-            Assert.IsNotNull(deserialized.convertibleB);
+            Assert.AreSame(deserialized.convertibleA, deserialized.convertibleB);
         }
 
         [Test]
@@ -158,43 +150,6 @@ namespace DecTest
             // no guarantees on what exactly they contain, though!
             Assert.IsNotNull(deserialized.convertibleA);
             Assert.IsNotNull(deserialized.convertibleB);
-        }
-
-        public class ConverterUnsuppliedClass
-        {
-            public int x;
-        }
-
-        public class ConverterUnsuppliedConverter : Dec.Converter
-        {
-            public override HashSet<Type> HandledTypes()
-            {
-                return new HashSet<Type> { typeof(ConverterUnsuppliedClass) };
-            }
-
-            public override object FromString(string input, Type type, string inputName, int lineNumber)
-            {
-                return new ConverterUnsuppliedClass();
-            }
-
-            // whoops we forgot to write a ToString function! how silly
-        }
-
-        [Test]
-        public void ConverterUnsupplied([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
-        {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConverterUnsuppliedConverter) } };
-
-            var parser = new Dec.Parser();
-            parser.Finish();
-
-            var root = new ConverterUnsuppliedClass();
-
-            root.x = 42;
-
-            var deserialized = DoRecorderRoundTrip(root, mode, expectWriteErrors: true);
-
-            Assert.IsNotNull(deserialized); // even if we don't know how to store it and deserialize it, we should at least be able to create it
         }
     }
 }
