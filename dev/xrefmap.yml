@@ -157,6 +157,12 @@ references:
   isSpec: "True"
   fullName: Dec.Config.TestParameters
   nameWithType: Config.TestParameters
+- uid: Dec.Config.TestRefEverything
+  name: TestRefEverything
+  href: api/Dec.Config.html#Dec_Config_TestRefEverything
+  commentId: F:Dec.Config.TestRefEverything
+  fullName: Dec.Config.TestRefEverything
+  nameWithType: Config.TestRefEverything
 - uid: Dec.Config.UnitTestParameters
   name: Config.UnitTestParameters
   href: api/Dec.Config.UnitTestParameters.html
