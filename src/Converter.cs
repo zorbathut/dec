@@ -48,7 +48,7 @@ namespace Dec
         /// Converts a string to a suitable object type.
         /// </summary>
         /// <remarks>
-        /// In case of error, call Dec.Dbg.Err with some appropriately useful message and return default. Message should be formatted as $"{inputName}:{lineNumber}: Something went wrong".
+        /// In case of error, call Dec.Dbg.Err with some appropriately useful message and return default. Message should be formatted as $"{context}: Something went wrong".
         /// </remarks>
         public abstract T Read(string input, InputContext context);
 

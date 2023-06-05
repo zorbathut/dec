@@ -48,7 +48,7 @@ namespace Dec
 
         private static Regex GenericParameterMatcher = new Regex("`[0-9]+", RegexOptions.Compiled);
         private static Dictionary<string, Type[]> StrippedTypeCache = null;
-        private static Type GetTypeFromAnyAssembly(string text, string inputLine, int lineNumber)
+        private static Type GetTypeFromAnyAssembly(string text, InputContext context)
         {
             // This is technically unnecessary if we're not parsing a generic, but we may as well do it because the cache will still be faster for nongenerics.
             // If we really wanted a perf boost here, we'd do one pass for non-template objects, then do it again on a cache miss to fill it with template stuff.
@@ -87,12 +87,12 @@ namespace Dec
             }
             else
             {
-                Dbg.Err($"{inputLine}:{lineNumber}: Too many types found with name {text}");
+                Dbg.Err($"{context}: Too many types found with name {text}");
                 return result[0];
             }
         }
 
-        private static Type ParseWithoutNamespace(Type root, string text, string inputLine, int lineNumber)
+        private static Type ParseWithoutNamespace(Type root, string text, InputContext context)
         {
             if (root == null)
             {
@@ -128,13 +128,13 @@ namespace Dec
                 }
 
                 // Chain on to another call in case we have a further-nested class-of-class
-                return ParseWithoutNamespace(chosenType, text.Substring(end), inputLine, lineNumber);
+                return ParseWithoutNamespace(chosenType, text.Substring(end), context);
             }
             else if (text[0] == '<')
             {
                 if (!root.IsGenericTypeDefinition)
                 {
-                    Dbg.Err($"{inputLine}:{lineNumber}: Found generic specification on non-generic type {root}");
+                    Dbg.Err($"{context}: Found generic specification on non-generic type {root}");
                     return null;
                 }
 
@@ -146,7 +146,7 @@ namespace Dec
                 var parsedTypes = new List<Type>();
                 void AddParsedType(string type)
                 {
-                    parsedTypes.Add(ParseDecFormatted(type.Trim(), inputLine, lineNumber));
+                    parsedTypes.Add(ParseDecFormatted(type.Trim(), context));
                 }
 
                 int tokenStart = 1;
@@ -197,13 +197,13 @@ namespace Dec
 
                 if (tokenStart >= text.Length || text[tokenStart] != '>')
                 {
-                    Dbg.Err($"{inputLine}:{lineNumber}: Failed to find closing angle bracket in type");
+                    Dbg.Err($"{context}: Failed to find closing angle bracket in type");
                     return null;
                 }
 
                 if (parsedTypes.Count != root.GetGenericArguments().Length)
                 {
-                    Dbg.Err($"{inputLine}:{lineNumber}: Wrong number of generic arguments for type {root}");
+                    Dbg.Err($"{context}: Wrong number of generic arguments for type {root}");
                     return null;
                 }
 
@@ -213,7 +213,7 @@ namespace Dec
                 // yay!
 
                 // We also might have more type to parse.
-                return ParseWithoutNamespace(specifiedType, text.Substring(tokenStart + 1), inputLine, lineNumber);
+                return ParseWithoutNamespace(specifiedType, text.Substring(tokenStart + 1), context);
             }
             else
             {
@@ -222,7 +222,7 @@ namespace Dec
             }
         }
 
-        private static Type ParseWithNamespace(string text, string inputLine, int lineNumber)
+        private static Type ParseWithNamespace(string text, InputContext context)
         {
             // At this point we've dealt with the whole Using thing, we just need to deal with this class on its own.
 
@@ -239,10 +239,10 @@ namespace Dec
                 }
 
                 string token = text.Substring(0, tokenEnd);
-                Type parsedType = GetTypeFromAnyAssembly(token, inputLine, lineNumber);
+                Type parsedType = GetTypeFromAnyAssembly(token, context);
                 if (parsedType != null)
                 {
-                    return ParseWithoutNamespace(parsedType, text.Substring(tokenEnd), inputLine, lineNumber);
+                    return ParseWithoutNamespace(parsedType, text.Substring(tokenEnd), context);
                 }
 
                 tokenNext = tokenEnd + 1;
@@ -255,7 +255,7 @@ namespace Dec
         }
 
         private static Dictionary<string, Type> ParseCache = new Dictionary<string, Type>();
-        internal static Type ParseDecFormatted(string text, string inputLine, int lineNumber)
+        internal static Type ParseDecFormatted(string text, InputContext context)
         {
             if (ParseCache.TryGetValue(text, out Type cacheVal))
             {
@@ -283,20 +283,20 @@ namespace Dec
 
             // We need to find a class that matches the least number of tokens. Namespaces can't be templates so at most this continues until we hit a namespace.
             var possibleTypes = Config.UsingNamespaces
-                .Select(ns => ParseWithNamespace($"{ns}.{text}", inputLine, lineNumber))
-                .Concat(ParseWithNamespace(text, inputLine, lineNumber))
+                .Select(ns => ParseWithNamespace($"{ns}.{text}", context))
+                .Concat(ParseWithNamespace(text, context))
                 .Where(t => t != null)
                 .ToArray();
 
             Type result;
             if (possibleTypes.Length == 0)
             {
-                Dbg.Err($"{inputLine}:{lineNumber}: Couldn't find type named `{text}`");
+                Dbg.Err($"{context}: Couldn't find type named `{text}`");
                 result = null;
             }
             else if (possibleTypes.Length > 1)
             {
-                Dbg.Err($"{inputLine}:{lineNumber}: Found too many types named `{text}` ({possibleTypes.Select(t => t.FullName).ToCommaString()})");
+                Dbg.Err($"{context}: Found too many types named `{text}` ({possibleTypes.Select(t => t.FullName).ToCommaString()})");
                 result = possibleTypes[0];
             }
             else

@@ -24,13 +24,15 @@ namespace DecTest
         [OneTimeSetUp]
         public void CreateCallbacks()
         {
+            var inputContext = Activator.CreateInstance(Assembly.GetAssembly(typeof(Dec.Dec)).GetType("Dec.InputContext"), "(testing)");
+
             var reflectionClass = Assembly.GetAssembly(typeof(Dec.Dec)).GetType("Dec.UtilType");
 
             var serialize = reflectionClass.GetMethod("ComposeDecFormatted", BindingFlags.NonPublic | BindingFlags.Static);
             serializeType = type => (string)serialize.Invoke(null, new object[] { type });
 
             var parse = reflectionClass.GetMethod("ParseDecFormatted", BindingFlags.NonPublic | BindingFlags.Static);
-            parseType = str => (Type)parse.Invoke(null, new object[] { str, "XXX", -1 });
+            parseType = str => (Type)parse.Invoke(null, new object[] { str, inputContext });
         }
 
         [SetUp]

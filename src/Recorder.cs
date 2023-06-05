@@ -316,17 +316,17 @@ namespace Dec
                 var record = doc.Elements().First();
                 if (record.Name.LocalName != "Record")
                 {
-                    Dbg.Wrn($"{stringName}:{record.LineNumber()}: Found root element with name `{record.Name.LocalName}` when it should be `Record`");
+                    Dbg.Wrn($"{new InputContext(stringName, record)}: Found root element with name `{record.Name.LocalName}` when it should be `Record`");
                 }
 
                 var recordFormatVersion = record.ElementNamed("recordFormatVersion");
                 if (recordFormatVersion == null)
                 {
-                    Dbg.Err($"{stringName}:{record.LineNumber()}: Missing record format version, assuming the data is up-to-date");
+                    Dbg.Err($"{new InputContext(stringName, record)}: Missing record format version, assuming the data is up-to-date");
                 }
                 else if (recordFormatVersion.GetText() != "1")
                 {
-                    Dbg.Err($"{stringName}:{recordFormatVersion.LineNumber()}: Unknown record format version {recordFormatVersion.GetText()}, expected 1 or earlier");
+                    Dbg.Err($"{new InputContext(stringName, recordFormatVersion)}: Unknown record format version {recordFormatVersion.GetText()}, expected 1 or earlier");
 
                     // I would rather not guess about this
                     return default(T);
@@ -344,15 +344,17 @@ namespace Dec
                     var furtherParsing = new List<Action>();
                     foreach (var reference in refs.Elements())
                     {
+                        var context = new InputContext(stringName, reference);
+
                         if (reference.Name.LocalName != "Ref")
                         {
-                            Dbg.Wrn($"{stringName}:{reference.LineNumber()}: Reference element should be named 'Ref'");
+                            Dbg.Wrn($"{context}: Reference element should be named 'Ref'");
                         }
 
                         var id = reference.Attribute("id")?.Value;
                         if (id == null)
                         {
-                            Dbg.Err($"{stringName}:{reference.LineNumber()}: Missing reference ID");
+                            Dbg.Err($"{context}: Missing reference ID");
                             continue;
                         }
 
@@ -362,14 +364,14 @@ namespace Dec
                         var className = reference.Attribute("class")?.Value;
                         if (className == null)
                         {
-                            Dbg.Err($"{stringName}:{reference.LineNumber()}: Missing reference class name");
+                            Dbg.Err($"{context}: Missing reference class name");
                             continue;
                         }
 
-                        var possibleType = (Type)Serialization.ParseString(className, typeof(Type), null, stringName, reference.LineNumber());
+                        var possibleType = (Type)Serialization.ParseString(className, typeof(Type), null, context);
                         if (possibleType.IsValueType)
                         {
-                            Dbg.Err($"{stringName}:{reference.LineNumber()}: Reference assigned type {possibleType}, which is a value type");
+                            Dbg.Err($"{context}: Reference assigned type {possibleType}, which is a value type");
                             continue;
                         }
 
@@ -378,14 +380,14 @@ namespace Dec
                         {
                             if (converter is ConverterString converterString)
                             {
-                                refInstance = converterString.ReadObj(reference.GetText(), new InputContext() { filename = stringName, handle = reference });
+                                refInstance = converterString.ReadObj(reference.GetText(), context);
 
                                 // this does not need to be queued for parsing
                             }
                             else if (converter is ConverterRecord converterRecord)
                             {
                                 // create the basic object
-                                refInstance = possibleType.CreateInstanceSafe("object", () => $"{stringName}:{reference.LineNumber()}", children: reference.Elements().Count());
+                                refInstance = possibleType.CreateInstanceSafe("object", context, children: reference.Elements().Count());
 
                                 // the next parse step
                                 furtherParsing.Add(() => converterRecord.RecordObj(refInstance, new RecorderReader(reference, readerContext)));
@@ -406,7 +408,7 @@ namespace Dec
                         else
                         {
                             // Create a stub so other things can reference it later
-                            refInstance = possibleType.CreateInstanceSafe("object", () => $"{stringName}:{reference.LineNumber()}", children: reference.Elements().Count());
+                            refInstance = possibleType.CreateInstanceSafe("object", context, children: reference.Elements().Count());
 
                             // Whoops, failed to construct somehow. CreateInstanceSafe() has already made a report
                             if (refInstance != null)
@@ -418,7 +420,7 @@ namespace Dec
 
                                     if (refInstance != refInstanceOutput)
                                     {
-                                        Dbg.Err($"{stringName}:{reference.LineNumber()}: Something really bizarre has happened and we got the wrong object back. Things are probably irrevocably broken. Please report this as a bug in Dec.");
+                                        Dbg.Err($"{context}: Something really bizarre has happened and we got the wrong object back. Things are probably irrevocably broken. Please report this as a bug in Dec.");
                                     }
                                 });
                             }
@@ -449,7 +451,7 @@ namespace Dec
                 var data = record.ElementNamed("data");
                 if (data == null)
                 {
-                    Dbg.Err($"{stringName}:{record.LineNumber()}: No data element provided. This is not very recoverable.");
+                    Dbg.Err($"{new InputContext(stringName, record)}: No data element provided. This is not very recoverable.");
 
                     return default(T);
                 }
@@ -532,24 +534,25 @@ namespace Dec
     {
         private bool asThis = false;
         private readonly XElement element;
-        private readonly ReaderContext context;
+        private readonly ReaderContext readerContext;
         private bool disallowShared;
+        private InputContext inputContext;
 
-        public string SourceName { get => context.sourceName; }
-        public int SourceLine { get => element.LineNumber(); }
+        public InputContext InputContext { get => inputContext; }
 
         internal RecorderReader(XElement element, ReaderContext context, bool disallowShared = false)
         {
             this.element = element;
-            this.context = context;
+            this.readerContext = context;
             this.disallowShared = disallowShared;
+            this.inputContext = new InputContext(readerContext.sourceName, element);
         }
 
         internal override void Record<T>(ref T value, string label, Parameters parameters)
         {
             if (asThis)
             {
-                Dbg.Err($"{SourceName}:{SourceLine}: Attempting to read a second field after a RecordAsThis call");
+                Dbg.Err($"{inputContext}: Attempting to read a second field after a RecordAsThis call");
                 return;
             }
 
@@ -558,14 +561,14 @@ namespace Dec
                 asThis = true;
 
                 // Explicit cast here because we want an error if we have the wrong type!
-                value = (T)Serialization.ParseElement(element, typeof(T), value, context, parameters.CreateContext());
+                value = (T)Serialization.ParseElement(element, typeof(T), value, readerContext, parameters.CreateContext());
 
                 return;
             }
 
             if (disallowShared && parameters.shared)
             {
-                Dbg.Err($"{SourceName}:{SourceLine}: Shared object used in a context that disallows shared objects (probably ConverterFactory<>.Create())");
+                Dbg.Err($"{inputContext}: Shared object used in a context that disallows shared objects (probably ConverterFactory<>.Create())");
             }
 
             var recorded = element.ElementNamed(label);
@@ -575,7 +578,7 @@ namespace Dec
             }
 
             // Explicit cast here because we want an error if we have the wrong type!
-            value = (T)Serialization.ParseElement(recorded, typeof(T), value, context, parameters.CreateContext());
+            value = (T)Serialization.ParseElement(recorded, typeof(T), value, readerContext, parameters.CreateContext());
         }
 
         public override Direction Mode { get => Direction.Read; }

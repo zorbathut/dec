@@ -146,25 +146,27 @@ namespace Dec
 
                 foreach (var rootElement in doc.Elements())
                 {
+                    var rootContext = new InputContext(stringName, rootElement);
                     if (rootElement.Name.LocalName != "Decs")
                     {
-                        Dbg.Wrn($"{stringName}:{rootElement.LineNumber()}: Found root element with name `{rootElement.Name.LocalName}` when it should be `Decs`");
+                        Dbg.Wrn($"{rootContext}: Found root element with name `{rootElement.Name.LocalName}` when it should be `Decs`");
                     }
 
                     foreach (var decElement in rootElement.Elements())
                     {
+                        var decContext = new InputContext(stringName, decElement);
                         string typeName = decElement.Name.LocalName;
 
-                        Type typeHandle = UtilType.ParseDecFormatted(typeName, stringName, decElement.LineNumber());
+                        Type typeHandle = UtilType.ParseDecFormatted(typeName, decContext);
                         if (typeHandle == null || !typeof(Dec).IsAssignableFrom(typeHandle))
                         {
-                            Dbg.Err($"{stringName}:{decElement.LineNumber()}: {typeName} is not a valid root Dec type");
+                            Dbg.Err($"{decContext}: {typeName} is not a valid root Dec type");
                             continue;
                         }
 
                         if (decElement.Attribute("decName") == null)
                         {
-                            Dbg.Err($"{stringName}:{decElement.LineNumber()}: No dec name provided, add a `decName=` attribute to the {typeName} tag (example: <{typeName} decName=\"TheNameOfYour{typeName}\">)");
+                            Dbg.Err($"{decContext}: No dec name provided, add a `decName=` attribute to the {typeName} tag (example: <{typeName} decName=\"TheNameOfYour{typeName}\">)");
                             continue;
                         }
 
@@ -174,15 +176,15 @@ namespace Dec
                             // This feels very hardcoded, but these are also *by far* the most common errors I've seen, and I haven't come up with a better and more general solution
                             if (decName.Contains(" "))
                             {
-                                Dbg.Err($"{stringName}:{decElement.LineNumber()}: Dec name `{decName}` is not a valid identifier; consider removing spaces");
+                                Dbg.Err($"{decContext}: Dec name `{decName}` is not a valid identifier; consider removing spaces");
                             }
                             else if (decName.Contains("\""))
                             {
-                                Dbg.Err($"{stringName}:{decElement.LineNumber()}: Dec name `{decName}` is not a valid identifier; consider removing quotes");
+                                Dbg.Err($"{decContext}: Dec name `{decName}` is not a valid identifier; consider removing quotes");
                             }
                             else
                             {
-                                Dbg.Err($"{stringName}:{decElement.LineNumber()}: Dec name `{decName}` is not a valid identifier; dec identifiers must be valid C# identifiers");
+                                Dbg.Err($"{decContext}: Dec name `{decName}` is not a valid identifier; dec identifiers must be valid C# identifiers");
                             }
                             
                             continue;
@@ -199,7 +201,7 @@ namespace Dec
                             {
                                 if (!bool.TryParse(abstractAttribute.Value, out abstrct))
                                 {
-                                    Dbg.Err($"{stringName}:{decElement.LineNumber()}: Error encountered when parsing abstract attribute");
+                                    Dbg.Err($"{decContext}: Error encountered when parsing abstract attribute");
                                 }
 
                                 abstractAttribute.Remove();
@@ -223,7 +225,7 @@ namespace Dec
                             var identifier = Tuple.Create(typeHandle.GetDecRootType(), decName);
                             if (potentialParents.ContainsKey(identifier))
                             {
-                                Dbg.Err($"{stringName}:{decElement.LineNumber()}: Dec [{identifier.Item1}:{identifier.Item2}] defined twice");
+                                Dbg.Err($"{decContext}: Dec [{identifier.Item1}:{identifier.Item2}] defined twice");
                             }
                             else
                             {
@@ -234,7 +236,7 @@ namespace Dec
                         if (!abstrct)
                         {
                             // Not an abstract dec instance, so create our instance
-                            var decInstance = (Dec)typeHandle.CreateInstanceSafe("dec", () => $"{stringName}:{decElement.LineNumber()}");
+                            var decInstance = (Dec)typeHandle.CreateInstanceSafe("dec", decContext);
 
                             // Error reporting happens within CreateInstanceSafe; if we get null out, we just need to clean up elegantly
                             if (decInstance != null)
@@ -339,7 +341,7 @@ namespace Dec
                         // This is a struct for the sake of performance, so child itself won't be null
                         if (parentData.xml == null)
                         {
-                            Dbg.Err($"{currentContext.sourceName}:{currentXml.LineNumber()}: Dec `{currentDecName}` is attempting to use parent `{parentDecName}`, but no such dec exists");
+                            Dbg.Err($"{new InputContext(currentContext.sourceName, currentXml)}: Dec `{currentDecName}` is attempting to use parent `{parentDecName}`, but no such dec exists");
 
                             // Not much more we can do here.
                             break;

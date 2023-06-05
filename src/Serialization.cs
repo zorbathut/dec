@@ -19,9 +19,27 @@ namespace Dec
         internal string filename;
         internal System.Xml.Linq.XElement handle;
 
+        public InputContext(string filename)
+        {
+            this.filename = filename;
+        }
+
+        public InputContext(string filename, System.Xml.Linq.XElement handle)
+        {
+            this.filename = filename;
+            this.handle = handle;
+        }
+
         public override string ToString()
         {
-            return $"{filename}:{( handle != null ? handle.LineNumber().ToString() : "???" )}";
+            if (this.handle != null)
+            {
+                return $"{filename}:{handle.LineNumber()}";
+            }
+            else
+            {
+                return filename;
+            }
         }
     }
 
@@ -54,7 +72,7 @@ namespace Dec
 
             foreach (var type in conversionTypes)
             {
-                var converter = (Converter)type.CreateInstanceSafe("converter", () => "converter");
+                var converter = (Converter)type.CreateInstanceSafe("converter", new InputContext("converter"));
 
                 if (converter != null && (converter is ConverterString || converter is ConverterRecord || converter is ConverterFactory))
                 {
@@ -100,7 +118,7 @@ namespace Dec
             //PatchIfExists, //NYI
             //DeleteIfExists, //NYI
         }
-        internal static ParseMode ParseModeFromString(ReaderContext context, XElement element, string str)
+        internal static ParseMode ParseModeFromString(InputContext context, string str)
         {
             if (str == null)
             {
@@ -120,7 +138,7 @@ namespace Dec
             }
             else
             {
-                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Invalid `{str}` mode!");
+                Dbg.Err($"{context}: Invalid `{str}` mode!");
 
                 return ParseMode.Default;
             }
@@ -132,7 +150,7 @@ namespace Dec
             object result = original;
 
             // Get our input formatting together
-            var inputContext = new InputContext() { filename = context.sourceName, handle = element };
+            var inputContext = new InputContext(context.sourceName, element);
 
             // Verify our Shared flags as the *very* first step to ensure nothing gets past us.
             // In theory this should be fine with Flexible; Flexible only happens on an outer wrapper that was shared, and therefore was null, and therefore this is default also
@@ -141,12 +159,12 @@ namespace Dec
                 if (!type.CanBeShared())
                 {
                     // If shared, make sure our input is null and our type is appropriate for sharing
-                    Dbg.Wrn($"{context.sourceName}:{element.LineNumber()}: Value type `{type}` tagged as Shared in recorder, this is meaningless but harmless");
+                    Dbg.Wrn($"{inputContext}: Value type `{type}` tagged as Shared in recorder, this is meaningless but harmless");
                 }
                 else if (original != null)
                 {
                     // We need to create objects without context if it's shared, so we kind of panic in this case
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Shared `{type}` provided with non-null default object, this may result in unexpected behavior");
+                    Dbg.Err($"{inputContext}: Shared `{type}` provided with non-null default object, this may result in unexpected behavior");
                 }
             }
 
@@ -164,7 +182,7 @@ namespace Dec
             {
                 if (!bool.TryParse(nullAttribute, out bool nullValue))
                 {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Invalid `null` attribute");
+                    Dbg.Err($"{inputContext}: Invalid `null` attribute");
                     nullAttribute = null;
                 }
                 else if (!nullValue)
@@ -176,28 +194,28 @@ namespace Dec
 
             if (refAttribute != null && !context.recorderMode)
             {
-                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Found a reference tag while not evaluating Recorder mode, ignoring it");
+                Dbg.Err($"{inputContext}: Found a reference tag while not evaluating Recorder mode, ignoring it");
                 refAttribute = null;
             }
 
-            ParseMode parseMode = ParseModeFromString(context, element, modeAttribute);
+            ParseMode parseMode = ParseModeFromString(inputContext, modeAttribute);
 
             // Some of these are redundant and that's OK
             if (nullAttribute != null && (refAttribute != null || classAttribute != null || modeAttribute != null))
             {
-                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Null element may not have ref, class, or mode specified; guessing wildly at intentions");
+                Dbg.Err($"{inputContext}: Null element may not have ref, class, or mode specified; guessing wildly at intentions");
             }
             else if (refAttribute != null && (nullAttribute != null || classAttribute != null || modeAttribute != null))
             {
-                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Ref element may not have null, class, or mode specified; guessing wildly at intentions");
+                Dbg.Err($"{inputContext}: Ref element may not have null, class, or mode specified; guessing wildly at intentions");
             }
             else if (classAttribute != null && (nullAttribute != null || refAttribute != null))
             {
-                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Class-specified element may not have null or ref specified; guessing wildly at intentions");
+                Dbg.Err($"{inputContext}: Class-specified element may not have null or ref specified; guessing wildly at intentions");
             }
             else if (modeAttribute != null && (nullAttribute != null || refAttribute != null))
             {
-                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Mode-specified element may not have null or ref specified; guessing wildly at intentions");
+                Dbg.Err($"{inputContext}: Mode-specified element may not have null or ref specified; guessing wildly at intentions");
             }
 
             if (element.HasAttributes)
@@ -205,7 +223,7 @@ namespace Dec
                 if (consumedAttributes == null || element.Attributes().Select(attr => attr.Name.LocalName).Any(attrname => !consumedAttributes.Contains(attrname)))
                 {
                     string attrlist = string.Join(", ", element.Attributes().Select(attr => attr.Name.LocalName).Where(attrname => consumedAttributes == null || !consumedAttributes.Contains(attrname)));
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Has unknown attributes {attrlist}");
+                    Dbg.Err($"{inputContext}: Has unknown attributes {attrlist}");
                 }
             }
 
@@ -215,25 +233,25 @@ namespace Dec
 
                 if (recContext.shared == Recorder.Context.Shared.Deny)
                 {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Found a reference in a non-.Shared() context, using it anyway but this might produce unexpected results");
+                    Dbg.Err($"{inputContext}: Found a reference in a non-.Shared() context, using it anyway but this might produce unexpected results");
                 }
 
                 if (context.refs == null)
                 {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Found a reference object {refAttribute} before refs are initialized (is this being used in a ConverterFactory<>.Create()?)");
+                    Dbg.Err($"{inputContext}: Found a reference object {refAttribute} before refs are initialized (is this being used in a ConverterFactory<>.Create()?)");
                     return result;
                 }
 
                 if (!context.refs.ContainsKey(refAttribute))
                 {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Found a reference object {refAttribute} without a valid reference mapping");
+                    Dbg.Err($"{inputContext}: Found a reference object {refAttribute} without a valid reference mapping");
                     return result;
                 }
 
                 object refObject = context.refs[refAttribute];
                 if (!type.IsAssignableFrom(refObject.GetType()))
                 {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Reference object {refAttribute} is of type {refObject.GetType()}, which cannot be converted to expected type {type}");
+                    Dbg.Err($"{inputContext}: Reference object {refAttribute} is of type {refObject.GetType()}, which cannot be converted to expected type {type}");
                     return result;
                 }
 
@@ -250,14 +268,14 @@ namespace Dec
             }
             else if (classAttribute != null)
             {
-                var possibleType = (Type)ParseString(classAttribute, typeof(Type), null, context.sourceName, element.LineNumber());
+                var possibleType = (Type)ParseString(classAttribute, typeof(Type), null, inputContext);
                 if (!type.IsAssignableFrom(possibleType))
                 {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Explicit type {classAttribute} cannot be assigned to expected type {type}");
+                    Dbg.Err($"{inputContext}: Explicit type {classAttribute} cannot be assigned to expected type {type}");
                 }
                 else if (result != null && result.GetType() != possibleType)
                 {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Explicit type {classAttribute} does not match already-provided instance {type}");
+                    Dbg.Err($"{inputContext}: Explicit type {classAttribute} does not match already-provided instance {type}");
                 }
                 else
                 {
@@ -272,14 +290,14 @@ namespace Dec
 
             if (hasChildren && hasText)
             {
-                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Cannot have both text and child nodes in XML - this is probably a typo, maybe you have the wrong number of close tags or added text somewhere you didn't mean to?");
+                Dbg.Err($"{inputContext}: Cannot have both text and child nodes in XML - this is probably a typo, maybe you have the wrong number of close tags or added text somewhere you didn't mean to?");
 
                 // we'll just fall through and try to parse anyway, though
             }
 
             if (typeof(Dec).IsAssignableFrom(type) && hasChildren && !isRootDec)
             {
-                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Defining members of an item of type {type}, derived from Dec.Dec, is not supported within an outer Dec. Either reference a {type} defined independently or remove {type}'s inheritance from Dec.");
+                Dbg.Err($"{inputContext}: Defining members of an item of type {type}, derived from Dec.Dec, is not supported within an outer Dec. Either reference a {type} defined independently or remove {type}'s inheritance from Dec.");
                 return null;
             }
 
@@ -297,13 +315,13 @@ namespace Dec
                             break;
 
                         default:
-                            Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Invalid mode {parseMode} provided for a ConverterString parse, defaulting to Replace");
+                            Dbg.Err($"{inputContext}: Invalid mode {parseMode} provided for a ConverterString parse, defaulting to Replace");
                             goto case ParseMode.Default;
                     }
 
                     if (hasChildren)
                     {
-                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: String converter {converter.GetType()} called with child XML nodes, which will be ignored");
+                        Dbg.Err($"{inputContext}: String converter {converter.GetType()} called with child XML nodes, which will be ignored");
                     }
 
                     // We actually accept "no text" here, though, empty-string might be valid!
@@ -334,13 +352,13 @@ namespace Dec
                             break;
 
                         default:
-                            Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Invalid mode {parseMode} provided for a ConverterRecord parse, defaulting to Patch");
+                            Dbg.Err($"{inputContext}: Invalid mode {parseMode} provided for a ConverterRecord parse, defaulting to Patch");
                             goto case ParseMode.Default;
                     }
 
                     if (result == null)
                     {
-                        result = type.CreateInstanceSafe("converterrecord", () => $"{context.sourceName}:{element.LineNumber()}");
+                        result = type.CreateInstanceSafe("converterrecord", inputContext);
                     }
 
                     // context might be null; that's OK at the moment
@@ -352,7 +370,7 @@ namespace Dec
 
                             if (!type.IsValueType && result != returnedResult)
                             {
-                                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Converter {converterRecord.GetType()} changed object instance, this is disallowed");
+                                Dbg.Err($"{inputContext}: Converter {converterRecord.GetType()} changed object instance, this is disallowed");
                             }
                             else
                             {
@@ -382,7 +400,7 @@ namespace Dec
                             break;
 
                         default:
-                            Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Invalid mode {parseMode} provided for a ConverterFactory parse, defaulting to Patch");
+                            Dbg.Err($"{inputContext}: Invalid mode {parseMode} provided for a ConverterFactory parse, defaulting to Patch");
                             goto case ParseMode.Default;
                     }
 
@@ -425,7 +443,7 @@ namespace Dec
                         break;
 
                     default:
-                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Invalid mode {parseMode} provided for an IRecordable parse, defaulting to Patch");
+                        Dbg.Err($"{inputContext}: Invalid mode {parseMode} provided for an IRecordable parse, defaulting to Patch");
                         goto case ParseMode.Patch;
                 }
 
@@ -437,7 +455,7 @@ namespace Dec
                 }
                 else if (recContext.factories == null)
                 {
-                    recordable = (IRecordable)type.CreateInstanceSafe("recordable", () => $"{context.sourceName}:{element.LineNumber()}");
+                    recordable = (IRecordable)type.CreateInstanceSafe("recordable", inputContext);
                 }
                 else
                 {
@@ -456,7 +474,7 @@ namespace Dec
 
                     if (maker == null)
                     {
-                        recordable = (IRecordable)type.CreateInstanceSafe("recordable", () => $"{context.sourceName}:{element.LineNumber()}");
+                        recordable = (IRecordable)type.CreateInstanceSafe("recordable", inputContext);
                     }
                     else
                     {
@@ -475,12 +493,12 @@ namespace Dec
                         if (obj == null)
                         {
                             // fall back to default behavior
-                            recordable = (IRecordable)type.CreateInstanceSafe("recordable", () => $"{context.sourceName}:{element.LineNumber()}");
+                            recordable = (IRecordable)type.CreateInstanceSafe("recordable", inputContext);
                         }
                         else if (!type.IsAssignableFrom(obj.GetType()))
                         {
                             Dbg.Err($"Custom factory generated {obj.GetType()} when {type} was expected; falling back on a default object");
-                            recordable = (IRecordable)type.CreateInstanceSafe("recordable", () => $"{context.sourceName}:{element.LineNumber()}");
+                            recordable = (IRecordable)type.CreateInstanceSafe("recordable", inputContext);
                         }
                         else
                         {
@@ -515,22 +533,22 @@ namespace Dec
                         break;
 
                     default:
-                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Invalid mode {parseMode} provided for a simple string parse, defaulting to Replace");
+                        Dbg.Err($"{inputContext}: Invalid mode {parseMode} provided for a simple string parse, defaulting to Replace");
                         goto case ParseMode.Replace;
                 }
 
                 if (hasChildren)
                 {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Child nodes are not valid when parsing {type}");
+                    Dbg.Err($"{inputContext}: Child nodes are not valid when parsing {type}");
                 }
 
-                return ParseString(element.GetText(), type, original, context.sourceName, element.LineNumber());
+                return ParseString(element.GetText(), type, original, inputContext);
             }
 
             // Nothing past this point even supports text, so let's just get angry and break stuff.
             if (hasText)
             {
-                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Text detected in a situation where it is invalid; will be ignored");
+                Dbg.Err($"{inputContext}: Text detected in a situation where it is invalid; will be ignored");
             }
 
             // Special case: Lists
@@ -554,7 +572,7 @@ namespace Dec
                         break;
 
                     default:
-                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Invalid mode {parseMode} provided for a List parse, defaulting to Replace");
+                        Dbg.Err($"{inputContext}: Invalid mode {parseMode} provided for a List parse, defaulting to Replace");
                         goto case ParseMode.Replace;
                 }
 
@@ -567,7 +585,8 @@ namespace Dec
                 {
                     if (fieldElement.Name.LocalName != "li")
                     {
-                        Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
+                        var elementContext = new InputContext(context.sourceName, fieldElement);
+                        Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                     }
 
                     list.Add(ParseElement(fieldElement, referencedType, null, context, recContext.CreateChild()));
@@ -621,7 +640,7 @@ namespace Dec
                         break;
 
                     default:
-                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Invalid mode {parseMode} provided for an Array parse, defaulting to Replace");
+                        Dbg.Err($"{inputContext}: Invalid mode {parseMode} provided for an Array parse, defaulting to Replace");
                         goto case ParseMode.Replace;
                 }
 
@@ -630,7 +649,8 @@ namespace Dec
                     var fieldElement = elements[i];
                     if (fieldElement.Name.LocalName != "li")
                     {
-                        Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
+                        var elementContext = new InputContext(context.sourceName, fieldElement);
+                        Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                     }
 
                     array.SetValue(ParseElement(fieldElement, referencedType, null, context, recContext.CreateChild()), startOffset + i);
@@ -674,7 +694,7 @@ namespace Dec
                         break;
 
                     default:
-                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Invalid mode {parseMode} provided for a Dictionary parse, defaulting to Replace");
+                        Dbg.Err($"{inputContext}: Invalid mode {parseMode} provided for a Dictionary parse, defaulting to Replace");
                         goto case ParseMode.Replace;
                 }
 
@@ -686,11 +706,13 @@ namespace Dec
 
                 foreach (var fieldElement in element.Elements())
                 {
+                    var elementContext = new InputContext(context.sourceName, fieldElement);
+
                     if (fieldElement.Name.LocalName == "li")
                     {
                         // Treat this like a key/value pair
-                        var keyNode = fieldElement.ElementNamedWithFallback("key", context.sourceName, fieldElement.LineNumber(), "Dictionary includes li tag without a `key`");
-                        var valueNode = fieldElement.ElementNamedWithFallback("value", context.sourceName, fieldElement.LineNumber(), "Dictionary includes li tag without a `value`");
+                        var keyNode = fieldElement.ElementNamedWithFallback("key", elementContext, "Dictionary includes li tag without a `key`");
+                        var valueNode = fieldElement.ElementNamedWithFallback("value", elementContext, "Dictionary includes li tag without a `value`");
 
                         if (keyNode == null)
                         {
@@ -708,7 +730,7 @@ namespace Dec
 
                         if (key == null)
                         {
-                            Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Dictionary includes null key, skipping pair");
+                            Dbg.Err($"{elementContext}: Dictionary includes null key, skipping pair");
                             continue;
                         }
 
@@ -719,24 +741,24 @@ namespace Dec
                         }
                         else if (dict.Contains(key))
                         {
-                            Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Dictionary includes duplicate key `{key.ToString()}`");
+                            Dbg.Err($"{elementContext}: Dictionary includes duplicate key `{key.ToString()}`");
                         }
 
                         dict[key] = ParseElement(valueNode, valueType, null, context, recContext.CreateChild());
                     }
                     else
                     {
-                        var key = ParseString(fieldElement.Name.LocalName, keyType, null, context.sourceName, fieldElement.LineNumber());
+                        var key = ParseString(fieldElement.Name.LocalName, keyType, null, elementContext);
 
                         if (key == null)
                         {
                             // it's really rare for this to happen, I think you could do it with a converter but that's it
-                            Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Dictionary includes null key, skipping pair");
+                            Dbg.Err($"{elementContext}: Dictionary includes null key, skipping pair");
 
                             // just in case . . .
                             if (string.Compare(fieldElement.Name.LocalName, "li", true, System.Globalization.CultureInfo.InvariantCulture) == 0)
                             {
-                                Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Did you mean to write `li`? This field is case-sensitive.");
+                                Dbg.Err($"{elementContext}: Did you mean to write `li`? This field is case-sensitive.");
                             }
 
                             continue;
@@ -749,7 +771,7 @@ namespace Dec
                         }
                         else if (dict.Contains(key))
                         {
-                            Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: Dictionary includes duplicate key `{fieldElement.Name.LocalName}`");
+                            Dbg.Err($"{elementContext}: Dictionary includes duplicate key `{fieldElement.Name.LocalName}`");
                         }
 
                         dict[key] = ParseElement(fieldElement, valueType, null, context, recContext.CreateChild());
@@ -804,7 +826,7 @@ namespace Dec
                         break;
 
                     default:
-                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Invalid mode {parseMode} provided for a HashSet parse, defaulting to Replace");
+                        Dbg.Err($"{inputContext}: Invalid mode {parseMode} provided for a HashSet parse, defaulting to Replace");
                         goto case ParseMode.Replace;
                 }
 
@@ -817,6 +839,8 @@ namespace Dec
 
                 foreach (var fieldElement in element.Elements())
                 {
+                    var elementContext = new InputContext(context.sourceName, fieldElement);
+
                     // There's a potential bit of ambiguity here if someone does <li /> and expects that to be an actual string named "li".
                     // Practically, I think this is less likely than someone doing <li></li> and expecting that to be the empty string.
                     // And there's no other way to express the empty string.
@@ -828,7 +852,7 @@ namespace Dec
 
                         if (key == null)
                         {
-                            Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: HashSet includes null key, skipping");
+                            Dbg.Err($"{elementContext}: HashSet includes null key, skipping");
                             continue;
                         }
 
@@ -841,7 +865,7 @@ namespace Dec
                         }
                         else if ((bool)containsFunction.Invoke(set, keyParam))
                         {
-                            Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: HashSet includes duplicate key `{key.ToString()}`");
+                            Dbg.Err($"{elementContext}: HashSet includes duplicate key `{key.ToString()}`");
                         }
 
                         addFunction.Invoke(set, keyParam);
@@ -850,15 +874,15 @@ namespace Dec
                     {
                         if (fieldElement.HasElements)
                         {
-                            Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: HashSet non-li member includes data, ignoring");
+                            Dbg.Err($"{elementContext}: HashSet non-li member includes data, ignoring");
                         }
 
-                        var key = ParseString(fieldElement.Name.LocalName, keyType, null, context.sourceName, fieldElement.LineNumber());
+                        var key = ParseString(fieldElement.Name.LocalName, keyType, null, elementContext);
 
                         if (key == null)
                         {
                             // it's really rare for this to happen, I think you could do it with a converter but that's it
-                            Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: HashSet includes null key, skipping pair");
+                            Dbg.Err($"{elementContext}: HashSet includes null key, skipping pair");
                             continue;
                         }
 
@@ -871,7 +895,7 @@ namespace Dec
                         }
                         else if ((bool)containsFunction.Invoke(set, keyParam))
                         {
-                            Dbg.Err($"{context.sourceName}:{fieldElement.LineNumber()}: HashSet includes duplicate key `{fieldElement.Name.LocalName}`");
+                            Dbg.Err($"{elementContext}: HashSet includes duplicate key `{fieldElement.Name.LocalName}`");
                         }
 
                         addFunction.Invoke(set, keyParam);
@@ -910,7 +934,7 @@ namespace Dec
                         break;
 
                     default:
-                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Invalid mode {parseMode} provided for a Tuple parse, defaulting to Replace");
+                        Dbg.Err($"{inputContext}: Invalid mode {parseMode} provided for a Tuple parse, defaulting to Replace");
                         goto case ParseMode.Replace;
                 }
 
@@ -934,7 +958,7 @@ namespace Dec
 
                     if (elements.Count != parameters.Length)
                     {
-                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Tuple expects {expectedCount} parameters but got {elements.Count}");
+                        Dbg.Err($"{inputContext}: Tuple expects {expectedCount} parameters but got {elements.Count}");
                     }
 
                     for (int i = 0; i < Math.Min(parameters.Length, elements.Count); ++i)
@@ -959,7 +983,7 @@ namespace Dec
 
                     if (names.Count < expectedCount)
                     {
-                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Not enough tuple names (this honestly shouldn't even be possible)");
+                        Dbg.Err($"{inputContext}: Not enough tuple names (this honestly shouldn't even be possible)");
 
                         // TODO: handle it
                     }
@@ -967,17 +991,19 @@ namespace Dec
                     bool[] seen = new bool[expectedCount];
                     foreach (var elementItem in elements)
                     {
+                        var elementContext = new InputContext(context.sourceName, elementItem);
+
                         int index = names.FirstIndexOf(n => n == elementItem.Name.LocalName);
 
                         if (index == -1)
                         {
-                            Dbg.Err($"{context.sourceName}:{elementItem.LineNumber()}: Found field with unexpected name `{elementItem.Name.LocalName}`");
+                            Dbg.Err($"{elementContext}: Found field with unexpected name `{elementItem.Name.LocalName}`");
                             continue;
                         }
 
                         if (seen[index])
                         {
-                            Dbg.Err($"{context.sourceName}:{elementItem.LineNumber()}: Found duplicate of field `{elementItem.Name.LocalName}`");
+                            Dbg.Err($"{elementContext}: Found duplicate of field `{elementItem.Name.LocalName}`");
                         }
 
                         seen[index] = true;
@@ -988,7 +1014,7 @@ namespace Dec
                     {
                         if (!seen[i])
                         {
-                            Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Missing field with name `{names[i]}`");
+                            Dbg.Err($"{inputContext}: Missing field with name `{names[i]}`");
 
                             // Patch it up as best we can
                             parameters[i] = GenerateResultFallback(null, type.GenericTypeArguments[i]);
@@ -1009,7 +1035,7 @@ namespace Dec
             // And the full reflection system is probably impossible to secure, whereas the Record system should be secureable.
             if (context.recorderMode)
             {
-                Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Falling back to reflection within a Record system while parsing a {type}; this is currently not allowed for security reasons. Either you shouldn't be trying to serialize this, or it should implement Dec.IRecorder (https://zorbathut.github.io/dec/release/documentation/serialization.html), or you need a Dec.Converter (https://zorbathut.github.io/dec/release/documentation/custom.html)");
+                Dbg.Err($"{inputContext}: Falling back to reflection within a Record system while parsing a {type}; this is currently not allowed for security reasons. Either you shouldn't be trying to serialize this, or it should implement Dec.IRecorder (https://zorbathut.github.io/dec/release/documentation/serialization.html), or you need a Dec.Converter (https://zorbathut.github.io/dec/release/documentation/custom.html)");
                 return result;
             }
 
@@ -1023,7 +1049,7 @@ namespace Dec
                         break;
 
                     default:
-                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Invalid mode {parseMode} provided for a composite reflection parse, defaulting to Patch");
+                        Dbg.Err($"{inputContext}: Invalid mode {parseMode} provided for a composite reflection parse, defaulting to Patch");
                         goto case ParseMode.Patch;
                 }
             }
@@ -1031,14 +1057,14 @@ namespace Dec
             {
                 if (parseMode != ParseMode.Default)
                 {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Mode provided for root Dec; this is currently not supported in any form");
+                    Dbg.Err($"{inputContext}: Mode provided for root Dec; this is currently not supported in any form");
                 }
             }
 
             // If we haven't been given a template class from our parent, go ahead and init to defaults
             if (result == null)
             {
-                result = type.CreateInstanceSafe("object", () => $"{context.sourceName}:{element.LineNumber()}");
+                result = type.CreateInstanceSafe("object", inputContext);
 
                 if (result == null)
                 {
@@ -1054,7 +1080,7 @@ namespace Dec
                 string fieldName = fieldElement.Name.LocalName;
                 if (setFields.Contains(fieldName))
                 {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Duplicate field `{fieldName}`");
+                    Dbg.Err($"{inputContext}: Duplicate field `{fieldName}`");
                     // Just allow us to fall through; it's an error, but one with a reasonably obvious handling mechanism
                 }
                 setFields.Add(fieldName);
@@ -1079,11 +1105,11 @@ namespace Dec
 
                     if (match != null)
                     {
-                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Field `{fieldName}` does not exist in type {type}; did you mean `{match}`?");
+                        Dbg.Err($"{inputContext}: Field `{fieldName}` does not exist in type {type}; did you mean `{match}`?");
                     }
                     else
                     {
-                        Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Field `{fieldName}` does not exist in type {type}");
+                        Dbg.Err($"{inputContext}: Field `{fieldName}` does not exist in type {type}");
                     }
                     
                     continue;
@@ -1091,13 +1117,13 @@ namespace Dec
 
                 if (fieldElementInfo.GetCustomAttribute<IndexAttribute>() != null)
                 {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Attempting to set index field `{fieldName}`; these are generated by the dec system");
+                    Dbg.Err($"{inputContext}: Attempting to set index field `{fieldName}`; these are generated by the dec system");
                     continue;
                 }
 
                 if (fieldElementInfo.GetCustomAttribute<NonSerializedAttribute>() != null)
                 {
-                    Dbg.Err($"{context.sourceName}:{element.LineNumber()}: Attempting to set nonserialized field `{fieldName}`");
+                    Dbg.Err($"{inputContext}: Attempting to set nonserialized field `{fieldName}`");
                     continue;
                 }
 
@@ -1110,14 +1136,13 @@ namespace Dec
             return result;
         }
 
-        internal static object ParseString(string text, Type type, object original, string inputName, int lineNumber)
+        internal static object ParseString(string text, Type type, object original, InputContext context)
         {
             // Special case: Converter override
             // This is redundant if we're being called from ParseElement, but we aren't always.
             if (Converters.TryGetValue(type, out Converter converter))
             {
                 object result = original;
-                var inputContext = new InputContext() { filename = inputName };
 
                 try
                 {
@@ -1125,19 +1150,19 @@ namespace Dec
                     if (converter is ConverterString converterString)
                     {
                         // context might be null; that's OK at the moment
-                        result = converterString.ReadObj(text, inputContext);
+                        result = converterString.ReadObj(text, context);
                     }
                     else if (converter is ConverterRecord converterRecord)
                     {
                         // string parsing really doesn't apply here, we can't get a full Recorder context out anymore
                         // in theory this could be done with RecordAsThis() but I'm just going to skip it for now
-                        Dbg.Err($"{inputContext}: Attempt to string-parse with a ConverterRecord, this is currently not supported, contact developers if you need this feature");
+                        Dbg.Err($"{context}: Attempt to string-parse with a ConverterRecord, this is currently not supported, contact developers if you need this feature");
                     }
                     else if (converter is ConverterFactory converterFactory)
                     {
                         // string parsing really doesn't apply here, we can't get a full Recorder context out anymore
                         // in theory this could be done with RecordAsThis() but I'm just going to skip it for now
-                        Dbg.Err($"{inputContext}: Attempt to string-parse with a ConverterFactory, this is currently not supported, contact developers if you need this feature");
+                        Dbg.Err($"{context}: Attempt to string-parse with a ConverterFactory, this is currently not supported, contact developers if you need this feature");
                     }
                     else
                     {
@@ -1164,7 +1189,7 @@ namespace Dec
                 {
                     if (type.GetDecRootType() == null)
                     {
-                        Dbg.Err($"{inputName}:{lineNumber}: Non-hierarchy decs cannot be used as references");
+                        Dbg.Err($"{context}: Non-hierarchy decs cannot be used as references");
                         return null;
                     }
 
@@ -1174,19 +1199,19 @@ namespace Dec
                         // This feels very hardcoded, but these are also *by far* the most common errors I've seen, and I haven't come up with a better and more general solution
                         if (text.Contains(" "))
                         {
-                            Dbg.Err($"{inputName}:{lineNumber}: Dec name `{text}` is not a valid identifier; consider removing spaces");
+                            Dbg.Err($"{context}: Dec name `{text}` is not a valid identifier; consider removing spaces");
                         }
                         else if (text.Contains("\""))
                         {
-                            Dbg.Err($"{inputName}:{lineNumber}: Dec name `{text}` is not a valid identifier; consider removing quotes");
+                            Dbg.Err($"{context}: Dec name `{text}` is not a valid identifier; consider removing quotes");
                         }
                         else if (!Parser.DecNameValidator.IsMatch(text))
                         {
-                            Dbg.Err($"{inputName}:{lineNumber}: Dec name `{text}` is not a valid identifier; dec identifiers must be valid C# identifiers");
+                            Dbg.Err($"{context}: Dec name `{text}` is not a valid identifier; dec identifiers must be valid C# identifiers");
                         }
                         else
                         {
-                            Dbg.Err($"{inputName}:{lineNumber}: Couldn't find {type} named `{text}`");
+                            Dbg.Err($"{context}: Couldn't find {type} named `{text}`");
                         }
                     }
                     return result;
@@ -1201,7 +1226,7 @@ namespace Dec
                     return null;
                 }
 
-                return UtilType.ParseDecFormatted(text, inputName, lineNumber);
+                return UtilType.ParseDecFormatted(text, context);
             }
 
             // Various non-composite-type special-cases
@@ -1214,7 +1239,7 @@ namespace Dec
                 }
                 catch (System.Exception e)  // I would normally not catch System.Exception, but TypeConverter is wrapping FormatException in an Exception for some reason
                 {
-                    Dbg.Err($"{inputName}:{lineNumber}: {e.ToString()}");
+                    Dbg.Err($"{context}: {e.ToString()}");
                     return original;
                 }
             }
@@ -1226,7 +1251,7 @@ namespace Dec
             else
             {
                 // If we don't have text, and we've fallen down to this point, that's an error (and return original value I guess)
-                Dbg.Err($"{inputName}:{lineNumber}: Empty field provided for type {type}");
+                Dbg.Err($"{context}: Empty field provided for type {type}");
                 return original;
             }
         }

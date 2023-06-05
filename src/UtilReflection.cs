@@ -193,11 +193,11 @@ namespace Dec
             return field.Name.StartsWith("<");
         }
 
-        internal static object CreateInstanceSafe(this Type type, string errorType, Func<string> errorPrefix, int children = 0)
+        internal static object CreateInstanceSafe(this Type type, string errorType, InputContext context, int children = 0)
         {
             if (type.IsAbstract)
             {
-                Dbg.Err($"{errorPrefix()}: Attempting to create {errorType} of abstract type {type}");
+                Dbg.Err($"{context}: Attempting to create {errorType} of abstract type {type}");
                 return null;    // thankfully all abstract types can accept being null
             }
             else if (type.IsArray)
@@ -210,7 +210,7 @@ namespace Dec
             {
                 // Note: Structs don't have constructors. I actually can't tell if ints do, I'm kind of bypassing that system.
 
-                Dbg.Err($"{errorPrefix()}: Attempting to create {errorType} of type {type} without a no-argument constructor");
+                Dbg.Err($"{context}: Attempting to create {errorType} of type {type} without a no-argument constructor");
                 return null;    // similarly, anything that is capable of not having a no-argument constructor can accept being null
             }
             else
@@ -223,7 +223,7 @@ namespace Dec
                         // This is difficult to test; there are very few things that can get CreateInstance to return null, and right now the Dec type system doesn't support them (int? for example)
                         // Right now we're just hardcode testing this for laughs.
                         // *need more coverage*
-                        Dbg.Err($"{errorPrefix()}: {errorType} of type {type} was not properly created; this will cause issues");
+                        Dbg.Err($"{context}: {errorType} of type {type} was not properly created; this will cause issues");
                     }
                     return result;
                 }
