@@ -10,6 +10,9 @@ All notable changes to this project will be documented in this file.
 ### Improved
 * RecordAsThis() does not (and currently cannot) work on a polymorphic object; document this and explicitly report it as an error.
 
+### Changed
+* Recorder now defaults to not doing pretty-print.
+
 ### Fixed
 * Failed ref instantiations can later cause unhandled exceptions.
 * Recorder breaks when trying to deal with multiply referenced Array objects.
