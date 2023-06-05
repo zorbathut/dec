@@ -664,6 +664,25 @@ references:
   commentId: T:Dec.InputContext
   fullName: Dec.InputContext
   nameWithType: InputContext
+- uid: Dec.InputContext.#ctor(System.String)
+  name: InputContext(String)
+  href: api/Dec.InputContext.html#Dec_InputContext__ctor_System_String_
+  commentId: M:Dec.InputContext.#ctor(System.String)
+  fullName: Dec.InputContext.InputContext(System.String)
+  nameWithType: InputContext.InputContext(String)
+- uid: Dec.InputContext.#ctor(System.String,System.Xml.Linq.XElement)
+  name: InputContext(String, System.Xml.Linq.XElement)
+  href: api/Dec.InputContext.html#Dec_InputContext__ctor_System_String_System_Xml_Linq_XElement_
+  commentId: M:Dec.InputContext.#ctor(System.String,System.Xml.Linq.XElement)
+  fullName: Dec.InputContext.InputContext(System.String, System.Xml.Linq.XElement)
+  nameWithType: InputContext.InputContext(String, System.Xml.Linq.XElement)
+- uid: Dec.InputContext.#ctor*
+  name: InputContext
+  href: api/Dec.InputContext.html#Dec_InputContext__ctor_
+  commentId: Overload:Dec.InputContext.#ctor
+  isSpec: "True"
+  fullName: Dec.InputContext.InputContext
+  nameWithType: InputContext.InputContext
 - uid: Dec.InputContext.ToString
   name: ToString()
   href: api/Dec.InputContext.html#Dec_InputContext_ToString
