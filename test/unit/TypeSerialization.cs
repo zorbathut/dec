@@ -38,7 +38,7 @@ namespace DecTest
         [SetUp]
         public void InitEnvironment()
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
             var parser = new Dec.Parser();
             parser.Finish();

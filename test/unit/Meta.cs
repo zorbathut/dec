@@ -23,7 +23,7 @@ namespace DecTest
             // we don't test StubDecs.TestDec here because if we do, we'll kick off the detection
 
             {
-                Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(StubDecs) } };
+                UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(StubDecs) } });
 
                 var parser = new Dec.Parser();
                 parser.AddString(@"
@@ -42,7 +42,7 @@ namespace DecTest
             Assert.IsNull(StubDecs.TestDec);
 
             {
-                Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(StubDecs) } };
+                UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(StubDecs) } });
 
                 var parser = new Dec.Parser();
                 parser.AddString(@"
@@ -78,7 +78,7 @@ namespace DecTest
             // This double-checks it
 
             {
-                Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDec), typeof(RefSourceDec) } };
+                UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDec), typeof(RefSourceDec) } });
 
                 var parser = new Dec.Parser();
                 parser.AddString(@"
@@ -103,7 +103,7 @@ namespace DecTest
             Dec.Database.Clear();
 
             {
-                Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDec), typeof(RefSourceDec) } };
+                UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDec), typeof(RefSourceDec) } });
 
                 var parser = new Dec.Parser();
                 parser.AddString(@"
@@ -128,7 +128,7 @@ namespace DecTest
         [Test]
         public void ClassCacheReset()
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
             var parseCache = (Dictionary<string, Type>)Assembly.GetAssembly(typeof(Dec.Dec)).GetType("Dec.UtilType").GetField("ParseCache", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
 

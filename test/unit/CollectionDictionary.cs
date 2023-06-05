@@ -15,7 +15,7 @@ namespace DecTest
         [Test]
         public void String([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(DictionaryStringDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(DictionaryStringDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -40,7 +40,7 @@ namespace DecTest
         [Test]
         public void Li([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryStringDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryStringDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -71,7 +71,7 @@ namespace DecTest
         [Test]
         public void Hybrid([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryStringDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryStringDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -99,7 +99,7 @@ namespace DecTest
         [Test]
         public void Duplicate([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(DictionaryStringDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(DictionaryStringDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -131,7 +131,7 @@ namespace DecTest
         [Test]
         public void OverrideString([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryStringOverrideDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryStringOverrideDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -159,7 +159,7 @@ namespace DecTest
         [Test]
         public void NullKey([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryStringDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryStringDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -191,7 +191,7 @@ namespace DecTest
         [Test]
         public void EnumKey([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryEnumDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryEnumDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -228,7 +228,7 @@ namespace DecTest
         [Test]
         public void DecKey([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryDecDec), typeof(StubDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryDecDec), typeof(StubDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -265,7 +265,7 @@ namespace DecTest
         [Test]
         public void CaseProblem([Values] ParserMode mode, [Values] bool badKey, [Values] bool badValue)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryStringDec), typeof(StubDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryStringDec), typeof(StubDec) } });
 
             string key = badKey ? "Key" : "key";
             string value = badValue ? "Value" : "value";

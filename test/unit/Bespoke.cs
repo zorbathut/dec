@@ -25,7 +25,7 @@ namespace DecTest
         [Test]
         public void IgnoreRecordDuringParserParser([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IgnoreRecordDuringParserDec), typeof(IgnoreRecordDuringParserObj) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IgnoreRecordDuringParserDec), typeof(IgnoreRecordDuringParserObj) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -51,7 +51,7 @@ namespace DecTest
         [Test]
         public void IgnoreRecordDuringParserRecorder([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
             var parser = new Dec.Parser();
             parser.Finish();

@@ -136,7 +136,7 @@ namespace DecTest
         [Test]
         public void Delete([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -159,7 +159,7 @@ namespace DecTest
         [Test]
         public void DoubleDelete([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -203,7 +203,7 @@ namespace DecTest
         [Test]
         public void Rename([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -247,7 +247,7 @@ namespace DecTest
         [Test]
         public void RenameDeleted([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"

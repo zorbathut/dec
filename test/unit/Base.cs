@@ -1,14 +1,10 @@
 namespace DecTest
 {
-    using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
     using System;
-    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Reflection;
-    using System.Runtime.Loader;
 
     [TestFixture]
     public class Base
@@ -105,6 +101,16 @@ namespace DecTest
             };
 
             PrepCwd();
+        }
+
+        public static void UpdateTestParameters(Dec.Config.UnitTestParameters parameters)
+        {
+            typeof(Dec.Config).GetField("TestParameters", BindingFlags.NonPublic | BindingFlags.Static).SetValue(null, parameters);
+        }
+
+        public static void UpdateTestRefEverything(bool testRefEverything)
+        {
+            typeof(Dec.Config).GetField("TestRefEverything", BindingFlags.NonPublic | BindingFlags.Static).SetValue(null, testRefEverything);
         }
 
         public static void PrepCwd()
@@ -310,7 +316,7 @@ namespace DecTest
 
         public T DoRecorderRoundTrip<T>(T input, RecorderMode mode, Action<string> testSerializedResult = null, bool expectWriteErrors = false, bool expectWriteWarnings = false, bool expectReadErrors = false, bool expectReadWarnings = false)
         {
-            Dec.Config.TestRefEverything = mode == RecorderMode.RefEverything;
+            UpdateTestRefEverything(mode == RecorderMode.RefEverything);
 
             if (mode == RecorderMode.Validation)
             {
@@ -381,7 +387,7 @@ namespace DecTest
             Assert.IsNotNull(serialized);
 
             // reset
-            Dec.Config.TestRefEverything = false;
+            UpdateTestRefEverything(false);
 
             return deserialized;
         }

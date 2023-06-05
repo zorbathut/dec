@@ -15,7 +15,7 @@ namespace DecTest
         [Test]
         public void Basic([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ListDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ListDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -50,7 +50,7 @@ namespace DecTest
         [Test]
         public void Override([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ListOverrideDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ListOverrideDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"

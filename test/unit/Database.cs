@@ -11,7 +11,7 @@ namespace DecTest
         [Test]
         public void DatabaseList([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -53,7 +53,7 @@ namespace DecTest
         [Test]
         public void DatabaseHierarchy([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(RootDec), typeof(ParentDec), typeof(ChildDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(RootDec), typeof(ParentDec), typeof(ChildDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -97,7 +97,7 @@ namespace DecTest
         [Test]
         public void DatabaseErrorQuery()
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
             var parser = new Dec.Parser();
             parser.Finish();

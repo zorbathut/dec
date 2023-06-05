@@ -16,7 +16,7 @@ namespace DecTest
         [Test]
         public void Basic([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ArrayDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ArrayDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -52,7 +52,7 @@ namespace DecTest
         [Test]
         public void AsStringError([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -77,7 +77,7 @@ namespace DecTest
         [Test]
         public void Zero([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -101,7 +101,7 @@ namespace DecTest
         [Test]
         public void Null([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -125,7 +125,7 @@ namespace DecTest
         [Test]
         public void ElementMisparse([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"

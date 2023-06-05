@@ -35,7 +35,7 @@ namespace DecTest
         [Test]
         public void Refs([Values] RecorderMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
             var parser = new Dec.Parser();
             parser.Finish();
@@ -82,7 +82,7 @@ namespace DecTest
         [Test]
         public void ContainerRecursive([Values] RecorderMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
             var parser = new Dec.Parser();
             parser.Finish();
@@ -136,7 +136,7 @@ namespace DecTest
             // I'm choosing 10000 because it's well into the Doesn't Work territory, but it also doesn't take forever to run.
             const int depth = 10000;
 
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
             var parser = new Dec.Parser();
             parser.Finish();
@@ -178,7 +178,7 @@ namespace DecTest
             // We use single links so we don't generate refs, we actually embed objects.
             const int depth = 10_000;
 
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
             var parser = new Dec.Parser();
             parser.Finish();
@@ -232,7 +232,7 @@ namespace DecTest
             // We're actually really close to hitting stack overflow here, so we run it with 130 so we can still read it.
             const int depth = 130;
 
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
             var parser = new Dec.Parser();
             parser.Finish();
@@ -535,7 +535,7 @@ namespace DecTest
         [Test]
         public void ParserRef([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ParserRefDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ParserRefDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -580,7 +580,7 @@ namespace DecTest
         [Test]
         public void DerivedRefRecordables([Values] RecorderMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
             var root = new RecordableContainer();
             root.a = new DerivedRecordable();

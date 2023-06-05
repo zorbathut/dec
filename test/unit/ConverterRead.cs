@@ -34,7 +34,7 @@ namespace DecTest
         [Test]
         public void BasicFunctionality([ValuesExcept(ParserMode.Validation)] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterDec) }, explicitConverters = new Type[]{ typeof(ConverterBasicTest) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterDec) }, explicitConverters = new Type[]{ typeof(ConverterBasicTest) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -69,7 +69,7 @@ namespace DecTest
         [Test]
         public void OverlappingConverters()
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(StubConv1), typeof(StubConv2) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(StubConv1), typeof(StubConv2) } });
 
             Dec.Parser parser = null;
             ExpectErrors(() => parser = new Dec.Parser());
@@ -102,7 +102,7 @@ namespace DecTest
         [Test]
         public void ConverterDict([ValuesExcept(ParserMode.Validation)] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterDictDec) }, explicitConverters = new Type[]{ typeof(ConverterDictTest) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterDictDec) }, explicitConverters = new Type[]{ typeof(ConverterDictTest) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -134,7 +134,7 @@ namespace DecTest
         [Test]
         public void EmptyInputConverter([ValuesExcept(ParserMode.Validation)] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterStringDec) }, explicitConverters = new Type[]{ typeof(ConverterDictTest) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConverterStringDec) }, explicitConverters = new Type[]{ typeof(ConverterDictTest) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -176,7 +176,7 @@ namespace DecTest
         [Test]
         public void ConvertToNull()
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(NonEmptyPayloadDec) }, explicitConverters = new Type[]{ typeof(DefaultNullConverter) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(NonEmptyPayloadDec) }, explicitConverters = new Type[]{ typeof(DefaultNullConverter) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -219,7 +219,7 @@ namespace DecTest
         [Test]
         public void ConverterStruct([ValuesExcept(ParserMode.Validation)] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ConverterStructDec) }, explicitConverters = new Type[] { typeof(ConverterStructConverter) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ConverterStructDec) }, explicitConverters = new Type[] { typeof(ConverterStructConverter) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -283,7 +283,7 @@ namespace DecTest
         [Test]
         public void Fallback([ValuesExcept(ParserMode.Validation)] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(FallbackDec) }, explicitConverters = new Type[] { typeof(FallbackConverter) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(FallbackDec) }, explicitConverters = new Type[] { typeof(FallbackConverter) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -349,7 +349,7 @@ namespace DecTest
         [Test]
         public void Exception([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExceptionDec) }, explicitConverters = new Type[] { typeof(ExceptionPayloadConverter) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExceptionDec) }, explicitConverters = new Type[] { typeof(ExceptionPayloadConverter) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -385,7 +385,7 @@ namespace DecTest
         [Test]
         public void ExceptionRecoveryNull()
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExceptionRecoveryDec) }, explicitConverters = new Type[] { typeof(ExceptionPayloadStructConverter) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExceptionRecoveryDec) }, explicitConverters = new Type[] { typeof(ExceptionPayloadStructConverter) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -404,7 +404,7 @@ namespace DecTest
         [Test]
         public void ExceptionRecoveryNonNull()
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExceptionRecoveryDec) }, explicitConverters = new Type[] { typeof(ExceptionPayloadStructConverter) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExceptionRecoveryDec) }, explicitConverters = new Type[] { typeof(ExceptionPayloadStructConverter) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -424,7 +424,7 @@ namespace DecTest
         [Test]
         public void ExceptionRecoveryStruct()
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExceptionRecoveryDec) }, explicitConverters = new Type[] { typeof(ExceptionPayloadStructConverter) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExceptionRecoveryDec) }, explicitConverters = new Type[] { typeof(ExceptionPayloadStructConverter) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -508,7 +508,7 @@ namespace DecTest
         [Test]
         public void RefsInWrongPlaces([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(RefsInWrongPlacesConverter) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(RefsInWrongPlacesConverter) } });
             new Dec.Parser().Finish(); // we're only doing this to kick off the converter init; this is bad and I should fix it
 
             var dat = new RefsForThings();
@@ -532,7 +532,7 @@ namespace DecTest
         [Test]
         public void RefsInWrongPlacesSubtle([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(RefsInWrongPlacesConverter) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(RefsInWrongPlacesConverter) } });
             new Dec.Parser().Finish(); // we're only doing this to kick off the converter init; this is bad and I should fix it
 
             var dat = new RefsForThings();
@@ -547,7 +547,7 @@ namespace DecTest
         [Test]
         public void RefsInWrongPlacesBroken([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(RefsInWrongPlacesConverter) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(RefsInWrongPlacesConverter) } });
             new Dec.Parser().Finish(); // we're only doing this to kick off the converter init; this is bad and I should fix it
 
             var dat = new RefsForThingsPair();
@@ -566,7 +566,7 @@ namespace DecTest
         [Test]
         public void RefsInRightPlaces([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(RefsInRightPlacesConverter) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(RefsInRightPlacesConverter) } });
             new Dec.Parser().Finish(); // we're only doing this to kick off the converter init; this is bad and I should fix it
 
             var dat = new RefsForThings();

@@ -18,7 +18,7 @@ namespace DecTest
         [Test]
         public void StaticReference([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(StaticReferenceDecs) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(StaticReferenceDecs) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -55,7 +55,7 @@ namespace DecTest
         [Test]
         public void PreciseClass([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDerivedDec) }, explicitStaticRefs = new Type[]{ typeof(PreciseClassDecs) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDerivedDec) }, explicitStaticRefs = new Type[]{ typeof(PreciseClassDecs) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -83,7 +83,7 @@ namespace DecTest
         [Test]
         public void SuperClass([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDerivedDec) }, explicitStaticRefs = new Type[]{ typeof(SuperClassDecs) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDerivedDec) }, explicitStaticRefs = new Type[]{ typeof(SuperClassDecs) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -111,7 +111,7 @@ namespace DecTest
         [Test]
         public void SubClass([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(SubClassDecs) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(SubClassDecs) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -138,7 +138,7 @@ namespace DecTest
         [Test]
         public void NoAttribute([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) }, explicitStaticRefs = new Type[] { typeof(NoAttributeDecs) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) }, explicitStaticRefs = new Type[] { typeof(NoAttributeDecs) } });
 
             Dec.Parser parser = null;
             ExpectErrors(() => parser = new Dec.Parser());
@@ -165,7 +165,7 @@ namespace DecTest
         [Test]
         public void NoInitializer([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(NoInitializerDecs) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(NoInitializerDecs) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -193,7 +193,7 @@ namespace DecTest
         [Test]
         public void NoStatic([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) }, explicitStaticRefs = new Type[] { typeof(NoStaticDecs) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) }, explicitStaticRefs = new Type[] { typeof(NoStaticDecs) } });
 
             Dec.Parser parser = null;
             ExpectErrors(() => parser = new Dec.Parser());
@@ -222,7 +222,7 @@ namespace DecTest
         [Test]
         public void Missing([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(MissingDecs) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(MissingDecs) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -260,7 +260,7 @@ namespace DecTest
         {
             // We avoid BehaviorMode here because the StaticReference error event can happen at most once, which means that we can't run the test twice without the second (and later) tests failing.
             // This also means that test success would depend on test order run, which, no.
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -292,7 +292,7 @@ namespace DecTest
         {
             // We avoid BehaviorMode here because the StaticReference error event can happen at most once, which means that we can't run the test twice without the second (and later) tests failing.
             // This also means that test success would depend on test order run, which, no.
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(UnexpectedTouchDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(UnexpectedTouchDec) } });
 
             var parser = new Dec.Parser();
             ExpectErrors(() => parser.AddString(@"
@@ -327,7 +327,7 @@ namespace DecTest
         {
             // We avoid BehaviorMode here because the StaticReference error event can happen at most once, which means that we can't run the test twice without the second (and later) tests failing.
             // This also means that test success would depend on test order run, which, no.
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConstructorTouchDec) }, explicitStaticRefs = new Type[]{ typeof(ConstructorTouchDecs) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConstructorTouchDec) }, explicitStaticRefs = new Type[]{ typeof(ConstructorTouchDecs) } });
 
             var parser = new Dec.Parser();
             ExpectErrors(() => parser.AddString(@"
@@ -352,7 +352,7 @@ namespace DecTest
         [Test]
         public void Internal([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(InternalDecs) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(InternalDecs) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -375,7 +375,7 @@ namespace DecTest
         [Test]
         public void EmptyRefs()
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { }, explicitStaticRefs = new Type[] { typeof(EmptyDecs) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { }, explicitStaticRefs = new Type[] { typeof(EmptyDecs) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -404,7 +404,7 @@ namespace DecTest
         [Test]
         public void Unicode([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) }, explicitStaticRefs = new Type[] { typeof(UnicodeDecs) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) }, explicitStaticRefs = new Type[] { typeof(UnicodeDecs) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"

@@ -22,7 +22,7 @@ namespace DecTest
         [Test]
         public void Private()
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConverterPrivate) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConverterPrivate) } });
 
             Dec.Parser parser = new Dec.Parser();
             parser.Finish();
@@ -41,7 +41,7 @@ namespace DecTest
         [Test]
         public void Parameter()
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConverterParameter) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConverterParameter) } });
 
             Dec.Parser parser = null;
             ExpectErrors(() => parser = new Dec.Parser());
@@ -71,7 +71,7 @@ namespace DecTest
         [Test]
         public void DerivedConverterTest([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(DerivedConverter) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(DerivedConverter) } });
 
             // we're only doing this to kick off the converter init
             new Dec.Parser().Finish();

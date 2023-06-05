@@ -15,7 +15,7 @@ namespace DecTest
         [Test]
         public void Nested([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(NestedDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(NestedDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"

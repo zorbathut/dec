@@ -15,7 +15,7 @@ namespace DecTest
         [Test]
         public void String([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetStringDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetStringDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -40,7 +40,7 @@ namespace DecTest
         [Test]
         public void Duplicate([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetStringDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetStringDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -74,7 +74,7 @@ namespace DecTest
         [Test]
         public void OverrideString([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetStringOverrideDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetStringOverrideDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -101,7 +101,7 @@ namespace DecTest
         [Test]
         public void EmptyString([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetStringDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetStringDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -131,7 +131,7 @@ namespace DecTest
         [Test]
         public void EnumKey([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetEnumDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetEnumDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -168,7 +168,7 @@ namespace DecTest
         [Test]
         public void DecKey([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetDecDec), typeof(StubDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetDecDec), typeof(StubDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"

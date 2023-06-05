@@ -41,7 +41,7 @@ namespace DecTest
         [Test]
         public void Record([Values] bool classTag, [Values] bool nullTag, [Values] bool refTag, [Values] bool modeTag)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(BaseString), typeof(DerivedString) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(BaseString), typeof(DerivedString) } });
 
             string serialized = $@"
                 <Record>
@@ -90,7 +90,7 @@ namespace DecTest
         [Test]
         public void Parser([Values] ParserMode mode, [Values] bool classTag, [Values] bool nullTag, [Values] bool refTag, [Values] bool modeTag)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StringMemberDec), typeof(DerivedString) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StringMemberDec), typeof(DerivedString) } });
 
             var parser = new Dec.Parser();
             parser.AddString($@"

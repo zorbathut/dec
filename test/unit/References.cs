@@ -24,7 +24,7 @@ namespace DecTest
         [Test]
         public void Basic([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDec), typeof(RefSourceDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDec), typeof(RefSourceDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -49,7 +49,7 @@ namespace DecTest
         [Test]
         public void Reversed([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDec), typeof(RefSourceDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDec), typeof(RefSourceDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -74,7 +74,7 @@ namespace DecTest
         [Test]
         public void Multistring([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDec), typeof(RefSourceDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDec), typeof(RefSourceDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -102,7 +102,7 @@ namespace DecTest
         [Test]
         public void Refdec([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefSourceDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefSourceDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -122,7 +122,7 @@ namespace DecTest
         [Test]
         public void Circular([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefCircularDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefCircularDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -150,7 +150,7 @@ namespace DecTest
         [Test]
         public void CircularTight([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefCircularDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefCircularDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -173,7 +173,7 @@ namespace DecTest
         public void NullRef([Values] ParserMode mode)
         {
             // This is a little wonky; we have to test it by duplicating a tag, which is technically an error
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefCircularDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefCircularDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -196,7 +196,7 @@ namespace DecTest
         [Test]
         public void FailedLookup([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefSourceDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefSourceDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -223,7 +223,7 @@ namespace DecTest
         [Test]
         public void BareDec([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(BareDecDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(BareDecDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"

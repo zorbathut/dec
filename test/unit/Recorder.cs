@@ -30,7 +30,7 @@ namespace DecTest
         [Test]
         public void Primitives([Values] RecorderMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
             var parser = new Dec.Parser();
             parser.Finish();
@@ -76,7 +76,7 @@ namespace DecTest
         [Test]
         public void Enum([Values] RecorderMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
             var parser = new Dec.Parser();
             parser.Finish();
@@ -147,7 +147,7 @@ namespace DecTest
         [Test]
         public void Decs([Values] RecorderMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) }, explicitStaticRefs = new Type[] { typeof(StaticReferenceDecs) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) }, explicitStaticRefs = new Type[] { typeof(StaticReferenceDecs) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -174,7 +174,7 @@ namespace DecTest
         [Test]
         public void DecsRemoved([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) }, explicitStaticRefs = new Type[] { typeof(StaticReferenceDecs) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) }, explicitStaticRefs = new Type[] { typeof(StaticReferenceDecs) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -213,7 +213,7 @@ namespace DecTest
         [Test]
         public void Containers([Values] RecorderMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
             var parser = new Dec.Parser();
             parser.Finish();
@@ -248,7 +248,7 @@ namespace DecTest
         [Test]
         public void ContainersNested([Values] RecorderMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
             var parser = new Dec.Parser();
             parser.Finish();
@@ -287,7 +287,7 @@ namespace DecTest
         [Test]
         public void Misparse([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
             var parser = new Dec.Parser();
             parser.Finish();
@@ -317,7 +317,7 @@ namespace DecTest
         [Test]
         public void RecursiveSquared([Values] RecorderMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
             var parser = new Dec.Parser();
             parser.Finish();
@@ -361,7 +361,7 @@ namespace DecTest
         [Test]
         public void RecursiveSquaredRoot([Values] RecorderMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
             var parser = new Dec.Parser();
             parser.Finish();
@@ -408,7 +408,7 @@ namespace DecTest
         [Test]
         public void RootPrimitive([Values] RecorderMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
             var parser = new Dec.Parser();
             parser.Finish();
@@ -461,7 +461,7 @@ namespace DecTest
         [Test]
         public void DerivedRecordables([Values] RecorderMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
             var parser = new Dec.Parser();
             parser.Finish();
@@ -482,7 +482,7 @@ namespace DecTest
         [Test]
         public void DerivedBareRecordables([Values] RecorderMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
             var parser = new Dec.Parser();
             parser.Finish();

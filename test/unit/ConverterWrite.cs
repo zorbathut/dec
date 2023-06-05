@@ -42,7 +42,7 @@ namespace DecTest
         [Test]
         public void ConverterString([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterString) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterString) } });
 
             var parser = new Dec.Parser();
             parser.Finish();
@@ -73,7 +73,7 @@ namespace DecTest
         [Test]
         public void ConverterRecord([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterRecord) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterRecord) } });
 
             var parser = new Dec.Parser();
             parser.Finish();
@@ -106,7 +106,7 @@ namespace DecTest
         [Test]
         public void ConverterStringRef([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterString) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterString) } });
 
             var parser = new Dec.Parser();
             parser.Finish();
@@ -134,7 +134,7 @@ namespace DecTest
         [Test]
         public void ConverterReplacementWorking([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterRecord) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterRecord) } });
 
             var parser = new Dec.Parser();
             parser.Finish();

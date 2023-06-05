@@ -120,7 +120,7 @@ namespace Dec
         private static string[] UsingNamespaceBacking = new string[0];
 
         /// <summary>
-        /// Parameters that are intended for unit tests. Not recommended or supported for actual code.
+        /// Used for unit tests. Not recommended or supported for actual code.
         /// </summary>
         public class UnitTestParameters
         {
@@ -128,12 +128,8 @@ namespace Dec
             public Type[] explicitStaticRefs = null;
             public Type[] explicitConverters = null;
         }
-        public static UnitTestParameters TestParameters { get; set; } = null;
-
-        /// <summary>
-        /// Parameters that are intended for unit tests. Not recommended or supported for actual code.
-        /// </summary>
-        public static bool TestRefEverything = false;
+        internal static UnitTestParameters TestParameters = null;
+        internal static bool TestRefEverything = false;
 
         static Config()
         {

@@ -15,7 +15,7 @@ namespace DecTest
         [Test]
         public void Private([ValuesExcept(ParserMode.Validation)] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(PrivateDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(PrivateDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -42,7 +42,7 @@ namespace DecTest
         [Test]
         public void Internal([ValuesExcept(ParserMode.Validation)] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(InternalDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(InternalDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -76,7 +76,7 @@ namespace DecTest
         [Test]
         public void PrivateMember([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(PrivateMemberDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(PrivateMemberDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -110,7 +110,7 @@ namespace DecTest
         [Test]
         public void InternalMember([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(InternalMemberDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(InternalMemberDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -142,7 +142,7 @@ namespace DecTest
         [Test]
         public void ProtectedMember([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ProtectedMemberDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ProtectedMemberDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -181,7 +181,7 @@ namespace DecTest
         [Test]
         public void PrivateMemberParent([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(PrivateMemberChildDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(PrivateMemberChildDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"

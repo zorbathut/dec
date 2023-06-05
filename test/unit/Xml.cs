@@ -9,7 +9,7 @@ namespace DecTest
         [Test]
         public void DTDParse([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"<?xml version=""1.0"" encoding=""UTF-8"" ?>
@@ -27,7 +27,7 @@ namespace DecTest
         [Test]
         public void IncorrectRoot([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } });
 
             var parser = new Dec.Parser();
             ExpectWarnings(() => parser.AddString(@"
@@ -44,7 +44,7 @@ namespace DecTest
         [Test]
         public void MultipleRoot([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } });
 
             var parser = new Dec.Parser();
             ExpectErrors(() => parser.AddString(@"
@@ -64,7 +64,7 @@ namespace DecTest
         [Test]
         public void MultiXml([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -86,7 +86,7 @@ namespace DecTest
         [Test]
         public void ProvidedFilenameForXml([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) } });
 
             var parser = new Dec.Parser();
             ExpectErrors(() => parser.AddString(@"test.xml"));
@@ -98,7 +98,7 @@ namespace DecTest
         [Test]
         public void ProperStringName([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
             var parser = new Dec.Parser();
             ExpectErrors(() => parser.AddString(@"
@@ -113,7 +113,7 @@ namespace DecTest
         [Test]
         public void Garbage([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
             var parser = new Dec.Parser();
             ExpectErrors(() => parser.AddString(@"�SimpleDec decName=""Hello""><value>3</value></SimpleDec>"));
@@ -125,7 +125,7 @@ namespace DecTest
         [Test]
         public void Empty([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
             var parser = new Dec.Parser();
             ExpectErrors(() => parser.AddString(@""));

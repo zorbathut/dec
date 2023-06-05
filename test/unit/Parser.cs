@@ -9,7 +9,7 @@ namespace DecTest
         [Test]
         public void ConflictingParsers()
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters();
+            UpdateTestParameters(new Dec.Config.UnitTestParameters());
 
             var parserA = new Dec.Parser();
             ExpectErrors(() => new Dec.Parser());
@@ -18,7 +18,7 @@ namespace DecTest
         [Test]
         public void LateAddition()
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters();
+            UpdateTestParameters(new Dec.Config.UnitTestParameters());
 
             var parser = new Dec.Parser();
             parser.Finish();
@@ -29,7 +29,7 @@ namespace DecTest
         [Test]
         public void MultiFinish()
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters();
+            UpdateTestParameters(new Dec.Config.UnitTestParameters());
 
             var parser = new Dec.Parser();
             parser.Finish();
@@ -40,7 +40,7 @@ namespace DecTest
         [Test]
         public void PostFinish()
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters();
+            UpdateTestParameters(new Dec.Config.UnitTestParameters());
 
             var parserA = new Dec.Parser();
             parserA.Finish();
@@ -51,7 +51,7 @@ namespace DecTest
         [Test]
         public void PostClear()
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters();
+            UpdateTestParameters(new Dec.Config.UnitTestParameters());
 
             var parserA = new Dec.Parser();
             parserA.Finish();
@@ -65,7 +65,7 @@ namespace DecTest
         [Test]
         public void PartialClear()
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters();
+            UpdateTestParameters(new Dec.Config.UnitTestParameters());
 
             var parserA = new Dec.Parser();
 
@@ -83,7 +83,7 @@ namespace DecTest
         [Test]
         public void NonSerializablePositive([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -103,7 +103,7 @@ namespace DecTest
         [Test]
         public void NonSerializableNegative([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -140,7 +140,7 @@ namespace DecTest
         [Test]
         public void AbstractRoot([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ConcreteChildADec), typeof(ConcreteChildBDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ConcreteChildADec), typeof(ConcreteChildBDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -167,7 +167,7 @@ namespace DecTest
         [Test]
         public void LoadFile([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
 
             var parser = new Dec.Parser();
             parser.AddFile("data/Parser.LoadFile.xml");
@@ -181,7 +181,7 @@ namespace DecTest
         [Test]
         public void LoadFileError([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
 
             var parser = new Dec.Parser();
             parser.AddFile("data/Parser.LoadFileError.xml");
@@ -195,7 +195,7 @@ namespace DecTest
         [Test]
         public void LoadDirectory([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
 
             var parser = new Dec.Parser();
             parser.AddDirectory("data/Parser.LoadDirectory");
@@ -210,7 +210,7 @@ namespace DecTest
         [Test]
         public void LoadDirectoryRecursive([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
 
             var parser = new Dec.Parser();
             parser.AddDirectory("data/Parser.LoadDirectoryRecursive");
@@ -225,7 +225,7 @@ namespace DecTest
         [Test]
         public void LoadDirectoryDotIgnore([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
 
             var parser = new Dec.Parser();
             parser.AddDirectory("data/Parser.LoadDirectoryDotIgnore");
@@ -240,7 +240,7 @@ namespace DecTest
         [Test]
         public void LoadDirectoryDotIgnore1Dot([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
 
             var parser = new Dec.Parser();
             parser.AddDirectory("data/Parser.LoadDirectoryDotIgnore/.");
@@ -255,7 +255,7 @@ namespace DecTest
         [Test]
         public void LoadDirectoryDotIgnore2Dot([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
 
             var parser = new Dec.Parser();
             parser.AddDirectory("data/Parser.LoadDirectoryDotIgnore/../Parser.LoadDirectoryDotIgnore");

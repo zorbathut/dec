@@ -26,7 +26,7 @@ namespace DecTest
         [Test]
         public void IndexBaseList([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndexBaseDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndexBaseDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -49,7 +49,7 @@ namespace DecTest
         [Test]
         public void IndexDerivedList([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndexBaseDec), typeof(IndexDerivedDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndexBaseDec), typeof(IndexDerivedDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -81,7 +81,7 @@ namespace DecTest
         [Test]
         public void IndexLeafList([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndexLeafDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndexLeafDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -123,7 +123,7 @@ namespace DecTest
         [Test]
         public void IndependentIndex([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndependentIndexDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndependentIndexDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -179,7 +179,7 @@ namespace DecTest
         [Test]
         public void ExcessiveIndices([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExcessiveIndicesDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExcessiveIndicesDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -213,7 +213,7 @@ namespace DecTest
         [Ignore("Currently broken :(")]
         public void ParentReplaceIndex([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ParentReplaceIndexDec), typeof(ParentReplaceIndexCarrier) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ParentReplaceIndexDec), typeof(ParentReplaceIndexCarrier) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -241,7 +241,7 @@ namespace DecTest
         [Test]
         public void Multifile([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndexBaseDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndexBaseDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"

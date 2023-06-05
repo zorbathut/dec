@@ -23,7 +23,7 @@ namespace DecTest
         [Test]
         public void Simple([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(SimpleDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(SimpleDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -112,7 +112,7 @@ namespace DecTest
         [Test]
         public void Value([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ValueDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ValueDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -218,7 +218,7 @@ namespace DecTest
         [Test]
         public void TooFew([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(QuadDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(QuadDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -244,7 +244,7 @@ namespace DecTest
         [Test]
         public void TooMany([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(QuadDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(QuadDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -272,7 +272,7 @@ namespace DecTest
         [Test]
         public void Misnamed([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(QuadDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(QuadDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -299,7 +299,7 @@ namespace DecTest
         [Test]
         public void ForcedNames([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(QuadDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(QuadDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -331,7 +331,7 @@ namespace DecTest
         [Test]
         public void Named([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(NamedDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(NamedDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -359,7 +359,7 @@ namespace DecTest
         [Test]
         public void NamedReordered([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(NamedDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(NamedDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -387,7 +387,7 @@ namespace DecTest
         [Test]
         public void NamedLi([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(NamedDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(NamedDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -415,7 +415,7 @@ namespace DecTest
         [Test]
         public void NamedPartial([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(NamedDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(NamedDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -447,7 +447,7 @@ namespace DecTest
         [Test]
         public void NamedAsLiList([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(NamedAsLiDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(NamedAsLiDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -475,7 +475,7 @@ namespace DecTest
         [Test]
         public void NamedAsLiNames([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(NamedAsLiDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(NamedAsLiDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"
@@ -503,7 +503,7 @@ namespace DecTest
         [Test]
         public void NamedAsLiSingle([Values] ParserMode mode)
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(NamedAsLiDec) } };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(NamedAsLiDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(@"

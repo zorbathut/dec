@@ -10,7 +10,7 @@ namespace DecTest
 
         public static void Setup()
         {
-            Dec.Config.TestParameters = new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { <<TYPES>> } };
+            Base.UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { <<TYPES>> } });
         }
 
         public static void Validate()
