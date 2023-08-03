@@ -302,171 +302,102 @@ namespace Dec
         {
             using (var _ = new CultureInfoScope(Config.CultureInfo))
             {
-                XDocument doc;
-
-                try
+                ReaderFileRecorder reader = ReaderFileRecorderXml.Create(input, stringName);
+                if (reader == null)
                 {
-                    doc = XDocument.Parse(input, LoadOptions.SetLineInfo);
-                }
-                catch (System.Xml.XmlException e)
-                {
-                    Dbg.Ex(e);
-                    return default(T);
+                    return default;
                 }
 
-                if (doc.Elements().Count() > 1)
-                {
-                    // This isn't testable, unfortunately; XDocument doesn't even support multiple root elements.
-                    Dbg.Err($"{stringName}: Found {doc.Elements().Count()} root elements instead of the expected 1");
-                }
+                var refs = reader.ParseRefs();
 
-                var record = doc.Elements().First();
-                if (record.Name.LocalName != "Record")
-                {
-                    Dbg.Wrn($"{new InputContext(stringName, record)}: Found root element with name `{record.Name.LocalName}` when it should be `Record`");
-                }
-
-                var recordFormatVersion = record.ElementNamed("recordFormatVersion");
-                if (recordFormatVersion == null)
-                {
-                    Dbg.Err($"{new InputContext(stringName, record)}: Missing record format version, assuming the data is up-to-date");
-                }
-                else if (recordFormatVersion.GetText() != "1")
-                {
-                    Dbg.Err($"{new InputContext(stringName, recordFormatVersion)}: Unknown record format version {recordFormatVersion.GetText()}, expected 1 or earlier");
-
-                    // I would rather not guess about this
-                    return default(T);
-                }
-
-                var refs = record.ElementNamed("refs");
-
-                var readerContext = new ReaderContext(stringName, true);
+                // First, we need to make the instances for all the references, so they can be crosslinked appropriately
+                // We'll be doing a second parse to parse *many* of these, but not all
+                var furtherParsing = new List<Action>();
                 var refDict = new Dictionary<string, object>();
+                var readerContext = new ReaderContext(stringName, true);
 
-                if (refs != null)
+                foreach (var reference in refs)
                 {
-                    // First, we need to make the instances for all the references, so they can be crosslinked appropriately
-                    // We'll be doing a second parse to parse *many* of these, but not all
-                    var furtherParsing = new List<Action>();
-                    foreach (var reference in refs.Elements())
+                    var context = new InputContext(stringName, reference.node.HackyExtractXml());
+
+                    object refInstance = null;
+                    if (Serialization.Converters.TryGetValue(reference.type, out var converter))
                     {
-                        var context = new InputContext(stringName, reference);
-
-                        if (reference.Name.LocalName != "Ref")
+                        if (converter is ConverterString converterString)
                         {
-                            Dbg.Wrn($"{context}: Reference element should be named 'Ref'");
+                            refInstance = converterString.ReadObj(reference.node.HackyExtractXml().GetText(), context);
+
+                            // this does not need to be queued for parsing
                         }
-
-                        var id = reference.Attribute("id")?.Value;
-                        if (id == null)
+                        else if (converter is ConverterRecord converterRecord)
                         {
-                            Dbg.Err($"{context}: Missing reference ID");
-                            continue;
+                            // create the basic object
+                            refInstance = reference.type.CreateInstanceSafe("object", context, children: reference.node.HackyExtractXml().Elements().Count());
+
+                            // the next parse step
+                            furtherParsing.Add(() => converterRecord.RecordObj(refInstance, new RecorderReader(reference.node.HackyExtractXml(), readerContext)));
                         }
-
-                        // Further steps don't know how to deal with this, so we just strip it
-                        reference.Attribute("id").Remove();
-
-                        var className = reference.Attribute("class")?.Value;
-                        if (className == null)
+                        else if (converter is ConverterFactory converterFactory)
                         {
-                            Dbg.Err($"{context}: Missing reference class name");
-                            continue;
-                        }
+                            // create the basic object
+                            refInstance = converterFactory.CreateObj(new RecorderReader(reference.node.HackyExtractXml(), readerContext, disallowShared: true));
 
-                        var possibleType = (Type)Serialization.ParseString(className, typeof(Type), null, context);
-                        if (possibleType.IsValueType)
-                        {
-                            Dbg.Err($"{context}: Reference assigned type {possibleType}, which is a value type");
-                            continue;
-                        }
-
-                        object refInstance = null;
-                        if (Serialization.Converters.TryGetValue(possibleType, out var converter))
-                        {
-                            if (converter is ConverterString converterString)
-                            {
-                                refInstance = converterString.ReadObj(reference.GetText(), context);
-
-                                // this does not need to be queued for parsing
-                            }
-                            else if (converter is ConverterRecord converterRecord)
-                            {
-                                // create the basic object
-                                refInstance = possibleType.CreateInstanceSafe("object", context, children: reference.Elements().Count());
-
-                                // the next parse step
-                                furtherParsing.Add(() => converterRecord.RecordObj(refInstance, new RecorderReader(reference, readerContext)));
-                            }
-                            else if (converter is ConverterFactory converterFactory)
-                            {
-                                // create the basic object
-                                refInstance = converterFactory.CreateObj(new RecorderReader(reference, readerContext, disallowShared: true));
-
-                                // the next parse step
-                                furtherParsing.Add(() => converterFactory.ReadObj(refInstance, new RecorderReader(reference, readerContext)));
-                            }
-                            else
-                            {
-                                Dbg.Err($"Somehow ended up with an unsupported converter {converter.GetType()}");
-                            }
+                            // the next parse step
+                            furtherParsing.Add(() => converterFactory.ReadObj(refInstance, new RecorderReader(reference.node.HackyExtractXml(), readerContext)));
                         }
                         else
                         {
-                            // Create a stub so other things can reference it later
-                            refInstance = possibleType.CreateInstanceSafe("object", context, children: reference.Elements().Count());
-
-                            // Whoops, failed to construct somehow. CreateInstanceSafe() has already made a report
-                            if (refInstance != null)
-                            {
-                                furtherParsing.Add(() =>
-                                {
-                                    // Do our actual parsing
-                                    // We know this *was* shared or it wouldn't be a ref now, so we tag it again in case it's a List<SomeClass> so we can share its children as well.
-                                    var refInstanceOutput = Serialization.ParseElement(reference, refInstance.GetType(), refInstance, readerContext, new Recorder.Context() { shared = Context.Shared.Allow }, hasReferenceId: true);
-
-                                    if (refInstance != refInstanceOutput)
-                                    {
-                                        Dbg.Err($"{context}: Something really bizarre has happened and we got the wrong object back. Things are probably irrevocably broken. Please report this as a bug in Dec.");
-                                    }
-                                });
-                            }
+                            Dbg.Err($"Somehow ended up with an unsupported converter {converter.GetType()}");
                         }
+                    }
+                    else
+                    {
+                        // Create a stub so other things can reference it later
+                        refInstance = reference.type.CreateInstanceSafe("object", context, children: reference.node.HackyExtractXml().Elements().Count());
 
-                        // If this is null, CreateInstanceSafe has done the error reporting, but we still don't want it in the array because it will break stuff downstream
+                        // Whoops, failed to construct somehow. CreateInstanceSafe() has already made a report
                         if (refInstance != null)
                         {
-                            refDict[id] = refInstance;
+                            furtherParsing.Add(() =>
+                            {
+                                // Do our actual parsing
+                                // We know this *was* shared or it wouldn't be a ref now, so we tag it again in case it's a List<SomeClass> so we can share its children as well.
+                                var refInstanceOutput = Serialization.ParseElement(reference.node.HackyExtractXml(), refInstance.GetType(), refInstance, readerContext, new Recorder.Context() { shared = Context.Shared.Allow }, hasReferenceId: true);
+
+                                if (refInstance != refInstanceOutput)
+                                {
+                                    Dbg.Err($"{context}: Something really bizarre has happened and we got the wrong object back. Things are probably irrevocably broken. Please report this as a bug in Dec.");
+                                }
+                            });
                         }
                     }
 
-                    // link up the ref dict
-                    readerContext.refs = refDict;
-
-                    // finish up our second-stage ref parsing
-                    foreach (var action in furtherParsing)
+                    // If this is null, CreateInstanceSafe has done the error reporting, but we still don't want it in the array because it will break stuff downstream
+                    if (refInstance != null)
                     {
-                        action();
+                        refDict[reference.id] = refInstance;
                     }
                 }
-                else
+
+                // link up the ref dict; we do this afterwards so we can verify that the object creation code is not using refs
+                readerContext.refs = refDict;
+
+                // finish up our second-stage ref parsing
+                foreach (var action in furtherParsing)
                 {
-                    // empty ref dict, sure
-                    readerContext.refs = new Dictionary<string, object>();
+                    action();
                 }
 
-                var data = record.ElementNamed("data");
-                if (data == null)
+                var parseNode = reader.ParseNode();
+                if (parseNode == null)
                 {
-                    Dbg.Err($"{new InputContext(stringName, record)}: No data element provided. This is not very recoverable.");
-
-                    return default(T);
+                    // error has already been reported
+                    return default;
                 }
 
                 // And now, we can finally parse our actual root element!
                 // (which accounts for a tiny percentage of things that need to be parsed)
-                return (T)Serialization.ParseElement(data, typeof(T), null, readerContext, new Recorder.Context() { shared = Context.Shared.Flexible });
+                return (T)Serialization.ParseElement(parseNode.HackyExtractXml(), typeof(T), null, new ReaderContext(stringName, true) { refs = refDict }, new Recorder.Context() { shared = Context.Shared.Flexible });
             }
         }
     }

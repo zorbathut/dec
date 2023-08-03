@@ -18,11 +18,23 @@ namespace Dec
             public string parent;
         }
 
+        // this is a little awkward because it mutates state and should not be called twice. we should fix that
         public abstract List<ReaderDec> ParseDecs();
     }
 
     internal abstract class ReaderFileRecorder
     {
+        public struct ReaderRef
+        {
+            public Type type;
+            public string id;
+
+            public ReaderNode node;
+        }
+
+        // this is a little awkward because it mutates state and should not be called twice. we should fix that
+        public abstract List<ReaderRef> ParseRefs();
+        public abstract ReaderNode ParseNode();
     }
 
     internal abstract class ReaderNode

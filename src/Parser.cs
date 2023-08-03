@@ -120,7 +120,6 @@ namespace Dec
                 }
 
                 ReaderFileDecXml reader = ReaderFileDecXml.Create(input, stringName);
-
                 if (reader == null)
                 {
                     return;
