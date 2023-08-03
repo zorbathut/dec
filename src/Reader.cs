@@ -6,6 +6,18 @@ namespace Dec
 
     internal abstract class ReaderFileDec
     {
+        public struct ReaderDec
+        {
+            public Type type;
+            public string name;
+
+            public ReaderNode node;
+            public InputContext inputContext;
+
+            public bool abstrct;
+            public string parent;
+        }
+
         public abstract List<ReaderDec> ParseDecs();
     }
 
@@ -16,17 +28,5 @@ namespace Dec
     internal abstract class ReaderNode
     {
         public abstract XElement HackyExtractXml();
-    }
-
-    internal struct ReaderDec
-    {
-        public Type type;
-        public string name;
-
-        public ReaderNode node;
-        public InputContext inputContext;
-
-        public bool abstrct;
-        public string parent;
     }
 }
