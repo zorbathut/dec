@@ -39,6 +39,8 @@ namespace Dec
 
     internal abstract class ReaderNode
     {
+        public abstract InputContext GetInputContext();
+
         public abstract XElement HackyExtractXml();
     }
 }

@@ -161,7 +161,7 @@ namespace Dec
             object result = original;
 
             // Get our input formatting together
-            var inputContext = new InputContext(context.sourceName, element);
+            var inputContext = node.GetInputContext();
 
             // Verify our Shared flags as the *very* first step to ensure nothing gets past us.
             // In theory this should be fine with Flexible; Flexible only happens on an outer wrapper that was shared, and therefore was null, and therefore this is default also
@@ -606,7 +606,7 @@ namespace Dec
                         Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                     }
 
-                    list.Add(ParseElement(new ReaderNodeXml(fieldElement), referencedType, null, context, recContext.CreateChild()));
+                    list.Add(ParseElement(new ReaderNodeXml(fieldElement, context.sourceName), referencedType, null, context, recContext.CreateChild()));
                 }
 
                 return list;
@@ -670,7 +670,7 @@ namespace Dec
                         Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                     }
 
-                    array.SetValue(ParseElement(new ReaderNodeXml(fieldElement), referencedType, null, context, recContext.CreateChild()), startOffset + i);
+                    array.SetValue(ParseElement(new ReaderNodeXml(fieldElement, context.sourceName), referencedType, null, context, recContext.CreateChild()), startOffset + i);
                 }
 
                 return array;
@@ -743,7 +743,7 @@ namespace Dec
                             continue;
                         }
 
-                        var key = ParseElement(new ReaderNodeXml(keyNode), keyType, null, context, recContext.CreateChild());
+                        var key = ParseElement(new ReaderNodeXml(keyNode, context.sourceName), keyType, null, context, recContext.CreateChild());
 
                         if (key == null)
                         {
@@ -761,7 +761,7 @@ namespace Dec
                             Dbg.Err($"{elementContext}: Dictionary includes duplicate key `{key.ToString()}`");
                         }
 
-                        dict[key] = ParseElement(new ReaderNodeXml(valueNode), valueType, null, context, recContext.CreateChild());
+                        dict[key] = ParseElement(new ReaderNodeXml(valueNode, context.sourceName), valueType, null, context, recContext.CreateChild());
                     }
                     else
                     {
@@ -791,7 +791,7 @@ namespace Dec
                             Dbg.Err($"{elementContext}: Dictionary includes duplicate key `{fieldElement.Name.LocalName}`");
                         }
 
-                        dict[key] = ParseElement(new ReaderNodeXml(fieldElement), valueType, null, context, recContext.CreateChild());
+                        dict[key] = ParseElement(new ReaderNodeXml(fieldElement, context.sourceName), valueType, null, context, recContext.CreateChild());
                     }
                 }
 
@@ -865,7 +865,7 @@ namespace Dec
                     if (fieldElement.Name.LocalName == "li")
                     {
                         // Treat this like a full node
-                        var key = ParseElement(new ReaderNodeXml(fieldElement), keyType, null, context, recContext.CreateChild());
+                        var key = ParseElement(new ReaderNodeXml(fieldElement, context.sourceName), keyType, null, context, recContext.CreateChild());
 
                         if (key == null)
                         {
@@ -980,7 +980,7 @@ namespace Dec
 
                     for (int i = 0; i < Math.Min(parameters.Length, elements.Count); ++i)
                     {
-                        parameters[i] = ParseElement(new ReaderNodeXml(elements[i]), type.GenericTypeArguments[i], null, context, recContext.CreateChild());
+                        parameters[i] = ParseElement(new ReaderNodeXml(elements[i], context.sourceName), type.GenericTypeArguments[i], null, context, recContext.CreateChild());
                     }
 
                     // fill in anything missing
@@ -1024,7 +1024,7 @@ namespace Dec
                         }
 
                         seen[index] = true;
-                        parameters[index] = ParseElement(new ReaderNodeXml(elementItem), type.GenericTypeArguments[index], null, context, recContext.CreateChild());
+                        parameters[index] = ParseElement(new ReaderNodeXml(elementItem, context.sourceName), type.GenericTypeArguments[index], null, context, recContext.CreateChild());
                     }
 
                     for (int i = 0; i < seen.Length; ++i)
@@ -1144,7 +1144,7 @@ namespace Dec
                     continue;
                 }
 
-                fieldElementInfo.SetValue(result, ParseElement(new ReaderNodeXml(fieldElement), fieldElementInfo.FieldType, fieldElementInfo.GetValue(result), context, recContext.CreateChild(), fieldInfo: fieldElementInfo));
+                fieldElementInfo.SetValue(result, ParseElement(new ReaderNodeXml(fieldElement, context.sourceName), fieldElementInfo.FieldType, fieldElementInfo.GetValue(result), context, recContext.CreateChild(), fieldInfo: fieldElementInfo));
             }
 
             // Set up our index fields; this has to happen last in case we're a struct

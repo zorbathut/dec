@@ -23,7 +23,7 @@ namespace Dec
 
             var result = new ReaderFileDecXml();
             result.doc = doc;
-            result.identifier = identifier;
+            result.fileIdentifier = identifier;
             return result;
         }
 
@@ -32,14 +32,14 @@ namespace Dec
             if (doc.Elements().Count() > 1)
             {
                 // This isn't testable, unfortunately; XDocument doesn't even support multiple root elements.
-                Dbg.Err($"{identifier}: Found {doc.Elements().Count()} root elements instead of the expected 1");
+                Dbg.Err($"{fileIdentifier}: Found {doc.Elements().Count()} root elements instead of the expected 1");
             }
 
             var result = new List<ReaderDec>();
 
             foreach (var rootElement in doc.Elements())
             {
-                var rootContext = new InputContext(identifier, rootElement);
+                var rootContext = new InputContext(fileIdentifier, rootElement);
                 if (rootElement.Name.LocalName != "Decs")
                 {
                     Dbg.Wrn($"{rootContext}: Found root element with name `{rootElement.Name.LocalName}` when it should be `Decs`");
@@ -49,7 +49,7 @@ namespace Dec
                 {
                     var readerDec = new ReaderDec();
 
-                    readerDec.inputContext = new InputContext(identifier, decElement);
+                    readerDec.inputContext = new InputContext(fileIdentifier, decElement);
                     string typeName = decElement.Name.LocalName;
 
                     readerDec.type = UtilType.ParseDecFormatted(typeName, readerDec.inputContext);
@@ -100,7 +100,7 @@ namespace Dec
                     }
 
                     // Everything looks good!
-                    readerDec.node = new ReaderNodeXml(decElement);
+                    readerDec.node = new ReaderNodeXml(decElement, fileIdentifier);
 
                     result.Add(readerDec);
                 }
@@ -110,7 +110,7 @@ namespace Dec
         }
 
         private XDocument doc;
-        private string identifier;
+        private string fileIdentifier;
     }
 
     internal class ReaderFileRecorderXml : ReaderFileRecorder
@@ -156,7 +156,7 @@ namespace Dec
 
             var result = new ReaderFileRecorderXml();
             result.record = record;
-            result.identifier = identifier;
+            result.fileIdentifier = identifier;
 
             return result;
         }
@@ -172,7 +172,7 @@ namespace Dec
                 {
                     var readerRef = new ReaderRef();
 
-                    var context = new InputContext(identifier, reference);
+                    var context = new InputContext(fileIdentifier, reference);
 
                     if (reference.Name.LocalName != "Ref")
                     {
@@ -203,7 +203,7 @@ namespace Dec
                         continue;
                     }
 
-                    readerRef.node = new ReaderNodeXml(reference);
+                    readerRef.node = new ReaderNodeXml(reference, fileIdentifier);
                     result.Add(readerRef);
                 }
             }
@@ -216,23 +216,29 @@ namespace Dec
             var data = record.ElementNamed("data");
             if (data == null)
             {
-                Dbg.Err($"{new InputContext(identifier, record)}: No data element provided. This is not very recoverable.");
+                Dbg.Err($"{new InputContext(fileIdentifier, record)}: No data element provided. This is not very recoverable.");
 
                 return null;
             }
 
-            return new ReaderNodeXml(data);
+            return new ReaderNodeXml(data, fileIdentifier);
         }
 
         private XElement record;
-        private string identifier;
+        private string fileIdentifier;
     }
 
     internal class ReaderNodeXml : ReaderNode
     {
-        public ReaderNodeXml(XElement xml)
+        public ReaderNodeXml(XElement xml, string fileIdentifier)
         {
             this.xml = xml;
+            this.fileIdentifier = fileIdentifier;
+        }
+
+        public override InputContext GetInputContext()
+        {
+            return new InputContext(fileIdentifier, xml);
         }
 
         public override XElement HackyExtractXml()
@@ -241,5 +247,6 @@ namespace Dec
         }
 
         private XElement xml;
+        private string fileIdentifier;
     }
 }
