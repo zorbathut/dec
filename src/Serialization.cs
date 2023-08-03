@@ -1210,23 +1210,12 @@ namespace Dec
                     Dec result = Database.Get(type, text);
                     if (result == null)
                     {
-                        // This feels very hardcoded, but these are also *by far* the most common errors I've seen, and I haven't come up with a better and more general solution
-                        if (text.Contains(" "))
-                        {
-                            Dbg.Err($"{context}: Dec name `{text}` is not a valid identifier; consider removing spaces");
-                        }
-                        else if (text.Contains("\""))
-                        {
-                            Dbg.Err($"{context}: Dec name `{text}` is not a valid identifier; consider removing quotes");
-                        }
-                        else if (!Parser.DecNameValidator.IsMatch(text))
-                        {
-                            Dbg.Err($"{context}: Dec name `{text}` is not a valid identifier; dec identifiers must be valid C# identifiers");
-                        }
-                        else
+                        if (Util.ValidateDecName(text, context))
                         {
                             Dbg.Err($"{context}: Couldn't find {type} named `{text}`");
                         }
+
+                        // If we're an invalid name, we already spat out the error
                     }
                     return result;
                 }

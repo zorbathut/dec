@@ -1,11 +1,6 @@
 namespace Dec
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using System.Xml;
-    using System.Xml.Linq;
+    using System.Text.RegularExpressions;
 
     internal static class Util
     {
@@ -51,5 +46,31 @@ namespace Dec
             "Item7",
             "Rest",
         };
+
+        // this should really be yanked out of here
+        private static readonly Regex DecNameValidator = new Regex(@"^[\p{Lu}\p{Ll}\p{Lt}\p{Lm}\p{Lo}\p{Nl}][\p{Lu}\p{Ll}\p{Lt}\p{Lm}\p{Lo}\p{Nl}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\p{Cf}]*$", RegexOptions.Compiled);
+        internal static bool ValidateDecName(string name, InputContext context)
+        {
+            if (DecNameValidator.IsMatch(name))
+            {
+                return true;
+            }
+
+            // This feels very hardcoded, but these are also *by far* the most common errors I've seen, and I haven't come up with a better and more general solution
+            if (name.Contains(" "))
+            {
+                Dbg.Err($"{context}: Dec name `{name}` is not a valid identifier; consider removing spaces");
+            }
+            else if (name.Contains("\""))
+            {
+                Dbg.Err($"{context}: Dec name `{name}` is not a valid identifier; consider removing quotes");
+            }
+            else
+            {
+                Dbg.Err($"{context}: Dec name `{name}` is not a valid identifier; dec identifiers must be valid C# identifiers");
+            }
+
+            return false;
+        }
     }
 }

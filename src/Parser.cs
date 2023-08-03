@@ -2,14 +2,12 @@ namespace Dec
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Reflection;
     using System.Runtime.CompilerServices;
-    using System.Text.RegularExpressions;
     using System.Xml.Linq;
-    
+
     /// <summary>
     /// Handles all parsing and initialization of dec structures.
     /// </summary>
@@ -33,7 +31,7 @@ namespace Dec
         // A list of types that can be inherited from
         private struct Parent
         {
-            public XElement xml;
+            public ReaderNode node;
             public ReaderContext context;
             public string parent;
         }
@@ -43,7 +41,7 @@ namespace Dec
         private struct InheritanceJob
         {
             public Dec target;
-            public XElement xml;
+            public ReaderNode node;
             public ReaderContext context;
             public string parent;
         }
@@ -102,9 +100,6 @@ namespace Dec
             Serialization.Initialize();
         }
 
-        // this should really be yanked out of here
-        internal static readonly Regex DecNameValidator = new Regex(@"^[\p{Lu}\p{Ll}\p{Lt}\p{Lm}\p{Lo}\p{Nl}][\p{Lu}\p{Ll}\p{Lt}\p{Lm}\p{Lo}\p{Nl}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\p{Cf}]*$", RegexOptions.Compiled);
-
         /// <summary>
         /// Pass an XML document string in for processing.
         /// </summary>
@@ -124,137 +119,49 @@ namespace Dec
                     Dbg.Err($"Adding data while while the world is in {s_Status} state; should be {Status.Accumulating} state");
                 }
 
-                XDocument doc;
+                ReaderFileDecXml reader = ReaderFileDecXml.Create(input, stringName);
 
-                try
+                if (reader == null)
                 {
-                    doc = XDocument.Parse(input, LoadOptions.SetLineInfo);
-                }
-                catch (System.Xml.XmlException e)
-                {
-                    Dbg.Ex(e);
                     return;
                 }
 
-                if (doc.Elements().Count() > 1)
+                foreach (var readerDec in reader.ParseDecs())
                 {
-                    // This isn't testable, unfortunately; XDocument doesn't even support multiple root elements.
-                    Dbg.Err($"{stringName}: Found {doc.Elements().Count()} root elements instead of the expected 1");
-                }
-
-                var readerContext = new ReaderContext(stringName, false);
-
-                foreach (var rootElement in doc.Elements())
-                {
-                    var rootContext = new InputContext(stringName, rootElement);
-                    if (rootElement.Name.LocalName != "Decs")
+                    // Register ourselves as an available parenting object
                     {
-                        Dbg.Wrn($"{rootContext}: Found root element with name `{rootElement.Name.LocalName}` when it should be `Decs`");
+                        var identifier = Tuple.Create(readerDec.type.GetDecRootType(), readerDec.name);
+                        if (potentialParents.ContainsKey(identifier))
+                        {
+                            Dbg.Err($"{readerDec.inputContext}: Dec [{identifier.Item1}:{identifier.Item2}] defined twice");
+                        }
+                        else
+                        {
+                            potentialParents[identifier] = new Parent { node = readerDec.node, context = new ReaderContext(stringName, false), parent = readerDec.parent };
+                        }
                     }
 
-                    foreach (var decElement in rootElement.Elements())
+                    if (!readerDec.abstrct)
                     {
-                        var decContext = new InputContext(stringName, decElement);
-                        string typeName = decElement.Name.LocalName;
+                        // Not an abstract dec instance, so create our instance
+                        var decInstance = (Dec)readerDec.type.CreateInstanceSafe("dec", readerDec.inputContext);
 
-                        Type typeHandle = UtilType.ParseDecFormatted(typeName, decContext);
-                        if (typeHandle == null || !typeof(Dec).IsAssignableFrom(typeHandle))
+                        // Error reporting happens within CreateInstanceSafe; if we get null out, we just need to clean up elegantly
+                        if (decInstance != null)
                         {
-                            Dbg.Err($"{decContext}: {typeName} is not a valid root Dec type");
-                            continue;
-                        }
+                            decInstance.DecName = readerDec.name;
 
-                        if (decElement.Attribute("decName") == null)
-                        {
-                            Dbg.Err($"{decContext}: No dec name provided, add a `decName=` attribute to the {typeName} tag (example: <{typeName} decName=\"TheNameOfYour{typeName}\">)");
-                            continue;
-                        }
+                            Database.Register(decInstance);
 
-                        string decName = decElement.Attribute("decName").Value;
-                        if (!DecNameValidator.IsMatch(decName))
-                        {
-                            // This feels very hardcoded, but these are also *by far* the most common errors I've seen, and I haven't come up with a better and more general solution
-                            if (decName.Contains(" "))
+                            if (readerDec.parent == null)
                             {
-                                Dbg.Err($"{decContext}: Dec name `{decName}` is not a valid identifier; consider removing spaces");
-                            }
-                            else if (decName.Contains("\""))
-                            {
-                                Dbg.Err($"{decContext}: Dec name `{decName}` is not a valid identifier; consider removing quotes");
+                                // Non-parent objects are simple; we just handle them here in order to avoid unnecessary GC churn
+                                finishWork.Add(() => Serialization.ParseElement(readerDec.node.HackyExtractXml(), readerDec.type, decInstance, new ReaderContext(stringName, false), new Recorder.Context(), isRootDec: true));
                             }
                             else
                             {
-                                Dbg.Err($"{decContext}: Dec name `{decName}` is not a valid identifier; dec identifiers must be valid C# identifiers");
-                            }
-                            
-                            continue;
-                        }
-
-                        // Consume decName so we know it's not hanging around
-                        decElement.Attribute("decName").Remove();
-
-                        // Check to see if we're abstract
-                        bool abstrct = false;
-                        {
-                            var abstractAttribute = decElement.Attribute("abstract");
-                            if (abstractAttribute != null)
-                            {
-                                if (!bool.TryParse(abstractAttribute.Value, out abstrct))
-                                {
-                                    Dbg.Err($"{decContext}: Error encountered when parsing abstract attribute");
-                                }
-
-                                abstractAttribute.Remove();
-                            }
-                        }
-
-                        // Get our parent info
-                        string parent = null;
-                        {
-                            var parentAttribute = decElement.Attribute("parent");
-                            if (parentAttribute != null)
-                            {
-                                parent = parentAttribute.Value;
-
-                                parentAttribute.Remove();
-                            }
-                        }
-
-                        // Register ourselves as an available parenting object
-                        {
-                            var identifier = Tuple.Create(typeHandle.GetDecRootType(), decName);
-                            if (potentialParents.ContainsKey(identifier))
-                            {
-                                Dbg.Err($"{decContext}: Dec [{identifier.Item1}:{identifier.Item2}] defined twice");
-                            }
-                            else
-                            {
-                                potentialParents[identifier] = new Parent { xml = decElement, context = readerContext, parent = parent };
-                            }
-                        }
-
-                        if (!abstrct)
-                        {
-                            // Not an abstract dec instance, so create our instance
-                            var decInstance = (Dec)typeHandle.CreateInstanceSafe("dec", decContext);
-
-                            // Error reporting happens within CreateInstanceSafe; if we get null out, we just need to clean up elegantly
-                            if (decInstance != null)
-                            {
-                                decInstance.DecName = decName;
-
-                                Database.Register(decInstance);
-
-                                if (parent == null)
-                                {
-                                    // Non-parent objects are simple; we just handle them here in order to avoid unnecessary GC churn
-                                    finishWork.Add(() => Serialization.ParseElement(decElement, typeHandle, decInstance, readerContext, new Recorder.Context(), isRootDec: true));
-                                }
-                                else
-                                {
-                                    // Add an inheritance resolution job; we'll take care of this soon
-                                    inheritanceJobs.Add(new InheritanceJob { target = decInstance, xml = decElement, context = readerContext, parent = parent });
-                                }
+                                // Add an inheritance resolution job; we'll take care of this soon
+                                inheritanceJobs.Add(new InheritanceJob { target = decInstance, node = readerDec.node, context = new ReaderContext(stringName, false), parent = readerDec.parent });
                             }
                         }
                     }
@@ -327,10 +234,10 @@ namespace Dec
                     // The final parse is listed first, then all the children up to the final point
                     var actions = new List<Action>();
 
-                    actions.Add(() => Serialization.ParseElement(work.xml, work.target.GetType(), work.target, work.context, new Recorder.Context(), isRootDec: true));
+                    actions.Add(() => Serialization.ParseElement(work.node.HackyExtractXml(), work.target.GetType(), work.target, work.context, new Recorder.Context(), isRootDec: true));
 
                     string currentDecName = work.target.DecName;
-                    XElement currentXml = work.xml;
+                    XElement currentXml = work.node.HackyExtractXml();
                     ReaderContext currentContext = work.context;
 
                     string parentDecName = work.parent;
@@ -338,8 +245,9 @@ namespace Dec
                     {
                         var parentData = potentialParents.TryGetValue(Tuple.Create(work.target.GetType().GetDecRootType(), parentDecName));
 
-                        // This is a struct for the sake of performance, so child itself won't be null
-                        if (parentData.xml == null)
+                        // This is a struct for the sake of performance, so parentData itself won't be null
+                        // (wish I could just use ?. here)
+                        if (parentData.node == null)
                         {
                             Dbg.Err($"{new InputContext(currentContext.sourceName, currentXml)}: Dec `{currentDecName}` is attempting to use parent `{parentDecName}`, but no such dec exists");
 
@@ -347,10 +255,10 @@ namespace Dec
                             break;
                         }
 
-                        actions.Add(() => Serialization.ParseElement(parentData.xml, work.target.GetType(), work.target, parentData.context, new Recorder.Context(), isRootDec: true));
+                        actions.Add(() => Serialization.ParseElement(parentData.node.HackyExtractXml(), work.target.GetType(), work.target, parentData.context, new Recorder.Context(), isRootDec: true));
 
                         currentDecName = parentDecName;
-                        currentXml = parentData.xml;
+                        currentXml = parentData.node.HackyExtractXml();
                         currentContext = parentData.context;
 
                         parentDecName = parentData.parent;
