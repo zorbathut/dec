@@ -4,13 +4,13 @@ namespace Dec
     using System.Collections.Generic;
     using System.Xml.Linq;
 
-    internal abstract class ReaderFileRecorder
-    {
-    }
-
     internal abstract class ReaderFileDec
     {
         public abstract List<ReaderDec> ParseDecs();
+    }
+
+    internal abstract class ReaderFileRecorder
+    {
     }
 
     internal abstract class ReaderNode

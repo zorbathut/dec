@@ -5,10 +5,6 @@ namespace Dec
     using System.Linq;
     using System.Xml.Linq;
 
-    internal class ReaderFileRecorderXml : ReaderFileRecorder
-    {
-    }
-
     internal class ReaderFileDecXml : ReaderFileDec
     {
         public static ReaderFileDecXml Create(string input, string identifier)
@@ -115,6 +111,10 @@ namespace Dec
 
         private XDocument doc;
         private string identifier;
+    }
+
+    internal class ReaderFileRecorderXml : ReaderFileRecorder
+    {
     }
 
     internal class ReaderNodeXml : ReaderNode
