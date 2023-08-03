@@ -155,7 +155,7 @@ namespace Dec
                             if (readerDec.parent == null)
                             {
                                 // Non-parent objects are simple; we just handle them here in order to avoid unnecessary GC churn
-                                finishWork.Add(() => Serialization.ParseElement(readerDec.node.HackyExtractXml(), readerDec.type, decInstance, new ReaderContext(stringName, false), new Recorder.Context(), isRootDec: true));
+                                finishWork.Add(() => Serialization.ParseElement(readerDec.node, readerDec.type, decInstance, new ReaderContext(stringName, false), new Recorder.Context(), isRootDec: true));
                             }
                             else
                             {
@@ -233,7 +233,7 @@ namespace Dec
                     // The final parse is listed first, then all the children up to the final point
                     var actions = new List<Action>();
 
-                    actions.Add(() => Serialization.ParseElement(work.node.HackyExtractXml(), work.target.GetType(), work.target, work.context, new Recorder.Context(), isRootDec: true));
+                    actions.Add(() => Serialization.ParseElement(work.node, work.target.GetType(), work.target, work.context, new Recorder.Context(), isRootDec: true));
 
                     string currentDecName = work.target.DecName;
                     XElement currentXml = work.node.HackyExtractXml();
@@ -254,7 +254,7 @@ namespace Dec
                             break;
                         }
 
-                        actions.Add(() => Serialization.ParseElement(parentData.node.HackyExtractXml(), work.target.GetType(), work.target, parentData.context, new Recorder.Context(), isRootDec: true));
+                        actions.Add(() => Serialization.ParseElement(parentData.node, work.target.GetType(), work.target, parentData.context, new Recorder.Context(), isRootDec: true));
 
                         currentDecName = parentDecName;
                         currentXml = parentData.node.HackyExtractXml();
