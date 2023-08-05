@@ -236,7 +236,7 @@ namespace Dec
                     actions.Add(() => Serialization.ParseElement(work.node, work.target.GetType(), work.target, work.context, new Recorder.Context(), isRootDec: true));
 
                     string currentDecName = work.target.DecName;
-                    XElement currentXml = work.node.HackyExtractXml();
+                    var currentNode = work.node;
                     ReaderContext currentContext = work.context;
 
                     string parentDecName = work.parent;
@@ -248,7 +248,7 @@ namespace Dec
                         // (wish I could just use ?. here)
                         if (parentData.node == null)
                         {
-                            Dbg.Err($"{new InputContext(currentContext.sourceName, currentXml)}: Dec `{currentDecName}` is attempting to use parent `{parentDecName}`, but no such dec exists");
+                            Dbg.Err($"{currentNode.GetInputContext()}: Dec `{currentDecName}` is attempting to use parent `{parentDecName}`, but no such dec exists");
 
                             // Not much more we can do here.
                             break;
@@ -257,7 +257,7 @@ namespace Dec
                         actions.Add(() => Serialization.ParseElement(parentData.node, work.target.GetType(), work.target, parentData.context, new Recorder.Context(), isRootDec: true));
 
                         currentDecName = parentDecName;
-                        currentXml = parentData.node.HackyExtractXml();
+                        currentNode = parentData.node;
                         currentContext = parentData.context;
 
                         parentDecName = parentData.parent;
