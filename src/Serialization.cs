@@ -303,7 +303,8 @@ namespace Dec
             // Basic early validation
 
             bool hasChildren = element.Elements().Any();
-            bool hasText = element.Nodes().OfType<XText>().Any();
+            string text = node.GetText();
+            bool hasText = text != null;
 
             if (hasChildren && hasText)
             {
@@ -346,7 +347,7 @@ namespace Dec
                     // context might be null; that's OK at the moment
                     try
                     {
-                        result = converterString.ReadObj(element.GetText() ?? "", inputContext);
+                        result = converterString.ReadObj(node.GetText() ?? "", inputContext);
                     }
                     catch (Exception e)
                     {
@@ -559,7 +560,7 @@ namespace Dec
                     Dbg.Err($"{inputContext}: Child nodes are not valid when parsing {type}");
                 }
 
-                return ParseString(element.GetText(), type, original, inputContext);
+                return ParseString(text, type, original, inputContext);
             }
 
             // Nothing past this point even supports text, so let's just get angry and break stuff.

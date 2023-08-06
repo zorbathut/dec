@@ -241,6 +241,11 @@ namespace Dec
             return new InputContext(fileIdentifier, xml);
         }
 
+        public override string GetText()
+        {
+            return xml.GetText();
+        }
+
         public override XElement HackyExtractXml()
         {
             return xml;

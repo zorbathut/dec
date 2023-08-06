@@ -318,21 +318,19 @@ namespace Dec
 
                 foreach (var reference in refs)
                 {
-                    var context = new InputContext(stringName, reference.node.HackyExtractXml());
-
                     object refInstance = null;
                     if (Serialization.Converters.TryGetValue(reference.type, out var converter))
                     {
                         if (converter is ConverterString converterString)
                         {
-                            refInstance = converterString.ReadObj(reference.node.HackyExtractXml().GetText(), context);
+                            refInstance = converterString.ReadObj(reference.node.GetText(), reference.node.GetInputContext());
 
                             // this does not need to be queued for parsing
                         }
                         else if (converter is ConverterRecord converterRecord)
                         {
                             // create the basic object
-                            refInstance = reference.type.CreateInstanceSafe("object", context, children: reference.node.HackyExtractXml().Elements().Count());
+                            refInstance = reference.type.CreateInstanceSafe("object", reference.node.GetInputContext(), children: reference.node.HackyExtractXml().Elements().Count());
 
                             // the next parse step
                             furtherParsing.Add(() => converterRecord.RecordObj(refInstance, new RecorderReader(reference.node.HackyExtractXml(), readerContext)));
@@ -353,7 +351,7 @@ namespace Dec
                     else
                     {
                         // Create a stub so other things can reference it later
-                        refInstance = reference.type.CreateInstanceSafe("object", context, children: reference.node.HackyExtractXml().Elements().Count());
+                        refInstance = reference.type.CreateInstanceSafe("object", reference.node.GetInputContext(), children: reference.node.HackyExtractXml().Elements().Count());
 
                         // Whoops, failed to construct somehow. CreateInstanceSafe() has already made a report
                         if (refInstance != null)
@@ -366,7 +364,7 @@ namespace Dec
 
                                 if (refInstance != refInstanceOutput)
                                 {
-                                    Dbg.Err($"{context}: Something really bizarre has happened and we got the wrong object back. Things are probably irrevocably broken. Please report this as a bug in Dec.");
+                                    Dbg.Err($"{reference.node.GetInputContext()}: Something really bizarre has happened and we got the wrong object back. Things are probably irrevocably broken. Please report this as a bug in Dec.");
                                 }
                             });
                         }
