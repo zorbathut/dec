@@ -143,7 +143,7 @@ namespace Dec
                     if (!readerDec.abstrct)
                     {
                         // Not an abstract dec instance, so create our instance
-                        var decInstance = (Dec)readerDec.type.CreateInstanceSafe("dec", readerDec.inputContext);
+                        var decInstance = (Dec)readerDec.type.CreateInstanceSafe("dec", readerDec.node);
 
                         // Error reporting happens within CreateInstanceSafe; if we get null out, we just need to clean up elegantly
                         if (decInstance != null)

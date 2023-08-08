@@ -80,7 +80,7 @@ namespace Dec
                     continue;
                 }
 
-                var converter = (Converter)type.CreateInstanceSafe("converter", new InputContext("converter"));
+                var converter = (Converter)type.CreateInstanceSafe("converter", null);
 
                 if (converter != null && (converter is ConverterString || converter is ConverterRecord || converter is ConverterFactory))
                 {
@@ -376,7 +376,7 @@ namespace Dec
 
                     if (result == null)
                     {
-                        result = type.CreateInstanceSafe("converterrecord", inputContext);
+                        result = type.CreateInstanceSafe("converterrecord", node);
                     }
 
                     // context might be null; that's OK at the moment
@@ -473,7 +473,7 @@ namespace Dec
                 }
                 else if (recContext.factories == null)
                 {
-                    recordable = (IRecordable)type.CreateInstanceSafe("recordable", inputContext);
+                    recordable = (IRecordable)type.CreateInstanceSafe("recordable", node);
                 }
                 else
                 {
@@ -492,7 +492,7 @@ namespace Dec
 
                     if (maker == null)
                     {
-                        recordable = (IRecordable)type.CreateInstanceSafe("recordable", inputContext);
+                        recordable = (IRecordable)type.CreateInstanceSafe("recordable", node);
                     }
                     else
                     {
@@ -511,12 +511,12 @@ namespace Dec
                         if (obj == null)
                         {
                             // fall back to default behavior
-                            recordable = (IRecordable)type.CreateInstanceSafe("recordable", inputContext);
+                            recordable = (IRecordable)type.CreateInstanceSafe("recordable", node);
                         }
                         else if (!type.IsAssignableFrom(obj.GetType()))
                         {
                             Dbg.Err($"Custom factory generated {obj.GetType()} when {type} was expected; falling back on a default object");
-                            recordable = (IRecordable)type.CreateInstanceSafe("recordable", inputContext);
+                            recordable = (IRecordable)type.CreateInstanceSafe("recordable", node);
                         }
                         else
                         {
@@ -1082,7 +1082,7 @@ namespace Dec
             // If we haven't been given a template class from our parent, go ahead and init to defaults
             if (result == null)
             {
-                result = type.CreateInstanceSafe("object", inputContext);
+                result = type.CreateInstanceSafe("object", node);
 
                 if (result == null)
                 {

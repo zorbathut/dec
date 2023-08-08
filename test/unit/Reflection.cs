@@ -175,14 +175,12 @@ namespace DecTest
         public void CreatedNull()
         {
             var CreateInstanceSafeHandle = Assembly.GetAssembly(typeof(Dec.Dec)).GetType("Dec.UtilReflection").GetMethod("CreateInstanceSafe", BindingFlags.Static | BindingFlags.NonPublic);
-            object CreateInstanceSafe(Type type, string errorType, string errorMessage)
+            object CreateInstanceSafe(Type type, string errorType, object readerNode)
             {
-                var inputContext = Activator.CreateInstance(Assembly.GetAssembly(typeof(Dec.Dec)).GetType("Dec.InputContext"), errorMessage);
-
-                return CreateInstanceSafeHandle.Invoke(null, new object[] { type, errorType, inputContext, 0 });
+                return CreateInstanceSafeHandle.Invoke(null, new object[] { type, errorType, readerNode });
             }
 
-            ExpectErrors(() => Assert.AreEqual(null, CreateInstanceSafe(typeof(int?), "object", "(testing)")));
+            ExpectErrors(() => Assert.AreEqual(null, CreateInstanceSafe(typeof(int?), "object", null)));
         }
     }
 }

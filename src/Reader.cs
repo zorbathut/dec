@@ -42,6 +42,8 @@ namespace Dec
         public abstract InputContext GetInputContext();
         public abstract string GetText();
 
+        public abstract int GetProspectiveArrayLength();
+
         public abstract XElement HackyExtractXml();
     }
 }

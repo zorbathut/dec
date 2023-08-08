@@ -246,6 +246,11 @@ namespace Dec
             return xml.GetText();
         }
 
+        public override int GetProspectiveArrayLength()
+        {
+            return xml.Elements().Count();
+        }
+
         public override XElement HackyExtractXml()
         {
             return xml;

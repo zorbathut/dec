@@ -330,7 +330,7 @@ namespace Dec
                         else if (converter is ConverterRecord converterRecord)
                         {
                             // create the basic object
-                            refInstance = reference.type.CreateInstanceSafe("object", reference.node.GetInputContext(), children: reference.node.HackyExtractXml().Elements().Count());
+                            refInstance = reference.type.CreateInstanceSafe("object", reference.node);
 
                             // the next parse step
                             furtherParsing.Add(() => converterRecord.RecordObj(refInstance, new RecorderReader(reference.node.HackyExtractXml(), readerContext)));
@@ -351,7 +351,7 @@ namespace Dec
                     else
                     {
                         // Create a stub so other things can reference it later
-                        refInstance = reference.type.CreateInstanceSafe("object", reference.node.GetInputContext(), children: reference.node.HackyExtractXml().Elements().Count());
+                        refInstance = reference.type.CreateInstanceSafe("object", reference.node);
 
                         // Whoops, failed to construct somehow. CreateInstanceSafe() has already made a report
                         if (refInstance != null)
