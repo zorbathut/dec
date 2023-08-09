@@ -269,7 +269,7 @@ namespace Dec
             return unrecognized == string.Empty ? null : unrecognized;
         }
 
-        public override int GetProspectiveArrayLength()
+        public override int GetChildCount()
         {
             return xml.Elements().Count();
         }

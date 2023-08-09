@@ -293,13 +293,9 @@ namespace Dec
                 }
             }
 
-
-            // hackhack
-            XElement element = node.HackyExtractXml();
-
             // Basic early validation
 
-            bool hasChildren = element.Elements().Any();
+            bool hasChildren = node.GetChildCount() != 0;
             string text = node.GetText();
             bool hasText = text != null;
 
@@ -565,6 +561,9 @@ namespace Dec
             {
                 Dbg.Err($"{node.GetInputContext()}: Text detected in a situation where it is invalid; will be ignored");
             }
+
+            // hackhack
+            XElement element = node.HackyExtractXml();
 
             // Special case: Lists
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))

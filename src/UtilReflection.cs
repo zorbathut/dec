@@ -209,7 +209,7 @@ namespace Dec
             {
                 // Special handling, we need a fancy constructor with an int parameter
                 // Conveniently, arrays are really easy to deal with in this pathway :D
-                return Activator.CreateInstance(type, node.GetProspectiveArrayLength());
+                return Activator.CreateInstance(type, node.GetChildCount());
             }
             else if (!type.IsValueType && type.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { }, null) == null)
             {
