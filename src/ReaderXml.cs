@@ -252,6 +252,23 @@ namespace Dec
             return xml.GetText();
         }
 
+        public override string GetMetadata(Metadata metadata)
+        {
+            return xml.Attribute(metadata.ToLowerString())?.Value;
+        }
+
+        private readonly HashSet<string> metadataNames = Enum.GetValues<Metadata>().Select(metadata => metadata.ToLowerString()).ToHashSet();
+        public override string GetMetadataUnrecognized()
+        {
+            if (!xml.HasAttributes)
+            {
+                return null;
+            }
+
+            var unrecognized = string.Join(", ", xml.Attributes().Select(attr => attr.Name.LocalName).Where(name => !metadataNames.Contains(name)));
+            return unrecognized == string.Empty ? null : unrecognized;
+        }
+
         public override int GetProspectiveArrayLength()
         {
             return xml.Elements().Count();

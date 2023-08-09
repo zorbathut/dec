@@ -154,14 +154,8 @@ namespace Dec
 
         internal static object ParseElement(ReaderNode node, Type type, object original, ReaderContext context, Recorder.Context recContext, FieldInfo fieldInfo = null, bool isRootDec = false, bool hasReferenceId = false, bool asThis = false)
         {
-            // hackhack
-            XElement element = node.HackyExtractXml();
-
             // We keep the original around in case of error, but do all our manipulation on a result object.
             object result = original;
-
-            // Get our input formatting together
-            var inputContext = node.GetInputContext();
 
             // Verify our Shared flags as the *very* first step to ensure nothing gets past us.
             // In theory this should be fine with Flexible; Flexible only happens on an outer wrapper that was shared, and therefore was null, and therefore this is default also
@@ -170,12 +164,12 @@ namespace Dec
                 if (!type.CanBeShared())
                 {
                     // If shared, make sure our input is null and our type is appropriate for sharing
-                    Dbg.Wrn($"{inputContext}: Value type `{type}` tagged as Shared in recorder, this is meaningless but harmless");
+                    Dbg.Wrn($"{node.GetInputContext()}: Value type `{type}` tagged as Shared in recorder, this is meaningless but harmless");
                 }
                 else if (original != null && !hasReferenceId)
                 {
                     // We need to create objects without context if it's shared, so we kind of panic in this case
-                    Dbg.Err($"{inputContext}: Shared `{type}` provided with non-null default object, this may result in unexpected behavior");
+                    Dbg.Err($"{node.GetInputContext()}: Shared `{type}` provided with non-null default object, this may result in unexpected behavior");
                 }
             }
 
@@ -184,10 +178,10 @@ namespace Dec
 
             // The interaction between these is complicated!
             HashSet<string> consumedAttributes = null;
-            string nullAttribute = element.ConsumeAttribute(context.sourceName, "null", ref consumedAttributes);
-            string refAttribute = element.ConsumeAttribute(context.sourceName, "ref", ref consumedAttributes);
-            string classAttribute = element.ConsumeAttribute(context.sourceName, "class", ref consumedAttributes);
-            string modeAttribute = element.ConsumeAttribute(context.sourceName, "mode", ref consumedAttributes);
+            string nullAttribute = node.GetMetadata(ReaderNode.Metadata.Null);
+            string refAttribute = node.GetMetadata(ReaderNode.Metadata.Ref);
+            string classAttribute = node.GetMetadata(ReaderNode.Metadata.Class);
+            string modeAttribute = node.GetMetadata(ReaderNode.Metadata.Mode);
 
             if (asThis)
             {
@@ -199,7 +193,7 @@ namespace Dec
             {
                 if (!bool.TryParse(nullAttribute, out bool nullValue))
                 {
-                    Dbg.Err($"{inputContext}: Invalid `null` attribute");
+                    Dbg.Err($"{node.GetInputContext()}: Invalid `null` attribute");
                     nullAttribute = null;
                 }
                 else if (!nullValue)
@@ -211,38 +205,43 @@ namespace Dec
 
             if (refAttribute != null && !context.recorderMode)
             {
-                Dbg.Err($"{inputContext}: Found a reference tag while not evaluating Recorder mode, ignoring it");
+                Dbg.Err($"{node.GetInputContext()}: Found a reference tag while not evaluating Recorder mode, ignoring it");
                 refAttribute = null;
             }
 
-            ParseMode parseMode = ParseModeFromString(inputContext, modeAttribute);
+            // this could be cleaned up a bit; this trinary exists entirely to avoid calling GetInputContext() unnecessarily
+            // but there's definitely other ways to do this, maybe cleaner ways
+            ParseMode parseMode = modeAttribute != null ? ParseModeFromString(node.GetInputContext(), modeAttribute) : ParseMode.Default;
 
             // Some of these are redundant and that's OK
             if (nullAttribute != null && (refAttribute != null || classAttribute != null || modeAttribute != null))
             {
-                Dbg.Err($"{inputContext}: Null element may not have ref, class, or mode specified; guessing wildly at intentions");
+                Dbg.Err($"{node.GetInputContext()}: Null element may not have ref, class, or mode specified; guessing wildly at intentions");
             }
             else if (refAttribute != null && (nullAttribute != null || classAttribute != null || modeAttribute != null))
             {
-                Dbg.Err($"{inputContext}: Ref element may not have null, class, or mode specified; guessing wildly at intentions");
+                Dbg.Err($"{node.GetInputContext()}: Ref element may not have null, class, or mode specified; guessing wildly at intentions");
             }
             else if (classAttribute != null && (nullAttribute != null || refAttribute != null))
             {
-                Dbg.Err($"{inputContext}: Class-specified element may not have null or ref specified; guessing wildly at intentions");
+                Dbg.Err($"{node.GetInputContext()}: Class-specified element may not have null or ref specified; guessing wildly at intentions");
             }
             else if (modeAttribute != null && (nullAttribute != null || refAttribute != null))
             {
-                Dbg.Err($"{inputContext}: Mode-specified element may not have null or ref specified; guessing wildly at intentions");
+                Dbg.Err($"{node.GetInputContext()}: Mode-specified element may not have null or ref specified; guessing wildly at intentions");
             }
 
-            if (element.HasAttributes)
             {
-                if (consumedAttributes == null || element.Attributes().Select(attr => attr.Name.LocalName).Any(attrname => !consumedAttributes.Contains(attrname)))
+                var unrecognized = node.GetMetadataUnrecognized();
+                if (unrecognized != null)
                 {
-                    string attrlist = string.Join(", ", element.Attributes().Select(attr => attr.Name.LocalName).Where(attrname => consumedAttributes == null || !consumedAttributes.Contains(attrname)));
-                    Dbg.Err($"{inputContext}: Has unknown attributes {attrlist}");
+                    Dbg.Err($"{node.GetInputContext()}: Has unknown attributes {unrecognized}");
                 }
             }
+
+            // hackhack
+            XElement element = node.HackyExtractXml();
+            var inputContext = node.GetInputContext();
 
             if (refAttribute != null)
             {
