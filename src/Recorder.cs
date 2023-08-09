@@ -333,15 +333,15 @@ namespace Dec
                             refInstance = reference.type.CreateInstanceSafe("object", reference.node);
 
                             // the next parse step
-                            furtherParsing.Add(() => converterRecord.RecordObj(refInstance, new RecorderReader(reference.node.HackyExtractXml(), readerContext)));
+                            furtherParsing.Add(() => converterRecord.RecordObj(refInstance, new RecorderReader(reference.node, readerContext)));
                         }
                         else if (converter is ConverterFactory converterFactory)
                         {
                             // create the basic object
-                            refInstance = converterFactory.CreateObj(new RecorderReader(reference.node.HackyExtractXml(), readerContext, disallowShared: true));
+                            refInstance = converterFactory.CreateObj(new RecorderReader(reference.node, readerContext, disallowShared: true));
 
                             // the next parse step
-                            furtherParsing.Add(() => converterFactory.ReadObj(refInstance, new RecorderReader(reference.node.HackyExtractXml(), readerContext)));
+                            furtherParsing.Add(() => converterFactory.ReadObj(refInstance, new RecorderReader(reference.node, readerContext)));
                         }
                         else
                         {
@@ -470,26 +470,25 @@ namespace Dec
     internal class RecorderReader : Recorder
     {
         private bool asThis = false;
-        private readonly XElement element;
+        private readonly ReaderNode node;
         private readonly ReaderContext readerContext;
         private bool disallowShared;
         private InputContext inputContext;
 
         public InputContext InputContext { get => inputContext; }
 
-        internal RecorderReader(XElement element, ReaderContext context, bool disallowShared = false)
+        internal RecorderReader(ReaderNode node, ReaderContext context, bool disallowShared = false)
         {
-            this.element = element;
+            this.node = node;
             this.readerContext = context;
             this.disallowShared = disallowShared;
-            this.inputContext = new InputContext(readerContext.sourceName, element);
         }
 
         internal override void Record<T>(ref T value, string label, Parameters parameters)
         {
             if (asThis)
             {
-                Dbg.Err($"{inputContext}: Attempting to read a second field after a RecordAsThis call");
+                Dbg.Err($"{node.GetInputContext()}: Attempting to read a second field after a RecordAsThis call");
                 return;
             }
 
@@ -498,7 +497,7 @@ namespace Dec
                 asThis = true;
 
                 // Explicit cast here because we want an error if we have the wrong type!
-                value = (T)Serialization.ParseElement(new ReaderNodeXml(element, readerContext.sourceName), typeof(T), value, readerContext, parameters.CreateContext(), asThis: true);
+                value = (T)Serialization.ParseElement(node, typeof(T), value, readerContext, parameters.CreateContext(), asThis: true);
 
                 return;
             }
@@ -508,14 +507,14 @@ namespace Dec
                 Dbg.Err($"{inputContext}: Shared object used in a context that disallows shared objects (probably ConverterFactory<>.Create())");
             }
 
-            var recorded = element.ElementNamed(label);
+            var recorded = node.GetChildNamed(label);
             if (recorded == null)
             {
                 return;
             }
 
             // Explicit cast here because we want an error if we have the wrong type!
-            value = (T)Serialization.ParseElement(new ReaderNodeXml(recorded, readerContext.sourceName), typeof(T), value, readerContext, parameters.CreateContext());
+            value = (T)Serialization.ParseElement(recorded, typeof(T), value, readerContext, parameters.CreateContext());
         }
 
         public override Direction Mode { get => Direction.Read; }

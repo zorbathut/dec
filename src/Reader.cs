@@ -39,6 +39,7 @@ namespace Dec
 
     internal abstract class ReaderNode
     {
+        public abstract ReaderNode GetChildNamed(string name);
         public abstract InputContext GetInputContext();
         public abstract string GetText();
 

@@ -384,7 +384,7 @@ namespace Dec
                     {
                         try
                         {
-                            object returnedResult = converterRecord.RecordObj(result, new RecorderReader(element, context));
+                            object returnedResult = converterRecord.RecordObj(result, new RecorderReader(node, context));
 
                             if (!type.IsValueType && result != returnedResult)
                             {
@@ -424,7 +424,7 @@ namespace Dec
 
                     if (result == null)
                     {
-                        result = converterFactory.CreateObj(new RecorderReader(element, context, disallowShared: true));
+                        result = converterFactory.CreateObj(new RecorderReader(node, context, disallowShared: true));
                     }
 
                     // context might be null; that's OK at the moment
@@ -432,7 +432,7 @@ namespace Dec
                     {
                         try
                         {
-                            result = converterFactory.ReadObj(result, new RecorderReader(element, context));
+                            result = converterFactory.ReadObj(result, new RecorderReader(node, context));
                         }
                         catch (Exception e)
                         {
@@ -528,7 +528,7 @@ namespace Dec
 
                 if (recordable != null)
                 {
-                    recordable.Record(new RecorderReader(element, context));
+                    recordable.Record(new RecorderReader(node, context));
 
                     // TODO: support indices if this is within the Dec system?
                 }

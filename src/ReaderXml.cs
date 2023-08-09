@@ -241,6 +241,12 @@ namespace Dec
             return new InputContext(fileIdentifier, xml);
         }
 
+        public override ReaderNode GetChildNamed(string name)
+        {
+            var child = xml.ElementNamed(name);
+            return child == null ? null : new ReaderNodeXml(child, fileIdentifier);
+        }
+
         public override string GetText()
         {
             return xml.GetText();
