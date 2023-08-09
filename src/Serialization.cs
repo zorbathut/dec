@@ -209,9 +209,7 @@ namespace Dec
                 refAttribute = null;
             }
 
-            // this could be cleaned up a bit; this trinary exists entirely to avoid calling GetInputContext() unnecessarily
-            // but there's definitely other ways to do this, maybe cleaner ways
-            ParseMode parseMode = modeAttribute != null ? ParseModeFromString(node.GetInputContext(), modeAttribute) : ParseMode.Default;
+            ParseMode parseMode = ParseModeFromString(node.GetInputContext(), modeAttribute);
 
             // Some of these are redundant and that's OK
             if (nullAttribute != null && (refAttribute != null || classAttribute != null || modeAttribute != null))
