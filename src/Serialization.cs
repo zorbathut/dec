@@ -237,35 +237,31 @@ namespace Dec
                 }
             }
 
-            // hackhack
-            XElement element = node.HackyExtractXml();
-            var inputContext = node.GetInputContext();
-
             if (refAttribute != null)
             {
                 // Ref is the highest priority, largely because I think it's cool
 
                 if (recContext.shared == Recorder.Context.Shared.Deny)
                 {
-                    Dbg.Err($"{inputContext}: Found a reference in a non-.Shared() context, using it anyway but this might produce unexpected results");
+                    Dbg.Err($"{node.GetInputContext()}: Found a reference in a non-.Shared() context, using it anyway but this might produce unexpected results");
                 }
 
                 if (context.refs == null)
                 {
-                    Dbg.Err($"{inputContext}: Found a reference object {refAttribute} before refs are initialized (is this being used in a ConverterFactory<>.Create()?)");
+                    Dbg.Err($"{node.GetInputContext()}: Found a reference object {refAttribute} before refs are initialized (is this being used in a ConverterFactory<>.Create()?)");
                     return result;
                 }
 
                 if (!context.refs.ContainsKey(refAttribute))
                 {
-                    Dbg.Err($"{inputContext}: Found a reference object {refAttribute} without a valid reference mapping");
+                    Dbg.Err($"{node.GetInputContext()}: Found a reference object {refAttribute} without a valid reference mapping");
                     return result;
                 }
 
                 object refObject = context.refs[refAttribute];
                 if (!type.IsAssignableFrom(refObject.GetType()))
                 {
-                    Dbg.Err($"{inputContext}: Reference object {refAttribute} is of type {refObject.GetType()}, which cannot be converted to expected type {type}");
+                    Dbg.Err($"{node.GetInputContext()}: Reference object {refAttribute} is of type {refObject.GetType()}, which cannot be converted to expected type {type}");
                     return result;
                 }
 
@@ -282,20 +278,25 @@ namespace Dec
             }
             else if (classAttribute != null)
             {
-                var possibleType = (Type)ParseString(classAttribute, typeof(Type), null, inputContext);
+                var possibleType = (Type)ParseString(classAttribute, typeof(Type), null, node.GetInputContext());
                 if (!type.IsAssignableFrom(possibleType))
                 {
-                    Dbg.Err($"{inputContext}: Explicit type {classAttribute} cannot be assigned to expected type {type}");
+                    Dbg.Err($"{node.GetInputContext()}: Explicit type {classAttribute} cannot be assigned to expected type {type}");
                 }
                 else if (result != null && result.GetType() != possibleType)
                 {
-                    Dbg.Err($"{inputContext}: Explicit type {classAttribute} does not match already-provided instance {type}");
+                    Dbg.Err($"{node.GetInputContext()}: Explicit type {classAttribute} does not match already-provided instance {type}");
                 }
                 else
                 {
                     type = possibleType;
                 }
             }
+
+
+            // hackhack
+            XElement element = node.HackyExtractXml();
+            var inputContext = node.GetInputContext();
 
             // Basic early validation
 
