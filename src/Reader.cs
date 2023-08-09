@@ -1,6 +1,7 @@
 namespace Dec
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Xml.Linq;
 
@@ -55,6 +56,8 @@ namespace Dec
 
         public abstract int GetChildCount();
         public abstract ReaderNode GetChildNamed(string name);
+
+        public abstract void ParseList(IList list, Type referencedType, ReaderContext readerContext, Recorder.Context recorderContext);
 
         public abstract XElement HackyExtractXml();
     }

@@ -1,6 +1,7 @@
 namespace Dec
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using System.Xml.Linq;
@@ -272,6 +273,22 @@ namespace Dec
         public override int GetChildCount()
         {
             return xml.Elements().Count();
+        }
+
+        public override void ParseList(IList list, Type referencedType, ReaderContext readerContext, Recorder.Context recorderContext)
+        {
+            var recorderChildContext = recorderContext.CreateChild();
+
+            foreach (var fieldElement in xml.Elements())
+            {
+                if (fieldElement.Name.LocalName != "li")
+                {
+                    var elementContext = new InputContext(fileIdentifier, fieldElement);
+                    Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
+                }
+
+                list.Add(Serialization.ParseElement(new ReaderNodeXml(fieldElement, fileIdentifier), referencedType, null, readerContext, recorderChildContext));
+            }
         }
 
         public override XElement HackyExtractXml()

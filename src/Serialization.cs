@@ -562,9 +562,6 @@ namespace Dec
                 Dbg.Err($"{node.GetInputContext()}: Text detected in a situation where it is invalid; will be ignored");
             }
 
-            // hackhack
-            XElement element = node.HackyExtractXml();
-
             // Special case: Lists
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
             {
@@ -595,19 +592,13 @@ namespace Dec
 
                 var list = (IList)(result ?? Activator.CreateInstance(type));
 
-                foreach (var fieldElement in element.Elements())
-                {
-                    if (fieldElement.Name.LocalName != "li")
-                    {
-                        var elementContext = new InputContext(context.sourceName, fieldElement);
-                        Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
-                    }
-
-                    list.Add(ParseElement(new ReaderNodeXml(fieldElement, context.sourceName), referencedType, null, context, recContext.CreateChild()));
-                }
+                node.ParseList(list, referencedType, context, recContext);
 
                 return list;
             }
+
+            // hackhack
+            XElement element = node.HackyExtractXml();
 
             // Special case: Arrays
             if (type.IsArray)
