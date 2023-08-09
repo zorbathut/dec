@@ -48,7 +48,7 @@ namespace Dec
         }
 
         public abstract ReaderNode GetChildNamed(string name);
-        public abstract InputContext GetInputContext();
+        public abstract InputContext GetInputContext(); // note: this function must be really fast!
         public abstract string GetMetadata(Metadata metadata);
         public abstract string GetMetadataUnrecognized();
         public abstract string GetText();

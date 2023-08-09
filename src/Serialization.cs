@@ -12,7 +12,7 @@ namespace Dec
     /// Information on the current cursor position when reading files.
     /// </summary>
     /// <remarks>
-    /// Standard output format is $"{inputContext}: Your Error Text Here!". This abstracts out the requirements for generating error text.
+    /// Standard output format is $"{node.GetInputContext()}: Your Error Text Here!". This abstracts out the requirements for generating error text.
     /// </remarks>
     public struct InputContext
     {
@@ -296,7 +296,6 @@ namespace Dec
 
             // hackhack
             XElement element = node.HackyExtractXml();
-            var inputContext = node.GetInputContext();
 
             // Basic early validation
 
@@ -306,14 +305,14 @@ namespace Dec
 
             if (hasChildren && hasText)
             {
-                Dbg.Err($"{inputContext}: Cannot have both text and child nodes in XML - this is probably a typo, maybe you have the wrong number of close tags or added text somewhere you didn't mean to?");
+                Dbg.Err($"{node.GetInputContext()}: Cannot have both text and child nodes in XML - this is probably a typo, maybe you have the wrong number of close tags or added text somewhere you didn't mean to?");
 
                 // we'll just fall through and try to parse anyway, though
             }
 
             if (typeof(Dec).IsAssignableFrom(type) && hasChildren && !isRootDec)
             {
-                Dbg.Err($"{inputContext}: Defining members of an item of type {type}, derived from Dec.Dec, is not supported within an outer Dec. Either reference a {type} defined independently or remove {type}'s inheritance from Dec.");
+                Dbg.Err($"{node.GetInputContext()}: Defining members of an item of type {type}, derived from Dec.Dec, is not supported within an outer Dec. Either reference a {type} defined independently or remove {type}'s inheritance from Dec.");
                 return null;
             }
 
@@ -331,13 +330,13 @@ namespace Dec
                             break;
 
                         default:
-                            Dbg.Err($"{inputContext}: Invalid mode {parseMode} provided for a ConverterString parse, defaulting to Replace");
+                            Dbg.Err($"{node.GetInputContext()}: Invalid mode {parseMode} provided for a ConverterString parse, defaulting to Replace");
                             goto case ParseMode.Default;
                     }
 
                     if (hasChildren)
                     {
-                        Dbg.Err($"{inputContext}: String converter {converter.GetType()} called with child XML nodes, which will be ignored");
+                        Dbg.Err($"{node.GetInputContext()}: String converter {converter.GetType()} called with child XML nodes, which will be ignored");
                     }
 
                     // We actually accept "no text" here, though, empty-string might be valid!
@@ -345,7 +344,7 @@ namespace Dec
                     // context might be null; that's OK at the moment
                     try
                     {
-                        result = converterString.ReadObj(node.GetText() ?? "", inputContext);
+                        result = converterString.ReadObj(node.GetText() ?? "", node.GetInputContext());
                     }
                     catch (Exception e)
                     {
@@ -368,7 +367,7 @@ namespace Dec
                             break;
 
                         default:
-                            Dbg.Err($"{inputContext}: Invalid mode {parseMode} provided for a ConverterRecord parse, defaulting to Patch");
+                            Dbg.Err($"{node.GetInputContext()}: Invalid mode {parseMode} provided for a ConverterRecord parse, defaulting to Patch");
                             goto case ParseMode.Default;
                     }
 
@@ -386,7 +385,7 @@ namespace Dec
 
                             if (!type.IsValueType && result != returnedResult)
                             {
-                                Dbg.Err($"{inputContext}: Converter {converterRecord.GetType()} changed object instance, this is disallowed");
+                                Dbg.Err($"{node.GetInputContext()}: Converter {converterRecord.GetType()} changed object instance, this is disallowed");
                             }
                             else
                             {
@@ -416,7 +415,7 @@ namespace Dec
                             break;
 
                         default:
-                            Dbg.Err($"{inputContext}: Invalid mode {parseMode} provided for a ConverterFactory parse, defaulting to Patch");
+                            Dbg.Err($"{node.GetInputContext()}: Invalid mode {parseMode} provided for a ConverterFactory parse, defaulting to Patch");
                             goto case ParseMode.Default;
                     }
 
@@ -459,7 +458,7 @@ namespace Dec
                         break;
 
                     default:
-                        Dbg.Err($"{inputContext}: Invalid mode {parseMode} provided for an IRecordable parse, defaulting to Patch");
+                        Dbg.Err($"{node.GetInputContext()}: Invalid mode {parseMode} provided for an IRecordable parse, defaulting to Patch");
                         goto case ParseMode.Patch;
                 }
 
@@ -549,22 +548,22 @@ namespace Dec
                         break;
 
                     default:
-                        Dbg.Err($"{inputContext}: Invalid mode {parseMode} provided for a simple string parse, defaulting to Replace");
+                        Dbg.Err($"{node.GetInputContext()}: Invalid mode {parseMode} provided for a simple string parse, defaulting to Replace");
                         goto case ParseMode.Replace;
                 }
 
                 if (hasChildren)
                 {
-                    Dbg.Err($"{inputContext}: Child nodes are not valid when parsing {type}");
+                    Dbg.Err($"{node.GetInputContext()}: Child nodes are not valid when parsing {type}");
                 }
 
-                return ParseString(text, type, original, inputContext);
+                return ParseString(text, type, original, node.GetInputContext());
             }
 
             // Nothing past this point even supports text, so let's just get angry and break stuff.
             if (hasText)
             {
-                Dbg.Err($"{inputContext}: Text detected in a situation where it is invalid; will be ignored");
+                Dbg.Err($"{node.GetInputContext()}: Text detected in a situation where it is invalid; will be ignored");
             }
 
             // Special case: Lists
@@ -588,7 +587,7 @@ namespace Dec
                         break;
 
                     default:
-                        Dbg.Err($"{inputContext}: Invalid mode {parseMode} provided for a List parse, defaulting to Replace");
+                        Dbg.Err($"{node.GetInputContext()}: Invalid mode {parseMode} provided for a List parse, defaulting to Replace");
                         goto case ParseMode.Replace;
                 }
 
@@ -656,7 +655,7 @@ namespace Dec
                         break;
 
                     default:
-                        Dbg.Err($"{inputContext}: Invalid mode {parseMode} provided for an Array parse, defaulting to Replace");
+                        Dbg.Err($"{node.GetInputContext()}: Invalid mode {parseMode} provided for an Array parse, defaulting to Replace");
                         goto case ParseMode.Replace;
                 }
 
@@ -710,7 +709,7 @@ namespace Dec
                         break;
 
                     default:
-                        Dbg.Err($"{inputContext}: Invalid mode {parseMode} provided for a Dictionary parse, defaulting to Replace");
+                        Dbg.Err($"{node.GetInputContext()}: Invalid mode {parseMode} provided for a Dictionary parse, defaulting to Replace");
                         goto case ParseMode.Replace;
                 }
 
@@ -842,7 +841,7 @@ namespace Dec
                         break;
 
                     default:
-                        Dbg.Err($"{inputContext}: Invalid mode {parseMode} provided for a HashSet parse, defaulting to Replace");
+                        Dbg.Err($"{node.GetInputContext()}: Invalid mode {parseMode} provided for a HashSet parse, defaulting to Replace");
                         goto case ParseMode.Replace;
                 }
 
@@ -950,7 +949,7 @@ namespace Dec
                         break;
 
                     default:
-                        Dbg.Err($"{inputContext}: Invalid mode {parseMode} provided for a Tuple parse, defaulting to Replace");
+                        Dbg.Err($"{node.GetInputContext()}: Invalid mode {parseMode} provided for a Tuple parse, defaulting to Replace");
                         goto case ParseMode.Replace;
                 }
 
@@ -974,7 +973,7 @@ namespace Dec
 
                     if (elements.Count != parameters.Length)
                     {
-                        Dbg.Err($"{inputContext}: Tuple expects {expectedCount} parameters but got {elements.Count}");
+                        Dbg.Err($"{node.GetInputContext()}: Tuple expects {expectedCount} parameters but got {elements.Count}");
                     }
 
                     for (int i = 0; i < Math.Min(parameters.Length, elements.Count); ++i)
@@ -999,7 +998,7 @@ namespace Dec
 
                     if (names.Count < expectedCount)
                     {
-                        Dbg.Err($"{inputContext}: Not enough tuple names (this honestly shouldn't even be possible)");
+                        Dbg.Err($"{node.GetInputContext()}: Not enough tuple names (this honestly shouldn't even be possible)");
 
                         // TODO: handle it
                     }
@@ -1030,7 +1029,7 @@ namespace Dec
                     {
                         if (!seen[i])
                         {
-                            Dbg.Err($"{inputContext}: Missing field with name `{names[i]}`");
+                            Dbg.Err($"{node.GetInputContext()}: Missing field with name `{names[i]}`");
 
                             // Patch it up as best we can
                             parameters[i] = GenerateResultFallback(null, type.GenericTypeArguments[i]);
@@ -1051,7 +1050,7 @@ namespace Dec
             // And the full reflection system is probably impossible to secure, whereas the Record system should be secureable.
             if (context.recorderMode)
             {
-                Dbg.Err($"{inputContext}: Falling back to reflection within a Record system while parsing a {type}; this is currently not allowed for security reasons. Either you shouldn't be trying to serialize this, or it should implement Dec.IRecorder (https://zorbathut.github.io/dec/release/documentation/serialization.html), or you need a Dec.Converter (https://zorbathut.github.io/dec/release/documentation/custom.html)");
+                Dbg.Err($"{node.GetInputContext()}: Falling back to reflection within a Record system while parsing a {type}; this is currently not allowed for security reasons. Either you shouldn't be trying to serialize this, or it should implement Dec.IRecorder (https://zorbathut.github.io/dec/release/documentation/serialization.html), or you need a Dec.Converter (https://zorbathut.github.io/dec/release/documentation/custom.html)");
                 return result;
             }
 
@@ -1065,7 +1064,7 @@ namespace Dec
                         break;
 
                     default:
-                        Dbg.Err($"{inputContext}: Invalid mode {parseMode} provided for a composite reflection parse, defaulting to Patch");
+                        Dbg.Err($"{node.GetInputContext()}: Invalid mode {parseMode} provided for a composite reflection parse, defaulting to Patch");
                         goto case ParseMode.Patch;
                 }
             }
@@ -1073,7 +1072,7 @@ namespace Dec
             {
                 if (parseMode != ParseMode.Default)
                 {
-                    Dbg.Err($"{inputContext}: Mode provided for root Dec; this is currently not supported in any form");
+                    Dbg.Err($"{node.GetInputContext()}: Mode provided for root Dec; this is currently not supported in any form");
                 }
             }
 
@@ -1096,7 +1095,7 @@ namespace Dec
                 string fieldName = fieldElement.Name.LocalName;
                 if (setFields.Contains(fieldName))
                 {
-                    Dbg.Err($"{inputContext}: Duplicate field `{fieldName}`");
+                    Dbg.Err($"{node.GetInputContext()}: Duplicate field `{fieldName}`");
                     // Just allow us to fall through; it's an error, but one with a reasonably obvious handling mechanism
                 }
                 setFields.Add(fieldName);
@@ -1121,11 +1120,11 @@ namespace Dec
 
                     if (match != null)
                     {
-                        Dbg.Err($"{inputContext}: Field `{fieldName}` does not exist in type {type}; did you mean `{match}`?");
+                        Dbg.Err($"{node.GetInputContext()}: Field `{fieldName}` does not exist in type {type}; did you mean `{match}`?");
                     }
                     else
                     {
-                        Dbg.Err($"{inputContext}: Field `{fieldName}` does not exist in type {type}");
+                        Dbg.Err($"{node.GetInputContext()}: Field `{fieldName}` does not exist in type {type}");
                     }
                     
                     continue;
@@ -1133,13 +1132,13 @@ namespace Dec
 
                 if (fieldElementInfo.GetCustomAttribute<IndexAttribute>() != null)
                 {
-                    Dbg.Err($"{inputContext}: Attempting to set index field `{fieldName}`; these are generated by the dec system");
+                    Dbg.Err($"{node.GetInputContext()}: Attempting to set index field `{fieldName}`; these are generated by the dec system");
                     continue;
                 }
 
                 if (fieldElementInfo.GetCustomAttribute<NonSerializedAttribute>() != null)
                 {
-                    Dbg.Err($"{inputContext}: Attempting to set nonserialized field `{fieldName}`");
+                    Dbg.Err($"{node.GetInputContext()}: Attempting to set nonserialized field `{fieldName}`");
                     continue;
                 }
 
