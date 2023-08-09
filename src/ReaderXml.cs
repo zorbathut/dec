@@ -257,7 +257,7 @@ namespace Dec
             return xml.Attribute(metadata.ToLowerString())?.Value;
         }
 
-        private readonly HashSet<string> metadataNames = Enum.GetValues<Metadata>().Select(metadata => metadata.ToLowerString()).ToHashSet();
+        private readonly HashSet<string> metadataNames = Util.GetEnumValues<Metadata>().Select(metadata => metadata.ToLowerString()).ToHashSet();
         public override string GetMetadataUnrecognized()
         {
             if (!xml.HasAttributes)

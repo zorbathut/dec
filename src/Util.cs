@@ -1,5 +1,6 @@
 namespace Dec
 {
+    using System;
     using System.Text.RegularExpressions;
 
     internal static class Util
@@ -71,6 +72,16 @@ namespace Dec
             }
 
             return false;
+        }
+
+        // Duplicate of Enum.GetValues(), which doesn't exist in old versions of .NET.
+        public static T[] GetEnumValues<T>() where T : Enum
+        {
+            Type enumType = typeof(T);
+            Array values = Enum.GetValues(enumType);
+            var result = new T[values.Length];
+            values.CopyTo(result, 0);
+            return result;
         }
     }
 }
