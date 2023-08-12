@@ -667,7 +667,10 @@ namespace Dec
                         break;
 
                     case ParseMode.Patch:
-                        permitPatch = true;
+                        if (original != null)
+                        {
+                            permitPatch = true;
+                        }
                         break;
 
                     case ParseMode.Append:
@@ -687,13 +690,8 @@ namespace Dec
 
                 node.ParseDictionary(dict, keyType, valueType, context, recContext, permitPatch);
 
-                
-
                 return dict;
             }
-
-            // hackhack
-            XElement element = node.HackyExtractXml();
 
             // Special case: HashSet
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(HashSet<>))
@@ -705,7 +703,7 @@ namespace Dec
                 // This might be a performance problem and we'll . . . deal with it later I guess?
                 // This might actually be a good first place to use IL generation.
 
-                HashSet<object> replaceableElements = null;
+                bool permitPatch = false;
                 switch (parseMode)
                 {
                     case ParseMode.Default:
@@ -726,12 +724,7 @@ namespace Dec
                     case ParseMode.Patch:
                         if (original != null)
                         {
-                            // set up the replaceableElements
-                            replaceableElements = new HashSet<object>();
-                            foreach (var originalElement in (IEnumerable)original)
-                            {
-                                replaceableElements.Add(originalElement);
-                            }
+                            permitPatch = true;
                         }
                         break;
 
@@ -747,77 +740,14 @@ namespace Dec
                 Type keyType = type.GetGenericArguments()[0];
 
                 var set = result ?? Activator.CreateInstance(type);
-                
-                var containsFunction = set.GetType().GetMethod("Contains");
-                var addFunction = set.GetType().GetMethod("Add");
 
-                foreach (var fieldElement in element.Elements())
-                {
-                    var elementContext = new InputContext(context.sourceName, fieldElement);
-
-                    // There's a potential bit of ambiguity here if someone does <li /> and expects that to be an actual string named "li".
-                    // Practically, I think this is less likely than someone doing <li></li> and expecting that to be the empty string.
-                    // And there's no other way to express the empty string.
-                    // So . . . we treat that like the empty string.
-                    if (fieldElement.Name.LocalName == "li")
-                    {
-                        // Treat this like a full node
-                        var key = ParseElement(new ReaderNodeXml(fieldElement, context.sourceName), keyType, null, context, recContext.CreateChild());
-
-                        if (key == null)
-                        {
-                            Dbg.Err($"{elementContext}: HashSet includes null key, skipping");
-                            continue;
-                        }
-
-                        var keyParam = new object[] { key };
-
-                        if (replaceableElements != null && replaceableElements.Contains(key))
-                        {
-                            // this can be re-specified only exactly once
-                            replaceableElements.Remove(key);
-                        }
-                        else if ((bool)containsFunction.Invoke(set, keyParam))
-                        {
-                            Dbg.Err($"{elementContext}: HashSet includes duplicate key `{key.ToString()}`");
-                        }
-
-                        addFunction.Invoke(set, keyParam);
-                    }
-                    else
-                    {
-                        if (fieldElement.HasElements)
-                        {
-                            Dbg.Err($"{elementContext}: HashSet non-li member includes data, ignoring");
-                        }
-
-                        var key = ParseString(fieldElement.Name.LocalName, keyType, null, elementContext);
-
-                        if (key == null)
-                        {
-                            // it's really rare for this to happen, I think you could do it with a converter but that's it
-                            Dbg.Err($"{elementContext}: HashSet includes null key, skipping pair");
-                            continue;
-                        }
-
-                        var keyParam = new object[] { key };
-
-                        if (replaceableElements != null && replaceableElements.Contains(key))
-                        {
-                            // this can be re-specified only exactly once
-                            replaceableElements.Remove(key);
-                        }
-                        else if ((bool)containsFunction.Invoke(set, keyParam))
-                        {
-                            Dbg.Err($"{elementContext}: HashSet includes duplicate key `{fieldElement.Name.LocalName}`");
-                        }
-
-                        addFunction.Invoke(set, keyParam);
-                    }
-                }
+                node.ParseHashset(set, keyType, context, recContext, permitPatch);
 
                 return set;
             }
+
+            // hackhack
+            XElement element = node.HackyExtractXml();
 
             // Special case: A bucket of tuples
             // These are all basically identical, but AFAIK there's no good way to test them all in a better way.

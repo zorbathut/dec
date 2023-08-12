@@ -382,6 +382,75 @@ namespace Dec
             }
         }
 
+        public override void ParseHashset(object hashset, Type referencedType, ReaderContext readerContext, Recorder.Context recorderContext, bool permitPatch)
+        {
+            var containsFunction = hashset.GetType().GetMethod("Contains");
+            var addFunction = hashset.GetType().GetMethod("Add");
+
+            var recorderChildContext = recorderContext.CreateChild();
+            var keyParam = new object[1];   // this is just to cut down on GC churn
+
+            // avoid the heap allocation if we can
+            var writtenFields = permitPatch ? new HashSet<object>() : null;
+
+            foreach (var fieldElement in xml.Elements())
+            {
+                var elementContext = new InputContext(fileIdentifier, fieldElement);
+
+                // There's a potential bit of ambiguity here if someone does <li /> and expects that to be an actual string named "li".
+                // Practically, I think this is less likely than someone doing <li></li> and expecting that to be the empty string.
+                // And there's no other way to express the empty string.
+                // So . . . we treat that like the empty string.
+                if (fieldElement.Name.LocalName == "li")
+                {
+                    // Treat this like a full node
+                    var key = Serialization.ParseElement(new ReaderNodeXml(fieldElement, fileIdentifier), referencedType, null, readerContext, recorderChildContext);
+
+                    if (key == null)
+                    {
+                        Dbg.Err($"{elementContext}: HashSet includes null key, skipping");
+                        continue;
+                    }
+
+                    keyParam[0] = key;
+                    
+                    if ((bool)containsFunction.Invoke(hashset, keyParam) && (writtenFields == null || writtenFields.Contains(key)))
+                    {
+                        Dbg.Err($"{elementContext}: HashSet includes duplicate key `{key.ToString()}`");
+                    }
+                    writtenFields?.Add(key);
+
+                    addFunction.Invoke(hashset, keyParam);
+                }
+                else
+                {
+                    if (fieldElement.HasElements)
+                    {
+                        Dbg.Err($"{elementContext}: HashSet non-li member includes data, ignoring");
+                    }
+
+                    var key = Serialization.ParseString(fieldElement.Name.LocalName, referencedType, null, elementContext);
+
+                    if (key == null)
+                    {
+                        // it's really rare for this to happen, I think you could do it with a converter but that's it
+                        Dbg.Err($"{elementContext}: HashSet includes null key, skipping pair");
+                        continue;
+                    }
+
+                    keyParam[0] = key;
+
+                    if ((bool)containsFunction.Invoke(hashset, keyParam) && (writtenFields == null || writtenFields.Contains(key)))
+                    {
+                        Dbg.Err($"{elementContext}: HashSet includes duplicate key `{key.ToString()}`");
+                    }
+                    writtenFields?.Add(key);
+
+                    addFunction.Invoke(hashset, keyParam);
+                }
+            }
+        }
+
         public override XElement HackyExtractXml()
         {
             return xml;
