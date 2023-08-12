@@ -308,6 +308,80 @@ namespace Dec
             }
         }
 
+        public override void ParseDictionary(IDictionary dict, Type referencedKeyType, Type referencedValueType, ReaderContext readerContext, Recorder.Context recorderContext, bool permitPatch)
+        {
+            var recorderChildContext = recorderContext.CreateChild();
+
+            // avoid the heap allocation if we can
+            var writtenFields = permitPatch ? new HashSet<object>() : null;
+
+            foreach (var fieldElement in xml.Elements())
+            {
+                var elementContext = new InputContext(fileIdentifier, fieldElement);
+
+                if (fieldElement.Name.LocalName == "li")
+                {
+                    // Treat this like a key/value pair
+                    var keyNode = fieldElement.ElementNamedWithFallback("key", elementContext, "Dictionary includes li tag without a `key`");
+                    var valueNode = fieldElement.ElementNamedWithFallback("value", elementContext, "Dictionary includes li tag without a `value`");
+
+                    if (keyNode == null)
+                    {
+                        // error has already been generated
+                        continue;
+                    }
+
+                    if (valueNode == null)
+                    {
+                        // error has already been generated
+                        continue;
+                    }
+
+                    var key = Serialization.ParseElement(new ReaderNodeXml(keyNode, fileIdentifier), referencedKeyType, null, readerContext, recorderChildContext);
+
+                    if (key == null)
+                    {
+                        Dbg.Err($"{new InputContext(fileIdentifier, keyNode)}: Dictionary includes null key, skipping pair");
+                        continue;
+                    }
+
+                    if (dict.Contains(key) && (writtenFields == null || writtenFields.Contains(key)))
+                    {
+                        Dbg.Err($"{elementContext}: Dictionary includes duplicate key `{key.ToString()}`");
+                    }
+                    writtenFields?.Add(key);
+
+                    dict[key] = Serialization.ParseElement(new ReaderNodeXml(valueNode, fileIdentifier), referencedValueType, null, readerContext, recorderChildContext);
+                }
+                else
+                {
+                    var key = Serialization.ParseString(fieldElement.Name.LocalName, referencedKeyType, null, elementContext);
+
+                    if (key == null)
+                    {
+                        // it's really rare for this to happen, I think you could do it with a converter but that's it
+                        Dbg.Err($"{elementContext}: Dictionary includes null key, skipping pair");
+
+                        // just in case . . .
+                        if (string.Compare(fieldElement.Name.LocalName, "li", true, System.Globalization.CultureInfo.InvariantCulture) == 0)
+                        {
+                            Dbg.Err($"{elementContext}: Did you mean to write `li`? This field is case-sensitive.");
+                        }
+
+                        continue;
+                    }
+
+                    if (dict.Contains(key) && (writtenFields == null || writtenFields.Contains(key)))
+                    {
+                        Dbg.Err($"{elementContext}: Dictionary includes duplicate key `{key.ToString()}`");
+                    }
+                    writtenFields?.Add(key);
+
+                    dict[key] = Serialization.ParseElement(new ReaderNodeXml(fieldElement, fileIdentifier), referencedValueType, null, readerContext, recorderChildContext);
+                }
+            }
+        }
+
         public override XElement HackyExtractXml()
         {
             return xml;

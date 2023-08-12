@@ -649,13 +649,10 @@ namespace Dec
                 return array;
             }
 
-            // hackhack
-            XElement element = node.HackyExtractXml();
-
             // Special case: Dictionaries
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>))
             {
-                HashSet<object> replaceableElements = null;
+                bool permitPatch = false;
                 switch (parseMode)
                 {
                     case ParseMode.Default:
@@ -670,16 +667,7 @@ namespace Dec
                         break;
 
                     case ParseMode.Patch:
-                        if (original != null)
-                        {
-                            // set up the replaceableElements
-                            replaceableElements = new HashSet<object>();
-                            var originalDict = (IDictionary)original;
-                            foreach (var originalKey in originalDict.Keys)
-                            {
-                                replaceableElements.Add(originalKey);
-                            }
-                        }
+                        permitPatch = true;
                         break;
 
                     case ParseMode.Append:
@@ -697,82 +685,15 @@ namespace Dec
 
                 var dict = (IDictionary)(result ?? Activator.CreateInstance(type));
 
-                foreach (var fieldElement in element.Elements())
-                {
-                    var elementContext = new InputContext(context.sourceName, fieldElement);
+                node.ParseDictionary(dict, keyType, valueType, context, recContext, permitPatch);
 
-                    if (fieldElement.Name.LocalName == "li")
-                    {
-                        // Treat this like a key/value pair
-                        var keyNode = fieldElement.ElementNamedWithFallback("key", elementContext, "Dictionary includes li tag without a `key`");
-                        var valueNode = fieldElement.ElementNamedWithFallback("value", elementContext, "Dictionary includes li tag without a `value`");
-
-                        if (keyNode == null)
-                        {
-                            // error has already been generated
-                            continue;
-                        }
-
-                        if (valueNode == null)
-                        {
-                            // error has already been generated
-                            continue;
-                        }
-
-                        var key = ParseElement(new ReaderNodeXml(keyNode, context.sourceName), keyType, null, context, recContext.CreateChild());
-
-                        if (key == null)
-                        {
-                            Dbg.Err($"{elementContext}: Dictionary includes null key, skipping pair");
-                            continue;
-                        }
-
-                        if (replaceableElements != null && replaceableElements.Contains(key))
-                        {
-                            // this can be re-specified only exactly once
-                            replaceableElements.Remove(key);
-                        }
-                        else if (dict.Contains(key))
-                        {
-                            Dbg.Err($"{elementContext}: Dictionary includes duplicate key `{key.ToString()}`");
-                        }
-
-                        dict[key] = ParseElement(new ReaderNodeXml(valueNode, context.sourceName), valueType, null, context, recContext.CreateChild());
-                    }
-                    else
-                    {
-                        var key = ParseString(fieldElement.Name.LocalName, keyType, null, elementContext);
-
-                        if (key == null)
-                        {
-                            // it's really rare for this to happen, I think you could do it with a converter but that's it
-                            Dbg.Err($"{elementContext}: Dictionary includes null key, skipping pair");
-
-                            // just in case . . .
-                            if (string.Compare(fieldElement.Name.LocalName, "li", true, System.Globalization.CultureInfo.InvariantCulture) == 0)
-                            {
-                                Dbg.Err($"{elementContext}: Did you mean to write `li`? This field is case-sensitive.");
-                            }
-
-                            continue;
-                        }
-
-                        if (replaceableElements != null && replaceableElements.Contains(key))
-                        {
-                            // this can be re-specified only exactly once
-                            replaceableElements.Remove(key);
-                        }
-                        else if (dict.Contains(key))
-                        {
-                            Dbg.Err($"{elementContext}: Dictionary includes duplicate key `{fieldElement.Name.LocalName}`");
-                        }
-
-                        dict[key] = ParseElement(new ReaderNodeXml(fieldElement, context.sourceName), valueType, null, context, recContext.CreateChild());
-                    }
-                }
+                
 
                 return dict;
             }
+
+            // hackhack
+            XElement element = node.HackyExtractXml();
 
             // Special case: HashSet
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(HashSet<>))
