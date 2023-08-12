@@ -473,9 +473,6 @@ namespace Dec
         private readonly ReaderNode node;
         private readonly ReaderContext readerContext;
         private bool disallowShared;
-        private InputContext inputContext;
-
-        public InputContext InputContext { get => inputContext; }
 
         internal RecorderReader(ReaderNode node, ReaderContext context, bool disallowShared = false)
         {
@@ -504,7 +501,7 @@ namespace Dec
 
             if (disallowShared && parameters.shared)
             {
-                Dbg.Err($"{inputContext}: Shared object used in a context that disallows shared objects (probably ConverterFactory<>.Create())");
+                Dbg.Err($"{node.GetInputContext()}: Shared object used in a context that disallows shared objects (probably ConverterFactory<>.Create())");
             }
 
             var recorded = node.GetChildNamed(label);

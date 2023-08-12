@@ -177,7 +177,6 @@ namespace Dec
             // Don't return anything until we do our element.HasAtttributes check!
 
             // The interaction between these is complicated!
-            HashSet<string> consumedAttributes = null;
             string nullAttribute = node.GetMetadata(ReaderNode.Metadata.Null);
             string refAttribute = node.GetMetadata(ReaderNode.Metadata.Ref);
             string classAttribute = node.GetMetadata(ReaderNode.Metadata.Class);
