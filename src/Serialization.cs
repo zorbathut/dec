@@ -597,15 +597,10 @@ namespace Dec
                 return list;
             }
 
-            // hackhack
-            XElement element = node.HackyExtractXml();
-
             // Special case: Arrays
             if (type.IsArray)
             {
                 Type referencedType = type.GetElementType();
-
-                var elements = element.Elements().ToArray();
 
                 Array array;
                 int startOffset = 0;
@@ -616,7 +611,7 @@ namespace Dec
                     case ParseMode.Default:
                     case ParseMode.Replace:
                         // This is a full override, so we're going to create it here.
-                        if (result != null && result.GetType() == type && ((Array)result).Length == elements.Length)
+                        if (result != null && result.GetType() == type && ((Array)result).Length == node.GetChildCount())
                         {
                             // It is actually vitally important that we fall back on the model when possible, because the Recorder Ref system requires it.
                             array = (Array)result;
@@ -624,7 +619,7 @@ namespace Dec
                         else
                         {
                             // Otherwise just make a new one, no harm done.
-                            array = (Array)Activator.CreateInstance(type, new object[] { elements.Length });
+                            array = (Array)Activator.CreateInstance(type, new object[] { node.GetChildCount() });
                         }
                         
                         break;
@@ -639,7 +634,7 @@ namespace Dec
                         // (yes, I know, that's the point of arrays, I'm not complaining, just . . . grumbling a little)
                         var oldArray = (Array)result;
                         startOffset = oldArray.Length;
-                        array = (Array)Activator.CreateInstance(type, new object[] { startOffset + elements.Length });
+                        array = (Array)Activator.CreateInstance(type, new object[] { startOffset + node.GetChildCount() });
                         oldArray.CopyTo(array, 0);
 
                         break;
@@ -649,20 +644,13 @@ namespace Dec
                         goto case ParseMode.Replace;
                 }
 
-                for (int i = 0; i < elements.Length; ++i)
-                {
-                    var fieldElement = elements[i];
-                    if (fieldElement.Name.LocalName != "li")
-                    {
-                        var elementContext = new InputContext(context.sourceName, fieldElement);
-                        Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
-                    }
-
-                    array.SetValue(ParseElement(new ReaderNodeXml(fieldElement, context.sourceName), referencedType, null, context, recContext.CreateChild()), startOffset + i);
-                }
+                node.ParseArray(array, referencedType, context, recContext, startOffset);
 
                 return array;
             }
+
+            // hackhack
+            XElement element = node.HackyExtractXml();
 
             // Special case: Dictionaries
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>))

@@ -58,6 +58,7 @@ namespace Dec
         public abstract ReaderNode GetChildNamed(string name);
 
         public abstract void ParseList(IList list, Type referencedType, ReaderContext readerContext, Recorder.Context recorderContext);
+        public abstract void ParseArray(Array array, Type referencedType, ReaderContext readerContext, Recorder.Context recorderContext, int startOffset);
 
         public abstract XElement HackyExtractXml();
     }

@@ -291,6 +291,23 @@ namespace Dec
             }
         }
 
+        public override void ParseArray(Array array, Type referencedType, ReaderContext readerContext, Recorder.Context recorderContext, int startOffset)
+        {
+            var recorderChildContext = recorderContext.CreateChild();
+
+            int i = 0;
+            foreach (var fieldElement in xml.Elements())
+            {
+                if (fieldElement.Name.LocalName != "li")
+                {
+                    var elementContext = new InputContext(fileIdentifier, fieldElement);
+                    Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
+                }
+
+                array.SetValue(Serialization.ParseElement(new ReaderNodeXml(fieldElement, fileIdentifier), referencedType, null, readerContext, recorderChildContext), startOffset + i++);
+            }
+        }
+
         public override XElement HackyExtractXml()
         {
             return xml;
