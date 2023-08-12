@@ -451,6 +451,92 @@ namespace Dec
             }
         }
 
+        public override void ParseTuple(object[] parameters, Type referencedType, IList<string?> parameterNames, ReaderContext readerContext, Recorder.Context recorderContext)
+        {
+            int expectedCount = referencedType.GenericTypeArguments.Length;
+            var recorderChildContext = recorderContext.CreateChild();
+
+            var elements = xml.Elements().ToList();
+
+            bool hasNonLi = false;
+            foreach (var elementField in elements)
+            {
+                if (elementField.Name.LocalName != "li")
+                {
+                    hasNonLi = true;
+                }
+            }
+
+            if (!hasNonLi)
+            {
+                // Treat it like an indexed array
+
+                if (elements.Count != parameters.Length)
+                {
+                    Dbg.Err($"{GetInputContext()}: Tuple expects {expectedCount} parameters but got {elements.Count}");
+                }
+
+                for (int i = 0; i < Math.Min(parameters.Length, elements.Count); ++i)
+                {
+                    parameters[i] = Serialization.ParseElement(new ReaderNodeXml(elements[i], fileIdentifier), referencedType.GenericTypeArguments[i], null, readerContext, recorderChildContext);
+                }
+
+                // fill in anything missing
+                for (int i = Math.Min(parameters.Length, elements.Count); i < parameters.Length; ++i)
+                {
+                    parameters[i] = Serialization.GenerateResultFallback(null, referencedType.GenericTypeArguments[i]);
+                }
+            }
+            else
+            {
+                // We're doing named lookups instead
+                if (parameterNames == null)
+                {
+                    parameterNames = Util.DefaultTupleNames;
+                }
+
+                if (parameterNames.Count < expectedCount)
+                {
+                    Dbg.Err($"{GetInputContext()}: Not enough tuple names (this honestly shouldn't even be possible)");
+
+                    // TODO: handle it
+                }
+
+                bool[] seen = new bool[expectedCount];
+                foreach (var elementItem in elements)
+                {
+                    var elementContext = new InputContext(fileIdentifier, elementItem);
+
+                    int index = parameterNames.FirstIndexOf(n => n == elementItem.Name.LocalName);
+
+                    if (index == -1)
+                    {
+                        Dbg.Err($"{elementContext}: Found field with unexpected name `{elementItem.Name.LocalName}`");
+                        continue;
+                    }
+
+                    if (seen[index])
+                    {
+                        Dbg.Err($"{elementContext}: Found duplicate of field `{elementItem.Name.LocalName}`");
+                    }
+
+                    seen[index] = true;
+                    parameters[index] = Serialization.ParseElement(new ReaderNodeXml(elementItem, fileIdentifier), referencedType.GenericTypeArguments[index], null, readerContext, recorderChildContext);
+                }
+
+                for (int i = 0; i < seen.Length; ++i)
+                {
+                    if (!seen[i])
+                    {
+                        Dbg.Err($"{GetInputContext()}: Missing field with name `{parameterNames[i]}`");
+
+                        // Patch it up as best we can
+                        parameters[i] = Serialization.GenerateResultFallback(null, referencedType.GenericTypeArguments[i]);
+                    }
+                }
+            }
+        }
+
         public override XElement HackyExtractXml()
         {
             return xml;

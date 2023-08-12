@@ -95,7 +95,7 @@ namespace Dec
             }
         }
 
-        private static object GenerateResultFallback(object model, Type type)
+        internal static object GenerateResultFallback(object model, Type type)
         {
             if (model != null)
             {
@@ -745,9 +745,6 @@ namespace Dec
                 return set;
             }
 
-            // hackhack
-            XElement element = node.HackyExtractXml();
-
             // Special case: A bucket of tuples
             // These are all basically identical, but AFAIK there's no good way to test them all in a better way.
             if (type.IsGenericType && (
@@ -782,92 +779,16 @@ namespace Dec
                 }
 
                 int expectedCount = type.GenericTypeArguments.Length;
-
                 object[] parameters = new object[expectedCount];
-                var elements = element.Elements().ToList();
 
-                bool hasNonLi = false;
-                foreach (var elementField in elements)
-                {
-                    if (elementField.Name.LocalName != "li")
-                    {
-                        hasNonLi = true;
-                    }
-                }
-
-                if (!hasNonLi)
-                {
-                    // Treat it like an indexed array
-
-                    if (elements.Count != parameters.Length)
-                    {
-                        Dbg.Err($"{node.GetInputContext()}: Tuple expects {expectedCount} parameters but got {elements.Count}");
-                    }
-
-                    for (int i = 0; i < Math.Min(parameters.Length, elements.Count); ++i)
-                    {
-                        parameters[i] = ParseElement(new ReaderNodeXml(elements[i], context.sourceName), type.GenericTypeArguments[i], null, context, recContext.CreateChild());
-                    }
-
-                    // fill in anything missing
-                    for (int i = Math.Min(parameters.Length, elements.Count); i < parameters.Length; ++i)
-                    {
-                        parameters[i] = GenerateResultFallback(null, type.GenericTypeArguments[i]);
-                    }
-                }
-                else
-                {
-                    // We're doing named lookups instead
-                    var names = fieldInfo?.GetCustomAttribute<System.Runtime.CompilerServices.TupleElementNamesAttribute>()?.TransformNames;
-                    if (names == null)
-                    {
-                        names = Util.DefaultTupleNames;
-                    }
-
-                    if (names.Count < expectedCount)
-                    {
-                        Dbg.Err($"{node.GetInputContext()}: Not enough tuple names (this honestly shouldn't even be possible)");
-
-                        // TODO: handle it
-                    }
-
-                    bool[] seen = new bool[expectedCount];
-                    foreach (var elementItem in elements)
-                    {
-                        var elementContext = new InputContext(context.sourceName, elementItem);
-
-                        int index = names.FirstIndexOf(n => n == elementItem.Name.LocalName);
-
-                        if (index == -1)
-                        {
-                            Dbg.Err($"{elementContext}: Found field with unexpected name `{elementItem.Name.LocalName}`");
-                            continue;
-                        }
-
-                        if (seen[index])
-                        {
-                            Dbg.Err($"{elementContext}: Found duplicate of field `{elementItem.Name.LocalName}`");
-                        }
-
-                        seen[index] = true;
-                        parameters[index] = ParseElement(new ReaderNodeXml(elementItem, context.sourceName), type.GenericTypeArguments[index], null, context, recContext.CreateChild());
-                    }
-
-                    for (int i = 0; i < seen.Length; ++i)
-                    {
-                        if (!seen[i])
-                        {
-                            Dbg.Err($"{node.GetInputContext()}: Missing field with name `{names[i]}`");
-
-                            // Patch it up as best we can
-                            parameters[i] = GenerateResultFallback(null, type.GenericTypeArguments[i]);
-                        }
-                    }
-                }
+                node.ParseTuple(parameters, type, fieldInfo?.GetCustomAttribute<System.Runtime.CompilerServices.TupleElementNamesAttribute>()?.TransformNames, context, recContext);
 
                 // construct!
                 return Activator.CreateInstance(type, parameters);
             }
+
+            // hackhack
+            XElement element = node.HackyExtractXml();
 
             // At this point, we're either a class or a struct, and we need to do the reflection thing
 
