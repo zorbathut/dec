@@ -378,6 +378,14 @@ namespace Dec
                 }
 
                 // link up the ref dict; we do this afterwards so we can verify that the object creation code is not using refs
+                // note: I sort of feel like this shouldn't work, because we're stashing readerContext in some inline functions that we're adding to a list
+                // it's important that they be updated by this line, so they can link up the refs properly
+                // but this is a struct; does it not get copied? how does this work? is it boxed, somehow? is it actually referring to the stack?
+                // if I exit this context while leaving those functions around, then change readerContext within one of them, does that change propogate?
+                // if not, then when does this behavior switch?
+                // if so, then are we filling up the heap with stuff?
+                // gotta look into this someday
+                // anyway the good news is that the test suite is testing this pretty extensively, so at least it works right now, even if it's not fast
                 readerContext.refs = refDict;
 
                 // finish up our second-stage ref parsing
@@ -395,7 +403,7 @@ namespace Dec
 
                 // And now, we can finally parse our actual root element!
                 // (which accounts for a tiny percentage of things that need to be parsed)
-                return (T)Serialization.ParseElement(parseNode, typeof(T), null, new ReaderContext(true) { refs = refDict }, new Recorder.Context() { shared = Context.Shared.Flexible });
+                return (T)Serialization.ParseElement(parseNode, typeof(T), null, readerContext, new Recorder.Context() { shared = Context.Shared.Flexible });
             }
         }
     }
@@ -454,7 +462,7 @@ namespace Dec
         public override Direction Mode { get => Direction.Write; }
     }
 
-    internal class ReaderContext
+    internal struct ReaderContext
     {
         public Dictionary<string, object> refs;
         public bool recorderMode;
@@ -462,6 +470,7 @@ namespace Dec
         public ReaderContext(bool recorderMode)
         {
             this.recorderMode = recorderMode;
+            this.refs = null;
         }
     }
 
