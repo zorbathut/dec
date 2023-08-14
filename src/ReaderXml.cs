@@ -602,11 +602,6 @@ namespace Dec
             }
         }
 
-        public override XElement HackyExtractXml()
-        {
-            return xml;
-        }
-
         private XElement xml;
         private string fileIdentifier;
     }
