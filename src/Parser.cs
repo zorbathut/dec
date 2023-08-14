@@ -136,7 +136,7 @@ namespace Dec
                         }
                         else
                         {
-                            potentialParents[identifier] = new Parent { node = readerDec.node, context = new ReaderContext(stringName, false), parent = readerDec.parent };
+                            potentialParents[identifier] = new Parent { node = readerDec.node, context = new ReaderContext(false), parent = readerDec.parent };
                         }
                     }
 
@@ -155,12 +155,12 @@ namespace Dec
                             if (readerDec.parent == null)
                             {
                                 // Non-parent objects are simple; we just handle them here in order to avoid unnecessary GC churn
-                                finishWork.Add(() => Serialization.ParseElement(readerDec.node, readerDec.type, decInstance, new ReaderContext(stringName, false), new Recorder.Context(), isRootDec: true));
+                                finishWork.Add(() => Serialization.ParseElement(readerDec.node, readerDec.type, decInstance, new ReaderContext(false), new Recorder.Context(), isRootDec: true));
                             }
                             else
                             {
                                 // Add an inheritance resolution job; we'll take care of this soon
-                                inheritanceJobs.Add(new InheritanceJob { target = decInstance, node = readerDec.node, context = new ReaderContext(stringName, false), parent = readerDec.parent });
+                                inheritanceJobs.Add(new InheritanceJob { target = decInstance, node = readerDec.node, context = new ReaderContext(false), parent = readerDec.parent });
                             }
                         }
                     }

@@ -314,7 +314,7 @@ namespace Dec
                 // We'll be doing a second parse to parse *many* of these, but not all
                 var furtherParsing = new List<Action>();
                 var refDict = new Dictionary<string, object>();
-                var readerContext = new ReaderContext(stringName, true);
+                var readerContext = new ReaderContext(true);
 
                 foreach (var reference in refs)
                 {
@@ -395,7 +395,7 @@ namespace Dec
 
                 // And now, we can finally parse our actual root element!
                 // (which accounts for a tiny percentage of things that need to be parsed)
-                return (T)Serialization.ParseElement(parseNode, typeof(T), null, new ReaderContext(stringName, true) { refs = refDict }, new Recorder.Context() { shared = Context.Shared.Flexible });
+                return (T)Serialization.ParseElement(parseNode, typeof(T), null, new ReaderContext(true) { refs = refDict }, new Recorder.Context() { shared = Context.Shared.Flexible });
             }
         }
     }
@@ -456,13 +456,11 @@ namespace Dec
 
     internal class ReaderContext
     {
-        public string sourceName;
         public Dictionary<string, object> refs;
         public bool recorderMode;
 
-        public ReaderContext(string sourceName, bool recorderMode)
+        public ReaderContext(bool recorderMode)
         {
-            this.sourceName = sourceName;
             this.recorderMode = recorderMode;
         }
     }
