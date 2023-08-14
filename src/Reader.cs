@@ -62,6 +62,7 @@ namespace Dec
         public abstract void ParseDictionary(IDictionary dict, Type referencedKeyType, Type referencedValueType, ReaderContext readerContext, Recorder.Context recorderContext, bool permitPatch);
         public abstract void ParseHashset(object hashset, Type referencedType, ReaderContext readerContext, Recorder.Context recorderContext, bool permitPatch);
         public abstract void ParseTuple(object[] parameters, Type referencedType, IList<string?> parameterNames, ReaderContext readerContext, Recorder.Context recorderContext);
+        public abstract void ParseReflection(object obj, ReaderContext readerContext, Recorder.Context recorderContext);
 
         public abstract XElement HackyExtractXml();
     }
