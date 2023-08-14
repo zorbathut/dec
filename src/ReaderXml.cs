@@ -452,7 +452,7 @@ namespace Dec
             }
         }
 
-        public override void ParseTuple(object[] parameters, Type referencedType, IList<string?> parameterNames, ReaderContext readerContext, Recorder.Context recorderContext)
+        public override void ParseTuple(object[] parameters, Type referencedType, IList<string> parameterNames, ReaderContext readerContext, Recorder.Context recorderContext)
         {
             int expectedCount = referencedType.GenericTypeArguments.Length;
             var recorderChildContext = recorderContext.CreateChild();
