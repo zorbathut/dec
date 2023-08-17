@@ -196,7 +196,7 @@ namespace Dec
                 }
             }
 
-            ParserModdable.Clear();
+            ParserModular.Clear();
             Serialization.Clear();
             Index.Clear();
 

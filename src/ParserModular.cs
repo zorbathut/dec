@@ -13,7 +13,7 @@ namespace Dec
     ///
     /// Intended for moddable games; use Parser for non-moddable or prototype games.
     /// </summary>
-    public class ParserModdable
+    public class ParserModular
     {
         // Global status
         private enum Status
@@ -58,7 +58,7 @@ namespace Dec
         /// <summary>
         /// Creates a Parser.
         /// </summary>
-        public ParserModdable()
+        public ParserModular()
         {
             if (s_Status != Status.Uninitialized)
             {

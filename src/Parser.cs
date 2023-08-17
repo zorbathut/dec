@@ -25,7 +25,7 @@ namespace Dec
     public class Parser : IParser
     {
         // That's right! I'm actually a ParserModdable on the inside! Evil cackle!
-        private ParserModdable parserModdable;
+        private ParserModular parserModdable;
 
         public enum FileType
         {
@@ -34,7 +34,7 @@ namespace Dec
 
         public Parser()
         {
-            parserModdable = new ParserModdable();
+            parserModdable = new ParserModular();
         }
 
         /// <summary>
