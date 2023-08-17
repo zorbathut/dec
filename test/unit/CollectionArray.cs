@@ -19,7 +19,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ArrayDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <ArrayDec decName=""TestDec"">
                         <dataEmpty>
@@ -55,7 +55,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <ArrayDec decName=""TestDec"">
                         <dataEmpty>nope</dataEmpty>
@@ -80,7 +80,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <ArrayDec decName=""TestDec"">
                         <dataEmpty></dataEmpty>
@@ -104,7 +104,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <ArrayDec decName=""TestDec"">
                         <dataEmpty null=""true""></dataEmpty>
@@ -128,7 +128,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <ArrayDec decName=""TestDec"">
                         <dataEmpty>

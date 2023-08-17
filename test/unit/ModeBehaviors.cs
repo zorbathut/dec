@@ -48,7 +48,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DecDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString($@"
+            parser.AddString(Dec.Parser.FileType.Xml, $@"
                 <Decs>
                     <DecDec decName=""TestDec"" {GenerateParseModeTag(parseMode)}>
                         <value>6</value>
@@ -96,7 +96,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ConverterDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString($@"
+            parser.AddString(Dec.Parser.FileType.Xml, $@"
                 <Decs>
                     <ConverterDec decName=""TestDec"">
                         <empty {GenerateParseModeTag(parseMode)}><value>60</value></empty>
@@ -127,7 +127,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ConverterDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString($@"
+            parser.AddString(Dec.Parser.FileType.Xml, $@"
                 <Decs>
                     <ConverterDec decName=""TestDec"">
                         <filled {GenerateParseModeTag(parseMode)}><value>60</value></filled>
@@ -175,7 +175,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(RecorderDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString($@"
+            parser.AddString(Dec.Parser.FileType.Xml, $@"
                 <Decs>
                     <RecorderDec decName=""TestDec"">
                         <empty {GenerateParseModeTag(parseMode)}><value>60</value></empty>
@@ -206,7 +206,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(RecorderDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString($@"
+            parser.AddString(Dec.Parser.FileType.Xml, $@"
                 <Decs>
                     <RecorderDec decName=""TestDec"">
                         <filled {GenerateParseModeTag(parseMode)}><value>60</value></filled>
@@ -241,7 +241,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(PrimitiveDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString($@"
+            parser.AddString(Dec.Parser.FileType.Xml, $@"
                 <Decs>
                     <PrimitiveDec decName=""TestDec"">
                         <value {GenerateParseModeTag(parseMode)}>60</value>
@@ -274,7 +274,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ListDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString($@"
+            parser.AddString(Dec.Parser.FileType.Xml, $@"
                 <Decs>
                     <ListDec decName=""TestDec"">
                         <empty {GenerateParseModeTag(parseMode)}>
@@ -306,7 +306,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ListDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString($@"
+            parser.AddString(Dec.Parser.FileType.Xml, $@"
                 <Decs>
                     <ListDec decName=""TestDec"">
                         <filled {GenerateParseModeTag(parseMode)}>
@@ -351,7 +351,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString($@"
+            parser.AddString(Dec.Parser.FileType.Xml, $@"
                 <Decs>
                     <ArrayDec decName=""TestDec"">
                         <empty {GenerateParseModeTag(parseMode)}>
@@ -383,7 +383,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString($@"
+            parser.AddString(Dec.Parser.FileType.Xml, $@"
                 <Decs>
                     <ArrayDec decName=""TestDec"">
                         <filled {GenerateParseModeTag(parseMode)}>
@@ -428,7 +428,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString($@"
+            parser.AddString(Dec.Parser.FileType.Xml, $@"
                 <Decs>
                     <DictionaryDec decName=""TestDec"">
                         <empty {GenerateParseModeTag(parseMode)}>
@@ -459,7 +459,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString($@"
+            parser.AddString(Dec.Parser.FileType.Xml, $@"
                 <Decs>
                     <DictionaryDec decName=""TestDec"">
                         <filled {GenerateParseModeTag(parseMode)}>
@@ -497,7 +497,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString($@"
+            parser.AddString(Dec.Parser.FileType.Xml, $@"
                 <Decs>
                     <DictionaryDec decName=""TestDec"">
                         <filled {GenerateParseModeTag(parseMode)}>
@@ -536,7 +536,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString($@"
+            parser.AddString(Dec.Parser.FileType.Xml, $@"
                 <Decs>
                     <DictionaryDec decName=""TestDec"">
                         <filled {GenerateParseModeTag(parseMode)}>
@@ -575,7 +575,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString($@"
+            parser.AddString(Dec.Parser.FileType.Xml, $@"
                 <Decs>
                     <HashSetDec decName=""TestDec"">
                         <empty {GenerateParseModeTag(parseMode)}>
@@ -607,7 +607,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString($@"
+            parser.AddString(Dec.Parser.FileType.Xml, $@"
                 <Decs>
                     <HashSetDec decName=""TestDec"">
                         <filled {GenerateParseModeTag(parseMode)}>
@@ -646,7 +646,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString($@"
+            parser.AddString(Dec.Parser.FileType.Xml, $@"
                 <Decs>
                     <HashSetDec decName=""TestDec"">
                         <filled {GenerateParseModeTag(parseMode)}>
@@ -686,7 +686,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString($@"
+            parser.AddString(Dec.Parser.FileType.Xml, $@"
                 <Decs>
                     <HashSetDec decName=""TestDec"">
                         <filled {GenerateParseModeTag(parseMode)}>
@@ -725,7 +725,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(TupleDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString($@"
+            parser.AddString(Dec.Parser.FileType.Xml, $@"
                 <Decs>
                     <TupleDec decName=""TestDec"">
                         <value {GenerateParseModeTag(parseMode)}>
@@ -767,7 +767,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(CompositeDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString($@"
+            parser.AddString(Dec.Parser.FileType.Xml, $@"
                 <Decs>
                     <CompositeDec decName=""TestDec"">
                         <empty {GenerateParseModeTag(parseMode)}><value>60</value></empty>
@@ -798,7 +798,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(CompositeDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString($@"
+            parser.AddString(Dec.Parser.FileType.Xml, $@"
                 <Decs>
                     <CompositeDec decName=""TestDec"">
                         <filled {GenerateParseModeTag(parseMode)}><value>60</value></filled>
@@ -837,7 +837,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(EntityDec), typeof(ComponentConcrete) } });
 
             var parser = new Dec.Parser();
-            parser.AddString($@"
+            parser.AddString(Dec.Parser.FileType.Xml, $@"
                 <Decs>
                     <EntityDec decName=""BaseEntity"" abstract=""true"">
                         <components>

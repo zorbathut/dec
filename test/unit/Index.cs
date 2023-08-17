@@ -29,7 +29,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndexBaseDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <IndexBaseDec decName=""TestDecA"" />
                     <IndexBaseDec decName=""TestDecB"" />
@@ -52,7 +52,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndexBaseDec), typeof(IndexDerivedDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <IndexDerivedDec decName=""TestDecA"" />
                     <IndexBaseDec decName=""TestDecB"" />
@@ -84,7 +84,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndexLeafDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <IndexLeafDec decName=""TestDecA"" />
                     <IndexLeafDec decName=""TestDecB"" />
@@ -126,7 +126,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndependentIndexDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <IndependentIndexDec decName=""TestDecA"">
                         <iicPrefilled />
@@ -182,7 +182,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExcessiveIndicesDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <ExcessiveIndicesDec decName=""TestDecA"" />
                     <ExcessiveIndicesDec decName=""TestDecB"" />
@@ -216,7 +216,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ParentReplaceIndexDec), typeof(ParentReplaceIndexCarrier) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <ParentReplaceIndexDec decName=""Parent"" abstract=""true"">
                         <list>
@@ -244,19 +244,19 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IndexBaseDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <IndexBaseDec decName=""TestDecA"" />
                     <IndexBaseDec decName=""TestDecB"" />
                     <IndexBaseDec decName=""TestDecC"" />
                 </Decs>");
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <IndexBaseDec decName=""TestDecD"" />
                     <IndexBaseDec decName=""TestDecE"" />
                     <IndexBaseDec decName=""TestDecF"" />
                 </Decs>");
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <IndexBaseDec decName=""TestDecG"" />
                     <IndexBaseDec decName=""TestDecH"" />

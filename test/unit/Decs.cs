@@ -14,7 +14,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <StubDec decName=""TestDec"">
                     </StubDec>
@@ -32,7 +32,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <StubDec decName=""TestDec"" />
                 </Decs>");
@@ -49,7 +49,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } });
 
             var parser = new Dec.Parser();
-            ExpectErrors(() => parser.AddString(@"
+            ExpectErrors(() => parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <NonexistentDec decName=""TestDecA"" />
                     <StubDec decName=""TestDecB"" />
@@ -68,7 +68,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } });
 
             var parser = new Dec.Parser();
-            ExpectErrors(() => parser.AddString(@"
+            ExpectErrors(() => parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <StubDec />
                 </Decs>"));
@@ -83,7 +83,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } });
 
             var parser = new Dec.Parser();
-            ExpectErrors(() => parser.AddString(@"
+            ExpectErrors(() => parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <StubDec decName=""1NumberPrefix"" />
                     <StubDec decName=""Contains Spaces"" />
@@ -113,7 +113,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(IntDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <IntDec decName=""TestDec"">
                         <value>3</value>
@@ -136,7 +136,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(IntDec) } });
 
             var parser = new Dec.Parser();
-            ExpectErrors(() => parser.AddString(@"
+            ExpectErrors(() => parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <IntDec decName=""TestDec"">
                         <value>10</value>
@@ -171,7 +171,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(DeepChildDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <DeepChildDec decName=""TestDec"">
                         <value>12</value>
@@ -213,7 +213,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(DupeChildDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <DupeChildDec decName=""TestDec"">
                         <value>12</value>
@@ -236,7 +236,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <StubDec decName=""TestDec"" invalidAttribute=""hello"" />
                 </Decs>");
@@ -263,7 +263,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <StubDec decName=""TestDec"" />
                 </Decs>");
@@ -344,7 +344,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ErrorDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <ErrorDec decName=""TestDecA"" />
                     <ErrorDec decName=""TestDecB"" />
@@ -365,7 +365,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(PostLoadErrorDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <PostLoadErrorDec decName=""TestDecA"" />
                     <PostLoadErrorDec decName=""TestDecB"" />
@@ -386,7 +386,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ErrorExceptionDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <ErrorExceptionDec decName=""TestDecA"" />
                     <ErrorExceptionDec decName=""TestDecB"" />
@@ -405,7 +405,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(PostLoadErrorExceptionDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <PostLoadErrorExceptionDec decName=""TestDecA"" />
                     <PostLoadErrorExceptionDec decName=""TestDecB"" />
@@ -436,7 +436,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(PostLoadDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <PostLoadDec decName=""TestDec"" />
                 </Decs>");
@@ -459,7 +459,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DecMemberDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <DecMemberDec decName=""TestDec"">
                         <invalidReference>TestDec</invalidReference>
@@ -484,7 +484,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SelfReferentialDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <SelfReferentialDec decName=""TestDec"">
                         <recursive>TestDec</recursive>
@@ -511,7 +511,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(LooseMatchDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <LooseMatchDec decName=""TestDec"">
                         <Cat>words</Cat>
@@ -528,7 +528,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(LooseMatchDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <LooseMatchDec decName=""TestDec"">
                         <snakeCase>words</snakeCase>
@@ -545,7 +545,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(LooseMatchDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <LooseMatchDec decName=""TestDec"">
                         <camel_case>words</camel_case>
@@ -566,7 +566,7 @@ namespace DecTest
             // This is a little silly because, as of this writing, DecName is a property and we don't even support writing to properties.
             // So we're not really testing forbidden fields here. We're really just double-checking the fact that properties can't be written to.
             // But someday I'll probably support properties, and then this had better work.
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <StubDec decName=""TestDec"">
                         <DecName>NotTestDec</DecName>
@@ -602,7 +602,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(InternalInheritanceDec), typeof(InternalDerived) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <InternalInheritanceDec decName=""TestDec"">
                         <value class=""InternalDerived"">
@@ -642,7 +642,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ConflictInheritanceDec), typeof(ConflictDerived) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <ConflictInheritanceDec decName=""TestDec"">
                         <value class=""ConflictDerived"">
@@ -676,7 +676,7 @@ namespace DecTest
             // Currently providing absolutely no guarantees for how these weird things parse, only that the types will be properly preserved.
             // Also: Don't do this, yo.
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <ContainerInheritanceDec decName=""TestDec"">
                         <list class=""WeirdList"" />
@@ -700,7 +700,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(AbstractDec), typeof(ConcreteDec) } });
 
             var parser = new Dec.Parser();
-            ExpectErrors(() => parser.AddString(@"
+            ExpectErrors(() => parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <AbstractDec decName=""Abstract"" />
                     <ConcreteDec decName=""Concrete"" />
@@ -732,7 +732,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(RawMemberDec), typeof(TrueConcreteDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString($@"
+            parser.AddString(Dec.Parser.FileType.Xml, $@"
                 <Decs>
                     <RawMemberDec decName=""Missing"">
                         <member {(classSpecified ? "class=\"TrueConcreteDec\"" : "")}>Concrete</member>
@@ -768,7 +768,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(AbstractMemberDec), typeof(TrueConcreteDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString($@"
+            parser.AddString(Dec.Parser.FileType.Xml, $@"
                 <Decs>
                     <AbstractMemberDec decName=""Missing"">
                         <member {( classSpecified ? "class=\"TrueConcreteDec\"" : "" )}>Concrete</member>
@@ -809,7 +809,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ConstructorPrivateDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <ConstructorPrivateDec decName=""TestDec"" />
                 </Decs>");
@@ -831,7 +831,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ConstructorParameterDec) } });
 
             var parser = new Dec.Parser();
-            ExpectErrors(() => parser.AddString(@"
+            ExpectErrors(() => parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <ConstructorParameterDec decName=""TestDec"" />
                 </Decs>"));

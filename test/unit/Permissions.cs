@@ -18,7 +18,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(PrivateDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <PrivateDec decName=""TestDec"">
                         <value>20</value>
@@ -45,7 +45,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(InternalDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <InternalDec decName=""TestDec"">
                         <value>20</value>
@@ -79,7 +79,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(PrivateMemberDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <PrivateMemberDec decName=""TestDec"">
                         <value>20</value>
@@ -113,7 +113,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(InternalMemberDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <InternalMemberDec decName=""TestDec"">
                         <value>20</value>
@@ -145,7 +145,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ProtectedMemberDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <ProtectedMemberDec decName=""TestDec"">
                         <value>20</value>
@@ -184,7 +184,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(PrivateMemberChildDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <PrivateMemberChildDec decName=""TestDec"">
                         <value>20</value>

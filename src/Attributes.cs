@@ -25,7 +25,7 @@ namespace Dec
         [MethodImpl(MethodImplOptions.NoInlining)]  // We use stack black magic to identify the class, so we need to make sure it isn't inlined
         public static void Initialized()
         {
-            Parser.StaticReferencesInitialized();
+            ParserModdable.StaticReferencesInitialized();
         }
     }
 

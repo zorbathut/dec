@@ -26,7 +26,7 @@ namespace DecTest
                 UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(StubDecs) } });
 
                 var parser = new Dec.Parser();
-                parser.AddString(@"
+                parser.AddString(Dec.Parser.FileType.Xml, @"
                     <Decs>
                         <StubDec decName=""TestDec"" />
                     </Decs>");
@@ -45,7 +45,7 @@ namespace DecTest
                 UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(StubDecs) } });
 
                 var parser = new Dec.Parser();
-                parser.AddString(@"
+                parser.AddString(Dec.Parser.FileType.Xml, @"
                     <Decs>
                         <StubDec decName=""TestDec"" />
                     </Decs>");
@@ -81,7 +81,7 @@ namespace DecTest
                 UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDec), typeof(RefSourceDec) } });
 
                 var parser = new Dec.Parser();
-                parser.AddString(@"
+                parser.AddString(Dec.Parser.FileType.Xml, @"
                     <Decs>
                         <RefTargetDec decName=""Target"" />
                         <RefSourceDec decName=""Source"">
@@ -106,7 +106,7 @@ namespace DecTest
                 UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(RefTargetDec), typeof(RefSourceDec) } });
 
                 var parser = new Dec.Parser();
-                parser.AddString(@"
+                parser.AddString(Dec.Parser.FileType.Xml, @"
                     <Decs>
                         <RefSourceDec decName=""Source"">
                             <target>Target</target>

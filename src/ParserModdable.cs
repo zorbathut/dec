@@ -10,8 +10,10 @@ namespace Dec
 
     /// <summary>
     /// Handles all parsing and initialization of dec structures.
+    ///
+    /// Intended for moddable games; use Parser for non-moddable or prototype games.
     /// </summary>
-    public class Parser
+    public class ParserModdable
     {
         // Global status
         private enum Status
@@ -56,7 +58,7 @@ namespace Dec
         /// <summary>
         /// Creates a Parser.
         /// </summary>
-        public Parser()
+        public ParserModdable()
         {
             if (s_Status != Status.Uninitialized)
             {
@@ -103,9 +105,15 @@ namespace Dec
         /// <summary>
         /// Pass an XML document string in for processing.
         /// </summary>
-        /// <param name="stringName">A human-readable identifier useful for debugging. Generally, the name of the file that the string was read from. Not required (but very useful.)</param>
-        public void AddString(string input, string stringName = "(unnamed)")
+        /// <param name="stringName">A human-readable identifier useful for debugging. Generally, the name of the file that the string was read from. Not required, but helpful.</param>
+        public void AddString(Parser.FileType fileType, string input, string stringName = "(unnamed)")
         {
+            if (fileType != Parser.FileType.Xml)
+            {
+                Dbg.Err($"{stringName}: Only XML files are supported at this time");
+                return;
+            }
+
             using (var _ = new CultureInfoScope(Config.CultureInfo))
             {
                 // This is a really easy error to make; we might as well handle it.
@@ -173,16 +181,42 @@ namespace Dec
         /// <summary>
         /// Pass a file in for processing.
         /// </summary>
-        /// <param name="stringName">A human-readable identifier useful for debugging. Generally, the name of the file that the string was read from. Not required; will be derived from filename automatically</param>
-        public void AddFile(string filename, string identifier = null)
+        /// <param name="stringName">A human-readable identifier useful for debugging. Generally, the name of the file that the string was read from. Not required; will be derived from filename automatically.</param>
+        public void AddFile(Parser.FileType fileType, string filename, string identifier = null)
         {
+            if (fileType != Parser.FileType.Xml)
+            {
+                Dbg.Err($"{filename}: Only XML files are supported at this time");
+                return;
+            }
+
             if (identifier == null)
             {
                 // This is imperfect, but good enough. People can pass their own identifier in if they want something clever.
                 identifier = Path.GetFileName(filename);
             }
 
-            AddString(File.ReadAllText(filename), identifier);
+            AddStream(fileType, new FileStream(filename, FileMode.Open), identifier);
+        }
+
+        /// <summary>
+        /// Pass a stream in for processing.
+        /// </summary>
+        /// <param name="stringName">A human-readable identifier useful for debugging. Generally, the name of the file that the stream was built from. Not required, but helpful.</param>
+        public void AddStream(Parser.FileType fileType, Stream stream, string identifier = "(unnamed)")
+        {
+            if (fileType != Parser.FileType.Xml)
+            {
+                Dbg.Err($"{identifier}: Only XML files are supported at this time");
+                return;
+            }
+
+            // this is inefficient but I'm just doing it for now
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                AddString(fileType, reader.ReadToEnd(), identifier);
+            }
+            stream.Dispose();
         }
 
         /// <summary>
@@ -192,14 +226,13 @@ namespace Dec
         /// This function will ignore dot-prefixed directory names and files, which are common for development tools to create.
         /// </remarks>
         /// <param name="directory">The directory to look for files in.</param>
-        /// <param name="pattern">The filename glob pattern to match.</param>
-        public void AddDirectory(string directory, string pattern = "*.xml")
+        public void AddDirectory(string directory)
         {
-            foreach (var file in Directory.GetFiles(directory, pattern))
+            foreach (var file in Directory.GetFiles(directory, "*.xml"))
             {
                 if (!System.IO.Path.GetFileName(file).StartsWith("."))
                 {
-                    AddFile(file);
+                    AddFile(Parser.FileType.Xml, file);
                 }
             }
 
@@ -207,7 +240,7 @@ namespace Dec
             {
                 if (!System.IO.Path.GetFileName(subdir).StartsWith("."))
                 {
-                    AddDirectory(subdir, pattern);
+                    AddDirectory(subdir);
                 }
             }
         }

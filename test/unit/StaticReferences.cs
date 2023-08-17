@@ -21,7 +21,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(StaticReferenceDecs) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <StubDec decName=""TestDecA"" />
                     <StubDec decName=""TestDecB"" />
@@ -58,7 +58,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDerivedDec) }, explicitStaticRefs = new Type[]{ typeof(PreciseClassDecs) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <StubDerivedDec decName=""TestDec"" />
                 </Decs>");
@@ -86,7 +86,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDerivedDec) }, explicitStaticRefs = new Type[]{ typeof(SuperClassDecs) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <StubDerivedDec decName=""TestDec"" />
                 </Decs>");
@@ -114,7 +114,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(SubClassDecs) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <StubDec decName=""TestDec"" />
                 </Decs>");
@@ -142,7 +142,7 @@ namespace DecTest
 
             Dec.Parser parser = null;
             ExpectErrors(() => parser = new Dec.Parser());
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <StubDec decName=""TestDec"" />
                 </Decs>");
@@ -168,7 +168,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(NoInitializerDecs) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <StubDec decName=""TestDec"" />
                 </Decs>");
@@ -197,7 +197,7 @@ namespace DecTest
 
             Dec.Parser parser = null;
             ExpectErrors(() => parser = new Dec.Parser());
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <StubDec decName=""TestDec"" />
                 </Decs>");
@@ -225,7 +225,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(MissingDecs) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                 </Decs>");
             ExpectErrors(() => parser.Finish());
@@ -263,7 +263,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                 </Decs>");
             parser.Finish();
@@ -295,7 +295,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(UnexpectedTouchDec) } });
 
             var parser = new Dec.Parser();
-            ExpectErrors(() => parser.AddString(@"
+            ExpectErrors(() => parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <UnexpectedTouchDec decName=""TestDec"" />
                 </Decs>"));
@@ -330,7 +330,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConstructorTouchDec) }, explicitStaticRefs = new Type[]{ typeof(ConstructorTouchDecs) } });
 
             var parser = new Dec.Parser();
-            ExpectErrors(() => parser.AddString(@"
+            ExpectErrors(() => parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <ConstructorTouchDec decName=""TestDec"" />
                 </Decs>"));
@@ -355,7 +355,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) }, explicitStaticRefs = new Type[]{ typeof(InternalDecs) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <StubDec decName=""TestDec"" />
                 </Decs>");
@@ -378,7 +378,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { }, explicitStaticRefs = new Type[] { typeof(EmptyDecs) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                 </Decs>");
             parser.Finish();
@@ -407,7 +407,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) }, explicitStaticRefs = new Type[] { typeof(UnicodeDecs) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <StubDec decName=""Brød"" />
                     <StubDec decName=""ขนมปัง"" />

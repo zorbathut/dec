@@ -27,7 +27,7 @@ namespace DecTest
             type.GetMethod("Setup").Invoke(null, null);
 
             var parser = new Dec.Parser();
-            parser.AddString(DecUtilLib.Compress.ReadFromFile(Path.Combine(directory, "data.xml")));
+            parser.AddString(Dec.Parser.FileType.Xml, DecUtilLib.Compress.ReadFromFile(Path.Combine(directory, "data.xml")));
             parser.Finish();
 
             DoParserTests(mode, validation_assemblies: new Assembly[] { assembly });

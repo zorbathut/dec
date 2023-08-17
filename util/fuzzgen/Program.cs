@@ -120,7 +120,7 @@ namespace Fuzzgen
             bootstrapAssembly.GetType("DecTest.Harness").GetMethod("Setup").Invoke(null, null);
 
             var parser = new Dec.Parser();
-            parser.AddString(xmlCode);
+            parser.AddString(Dec.Parser.FileType.Xml, xmlCode);
             parser.Finish();
 
             var composer = new Dec.Composer();

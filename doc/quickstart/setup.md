@@ -74,7 +74,7 @@ parser.Finish();
 
 Parser can be garbage-collected after this completes.
 
-If you need to add files manually, [Dec.Parser.AddFile()](xref:Dec.Parser.AddFile*) exists; if your XML data is stored in some format besides plain files, [Dec.Parser.AddString()](xref:Dec.Parser.AddString*) allows you to add raw XML data.
+If you need to add files manually, [Dec.Parser.AddFile()](xref:Dec.Parser.AddFile*) exists; if your XML data is stored in some format besides plain files, [Dec.Parser.AddStream()](xref:Dec.Parser.AddStream*) or [Dec.Parser.AddString()](xref:Dec.Parser.AddString*) allows you to add raw XML data.
 
 On Unity, it's likely that you'll place XML files inside the StreamingAssets directory, in which case you'd want to read them using Unity's [Application.streamingAssetsPath](https://docs.unity3d.com/ScriptReference/Application-streamingAssetsPath.html) property.
 

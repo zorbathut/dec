@@ -23,7 +23,7 @@ namespace DecTest
             var parser = new Dec.Parser();
             parser.Finish();
 
-            ExpectErrors(() => parser.AddString("<Decs />"));
+            ExpectErrors(() => parser.AddString(Dec.Parser.FileType.Xml, "<Decs />"));
         }
 
         [Test]
@@ -86,7 +86,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <IntDec decName=""TestDec"">
                         <value>55</value>
@@ -106,7 +106,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <IntDec decName=""TestDec"">
                         <value>60</value>
@@ -143,7 +143,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ConcreteChildADec), typeof(ConcreteChildBDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <ConcreteChildADec decName=""TestDec"">
                         <absInt>20</absInt>
@@ -170,7 +170,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddFile("data/Parser.LoadFile.xml");
+            parser.AddFile(Dec.Parser.FileType.Xml, "data/Parser.LoadFile.xml");
             parser.Finish();
 
             DoParserTests(mode);
@@ -184,7 +184,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddFile("data/Parser.LoadFileError.xml");
+            parser.AddFile(Dec.Parser.FileType.Xml, "data/Parser.LoadFileError.xml");
             ExpectErrors(() => parser.Finish(), errorValidator: str => str.Contains("Parser.LoadFileError"));
 
             DoParserTests(mode);

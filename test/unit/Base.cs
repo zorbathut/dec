@@ -247,7 +247,7 @@ namespace DecTest
                 void RunParser()
                 {
                     var parser = new Dec.Parser();
-                    parser.AddString(data);
+                    parser.AddString(Dec.Parser.FileType.Xml, data);
                     parser.Finish();
                 }
 

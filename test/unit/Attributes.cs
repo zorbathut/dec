@@ -93,7 +93,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StringMemberDec), typeof(DerivedString) } });
 
             var parser = new Dec.Parser();
-            parser.AddString($@"
+            parser.AddString(Dec.Parser.FileType.Xml, $@"
                 <Decs>
                     <StringMemberDec decName=""TestDec"">
                         <member {(classTag ? "class='DerivedString'" : "")} {(nullTag ? "null='true'" : "")} {(refTag ? "ref='ref00000'" : "")} {(modeTag ? "mode='patch'" : "")}><value>data</value></member>

@@ -139,7 +139,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <IntDec decName=""One""><value>1</value></IntDec>
                     <IntDec decName=""Two""><value>2</value></IntDec>
@@ -162,7 +162,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <IntDec decName=""One""><value>1</value></IntDec>
                     <IntDec decName=""Two""><value>2</value></IntDec>
@@ -206,7 +206,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <IntDec decName=""One""><value>1</value></IntDec>
                     <IntDec decName=""Two""><value>2</value></IntDec>
@@ -250,7 +250,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <IntDec decName=""One""><value>1</value></IntDec>
                     <IntDec decName=""Two""><value>2</value></IntDec>

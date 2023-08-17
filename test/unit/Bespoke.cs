@@ -28,7 +28,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IgnoreRecordDuringParserDec), typeof(IgnoreRecordDuringParserObj) } });
 
             var parser = new Dec.Parser();
-            parser.AddString(@"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <IgnoreRecordDuringParserDec decName=""TestDec"">
                         <obj>
