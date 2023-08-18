@@ -30,11 +30,11 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } });
 
             var parser = new Dec.Parser();
-            ExpectWarnings(() => parser.AddString(Dec.Parser.FileType.Xml, @"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <NotDecs>
                     <StubDec decName=""TestDec"" />
-                </NotDecs>"));
-            parser.Finish();
+                </NotDecs>");
+            ExpectWarnings(() => parser.Finish());
 
             DoParserTests(mode);
 
@@ -101,11 +101,11 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
             var parser = new Dec.Parser();
-            ExpectErrors(() => parser.AddString(Dec.Parser.FileType.Xml, @"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <StubDec decName=""TestDecA"" />
-                </Decs>", "TestStringName"), errorValidator: str => str.StartsWith("TestStringName"));
-            parser.Finish();
+                </Decs>", "TestStringName");
+            ExpectErrors(() => parser.Finish(), errorValidator: str => str.StartsWith("TestStringName"));
 
             DoParserTests(mode);
         }

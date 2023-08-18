@@ -49,12 +49,12 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } });
 
             var parser = new Dec.Parser();
-            ExpectErrors(() => parser.AddString(Dec.Parser.FileType.Xml, @"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <NonexistentDec decName=""TestDecA"" />
                     <StubDec decName=""TestDecB"" />
-                </Decs>"));
-            parser.Finish();
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
 
             DoParserTests(mode);
 
@@ -68,11 +68,11 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } });
 
             var parser = new Dec.Parser();
-            ExpectErrors(() => parser.AddString(Dec.Parser.FileType.Xml, @"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <StubDec />
-                </Decs>"));
-            parser.Finish();
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
 
             DoParserTests(mode);
         }
@@ -83,15 +83,15 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } });
 
             var parser = new Dec.Parser();
-            ExpectErrors(() => parser.AddString(Dec.Parser.FileType.Xml, @"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <StubDec decName=""1NumberPrefix"" />
                     <StubDec decName=""Contains Spaces"" />
                     <StubDec decName=""HasPunctuation!"" />
                     <StubDec decName=""&quot;Quotes&quot;"" />
                     <StubDec decName=""ActuallyAValidDecName"" />
-                </Decs>"));
-            parser.Finish();
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
 
             DoParserTests(mode);
 
@@ -136,7 +136,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(IntDec) } });
 
             var parser = new Dec.Parser();
-            ExpectErrors(() => parser.AddString(Dec.Parser.FileType.Xml, @"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <IntDec decName=""TestDec"">
                         <value>10</value>
@@ -144,8 +144,8 @@ namespace DecTest
                     <IntDec decName=""TestDec"">
                         <value>20</value>
                     </IntDec>
-                </Decs>"));
-            parser.Finish();
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
 
             DoParserTests(mode, errorValidator: err => err.Contains("IntDec:TestDec"));
 
@@ -700,12 +700,12 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(AbstractDec), typeof(ConcreteDec) } });
 
             var parser = new Dec.Parser();
-            ExpectErrors(() => parser.AddString(Dec.Parser.FileType.Xml, @"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <AbstractDec decName=""Abstract"" />
                     <ConcreteDec decName=""Concrete"" />
-                </Decs>"));
-            parser.Finish();
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
 
             DoParserTests(mode);
 
@@ -831,11 +831,11 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ConstructorParameterDec) } });
 
             var parser = new Dec.Parser();
-            ExpectErrors(() => parser.AddString(Dec.Parser.FileType.Xml, @"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <ConstructorParameterDec decName=""TestDec"" />
-                </Decs>"));
-            parser.Finish();
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
 
             DoParserTests(mode);
 

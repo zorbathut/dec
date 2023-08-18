@@ -15,6 +15,116 @@ namespace Dec
     /// </summary>
     public class ParserModular
     {
+        public class Module : IParser
+        {
+            internal string name;
+            internal ParserModular parser;
+            internal readonly List<ReaderFileDec> readers = new List<ReaderFileDec>();
+
+            /// <summary>
+            /// Pass a directory in for recursive processing.
+            /// </summary>
+            /// <remarks>
+            /// This function will ignore dot-prefixed directory names and files, which are common for development tools to create.
+            /// </remarks>
+            /// <param name="directory">The directory to look for files in.</param>
+            public void AddDirectory(string directory)
+            {
+                foreach (var file in Directory.GetFiles(directory, "*.xml"))
+                {
+                    if (!System.IO.Path.GetFileName(file).StartsWith("."))
+                    {
+                        AddFile(Parser.FileType.Xml, file);
+                    }
+                }
+
+                foreach (var subdir in Directory.GetDirectories(directory))
+                {
+                    if (!System.IO.Path.GetFileName(subdir).StartsWith("."))
+                    {
+                        AddDirectory(subdir);
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Pass a file in for processing.
+            /// </summary>
+            /// <param name="stringName">A human-readable identifier useful for debugging. Generally, the name of the file that the string was read from. Not required; will be derived from filename automatically.</param>
+            public void AddFile(Parser.FileType fileType, string filename, string identifier = null)
+            {
+                if (identifier == null)
+                {
+                    // This is imperfect, but good enough. People can pass their own identifier in if they want something clever.
+                    identifier = Path.GetFileName(filename);
+                }
+
+                using (var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
+                {
+                    AddStream(fileType, fs, identifier);
+                }
+            }
+
+            /// <summary>
+            /// Pass a stream in for processing.
+            /// </summary>
+            /// <param name="identifier">A human-readable identifier useful for debugging. Generally, the name of the file that the stream was built from. Not required; will be derived from filename automatically</param>
+            public void AddStream(Parser.FileType fileType, Stream stream, string identifier = "(unnamed)")
+            {
+                using (var reader = new StreamReader(stream))
+                {
+                    AddTextReader(fileType, reader, identifier);
+                }
+            }
+
+            /// <summary>
+            /// Pass a string in for processing.
+            /// </summary>
+            /// <param name="identifier">A human-readable identifier useful for debugging. Generally, the name of the file that the string was built from. Not required, but helpful.</param>
+            public void AddString(Parser.FileType fileType, string contents, string identifier = "(unnamed)")
+            {
+                // This is a really easy error to make; we might as well handle it.
+                if (contents.EndsWith(".xml"))
+                {
+                    Dbg.Err($"It looks like you've passed the filename `{contents}` to AddString instead of the actual XML file. Either use AddFile() or pass the file contents in.");
+                }
+
+                using (var reader = new StringReader(contents))
+                {
+                    AddTextReader(fileType, reader, identifier);
+                }
+            }
+
+            private void AddTextReader(Parser.FileType fileType, TextReader textReader, string identifier = "(unnamed)")
+            {
+                if (s_Status != Status.Accumulating)
+                {
+                    Dbg.Err($"Adding data while while the world is in {s_Status} state; should be {Status.Accumulating} state");
+                }
+
+                string bakedIdentifier = (name == "core") ? identifier : $"{name}:{identifier}";
+
+                ReaderFileDec reader;
+
+                if (fileType == Parser.FileType.Xml)
+                {
+                    reader = ReaderFileDecXml.Create(textReader, bakedIdentifier);
+                }
+                else
+                {
+                    Dbg.Err($"{bakedIdentifier}: Only XML files are supported at this time");
+                    return;
+                }
+
+                if (reader != null)
+                {
+                    readers.Add(reader);
+                }
+
+                // otherwise, error has already been printed
+            }
+        }
+
         // Global status
         private enum Status
         {
@@ -30,6 +140,9 @@ namespace Dec
         // Data stored from initialization parameters
         private List<Type> staticReferences = new List<Type>();
 
+        // Modules
+        internal List<Module> modules = new List<Module>();
+
         // A list of types that can be inherited from
         private struct Parent
         {
@@ -37,7 +150,6 @@ namespace Dec
             public ReaderContext context;
             public string parent;
         }
-        private Dictionary<Tuple<Type, string>, Parent> potentialParents = new Dictionary<Tuple<Type, string>, Parent>();
 
         // A list of inheritance-based work that still has to be resolved
         private struct InheritanceJob
@@ -47,10 +159,6 @@ namespace Dec
             public ReaderContext context;
             public string parent;
         }
-        private List<InheritanceJob> inheritanceJobs = new List<InheritanceJob>();
-
-        // List of work to be run during the Finish stage
-        private List<Action> finishWork = new List<Action>();
 
         // Used for static reference validation
         private static Action s_StaticReferenceHandler = null;
@@ -103,146 +211,14 @@ namespace Dec
         }
 
         /// <summary>
-        /// Pass an XML document string in for processing.
+        /// Creates and registers a new module with a given name.
         /// </summary>
-        /// <param name="stringName">A human-readable identifier useful for debugging. Generally, the name of the file that the string was read from. Not required, but helpful.</param>
-        public void AddString(Parser.FileType fileType, string input, string stringName = "(unnamed)")
+        public Module CreateModule(string name)
         {
-            if (fileType != Parser.FileType.Xml)
-            {
-                Dbg.Err($"{stringName}: Only XML files are supported at this time");
-                return;
-            }
-
-            using (var _ = new CultureInfoScope(Config.CultureInfo))
-            {
-                // This is a really easy error to make; we might as well handle it.
-                if (input.EndsWith(".xml"))
-                {
-                    Dbg.Err($"It looks like you've passed the filename `{input}` to AddString instead of the actual XML file. Either use AddFile() or pass the file contents in.");
-                }
-
-                if (s_Status != Status.Accumulating)
-                {
-                    Dbg.Err($"Adding data while while the world is in {s_Status} state; should be {Status.Accumulating} state");
-                }
-
-                ReaderFileDecXml reader = ReaderFileDecXml.Create(input, stringName);
-                if (reader == null)
-                {
-                    return;
-                }
-
-                var readerContext = new ReaderContext(false);
-
-                foreach (var readerDec in reader.ParseDecs())
-                {
-                    // Register ourselves as an available parenting object
-                    {
-                        var identifier = Tuple.Create(readerDec.type.GetDecRootType(), readerDec.name);
-                        if (potentialParents.ContainsKey(identifier))
-                        {
-                            Dbg.Err($"{readerDec.inputContext}: Dec [{identifier.Item1}:{identifier.Item2}] defined twice");
-                        }
-                        else
-                        {
-                            potentialParents[identifier] = new Parent { node = readerDec.node, context = readerContext, parent = readerDec.parent };
-                        }
-                    }
-
-                    if (!readerDec.abstrct)
-                    {
-                        // Not an abstract dec instance, so create our instance
-                        var decInstance = (Dec)readerDec.type.CreateInstanceSafe("dec", readerDec.node);
-
-                        // Error reporting happens within CreateInstanceSafe; if we get null out, we just need to clean up elegantly
-                        if (decInstance != null)
-                        {
-                            decInstance.DecName = readerDec.name;
-
-                            Database.Register(decInstance);
-
-                            if (readerDec.parent == null)
-                            {
-                                // Non-parent objects are simple; we just handle them here in order to avoid unnecessary GC churn
-                                finishWork.Add(() => Serialization.ParseElement(readerDec.node, readerDec.type, decInstance, readerContext, new Recorder.Context(), isRootDec: true));
-                            }
-                            else
-                            {
-                                // Add an inheritance resolution job; we'll take care of this soon
-                                inheritanceJobs.Add(new InheritanceJob { target = decInstance, node = readerDec.node, context = readerContext, parent = readerDec.parent });
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Pass a file in for processing.
-        /// </summary>
-        /// <param name="stringName">A human-readable identifier useful for debugging. Generally, the name of the file that the string was read from. Not required; will be derived from filename automatically.</param>
-        public void AddFile(Parser.FileType fileType, string filename, string identifier = null)
-        {
-            if (fileType != Parser.FileType.Xml)
-            {
-                Dbg.Err($"{filename}: Only XML files are supported at this time");
-                return;
-            }
-
-            if (identifier == null)
-            {
-                // This is imperfect, but good enough. People can pass their own identifier in if they want something clever.
-                identifier = Path.GetFileName(filename);
-            }
-
-            AddStream(fileType, new FileStream(filename, FileMode.Open), identifier);
-        }
-
-        /// <summary>
-        /// Pass a stream in for processing.
-        /// </summary>
-        /// <param name="stringName">A human-readable identifier useful for debugging. Generally, the name of the file that the stream was built from. Not required, but helpful.</param>
-        public void AddStream(Parser.FileType fileType, Stream stream, string identifier = "(unnamed)")
-        {
-            if (fileType != Parser.FileType.Xml)
-            {
-                Dbg.Err($"{identifier}: Only XML files are supported at this time");
-                return;
-            }
-
-            // this is inefficient but I'm just doing it for now
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                AddString(fileType, reader.ReadToEnd(), identifier);
-            }
-            stream.Dispose();
-        }
-
-        /// <summary>
-        /// Pass a directory in for recursive processing.
-        /// </summary>
-        /// <remarks>
-        /// This function will ignore dot-prefixed directory names and files, which are common for development tools to create.
-        /// </remarks>
-        /// <param name="directory">The directory to look for files in.</param>
-        public void AddDirectory(string directory)
-        {
-            foreach (var file in Directory.GetFiles(directory, "*.xml"))
-            {
-                if (!System.IO.Path.GetFileName(file).StartsWith("."))
-                {
-                    AddFile(Parser.FileType.Xml, file);
-                }
-            }
-
-            foreach (var subdir in Directory.GetDirectories(directory))
-            {
-                if (!System.IO.Path.GetFileName(subdir).StartsWith("."))
-                {
-                    AddDirectory(subdir);
-                }
-            }
+            var module = new Module();
+            module.name = name;
+            modules.Add(module);
+            return module;
         }
 
         /// <summary>
@@ -250,6 +226,8 @@ namespace Dec
         /// </summary>
         public void Finish()
         {
+            System.GC.Collect();
+
             using (var _ = new CultureInfoScope(Config.CultureInfo))
             {
                 if (s_Status != Status.Accumulating)
@@ -258,7 +236,63 @@ namespace Dec
                 }
                 s_Status = Status.Processing;
 
-                // We've successfully hit the Finish call, so let's stop spitting out empty warnings.
+                // A list of inheritance-based work that still has to be resolved
+                var inheritanceJobs = new List<InheritanceJob>();
+
+                // A list of types that can be inherited from
+                var potentialParents = new Dictionary<Tuple<Type, string>, Parent>();
+
+                // List of work to be run during the Finish stage
+                var finishWork = new List<Action>();
+
+                var readerContext = new ReaderContext(false);
+
+                // this is absolutely not the right way to handle multiple modules
+                foreach (var reader in modules.SelectMany(module => module.readers))
+                {
+                    foreach (var readerDec in reader.ParseDecs())
+                    {
+                        // Register ourselves as an available parenting object
+                        {
+                            var identifier = Tuple.Create(readerDec.type.GetDecRootType(), readerDec.name);
+                            if (potentialParents.ContainsKey(identifier))
+                            {
+                                Dbg.Err($"{readerDec.inputContext}: Dec [{identifier.Item1}:{identifier.Item2}] defined twice");
+                            }
+                            else
+                            {
+                                potentialParents[identifier] = new Parent { node = readerDec.node, context = readerContext, parent = readerDec.parent };
+                            }
+                        }
+
+                        if (!readerDec.abstrct)
+                        {
+                            // Not an abstract dec instance, so create our instance
+                            var decInstance = (Dec)readerDec.type.CreateInstanceSafe("dec", readerDec.node);
+
+                            // Error reporting happens within CreateInstanceSafe; if we get null out, we just need to clean up elegantly
+                            if (decInstance != null)
+                            {
+                                decInstance.DecName = readerDec.name;
+
+                                Database.Register(decInstance);
+
+                                if (readerDec.parent == null)
+                                {
+                                    // Non-parent objects are simple; we just handle them here in order to avoid unnecessary GC churn
+                                    finishWork.Add(() => Serialization.ParseElement(readerDec.node, readerDec.type, decInstance, readerContext, new Recorder.Context(), isRootDec: true));
+                                }
+                                else
+                                {
+                                    // Add an inheritance resolution job; we'll take care of this soon
+                                    inheritanceJobs.Add(new InheritanceJob { target = decInstance, node = readerDec.node, context = readerContext, parent = readerDec.parent });
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // It's time to actually shove stuff into the database, so let's stop spitting out empty warnings.
                 Database.SuppressEmptyWarning();
 
                 // Resolve all our inheritance jobs

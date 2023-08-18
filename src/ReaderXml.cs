@@ -3,24 +3,34 @@ namespace Dec
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Xml;
     using System.Xml.Linq;
 
     internal class ReaderFileDecXml : ReaderFileDec
     {
-        public static ReaderFileDecXml Create(string input, string identifier)
+        public static ReaderFileDecXml Create(TextReader input, string identifier)
         {
             XDocument doc;
 
-            try
+            using (var _ = new CultureInfoScope(Config.CultureInfo))
             {
-                doc = XDocument.Parse(input, LoadOptions.SetLineInfo);
-            }
-            catch (System.Xml.XmlException e)
-            {
-                Dbg.Ex(e);
-                return null;
+                try
+                {
+                    var settings = new XmlReaderSettings();
+                    settings.IgnoreWhitespace = true;
+                    using (var reader = XmlReader.Create(input, settings))
+                    {
+                        doc = XDocument.Load(reader, LoadOptions.SetLineInfo);
+                    }
+                }
+                catch (System.Xml.XmlException e)
+                {
+                    Dbg.Ex(e);
+                    return null;
+                }
             }
 
             var result = new ReaderFileDecXml();

@@ -27,6 +27,8 @@ namespace Dec
         // That's right! I'm actually a ParserModdable on the inside! Evil cackle!
         private ParserModular parserModdable;
 
+        private ParserModular.Module coreModule;
+
         public enum FileType
         {
             Xml,
@@ -35,6 +37,7 @@ namespace Dec
         public Parser()
         {
             parserModdable = new ParserModular();
+            coreModule = parserModdable.CreateModule("core");
         }
 
         /// <summary>
@@ -46,7 +49,7 @@ namespace Dec
         /// <param name="directory">The directory to look for files in.</param>
         public void AddDirectory(string directory)
         {
-            parserModdable.AddDirectory(directory);
+            coreModule.AddDirectory(directory);
         }
 
         /// <summary>
@@ -55,7 +58,7 @@ namespace Dec
         /// <param name="stringName">A human-readable identifier useful for debugging. Generally, the name of the file that the string was read from. Not required; will be derived from filename automatically.</param>
         public void AddFile(Parser.FileType fileType, string filename, string identifier = null)
         {
-            parserModdable.AddFile(fileType, filename, identifier);
+            coreModule.AddFile(fileType, filename, identifier);
         }
 
         /// <summary>
@@ -64,7 +67,7 @@ namespace Dec
         /// <param name="identifier">A human-readable identifier useful for debugging. Generally, the name of the file that the string was built from. Not required, but helpful.</param>
         public void AddString(Parser.FileType fileType, string contents, string identifier = "(unnamed)")
         {
-            parserModdable.AddString(fileType, contents, identifier);
+            coreModule.AddString(fileType, contents, identifier);
         }
 
         /// <summary>
@@ -73,7 +76,7 @@ namespace Dec
         /// <param name="identifier">A human-readable identifier useful for debugging. Generally, the name of the file that the stream was built from. Not required; will be derived from filename automatically</param>
         public void AddStream(Parser.FileType fileType, Stream stream, string identifier = "(unnamed)")
         {
-            parserModdable.AddStream(fileType, stream, identifier);
+            coreModule.AddStream(fileType, stream, identifier);
         }
 
         /// <summary>

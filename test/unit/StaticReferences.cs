@@ -295,11 +295,11 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(UnexpectedTouchDec) } });
 
             var parser = new Dec.Parser();
-            ExpectErrors(() => parser.AddString(Dec.Parser.FileType.Xml, @"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <UnexpectedTouchDec decName=""TestDec"" />
-                </Decs>"));
-            parser.Finish();
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
 
             Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDec"));
         }
@@ -330,10 +330,10 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConstructorTouchDec) }, explicitStaticRefs = new Type[]{ typeof(ConstructorTouchDecs) } });
 
             var parser = new Dec.Parser();
-            ExpectErrors(() => parser.AddString(Dec.Parser.FileType.Xml, @"
+            parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <ConstructorTouchDec decName=""TestDec"" />
-                </Decs>"));
+                </Decs>");
             ExpectErrors(() => parser.Finish());
 
             Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDec"));

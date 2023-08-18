@@ -8,19 +8,26 @@ namespace Dec
     internal class CultureInfoScope : IDisposable
     {
         private readonly CultureInfo originalCulture;
- 
+        private readonly CultureInfo intendedCulture;
+
         public CultureInfoScope(CultureInfo culture)
         {
             this.originalCulture = CultureInfo.CurrentCulture;
- 
+            this.intendedCulture = culture;
+
             Thread.CurrentThread.CurrentCulture = culture;
-            Thread.CurrentThread.CurrentUICulture = culture;
         }
  
         public void Dispose()
         {
-            Thread.CurrentThread.CurrentCulture = this.originalCulture;
-            Thread.CurrentThread.CurrentUICulture = this.originalCulture;
+            if (Thread.CurrentThread.CurrentCulture == intendedCulture)
+            {
+                Thread.CurrentThread.CurrentCulture = this.originalCulture;
+            }
+            else
+            {
+                Dbg.Err($"Current culture unexpectedly changed from {intendedCulture} to {Thread.CurrentThread.CurrentCulture}; this may cause parse errors");
+            }
         }
     }
 }
