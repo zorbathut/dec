@@ -18,7 +18,6 @@ namespace Dec
         public class Module : IParser
         {
             internal string name;
-            internal ParserModular parser;
             internal readonly List<ReaderFileDec> readers = new List<ReaderFileDec>();
 
             /// <summary>
