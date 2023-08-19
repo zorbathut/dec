@@ -159,6 +159,11 @@ namespace Dec
                 return original;
             }
 
+            if (context.recorderMode && nodes.Count > 1)
+            {
+                Dbg.Err("Internal error, multiple nodes provided for recorder-mode behavior. Please report this!");
+            }
+
             // We keep the original around in case of error, but do all our manipulation on a result object.
             object result = original;
 
@@ -178,18 +183,36 @@ namespace Dec
                 }
             }
 
+            // The next thing we do is parse all our attributes. This is because we want to verify that there are no attributes being ignored.
+            // Don't return anything until we do our element.HasAtttributes check!
+
+            // Doesn't mean anything outside recorderMode, so we check it for validity just in case
+            string refAttribute;
+            if (!context.recorderMode)
+            {
+                refAttribute = null;
+                foreach (var s_node in nodes)
+                {
+                    string nodeRefAttribute = s_node.GetMetadata(ReaderNode.Metadata.Ref);
+                    if (nodeRefAttribute != null)
+                    {
+                        Dbg.Err($"{s_node.GetInputContext()}: Found a reference tag while not evaluating Recorder mode, ignoring it");
+                    }
+                }
+            }
+            else
+            {
+                refAttribute = nodes.Select(node => node.GetMetadata(ReaderNode.Metadata.Ref)).Where(attr => attr != null).LastOrDefault();
+            }
+
             if (nodes.Count != 1)
             {
                 Dbg.Err("Too many nodes, internal error, why are you using an unstable branch, stop it");
             }            
             var node = nodes[0];
 
-            // The next thing we do is parse all our attributes. This is because we want to verify that there are no attributes being ignored.
-            // Don't return anything until we do our element.HasAtttributes check!
-
             // The interaction between these is complicated!
             string nullAttribute = node.GetMetadata(ReaderNode.Metadata.Null);
-            string refAttribute = node.GetMetadata(ReaderNode.Metadata.Ref);
             string classAttribute = node.GetMetadata(ReaderNode.Metadata.Class);
             string modeAttribute = node.GetMetadata(ReaderNode.Metadata.Mode);
 
