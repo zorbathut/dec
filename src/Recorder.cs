@@ -360,7 +360,7 @@ namespace Dec
                             {
                                 // Do our actual parsing
                                 // We know this *was* shared or it wouldn't be a ref now, so we tag it again in case it's a List<SomeClass> so we can share its children as well.
-                                var refInstanceOutput = Serialization.ParseElement(reference.node, refInstance.GetType(), refInstance, readerContext, new Recorder.Context() { shared = Context.Shared.Allow }, hasReferenceId: true);
+                                var refInstanceOutput = Serialization.ParseElement(new List<ReaderNode>() { reference.node }, refInstance.GetType(), refInstance, readerContext, new Recorder.Context() { shared = Context.Shared.Allow }, hasReferenceId: true);
 
                                 if (refInstance != refInstanceOutput)
                                 {
@@ -403,7 +403,7 @@ namespace Dec
 
                 // And now, we can finally parse our actual root element!
                 // (which accounts for a tiny percentage of things that need to be parsed)
-                return (T)Serialization.ParseElement(parseNode, typeof(T), null, readerContext, new Recorder.Context() { shared = Context.Shared.Flexible });
+                return (T)Serialization.ParseElement(new List<ReaderNode>() { parseNode }, typeof(T), null, readerContext, new Recorder.Context() { shared = Context.Shared.Flexible });
             }
         }
     }
@@ -501,7 +501,7 @@ namespace Dec
                 asThis = true;
 
                 // Explicit cast here because we want an error if we have the wrong type!
-                value = (T)Serialization.ParseElement(node, typeof(T), value, readerContext, parameters.CreateContext(), asThis: true);
+                value = (T)Serialization.ParseElement(new List<ReaderNode>() { node }, typeof(T), value, readerContext, parameters.CreateContext(), asThis: true);
 
                 return;
             }
@@ -518,7 +518,7 @@ namespace Dec
             }
 
             // Explicit cast here because we want an error if we have the wrong type!
-            value = (T)Serialization.ParseElement(recorded, typeof(T), value, readerContext, parameters.CreateContext());
+            value = (T)Serialization.ParseElement(new List<ReaderNode>() { recorded }, typeof(T), value, readerContext, parameters.CreateContext());
         }
 
         public override Direction Mode { get => Direction.Read; }

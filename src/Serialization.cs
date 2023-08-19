@@ -151,8 +151,14 @@ namespace Dec
             }
         }
 
-        internal static object ParseElement(ReaderNode node, Type type, object original, ReaderContext context, Recorder.Context recContext, FieldInfo fieldInfo = null, bool isRootDec = false, bool hasReferenceId = false, bool asThis = false)
+        internal static object ParseElement(List<ReaderNode> nodes, Type type, object original, ReaderContext context, Recorder.Context recContext, FieldInfo fieldInfo = null, bool isRootDec = false, bool hasReferenceId = false, bool asThis = false)
         {
+            if (nodes == null || nodes.Count == 0)
+            {
+                Dbg.Err("Internal error, Dec failed to provide nodes to ParseElement. Please report this!");
+                return original;
+            }
+
             // We keep the original around in case of error, but do all our manipulation on a result object.
             object result = original;
 
@@ -163,14 +169,20 @@ namespace Dec
                 if (!type.CanBeShared())
                 {
                     // If shared, make sure our input is null and our type is appropriate for sharing
-                    Dbg.Wrn($"{node.GetInputContext()}: Value type `{type}` tagged as Shared in recorder, this is meaningless but harmless");
+                    Dbg.Wrn($"{nodes[0].GetInputContext()}: Value type `{type}` tagged as Shared in recorder, this is meaningless but harmless");
                 }
                 else if (original != null && !hasReferenceId)
                 {
                     // We need to create objects without context if it's shared, so we kind of panic in this case
-                    Dbg.Err($"{node.GetInputContext()}: Shared `{type}` provided with non-null default object, this may result in unexpected behavior");
+                    Dbg.Err($"{nodes[0].GetInputContext()}: Shared `{type}` provided with non-null default object, this may result in unexpected behavior");
                 }
             }
+
+            if (nodes.Count != 1)
+            {
+                Dbg.Err("Too many nodes, internal error, why are you using an unstable branch, stop it");
+            }            
+            var node = nodes[0];
 
             // The next thing we do is parse all our attributes. This is because we want to verify that there are no attributes being ignored.
             // Don't return anything until we do our element.HasAtttributes check!
