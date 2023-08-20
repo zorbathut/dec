@@ -155,7 +155,6 @@ namespace Dec
         {
             public Dec target;
             public ReaderNode node;
-            public ReaderContext context;
             public string parent;
         }
 
@@ -284,7 +283,7 @@ namespace Dec
                                 else
                                 {
                                     // Add an inheritance resolution job; we'll take care of this soon
-                                    inheritanceJobs.Add(new InheritanceJob { target = decInstance, node = readerDec.node, context = readerContext, parent = readerDec.parent });
+                                    inheritanceJobs.Add(new InheritanceJob { target = decInstance, node = readerDec.node, parent = readerDec.parent });
                                 }
                             }
                         }
@@ -297,16 +296,12 @@ namespace Dec
                 // Resolve all our inheritance jobs
                 foreach (var work in inheritanceJobs)
                 {
-                    // These are the actions we need to perform; we actually have to resolve these backwards (it makes their construction a little easier)
-                    // The final parse is listed first, then all the children up to the final point
-                    var actions = new List<Action>();
+                    // These are the nodes we need to analyze in order
+                    var readerNodes = new List<ReaderNode>();
 
-                    actions.Add(() => Serialization.ParseElement(new List<ReaderNode>() { work.node }, work.target.GetType(), work.target, work.context, new Recorder.Context(), isRootDec: true));
+                    readerNodes.Add(work.node);
 
                     string currentDecName = work.target.DecName;
-                    var currentNode = work.node;
-                    ReaderContext currentContext = work.context;
-
                     string parentDecName = work.parent;
                     while (parentDecName != null)
                     {
@@ -316,27 +311,24 @@ namespace Dec
                         // (wish I could just use ?. here)
                         if (parentData.node == null)
                         {
-                            Dbg.Err($"{currentNode.GetInputContext()}: Dec `{currentDecName}` is attempting to use parent `{parentDecName}`, but no such dec exists");
+                            Dbg.Err($"{work.node.GetInputContext()}: Dec `{currentDecName}` is attempting to use parent `{parentDecName}`, but no such dec exists");
 
                             // Not much more we can do here.
                             break;
                         }
 
-                        actions.Add(() => Serialization.ParseElement(new List<ReaderNode>() { parentData.node }, work.target.GetType(), work.target, parentData.context, new Recorder.Context(), isRootDec: true));
+                        readerNodes.Add(parentData.node);
 
                         currentDecName = parentDecName;
-                        currentNode = parentData.node;
-                        currentContext = parentData.context;
-
                         parentDecName = parentData.parent;
                     }
 
+                    readerNodes.Reverse();
+
+                    // do this all in one batch
                     finishWork.Add(() =>
                     {
-                        for (int i = actions.Count - 1; i >= 0; --i)
-                        {
-                            actions[i]();
-                        }
+                        Serialization.ParseElement(readerNodes, work.target.GetType(), work.target, readerContext, new Recorder.Context(), isRootDec: true);
                     });
                 }
 
