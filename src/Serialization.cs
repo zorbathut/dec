@@ -315,10 +315,6 @@ namespace Dec
             // Now we traverse the Mode attributes as prep for our final parse pass.
             UtilType.ParseModeCategory modeCategory = type.CalculateSerializationModeCategory(converter, isRootDec);
             List<(ParseCommand command, ReaderNode node)> orders = new List<(ParseCommand command, ReaderNode node)>();
-            bool hasChildren = false;
-            ReaderNode hasChildrenNode = null;
-            bool hasText = false;
-            ReaderNode hasTextNode = null;
             for (int i = 0; i < nodes.Count; ++i)
             {
                 string modeAttribute = nodes[i].GetMetadata(ReaderNode.Metadata.Mode);
@@ -417,22 +413,26 @@ namespace Dec
                     // This is sort of a weird compromise so we can use the same codepath for both Dec and Recorder; Dec doesn't have refs, Recorder doesn't have parse modes, so practically speaking there's an easy choice for both of them
                     // it's just not the same easy choice
                     // but, whatever, we need this distinction anyway so we can do Append
-
-                    hasChildren = false;
-                    hasText = false;
                 }
 
                 orders.Add((s_parseCommand, nodes[i]));
 
-                if (!hasChildren && nodes[i].GetChildCount() > 0)
+            // Gather info
+            bool hasChildren = false;
+            ReaderNode hasChildrenNode = null;
+            bool hasText = false;
+            ReaderNode hasTextNode = null;
+            foreach (var (_, node) in orders)
+            {
+                if (!hasChildren && node.GetChildCount() > 0)
                 {
                     hasChildren = true;
-                    hasChildrenNode = nodes[i];
+                    hasChildrenNode = node;
                 }
-                if (!hasText && nodes[i].GetText() != null)
+                if (!hasText && node.GetText() != null)
                 {
                     hasText = true;
-                    hasTextNode = nodes[i];
+                    hasTextNode = node;
                 }
             }
 
