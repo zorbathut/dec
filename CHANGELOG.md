@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file.
 
 
+## [Unnreleased]
+### Added
+* ParserModular, a more complicated parser that supports game mods.
+
+### Breaking
+* Minor changes to Parser API to cleanly support more file types.
+
+### Fixed
+* Minor errors in several error messages.
+
+
 ## [v0.4.0]
 ### Breaking
 * Recorder no longer shares class references by default. The new `.Shared()` recorder decorator can be used to allow this, although it will error on non-null defaults.
