@@ -66,7 +66,12 @@ namespace DecTest
                 ExpectErrors(() => deserialized = Dec.Recorder.Read<StringMemberRecordable>(serialized));
             }
 
-            if (refTag)
+            if (refTag && classTag)
+            {
+                // these conflict and end up returning null
+                Assert.IsNull(deserialized.member);
+            }
+            else if (refTag)
             {
                 Assert.IsInstanceOf<BaseString>(deserialized.member);
                 Assert.AreEqual("reffed", deserialized.member.value);

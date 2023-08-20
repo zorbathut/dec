@@ -6,6 +6,7 @@ namespace Dec
     using System.ComponentModel;
     using System.Linq;
     using System.Reflection;
+    using System.Xml.Schema;
 
     /// <summary>
     /// Information on the current cursor position when reading files.
@@ -184,13 +185,46 @@ namespace Dec
             }
 
             // The next thing we do is parse all our attributes. This is because we want to verify that there are no attributes being ignored.
-            // Don't return anything until we do our element.HasAtttributes check!
+
+            // Validate all combinations here
+            // This could definitely be more efficient and skip at least one traversal pass
+            foreach (var s_node in nodes)
+            {
+                string nullAttribute = s_node.GetMetadata(ReaderNode.Metadata.Null);
+                string refAttribute = s_node.GetMetadata(ReaderNode.Metadata.Ref);
+                string classAttribute = s_node.GetMetadata(ReaderNode.Metadata.Class);
+                string modeAttribute = s_node.GetMetadata(ReaderNode.Metadata.Mode);
+
+                // Some of these are redundant and that's OK
+                if (nullAttribute != null && (refAttribute != null || classAttribute != null || modeAttribute != null))
+                {
+                    Dbg.Err($"{s_node.GetInputContext()}: Null element may not have ref, class, or mode specified; guessing wildly at intentions");
+                }
+                else if (refAttribute != null && (nullAttribute != null || classAttribute != null || modeAttribute != null))
+                {
+                    Dbg.Err($"{s_node.GetInputContext()}: Ref element may not have null, class, or mode specified; guessing wildly at intentions");
+                }
+                else if (classAttribute != null && (nullAttribute != null || refAttribute != null))
+                {
+                    Dbg.Err($"{s_node.GetInputContext()}: Class-specified element may not have null or ref specified; guessing wildly at intentions");
+                }
+                else if (modeAttribute != null && (nullAttribute != null || refAttribute != null))
+                {
+                    Dbg.Err($"{s_node.GetInputContext()}: Mode-specified element may not have null or ref specified; guessing wildly at intentions");
+                }
+
+                var unrecognized = s_node.GetMetadataUnrecognized();
+                if (unrecognized != null)
+                {
+                    Dbg.Err($"{s_node.GetInputContext()}: Has unknown attributes {unrecognized}");
+                }
+            }
 
             // Doesn't mean anything outside recorderMode, so we check it for validity just in case
-            string refAttribute;
+            string refKey;
             if (!context.recorderMode)
             {
-                refAttribute = null;
+                refKey = null;
                 foreach (var s_node in nodes)
                 {
                     string nodeRefAttribute = s_node.GetMetadata(ReaderNode.Metadata.Ref);
@@ -202,75 +236,188 @@ namespace Dec
             }
             else
             {
-                refAttribute = nodes.Select(node => node.GetMetadata(ReaderNode.Metadata.Ref)).Where(attr => attr != null).LastOrDefault();
+                refKey = nodes.Select(node => node.GetMetadata(ReaderNode.Metadata.Ref)).Where(attr => attr != null).LastOrDefault();
             }
+
+            // First figure out type. We actually need type to be set before we can properly analyze and validate the mode flags.
+            // If we're in an asThis block, it refers to the outer item, not the inner item; just skip this entirely
+            bool isNull = false;
+            if (!asThis)
+            {
+                string classAttribute = null;
+                ReaderNode classAttributeNode = null; // stored entirely for error reporting
+                bool replaced = false;
+                foreach (var s_node in nodes)
+                {
+                    // However, we do need to watch for Replace, because that means we should nuke the class attribute and start over.
+                    string modeAttribute = s_node.GetMetadata(ReaderNode.Metadata.Mode);
+                    ParseMode s_parseMode = ParseModeFromString(s_node.GetInputContext(), modeAttribute);
+                    if (s_parseMode == ParseMode.Replace)
+                    {
+                        // we also should maybe be doing this if we're a list, map, or set?
+                        classAttribute = null;
+                        replaced = true;
+                    }
+
+                    // if we get nulled, we kill the class tag and basically treat it like a delete
+                    // but we also reset the null tag on every entry
+                    isNull = false;
+                    string nullAttribute = s_node.GetMetadata(ReaderNode.Metadata.Null);
+                    if (nullAttribute != null)
+                    {
+                        if (!bool.TryParse(nullAttribute, out bool nullValue))
+                        {
+                            Dbg.Err($"{s_node.GetInputContext()}: Invalid `null` attribute");
+                        }
+                        else if (nullValue)
+                        {
+                            isNull = true;
+                        }
+                    }
+
+                    // update the class based on whatever this says
+                    string localClassAttribute = s_node.GetMetadata(ReaderNode.Metadata.Class);
+                    if (localClassAttribute != null)
+                    {
+                        classAttribute = localClassAttribute;
+                        classAttributeNode = s_node;
+                    }
+                }
+
+                if (classAttribute != null)
+                {
+                    var possibleType = (Type)ParseString(classAttribute, typeof(Type), null, classAttributeNode.GetInputContext());
+                    if (!type.IsAssignableFrom(possibleType))
+                    {
+                        Dbg.Err($"{classAttributeNode.GetInputContext()}: Explicit type {classAttribute} cannot be assigned to expected type {type}");
+                    }
+                    else if (!replaced && result != null && result.GetType() != possibleType)
+                    {
+                        Dbg.Err($"{classAttributeNode.GetInputContext()}: Explicit type {classAttribute} does not match already-provided instance {type}");
+                    }
+                    else
+                    {
+                        type = possibleType;
+                    }
+                }
+            }
+
+            // Now we traverse the Mode attributes as prep for our final parse pass.
+            UtilType.ParseModeCategory modeCategory = type.CalculateSerializationModeCategory();
+            int startingPosition = 0;
+            for (int i = 0; i < nodes.Count; ++i)
+            {
+                string modeAttribute = nodes[i].GetMetadata(ReaderNode.Metadata.Mode);
+                ParseMode s_parseMode = ParseModeFromString(nodes[i].GetInputContext(), nodes[i].GetMetadata(ReaderNode.Metadata.Mode));
+
+
+                switch (modeCategory)
+                {
+                    case UtilType.ParseModeCategory.Dec:
+                        switch (s_parseMode)
+                        {
+                            default:
+                                Dbg.Err($"{nodes[i].GetInputContext()}: Invalid mode {s_parseMode} provided for a Dec-type parse, defaulting to Patch");
+                                goto case ParseMode.Default;
+
+                            case ParseMode.Default:
+                                s_parseMode = ParseMode.Patch;
+                                break;
+
+                            case ParseMode.Patch:
+                                break;
+                        }
+                        break;
+                    case UtilType.ParseModeCategory.Object:
+                        switch (s_parseMode)
+                        {
+                            default:
+                                Dbg.Err($"{nodes[i].GetInputContext()}: Invalid mode {s_parseMode} provided for an Object-type parse, defaulting to Patch");
+                                goto case ParseMode.Default;
+
+                            case ParseMode.Default:
+                                s_parseMode = ParseMode.Patch;
+                                break;
+
+                            case ParseMode.Patch:
+                                break;
+                        }
+                        break;
+                    case UtilType.ParseModeCategory.OrderedContainer:
+                        switch (s_parseMode)
+                        {
+                            default:
+                                Dbg.Err($"{nodes[i].GetInputContext()}: Invalid mode {s_parseMode} provided for an ordered-container-type parse, defaulting to Replace");
+                                goto case ParseMode.Default;
+
+                            case ParseMode.Default:
+                                s_parseMode = ParseMode.Replace;
+                                break;
+
+                            case ParseMode.Replace:
+                            case ParseMode.Append:
+                                break;
+                        }
+                        break;
+                    case UtilType.ParseModeCategory.UnorderedContainer:
+                        switch (s_parseMode)
+                        {
+                            default:
+                                Dbg.Err($"{nodes[i].GetInputContext()}: Invalid mode {s_parseMode} provided for an unordered-container-type parse, defaulting to Replace");
+                                goto case ParseMode.Default;
+
+                            case ParseMode.Default:
+                                s_parseMode = ParseMode.Replace;
+                                break;
+
+                            case ParseMode.Replace:
+                            case ParseMode.Patch:
+                            case ParseMode.Append:
+                                break;
+                        }
+ 
+                        break;
+                    case UtilType.ParseModeCategory.Value:
+                        switch (s_parseMode)
+                        {
+                            default:
+                                Dbg.Err($"{nodes[i].GetInputContext()}: Invalid mode {s_parseMode} provided for a value-type parse, defaulting to Replace");
+                                goto case ParseMode.Default;
+
+                            case ParseMode.Default:
+                                s_parseMode = ParseMode.Replace;
+                                break;
+
+                            case ParseMode.Replace:
+                                break;
+                        }
+                        break;
+                    default:
+                        Dbg.Err($"{nodes[i].GetInputContext()}: Internal error, unknown mode category {modeCategory}, please report");
+                        break;
+                }
+
+                if (s_parseMode == ParseMode.Replace)
+                {
+                    startingPosition = i;
+                    // I'd love to just nuke `result` here, but for things like List<int> we want to preserve the existing object for ref reasons
+                    // This is sort of a weird compromise so we can use the same codepath for both Dec and Recorder; Dec doesn't have refs, Recorder doesn't have parse modes, so practically speaking there's an easy choice for both of them
+                    // it's just not the same easy choice
+                    // but, whatever, we need this distinction anyway so we can do Append
+                }
+            }
+
+            // Verify that we have a coherent set of results, somehow?
 
             if (nodes.Count != 1)
             {
                 Dbg.Err("Too many nodes, internal error, why are you using an unstable branch, stop it");
-            }            
+            }
             var node = nodes[0];
+            var parseMode = ParseModeFromString(nodes[0].GetInputContext(), nodes[0].GetMetadata(ReaderNode.Metadata.Mode));
 
-            // The interaction between these is complicated!
-            string nullAttribute = node.GetMetadata(ReaderNode.Metadata.Null);
-            string classAttribute = node.GetMetadata(ReaderNode.Metadata.Class);
-            string modeAttribute = node.GetMetadata(ReaderNode.Metadata.Mode);
-
-            if (asThis)
-            {
-                // ignore the class attribute; this refers to the outer item, not the inner item
-                classAttribute = null;
-            }
-
-            if (nullAttribute != null)
-            {
-                if (!bool.TryParse(nullAttribute, out bool nullValue))
-                {
-                    Dbg.Err($"{node.GetInputContext()}: Invalid `null` attribute");
-                    nullAttribute = null;
-                }
-                else if (!nullValue)
-                {
-                    // why did you specify this >:(
-                    nullAttribute = null;
-                }
-            }
-
-            if (refAttribute != null && !context.recorderMode)
-            {
-                Dbg.Err($"{node.GetInputContext()}: Found a reference tag while not evaluating Recorder mode, ignoring it");
-                refAttribute = null;
-            }
-
-            ParseMode parseMode = ParseModeFromString(node.GetInputContext(), modeAttribute);
-
-            // Some of these are redundant and that's OK
-            if (nullAttribute != null && (refAttribute != null || classAttribute != null || modeAttribute != null))
-            {
-                Dbg.Err($"{node.GetInputContext()}: Null element may not have ref, class, or mode specified; guessing wildly at intentions");
-            }
-            else if (refAttribute != null && (nullAttribute != null || classAttribute != null || modeAttribute != null))
-            {
-                Dbg.Err($"{node.GetInputContext()}: Ref element may not have null, class, or mode specified; guessing wildly at intentions");
-            }
-            else if (classAttribute != null && (nullAttribute != null || refAttribute != null))
-            {
-                Dbg.Err($"{node.GetInputContext()}: Class-specified element may not have null or ref specified; guessing wildly at intentions");
-            }
-            else if (modeAttribute != null && (nullAttribute != null || refAttribute != null))
-            {
-                Dbg.Err($"{node.GetInputContext()}: Mode-specified element may not have null or ref specified; guessing wildly at intentions");
-            }
-
-            {
-                var unrecognized = node.GetMetadataUnrecognized();
-                if (unrecognized != null)
-                {
-                    Dbg.Err($"{node.GetInputContext()}: Has unknown attributes {unrecognized}");
-                }
-            }
-
-            if (refAttribute != null)
+            // Actually handle our attributes
+            if (refKey != null)
             {
                 // Ref is the highest priority, largely because I think it's cool
 
@@ -281,49 +428,32 @@ namespace Dec
 
                 if (context.refs == null)
                 {
-                    Dbg.Err($"{node.GetInputContext()}: Found a reference object {refAttribute} before refs are initialized (is this being used in a ConverterFactory<>.Create()?)");
+                    Dbg.Err($"{node.GetInputContext()}: Found a reference object {refKey} before refs are initialized (is this being used in a ConverterFactory<>.Create()?)");
                     return result;
                 }
 
-                if (!context.refs.ContainsKey(refAttribute))
+                if (!context.refs.ContainsKey(refKey))
                 {
-                    Dbg.Err($"{node.GetInputContext()}: Found a reference object {refAttribute} without a valid reference mapping");
+                    Dbg.Err($"{node.GetInputContext()}: Found a reference object {refKey} without a valid reference mapping");
                     return result;
                 }
 
-                object refObject = context.refs[refAttribute];
+                object refObject = context.refs[refKey];
                 if (!type.IsAssignableFrom(refObject.GetType()))
                 {
-                    Dbg.Err($"{node.GetInputContext()}: Reference object {refAttribute} is of type {refObject.GetType()}, which cannot be converted to expected type {type}");
+                    Dbg.Err($"{node.GetInputContext()}: Reference object {refKey} is of type {refObject.GetType()}, which cannot be converted to expected type {type}");
                     return result;
                 }
 
                 return refObject;
             }
-            else if (nullAttribute != null)
+            else if (isNull)
             {
-                // guaranteed to be true at this point
                 return null;
 
                 // Note: It may seem wrong that we can return null along with a non-null model.
                 // The problem is that this is meant to be able to override defaults. If the default is an object, explicitly setting it to null *should* clear the object out.
                 // If we actually need a specific object to be returned, for whatever reason, the caller has to do the comparison.
-            }
-            else if (classAttribute != null)
-            {
-                var possibleType = (Type)ParseString(classAttribute, typeof(Type), null, node.GetInputContext());
-                if (!type.IsAssignableFrom(possibleType))
-                {
-                    Dbg.Err($"{node.GetInputContext()}: Explicit type {classAttribute} cannot be assigned to expected type {type}");
-                }
-                else if (result != null && result.GetType() != possibleType)
-                {
-                    Dbg.Err($"{node.GetInputContext()}: Explicit type {classAttribute} does not match already-provided instance {type}");
-                }
-                else
-                {
-                    type = possibleType;
-                }
             }
 
             // Basic early validation

@@ -515,5 +515,64 @@ namespace Dec
         {
             return !type.IsValueType && !typeof(Dec).IsAssignableFrom(type) && type != typeof(string) && type != typeof(Type);
         }
+
+        internal enum ParseModeCategory
+        {
+            Dec,
+            Object,
+            OrderedContainer,
+            UnorderedContainer,
+            Value,
+        }
+        internal static ParseModeCategory CalculateSerializationModeCategory(this Type type)
+        {
+            if (typeof(Dec).IsAssignableFrom(type))
+            {
+                return ParseModeCategory.Dec;
+            }
+            else if (type.IsPrimitive || type == typeof(string) || type == typeof(Type))
+            {
+                return ParseModeCategory.Value;
+            }
+            else if (
+                (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>)) ||
+                type.IsArray
+            )
+            {
+                return ParseModeCategory.OrderedContainer;
+            }
+            else if (
+                (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>)) ||
+                (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(HashSet<>))
+            )
+            {
+                return ParseModeCategory.UnorderedContainer;
+            }
+            else if (type.IsGenericType && (
+                    type.GetGenericTypeDefinition() == typeof(Tuple<>) ||
+                    type.GetGenericTypeDefinition() == typeof(Tuple<,>) ||
+                    type.GetGenericTypeDefinition() == typeof(Tuple<,,>) ||
+                    type.GetGenericTypeDefinition() == typeof(Tuple<,,,>) ||
+                    type.GetGenericTypeDefinition() == typeof(Tuple<,,,,>) ||
+                    type.GetGenericTypeDefinition() == typeof(Tuple<,,,,,>) ||
+                    type.GetGenericTypeDefinition() == typeof(Tuple<,,,,,,>) ||
+                    type.GetGenericTypeDefinition() == typeof(Tuple<,,,,,,,>) ||
+                    type.GetGenericTypeDefinition() == typeof(ValueTuple<>) ||
+                    type.GetGenericTypeDefinition() == typeof(ValueTuple<,>) ||
+                    type.GetGenericTypeDefinition() == typeof(ValueTuple<,,>) ||
+                    type.GetGenericTypeDefinition() == typeof(ValueTuple<,,,>) ||
+                    type.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,>) ||
+                    type.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,,>) ||
+                    type.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,,,>) ||
+                    type.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,,,,>)
+                ))
+            {
+                return ParseModeCategory.Value;
+            }
+            else
+            {
+                return ParseModeCategory.Object;
+            }
+        }
     }
 }
