@@ -229,6 +229,7 @@ namespace Dec
 
             // Doesn't mean anything outside recorderMode, so we check it for validity just in case
             string refKey;
+            ReaderNode refKeyNode = null; // stored entirely for error reporting
             if (!context.recorderMode)
             {
                 refKey = null;
@@ -243,7 +244,7 @@ namespace Dec
             }
             else
             {
-                refKey = nodes.Select(node => node.GetMetadata(ReaderNode.Metadata.Ref)).Where(attr => attr != null).LastOrDefault();
+                (refKey, refKeyNode) = nodes.Select(node => (node.GetMetadata(ReaderNode.Metadata.Ref), node)).Where(anp => anp.Item1 != null).LastOrDefault();
             }
 
             // First figure out type. We actually need type to be set before we can properly analyze and validate the mode flags.
@@ -313,12 +314,16 @@ namespace Dec
 
             // Now we traverse the Mode attributes as prep for our final parse pass.
             UtilType.ParseModeCategory modeCategory = type.CalculateSerializationModeCategory(converter, isRootDec);
-            int startingPosition = 0;
-            ParseCommand parseCommand = ParseCommand.Patch; // this should never matter, but there's no way to tell C# that the loop will always be hit once
+            List<(ParseCommand command, ReaderNode node)> orders = new List<(ParseCommand command, ReaderNode node)>();
+            bool hasChildren = false;
+            ReaderNode hasChildrenNode = null;
+            bool hasText = false;
+            ReaderNode hasTextNode = null;
             for (int i = 0; i < nodes.Count; ++i)
             {
                 string modeAttribute = nodes[i].GetMetadata(ReaderNode.Metadata.Mode);
                 ParseMode s_parseMode = ParseModeFromString(nodes[i].GetInputContext(), nodes[i].GetMetadata(ReaderNode.Metadata.Mode));
+                ParseCommand s_parseCommand;
 
                 switch (modeCategory)
                 {
@@ -330,7 +335,7 @@ namespace Dec
                                 goto case ParseMode.Default;
 
                             case ParseMode.Default:
-                                parseCommand = ParseCommand.Patch;
+                                s_parseCommand = ParseCommand.Patch;
                                 break;
                         }
                         break;
@@ -343,7 +348,7 @@ namespace Dec
 
                             case ParseMode.Default:
                             case ParseMode.Patch:
-                                parseCommand = ParseCommand.Patch;
+                                s_parseCommand = ParseCommand.Patch;
                                 break;
                         }
                         break;
@@ -356,11 +361,11 @@ namespace Dec
 
                             case ParseMode.Default:
                             case ParseMode.Replace:
-                                parseCommand = ParseCommand.Replace;
+                                s_parseCommand = ParseCommand.Replace;
                                 break;
                             
                             case ParseMode.Append:
-                                parseCommand = ParseCommand.Append;
+                                s_parseCommand = ParseCommand.Append;
                                 break;
                         }
                         break;
@@ -373,15 +378,15 @@ namespace Dec
 
                             case ParseMode.Default:
                             case ParseMode.Replace:
-                                parseCommand = ParseCommand.Replace;
+                                s_parseCommand = ParseCommand.Replace;
                                 break;
                             
                             case ParseMode.Patch:
-                                parseCommand = ParseCommand.Patch;
+                                s_parseCommand = ParseCommand.Patch;
                                 break;
 
                             case ParseMode.Append:
-                                parseCommand = ParseCommand.Append;
+                                s_parseCommand = ParseCommand.Append;
                                 break;
                         }
  
@@ -395,33 +400,41 @@ namespace Dec
 
                             case ParseMode.Default:
                             case ParseMode.Replace:
-                                parseCommand = ParseCommand.Replace;
+                                s_parseCommand = ParseCommand.Replace;
                                 break;
                         }
                         break;
                     default:
                         Dbg.Err($"{nodes[i].GetInputContext()}: Internal error, unknown mode category {modeCategory}, please report");
-                        parseCommand = ParseCommand.Patch;  // . . . I guess?
+                        s_parseCommand = ParseCommand.Patch;  // . . . I guess?
                         break;
                 }
 
-                if (parseCommand == ParseCommand.Replace)
+                if (s_parseCommand == ParseCommand.Replace)
                 {
-                    startingPosition = i;
+                    orders.Clear();
                     // I'd love to just nuke `result` here, but for things like List<int> we want to preserve the existing object for ref reasons
                     // This is sort of a weird compromise so we can use the same codepath for both Dec and Recorder; Dec doesn't have refs, Recorder doesn't have parse modes, so practically speaking there's an easy choice for both of them
                     // it's just not the same easy choice
                     // but, whatever, we need this distinction anyway so we can do Append
+
+                    hasChildren = false;
+                    hasText = false;
+                }
+
+                orders.Add((s_parseCommand, nodes[i]));
+
+                if (!hasChildren && nodes[i].GetChildCount() > 0)
+                {
+                    hasChildren = true;
+                    hasChildrenNode = nodes[i];
+                }
+                if (!hasText && nodes[i].GetText() != null)
+                {
+                    hasText = true;
+                    hasTextNode = nodes[i];
                 }
             }
-
-            // Verify that we have a coherent set of results, somehow?
-
-            if (nodes.Count != 1)
-            {
-                Dbg.Err("Too many nodes, internal error, why are you using an unstable branch, stop it");
-            }
-            var node = nodes[0];
 
             // Actually handle our attributes
             if (refKey != null)
@@ -430,25 +443,25 @@ namespace Dec
 
                 if (recContext.shared == Recorder.Context.Shared.Deny)
                 {
-                    Dbg.Err($"{node.GetInputContext()}: Found a reference in a non-.Shared() context, using it anyway but this might produce unexpected results");
+                    Dbg.Err($"{refKeyNode.GetInputContext()}: Found a reference in a non-.Shared() context, using it anyway but this might produce unexpected results");
                 }
 
                 if (context.refs == null)
                 {
-                    Dbg.Err($"{node.GetInputContext()}: Found a reference object {refKey} before refs are initialized (is this being used in a ConverterFactory<>.Create()?)");
+                    Dbg.Err($"{refKeyNode.GetInputContext()}: Found a reference object {refKey} before refs are initialized (is this being used in a ConverterFactory<>.Create()?)");
                     return result;
                 }
 
                 if (!context.refs.ContainsKey(refKey))
                 {
-                    Dbg.Err($"{node.GetInputContext()}: Found a reference object {refKey} without a valid reference mapping");
+                    Dbg.Err($"{refKeyNode.GetInputContext()}: Found a reference object {refKey} without a valid reference mapping");
                     return result;
                 }
 
                 object refObject = context.refs[refKey];
                 if (!type.IsAssignableFrom(refObject.GetType()))
                 {
-                    Dbg.Err($"{node.GetInputContext()}: Reference object {refKey} is of type {refObject.GetType()}, which cannot be converted to expected type {type}");
+                    Dbg.Err($"{refKeyNode.GetInputContext()}: Reference object {refKey} is of type {refObject.GetType()}, which cannot be converted to expected type {type}");
                     return result;
                 }
 
@@ -465,20 +478,16 @@ namespace Dec
 
             // Basic early validation
 
-            bool hasChildren = node.GetChildCount() != 0;
-            string text = node.GetText();
-            bool hasText = text != null;
-
             if (hasChildren && hasText)
             {
-                Dbg.Err($"{node.GetInputContext()}: Cannot have both text and child nodes in XML - this is probably a typo, maybe you have the wrong number of close tags or added text somewhere you didn't mean to?");
+                Dbg.Err($"{hasChildrenNode.GetInputContext()} / {hasTextNode.GetInputContext()}: Cannot have both text and child nodes in XML - this is probably a typo, maybe you have the wrong number of close tags or added text somewhere you didn't mean to?");
 
                 // we'll just fall through and try to parse anyway, though
             }
 
             if (typeof(Dec).IsAssignableFrom(type) && hasChildren && !isRootDec)
             {
-                Dbg.Err($"{node.GetInputContext()}: Defining members of an item of type {type}, derived from Dec.Dec, is not supported within an outer Dec. Either reference a {type} defined independently or remove {type}'s inheritance from Dec.");
+                Dbg.Err($"{hasChildrenNode.GetInputContext()}: Defining members of an item of type {type}, derived from Dec.Dec, is not supported within an outer Dec. Either reference a {type} defined independently or remove {type}'s inheritance from Dec.");
                 return null;
             }
 
@@ -488,117 +497,126 @@ namespace Dec
                 // string converter
                 if (converter is ConverterString converterString)
                 {
-                    switch (parseCommand)
+                    foreach (var (parseCommand, node) in orders)
                     {
-                        case ParseCommand.Replace:
-                            // easy, done
-                            break;
+                        switch (parseCommand)
+                        {
+                            case ParseCommand.Replace:
+                                // easy, done
+                                break;
 
-                        default:
-                            Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
-                            break;
-                    }
+                            default:
+                                Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                                break;
+                        }
 
-                    if (hasChildren)
-                    {
-                        Dbg.Err($"{node.GetInputContext()}: String converter {converter.GetType()} called with child XML nodes, which will be ignored");
-                    }
+                        if (hasChildren)
+                        {
+                            Dbg.Err($"{node.GetInputContext()}: String converter {converter.GetType()} called with child XML nodes, which will be ignored");
+                        }
 
-                    // We actually accept "no text" here, though, empty-string might be valid!
+                        // We actually accept "no text" here, though, empty-string might be valid!
 
-                    // context might be null; that's OK at the moment
-                    try
-                    {
-                        result = converterString.ReadObj(node.GetText() ?? "", node.GetInputContext());
-                    }
-                    catch (Exception e)
-                    {
-                        Dbg.Ex(e);
-
-                        result = GenerateResultFallback(result, type);
-                    }
-                }
-                else if (converter is ConverterRecord converterRecord)
-                {
-                    switch (parseCommand)
-                    {
-                        case ParseCommand.Patch:
-                            // easy, done
-                            break;
-
-                        case ParseCommand.Replace:
-                            result = null;
-                            break;
-
-                        default:
-                            Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
-                            break;
-                    }
-
-                    if (result == null)
-                    {
-                        result = type.CreateInstanceSafe("converterrecord", node);
-                    }
-
-                    // context might be null; that's OK at the moment
-                    if (result != null)
-                    {
+                        // context might be null; that's OK at the moment
                         try
                         {
-                            object returnedResult = converterRecord.RecordObj(result, new RecorderReader(node, context));
-
-                            if (!type.IsValueType && result != returnedResult)
-                            {
-                                Dbg.Err($"{node.GetInputContext()}: Converter {converterRecord.GetType()} changed object instance, this is disallowed");
-                            }
-                            else
-                            {
-                                // for value types, this is fine
-                                result = returnedResult;
-                            }
+                            result = converterString.ReadObj(node.GetText() ?? "", node.GetInputContext());
                         }
                         catch (Exception e)
                         {
                             Dbg.Ex(e);
 
-                            // no fallback needed, we already have a result
+                            result = GenerateResultFallback(result, type);
+                        }
+                    }
+                }
+                else if (converter is ConverterRecord converterRecord)
+                {
+                    foreach (var (parseCommand, node) in orders)
+                    {
+                        switch (parseCommand)
+                        {
+                            case ParseCommand.Patch:
+                                // easy, done
+                                break;
+
+                            case ParseCommand.Replace:
+                                result = null;
+                                break;
+
+                            default:
+                                Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                                break;
+                        }
+
+                        if (result == null)
+                        {
+                            result = type.CreateInstanceSafe("converterrecord", node);
+                        }
+
+                        // context might be null; that's OK at the moment
+                        if (result != null)
+                        {
+                            try
+                            {
+                                object returnedResult = converterRecord.RecordObj(result, new RecorderReader(node, context));
+
+                                if (!type.IsValueType && result != returnedResult)
+                                {
+                                    Dbg.Err($"{node.GetInputContext()}: Converter {converterRecord.GetType()} changed object instance, this is disallowed");
+                                }
+                                else
+                                {
+                                    // for value types, this is fine
+                                    result = returnedResult;
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                Dbg.Ex(e);
+
+                                // no fallback needed, we already have a result
+                            }
                         }
                     }
                 }
                 else if (converter is ConverterFactory converterFactory)
                 {
-                    switch (parseCommand)
+                    foreach (var (parseCommand, node) in orders)
                     {
-                        case ParseCommand.Patch:
-                            // easy, done
-                            break;
-
-                        case ParseCommand.Replace:
-                            result = null;
-                            break;
-
-                        default:
-                            Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
-                            break;
-                    }
-
-                    if (result == null)
-                    {
-                        result = converterFactory.CreateObj(new RecorderReader(node, context, disallowShared: true));
-                    }
-
-                    // context might be null; that's OK at the moment
-                    if (result != null)
-                    {
-                        try
+                        switch (parseCommand)
                         {
-                            result = converterFactory.ReadObj(result, new RecorderReader(node, context));
+                            case ParseCommand.Patch:
+                                // easy, done
+                                break;
+
+                            case ParseCommand.Replace:
+                                result = null;
+                                break;
+
+                            default:
+                                Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                                break;
                         }
-                        catch (Exception e)
-                        {
-                            Dbg.Ex(e);
 
-                            // no fallback needed, we already have a result
+                        if (result == null)
+                        {
+                            result = converterFactory.CreateObj(new RecorderReader(node, context, disallowShared: true));
+                        }
+
+                        // context might be null; that's OK at the moment
+                        if (result != null)
+                        {
+                            try
+                            {
+                                result = converterFactory.ReadObj(result, new RecorderReader(node, context));
+                            }
+                            catch (Exception e)
+                            {
+                                Dbg.Ex(e);
+
+                                // no fallback needed, we already have a result
+                            }
                         }
                     }
                 }
@@ -613,86 +631,91 @@ namespace Dec
             // Special case: IRecordables
             if (typeof(IRecordable).IsAssignableFrom(type) && (context.recorderMode || type.GetMethod("Record").GetCustomAttribute<Bespoke.IgnoreRecordDuringParserAttribute>() == null))
             {
-                switch (parseCommand)
+                foreach (var (parseCommand, node) in orders)
                 {
-                    case ParseCommand.Patch:
-                        // easy, done
-                        break;
-
-                    default:
-                        Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
-                        break;
-                }
-
-                IRecordable recordable = null;
-
-                if (result != null)
-                {
-                    recordable = (IRecordable)result;
-                }
-                else if (recContext.factories == null)
-                {
-                    recordable = (IRecordable)type.CreateInstanceSafe("recordable", node);
-                }
-                else
-                {
-                    // Iterate back to the appropriate type.
-                    Type targetType = type;
-                    Func<Type, object> maker = null;
-                    while (targetType != null)
+                    switch (parseCommand)
                     {
-                        if (recContext.factories.TryGetValue(targetType, out maker))
-                        {
+                        case ParseCommand.Patch:
+                            // easy, done
                             break;
-                        }
 
-                        targetType = targetType.BaseType;
+                        default:
+                            Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                            break;
                     }
 
-                    if (maker == null)
+                    IRecordable recordable = null;
+
+                    if (result != null)
+                    {
+                        recordable = (IRecordable)result;
+                    }
+                    else if (recContext.factories == null)
                     {
                         recordable = (IRecordable)type.CreateInstanceSafe("recordable", node);
                     }
                     else
                     {
-                        // want to propogate this throughout the factories list to save on time later
-                        // we're actually doing the same BaseType thing again, starting from scratch
-                        Type writeType = type;
-                        while (writeType != targetType)
+                        // Iterate back to the appropriate type.
+                        Type targetType = type;
+                        Func<Type, object> maker = null;
+                        while (targetType != null)
                         {
-                            recContext.factories[writeType] = maker;
-                            writeType = writeType.BaseType;
+                            if (recContext.factories.TryGetValue(targetType, out maker))
+                            {
+                                break;
+                            }
+
+                            targetType = targetType.BaseType;
                         }
 
-                        // oh right and I guess we should actually make the thing too
-                        var obj = maker(type);
-
-                        if (obj == null)
+                        if (maker == null)
                         {
-                            // fall back to default behavior
-                            recordable = (IRecordable)type.CreateInstanceSafe("recordable", node);
-                        }
-                        else if (!type.IsAssignableFrom(obj.GetType()))
-                        {
-                            Dbg.Err($"Custom factory generated {obj.GetType()} when {type} was expected; falling back on a default object");
                             recordable = (IRecordable)type.CreateInstanceSafe("recordable", node);
                         }
                         else
                         {
-                            // now that we've checked this is of the right type
-                            recordable = (IRecordable)obj;
+                            // want to propogate this throughout the factories list to save on time later
+                            // we're actually doing the same BaseType thing again, starting from scratch
+                            Type writeType = type;
+                            while (writeType != targetType)
+                            {
+                                recContext.factories[writeType] = maker;
+                                writeType = writeType.BaseType;
+                            }
+
+                            // oh right and I guess we should actually make the thing too
+                            var obj = maker(type);
+
+                            if (obj == null)
+                            {
+                                // fall back to default behavior
+                                recordable = (IRecordable)type.CreateInstanceSafe("recordable", node);
+                            }
+                            else if (!type.IsAssignableFrom(obj.GetType()))
+                            {
+                                Dbg.Err($"Custom factory generated {obj.GetType()} when {type} was expected; falling back on a default object");
+                                recordable = (IRecordable)type.CreateInstanceSafe("recordable", node);
+                            }
+                            else
+                            {
+                                // now that we've checked this is of the right type
+                                recordable = (IRecordable)obj;
+                            }
                         }
                     }
+
+                    if (recordable != null)
+                    {
+                        recordable.Record(new RecorderReader(node, context));
+
+                        // TODO: support indices if this is within the Dec system?
+                    }
+
+                    result = recordable;
                 }
 
-                if (recordable != null)
-                {
-                    recordable.Record(new RecorderReader(node, context));
-
-                    // TODO: support indices if this is within the Dec system?
-                }
-
-                return recordable;
+                return result;
             }
 
             // All our standard text-using options
@@ -702,63 +725,73 @@ namespace Dec
                 type == typeof(string) ||
                 type.IsPrimitive)
             {
-                switch (parseCommand)
+                foreach (var (parseCommand, node) in orders)
                 {
-                    case ParseCommand.Replace:
-                        // easy, done
-                        break;
+                    switch (parseCommand)
+                    {
+                        case ParseCommand.Replace:
+                            // easy, done
+                            break;
 
-                    default:
-                        Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
-                        break;
+                        default:
+                            Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                            break;
+                    }
+
+                    if (hasChildren)
+                    {
+                        Dbg.Err($"{node.GetInputContext()}: Child nodes are not valid when parsing {type}");
+                    }
+
+                    result = ParseString(node.GetText(), type, result, node.GetInputContext());
                 }
 
-                if (hasChildren)
-                {
-                    Dbg.Err($"{node.GetInputContext()}: Child nodes are not valid when parsing {type}");
-                }
-
-                return ParseString(text, type, original, node.GetInputContext());
+                return result;
             }
 
             // Nothing past this point even supports text, so let's just get angry and break stuff.
             if (hasText)
             {
-                Dbg.Err($"{node.GetInputContext()}: Text detected in a situation where it is invalid; will be ignored");
+                Dbg.Err($"{hasTextNode.GetInputContext()}: Text detected in a situation where it is invalid; will be ignored");
             }
 
             // Special case: Lists
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
             {
-                switch (parseCommand)
+                foreach (var (parseCommand, node) in orders)
                 {
-                    case ParseCommand.Replace:
-                        // If you have a default list, but specify it in XML, we assume this is a full override. Clear the original list to cut down on GC churn.
-                        // TODO: Is some bozo going to store the same "constant" global list on init, then be surprised when we re-use the list instead of creating a new one? Detect this and yell about it I guess.
-                        // If you are reading this because you're the bozo, [insert angry emoji here], but also feel free to be annoyed that I haven't fixed it yet despite realizing it's a problem. Ping me on Discord, I'll take care of it, sorry 'bout that.
-                        if (result != null)
-                        {
-                            ((IList)result).Clear();
-                        }
-                        break;
+                    switch (parseCommand)
+                    {
+                        case ParseCommand.Replace:
+                            // If you have a default list, but specify it in XML, we assume this is a full override. Clear the original list to cut down on GC churn.
+                            // TODO: Is some bozo going to store the same "constant" global list on init, then be surprised when we re-use the list instead of creating a new one? Detect this and yell about it I guess.
+                            // If you are reading this because you're the bozo, [insert angry emoji here], but also feel free to be annoyed that I haven't fixed it yet despite realizing it's a problem. Ping me on Discord, I'll take care of it, sorry 'bout that.
+                            if (result != null)
+                            {
+                                ((IList)result).Clear();
+                            }
+                            break;
 
-                    case ParseCommand.Append:
-                        // we're good
-                        break;
+                        case ParseCommand.Append:
+                            // we're good
+                            break;
 
-                    default:
-                        Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
-                        break;
+                        default:
+                            Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                            break;
+                    }
+
+                    // List<> handling
+                    Type referencedType = type.GetGenericArguments()[0];
+
+                    var list = (IList)(result ?? Activator.CreateInstance(type));
+
+                    node.ParseList(list, referencedType, context, recContext);
+
+                    result = list;
                 }
 
-                // List<> handling
-                Type referencedType = type.GetGenericArguments()[0];
-
-                var list = (IList)(result ?? Activator.CreateInstance(type));
-
-                node.ParseList(list, referencedType, context, recContext);
-
-                return list;
+                return result;
             }
 
             // Special case: Arrays
@@ -766,94 +799,104 @@ namespace Dec
             {
                 Type referencedType = type.GetElementType();
 
-                Array array;
-                int startOffset = 0;
-
-                // This is a bit extra-complicated because we can't append stuff after the fact, we need to figure out what our length is when we create the object.
-                switch (parseCommand)
+                foreach (var (parseCommand, node) in orders)
                 {
-                    case ParseCommand.Replace:
-                        /// This is a full override, so we're going to create it here.
-                        if (result != null && result.GetType() == type && ((Array)result).Length == node.GetChildCount())
-                        {
-                            // It is actually vitally important that we fall back on the model when possible, because the Recorder Ref system requires it.
-                            array = (Array)result;
-                        }
-                        else
-                        {
-                            // Otherwise just make a new one, no harm done.
-                            array = (Array)Activator.CreateInstance(type, new object[] { node.GetChildCount() });
-                        }
+                    Array array;
+                    int startOffset = 0;
 
-                        break;
+                    // This is a bit extra-complicated because we can't append stuff after the fact, we need to figure out what our length is when we create the object.
+                    switch (parseCommand)
+                    {
+                        case ParseCommand.Replace:
+                            /// This is a full override, so we're going to create it here.
+                            if (result != null && result.GetType() == type && ((Array)result).Length == node.GetChildCount())
+                            {
+                                // It is actually vitally important that we fall back on the model when possible, because the Recorder Ref system requires it.
+                                array = (Array)result;
+                            }
+                            else
+                            {
+                                // Otherwise just make a new one, no harm done.
+                                array = (Array)Activator.CreateInstance(type, new object[] { node.GetChildCount() });
+                            }
 
-                    case ParseCommand.Append:
-                        if (result == null)
-                        {
-                            goto case ParseCommand.Replace;
-                        }
+                            break;
 
-                        // This is jankier; we create it here with the intended final length, then copy the elements over, all because arrays can't be resized
-                        // (yes, I know, that's the point of arrays, I'm not complaining, just . . . grumbling a little)
-                        var oldArray = (Array)result;
-                        startOffset = oldArray.Length;
-                        array = (Array)Activator.CreateInstance(type, new object[] { startOffset + node.GetChildCount() });
-                        oldArray.CopyTo(array, 0);
+                        case ParseCommand.Append:
+                            if (result == null)
+                            {
+                                goto case ParseCommand.Replace;
+                            }
 
-                        break;
+                            // This is jankier; we create it here with the intended final length, then copy the elements over, all because arrays can't be resized
+                            // (yes, I know, that's the point of arrays, I'm not complaining, just . . . grumbling a little)
+                            var oldArray = (Array)result;
+                            startOffset = oldArray.Length;
+                            array = (Array)Activator.CreateInstance(type, new object[] { startOffset + node.GetChildCount() });
+                            oldArray.CopyTo(array, 0);
 
-                    default:
-                        Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
-                        array = null; // just to break the unassigned-local-variable
-                        break;
+                            break;
+
+                        default:
+                            Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                            array = null; // just to break the unassigned-local-variable
+                            break;
+                    }
+
+                    node.ParseArray(array, referencedType, context, recContext, startOffset);
+
+                    result = array;
                 }
 
-                node.ParseArray(array, referencedType, context, recContext, startOffset);
-
-                return array;
+                return result;
             }
 
             // Special case: Dictionaries
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>))
             {
-                bool permitPatch = false;
-                switch (parseCommand)
+                foreach (var (parseCommand, node) in orders)
                 {
-                    case ParseCommand.Replace:
-                        // If you have a default dict, but specify it in XML, we assume this is a full override. Clear the original list to cut down on GC churn.
-                        // TODO: Is some bozo going to store the same "constant" global dict on init, then be surprised when we re-use the dict instead of creating a new one? Detect this and yell about it I guess.
-                        // If you are reading this because you're the bozo, [insert angry emoji here], but also feel free to be annoyed that I haven't fixed it yet despite realizing it's a problem. Ping me on Discord, I'll take care of it, sorry 'bout that.
-                        if (result != null)
-                        {
-                            ((IDictionary)result).Clear();
-                        }
-                        break;
+                    bool permitPatch = false;
+                    switch (parseCommand)
+                    {
+                        case ParseCommand.Replace:
+                            // If you have a default dict, but specify it in XML, we assume this is a full override. Clear the original list to cut down on GC churn.
+                            // TODO: Is some bozo going to store the same "constant" global dict on init, then be surprised when we re-use the dict instead of creating a new one? Detect this and yell about it I guess.
+                            // If you are reading this because you're the bozo, [insert angry emoji here], but also feel free to be annoyed that I haven't fixed it yet despite realizing it's a problem. Ping me on Discord, I'll take care of it, sorry 'bout that.
+                            if (result != null)
+                            {
+                                ((IDictionary)result).Clear();
+                            }
+                            break;
 
-                    case ParseCommand.Patch:
-                        if (original != null)
-                        {
-                            permitPatch = true;
-                        }
-                        break;
+                        case ParseCommand.Patch:
+                            if (original != null)
+                            {
+                                permitPatch = true;
+                            }
+                            break;
 
-                    case ParseCommand.Append:
-                        // nothing needs to be done, our existing dupe checking will solve it
-                        break;
+                        case ParseCommand.Append:
+                            // nothing needs to be done, our existing dupe checking will solve it
+                            break;
 
-                    default:
-                        Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
-                        break;
+                        default:
+                            Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                            break;
+                    }
+
+                    // Dictionary<> handling
+                    Type keyType = type.GetGenericArguments()[0];
+                    Type valueType = type.GetGenericArguments()[1];
+
+                    var dict = (IDictionary)(result ?? Activator.CreateInstance(type));
+
+                    node.ParseDictionary(dict, keyType, valueType, context, recContext, permitPatch);
+
+                    result = dict;
                 }
 
-                // Dictionary<> handling
-                Type keyType = type.GetGenericArguments()[0];
-                Type valueType = type.GetGenericArguments()[1];
-
-                var dict = (IDictionary)(result ?? Activator.CreateInstance(type));
-
-                node.ParseDictionary(dict, keyType, valueType, context, recContext, permitPatch);
-
-                return dict;
+                return result;
             }
 
             // Special case: HashSet
@@ -866,46 +909,51 @@ namespace Dec
                 // This might be a performance problem and we'll . . . deal with it later I guess?
                 // This might actually be a good first place to use IL generation.
 
-                bool permitPatch = false;
-                switch (parseCommand)
+                foreach (var (parseCommand, node) in orders)
                 {
-                    case ParseCommand.Replace:
-                        // If you have a default set, but specify it in XML, we assume this is a full override. Clear the original set to cut down on GC churn.
-                        // TODO: Is some bozo going to store the same "constant" global set on init, then be surprised when we re-use the set instead of creating a new one? Detect this and yell about it I guess.
-                        // If you are reading this because you're the bozo, [insert angry emoji here], but also feel free to be annoyed that I haven't fixed it yet despite realizing it's a problem. Ping me on Discord, I'll take care of it, sorry 'bout that.
-                        if (result != null)
-                        {
-                            // Did you know there's no non-generic interface that HashSet<> supports that includes a Clear function?
-                            // Fun fact:
-                            // That thing I just wrote!
-                            var clearFunction = result.GetType().GetMethod("Clear");
-                            clearFunction.Invoke(result, null);
-                        }
-                        break;
+                    bool permitPatch = false;
+                    switch (parseCommand)
+                    {
+                        case ParseCommand.Replace:
+                            // If you have a default set, but specify it in XML, we assume this is a full override. Clear the original set to cut down on GC churn.
+                            // TODO: Is some bozo going to store the same "constant" global set on init, then be surprised when we re-use the set instead of creating a new one? Detect this and yell about it I guess.
+                            // If you are reading this because you're the bozo, [insert angry emoji here], but also feel free to be annoyed that I haven't fixed it yet despite realizing it's a problem. Ping me on Discord, I'll take care of it, sorry 'bout that.
+                            if (result != null)
+                            {
+                                // Did you know there's no non-generic interface that HashSet<> supports that includes a Clear function?
+                                // Fun fact:
+                                // That thing I just wrote!
+                                var clearFunction = result.GetType().GetMethod("Clear");
+                                clearFunction.Invoke(result, null);
+                            }
+                            break;
 
-                    case ParseCommand.Patch:
-                        if (original != null)
-                        {
-                            permitPatch = true;
-                        }
-                        break;
+                        case ParseCommand.Patch:
+                            if (original != null)
+                            {
+                                permitPatch = true;
+                            }
+                            break;
 
-                    case ParseCommand.Append:
-                        // nothing needs to be done, our existing dupe checking will solve it
-                        break;
+                        case ParseCommand.Append:
+                            // nothing needs to be done, our existing dupe checking will solve it
+                            break;
 
-                    default:
-                        Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
-                        break;
+                        default:
+                            Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                            break;
+                    }
+
+                    Type keyType = type.GetGenericArguments()[0];
+
+                    var set = result ?? Activator.CreateInstance(type);
+
+                    node.ParseHashset(set, keyType, context, recContext, permitPatch);
+
+                    result = set;
                 }
 
-                Type keyType = type.GetGenericArguments()[0];
-
-                var set = result ?? Activator.CreateInstance(type);
-
-                node.ParseHashset(set, keyType, context, recContext, permitPatch);
-
-                return set;
+                return result;
             }
 
             // Special case: A bucket of tuples
@@ -929,24 +977,29 @@ namespace Dec
                     type.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,,,,>)
                     ))
             {
-                switch (parseCommand)
+                foreach (var (parseCommand, node) in orders)
                 {
-                    case ParseCommand.Replace:
-                        // easy, done
-                        break;
+                    switch (parseCommand)
+                    {
+                        case ParseCommand.Replace:
+                            // easy, done
+                            break;
 
-                    default:
-                        Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
-                        break;
+                        default:
+                            Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                            break;
+                    }
+
+                    int expectedCount = type.GenericTypeArguments.Length;
+                    object[] parameters = new object[expectedCount];
+
+                    node.ParseTuple(parameters, type, fieldInfo?.GetCustomAttribute<System.Runtime.CompilerServices.TupleElementNamesAttribute>()?.TransformNames, context, recContext);
+
+                    // construct!
+                    result = Activator.CreateInstance(type, parameters);
                 }
 
-                int expectedCount = type.GenericTypeArguments.Length;
-                object[] parameters = new object[expectedCount];
-
-                node.ParseTuple(parameters, type, fieldInfo?.GetCustomAttribute<System.Runtime.CompilerServices.TupleElementNamesAttribute>()?.TransformNames, context, recContext);
-
-                // construct!
-                return Activator.CreateInstance(type, parameters);
+                return result;
             }
 
             // At this point, we're either a class or a struct, and we need to do the reflection thing
@@ -958,44 +1011,48 @@ namespace Dec
             // And the full reflection system is probably impossible to secure, whereas the Record system should be secureable.
             if (context.recorderMode)
             {
-                Dbg.Err($"{node.GetInputContext()}: Falling back to reflection within a Record system while parsing a {type}; this is currently not allowed for security reasons. Either you shouldn't be trying to serialize this, or it should implement Dec.IRecorder (https://zorbathut.github.io/dec/release/documentation/serialization.html), or you need a Dec.Converter (https://zorbathut.github.io/dec/release/documentation/custom.html)");
+                // just pick the first node to get something to go on
+                Dbg.Err($"{orders[0].node.GetInputContext()}: Falling back to reflection within a Record system while parsing a {type}; this is currently not allowed for security reasons. Either you shouldn't be trying to serialize this, or it should implement Dec.IRecorder (https://zorbathut.github.io/dec/release/documentation/serialization.html), or you need a Dec.Converter (https://zorbathut.github.io/dec/release/documentation/custom.html)");
                 return result;
             }
 
-            if (!isRootDec)
+            foreach (var (parseCommand, node) in orders)
             {
-                switch (parseCommand)
+                if (!isRootDec)
                 {
-                    case ParseCommand.Patch:
-                        // easy, done
-                        break;
+                    switch (parseCommand)
+                    {
+                        case ParseCommand.Patch:
+                            // easy, done
+                            break;
 
-                    default:
-                        Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
-                        break;
+                        default:
+                            Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                            break;
+                    }
                 }
-            }
-            else
-            {
-                if (parseCommand != ParseCommand.Patch)
+                else
                 {
-                    Dbg.Err($"{node.GetInputContext()}: Mode provided for root Dec; this is currently not supported in any form");
+                    if (parseCommand != ParseCommand.Patch)
+                    {
+                        Dbg.Err($"{node.GetInputContext()}: Mode provided for root Dec; this is currently not supported in any form");
+                    }
                 }
-            }
 
-            // If we haven't been given a template class from our parent, go ahead and init to defaults
-            if (result == null)
-            {
-                result = type.CreateInstanceSafe("object", node);
-
+                // If we haven't been given a template class from our parent, go ahead and init to defaults
                 if (result == null)
                 {
-                    // error already reported
-                    return result;
-                }
-            }
+                    result = type.CreateInstanceSafe("object", node);
 
-            node.ParseReflection(result, context, recContext);
+                    if (result == null)
+                    {
+                        // error already reported
+                        return result;
+                    }
+                }
+
+                node.ParseReflection(result, context, recContext);
+            }
 
             // Set up our index fields; this has to happen last in case we're a struct
             Index.Register(ref result);
