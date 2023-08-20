@@ -283,6 +283,7 @@ namespace Dec
                                 else
                                 {
                                     // Add an inheritance resolution job; we'll take care of this soon
+                                    // (but we need to wait until all the Dec's are registered so we can find parents)
                                     inheritanceJobs.Add(new InheritanceJob { target = decInstance, node = readerDec.node, parent = readerDec.parent });
                                 }
                             }
