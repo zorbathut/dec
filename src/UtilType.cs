@@ -524,13 +524,20 @@ namespace Dec
             UnorderedContainer,
             Value,
         }
-        internal static ParseModeCategory CalculateSerializationModeCategory(this Type type)
+        internal static ParseModeCategory CalculateSerializationModeCategory(this Type type, Converter converter, bool isRootDec)
         {
-            if (typeof(Dec).IsAssignableFrom(type))
+            if (isRootDec && typeof(Dec).IsAssignableFrom(type))
             {
                 return ParseModeCategory.Dec;
             }
-            else if (type.IsPrimitive || type == typeof(string) || type == typeof(Type))
+            else if (false
+                || type.IsPrimitive
+                || type == typeof(string)
+                || type == typeof(Type)
+                || (!isRootDec && typeof(Dec).IsAssignableFrom(type)) // unnecessary isRootDec test here is to shortcut the expensive IsAssignableFrom call
+                || typeof(Enum).IsAssignableFrom(type)
+                || converter is ConverterString
+            )
             {
                 return ParseModeCategory.Value;
             }

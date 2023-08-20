@@ -152,6 +152,13 @@ namespace Dec
             }
         }
 
+        private enum ParseCommand
+        {
+            Replace,
+            Patch,
+            Append,
+        }
+
         internal static object ParseElement(List<ReaderNode> nodes, Type type, object original, ReaderContext context, Recorder.Context recContext, FieldInfo fieldInfo = null, bool isRootDec = false, bool hasReferenceId = false, bool asThis = false)
         {
             if (nodes == null || nodes.Count == 0)
@@ -302,14 +309,16 @@ namespace Dec
                 }
             }
 
+            var converter = Converters.TryGetValue(type);
+
             // Now we traverse the Mode attributes as prep for our final parse pass.
-            UtilType.ParseModeCategory modeCategory = type.CalculateSerializationModeCategory();
+            UtilType.ParseModeCategory modeCategory = type.CalculateSerializationModeCategory(converter, isRootDec);
             int startingPosition = 0;
+            ParseCommand parseCommand = ParseCommand.Patch; // this should never matter, but there's no way to tell C# that the loop will always be hit once
             for (int i = 0; i < nodes.Count; ++i)
             {
                 string modeAttribute = nodes[i].GetMetadata(ReaderNode.Metadata.Mode);
                 ParseMode s_parseMode = ParseModeFromString(nodes[i].GetInputContext(), nodes[i].GetMetadata(ReaderNode.Metadata.Mode));
-
 
                 switch (modeCategory)
                 {
@@ -317,14 +326,11 @@ namespace Dec
                         switch (s_parseMode)
                         {
                             default:
-                                Dbg.Err($"{nodes[i].GetInputContext()}: Invalid mode {s_parseMode} provided for a Dec-type parse, defaulting to Patch");
+                                Dbg.Err($"{nodes[i].GetInputContext()}: Invalid mode {s_parseMode} provided for a Dec-type parse, defaulting to Create");
                                 goto case ParseMode.Default;
 
                             case ParseMode.Default:
-                                s_parseMode = ParseMode.Patch;
-                                break;
-
-                            case ParseMode.Patch:
+                                parseCommand = ParseCommand.Patch;
                                 break;
                         }
                         break;
@@ -336,10 +342,8 @@ namespace Dec
                                 goto case ParseMode.Default;
 
                             case ParseMode.Default:
-                                s_parseMode = ParseMode.Patch;
-                                break;
-
                             case ParseMode.Patch:
+                                parseCommand = ParseCommand.Patch;
                                 break;
                         }
                         break;
@@ -351,11 +355,12 @@ namespace Dec
                                 goto case ParseMode.Default;
 
                             case ParseMode.Default:
-                                s_parseMode = ParseMode.Replace;
-                                break;
-
                             case ParseMode.Replace:
+                                parseCommand = ParseCommand.Replace;
+                                break;
+                            
                             case ParseMode.Append:
+                                parseCommand = ParseCommand.Append;
                                 break;
                         }
                         break;
@@ -367,12 +372,16 @@ namespace Dec
                                 goto case ParseMode.Default;
 
                             case ParseMode.Default:
-                                s_parseMode = ParseMode.Replace;
+                            case ParseMode.Replace:
+                                parseCommand = ParseCommand.Replace;
+                                break;
+                            
+                            case ParseMode.Patch:
+                                parseCommand = ParseCommand.Patch;
                                 break;
 
-                            case ParseMode.Replace:
-                            case ParseMode.Patch:
                             case ParseMode.Append:
+                                parseCommand = ParseCommand.Append;
                                 break;
                         }
  
@@ -385,19 +394,18 @@ namespace Dec
                                 goto case ParseMode.Default;
 
                             case ParseMode.Default:
-                                s_parseMode = ParseMode.Replace;
-                                break;
-
                             case ParseMode.Replace:
+                                parseCommand = ParseCommand.Replace;
                                 break;
                         }
                         break;
                     default:
                         Dbg.Err($"{nodes[i].GetInputContext()}: Internal error, unknown mode category {modeCategory}, please report");
+                        parseCommand = ParseCommand.Patch;  // . . . I guess?
                         break;
                 }
 
-                if (s_parseMode == ParseMode.Replace)
+                if (parseCommand == ParseCommand.Replace)
                 {
                     startingPosition = i;
                     // I'd love to just nuke `result` here, but for things like List<int> we want to preserve the existing object for ref reasons
@@ -414,7 +422,6 @@ namespace Dec
                 Dbg.Err("Too many nodes, internal error, why are you using an unstable branch, stop it");
             }
             var node = nodes[0];
-            var parseMode = ParseModeFromString(nodes[0].GetInputContext(), nodes[0].GetMetadata(ReaderNode.Metadata.Mode));
 
             // Actually handle our attributes
             if (refKey != null)
@@ -476,21 +483,20 @@ namespace Dec
             }
 
             // Defer off to converters, whatever they feel like doing
-            if (Converters.TryGetValue(type, out var converter))
+            if (converter != null)
             {
                 // string converter
                 if (converter is ConverterString converterString)
                 {
-                    switch (parseMode)
+                    switch (parseCommand)
                     {
-                        case ParseMode.Default:
-                        case ParseMode.Replace:
+                        case ParseCommand.Replace:
                             // easy, done
                             break;
 
                         default:
-                            Dbg.Err($"{node.GetInputContext()}: Invalid mode {parseMode} provided for a ConverterString parse, defaulting to Replace");
-                            goto case ParseMode.Default;
+                            Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                            break;
                     }
 
                     if (hasChildren)
@@ -514,20 +520,19 @@ namespace Dec
                 }
                 else if (converter is ConverterRecord converterRecord)
                 {
-                    switch (parseMode)
+                    switch (parseCommand)
                     {
-                        case ParseMode.Default:
-                        case ParseMode.Patch:
+                        case ParseCommand.Patch:
                             // easy, done
                             break;
 
-                        case ParseMode.Replace:
+                        case ParseCommand.Replace:
                             result = null;
                             break;
 
                         default:
-                            Dbg.Err($"{node.GetInputContext()}: Invalid mode {parseMode} provided for a ConverterRecord parse, defaulting to Patch");
-                            goto case ParseMode.Default;
+                            Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                            break;
                     }
 
                     if (result == null)
@@ -562,20 +567,19 @@ namespace Dec
                 }
                 else if (converter is ConverterFactory converterFactory)
                 {
-                    switch (parseMode)
+                    switch (parseCommand)
                     {
-                        case ParseMode.Default:
-                        case ParseMode.Patch:
+                        case ParseCommand.Patch:
                             // easy, done
                             break;
 
-                        case ParseMode.Replace:
+                        case ParseCommand.Replace:
                             result = null;
                             break;
 
                         default:
-                            Dbg.Err($"{node.GetInputContext()}: Invalid mode {parseMode} provided for a ConverterFactory parse, defaulting to Patch");
-                            goto case ParseMode.Default;
+                            Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                            break;
                     }
 
                     if (result == null)
@@ -609,16 +613,15 @@ namespace Dec
             // Special case: IRecordables
             if (typeof(IRecordable).IsAssignableFrom(type) && (context.recorderMode || type.GetMethod("Record").GetCustomAttribute<Bespoke.IgnoreRecordDuringParserAttribute>() == null))
             {
-                switch (parseMode)
+                switch (parseCommand)
                 {
-                    case ParseMode.Default:
-                    case ParseMode.Patch:
+                    case ParseCommand.Patch:
                         // easy, done
                         break;
 
                     default:
-                        Dbg.Err($"{node.GetInputContext()}: Invalid mode {parseMode} provided for an IRecordable parse, defaulting to Patch");
-                        goto case ParseMode.Patch;
+                        Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                        break;
                 }
 
                 IRecordable recordable = null;
@@ -699,16 +702,15 @@ namespace Dec
                 type == typeof(string) ||
                 type.IsPrimitive)
             {
-                switch (parseMode)
+                switch (parseCommand)
                 {
-                    case ParseMode.Default:
-                    case ParseMode.Replace:
+                    case ParseCommand.Replace:
                         // easy, done
                         break;
 
                     default:
-                        Dbg.Err($"{node.GetInputContext()}: Invalid mode {parseMode} provided for a simple string parse, defaulting to Replace");
-                        goto case ParseMode.Replace;
+                        Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                        break;
                 }
 
                 if (hasChildren)
@@ -728,10 +730,9 @@ namespace Dec
             // Special case: Lists
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
             {
-                switch (parseMode)
+                switch (parseCommand)
                 {
-                    case ParseMode.Default:
-                    case ParseMode.Replace:
+                    case ParseCommand.Replace:
                         // If you have a default list, but specify it in XML, we assume this is a full override. Clear the original list to cut down on GC churn.
                         // TODO: Is some bozo going to store the same "constant" global list on init, then be surprised when we re-use the list instead of creating a new one? Detect this and yell about it I guess.
                         // If you are reading this because you're the bozo, [insert angry emoji here], but also feel free to be annoyed that I haven't fixed it yet despite realizing it's a problem. Ping me on Discord, I'll take care of it, sorry 'bout that.
@@ -741,13 +742,13 @@ namespace Dec
                         }
                         break;
 
-                    case ParseMode.Append:
+                    case ParseCommand.Append:
                         // we're good
                         break;
 
                     default:
-                        Dbg.Err($"{node.GetInputContext()}: Invalid mode {parseMode} provided for a List parse, defaulting to Replace");
-                        goto case ParseMode.Replace;
+                        Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                        break;
                 }
 
                 // List<> handling
@@ -769,11 +770,10 @@ namespace Dec
                 int startOffset = 0;
 
                 // This is a bit extra-complicated because we can't append stuff after the fact, we need to figure out what our length is when we create the object.
-                switch (parseMode)
+                switch (parseCommand)
                 {
-                    case ParseMode.Default:
-                    case ParseMode.Replace:
-                        // This is a full override, so we're going to create it here.
+                    case ParseCommand.Replace:
+                        /// This is a full override, so we're going to create it here.
                         if (result != null && result.GetType() == type && ((Array)result).Length == node.GetChildCount())
                         {
                             // It is actually vitally important that we fall back on the model when possible, because the Recorder Ref system requires it.
@@ -784,13 +784,13 @@ namespace Dec
                             // Otherwise just make a new one, no harm done.
                             array = (Array)Activator.CreateInstance(type, new object[] { node.GetChildCount() });
                         }
-                        
+
                         break;
 
-                    case ParseMode.Append:
+                    case ParseCommand.Append:
                         if (result == null)
                         {
-                            goto case ParseMode.Replace;
+                            goto case ParseCommand.Replace;
                         }
 
                         // This is jankier; we create it here with the intended final length, then copy the elements over, all because arrays can't be resized
@@ -803,8 +803,9 @@ namespace Dec
                         break;
 
                     default:
-                        Dbg.Err($"{node.GetInputContext()}: Invalid mode {parseMode} provided for an Array parse, defaulting to Replace");
-                        goto case ParseMode.Replace;
+                        Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                        array = null; // just to break the unassigned-local-variable
+                        break;
                 }
 
                 node.ParseArray(array, referencedType, context, recContext, startOffset);
@@ -816,10 +817,9 @@ namespace Dec
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>))
             {
                 bool permitPatch = false;
-                switch (parseMode)
+                switch (parseCommand)
                 {
-                    case ParseMode.Default:
-                    case ParseMode.Replace:
+                    case ParseCommand.Replace:
                         // If you have a default dict, but specify it in XML, we assume this is a full override. Clear the original list to cut down on GC churn.
                         // TODO: Is some bozo going to store the same "constant" global dict on init, then be surprised when we re-use the dict instead of creating a new one? Detect this and yell about it I guess.
                         // If you are reading this because you're the bozo, [insert angry emoji here], but also feel free to be annoyed that I haven't fixed it yet despite realizing it's a problem. Ping me on Discord, I'll take care of it, sorry 'bout that.
@@ -829,20 +829,20 @@ namespace Dec
                         }
                         break;
 
-                    case ParseMode.Patch:
+                    case ParseCommand.Patch:
                         if (original != null)
                         {
                             permitPatch = true;
                         }
                         break;
 
-                    case ParseMode.Append:
+                    case ParseCommand.Append:
                         // nothing needs to be done, our existing dupe checking will solve it
                         break;
 
                     default:
-                        Dbg.Err($"{node.GetInputContext()}: Invalid mode {parseMode} provided for a Dictionary parse, defaulting to Replace");
-                        goto case ParseMode.Replace;
+                        Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                        break;
                 }
 
                 // Dictionary<> handling
@@ -867,10 +867,9 @@ namespace Dec
                 // This might actually be a good first place to use IL generation.
 
                 bool permitPatch = false;
-                switch (parseMode)
+                switch (parseCommand)
                 {
-                    case ParseMode.Default:
-                    case ParseMode.Replace:
+                    case ParseCommand.Replace:
                         // If you have a default set, but specify it in XML, we assume this is a full override. Clear the original set to cut down on GC churn.
                         // TODO: Is some bozo going to store the same "constant" global set on init, then be surprised when we re-use the set instead of creating a new one? Detect this and yell about it I guess.
                         // If you are reading this because you're the bozo, [insert angry emoji here], but also feel free to be annoyed that I haven't fixed it yet despite realizing it's a problem. Ping me on Discord, I'll take care of it, sorry 'bout that.
@@ -884,20 +883,20 @@ namespace Dec
                         }
                         break;
 
-                    case ParseMode.Patch:
+                    case ParseCommand.Patch:
                         if (original != null)
                         {
                             permitPatch = true;
                         }
                         break;
 
-                    case ParseMode.Append:
+                    case ParseCommand.Append:
                         // nothing needs to be done, our existing dupe checking will solve it
                         break;
 
                     default:
-                        Dbg.Err($"{node.GetInputContext()}: Invalid mode {parseMode} provided for a HashSet parse, defaulting to Replace");
-                        goto case ParseMode.Replace;
+                        Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                        break;
                 }
 
                 Type keyType = type.GetGenericArguments()[0];
@@ -930,16 +929,15 @@ namespace Dec
                     type.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,,,,>)
                     ))
             {
-                switch (parseMode)
+                switch (parseCommand)
                 {
-                    case ParseMode.Default:
-                    case ParseMode.Replace:
+                    case ParseCommand.Replace:
                         // easy, done
                         break;
 
                     default:
-                        Dbg.Err($"{node.GetInputContext()}: Invalid mode {parseMode} provided for a Tuple parse, defaulting to Replace");
-                        goto case ParseMode.Replace;
+                        Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                        break;
                 }
 
                 int expectedCount = type.GenericTypeArguments.Length;
@@ -966,21 +964,20 @@ namespace Dec
 
             if (!isRootDec)
             {
-                switch (parseMode)
+                switch (parseCommand)
                 {
-                    case ParseMode.Default:
-                    case ParseMode.Patch:
+                    case ParseCommand.Patch:
                         // easy, done
                         break;
 
                     default:
-                        Dbg.Err($"{node.GetInputContext()}: Invalid mode {parseMode} provided for a composite reflection parse, defaulting to Patch");
-                        goto case ParseMode.Patch;
+                        Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                        break;
                 }
             }
             else
             {
-                if (parseMode != ParseMode.Default)
+                if (parseCommand != ParseCommand.Patch)
                 {
                     Dbg.Err($"{node.GetInputContext()}: Mode provided for root Dec; this is currently not supported in any form");
                 }
