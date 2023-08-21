@@ -152,11 +152,119 @@ namespace Dec
             }
         }
 
-        private enum ParseCommand
+        internal enum ParseCommand
         {
             Replace,
             Patch,
             Append,
+        }
+        internal static List<(ParseCommand command, ReaderNode node)> CompileOrders(UtilType.ParseModeCategory modeCategory, List<ReaderNode> nodes)
+        {
+            var orders = new List<(ParseCommand command, ReaderNode node)>();
+            foreach (var node in nodes)
+            {
+                string modeAttribute = node.GetMetadata(ReaderNode.Metadata.Mode);
+                ParseMode s_parseMode = ParseModeFromString(node.GetInputContext(), node.GetMetadata(ReaderNode.Metadata.Mode));
+                ParseCommand s_parseCommand;
+
+                switch (modeCategory)
+                {
+                    case UtilType.ParseModeCategory.Dec:
+                        switch (s_parseMode)
+                        {
+                            default:
+                                Dbg.Err($"{node.GetInputContext()}: Invalid mode {s_parseMode} provided for a Dec-type parse, defaulting to Create");
+                                goto case ParseMode.Default;
+
+                            case ParseMode.Default:
+                                s_parseCommand = ParseCommand.Patch;
+                                break;
+                        }
+                        break;
+                    case UtilType.ParseModeCategory.Object:
+                        switch (s_parseMode)
+                        {
+                            default:
+                                Dbg.Err($"{node.GetInputContext()}: Invalid mode {s_parseMode} provided for an Object-type parse, defaulting to Patch");
+                                goto case ParseMode.Default;
+
+                            case ParseMode.Default:
+                            case ParseMode.Patch:
+                                s_parseCommand = ParseCommand.Patch;
+                                break;
+                        }
+                        break;
+                    case UtilType.ParseModeCategory.OrderedContainer:
+                        switch (s_parseMode)
+                        {
+                            default:
+                                Dbg.Err($"{node.GetInputContext()}: Invalid mode {s_parseMode} provided for an ordered-container-type parse, defaulting to Replace");
+                                goto case ParseMode.Default;
+
+                            case ParseMode.Default:
+                            case ParseMode.Replace:
+                                s_parseCommand = ParseCommand.Replace;
+                                break;
+
+                            case ParseMode.Append:
+                                s_parseCommand = ParseCommand.Append;
+                                break;
+                        }
+                        break;
+                    case UtilType.ParseModeCategory.UnorderedContainer:
+                        switch (s_parseMode)
+                        {
+                            default:
+                                Dbg.Err($"{node.GetInputContext()}: Invalid mode {s_parseMode} provided for an unordered-container-type parse, defaulting to Replace");
+                                goto case ParseMode.Default;
+
+                            case ParseMode.Default:
+                            case ParseMode.Replace:
+                                s_parseCommand = ParseCommand.Replace;
+                                break;
+
+                            case ParseMode.Patch:
+                                s_parseCommand = ParseCommand.Patch;
+                                break;
+
+                            case ParseMode.Append:
+                                s_parseCommand = ParseCommand.Append;
+                                break;
+                        }
+
+                        break;
+                    case UtilType.ParseModeCategory.Value:
+                        switch (s_parseMode)
+                        {
+                            default:
+                                Dbg.Err($"{node.GetInputContext()}: Invalid mode {s_parseMode} provided for a value-type parse, defaulting to Replace");
+                                goto case ParseMode.Default;
+
+                            case ParseMode.Default:
+                            case ParseMode.Replace:
+                                s_parseCommand = ParseCommand.Replace;
+                                break;
+                        }
+                        break;
+                    default:
+                        Dbg.Err($"{node.GetInputContext()}: Internal error, unknown mode category {modeCategory}, please report");
+                        s_parseCommand = ParseCommand.Patch;  // . . . I guess?
+                        break;
+                }
+
+                if (s_parseCommand == ParseCommand.Replace)
+                {
+                    orders.Clear();
+                    // I'd love to just nuke `result` here, but for things like List<int> we want to preserve the existing object for ref reasons
+                    // This is sort of a weird compromise so we can use the same codepath for both Dec and Recorder; Dec doesn't have refs, Recorder doesn't have parse modes, so practically speaking there's an easy choice for both of them
+                    // it's just not the same easy choice
+                    // but, whatever, we need this distinction anyway so we can do Append
+                }
+
+                orders.Add((s_parseCommand, node));
+            }
+
+            return orders;
         }
 
         internal static object ParseElement(List<ReaderNode> nodes, Type type, object original, ReaderContext context, Recorder.Context recContext, FieldInfo fieldInfo = null, bool isRootDec = false, bool hasReferenceId = false, bool asThis = false)
@@ -314,109 +422,7 @@ namespace Dec
 
             // Now we traverse the Mode attributes as prep for our final parse pass.
             UtilType.ParseModeCategory modeCategory = type.CalculateSerializationModeCategory(converter, isRootDec);
-            List<(ParseCommand command, ReaderNode node)> orders = new List<(ParseCommand command, ReaderNode node)>();
-            foreach (var node in nodes)
-            {
-                string modeAttribute = node.GetMetadata(ReaderNode.Metadata.Mode);
-                ParseMode s_parseMode = ParseModeFromString(node.GetInputContext(), node.GetMetadata(ReaderNode.Metadata.Mode));
-                ParseCommand s_parseCommand;
-
-                switch (modeCategory)
-                {
-                    case UtilType.ParseModeCategory.Dec:
-                        switch (s_parseMode)
-                        {
-                            default:
-                                Dbg.Err($"{node.GetInputContext()}: Invalid mode {s_parseMode} provided for a Dec-type parse, defaulting to Create");
-                                goto case ParseMode.Default;
-
-                            case ParseMode.Default:
-                                s_parseCommand = ParseCommand.Patch;
-                                break;
-                        }
-                        break;
-                    case UtilType.ParseModeCategory.Object:
-                        switch (s_parseMode)
-                        {
-                            default:
-                                Dbg.Err($"{node.GetInputContext()}: Invalid mode {s_parseMode} provided for an Object-type parse, defaulting to Patch");
-                                goto case ParseMode.Default;
-
-                            case ParseMode.Default:
-                            case ParseMode.Patch:
-                                s_parseCommand = ParseCommand.Patch;
-                                break;
-                        }
-                        break;
-                    case UtilType.ParseModeCategory.OrderedContainer:
-                        switch (s_parseMode)
-                        {
-                            default:
-                                Dbg.Err($"{node.GetInputContext()}: Invalid mode {s_parseMode} provided for an ordered-container-type parse, defaulting to Replace");
-                                goto case ParseMode.Default;
-
-                            case ParseMode.Default:
-                            case ParseMode.Replace:
-                                s_parseCommand = ParseCommand.Replace;
-                                break;
-                            
-                            case ParseMode.Append:
-                                s_parseCommand = ParseCommand.Append;
-                                break;
-                        }
-                        break;
-                    case UtilType.ParseModeCategory.UnorderedContainer:
-                        switch (s_parseMode)
-                        {
-                            default:
-                                Dbg.Err($"{node.GetInputContext()}: Invalid mode {s_parseMode} provided for an unordered-container-type parse, defaulting to Replace");
-                                goto case ParseMode.Default;
-
-                            case ParseMode.Default:
-                            case ParseMode.Replace:
-                                s_parseCommand = ParseCommand.Replace;
-                                break;
-                            
-                            case ParseMode.Patch:
-                                s_parseCommand = ParseCommand.Patch;
-                                break;
-
-                            case ParseMode.Append:
-                                s_parseCommand = ParseCommand.Append;
-                                break;
-                        }
- 
-                        break;
-                    case UtilType.ParseModeCategory.Value:
-                        switch (s_parseMode)
-                        {
-                            default:
-                                Dbg.Err($"{node.GetInputContext()}: Invalid mode {s_parseMode} provided for a value-type parse, defaulting to Replace");
-                                goto case ParseMode.Default;
-
-                            case ParseMode.Default:
-                            case ParseMode.Replace:
-                                s_parseCommand = ParseCommand.Replace;
-                                break;
-                        }
-                        break;
-                    default:
-                        Dbg.Err($"{node.GetInputContext()}: Internal error, unknown mode category {modeCategory}, please report");
-                        s_parseCommand = ParseCommand.Patch;  // . . . I guess?
-                        break;
-                }
-
-                if (s_parseCommand == ParseCommand.Replace)
-                {
-                    orders.Clear();
-                    // I'd love to just nuke `result` here, but for things like List<int> we want to preserve the existing object for ref reasons
-                    // This is sort of a weird compromise so we can use the same codepath for both Dec and Recorder; Dec doesn't have refs, Recorder doesn't have parse modes, so practically speaking there's an easy choice for both of them
-                    // it's just not the same easy choice
-                    // but, whatever, we need this distinction anyway so we can do Append
-                }
-
-                orders.Add((s_parseCommand, node));
-            }
+            List<(ParseCommand command, ReaderNode node)> orders = CompileOrders(modeCategory, nodes);
 
             // Gather info
             bool hasChildren = false;
