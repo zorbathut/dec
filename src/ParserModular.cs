@@ -339,13 +339,6 @@ namespace Dec
 
                 foreach (var (id, orders) in toParseDecOrders)
                 {
-                    // see if we're abstract; if so, we'll ignore this
-                    bool abstrct = orders.Select(order => order.dec.abstrct).Where(abstr => abstr.HasValue).LastOrDefault() ?? false;
-                    if (abstrct)
-                    {
-                        continue;
-                    }
-
                     // Accumulate our orders
                     var completeOrders = orders;
 
