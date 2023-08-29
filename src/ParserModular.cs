@@ -269,7 +269,7 @@ namespace Dec
                 var registeredDecOrders = new Dictionary<(Type, string), List<(Serialization.ParseCommand command, ReaderFileDec.ReaderDec dec)>>();
                 foreach (var seenDec in registeredDecs)
                 {
-                    var orders = Serialization.CompileOrders(UtilType.ParseModeCategory.Dec, seenDec.Value.Select(seenDec => (seenDec, seenDec.node)));
+                    var orders = Serialization.CompileOrders(UtilType.ParseModeCategory.Dec, seenDec.Value.Select(seen => (seen, seen.node)));
                     registeredDecOrders[seenDec.Key] = orders;
                 }
 
@@ -340,7 +340,7 @@ namespace Dec
                 foreach (var (id, orders) in toParseDecOrders)
                 {
                     // see if we're abstract; if so, we'll ignore this
-                    bool abstrct = orders.Select(order => order.dec.abstrct).Where(abstrct => abstrct.HasValue).LastOrDefault() ?? false;
+                    bool abstrct = orders.Select(order => order.dec.abstrct).Where(abstr => abstr.HasValue).LastOrDefault() ?? false;
                     if (abstrct)
                     {
                         continue;
