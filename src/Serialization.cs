@@ -269,7 +269,7 @@ namespace Dec
             return orders;
         }
 
-        internal static object ParseElement(List<ReaderNode> nodes, Type type, object original, ReaderContext context, Recorder.Context recContext, FieldInfo fieldInfo = null, bool isRootDec = false, bool hasReferenceId = false, bool asThis = false)
+        internal static object ParseElement(List<ReaderNode> nodes, Type type, object original, ReaderContext context, Recorder.Context recContext, FieldInfo fieldInfo = null, bool isRootDec = false, bool hasReferenceId = false, bool asThis = false, List<(ParseCommand command, ReaderNode node)> ordersOverride = null)
         {
             if (nodes == null || nodes.Count == 0)
             {
@@ -423,8 +423,8 @@ namespace Dec
             var converter = Converters.TryGetValue(type);
 
             // Now we traverse the Mode attributes as prep for our final parse pass.
-            UtilType.ParseModeCategory modeCategory = type.CalculateSerializationModeCategory(converter, isRootDec);
-            List<(ParseCommand command, ReaderNode node)> orders = CompileOrders(modeCategory, nodes.Select(node => (node, node)));
+            // ordersOverride makes `nodes` admittedly a little unnecessary.
+            List<(ParseCommand command, ReaderNode node)> orders = ordersOverride ?? CompileOrders(type.CalculateSerializationModeCategory(converter, isRootDec), nodes.Select(node => (node, node)));
 
             // Gather info
             bool hasChildren = false;

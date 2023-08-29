@@ -91,10 +91,12 @@ namespace Dec
                         var abstractAttribute = decElement.Attribute("abstract");
                         if (abstractAttribute != null)
                         {
-                            if (!bool.TryParse(abstractAttribute.Value, out readerDec.abstrct))
+                            bool abstrct;
+                            if (!bool.TryParse(abstractAttribute.Value, out abstrct))
                             {
                                 Dbg.Err($"{readerDec.inputContext}: Error encountered when parsing abstract attribute");
                             }
+                            readerDec.abstrct = abstrct; // little dance to deal with the fact that readerDec.abstrct is a `bool?`
 
                             abstractAttribute.Remove();
                         }

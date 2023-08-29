@@ -15,7 +15,7 @@ namespace Dec
             public ReaderNode node;
             public InputContext inputContext;
 
-            public bool abstrct;
+            public bool? abstrct;
             public string parent;
         }
 

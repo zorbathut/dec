@@ -142,14 +142,6 @@ namespace Dec
         // Modules
         internal List<Module> modules = new List<Module>();
 
-        // A list of types that can be inherited from
-        private struct Parent
-        {
-            public ReaderNode node;
-            public ReaderContext context;
-            public string parent;
-        }
-
         // A list of inheritance-based work that still has to be resolved
         private struct InheritanceJob
         {
@@ -234,108 +226,154 @@ namespace Dec
                 }
                 s_Status = Status.Processing;
 
-                // A list of inheritance-based work that still has to be resolved
-                var inheritanceJobs = new List<InheritanceJob>();
-
-                // A list of types that can be inherited from
-                var potentialParents = new Dictionary<Tuple<Type, string>, Parent>();
-
-                // List of work to be run during the Finish stage
-                var finishWork = new List<Action>();
-
                 var readerContext = new ReaderContext(false);
 
-                // this is absolutely not the right way to handle multiple modules
-                foreach (var reader in modules.SelectMany(module => module.readers))
+                // Collate reader decs
+                var registeredDecs = new Dictionary<(Type, string), List<ReaderFileDec.ReaderDec>>();
+                foreach (var module in modules)
                 {
-                    foreach (var readerDec in reader.ParseDecs())
+                    var seenDecs = new Dictionary<(Type, string), ReaderNode>();
+                    foreach (var reader in module.readers)
                     {
-                        // Register ourselves as an available parenting object
+                        foreach (var readerDec in reader.ParseDecs())
                         {
-                            var identifier = Tuple.Create(readerDec.type.GetDecRootType(), readerDec.name);
-                            if (potentialParents.ContainsKey(identifier))
+                            var id = (readerDec.type.GetDecRootType(), readerDec.name);
+                            
+                            var collidingDec = seenDecs.TryGetValue(id);
+                            if (collidingDec != null)
                             {
-                                Dbg.Err($"{readerDec.inputContext}: Dec [{identifier.Item1}:{identifier.Item2}] defined twice");
+                                Dbg.Err($"{collidingDec.GetInputContext()} / {readerDec.node.GetInputContext()}: Dec [{id.Item1}:{id.Item2}] defined twice");
+
+                                // If the already-parsed one is abstract, we throw it away and go with the non-abstract one, because it's arguably more likely to be the one the user wants.
+                                if (!(registeredDecs[id].Select(dec => dec.abstrct).LastOrDefault(abstrct => abstrct.HasValue) ?? false))
+                                {
+                                    continue;
+                                }
+
+                                registeredDecs.Remove(id);
                             }
-                            else
+                            
+                            seenDecs[id] = readerDec.node;
+
+                            if (!registeredDecs.TryGetValue(id, out var list))
                             {
-                                potentialParents[identifier] = new Parent { node = readerDec.node, context = readerContext, parent = readerDec.parent };
+                                list = new List<ReaderFileDec.ReaderDec>();
+                                registeredDecs[id] = list;
                             }
+                            list.Add(readerDec);
+                        }
+                    }
+                }
+
+                // Compile reader decs into Order assemblies
+                var registeredDecOrders = new Dictionary<(Type, string), List<(Serialization.ParseCommand command, ReaderFileDec.ReaderDec dec)>>();
+                foreach (var seenDec in registeredDecs)
+                {
+                    var orders = Serialization.CompileOrders(UtilType.ParseModeCategory.Dec, seenDec.Value.Select(seenDec => (seenDec, seenDec.node)));
+                    registeredDecOrders[seenDec.Key] = orders;
+                }
+
+                // Instantiate all decs
+                var toParseDecOrders = new Dictionary<(Type, string), List<(Serialization.ParseCommand command, ReaderFileDec.ReaderDec dec)>>();
+                foreach (var (id, orders) in registeredDecOrders)
+                {
+                    // It's currently sort of unclear how we should be deriving the type.
+                    // I'm choosing, for now, to go with "the most derived type in the list, assuming all types are in the same inheritance sequence".
+                    // Thankfully this isn't too hard to do.
+                    var typeDeterminor = orders[0].dec;
+                    bool abstrct = typeDeterminor.abstrct ?? false;
+
+                    foreach (var order in orders.Skip(1))
+                    {
+                        // Since we're iterating over this anyway, yank the abstract updates out as go.
+                        if (order.dec.abstrct.HasValue)
+                        {
+                            abstrct = order.dec.abstrct.Value;
                         }
 
-                        if (!readerDec.abstrct)
+                        if (order.dec.type == typeDeterminor.type)
                         {
-                            // Not an abstract dec instance, so create our instance
-                            var decInstance = (Dec)readerDec.type.CreateInstanceSafe("dec", readerDec.node);
-
-                            // Error reporting happens within CreateInstanceSafe; if we get null out, we just need to clean up elegantly
-                            if (decInstance != null)
-                            {
-                                decInstance.DecName = readerDec.name;
-
-                                Database.Register(decInstance);
-
-                                if (readerDec.parent == null)
-                                {
-                                    // Non-parent objects are simple; we just handle them here in order to avoid unnecessary GC churn
-                                    finishWork.Add(() => Serialization.ParseElement(new List<ReaderNode>() { readerDec.node }, readerDec.type, decInstance, readerContext, new Recorder.Context(), isRootDec: true));
-                                }
-                                else
-                                {
-                                    // Add an inheritance resolution job; we'll take care of this soon
-                                    // (but we need to wait until all the Dec's are registered so we can find parents)
-                                    inheritanceJobs.Add(new InheritanceJob { target = decInstance, node = readerDec.node, parent = readerDec.parent });
-                                }
-                            }
+                            // fast case
+                            continue;
                         }
+
+                        if (order.dec.type.IsSubclassOf(typeDeterminor.type))
+                        {
+                            typeDeterminor = order.dec;
+                            continue;
+                        }
+
+                        if (typeDeterminor.type.IsSubclassOf(order.dec.type))
+                        {
+                            continue;
+                        }
+
+                        // oops, they're not subclasses of each other
+                        Dbg.Err($"{typeDeterminor.inputContext} / {order.dec.inputContext}: Modded dec with tree-identifier [{id.Item1}:{id.Item2}] has conflicting types without a simple subclass relationship ({typeDeterminor.type}/{order.dec.type}); deferring to {order.dec.type}");
+                        typeDeterminor = order.dec;
+                    }
+
+                    // We don't actually want an instance of this.
+                    if (abstrct)
+                    {
+                        continue;
+                    }
+
+                    // Not an abstract dec instance, so create our instance
+                    var decInstance = (Dec)typeDeterminor.type.CreateInstanceSafe("dec", typeDeterminor.node);
+
+                    // Error reporting happens within CreateInstanceSafe; if we get null out, we just need to clean up elegantly
+                    if (decInstance != null)
+                    {
+                        decInstance.DecName = id.Item2;
+
+                        Database.Register(decInstance);
+
+                        // filter out abstract objects and failed instantiations
+                        toParseDecOrders.Add(id, orders);
                     }
                 }
 
                 // It's time to actually shove stuff into the database, so let's stop spitting out empty warnings.
                 Database.SuppressEmptyWarning();
 
-                // Resolve all our inheritance jobs
-                foreach (var work in inheritanceJobs)
+                foreach (var (id, orders) in toParseDecOrders)
                 {
-                    // These are the nodes we need to analyze in order
-                    var readerNodes = new List<ReaderNode>();
-
-                    readerNodes.Add(work.node);
-
-                    string currentDecName = work.target.DecName;
-                    string parentDecName = work.parent;
-                    while (parentDecName != null)
+                    // see if we're abstract; if so, we'll ignore this
+                    bool abstrct = orders.Select(order => order.dec.abstrct).Where(abstrct => abstrct.HasValue).LastOrDefault() ?? false;
+                    if (abstrct)
                     {
-                        var parentData = potentialParents.TryGetValue(Tuple.Create(work.target.GetType().GetDecRootType(), parentDecName));
+                        continue;
+                    }
 
-                        // This is a struct for the sake of performance, so parentData itself won't be null
-                        // (wish I could just use ?. here)
-                        if (parentData.node == null)
+                    // Accumulate our orders
+                    var completeOrders = orders;
+
+                    var currentOrder = orders;
+                    while (true)
+                    {
+                        // See if we have a parent
+                        var decWithParent = currentOrder.Select(order => order.dec).Where(dec => dec.parent != null).LastOrDefault();
+                        if (decWithParent.parent == null || decWithParent.parent == "")
                         {
-                            Dbg.Err($"{work.node.GetInputContext()}: Dec `{currentDecName}` is attempting to use parent `{parentDecName}`, but no such dec exists");
-
-                            // Not much more we can do here.
                             break;
                         }
 
-                        readerNodes.Add(parentData.node);
+                        var parentId = (id.Item1, decWithParent.parent);
+                        if (!registeredDecOrders.TryGetValue(parentId, out var parentDec))
+                        {
+                            // THIS IS WRONG
+                            Dbg.Err($"{decWithParent.node.GetInputContext()}: Dec [{decWithParent.type}:{id.Item2}] is attempting to use parent `[{parentId.Item1}:{parentId.Item2}]`, but no such dec exists");
+                            break;
+                        }
 
-                        currentDecName = parentDecName;
-                        parentDecName = parentData.parent;
+                        completeOrders.InsertRange(0, parentDec);
+
+                        currentOrder = parentDec;
                     }
 
-                    readerNodes.Reverse();
-
-                    // do this all in one batch
-                    finishWork.Add(() =>
-                    {
-                        Serialization.ParseElement(readerNodes, work.target.GetType(), work.target, readerContext, new Recorder.Context(), isRootDec: true);
-                    });
-                }
-
-                foreach (var work in finishWork)
-                {
-                    work();
+                    var targetDec = Database.Get(id.Item1, id.Item2);
+                    Serialization.ParseElement(completeOrders.Select(order => order.dec.node).ToList(), targetDec.GetType(), targetDec, readerContext, new Recorder.Context(), isRootDec: true, ordersOverride: completeOrders.Select(order => (order.command, order.dec.node)).ToList());
                 }
 
                 if (s_Status != Status.Processing)

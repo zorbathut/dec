@@ -152,7 +152,8 @@ namespace DecTest
             var result = Dec.Database<IntDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
-            Assert.AreEqual(20, result.value);
+            // this can be either 10 or 20, but shouldn't change between runs, only between versions
+            Assert.True(result.value == 10);
         }
 
         public class DeepParentDec : Dec.Dec
