@@ -207,6 +207,12 @@ namespace Dec
         {
             var module = new Module();
             module.name = name;
+
+            if (modules.Any(mod => mod.name == name))
+            {
+                Dbg.Err($"Created duplicate module {name}");
+            }
+
             modules.Add(module);
             return module;
         }
