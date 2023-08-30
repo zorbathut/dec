@@ -108,5 +108,117 @@ namespace DecTest
             Assert.IsNotNull(Dec.Database<TwoIntsDec>.Get("First"));
             Assert.IsNotNull(Dec.Database<TwoIntsDec>.Get("Second"));
         }
+
+        public enum Vis
+        {
+            Hidden,
+            Create,
+        }
+        private string StrFromVis(Vis vis)
+        {
+            switch (vis)
+            {
+                case Vis.Hidden:
+                    return "";
+
+                case Vis.Create:
+                    return "mode=\"create\"";
+
+                default:
+                    Assert.Fail();
+                    return "";
+            }
+        }
+        [Test]
+        public void ModeCreatePass([Values] ParserMode mode, [Values] Vis vis)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(TwoIntsDec) } });
+
+            var parser = new Dec.ParserModular();
+            parser.CreateModule("Base").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <TwoIntsDec decName=""BaseOnly"" />
+                    <TwoIntsDec decName=""BaseAbstract"" abstract=""true"" />
+                </Decs>");
+            parser.CreateModule("Mod").AddString(Dec.Parser.FileType.Xml, $@"
+                <Decs>
+                    <TwoIntsDec decName=""ModOnly"" {StrFromVis(vis)} />
+                    <TwoIntsDec decName=""ModAbstract"" abstract=""true"" {StrFromVis(vis)} />
+                    <TwoIntsDec decName=""ModFromBase"" parent=""BaseAbstract"" {StrFromVis(vis)} />
+                    <TwoIntsDec decName=""ModFromMod"" parent=""ModAbstract"" {StrFromVis(vis)} />
+                </Decs>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            Assert.IsNotNull(Dec.Database<TwoIntsDec>.Get("BaseOnly"));
+            Assert.IsNull(Dec.Database<TwoIntsDec>.Get("BaseAbstract"));
+
+            Assert.IsNotNull(Dec.Database<TwoIntsDec>.Get("ModOnly"));
+            Assert.IsNull(Dec.Database<TwoIntsDec>.Get("ModAbstract"));
+            Assert.IsNotNull(Dec.Database<TwoIntsDec>.Get("ModFromBase"));
+            Assert.IsNotNull(Dec.Database<TwoIntsDec>.Get("ModFromMod"));
+        }
+
+        [Test]
+        public void ModeCreateFailBase([Values] ParserMode mode, [Values] Vis vis)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(TwoIntsDec) } });
+
+            var parser = new Dec.ParserModular();
+            parser.CreateModule("Base").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <TwoIntsDec decName=""BaseOnly"">
+                        <a>42</a>
+                        <b>100</b>
+                    </TwoIntsDec>
+                </Decs>");
+            parser.CreateModule("Mod").AddString(Dec.Parser.FileType.Xml, $@"
+                <Decs>
+                    <TwoIntsDec decName=""BaseOnly"" {StrFromVis(vis)}>
+                        <a>-42</a>
+                    </TwoIntsDec>
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoParserTests(mode);
+
+            Assert.IsNotNull(Dec.Database<TwoIntsDec>.Get("BaseOnly"));
+
+            Assert.AreEqual(-42, Dec.Database<TwoIntsDec>.Get("BaseOnly").a);
+            Assert.AreEqual(100, Dec.Database<TwoIntsDec>.Get("BaseOnly").b);
+        }
+
+        [Test]
+        public void ModeCreateFailAbstract([Values] ParserMode mode, [Values] Vis vis)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(TwoIntsDec) } });
+
+            var parser = new Dec.ParserModular();
+            parser.CreateModule("Base").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <TwoIntsDec decName=""BaseAbstract"" abstract=""true"">
+                        <a>42</a>
+                        <b>100</b>
+                    </TwoIntsDec>
+                </Decs>");
+            parser.CreateModule("Mod").AddString(Dec.Parser.FileType.Xml, $@"
+                <Decs>
+                    <TwoIntsDec decName=""BaseAbstract"" {StrFromVis(vis)}>
+                        <a>-42</a>
+                    </TwoIntsDec>
+
+                    <TwoIntsDec decName=""ModFromBase"" parent=""BaseAbstract"" {StrFromVis(vis)} />
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoParserTests(mode);
+
+            Assert.IsNull(Dec.Database<TwoIntsDec>.Get("BaseAbstract"));
+            Assert.IsNotNull(Dec.Database<TwoIntsDec>.Get("ModFromBase"));
+
+            Assert.AreEqual(-42, Dec.Database<TwoIntsDec>.Get("ModFromBase").a);
+            Assert.AreEqual(100, Dec.Database<TwoIntsDec>.Get("ModFromBase").b);
+        }
     }
 }
