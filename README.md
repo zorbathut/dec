@@ -3,7 +3,7 @@ dec
 
 [![Language: C#](https://img.shields.io/badge/language-C%23-blue)](https://docs.microsoft.com/en-us/dotnet/csharp/) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
 
-[![Build status](https://img.shields.io/github/actions/workflow/status/zorbathut/dec/test.yml?branch=master)](https://github.com/zorbathut/dec/actions?query=workflow%3ATest+branch%3Amaster) [![Coverage Status](https://coveralls.io/repos/github/zorbathut/dec/badge.svg)](https://coveralls.io/github/zorbathut/dec) [![Support](https://img.shields.io/discord/703688553707601962?label=support&logo=discord)](https://discord.gg/vQv9DMA)
+[![Build status](https://img.shields.io/github/actions/workflow/status/zorbathut/dec/test.yml?branch=dev)](https://github.com/zorbathut/dec/actions?query=workflow%3ATest+branch%3Adev) [![Coverage Status](https://coveralls.io/repos/github/zorbathut/dec/badge.svg)](https://coveralls.io/github/zorbathut/dec) [![Support](https://img.shields.io/discord/703688553707601962?label=support&logo=discord)](https://discord.gg/vQv9DMA)
 
 Dec is a C# library for declaring game asset types in XML. It includes extensive error reporting and recovery for ease of development, uses reflection to prevent writing lots of boilerplate code, is designed to allow easy moddability moddable by endusers (though not yet implemented), and includes a serialization system (intended for savegames, but often used for other things) that integrates cleanly with the underlying Dec types.
 
