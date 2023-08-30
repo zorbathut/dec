@@ -31,9 +31,9 @@ namespace DecTest
                 </Decs>");
             parser.CreateModule("Mod").AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
-                    <TwoIntsDec decName=""AbsA"" abstract=""false"" />
+                    <TwoIntsDec decName=""AbsA"" mode=""patch"" abstract=""false"" />
                     <TwoIntsDec decName=""ConcA"" parent=""AbsA"" />
-                    <TwoIntsDec decName=""AbsB"" />
+                    <TwoIntsDec decName=""AbsB"" mode=""patch"" />
                     <TwoIntsDec decName=""AAB"" parent=""AbsB"" abstract=""true"" />
                     <TwoIntsDec decName=""ConcAAB"" parent=""AAB"" />
                 </Decs>");
@@ -72,7 +72,7 @@ namespace DecTest
                 </Decs>");
             parser.CreateModule("Mod").AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
-                    <TwoIntsDec decName=""Abstract"">
+                    <TwoIntsDec decName=""Abstract"" mode=""patch"">
                         <a>-42</a>
                     </TwoIntsDec>
                 </Decs>");

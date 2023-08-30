@@ -116,15 +116,18 @@ namespace Dec
         {
             Default,
             Replace,
-            //ReplaceOrCreate, // NYI
             Patch,
-            //PatchOrCreate, // NYI
-            //Create, //NYI
             Append,
-            //Delete, //NYI
-            //ReplaceIfExists, //NYI
-            //PatchIfExists, //NYI
-            //DeleteIfExists, //NYI
+
+            // Dec-only
+            Create,
+            CreateOrReplace,
+            CreateOrPatch,
+            CreateOrIgnore,
+            Delete,
+            ReplaceIfExists,
+            PatchIfExists,
+            DeleteIfExists,
         }
         internal static ParseMode ParseModeFromString(InputContext context, string str)
         {
@@ -144,6 +147,38 @@ namespace Dec
             {
                 return ParseMode.Append;
             }
+            else if (str == "create")
+            {
+                return ParseMode.Create;
+            }
+            else if (str == "createOrReplace")
+            {
+                return ParseMode.CreateOrReplace;
+            }
+            else if (str == "createOrPatch")
+            {
+                return ParseMode.CreateOrPatch;
+            }
+            else if (str == "createOrIgnore")
+            {
+                return ParseMode.CreateOrPatch;
+            }
+            else if (str == "delete")
+            {
+                return ParseMode.Delete;
+            }
+            else if (str == "replaceIfExists")
+            {
+                return ParseMode.ReplaceIfExists;
+            }
+            else if (str == "patchIfExists")
+            {
+                return ParseMode.PatchIfExists;
+            }
+            else if (str == "deleteIfExists")
+            {
+                return ParseMode.DeleteIfExists;
+            }
             else
             {
                 Dbg.Err($"{context}: Invalid `{str}` mode!");
@@ -162,6 +197,13 @@ namespace Dec
         internal static List<(ParseCommand command, T node)> CompileOrders<T>(UtilType.ParseModeCategory modeCategory, IEnumerable<(T, ReaderNode)> nodes)
         {
             var orders = new List<(ParseCommand command, T payload)>();
+
+            if (modeCategory == UtilType.ParseModeCategory.Dec)
+            {
+                Dbg.Err($"Internal error: CompileOrders called with Dec mode category, this should never happen! Please report it.");
+                return orders;
+            }
+
             foreach (var (payload, node) in nodes)
             {
                 var inputContext = node.GetInputContext();
@@ -171,18 +213,6 @@ namespace Dec
 
                 switch (modeCategory)
                 {
-                    case UtilType.ParseModeCategory.Dec:
-                        switch (s_parseMode)
-                        {
-                            default:
-                                Dbg.Err($"{inputContext}: Invalid mode {s_parseMode} provided for a Dec-type parse, defaulting to Create");
-                                goto case ParseMode.Default;
-
-                            case ParseMode.Default:
-                                s_parseCommand = ParseCommand.Patch;
-                                break;
-                        }
-                        break;
                     case UtilType.ParseModeCategory.Object:
                         switch (s_parseMode)
                         {
@@ -257,13 +287,106 @@ namespace Dec
                 if (s_parseCommand == ParseCommand.Replace)
                 {
                     orders.Clear();
-                    // I'd love to just nuke `result` here, but for things like List<int> we want to preserve the existing object for ref reasons
-                    // This is sort of a weird compromise so we can use the same codepath for both Dec and Recorder; Dec doesn't have refs, Recorder doesn't have parse modes, so practically speaking there's an easy choice for both of them
-                    // it's just not the same easy choice
-                    // but, whatever, we need this distinction anyway so we can do Append
                 }
 
                 orders.Add((s_parseCommand, payload));
+            }
+
+            return orders;
+        }
+
+        internal static List<ReaderFileDec.ReaderDec> CompileDecOrders(List<ReaderFileDec.ReaderDec> decs)
+        {
+            var orders = new List<ReaderFileDec.ReaderDec>();
+            bool everExisted = false;
+            foreach (var item in decs)
+            {
+                var s_parseMode = ParseModeFromString(item.inputContext, item.node.GetMetadata(ReaderNode.Metadata.Mode));
+
+                switch (s_parseMode)
+                {
+                    default:
+                        Dbg.Err($"{item.inputContext}: Invalid mode {s_parseMode} provided for a Dec-type parse, defaulting to Create");
+                        goto case ParseMode.Default;
+
+                    case ParseMode.Default:
+                    case ParseMode.Create:
+                        if (orders.Count != 0)
+                        {
+                            Dbg.Err($"{item.inputContext}: Create mode used when a Dec already exists, falling back to Patch");
+                            goto case ParseMode.Patch;
+                        }
+                        orders.Add(item);
+                        everExisted = true;
+                        break;
+
+                    case ParseMode.Replace:
+                        if (orders.Count == 0)
+                        {
+                            Dbg.Err($"{item.inputContext}: Replace mode used when a Dec doesn't exist, falling back to Create");
+                            goto case ParseMode.Create;
+                        }
+                        orders.Clear();
+                        orders.Add(item);
+                        break;
+
+                    case ParseMode.Patch:
+                        if (orders.Count == 0)
+                        {
+                            Dbg.Err($"{item.inputContext}: Replace mode used when a Dec doesn't exist, falling back to Create");
+                            goto case ParseMode.Create;
+                        }
+                        orders.Add(item);
+                        break;
+
+                    case ParseMode.CreateOrReplace:
+                        // doesn't matter if we have a thing or not
+                        orders.Clear();
+                        orders.Add(item);
+                        everExisted = true;
+                        break;
+
+                    case ParseMode.CreateOrPatch:
+                        // doesn't matter if we have a thing or not
+                        orders.Add(item);
+                        everExisted = true;
+                        break;
+
+                    case ParseMode.CreateOrIgnore:
+                        if (orders.Count == 0)
+                        {
+                            orders.Add(item);
+                            everExisted = true;
+                        }
+                        break;
+
+                    case ParseMode.Delete:
+                        if (!everExisted)
+                        {
+                            Dbg.Err($"{item.inputContext}: Delete mode used when a Dec doesn't exist; did you want deleteIfExists?");
+                        }
+                        orders.Clear();
+                        break;
+
+                    case ParseMode.ReplaceIfExists:
+                        if (orders.Count != 0)
+                        {
+                            orders.Clear();
+                            orders.Add(item);
+                        }
+                        break;
+
+                    case ParseMode.PatchIfExists:
+                        if (orders.Count != 0)
+                        {
+                            orders.Add(item);
+                        }
+                        break;
+
+                    case ParseMode.DeleteIfExists:
+                        orders.Clear();
+                        break;
+                }
             }
 
             return orders;

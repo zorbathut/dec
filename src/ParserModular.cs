@@ -272,51 +272,51 @@ namespace Dec
                 }
 
                 // Compile reader decs into Order assemblies
-                var registeredDecOrders = new Dictionary<(Type, string), List<(Serialization.ParseCommand command, ReaderFileDec.ReaderDec dec)>>();
+                var registeredDecOrders = new Dictionary<(Type, string), List<ReaderFileDec.ReaderDec>>();
                 foreach (var seenDec in registeredDecs)
                 {
-                    var orders = Serialization.CompileOrders(UtilType.ParseModeCategory.Dec, seenDec.Value.Select(seen => (seen, seen.node)));
+                    var orders = Serialization.CompileDecOrders(seenDec.Value);
                     registeredDecOrders[seenDec.Key] = orders;
                 }
 
                 // Instantiate all decs
-                var toParseDecOrders = new Dictionary<(Type, string), List<(Serialization.ParseCommand command, ReaderFileDec.ReaderDec dec)>>();
+                var toParseDecOrders = new Dictionary<(Type, string), List<ReaderFileDec.ReaderDec>>();
                 foreach (var (id, orders) in registeredDecOrders)
                 {
                     // It's currently sort of unclear how we should be deriving the type.
                     // I'm choosing, for now, to go with "the most derived type in the list, assuming all types are in the same inheritance sequence".
                     // Thankfully this isn't too hard to do.
-                    var typeDeterminor = orders[0].dec;
+                    var typeDeterminor = orders[0];
                     bool abstrct = typeDeterminor.abstrct ?? false;
 
                     foreach (var order in orders.Skip(1))
                     {
                         // Since we're iterating over this anyway, yank the abstract updates out as go.
-                        if (order.dec.abstrct.HasValue)
+                        if (order.abstrct.HasValue)
                         {
-                            abstrct = order.dec.abstrct.Value;
+                            abstrct = order.abstrct.Value;
                         }
 
-                        if (order.dec.type == typeDeterminor.type)
+                        if (order.type == typeDeterminor.type)
                         {
                             // fast case
                             continue;
                         }
 
-                        if (order.dec.type.IsSubclassOf(typeDeterminor.type))
+                        if (order.type.IsSubclassOf(typeDeterminor.type))
                         {
-                            typeDeterminor = order.dec;
+                            typeDeterminor = order;
                             continue;
                         }
 
-                        if (typeDeterminor.type.IsSubclassOf(order.dec.type))
+                        if (typeDeterminor.type.IsSubclassOf(order.type))
                         {
                             continue;
                         }
 
                         // oops, they're not subclasses of each other
-                        Dbg.Err($"{typeDeterminor.inputContext} / {order.dec.inputContext}: Modded dec with tree-identifier [{id.Item1}:{id.Item2}] has conflicting types without a simple subclass relationship ({typeDeterminor.type}/{order.dec.type}); deferring to {order.dec.type}");
-                        typeDeterminor = order.dec;
+                        Dbg.Err($"{typeDeterminor.inputContext} / {order.inputContext}: Modded dec with tree-identifier [{id.Item1}:{id.Item2}] has conflicting types without a simple subclass relationship ({typeDeterminor.type}/{order.type}); deferring to {order.type}");
+                        typeDeterminor = order;
                     }
 
                     // We don't actually want an instance of this.
@@ -335,12 +335,12 @@ namespace Dec
 
                         Database.Register(decInstance);
 
-                        // filter out abstract objects and failed instantiations
+                        // create a new map that filters out abstract objects and failed instantiations
                         toParseDecOrders.Add(id, orders);
                     }
                 }
 
-                // It's time to actually shove stuff into the database, so let's stop spitting out empty warnings.
+                // It's time to actually pull references out of the database, so let's stop spitting out empty warnings.
                 Database.SuppressEmptyWarning();
 
                 foreach (var (id, orders) in toParseDecOrders)
@@ -352,7 +352,7 @@ namespace Dec
                     while (true)
                     {
                         // See if we have a parent
-                        var decWithParent = currentOrder.Select(order => order.dec).Where(dec => dec.parent != null).LastOrDefault();
+                        var decWithParent = currentOrder.Where(dec => dec.parent != null).LastOrDefault();
                         if (decWithParent.parent == null || decWithParent.parent == "")
                         {
                             break;
@@ -361,8 +361,8 @@ namespace Dec
                         var parentId = (id.Item1, decWithParent.parent);
                         if (!registeredDecOrders.TryGetValue(parentId, out var parentDec))
                         {
-                            // THIS IS WRONG
-                            Dbg.Err($"{decWithParent.node.GetInputContext()}: Dec [{decWithParent.type}:{id.Item2}] is attempting to use parent `[{parentId.Item1}:{parentId.Item2}]`, but no such dec exists");
+                            Dbg.Err($"{decWithParent.node.GetInputContext()}: Dec [{decWithParent.type}:{id.Item2}] is attempting to use parent `[{parentId.Item1}:{parentId.parent}]`, but no such dec exists");
+                            // guess we'll just try to build it from nothing
                             break;
                         }
 
@@ -372,7 +372,7 @@ namespace Dec
                     }
 
                     var targetDec = Database.Get(id.Item1, id.Item2);
-                    Serialization.ParseElement(completeOrders.Select(order => order.dec.node).ToList(), targetDec.GetType(), targetDec, readerContext, new Recorder.Context(), isRootDec: true, ordersOverride: completeOrders.Select(order => (order.command, order.dec.node)).ToList());
+                    Serialization.ParseElement(completeOrders.Select(order => order.node).ToList(), targetDec.GetType(), targetDec, readerContext, new Recorder.Context(), isRootDec: true, ordersOverride: completeOrders.Select(order => (Serialization.ParseCommand.Patch, order.node)).ToList());
                 }
 
                 if (s_Status != Status.Processing)
