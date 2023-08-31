@@ -8,8 +8,8 @@ namespace DecTest
     {
         public class TwoIntsDec : Dec.Dec
         {
-            public int a;
-            public int b;
+            public int a = -1;
+            public int b = -2;
         }
 
         [Test]
@@ -129,6 +129,7 @@ namespace DecTest
                     return "";
             }
         }
+
         [Test]
         public void ModeCreatePass([Values] ParserMode mode, [Values] Vis vis)
         {
@@ -219,6 +220,96 @@ namespace DecTest
 
             Assert.AreEqual(-42, Dec.Database<TwoIntsDec>.Get("ModFromBase").a);
             Assert.AreEqual(100, Dec.Database<TwoIntsDec>.Get("ModFromBase").b);
+        }
+
+        [Test]
+        public void ModeReplacePass([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(TwoIntsDec) } });
+
+            var parser = new Dec.ParserModular();
+            parser.CreateModule("Base").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <TwoIntsDec decName=""BaseOnly"">
+                        <a>1</a>
+                        <b>2</b>
+                    </TwoIntsDec>
+                    <TwoIntsDec decName=""BaseAbstract"" abstract=""true"">
+                        <a>3</a>
+                        <b>4</b>
+                    </TwoIntsDec>
+                    <TwoIntsDec decName=""BaseConcreteUntouched"" parent=""BaseAbstract"">
+                    </TwoIntsDec>
+                    <TwoIntsDec decName=""BaseConcreteTouched"" parent=""BaseAbstract"">
+                        <b>5</b>
+                    </TwoIntsDec>
+                    <TwoIntsDec decName=""BaseConcreteReplaceable"" parent=""BaseAbstract"">
+                        <b>6</b>
+                    </TwoIntsDec>
+                </Decs>");
+            parser.CreateModule("Mod").AddString(Dec.Parser.FileType.Xml, $@"
+                <Decs>
+                    <TwoIntsDec decName=""BaseOnly"" mode=""replace"">
+                        <a>7</a>
+                    </TwoIntsDec>
+                    <TwoIntsDec decName=""BaseAbstract"" mode=""replace"" abstract=""true"">
+                        <a>8</a>
+                    </TwoIntsDec>
+                    <TwoIntsDec decName=""BaseConcreteReplaceable"" mode=""replace"">
+                    </TwoIntsDec>
+                </Decs>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            TwoIntsDec baseOnly = Dec.Database<TwoIntsDec>.Get("BaseOnly");
+            Assert.IsNotNull(baseOnly);
+            Assert.AreEqual(7, baseOnly.a);
+            Assert.AreEqual(-2, baseOnly.b);
+
+            TwoIntsDec baseAbstract = Dec.Database<TwoIntsDec>.Get("BaseAbstract");
+            Assert.IsNull(baseAbstract);
+
+            TwoIntsDec baseConcreteUntouched = Dec.Database<TwoIntsDec>.Get("BaseConcreteUntouched");
+            Assert.IsNotNull(baseConcreteUntouched);
+            Assert.AreEqual(8, baseConcreteUntouched.a);
+            Assert.AreEqual(-2, baseConcreteUntouched.b);
+
+            TwoIntsDec baseConcreteTouched = Dec.Database<TwoIntsDec>.Get("BaseConcreteTouched");
+            Assert.IsNotNull(baseConcreteTouched);
+            Assert.AreEqual(8, baseConcreteTouched.a);
+            Assert.AreEqual(5, baseConcreteTouched.b);
+
+            TwoIntsDec baseConcreteReplaceable = Dec.Database<TwoIntsDec>.Get("BaseConcreteReplaceable");
+            Assert.IsNotNull(baseConcreteReplaceable);
+            Assert.AreEqual(-1, baseConcreteReplaceable.a);
+            Assert.AreEqual(-2, baseConcreteReplaceable.b);
+        }
+
+        [Test]
+        public void ModeReplaceMissing([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(TwoIntsDec) } });
+
+            var parser = new Dec.ParserModular();
+            parser.CreateModule("Base").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                </Decs>");
+            parser.CreateModule("Mod").AddString(Dec.Parser.FileType.Xml, $@"
+                <Decs>
+                    <TwoIntsDec decName=""Forged"" mode=""replace"">
+                        <a>1</a>
+                        <b>2</b>
+                    </TwoIntsDec>
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoParserTests(mode);
+
+            TwoIntsDec baseOnly = Dec.Database<TwoIntsDec>.Get("Forged");
+            Assert.IsNotNull(baseOnly);
+            Assert.AreEqual(1, baseOnly.a);
+            Assert.AreEqual(2, baseOnly.b);
         }
     }
 }
