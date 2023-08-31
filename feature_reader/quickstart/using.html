@@ -1,0 +1,142 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Using Decs from your code </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Using Decs from your code ">
+    <meta name="generator" content="docfx 2.59.4.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="using-decs-from-your-code">Using Decs from your code</h1>
+
+<h2 id="enumeration">Enumeration</h2>
+<p>The first and least common way to use Decs is via <a class="xref" href="../api/Dec.Database-1.html#Dec_Database_1_List"><code>Dec.Database&lt;T&gt;.List</code></a>. This lists all Decs of a given type, which is useful if your Dec is a list of things that sensibly needs to be traversed (keybinds, game difficulties, monsters when trying to display a Bestiary).</p>
+<h2 id="lookup-by-name">Lookup by name</h2>
+<p>In most cases, you don't want <em>all</em> Decs, you want a <em>specific</em> Dec. A good way to do this is with static references. Create the following class somewhere in your code:</p>
+<pre><code class="lang-cs">// The attribute lets dec know that it should fill this static class with data.
+[Dec.StaticReferences]
+public static class MonsterDecs
+{
+  // This bit of copy-pasted code is required to automatically detect some errors.
+  // dec will also detect if you haven't included this code and warn you about it.
+  static MonsterDecs() { Dec.StaticReferencesAttribute.Initialized(); }
+
+  // Include static members for any decs you want to reference directly.
+  public static MonsterDec Goblin;
+  public static MonsterDec DarkGoblin;
+  
+  // You don't have to include all decs here - in fact, it's recommended that you only include decs that you plan to reference by name.
+}
+</code></pre>
+<p>Now you can reference <code>MonsterDecs.Goblin</code> directly, with no more post-startup performance cost than checking a static member of a class. In addition, Dec will verify on startup that all referenced Decs exist.</p>
+<p>You can also search Decs by name with <a class="xref" href="../api/Dec.Database-1.html#Dec_Database_1_Get_"><code>Dec.Database&lt;T&gt;.Get()</code></a> <strong>but this is not recommended</strong> because errors will be detected only at runtime, not startup-time, and it's significantly slower than a static member lookup.</p>
+<h2 id="references">References</h2>
+<p>The most common way of using Decs is as a member of another Dec. For example:</p>
+<pre><code class="lang-cs">class EnemyDec : Dec.Dec
+{
+    public WeaponDec weapon;
+}
+</code></pre>
+<p>The Dec library will fill these in based on your XML and you can just use them as a normal member.</p>
+<h2 id="debug-functionality">Debug Functionality</h2>
+<p>If you really need a list of <em>every</em> Dec, of <em>every</em> type, you can use <a class="xref" href="../api/Dec.Database.html#Dec_Database_List"><code>Dec.Database.List</code></a>, but this is slow and very uncommon outside of debug code.</p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/zorbathut/dec/blob/feature_reader/doc/quickstart/using.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,122 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Introduction </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Introduction ">
+    <meta name="generator" content="docfx 2.59.4.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="introduction">Introduction</h1>
+
+<p>Dec is a library for declaring asset types in XML. It includes extensive error reporting and recovery for ease of development, uses reflection to prevent writing lots of boilerplate code, is designed to allow easy moddability moddable by endusers (though not yet implemented), and includes a serialization system (intended for savegames, but often used for other things) that integrates cleanly with the underlying Dec types.</p>
+<h2 id="the-basics">The Basics</h2>
+<p>Dec types represent general categories of thing, such as &quot;monster&quot; or &quot;inventory item&quot;. They're C# classes that inherit from <a class="xref" href="../api/Dec.Dec.html">Dec.Dec</a>.</p>
+<p>Dec instances represent specific types of thing, such as &quot;Goblin&quot; or &quot;Cheese&quot;. They don't represent specific goblins or cheese items in the world, only the template that Goblins or Cheeses are based on. Dec instances are instances of Dec types, declared in XML files and created at runtime by the Dec library. Dec instances should be immutable during runtime; if you attack a goblin, it doesn't wound the global concept of a goblin, it wounds a specific goblin.</p>
+<p>Dec instances are created in XML (<a class="xref" href="../future/csv.html">with plans for CSV</a>), usually using a text editor.</p>
+<h2 id="examples">Examples</h2>
+<p>A Dec type <code>class MonsterDec</code> could refer to any monster that the player may fight. The class would include properties for maximum health, attacks, and loot tables. Dec instances would include Goblin, Bugbear, and GnollKing, all declared in XML. At runtime, you might create hundreds of monsters that refer to the Goblin dec for their stats, each with their own current health.</p>
+<p>A Dec type <code>class CardDec</code> could refer to a collectible card that the player assembles into decks. Hundreds of CardDec instances are declared in XML, although the player may see only a handful of them during each game. The class includes properties for cost, effects, and card art. Individual <code>class Card</code>s are created at runtime; each card can be upgraded or damaged during play, and <code>Card</code> contains both the card's Dec and the mutable status of that specific card.</p>
+<p>A Dec type <code>class KeybindDec</code> could refer to a single configurable keybind used during gameplay and displayed in the main menu under &quot;Options&quot;. The game creates a number of <code>class Keybind</code>s which store the actual keybind information. This data is then saved to disk using the serialization system and loaded on startup.</p>
+<p>A Dec type <code>class ItemDec</code> could refer to anything the player can pick up and store in their inventory. <code>class WeaponDec</code> and <code>class ArmorDec</code> inherit from it. <code>ItemDec</code> lists name, weight, value, and description. <code>WeaponDec</code> includes damage and attack types, <code>ArmorDec</code> includes detailed stats that describe how it resists damage. When an item is dropped, the game instantiates a <code>class Item</code> that links to an <code>ItemDec</code> and includes extra per-item information, like wear and random stats.</p>
+<p>In addition, a Dec type <code>class AlchemyEffectDec</code> could refer to any possible effect that can be added to potions via a player Alchemy skill. The potions themselves would be a specific <code>ItemDec</code> Dec instance, but because there are literally trillions of possible player-crafted potion combinations, it would be impossible to make one Dec instance for each unique potion. As a result, there's a single <code>class Potion</code> that inherits from <code>Item</code> and includes properties listing which set of <code>AlchemyEffectDec</code>'s would occur if the player drank (or threw) this potion.</p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/zorbathut/dec/blob/feature_reader/doc/quickstart/introduction.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

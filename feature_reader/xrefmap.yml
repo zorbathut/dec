@@ -1,0 +1,1114 @@
+### YamlMime:XRefMap
+sorted: true
+references:
+- uid: Dec
+  name: Dec
+  href: api/Dec.html
+  commentId: N:Dec
+  fullName: Dec
+  nameWithType: Dec
+- uid: Dec.AbstractAttribute
+  name: AbstractAttribute
+  href: api/Dec.AbstractAttribute.html
+  commentId: T:Dec.AbstractAttribute
+  fullName: Dec.AbstractAttribute
+  nameWithType: AbstractAttribute
+- uid: Dec.Bespoke
+  name: Dec.Bespoke
+  href: api/Dec.Bespoke.html
+  commentId: N:Dec.Bespoke
+  fullName: Dec.Bespoke
+  nameWithType: Dec.Bespoke
+- uid: Dec.Bespoke.IgnoreRecordDuringParserAttribute
+  name: IgnoreRecordDuringParserAttribute
+  href: api/Dec.Bespoke.IgnoreRecordDuringParserAttribute.html
+  commentId: T:Dec.Bespoke.IgnoreRecordDuringParserAttribute
+  fullName: Dec.Bespoke.IgnoreRecordDuringParserAttribute
+  nameWithType: IgnoreRecordDuringParserAttribute
+- uid: Dec.Composer
+  name: Composer
+  href: api/Dec.Composer.html
+  commentId: T:Dec.Composer
+  fullName: Dec.Composer
+  nameWithType: Composer
+- uid: Dec.Composer.ComposeValidation
+  name: ComposeValidation()
+  href: api/Dec.Composer.html#Dec_Composer_ComposeValidation
+  commentId: M:Dec.Composer.ComposeValidation
+  fullName: Dec.Composer.ComposeValidation()
+  nameWithType: Composer.ComposeValidation()
+- uid: Dec.Composer.ComposeValidation*
+  name: ComposeValidation
+  href: api/Dec.Composer.html#Dec_Composer_ComposeValidation_
+  commentId: Overload:Dec.Composer.ComposeValidation
+  isSpec: "True"
+  fullName: Dec.Composer.ComposeValidation
+  nameWithType: Composer.ComposeValidation
+- uid: Dec.Composer.ComposeXml(System.Boolean)
+  name: ComposeXml(Boolean)
+  href: api/Dec.Composer.html#Dec_Composer_ComposeXml_System_Boolean_
+  commentId: M:Dec.Composer.ComposeXml(System.Boolean)
+  fullName: Dec.Composer.ComposeXml(System.Boolean)
+  nameWithType: Composer.ComposeXml(Boolean)
+- uid: Dec.Composer.ComposeXml*
+  name: ComposeXml
+  href: api/Dec.Composer.html#Dec_Composer_ComposeXml_
+  commentId: Overload:Dec.Composer.ComposeXml
+  isSpec: "True"
+  fullName: Dec.Composer.ComposeXml
+  nameWithType: Composer.ComposeXml
+- uid: Dec.Config
+  name: Config
+  href: api/Dec.Config.html
+  commentId: T:Dec.Config
+  fullName: Dec.Config
+  nameWithType: Config
+- uid: Dec.Config.CultureInfo
+  name: CultureInfo
+  href: api/Dec.Config.html#Dec_Config_CultureInfo
+  commentId: F:Dec.Config.CultureInfo
+  fullName: Dec.Config.CultureInfo
+  nameWithType: Config.CultureInfo
+- uid: Dec.Config.DefaultExceptionBehavior
+  name: Config.DefaultExceptionBehavior
+  href: api/Dec.Config.DefaultExceptionBehavior.html
+  commentId: T:Dec.Config.DefaultExceptionBehavior
+  fullName: Dec.Config.DefaultExceptionBehavior
+  nameWithType: Config.DefaultExceptionBehavior
+- uid: Dec.Config.DefaultExceptionBehavior.ErrorAndWarning
+  name: ErrorAndWarning
+  href: api/Dec.Config.DefaultExceptionBehavior.html#Dec_Config_DefaultExceptionBehavior_ErrorAndWarning
+  commentId: F:Dec.Config.DefaultExceptionBehavior.ErrorAndWarning
+  fullName: Dec.Config.DefaultExceptionBehavior.ErrorAndWarning
+  nameWithType: Config.DefaultExceptionBehavior.ErrorAndWarning
+- uid: Dec.Config.DefaultExceptionBehavior.ErrorOnly
+  name: ErrorOnly
+  href: api/Dec.Config.DefaultExceptionBehavior.html#Dec_Config_DefaultExceptionBehavior_ErrorOnly
+  commentId: F:Dec.Config.DefaultExceptionBehavior.ErrorOnly
+  fullName: Dec.Config.DefaultExceptionBehavior.ErrorOnly
+  nameWithType: Config.DefaultExceptionBehavior.ErrorOnly
+- uid: Dec.Config.DefaultExceptionBehavior.Never
+  name: Never
+  href: api/Dec.Config.DefaultExceptionBehavior.html#Dec_Config_DefaultExceptionBehavior_Never
+  commentId: F:Dec.Config.DefaultExceptionBehavior.Never
+  fullName: Dec.Config.DefaultExceptionBehavior.Never
+  nameWithType: Config.DefaultExceptionBehavior.Never
+- uid: Dec.Config.DefaultHandlerShowConfigOnException
+  name: DefaultHandlerShowConfigOnException
+  href: api/Dec.Config.html#Dec_Config_DefaultHandlerShowConfigOnException
+  commentId: F:Dec.Config.DefaultHandlerShowConfigOnException
+  fullName: Dec.Config.DefaultHandlerShowConfigOnException
+  nameWithType: Config.DefaultHandlerShowConfigOnException
+- uid: Dec.Config.DefaultHandlerThrowExceptions
+  name: DefaultHandlerThrowExceptions
+  href: api/Dec.Config.html#Dec_Config_DefaultHandlerThrowExceptions
+  commentId: F:Dec.Config.DefaultHandlerThrowExceptions
+  fullName: Dec.Config.DefaultHandlerThrowExceptions
+  nameWithType: Config.DefaultHandlerThrowExceptions
+- uid: Dec.Config.ErrorHandler
+  name: ErrorHandler
+  href: api/Dec.Config.html#Dec_Config_ErrorHandler
+  commentId: P:Dec.Config.ErrorHandler
+  fullName: Dec.Config.ErrorHandler
+  nameWithType: Config.ErrorHandler
+- uid: Dec.Config.ErrorHandler*
+  name: ErrorHandler
+  href: api/Dec.Config.html#Dec_Config_ErrorHandler_
+  commentId: Overload:Dec.Config.ErrorHandler
+  isSpec: "True"
+  fullName: Dec.Config.ErrorHandler
+  nameWithType: Config.ErrorHandler
+- uid: Dec.Config.ExceptionHandler
+  name: ExceptionHandler
+  href: api/Dec.Config.html#Dec_Config_ExceptionHandler
+  commentId: P:Dec.Config.ExceptionHandler
+  fullName: Dec.Config.ExceptionHandler
+  nameWithType: Config.ExceptionHandler
+- uid: Dec.Config.ExceptionHandler*
+  name: ExceptionHandler
+  href: api/Dec.Config.html#Dec_Config_ExceptionHandler_
+  commentId: Overload:Dec.Config.ExceptionHandler
+  isSpec: "True"
+  fullName: Dec.Config.ExceptionHandler
+  nameWithType: Config.ExceptionHandler
+- uid: Dec.Config.InfoHandler
+  name: InfoHandler
+  href: api/Dec.Config.html#Dec_Config_InfoHandler
+  commentId: P:Dec.Config.InfoHandler
+  fullName: Dec.Config.InfoHandler
+  nameWithType: Config.InfoHandler
+- uid: Dec.Config.InfoHandler*
+  name: InfoHandler
+  href: api/Dec.Config.html#Dec_Config_InfoHandler_
+  commentId: Overload:Dec.Config.InfoHandler
+  isSpec: "True"
+  fullName: Dec.Config.InfoHandler
+  nameWithType: Config.InfoHandler
+- uid: Dec.Config.UnitTestParameters
+  name: Config.UnitTestParameters
+  href: api/Dec.Config.UnitTestParameters.html
+  commentId: T:Dec.Config.UnitTestParameters
+  fullName: Dec.Config.UnitTestParameters
+  nameWithType: Config.UnitTestParameters
+- uid: Dec.Config.UnitTestParameters.explicitConverters
+  name: explicitConverters
+  href: api/Dec.Config.UnitTestParameters.html#Dec_Config_UnitTestParameters_explicitConverters
+  commentId: F:Dec.Config.UnitTestParameters.explicitConverters
+  fullName: Dec.Config.UnitTestParameters.explicitConverters
+  nameWithType: Config.UnitTestParameters.explicitConverters
+- uid: Dec.Config.UnitTestParameters.explicitStaticRefs
+  name: explicitStaticRefs
+  href: api/Dec.Config.UnitTestParameters.html#Dec_Config_UnitTestParameters_explicitStaticRefs
+  commentId: F:Dec.Config.UnitTestParameters.explicitStaticRefs
+  fullName: Dec.Config.UnitTestParameters.explicitStaticRefs
+  nameWithType: Config.UnitTestParameters.explicitStaticRefs
+- uid: Dec.Config.UnitTestParameters.explicitTypes
+  name: explicitTypes
+  href: api/Dec.Config.UnitTestParameters.html#Dec_Config_UnitTestParameters_explicitTypes
+  commentId: F:Dec.Config.UnitTestParameters.explicitTypes
+  fullName: Dec.Config.UnitTestParameters.explicitTypes
+  nameWithType: Config.UnitTestParameters.explicitTypes
+- uid: Dec.Config.UsingNamespaces
+  name: UsingNamespaces
+  href: api/Dec.Config.html#Dec_Config_UsingNamespaces
+  commentId: P:Dec.Config.UsingNamespaces
+  fullName: Dec.Config.UsingNamespaces
+  nameWithType: Config.UsingNamespaces
+- uid: Dec.Config.UsingNamespaces*
+  name: UsingNamespaces
+  href: api/Dec.Config.html#Dec_Config_UsingNamespaces_
+  commentId: Overload:Dec.Config.UsingNamespaces
+  isSpec: "True"
+  fullName: Dec.Config.UsingNamespaces
+  nameWithType: Config.UsingNamespaces
+- uid: Dec.Config.WarningHandler
+  name: WarningHandler
+  href: api/Dec.Config.html#Dec_Config_WarningHandler
+  commentId: P:Dec.Config.WarningHandler
+  fullName: Dec.Config.WarningHandler
+  nameWithType: Config.WarningHandler
+- uid: Dec.Config.WarningHandler*
+  name: WarningHandler
+  href: api/Dec.Config.html#Dec_Config_WarningHandler_
+  commentId: Overload:Dec.Config.WarningHandler
+  isSpec: "True"
+  fullName: Dec.Config.WarningHandler
+  nameWithType: Config.WarningHandler
+- uid: Dec.ConverterFactory`1
+  name: ConverterFactory<T>
+  href: api/Dec.ConverterFactory-1.html
+  commentId: T:Dec.ConverterFactory`1
+  name.vb: ConverterFactory(Of T)
+  fullName: Dec.ConverterFactory<T>
+  fullName.vb: Dec.ConverterFactory(Of T)
+  nameWithType: ConverterFactory<T>
+  nameWithType.vb: ConverterFactory(Of T)
+- uid: Dec.ConverterFactory`1.Create(Dec.Recorder)
+  name: Create(Recorder)
+  href: api/Dec.ConverterFactory-1.html#Dec_ConverterFactory_1_Create_Dec_Recorder_
+  commentId: M:Dec.ConverterFactory`1.Create(Dec.Recorder)
+  fullName: Dec.ConverterFactory<T>.Create(Dec.Recorder)
+  fullName.vb: Dec.ConverterFactory(Of T).Create(Dec.Recorder)
+  nameWithType: ConverterFactory<T>.Create(Recorder)
+  nameWithType.vb: ConverterFactory(Of T).Create(Recorder)
+- uid: Dec.ConverterFactory`1.Create*
+  name: Create
+  href: api/Dec.ConverterFactory-1.html#Dec_ConverterFactory_1_Create_
+  commentId: Overload:Dec.ConverterFactory`1.Create
+  isSpec: "True"
+  fullName: Dec.ConverterFactory<T>.Create
+  fullName.vb: Dec.ConverterFactory(Of T).Create
+  nameWithType: ConverterFactory<T>.Create
+  nameWithType.vb: ConverterFactory(Of T).Create
+- uid: Dec.ConverterFactory`1.Read(`0@,Dec.Recorder)
+  name: Read(ref T, Recorder)
+  href: api/Dec.ConverterFactory-1.html#Dec_ConverterFactory_1_Read__0__Dec_Recorder_
+  commentId: M:Dec.ConverterFactory`1.Read(`0@,Dec.Recorder)
+  name.vb: Read(ByRef T, Recorder)
+  fullName: Dec.ConverterFactory<T>.Read(ref T, Dec.Recorder)
+  fullName.vb: Dec.ConverterFactory(Of T).Read(ByRef T, Dec.Recorder)
+  nameWithType: ConverterFactory<T>.Read(ref T, Recorder)
+  nameWithType.vb: ConverterFactory(Of T).Read(ByRef T, Recorder)
+- uid: Dec.ConverterFactory`1.Read*
+  name: Read
+  href: api/Dec.ConverterFactory-1.html#Dec_ConverterFactory_1_Read_
+  commentId: Overload:Dec.ConverterFactory`1.Read
+  isSpec: "True"
+  fullName: Dec.ConverterFactory<T>.Read
+  fullName.vb: Dec.ConverterFactory(Of T).Read
+  nameWithType: ConverterFactory<T>.Read
+  nameWithType.vb: ConverterFactory(Of T).Read
+- uid: Dec.ConverterFactory`1.Write(`0,Dec.Recorder)
+  name: Write(T, Recorder)
+  href: api/Dec.ConverterFactory-1.html#Dec_ConverterFactory_1_Write__0_Dec_Recorder_
+  commentId: M:Dec.ConverterFactory`1.Write(`0,Dec.Recorder)
+  fullName: Dec.ConverterFactory<T>.Write(T, Dec.Recorder)
+  fullName.vb: Dec.ConverterFactory(Of T).Write(T, Dec.Recorder)
+  nameWithType: ConverterFactory<T>.Write(T, Recorder)
+  nameWithType.vb: ConverterFactory(Of T).Write(T, Recorder)
+- uid: Dec.ConverterFactory`1.Write*
+  name: Write
+  href: api/Dec.ConverterFactory-1.html#Dec_ConverterFactory_1_Write_
+  commentId: Overload:Dec.ConverterFactory`1.Write
+  isSpec: "True"
+  fullName: Dec.ConverterFactory<T>.Write
+  fullName.vb: Dec.ConverterFactory(Of T).Write
+  nameWithType: ConverterFactory<T>.Write
+  nameWithType.vb: ConverterFactory(Of T).Write
+- uid: Dec.ConverterRecord`1
+  name: ConverterRecord<T>
+  href: api/Dec.ConverterRecord-1.html
+  commentId: T:Dec.ConverterRecord`1
+  name.vb: ConverterRecord(Of T)
+  fullName: Dec.ConverterRecord<T>
+  fullName.vb: Dec.ConverterRecord(Of T)
+  nameWithType: ConverterRecord<T>
+  nameWithType.vb: ConverterRecord(Of T)
+- uid: Dec.ConverterRecord`1.Record(`0@,Dec.Recorder)
+  name: Record(ref T, Recorder)
+  href: api/Dec.ConverterRecord-1.html#Dec_ConverterRecord_1_Record__0__Dec_Recorder_
+  commentId: M:Dec.ConverterRecord`1.Record(`0@,Dec.Recorder)
+  name.vb: Record(ByRef T, Recorder)
+  fullName: Dec.ConverterRecord<T>.Record(ref T, Dec.Recorder)
+  fullName.vb: Dec.ConverterRecord(Of T).Record(ByRef T, Dec.Recorder)
+  nameWithType: ConverterRecord<T>.Record(ref T, Recorder)
+  nameWithType.vb: ConverterRecord(Of T).Record(ByRef T, Recorder)
+- uid: Dec.ConverterRecord`1.Record*
+  name: Record
+  href: api/Dec.ConverterRecord-1.html#Dec_ConverterRecord_1_Record_
+  commentId: Overload:Dec.ConverterRecord`1.Record
+  isSpec: "True"
+  fullName: Dec.ConverterRecord<T>.Record
+  fullName.vb: Dec.ConverterRecord(Of T).Record
+  nameWithType: ConverterRecord<T>.Record
+  nameWithType.vb: ConverterRecord(Of T).Record
+- uid: Dec.ConverterString`1
+  name: ConverterString<T>
+  href: api/Dec.ConverterString-1.html
+  commentId: T:Dec.ConverterString`1
+  name.vb: ConverterString(Of T)
+  fullName: Dec.ConverterString<T>
+  fullName.vb: Dec.ConverterString(Of T)
+  nameWithType: ConverterString<T>
+  nameWithType.vb: ConverterString(Of T)
+- uid: Dec.ConverterString`1.Read(System.String,Dec.InputContext)
+  name: Read(String, InputContext)
+  href: api/Dec.ConverterString-1.html#Dec_ConverterString_1_Read_System_String_Dec_InputContext_
+  commentId: M:Dec.ConverterString`1.Read(System.String,Dec.InputContext)
+  fullName: Dec.ConverterString<T>.Read(System.String, Dec.InputContext)
+  fullName.vb: Dec.ConverterString(Of T).Read(System.String, Dec.InputContext)
+  nameWithType: ConverterString<T>.Read(String, InputContext)
+  nameWithType.vb: ConverterString(Of T).Read(String, InputContext)
+- uid: Dec.ConverterString`1.Read*
+  name: Read
+  href: api/Dec.ConverterString-1.html#Dec_ConverterString_1_Read_
+  commentId: Overload:Dec.ConverterString`1.Read
+  isSpec: "True"
+  fullName: Dec.ConverterString<T>.Read
+  fullName.vb: Dec.ConverterString(Of T).Read
+  nameWithType: ConverterString<T>.Read
+  nameWithType.vb: ConverterString(Of T).Read
+- uid: Dec.ConverterString`1.Write(`0)
+  name: Write(T)
+  href: api/Dec.ConverterString-1.html#Dec_ConverterString_1_Write__0_
+  commentId: M:Dec.ConverterString`1.Write(`0)
+  fullName: Dec.ConverterString<T>.Write(T)
+  fullName.vb: Dec.ConverterString(Of T).Write(T)
+  nameWithType: ConverterString<T>.Write(T)
+  nameWithType.vb: ConverterString(Of T).Write(T)
+- uid: Dec.ConverterString`1.Write*
+  name: Write
+  href: api/Dec.ConverterString-1.html#Dec_ConverterString_1_Write_
+  commentId: Overload:Dec.ConverterString`1.Write
+  isSpec: "True"
+  fullName: Dec.ConverterString<T>.Write
+  fullName.vb: Dec.ConverterString(Of T).Write
+  nameWithType: ConverterString<T>.Write
+  nameWithType.vb: ConverterString(Of T).Write
+- uid: Dec.Database
+  name: Database
+  href: api/Dec.Database.html
+  commentId: T:Dec.Database
+  fullName: Dec.Database
+  nameWithType: Database
+- uid: Dec.Database.Clear
+  name: Clear()
+  href: api/Dec.Database.html#Dec_Database_Clear
+  commentId: M:Dec.Database.Clear
+  fullName: Dec.Database.Clear()
+  nameWithType: Database.Clear()
+- uid: Dec.Database.Clear*
+  name: Clear
+  href: api/Dec.Database.html#Dec_Database_Clear_
+  commentId: Overload:Dec.Database.Clear
+  isSpec: "True"
+  fullName: Dec.Database.Clear
+  nameWithType: Database.Clear
+- uid: Dec.Database.Count
+  name: Count
+  href: api/Dec.Database.html#Dec_Database_Count
+  commentId: P:Dec.Database.Count
+  fullName: Dec.Database.Count
+  nameWithType: Database.Count
+- uid: Dec.Database.Count*
+  name: Count
+  href: api/Dec.Database.html#Dec_Database_Count_
+  commentId: Overload:Dec.Database.Count
+  isSpec: "True"
+  fullName: Dec.Database.Count
+  nameWithType: Database.Count
+- uid: Dec.Database.Create(Type,System.String)
+  name: Create(Type, String)
+  href: api/Dec.Database.html#Dec_Database_Create_Type_System_String_
+  commentId: M:Dec.Database.Create(Type,System.String)
+  fullName: Dec.Database.Create(Type, System.String)
+  nameWithType: Database.Create(Type, String)
+- uid: Dec.Database.Create*
+  name: Create
+  href: api/Dec.Database.html#Dec_Database_Create_
+  commentId: Overload:Dec.Database.Create
+  isSpec: "True"
+  fullName: Dec.Database.Create
+  nameWithType: Database.Create
+- uid: Dec.Database.Create``1(System.String)
+  name: Create<T>(String)
+  href: api/Dec.Database.html#Dec_Database_Create__1_System_String_
+  commentId: M:Dec.Database.Create``1(System.String)
+  name.vb: Create(Of T)(String)
+  fullName: Dec.Database.Create<T>(System.String)
+  fullName.vb: Dec.Database.Create(Of T)(System.String)
+  nameWithType: Database.Create<T>(String)
+  nameWithType.vb: Database.Create(Of T)(String)
+- uid: Dec.Database.Delete(Dec.Dec)
+  name: Delete(Dec)
+  href: api/Dec.Database.html#Dec_Database_Delete_Dec_Dec_
+  commentId: M:Dec.Database.Delete(Dec.Dec)
+  fullName: Dec.Database.Delete(Dec.Dec)
+  nameWithType: Database.Delete(Dec)
+- uid: Dec.Database.Delete*
+  name: Delete
+  href: api/Dec.Database.html#Dec_Database_Delete_
+  commentId: Overload:Dec.Database.Delete
+  isSpec: "True"
+  fullName: Dec.Database.Delete
+  nameWithType: Database.Delete
+- uid: Dec.Database.Get(Type,System.String)
+  name: Get(Type, String)
+  href: api/Dec.Database.html#Dec_Database_Get_Type_System_String_
+  commentId: M:Dec.Database.Get(Type,System.String)
+  fullName: Dec.Database.Get(Type, System.String)
+  nameWithType: Database.Get(Type, String)
+- uid: Dec.Database.Get*
+  name: Get
+  href: api/Dec.Database.html#Dec_Database_Get_
+  commentId: Overload:Dec.Database.Get
+  isSpec: "True"
+  fullName: Dec.Database.Get
+  nameWithType: Database.Get
+- uid: Dec.Database.List
+  name: List
+  href: api/Dec.Database.html#Dec_Database_List
+  commentId: P:Dec.Database.List
+  fullName: Dec.Database.List
+  nameWithType: Database.List
+- uid: Dec.Database.List*
+  name: List
+  href: api/Dec.Database.html#Dec_Database_List_
+  commentId: Overload:Dec.Database.List
+  isSpec: "True"
+  fullName: Dec.Database.List
+  nameWithType: Database.List
+- uid: Dec.Database.Rename(Dec.Dec,System.String)
+  name: Rename(Dec, String)
+  href: api/Dec.Database.html#Dec_Database_Rename_Dec_Dec_System_String_
+  commentId: M:Dec.Database.Rename(Dec.Dec,System.String)
+  fullName: Dec.Database.Rename(Dec.Dec, System.String)
+  nameWithType: Database.Rename(Dec, String)
+- uid: Dec.Database.Rename*
+  name: Rename
+  href: api/Dec.Database.html#Dec_Database_Rename_
+  commentId: Overload:Dec.Database.Rename
+  isSpec: "True"
+  fullName: Dec.Database.Rename
+  nameWithType: Database.Rename
+- uid: Dec.Database`1
+  name: Database<T>
+  href: api/Dec.Database-1.html
+  commentId: T:Dec.Database`1
+  name.vb: Database(Of T)
+  fullName: Dec.Database<T>
+  fullName.vb: Dec.Database(Of T)
+  nameWithType: Database<T>
+  nameWithType.vb: Database(Of T)
+- uid: Dec.Database`1.Count
+  name: Count
+  href: api/Dec.Database-1.html#Dec_Database_1_Count
+  commentId: P:Dec.Database`1.Count
+  fullName: Dec.Database<T>.Count
+  fullName.vb: Dec.Database(Of T).Count
+  nameWithType: Database<T>.Count
+  nameWithType.vb: Database(Of T).Count
+- uid: Dec.Database`1.Count*
+  name: Count
+  href: api/Dec.Database-1.html#Dec_Database_1_Count_
+  commentId: Overload:Dec.Database`1.Count
+  isSpec: "True"
+  fullName: Dec.Database<T>.Count
+  fullName.vb: Dec.Database(Of T).Count
+  nameWithType: Database<T>.Count
+  nameWithType.vb: Database(Of T).Count
+- uid: Dec.Database`1.Get(System.String)
+  name: Get(String)
+  href: api/Dec.Database-1.html#Dec_Database_1_Get_System_String_
+  commentId: M:Dec.Database`1.Get(System.String)
+  fullName: Dec.Database<T>.Get(System.String)
+  fullName.vb: Dec.Database(Of T).Get(System.String)
+  nameWithType: Database<T>.Get(String)
+  nameWithType.vb: Database(Of T).Get(String)
+- uid: Dec.Database`1.Get*
+  name: Get
+  href: api/Dec.Database-1.html#Dec_Database_1_Get_
+  commentId: Overload:Dec.Database`1.Get
+  isSpec: "True"
+  fullName: Dec.Database<T>.Get
+  fullName.vb: Dec.Database(Of T).Get
+  nameWithType: Database<T>.Get
+  nameWithType.vb: Database(Of T).Get
+- uid: Dec.Database`1.List
+  name: List
+  href: api/Dec.Database-1.html#Dec_Database_1_List
+  commentId: P:Dec.Database`1.List
+  fullName: Dec.Database<T>.List
+  fullName.vb: Dec.Database(Of T).List
+  nameWithType: Database<T>.List
+  nameWithType.vb: Database(Of T).List
+- uid: Dec.Database`1.List*
+  name: List
+  href: api/Dec.Database-1.html#Dec_Database_1_List_
+  commentId: Overload:Dec.Database`1.List
+  isSpec: "True"
+  fullName: Dec.Database<T>.List
+  fullName.vb: Dec.Database(Of T).List
+  nameWithType: Database<T>.List
+  nameWithType.vb: Database(Of T).List
+- uid: Dec.Dec
+  name: Dec
+  href: api/Dec.Dec.html
+  commentId: T:Dec.Dec
+  fullName: Dec.Dec
+  nameWithType: Dec
+- uid: Dec.Dec.ConfigErrors(Action{System.String})
+  name: ConfigErrors(Action<String>)
+  href: api/Dec.Dec.html#Dec_Dec_ConfigErrors_Action_System_String__
+  commentId: M:Dec.Dec.ConfigErrors(Action{System.String})
+  name.vb: ConfigErrors(Action(Of String))
+  fullName: Dec.Dec.ConfigErrors(Action<System.String>)
+  fullName.vb: Dec.Dec.ConfigErrors(Action(Of System.String))
+  nameWithType: Dec.ConfigErrors(Action<String>)
+  nameWithType.vb: Dec.ConfigErrors(Action(Of String))
+- uid: Dec.Dec.ConfigErrors*
+  name: ConfigErrors
+  href: api/Dec.Dec.html#Dec_Dec_ConfigErrors_
+  commentId: Overload:Dec.Dec.ConfigErrors
+  isSpec: "True"
+  fullName: Dec.Dec.ConfigErrors
+  nameWithType: Dec.ConfigErrors
+- uid: Dec.Dec.DecName
+  name: DecName
+  href: api/Dec.Dec.html#Dec_Dec_DecName
+  commentId: P:Dec.Dec.DecName
+  fullName: Dec.Dec.DecName
+  nameWithType: Dec.DecName
+- uid: Dec.Dec.DecName*
+  name: DecName
+  href: api/Dec.Dec.html#Dec_Dec_DecName_
+  commentId: Overload:Dec.Dec.DecName
+  isSpec: "True"
+  fullName: Dec.Dec.DecName
+  nameWithType: Dec.DecName
+- uid: Dec.Dec.PostLoad(Action{System.String})
+  name: PostLoad(Action<String>)
+  href: api/Dec.Dec.html#Dec_Dec_PostLoad_Action_System_String__
+  commentId: M:Dec.Dec.PostLoad(Action{System.String})
+  name.vb: PostLoad(Action(Of String))
+  fullName: Dec.Dec.PostLoad(Action<System.String>)
+  fullName.vb: Dec.Dec.PostLoad(Action(Of System.String))
+  nameWithType: Dec.PostLoad(Action<String>)
+  nameWithType.vb: Dec.PostLoad(Action(Of String))
+- uid: Dec.Dec.PostLoad*
+  name: PostLoad
+  href: api/Dec.Dec.html#Dec_Dec_PostLoad_
+  commentId: Overload:Dec.Dec.PostLoad
+  isSpec: "True"
+  fullName: Dec.Dec.PostLoad
+  nameWithType: Dec.PostLoad
+- uid: Dec.Dec.ToString
+  name: ToString()
+  href: api/Dec.Dec.html#Dec_Dec_ToString
+  commentId: M:Dec.Dec.ToString
+  fullName: Dec.Dec.ToString()
+  nameWithType: Dec.ToString()
+- uid: Dec.Dec.ToString*
+  name: ToString
+  href: api/Dec.Dec.html#Dec_Dec_ToString_
+  commentId: Overload:Dec.Dec.ToString
+  isSpec: "True"
+  fullName: Dec.Dec.ToString
+  nameWithType: Dec.ToString
+- uid: Dec.Index`1
+  name: Index<T>
+  href: api/Dec.Index-1.html
+  commentId: T:Dec.Index`1
+  name.vb: Index(Of T)
+  fullName: Dec.Index<T>
+  fullName.vb: Dec.Index(Of T)
+  nameWithType: Index<T>
+  nameWithType.vb: Index(Of T)
+- uid: Dec.Index`1.Count
+  name: Count
+  href: api/Dec.Index-1.html#Dec_Index_1_Count
+  commentId: P:Dec.Index`1.Count
+  fullName: Dec.Index<T>.Count
+  fullName.vb: Dec.Index(Of T).Count
+  nameWithType: Index<T>.Count
+  nameWithType.vb: Index(Of T).Count
+- uid: Dec.Index`1.Count*
+  name: Count
+  href: api/Dec.Index-1.html#Dec_Index_1_Count_
+  commentId: Overload:Dec.Index`1.Count
+  isSpec: "True"
+  fullName: Dec.Index<T>.Count
+  fullName.vb: Dec.Index(Of T).Count
+  nameWithType: Index<T>.Count
+  nameWithType.vb: Index(Of T).Count
+- uid: Dec.Index`1.Get(System.Int32)
+  name: Get(Int32)
+  href: api/Dec.Index-1.html#Dec_Index_1_Get_System_Int32_
+  commentId: M:Dec.Index`1.Get(System.Int32)
+  fullName: Dec.Index<T>.Get(System.Int32)
+  fullName.vb: Dec.Index(Of T).Get(System.Int32)
+  nameWithType: Index<T>.Get(Int32)
+  nameWithType.vb: Index(Of T).Get(Int32)
+- uid: Dec.Index`1.Get*
+  name: Get
+  href: api/Dec.Index-1.html#Dec_Index_1_Get_
+  commentId: Overload:Dec.Index`1.Get
+  isSpec: "True"
+  fullName: Dec.Index<T>.Get
+  fullName.vb: Dec.Index(Of T).Get
+  nameWithType: Index<T>.Get
+  nameWithType.vb: Index(Of T).Get
+- uid: Dec.Index`1.List
+  name: List
+  href: api/Dec.Index-1.html#Dec_Index_1_List
+  commentId: P:Dec.Index`1.List
+  fullName: Dec.Index<T>.List
+  fullName.vb: Dec.Index(Of T).List
+  nameWithType: Index<T>.List
+  nameWithType.vb: Index(Of T).List
+- uid: Dec.Index`1.List*
+  name: List
+  href: api/Dec.Index-1.html#Dec_Index_1_List_
+  commentId: Overload:Dec.Index`1.List
+  isSpec: "True"
+  fullName: Dec.Index<T>.List
+  fullName.vb: Dec.Index(Of T).List
+  nameWithType: Index<T>.List
+  nameWithType.vb: Index(Of T).List
+- uid: Dec.IndexAttribute
+  name: IndexAttribute
+  href: api/Dec.IndexAttribute.html
+  commentId: T:Dec.IndexAttribute
+  fullName: Dec.IndexAttribute
+  nameWithType: IndexAttribute
+- uid: Dec.InputContext
+  name: InputContext
+  href: api/Dec.InputContext.html
+  commentId: T:Dec.InputContext
+  fullName: Dec.InputContext
+  nameWithType: InputContext
+- uid: Dec.InputContext.#ctor(System.String)
+  name: InputContext(String)
+  href: api/Dec.InputContext.html#Dec_InputContext__ctor_System_String_
+  commentId: M:Dec.InputContext.#ctor(System.String)
+  fullName: Dec.InputContext.InputContext(System.String)
+  nameWithType: InputContext.InputContext(String)
+- uid: Dec.InputContext.#ctor(System.String,System.Xml.Linq.XElement)
+  name: InputContext(String, System.Xml.Linq.XElement)
+  href: api/Dec.InputContext.html#Dec_InputContext__ctor_System_String_System_Xml_Linq_XElement_
+  commentId: M:Dec.InputContext.#ctor(System.String,System.Xml.Linq.XElement)
+  fullName: Dec.InputContext.InputContext(System.String, System.Xml.Linq.XElement)
+  nameWithType: InputContext.InputContext(String, System.Xml.Linq.XElement)
+- uid: Dec.InputContext.#ctor*
+  name: InputContext
+  href: api/Dec.InputContext.html#Dec_InputContext__ctor_
+  commentId: Overload:Dec.InputContext.#ctor
+  isSpec: "True"
+  fullName: Dec.InputContext.InputContext
+  nameWithType: InputContext.InputContext
+- uid: Dec.InputContext.ToString
+  name: ToString()
+  href: api/Dec.InputContext.html#Dec_InputContext_ToString
+  commentId: M:Dec.InputContext.ToString
+  fullName: Dec.InputContext.ToString()
+  nameWithType: InputContext.ToString()
+- uid: Dec.InputContext.ToString*
+  name: ToString
+  href: api/Dec.InputContext.html#Dec_InputContext_ToString_
+  commentId: Overload:Dec.InputContext.ToString
+  isSpec: "True"
+  fullName: Dec.InputContext.ToString
+  nameWithType: InputContext.ToString
+- uid: Dec.IRecordable
+  name: IRecordable
+  href: api/Dec.IRecordable.html
+  commentId: T:Dec.IRecordable
+  fullName: Dec.IRecordable
+  nameWithType: IRecordable
+- uid: Dec.IRecordable.Record(Dec.Recorder)
+  name: Record(Recorder)
+  href: api/Dec.IRecordable.html#Dec_IRecordable_Record_Dec_Recorder_
+  commentId: M:Dec.IRecordable.Record(Dec.Recorder)
+  fullName: Dec.IRecordable.Record(Dec.Recorder)
+  nameWithType: IRecordable.Record(Recorder)
+- uid: Dec.IRecordable.Record*
+  name: Record
+  href: api/Dec.IRecordable.html#Dec_IRecordable_Record_
+  commentId: Overload:Dec.IRecordable.Record
+  isSpec: "True"
+  fullName: Dec.IRecordable.Record
+  nameWithType: IRecordable.Record
+- uid: Dec.Parser
+  name: Parser
+  href: api/Dec.Parser.html
+  commentId: T:Dec.Parser
+  fullName: Dec.Parser
+  nameWithType: Parser
+- uid: Dec.Parser.#ctor
+  name: Parser()
+  href: api/Dec.Parser.html#Dec_Parser__ctor
+  commentId: M:Dec.Parser.#ctor
+  fullName: Dec.Parser.Parser()
+  nameWithType: Parser.Parser()
+- uid: Dec.Parser.#ctor*
+  name: Parser
+  href: api/Dec.Parser.html#Dec_Parser__ctor_
+  commentId: Overload:Dec.Parser.#ctor
+  isSpec: "True"
+  fullName: Dec.Parser.Parser
+  nameWithType: Parser.Parser
+- uid: Dec.Parser.AddDirectory(System.String)
+  name: AddDirectory(String)
+  href: api/Dec.Parser.html#Dec_Parser_AddDirectory_System_String_
+  commentId: M:Dec.Parser.AddDirectory(System.String)
+  fullName: Dec.Parser.AddDirectory(System.String)
+  nameWithType: Parser.AddDirectory(String)
+- uid: Dec.Parser.AddDirectory*
+  name: AddDirectory
+  href: api/Dec.Parser.html#Dec_Parser_AddDirectory_
+  commentId: Overload:Dec.Parser.AddDirectory
+  isSpec: "True"
+  fullName: Dec.Parser.AddDirectory
+  nameWithType: Parser.AddDirectory
+- uid: Dec.Parser.AddFile(Dec.Parser.FileType,System.String,System.String)
+  name: AddFile(Parser.FileType, String, String)
+  href: api/Dec.Parser.html#Dec_Parser_AddFile_Dec_Parser_FileType_System_String_System_String_
+  commentId: M:Dec.Parser.AddFile(Dec.Parser.FileType,System.String,System.String)
+  fullName: Dec.Parser.AddFile(Dec.Parser.FileType, System.String, System.String)
+  nameWithType: Parser.AddFile(Parser.FileType, String, String)
+- uid: Dec.Parser.AddFile*
+  name: AddFile
+  href: api/Dec.Parser.html#Dec_Parser_AddFile_
+  commentId: Overload:Dec.Parser.AddFile
+  isSpec: "True"
+  fullName: Dec.Parser.AddFile
+  nameWithType: Parser.AddFile
+- uid: Dec.Parser.AddStream(Dec.Parser.FileType,Stream,System.String)
+  name: AddStream(Parser.FileType, Stream, String)
+  href: api/Dec.Parser.html#Dec_Parser_AddStream_Dec_Parser_FileType_Stream_System_String_
+  commentId: M:Dec.Parser.AddStream(Dec.Parser.FileType,Stream,System.String)
+  fullName: Dec.Parser.AddStream(Dec.Parser.FileType, Stream, System.String)
+  nameWithType: Parser.AddStream(Parser.FileType, Stream, String)
+- uid: Dec.Parser.AddStream*
+  name: AddStream
+  href: api/Dec.Parser.html#Dec_Parser_AddStream_
+  commentId: Overload:Dec.Parser.AddStream
+  isSpec: "True"
+  fullName: Dec.Parser.AddStream
+  nameWithType: Parser.AddStream
+- uid: Dec.Parser.AddString(Dec.Parser.FileType,System.String,System.String)
+  name: AddString(Parser.FileType, String, String)
+  href: api/Dec.Parser.html#Dec_Parser_AddString_Dec_Parser_FileType_System_String_System_String_
+  commentId: M:Dec.Parser.AddString(Dec.Parser.FileType,System.String,System.String)
+  fullName: Dec.Parser.AddString(Dec.Parser.FileType, System.String, System.String)
+  nameWithType: Parser.AddString(Parser.FileType, String, String)
+- uid: Dec.Parser.AddString*
+  name: AddString
+  href: api/Dec.Parser.html#Dec_Parser_AddString_
+  commentId: Overload:Dec.Parser.AddString
+  isSpec: "True"
+  fullName: Dec.Parser.AddString
+  nameWithType: Parser.AddString
+- uid: Dec.Parser.FileType
+  name: Parser.FileType
+  href: api/Dec.Parser.FileType.html
+  commentId: T:Dec.Parser.FileType
+  fullName: Dec.Parser.FileType
+  nameWithType: Parser.FileType
+- uid: Dec.Parser.FileType.Xml
+  name: Xml
+  href: api/Dec.Parser.FileType.html#Dec_Parser_FileType_Xml
+  commentId: F:Dec.Parser.FileType.Xml
+  fullName: Dec.Parser.FileType.Xml
+  nameWithType: Parser.FileType.Xml
+- uid: Dec.Parser.Finish
+  name: Finish()
+  href: api/Dec.Parser.html#Dec_Parser_Finish
+  commentId: M:Dec.Parser.Finish
+  fullName: Dec.Parser.Finish()
+  nameWithType: Parser.Finish()
+- uid: Dec.Parser.Finish*
+  name: Finish
+  href: api/Dec.Parser.html#Dec_Parser_Finish_
+  commentId: Overload:Dec.Parser.Finish
+  isSpec: "True"
+  fullName: Dec.Parser.Finish
+  nameWithType: Parser.Finish
+- uid: Dec.ParserModular
+  name: ParserModular
+  href: api/Dec.ParserModular.html
+  commentId: T:Dec.ParserModular
+  fullName: Dec.ParserModular
+  nameWithType: ParserModular
+- uid: Dec.ParserModular.#ctor
+  name: ParserModular()
+  href: api/Dec.ParserModular.html#Dec_ParserModular__ctor
+  commentId: M:Dec.ParserModular.#ctor
+  fullName: Dec.ParserModular.ParserModular()
+  nameWithType: ParserModular.ParserModular()
+- uid: Dec.ParserModular.#ctor*
+  name: ParserModular
+  href: api/Dec.ParserModular.html#Dec_ParserModular__ctor_
+  commentId: Overload:Dec.ParserModular.#ctor
+  isSpec: "True"
+  fullName: Dec.ParserModular.ParserModular
+  nameWithType: ParserModular.ParserModular
+- uid: Dec.ParserModular.CreateModule(System.String)
+  name: CreateModule(String)
+  href: api/Dec.ParserModular.html#Dec_ParserModular_CreateModule_System_String_
+  commentId: M:Dec.ParserModular.CreateModule(System.String)
+  fullName: Dec.ParserModular.CreateModule(System.String)
+  nameWithType: ParserModular.CreateModule(String)
+- uid: Dec.ParserModular.CreateModule*
+  name: CreateModule
+  href: api/Dec.ParserModular.html#Dec_ParserModular_CreateModule_
+  commentId: Overload:Dec.ParserModular.CreateModule
+  isSpec: "True"
+  fullName: Dec.ParserModular.CreateModule
+  nameWithType: ParserModular.CreateModule
+- uid: Dec.ParserModular.Finish
+  name: Finish()
+  href: api/Dec.ParserModular.html#Dec_ParserModular_Finish
+  commentId: M:Dec.ParserModular.Finish
+  fullName: Dec.ParserModular.Finish()
+  nameWithType: ParserModular.Finish()
+- uid: Dec.ParserModular.Finish*
+  name: Finish
+  href: api/Dec.ParserModular.html#Dec_ParserModular_Finish_
+  commentId: Overload:Dec.ParserModular.Finish
+  isSpec: "True"
+  fullName: Dec.ParserModular.Finish
+  nameWithType: ParserModular.Finish
+- uid: Dec.ParserModular.Module
+  name: ParserModular.Module
+  href: api/Dec.ParserModular.Module.html
+  commentId: T:Dec.ParserModular.Module
+  fullName: Dec.ParserModular.Module
+  nameWithType: ParserModular.Module
+- uid: Dec.ParserModular.Module.AddDirectory(System.String)
+  name: AddDirectory(String)
+  href: api/Dec.ParserModular.Module.html#Dec_ParserModular_Module_AddDirectory_System_String_
+  commentId: M:Dec.ParserModular.Module.AddDirectory(System.String)
+  fullName: Dec.ParserModular.Module.AddDirectory(System.String)
+  nameWithType: ParserModular.Module.AddDirectory(String)
+- uid: Dec.ParserModular.Module.AddDirectory*
+  name: AddDirectory
+  href: api/Dec.ParserModular.Module.html#Dec_ParserModular_Module_AddDirectory_
+  commentId: Overload:Dec.ParserModular.Module.AddDirectory
+  isSpec: "True"
+  fullName: Dec.ParserModular.Module.AddDirectory
+  nameWithType: ParserModular.Module.AddDirectory
+- uid: Dec.ParserModular.Module.AddFile(Dec.Parser.FileType,System.String,System.String)
+  name: AddFile(Parser.FileType, String, String)
+  href: api/Dec.ParserModular.Module.html#Dec_ParserModular_Module_AddFile_Dec_Parser_FileType_System_String_System_String_
+  commentId: M:Dec.ParserModular.Module.AddFile(Dec.Parser.FileType,System.String,System.String)
+  fullName: Dec.ParserModular.Module.AddFile(Dec.Parser.FileType, System.String, System.String)
+  nameWithType: ParserModular.Module.AddFile(Parser.FileType, String, String)
+- uid: Dec.ParserModular.Module.AddFile*
+  name: AddFile
+  href: api/Dec.ParserModular.Module.html#Dec_ParserModular_Module_AddFile_
+  commentId: Overload:Dec.ParserModular.Module.AddFile
+  isSpec: "True"
+  fullName: Dec.ParserModular.Module.AddFile
+  nameWithType: ParserModular.Module.AddFile
+- uid: Dec.ParserModular.Module.AddStream(Dec.Parser.FileType,Stream,System.String)
+  name: AddStream(Parser.FileType, Stream, String)
+  href: api/Dec.ParserModular.Module.html#Dec_ParserModular_Module_AddStream_Dec_Parser_FileType_Stream_System_String_
+  commentId: M:Dec.ParserModular.Module.AddStream(Dec.Parser.FileType,Stream,System.String)
+  fullName: Dec.ParserModular.Module.AddStream(Dec.Parser.FileType, Stream, System.String)
+  nameWithType: ParserModular.Module.AddStream(Parser.FileType, Stream, String)
+- uid: Dec.ParserModular.Module.AddStream*
+  name: AddStream
+  href: api/Dec.ParserModular.Module.html#Dec_ParserModular_Module_AddStream_
+  commentId: Overload:Dec.ParserModular.Module.AddStream
+  isSpec: "True"
+  fullName: Dec.ParserModular.Module.AddStream
+  nameWithType: ParserModular.Module.AddStream
+- uid: Dec.ParserModular.Module.AddString(Dec.Parser.FileType,System.String,System.String)
+  name: AddString(Parser.FileType, String, String)
+  href: api/Dec.ParserModular.Module.html#Dec_ParserModular_Module_AddString_Dec_Parser_FileType_System_String_System_String_
+  commentId: M:Dec.ParserModular.Module.AddString(Dec.Parser.FileType,System.String,System.String)
+  fullName: Dec.ParserModular.Module.AddString(Dec.Parser.FileType, System.String, System.String)
+  nameWithType: ParserModular.Module.AddString(Parser.FileType, String, String)
+- uid: Dec.ParserModular.Module.AddString*
+  name: AddString
+  href: api/Dec.ParserModular.Module.html#Dec_ParserModular_Module_AddString_
+  commentId: Overload:Dec.ParserModular.Module.AddString
+  isSpec: "True"
+  fullName: Dec.ParserModular.Module.AddString
+  nameWithType: ParserModular.Module.AddString
+- uid: Dec.Recorder
+  name: Recorder
+  href: api/Dec.Recorder.html
+  commentId: T:Dec.Recorder
+  fullName: Dec.Recorder
+  nameWithType: Recorder
+- uid: Dec.Recorder.Direction
+  name: Recorder.Direction
+  href: api/Dec.Recorder.Direction.html
+  commentId: T:Dec.Recorder.Direction
+  fullName: Dec.Recorder.Direction
+  nameWithType: Recorder.Direction
+- uid: Dec.Recorder.Direction.Read
+  name: Read
+  href: api/Dec.Recorder.Direction.html#Dec_Recorder_Direction_Read
+  commentId: F:Dec.Recorder.Direction.Read
+  fullName: Dec.Recorder.Direction.Read
+  nameWithType: Recorder.Direction.Read
+- uid: Dec.Recorder.Direction.Write
+  name: Write
+  href: api/Dec.Recorder.Direction.html#Dec_Recorder_Direction_Write
+  commentId: F:Dec.Recorder.Direction.Write
+  fullName: Dec.Recorder.Direction.Write
+  nameWithType: Recorder.Direction.Write
+- uid: Dec.Recorder.Mode
+  name: Mode
+  href: api/Dec.Recorder.html#Dec_Recorder_Mode
+  commentId: P:Dec.Recorder.Mode
+  fullName: Dec.Recorder.Mode
+  nameWithType: Recorder.Mode
+- uid: Dec.Recorder.Mode*
+  name: Mode
+  href: api/Dec.Recorder.html#Dec_Recorder_Mode_
+  commentId: Overload:Dec.Recorder.Mode
+  isSpec: "True"
+  fullName: Dec.Recorder.Mode
+  nameWithType: Recorder.Mode
+- uid: Dec.Recorder.Parameters
+  name: Recorder.Parameters
+  href: api/Dec.Recorder.Parameters.html
+  commentId: T:Dec.Recorder.Parameters
+  fullName: Dec.Recorder.Parameters
+  nameWithType: Recorder.Parameters
+- uid: Dec.Recorder.Parameters.Record*
+  name: Record
+  href: api/Dec.Recorder.Parameters.html#Dec_Recorder_Parameters_Record_
+  commentId: Overload:Dec.Recorder.Parameters.Record
+  isSpec: "True"
+  fullName: Dec.Recorder.Parameters.Record
+  nameWithType: Recorder.Parameters.Record
+- uid: Dec.Recorder.Parameters.Record``1(``0@,System.String)
+  name: Record<T>(ref T, String)
+  href: api/Dec.Recorder.Parameters.html#Dec_Recorder_Parameters_Record__1___0__System_String_
+  commentId: M:Dec.Recorder.Parameters.Record``1(``0@,System.String)
+  name.vb: Record(Of T)(ByRef T, String)
+  fullName: Dec.Recorder.Parameters.Record<T>(ref T, System.String)
+  fullName.vb: Dec.Recorder.Parameters.Record(Of T)(ByRef T, System.String)
+  nameWithType: Recorder.Parameters.Record<T>(ref T, String)
+  nameWithType.vb: Recorder.Parameters.Record(Of T)(ByRef T, String)
+- uid: Dec.Recorder.Parameters.RecordAsThis*
+  name: RecordAsThis
+  href: api/Dec.Recorder.Parameters.html#Dec_Recorder_Parameters_RecordAsThis_
+  commentId: Overload:Dec.Recorder.Parameters.RecordAsThis
+  isSpec: "True"
+  fullName: Dec.Recorder.Parameters.RecordAsThis
+  nameWithType: Recorder.Parameters.RecordAsThis
+- uid: Dec.Recorder.Parameters.RecordAsThis``1(``0@)
+  name: RecordAsThis<T>(ref T)
+  href: api/Dec.Recorder.Parameters.html#Dec_Recorder_Parameters_RecordAsThis__1___0__
+  commentId: M:Dec.Recorder.Parameters.RecordAsThis``1(``0@)
+  name.vb: RecordAsThis(Of T)(ByRef T)
+  fullName: Dec.Recorder.Parameters.RecordAsThis<T>(ref T)
+  fullName.vb: Dec.Recorder.Parameters.RecordAsThis(Of T)(ByRef T)
+  nameWithType: Recorder.Parameters.RecordAsThis<T>(ref T)
+  nameWithType.vb: Recorder.Parameters.RecordAsThis(Of T)(ByRef T)
+- uid: Dec.Recorder.Parameters.Shared
+  name: Shared()
+  href: api/Dec.Recorder.Parameters.html#Dec_Recorder_Parameters_Shared
+  commentId: M:Dec.Recorder.Parameters.Shared
+  fullName: Dec.Recorder.Parameters.Shared()
+  nameWithType: Recorder.Parameters.Shared()
+- uid: Dec.Recorder.Parameters.Shared*
+  name: Shared
+  href: api/Dec.Recorder.Parameters.html#Dec_Recorder_Parameters_Shared_
+  commentId: Overload:Dec.Recorder.Parameters.Shared
+  isSpec: "True"
+  fullName: Dec.Recorder.Parameters.Shared
+  nameWithType: Recorder.Parameters.Shared
+- uid: Dec.Recorder.Parameters.WithFactory(Dictionary{Type,Func{Type,System.Object}})
+  name: WithFactory(Dictionary<Type, Func<Type, Object>>)
+  href: api/Dec.Recorder.Parameters.html#Dec_Recorder_Parameters_WithFactory_Dictionary_Type_Func_Type_System_Object___
+  commentId: M:Dec.Recorder.Parameters.WithFactory(Dictionary{Type,Func{Type,System.Object}})
+  name.vb: WithFactory(Dictionary(Of Type, Func(Of Type, Object)))
+  fullName: Dec.Recorder.Parameters.WithFactory(Dictionary<Type, Func<Type, System.Object>>)
+  fullName.vb: Dec.Recorder.Parameters.WithFactory(Dictionary(Of Type, Func(Of Type, System.Object)))
+  nameWithType: Recorder.Parameters.WithFactory(Dictionary<Type, Func<Type, Object>>)
+  nameWithType.vb: Recorder.Parameters.WithFactory(Dictionary(Of Type, Func(Of Type, Object)))
+- uid: Dec.Recorder.Parameters.WithFactory*
+  name: WithFactory
+  href: api/Dec.Recorder.Parameters.html#Dec_Recorder_Parameters_WithFactory_
+  commentId: Overload:Dec.Recorder.Parameters.WithFactory
+  isSpec: "True"
+  fullName: Dec.Recorder.Parameters.WithFactory
+  nameWithType: Recorder.Parameters.WithFactory
+- uid: Dec.Recorder.Read*
+  name: Read
+  href: api/Dec.Recorder.html#Dec_Recorder_Read_
+  commentId: Overload:Dec.Recorder.Read
+  isSpec: "True"
+  fullName: Dec.Recorder.Read
+  nameWithType: Recorder.Read
+- uid: Dec.Recorder.Read``1(System.String,System.String)
+  name: Read<T>(String, String)
+  href: api/Dec.Recorder.html#Dec_Recorder_Read__1_System_String_System_String_
+  commentId: M:Dec.Recorder.Read``1(System.String,System.String)
+  name.vb: Read(Of T)(String, String)
+  fullName: Dec.Recorder.Read<T>(System.String, System.String)
+  fullName.vb: Dec.Recorder.Read(Of T)(System.String, System.String)
+  nameWithType: Recorder.Read<T>(String, String)
+  nameWithType.vb: Recorder.Read(Of T)(String, String)
+- uid: Dec.Recorder.Record*
+  name: Record
+  href: api/Dec.Recorder.html#Dec_Recorder_Record_
+  commentId: Overload:Dec.Recorder.Record
+  isSpec: "True"
+  fullName: Dec.Recorder.Record
+  nameWithType: Recorder.Record
+- uid: Dec.Recorder.Record``1(``0@,System.String)
+  name: Record<T>(ref T, String)
+  href: api/Dec.Recorder.html#Dec_Recorder_Record__1___0__System_String_
+  commentId: M:Dec.Recorder.Record``1(``0@,System.String)
+  name.vb: Record(Of T)(ByRef T, String)
+  fullName: Dec.Recorder.Record<T>(ref T, System.String)
+  fullName.vb: Dec.Recorder.Record(Of T)(ByRef T, System.String)
+  nameWithType: Recorder.Record<T>(ref T, String)
+  nameWithType.vb: Recorder.Record(Of T)(ByRef T, String)
+- uid: Dec.Recorder.RecordAsThis*
+  name: RecordAsThis
+  href: api/Dec.Recorder.html#Dec_Recorder_RecordAsThis_
+  commentId: Overload:Dec.Recorder.RecordAsThis
+  isSpec: "True"
+  fullName: Dec.Recorder.RecordAsThis
+  nameWithType: Recorder.RecordAsThis
+- uid: Dec.Recorder.RecordAsThis``1(``0@)
+  name: RecordAsThis<T>(ref T)
+  href: api/Dec.Recorder.html#Dec_Recorder_RecordAsThis__1___0__
+  commentId: M:Dec.Recorder.RecordAsThis``1(``0@)
+  name.vb: RecordAsThis(Of T)(ByRef T)
+  fullName: Dec.Recorder.RecordAsThis<T>(ref T)
+  fullName.vb: Dec.Recorder.RecordAsThis(Of T)(ByRef T)
+  nameWithType: Recorder.RecordAsThis<T>(ref T)
+  nameWithType.vb: Recorder.RecordAsThis(Of T)(ByRef T)
+- uid: Dec.Recorder.Shared
+  name: Shared()
+  href: api/Dec.Recorder.html#Dec_Recorder_Shared
+  commentId: M:Dec.Recorder.Shared
+  fullName: Dec.Recorder.Shared()
+  nameWithType: Recorder.Shared()
+- uid: Dec.Recorder.Shared*
+  name: Shared
+  href: api/Dec.Recorder.html#Dec_Recorder_Shared_
+  commentId: Overload:Dec.Recorder.Shared
+  isSpec: "True"
+  fullName: Dec.Recorder.Shared
+  nameWithType: Recorder.Shared
+- uid: Dec.Recorder.WithFactory(Dictionary{Type,Func{Type,System.Object}})
+  name: WithFactory(Dictionary<Type, Func<Type, Object>>)
+  href: api/Dec.Recorder.html#Dec_Recorder_WithFactory_Dictionary_Type_Func_Type_System_Object___
+  commentId: M:Dec.Recorder.WithFactory(Dictionary{Type,Func{Type,System.Object}})
+  name.vb: WithFactory(Dictionary(Of Type, Func(Of Type, Object)))
+  fullName: Dec.Recorder.WithFactory(Dictionary<Type, Func<Type, System.Object>>)
+  fullName.vb: Dec.Recorder.WithFactory(Dictionary(Of Type, Func(Of Type, System.Object)))
+  nameWithType: Recorder.WithFactory(Dictionary<Type, Func<Type, Object>>)
+  nameWithType.vb: Recorder.WithFactory(Dictionary(Of Type, Func(Of Type, Object)))
+- uid: Dec.Recorder.WithFactory*
+  name: WithFactory
+  href: api/Dec.Recorder.html#Dec_Recorder_WithFactory_
+  commentId: Overload:Dec.Recorder.WithFactory
+  isSpec: "True"
+  fullName: Dec.Recorder.WithFactory
+  nameWithType: Recorder.WithFactory
+- uid: Dec.Recorder.Write*
+  name: Write
+  href: api/Dec.Recorder.html#Dec_Recorder_Write_
+  commentId: Overload:Dec.Recorder.Write
+  isSpec: "True"
+  fullName: Dec.Recorder.Write
+  nameWithType: Recorder.Write
+- uid: Dec.Recorder.Write``1(``0,System.Boolean)
+  name: Write<T>(T, Boolean)
+  href: api/Dec.Recorder.html#Dec_Recorder_Write__1___0_System_Boolean_
+  commentId: M:Dec.Recorder.Write``1(``0,System.Boolean)
+  name.vb: Write(Of T)(T, Boolean)
+  fullName: Dec.Recorder.Write<T>(T, System.Boolean)
+  fullName.vb: Dec.Recorder.Write(Of T)(T, System.Boolean)
+  nameWithType: Recorder.Write<T>(T, Boolean)
+  nameWithType.vb: Recorder.Write(Of T)(T, Boolean)
+- uid: Dec.Recorder.WriteValidation*
+  name: WriteValidation
+  href: api/Dec.Recorder.html#Dec_Recorder_WriteValidation_
+  commentId: Overload:Dec.Recorder.WriteValidation
+  isSpec: "True"
+  fullName: Dec.Recorder.WriteValidation
+  nameWithType: Recorder.WriteValidation
+- uid: Dec.Recorder.WriteValidation``1(``0)
+  name: WriteValidation<T>(T)
+  href: api/Dec.Recorder.html#Dec_Recorder_WriteValidation__1___0_
+  commentId: M:Dec.Recorder.WriteValidation``1(``0)
+  name.vb: WriteValidation(Of T)(T)
+  fullName: Dec.Recorder.WriteValidation<T>(T)
+  fullName.vb: Dec.Recorder.WriteValidation(Of T)(T)
+  nameWithType: Recorder.WriteValidation<T>(T)
+  nameWithType.vb: Recorder.WriteValidation(Of T)(T)
+- uid: Dec.StaticReferencesAttribute
+  name: StaticReferencesAttribute
+  href: api/Dec.StaticReferencesAttribute.html
+  commentId: T:Dec.StaticReferencesAttribute
+  fullName: Dec.StaticReferencesAttribute
+  nameWithType: StaticReferencesAttribute
+- uid: Dec.StaticReferencesAttribute.Initialized
+  name: Initialized()
+  href: api/Dec.StaticReferencesAttribute.html#Dec_StaticReferencesAttribute_Initialized
+  commentId: M:Dec.StaticReferencesAttribute.Initialized
+  fullName: Dec.StaticReferencesAttribute.Initialized()
+  nameWithType: StaticReferencesAttribute.Initialized()
+- uid: Dec.StaticReferencesAttribute.Initialized*
+  name: Initialized
+  href: api/Dec.StaticReferencesAttribute.html#Dec_StaticReferencesAttribute_Initialized_
+  commentId: Overload:Dec.StaticReferencesAttribute.Initialized
+  isSpec: "True"
+  fullName: Dec.StaticReferencesAttribute.Initialized
+  nameWithType: StaticReferencesAttribute.Initialized
+- uid: future_csv
+  name: CSV Support
+  href: future/csv.html

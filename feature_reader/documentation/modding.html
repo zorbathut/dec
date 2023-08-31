@@ -1,0 +1,142 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Modding </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Modding ">
+    <meta name="generator" content="docfx 2.59.4.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="modding">Modding</h1>
+
+<p>A major goal of Dec is to make it easy to support user-created game mods. This feature contains a few major parts:</p>
+<ul>
+<li>Standard descriptors for defining mods and defining mods' interactions with each other (see <a href="https://wiki.factorio.com/Tutorial:Mod_structure#info.json">Factorio's info.json file</a> for an example of this)</li>
+<li>A load system that loads mod .dll's and code in an appropriate order</li>
+<li>The ability to override and modify Dec data within mods, with appropriate error messages and diagnostics</li>
+</ul>
+<p>This feature is currently highly unfinished and only the third part is implemented. However, the third part is the only part that strictly needs to be provided by Dec itself, so Dec is now technically capable of supporting game mods.</p>
+<h2 id="fundamentals">Fundamentals</h2>
+<p>Dec organizes its input into groups of files called &quot;modules&quot;, defined by <a class="xref" href="../api/Dec.ParserModular.Module.html"><code>Dec.ParserModular.Module</code></a>. Each module represents a single mod's worth of data. Modules are created via <a class="xref" href="../api/Dec.ParserModular.html"><code>Dec.ParserModular</code></a>, which is a mod-capable replacement for <a class="xref" href="../api/Dec.Parser.html"><code>Dec.Parser</code></a>.</p>
+<p>(Dec.Parser is just a thin wrapper around Dec.ParserModule to make it easier to develop non-moddable games.)</p>
+<p>Be aware that module load order is <em>critical</em>, and right now, this is defined simply as the order in which Module objects are created.</p>
+<pre><code class="lang-cs">var parser = new Dec.ParserModular();
+parser.CreateModule(&quot;Base&quot;).AddDirectory(&quot;XML&quot;);
+
+// Order alphabetically to ensure that the load order is consistent
+var modDirectories = Directory.GetDirectories(&quot;Mods&quot;).OrderBy(d =&gt; d);
+foreach (var modDirectory in modDirectories)
+{
+    var modName = Path.GetFileName(modDirectory);
+    parser.CreateModule(modName).AddDirectory(Path.Combine(modDirectory, &quot;XML&quot;));
+}
+
+parser.Finish();
+</code></pre>
+<h2 id="merge-modes">Merge Modes</h2>
+<p>Mods often want to modify existing Decs in various ways. This behavior is similar to how <a href="inheritance.html">inheritance</a> works. See <a href="mergemodes.html">merge modes</a> for details.</p>
+<h2 id="security">Security</h2>
+<p>Dec is designed for an environment where mod developers will be able to create mods based around C# DLLs. As it's nearly impossible to sandbox a C# DLL, Dec makes very little effort to add more security through the .xml files themselves. To make matters worse, a major tool for C# modding is <a href="https://github.com/pardeike/Harmony">Harmony</a>, which monkeypatches the C# runtime through inserting machine-code changes at runtime. This is also essentially impossible to sandbox.</p>
+<p>Historically, this seems to mostly work out; modders are generally not malicious. This is also not solvable without either requiring some form of sandboxable user-provided code, or without removing code entirely from the modding system.</p>
+<p>I'd like to solve this, but practically speaking this will not be solvable without either major engine-level changes or a completely separate programming language; the latter I consider undesirable, the former is extraordinarily unlikely for Unity.</p>
+<p>If your game design requires security against malicious mods, you should not use Dec.</p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/zorbathut/dec/blob/feature_reader/doc/documentation/modding.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>
