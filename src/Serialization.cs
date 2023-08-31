@@ -161,7 +161,7 @@ namespace Dec
             }
             else if (str == "createOrIgnore")
             {
-                return ParseMode.CreateOrPatch;
+                return ParseMode.CreateOrIgnore;
             }
             else if (str == "delete")
             {
