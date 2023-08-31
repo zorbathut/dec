@@ -5,12 +5,17 @@ All notable changes to this project will be documented in this file.
 ## [Unnreleased]
 ### Added
 * ParserModular, a more complicated parser that supports game mods.
+* A *large* number of new merge modes intended for game modding.
 
 ### Breaking
 * Minor changes to Parser API to cleanly support more file types.
 
+### Improved
+* Internal validation checks in unit tests.
+
 ### Fixed
 * Minor errors in several error messages.
+* Comment typos in unit tests.
 
 
 ## [v0.4.0]
