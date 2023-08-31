@@ -1,8 +1,20 @@
 ### YamlMime:ManagedReference
 apiRules:
 - exclude:
-      uidRegex: ^System\.Object
+      uidRegex: ^System\.Object$
       type: Type
 - exclude:
-      uidRegex: ^System\.Attribute
+      uidRegex: ^System\.Attribute$
+      type: Type
+- exclude:
+      uidRegex: ^Dec\.Converter$
+      type: Type
+- exclude:
+      uidRegex: ^Dec\.ConverterString$
+      type: Type
+- exclude:
+      uidRegex: ^Dec\.ConverterRecord$
+      type: Type
+- exclude:
+      uidRegex: ^Dec\.ConverterFactory$
       type: Type

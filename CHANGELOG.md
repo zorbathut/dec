@@ -37,6 +37,7 @@ All notable changes to this project will be documented in this file.
 
 ### Documentation
 * Fixed typos.
+* Suppressed index pages for things that aren't really meant to be used.
  
 ### Testing
 * Better diagnostic output on missing expected errors.
