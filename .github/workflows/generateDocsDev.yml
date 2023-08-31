@@ -2,7 +2,8 @@ name: GenerateDocsDev
 
 on:
   push:
-    branches: [ master ]
+    branches:
+    - '**'
 
 jobs:
   build:
@@ -26,6 +27,8 @@ jobs:
     - uses: shogo82148/actions-mutex@v1
       with:
         key: documentation
+    - name: Extract branch name
+      run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
     - name: Check out repo shadow copy
       uses: actions/checkout@v2
       with:
@@ -34,15 +37,15 @@ jobs:
         fetch-depth: 0
     - name: Copy documentation over
       run: |
-        rm -rf docwrite/dev
-        cp -r doc/_site docwrite/dev
+        rm -rf docwrite/${BRANCH_NAME}
+        cp -r doc/_site docwrite/${BRANCH_NAME}
     - name: Check in
       working-directory: docwrite
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         git add .
-        git diff-index --quiet HEAD || git commit -a -m "Update dev documentation"
+        git diff-index --quiet HEAD || git commit -a -m "Update ${BRANCH_NAME} documentation"
     - name: Push changes
       uses: ad-m/github-push-action@master
       with:
