@@ -306,10 +306,10 @@ namespace DecTest
 
             DoParserTests(mode);
 
-            TwoIntsDec baseOnly = Dec.Database<TwoIntsDec>.Get("Forged");
-            Assert.IsNotNull(baseOnly);
-            Assert.AreEqual(1, baseOnly.a);
-            Assert.AreEqual(2, baseOnly.b);
+            TwoIntsDec forged = Dec.Database<TwoIntsDec>.Get("Forged");
+            Assert.IsNotNull(forged);
+            Assert.AreEqual(1, forged.a);
+            Assert.AreEqual(2, forged.b);
         }
 
         [Test]
@@ -396,10 +396,83 @@ namespace DecTest
 
             DoParserTests(mode);
 
-            TwoIntsDec baseOnly = Dec.Database<TwoIntsDec>.Get("Forged");
+            TwoIntsDec forged = Dec.Database<TwoIntsDec>.Get("Forged");
+            Assert.IsNotNull(forged);
+            Assert.AreEqual(1, forged.a);
+            Assert.AreEqual(2, forged.b);
+        }
+
+        [Test]
+        public void ModeCreateOrReplacePass([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(TwoIntsDec) } });
+
+            var parser = new Dec.ParserModular();
+            parser.CreateModule("Base").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <TwoIntsDec decName=""BaseOnly"">
+                        <a>1</a>
+                        <b>2</b>
+                    </TwoIntsDec>
+                    <TwoIntsDec decName=""BaseAbstract"" abstract=""true"">
+                        <a>3</a>
+                        <b>4</b>
+                    </TwoIntsDec>
+                    <TwoIntsDec decName=""BaseConcreteUntouched"" parent=""BaseAbstract"">
+                    </TwoIntsDec>
+                    <TwoIntsDec decName=""BaseConcreteTouched"" parent=""BaseAbstract"">
+                        <b>5</b>
+                    </TwoIntsDec>
+                    <TwoIntsDec decName=""BaseConcreteReplaceable"" parent=""BaseAbstract"">
+                        <b>6</b>
+                    </TwoIntsDec>
+                </Decs>");
+            parser.CreateModule("Mod").AddString(Dec.Parser.FileType.Xml, $@"
+                <Decs>
+                    <TwoIntsDec decName=""BaseOnly"" mode=""createOrReplace"">
+                        <a>7</a>
+                    </TwoIntsDec>
+                    <TwoIntsDec decName=""BaseAbstract"" mode=""createOrReplace"" abstract=""true"">
+                        <a>8</a>
+                    </TwoIntsDec>
+                    <TwoIntsDec decName=""BaseConcreteReplaceable"" mode=""createOrReplace"">
+                    </TwoIntsDec>
+                    <TwoIntsDec decName=""Forged"" mode=""createOrReplace"">
+                        <a>1</a>
+                        <b>2</b>
+                    </TwoIntsDec>
+                </Decs>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            TwoIntsDec baseOnly = Dec.Database<TwoIntsDec>.Get("BaseOnly");
             Assert.IsNotNull(baseOnly);
-            Assert.AreEqual(1, baseOnly.a);
-            Assert.AreEqual(2, baseOnly.b);
+            Assert.AreEqual(7, baseOnly.a);
+            Assert.AreEqual(-2, baseOnly.b);
+
+            TwoIntsDec baseAbstract = Dec.Database<TwoIntsDec>.Get("BaseAbstract");
+            Assert.IsNull(baseAbstract);
+
+            TwoIntsDec baseConcreteUntouched = Dec.Database<TwoIntsDec>.Get("BaseConcreteUntouched");
+            Assert.IsNotNull(baseConcreteUntouched);
+            Assert.AreEqual(8, baseConcreteUntouched.a);
+            Assert.AreEqual(-2, baseConcreteUntouched.b);
+
+            TwoIntsDec baseConcreteTouched = Dec.Database<TwoIntsDec>.Get("BaseConcreteTouched");
+            Assert.IsNotNull(baseConcreteTouched);
+            Assert.AreEqual(8, baseConcreteTouched.a);
+            Assert.AreEqual(5, baseConcreteTouched.b);
+
+            TwoIntsDec baseConcreteReplaceable = Dec.Database<TwoIntsDec>.Get("BaseConcreteReplaceable");
+            Assert.IsNotNull(baseConcreteReplaceable);
+            Assert.AreEqual(-1, baseConcreteReplaceable.a);
+            Assert.AreEqual(-2, baseConcreteReplaceable.b);
+
+            TwoIntsDec forged = Dec.Database<TwoIntsDec>.Get("Forged");
+            Assert.IsNotNull(forged);
+            Assert.AreEqual(1, forged.a);
+            Assert.AreEqual(2, forged.b);
         }
     }
 }
