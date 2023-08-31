@@ -135,5 +135,144 @@ namespace DecTest
             Assert.AreEqual(1, first.a);
             Assert.AreEqual(2, first.b);
         }
+
+        public class BaseDec : Dec.Dec { }
+        public class DerivedDec : BaseDec { }
+        public class Derived2Dec : DerivedDec { }
+        public class DerivedAlterDec : BaseDec { }
+
+        [Test]
+        public void BaseDerivedSpecialization([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(BaseDec), typeof(DerivedDec), typeof(Derived2Dec), typeof(DerivedAlterDec) } });
+
+            var parser = new Dec.ParserModular();
+            parser.CreateModule("Base").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <BaseDec decName=""Thing"" />
+                </Decs>");
+            parser.CreateModule("Mod").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <DerivedDec decName=""Thing"" mode=""patch"" />
+                </Decs>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(typeof(DerivedDec), Dec.Database<BaseDec>.Get("Thing").GetType());
+        }
+
+        [Test]
+        public void BaseDerivedBackwards([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(BaseDec), typeof(DerivedDec), typeof(Derived2Dec), typeof(DerivedAlterDec) } });
+
+            var parser = new Dec.ParserModular();
+            parser.CreateModule("Base").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <DerivedDec decName=""Thing"" />
+                </Decs>");
+            parser.CreateModule("Mod").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <BaseDec decName=""Thing"" mode=""patch"" />
+                </Decs>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(typeof(DerivedDec), Dec.Database<BaseDec>.Get("Thing").GetType());
+        }
+
+        [Test]
+        public void BaseDerivedDouble([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(BaseDec), typeof(DerivedDec), typeof(Derived2Dec), typeof(DerivedAlterDec) } });
+
+            var parser = new Dec.ParserModular();
+            parser.CreateModule("Base").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <BaseDec decName=""Thing"" />
+                </Decs>");
+            parser.CreateModule("Mod").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <DerivedDec decName=""Thing"" mode=""patch"" />
+                </Decs>");
+            parser.CreateModule("Mod2").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <Derived2Dec decName=""Thing"" mode=""patch"" />
+                </Decs>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(typeof(Derived2Dec), Dec.Database<BaseDec>.Get("Thing").GetType());
+        }
+
+        [Test]
+        public void BaseDerivedHopscotch([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(BaseDec), typeof(DerivedDec), typeof(Derived2Dec), typeof(DerivedAlterDec) } });
+
+            var parser = new Dec.ParserModular();
+            parser.CreateModule("Base").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <BaseDec decName=""Thing"" />
+                </Decs>");
+            parser.CreateModule("Mod").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <Derived2Dec decName=""Thing"" mode=""patch"" />
+                </Decs>");
+            parser.CreateModule("Mod2").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <DerivedDec decName=""Thing"" mode=""patch"" />
+                </Decs>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(typeof(Derived2Dec), Dec.Database<BaseDec>.Get("Thing").GetType());
+        }
+
+        [Test]
+        public void BaseDerivedSkip([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(BaseDec), typeof(DerivedDec), typeof(Derived2Dec), typeof(DerivedAlterDec) } });
+
+            var parser = new Dec.ParserModular();
+            parser.CreateModule("Base").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <BaseDec decName=""Thing"" />
+                </Decs>");
+            parser.CreateModule("Mod").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <Derived2Dec decName=""Thing"" mode=""patch"" />
+                </Decs>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(typeof(Derived2Dec), Dec.Database<BaseDec>.Get("Thing").GetType());
+        }
+
+        [Test]
+        public void BaseDerivedFork([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(BaseDec), typeof(DerivedDec), typeof(Derived2Dec), typeof(DerivedAlterDec) } });
+
+            var parser = new Dec.ParserModular();
+            parser.CreateModule("Base").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <DerivedDec decName=""Thing"" />
+                </Decs>");
+            parser.CreateModule("Mod").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <DerivedAlterDec decName=""Thing"" mode=""patch"" />
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(typeof(DerivedAlterDec), Dec.Database<BaseDec>.Get("Thing").GetType());
+        }
     }
 }
