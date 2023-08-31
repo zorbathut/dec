@@ -12,7 +12,7 @@ namespace Dec
     /// Information on the current cursor position when reading files.
     /// </summary>
     /// <remarks>
-    /// Standard output format is $"{node.GetInputContext()}: Your Error Text Here!". This abstracts out the requirements for generating error text.
+    /// Standard output format is $"{inputContext}: Your Error Text Here!". This abstracts out the requirements for generating the locational-context text.
     /// </remarks>
     public struct InputContext
     {
