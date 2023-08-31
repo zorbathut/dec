@@ -333,7 +333,7 @@ namespace Dec
                     case ParseMode.Patch:
                         if (orders.Count == 0)
                         {
-                            Dbg.Err($"{item.inputContext}: Replace mode used when a Dec doesn't exist, falling back to Create");
+                            Dbg.Err($"{item.inputContext}: Patch mode used when a Dec doesn't exist, falling back to Create");
                             goto case ParseMode.Create;
                         }
                         orders.Add(item);
