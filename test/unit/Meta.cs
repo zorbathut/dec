@@ -141,7 +141,7 @@ namespace DecTest
 
             ExpectWarnings(() => DoParserTests(ParserMode.RewrittenBare));
 
-            // Hopefully we reset after doing the DoBehavior()!
+            // Hopefully we reset after doing the DoParserTests()!
             Assert.AreEqual(baseSize, parseCache.Count);
         }
     }
