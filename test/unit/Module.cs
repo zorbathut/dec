@@ -620,5 +620,190 @@ namespace DecTest
             Assert.AreEqual(1, forged.a);
             Assert.AreEqual(2, forged.b);
         }
+
+        [Test]
+        public void ModeDeletePass([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(TwoIntsDec) } });
+
+            var parser = new Dec.ParserModular();
+            parser.CreateModule("Base").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <TwoIntsDec decName=""BaseDelete"">
+                        <a>1</a>
+                        <b>2</b>
+                    </TwoIntsDec>
+                    <TwoIntsDec decName=""BaseAlive"">
+                        <a>3</a>
+                        <b>4</b>
+                    </TwoIntsDec>
+                    <TwoIntsDec decName=""BaseAbstractPeace"" abstract=""true"">
+                        <a>5</a>
+                        <b>6</b>
+                    </TwoIntsDec>
+                    <TwoIntsDec decName=""BaseConcretePeace"" parent=""BaseAbstractPeace"">
+                    </TwoIntsDec>
+                    <TwoIntsDec decName=""BaseConcreteEliminate"" parent=""BaseAbstractPeace"">
+                    </TwoIntsDec>
+                    <TwoIntsDec decName=""BaseAbstractMurder"" abstract=""true"">
+                        <a>7</a>
+                        <b>8</b>
+                    </TwoIntsDec>
+                    <TwoIntsDec decName=""BaseAbstractSlaughter"" abstract=""true"">
+                        <a>9</a>
+                        <b>10</b>
+                    </TwoIntsDec>
+                    <TwoIntsDec decName=""BaseConcreteSlaughterDerived"" parent=""BaseAbstractSlaughter"">
+                    </TwoIntsDec>
+                </Decs>");
+            parser.CreateModule("Mod").AddString(Dec.Parser.FileType.Xml, $@"
+                <Decs>
+                    <TwoIntsDec decName=""BaseDelete"" mode=""delete"" />
+                    <TwoIntsDec decName=""BaseConcreteEliminate"" mode=""delete"" />
+                    <TwoIntsDec decName=""BaseAbstractMurder"" mode=""delete"" />
+                    <TwoIntsDec decName=""BaseAbstractSlaughter"" mode=""delete"" />
+                    <TwoIntsDec decName=""BaseConcreteSlaughterDerived"" mode=""delete"" />
+                </Decs>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            TwoIntsDec baseDelete = Dec.Database<TwoIntsDec>.Get("BaseDelete");
+            Assert.IsNull(baseDelete);
+
+            TwoIntsDec baseAlive = Dec.Database<TwoIntsDec>.Get("BaseAlive");
+            Assert.IsNotNull(baseAlive);
+            Assert.AreEqual(3, baseAlive.a);
+            Assert.AreEqual(4, baseAlive.b);
+
+            TwoIntsDec baseAbstractPeace = Dec.Database<TwoIntsDec>.Get("BaseAbstractPeace");
+            Assert.IsNull(baseAbstractPeace);
+
+            TwoIntsDec baseConcretePeace = Dec.Database<TwoIntsDec>.Get("BaseConcretePeace");
+            Assert.IsNotNull(baseConcretePeace);
+            Assert.AreEqual(5, baseConcretePeace.a);
+            Assert.AreEqual(6, baseConcretePeace.b);
+
+            TwoIntsDec baseConcreteEliminate = Dec.Database<TwoIntsDec>.Get("BaseConcreteEliminate");
+            Assert.IsNull(baseConcreteEliminate);
+
+            TwoIntsDec baseAbstractMurder = Dec.Database<TwoIntsDec>.Get("BaseAbstractMurder");
+            Assert.IsNull(baseAbstractMurder);
+
+            TwoIntsDec baseAbstractSlaughter = Dec.Database<TwoIntsDec>.Get("BaseAbstractSlaughter");
+            Assert.IsNull(baseAbstractSlaughter);
+
+            TwoIntsDec baseConcreteSlaughterDerived = Dec.Database<TwoIntsDec>.Get("BaseConcreteSlaughterDerived");
+            Assert.IsNull(baseConcreteSlaughterDerived);
+        }
+
+        [Test]
+        public void ModeDeleteParentFail([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(TwoIntsDec) } });
+
+            var parser = new Dec.ParserModular();
+            parser.CreateModule("Base").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <TwoIntsDec decName=""ParentAbstract"" abstract=""true"">
+                        <a>10</a>
+                        <b>20</b>
+                    </TwoIntsDec>
+                    <TwoIntsDec decName=""ChildConcrete"" parent=""ParentAbstract"">
+                        <a>30</a>
+                    </TwoIntsDec>
+                </Decs>");
+            parser.CreateModule("Mod").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <TwoIntsDec decName=""ParentAbstract"" mode=""delete"" />
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoParserTests(mode);
+
+            TwoIntsDec childConcrete = Dec.Database<TwoIntsDec>.Get("ChildConcrete");
+            Assert.IsNotNull(childConcrete);
+            Assert.AreEqual(30, childConcrete.a);
+            Assert.AreEqual(-2, childConcrete.b);
+        }
+
+        [Test]
+        public void ModeDeleteNonexistentFail([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(TwoIntsDec) } });
+
+            var parser = new Dec.ParserModular();
+            parser.CreateModule("Base").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                </Decs>");
+            parser.CreateModule("Mod").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <TwoIntsDec decName=""Missing"" mode=""delete"" />
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoParserTests(mode);
+
+            TwoIntsDec missing = Dec.Database<TwoIntsDec>.Get("Missing");
+            Assert.IsNull(missing);
+        }
+
+        [Test]
+        public void ModeDeleteDoublePass([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(TwoIntsDec) } });
+
+            var parser = new Dec.ParserModular();
+            parser.CreateModule("Base").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <TwoIntsDec decName=""DeleteMe"" />
+                </Decs>");
+            parser.CreateModule("ModA").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <TwoIntsDec decName=""DeleteMe"" mode=""delete"" />
+                </Decs>");
+            parser.CreateModule("ModB").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <TwoIntsDec decName=""DeleteMe"" mode=""delete"" />
+                </Decs>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            TwoIntsDec deleteMe = Dec.Database<TwoIntsDec>.Get("DeleteMe");
+            Assert.IsNull(deleteMe);
+        }
+
+        [Test]
+        public void ModeDeleteAndPatchFail([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(TwoIntsDec) } });
+
+            var parser = new Dec.ParserModular();
+            parser.CreateModule("Base").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <TwoIntsDec decName=""DeleteMe"">
+                        <a>10</a>
+                    </TwoIntsDec>
+                </Decs>");
+            parser.CreateModule("ModA").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <TwoIntsDec decName=""DeleteMe"" mode=""delete"" />
+                </Decs>");
+            parser.CreateModule("ModB").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <TwoIntsDec decName=""DeleteMe"" mode=""patch"">
+                        <b>20</b>
+                    </TwoIntsDec>
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoParserTests(mode);
+
+            TwoIntsDec deleteMe = Dec.Database<TwoIntsDec>.Get("DeleteMe");
+            Assert.IsNotNull(deleteMe);
+            Assert.AreEqual(-1, deleteMe.a);
+            Assert.AreEqual(20, deleteMe.b);
+        }
     }
 }

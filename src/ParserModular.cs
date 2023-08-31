@@ -276,7 +276,12 @@ namespace Dec
                 foreach (var seenDec in registeredDecs)
                 {
                     var orders = Serialization.CompileDecOrders(seenDec.Value);
-                    registeredDecOrders[seenDec.Key] = orders;
+
+                    // If we have no orders, this probably ended up deleted.
+                    if (orders.Count > 0)
+                    {
+                        registeredDecOrders[seenDec.Key] = orders;
+                    }
                 }
 
                 // Instantiate all decs
