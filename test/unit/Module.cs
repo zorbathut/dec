@@ -108,5 +108,32 @@ namespace DecTest
             Assert.IsNotNull(Dec.Database<TwoIntsDec>.Get("First"));
             Assert.IsNotNull(Dec.Database<TwoIntsDec>.Get("Second"));
         }
+
+        [Test]
+        public void SingularModulePatch([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(TwoIntsDec) } });
+
+            var parser = new Dec.ParserModular();
+            parser.CreateModule("Base").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <TwoIntsDec decName=""First"">
+                        <a>1</a>
+                        <b>2</b>
+                    </TwoIntsDec>
+                    <TwoIntsDec decName=""First"" mode=""patch"">
+                        <a>3</a>
+                        <b>4</b>
+                    </TwoIntsDec>
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoParserTests(mode);
+
+            var first = Dec.Database<TwoIntsDec>.Get("First");
+            Assert.IsNotNull(first);
+            Assert.AreEqual(1, first.a);
+            Assert.AreEqual(2, first.b);
+        }
     }
 }
