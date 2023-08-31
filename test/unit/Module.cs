@@ -805,5 +805,37 @@ namespace DecTest
             Assert.AreEqual(-1, deleteMe.a);
             Assert.AreEqual(20, deleteMe.b);
         }
+
+        [Test]
+        public void ModeDeleteAndCreatePass([Values] ParserMode mode, [Values] bool includeCreate)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(TwoIntsDec) } });
+
+            var parser = new Dec.ParserModular();
+            parser.CreateModule("Base").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <TwoIntsDec decName=""DeleteMe"">
+                        <a>10</a>
+                    </TwoIntsDec>
+                </Decs>");
+            parser.CreateModule("ModA").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <TwoIntsDec decName=""DeleteMe"" mode=""delete"" />
+                </Decs>");
+            parser.CreateModule("ModB").AddString(Dec.Parser.FileType.Xml, $@"
+                <Decs>
+                    <TwoIntsDec decName=""DeleteMe"" {(includeCreate ? "mode=\"create\"" : "")}>
+                        <b>20</b>
+                    </TwoIntsDec>
+                </Decs>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            TwoIntsDec deleteMe = Dec.Database<TwoIntsDec>.Get("DeleteMe");
+            Assert.IsNotNull(deleteMe);
+            Assert.AreEqual(-1, deleteMe.a);
+            Assert.AreEqual(20, deleteMe.b);
+        }
     }
 }
