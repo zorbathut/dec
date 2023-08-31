@@ -230,7 +230,7 @@ namespace DecTest
 
                 if (rewrite_expectWriteErrors)
                 {
-                    ExpectErrors(() => RunComposer(), "DoBehavior.Write", errorValidator: errorValidator);
+                    ExpectErrors(() => RunComposer(), "DoParserTests.Write", errorValidator: errorValidator);
                 }
                 else
                 {
@@ -253,7 +253,7 @@ namespace DecTest
 
                 if (rewrite_expectParseErrors)
                 {
-                    ExpectErrors(() => RunParser(), "DoBehavior.Read", errorValidator: errorValidator);
+                    ExpectErrors(() => RunParser(), "DoParserTests.Read", errorValidator: errorValidator);
                 }
                 else
                 {

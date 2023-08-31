@@ -1,5 +1,6 @@
 namespace DecTest
 {
+    using NUnit.Framework;
     using NUnit.Framework.Interfaces;
     using System;
     using System.Collections;
@@ -23,6 +24,11 @@ namespace DecTest
 
         public IEnumerable GetData(IParameterInfo parameter)
         {
+            foreach (var except in excepts)
+            {
+                Assert.IsTrue(Enum.IsDefined(parameter.ParameterType, except), "Enum {0} does not contain value {1}", parameter.ParameterType, except);
+            }
+
             foreach (var value in Enum.GetValues(parameter.ParameterType))
             {
                 if (excepts.Contains((Enum)value))
