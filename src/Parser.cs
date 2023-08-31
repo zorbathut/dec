@@ -29,6 +29,9 @@ namespace Dec
 
         private ParserModular.Module coreModule;
 
+        /// <summary>
+        /// Indicates which file type the input should be parsed as.
+        /// </summary>
         public enum FileType
         {
             Xml,
