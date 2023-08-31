@@ -6,7 +6,7 @@ namespace DecTest
     [TestFixture]
     public class Composer : Base
     {
-        // A lot of the Writer functionality is tested via BehaviorMode.Rewritten in other tests, so these tests mostly handle the Create/Delete/Rename functions.
+        // A lot of the Writer functionality is tested via ParserMode.Rewritten in other tests, so these tests mostly handle the Create/Delete/Rename functions.
 
         public class SomeDecsDec : Dec.Dec
         {

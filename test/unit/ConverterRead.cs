@@ -170,7 +170,7 @@ namespace DecTest
             }
         }
 
-        // Skipping BehaviorMode on this one; it's kind of weird that you can have a token that generates null without being "null", but it's even weirder to serialize that.
+        // Skipping ParserMode on this one; it's kind of weird that you can have a token that generates null without being "null", but it's even weirder to serialize that.
         // This works for now but I don't see much reason to make it work with serialization. (For now, at least.)
         // It could in theory be accomplished with XML . . .
         [Test]

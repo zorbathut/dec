@@ -258,7 +258,7 @@ namespace DecTest
         [Test]
         public void LateTouch()
         {
-            // We avoid BehaviorMode here because the StaticReference error event can happen at most once, which means that we can't run the test twice without the second (and later) tests failing.
+            // We avoid ParserMode here because the StaticReference error event can happen at most once, which means that we can't run the test twice without the second (and later) tests failing.
             // This also means that test success would depend on test order run, which, no.
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(StubDec) } });
 
@@ -290,7 +290,7 @@ namespace DecTest
         [Test]
         public void UnexpectedTouch()
         {
-            // We avoid BehaviorMode here because the StaticReference error event can happen at most once, which means that we can't run the test twice without the second (and later) tests failing.
+            // We avoid ParserMode here because the StaticReference error event can happen at most once, which means that we can't run the test twice without the second (and later) tests failing.
             // This also means that test success would depend on test order run, which, no.
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(UnexpectedTouchDec) } });
 
@@ -325,7 +325,7 @@ namespace DecTest
         [Test]
         public void ConstructorTouch()
         {
-            // We avoid BehaviorMode here because the StaticReference error event can happen at most once, which means that we can't run the test twice without the second (and later) tests failing.
+            // We avoid ParserMode here because the StaticReference error event can happen at most once, which means that we can't run the test twice without the second (and later) tests failing.
             // This also means that test success would depend on test order run, which, no.
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ConstructorTouchDec) }, explicitStaticRefs = new Type[]{ typeof(ConstructorTouchDecs) } });
 
