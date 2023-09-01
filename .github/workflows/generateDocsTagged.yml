@@ -12,9 +12,9 @@ jobs:
     runs-on: ubuntu-22.04
     
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Setup dotnet
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '7.0.x'
     - name: Setup environment
@@ -26,7 +26,7 @@ jobs:
     - name: Test documentation
       run: docfx.console.*/tools/docfx.exe doc/docfx.json
     - name: Check out repo shadow copy
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         ref: gh-pages
         path: docwrite
