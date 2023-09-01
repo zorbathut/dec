@@ -45,11 +45,14 @@ references:
   fullName: Dec.Composer.ComposeValidation
   nameWithType: Composer.ComposeValidation
 - uid: Dec.Composer.ComposeXml(System.Boolean)
-  name: ComposeXml(Boolean)
+  name: ComposeXml(bool)
   href: api/Dec.Composer.html#Dec_Composer_ComposeXml_System_Boolean_
   commentId: M:Dec.Composer.ComposeXml(System.Boolean)
-  fullName: Dec.Composer.ComposeXml(System.Boolean)
-  nameWithType: Composer.ComposeXml(Boolean)
+  name.vb: ComposeXml(Boolean)
+  fullName: Dec.Composer.ComposeXml(bool)
+  fullName.vb: Dec.Composer.ComposeXml(Boolean)
+  nameWithType: Composer.ComposeXml(bool)
+  nameWithType.vb: Composer.ComposeXml(Boolean)
 - uid: Dec.Composer.ComposeXml*
   name: ComposeXml
   href: api/Dec.Composer.html#Dec_Composer_ComposeXml_
@@ -224,11 +227,11 @@ references:
   name: Read(ref T, Recorder)
   href: api/Dec.ConverterFactory-1.html#Dec_ConverterFactory_1_Read__0__Dec_Recorder_
   commentId: M:Dec.ConverterFactory`1.Read(`0@,Dec.Recorder)
-  name.vb: Read(ByRef T, Recorder)
+  name.vb: Read(T, Recorder)
   fullName: Dec.ConverterFactory<T>.Read(ref T, Dec.Recorder)
-  fullName.vb: Dec.ConverterFactory(Of T).Read(ByRef T, Dec.Recorder)
+  fullName.vb: Dec.ConverterFactory(Of T).Read(T, Dec.Recorder)
   nameWithType: ConverterFactory<T>.Read(ref T, Recorder)
-  nameWithType.vb: ConverterFactory(Of T).Read(ByRef T, Recorder)
+  nameWithType.vb: ConverterFactory(Of T).Read(T, Recorder)
 - uid: Dec.ConverterFactory`1.Read*
   name: Read
   href: api/Dec.ConverterFactory-1.html#Dec_ConverterFactory_1_Read_
@@ -268,11 +271,11 @@ references:
   name: Record(ref T, Recorder)
   href: api/Dec.ConverterRecord-1.html#Dec_ConverterRecord_1_Record__0__Dec_Recorder_
   commentId: M:Dec.ConverterRecord`1.Record(`0@,Dec.Recorder)
-  name.vb: Record(ByRef T, Recorder)
+  name.vb: Record(T, Recorder)
   fullName: Dec.ConverterRecord<T>.Record(ref T, Dec.Recorder)
-  fullName.vb: Dec.ConverterRecord(Of T).Record(ByRef T, Dec.Recorder)
+  fullName.vb: Dec.ConverterRecord(Of T).Record(T, Dec.Recorder)
   nameWithType: ConverterRecord<T>.Record(ref T, Recorder)
-  nameWithType.vb: ConverterRecord(Of T).Record(ByRef T, Recorder)
+  nameWithType.vb: ConverterRecord(Of T).Record(T, Recorder)
 - uid: Dec.ConverterRecord`1.Record*
   name: Record
   href: api/Dec.ConverterRecord-1.html#Dec_ConverterRecord_1_Record_
@@ -292,12 +295,13 @@ references:
   nameWithType: ConverterString<T>
   nameWithType.vb: ConverterString(Of T)
 - uid: Dec.ConverterString`1.Read(System.String,Dec.InputContext)
-  name: Read(String, InputContext)
+  name: Read(string, InputContext)
   href: api/Dec.ConverterString-1.html#Dec_ConverterString_1_Read_System_String_Dec_InputContext_
   commentId: M:Dec.ConverterString`1.Read(System.String,Dec.InputContext)
-  fullName: Dec.ConverterString<T>.Read(System.String, Dec.InputContext)
-  fullName.vb: Dec.ConverterString(Of T).Read(System.String, Dec.InputContext)
-  nameWithType: ConverterString<T>.Read(String, InputContext)
+  name.vb: Read(String, InputContext)
+  fullName: Dec.ConverterString<T>.Read(string, Dec.InputContext)
+  fullName.vb: Dec.ConverterString(Of T).Read(String, Dec.InputContext)
+  nameWithType: ConverterString<T>.Read(string, InputContext)
   nameWithType.vb: ConverterString(Of T).Read(String, InputContext)
 - uid: Dec.ConverterString`1.Read*
   name: Read
@@ -357,12 +361,15 @@ references:
   isSpec: "True"
   fullName: Dec.Database.Count
   nameWithType: Database.Count
-- uid: Dec.Database.Create(Type,System.String)
-  name: Create(Type, String)
-  href: api/Dec.Database.html#Dec_Database_Create_Type_System_String_
-  commentId: M:Dec.Database.Create(Type,System.String)
-  fullName: Dec.Database.Create(Type, System.String)
-  nameWithType: Database.Create(Type, String)
+- uid: Dec.Database.Create(System.Type,System.String)
+  name: Create(Type, string)
+  href: api/Dec.Database.html#Dec_Database_Create_System_Type_System_String_
+  commentId: M:Dec.Database.Create(System.Type,System.String)
+  name.vb: Create(Type, String)
+  fullName: Dec.Database.Create(System.Type, string)
+  fullName.vb: Dec.Database.Create(System.Type, String)
+  nameWithType: Database.Create(Type, string)
+  nameWithType.vb: Database.Create(Type, String)
 - uid: Dec.Database.Create*
   name: Create
   href: api/Dec.Database.html#Dec_Database_Create_
@@ -371,13 +378,13 @@ references:
   fullName: Dec.Database.Create
   nameWithType: Database.Create
 - uid: Dec.Database.Create``1(System.String)
-  name: Create<T>(String)
+  name: Create<T>(string)
   href: api/Dec.Database.html#Dec_Database_Create__1_System_String_
   commentId: M:Dec.Database.Create``1(System.String)
   name.vb: Create(Of T)(String)
-  fullName: Dec.Database.Create<T>(System.String)
-  fullName.vb: Dec.Database.Create(Of T)(System.String)
-  nameWithType: Database.Create<T>(String)
+  fullName: Dec.Database.Create<T>(string)
+  fullName.vb: Dec.Database.Create(Of T)(String)
+  nameWithType: Database.Create<T>(string)
   nameWithType.vb: Database.Create(Of T)(String)
 - uid: Dec.Database.Delete(Dec.Dec)
   name: Delete(Dec)
@@ -392,12 +399,15 @@ references:
   isSpec: "True"
   fullName: Dec.Database.Delete
   nameWithType: Database.Delete
-- uid: Dec.Database.Get(Type,System.String)
-  name: Get(Type, String)
-  href: api/Dec.Database.html#Dec_Database_Get_Type_System_String_
-  commentId: M:Dec.Database.Get(Type,System.String)
-  fullName: Dec.Database.Get(Type, System.String)
-  nameWithType: Database.Get(Type, String)
+- uid: Dec.Database.Get(System.Type,System.String)
+  name: Get(Type, string)
+  href: api/Dec.Database.html#Dec_Database_Get_System_Type_System_String_
+  commentId: M:Dec.Database.Get(System.Type,System.String)
+  name.vb: Get(Type, String)
+  fullName: Dec.Database.Get(System.Type, string)
+  fullName.vb: Dec.Database.Get(System.Type, String)
+  nameWithType: Database.Get(Type, string)
+  nameWithType.vb: Database.Get(Type, String)
 - uid: Dec.Database.Get*
   name: Get
   href: api/Dec.Database.html#Dec_Database_Get_
@@ -419,11 +429,14 @@ references:
   fullName: Dec.Database.List
   nameWithType: Database.List
 - uid: Dec.Database.Rename(Dec.Dec,System.String)
-  name: Rename(Dec, String)
+  name: Rename(Dec, string)
   href: api/Dec.Database.html#Dec_Database_Rename_Dec_Dec_System_String_
   commentId: M:Dec.Database.Rename(Dec.Dec,System.String)
-  fullName: Dec.Database.Rename(Dec.Dec, System.String)
-  nameWithType: Database.Rename(Dec, String)
+  name.vb: Rename(Dec, String)
+  fullName: Dec.Database.Rename(Dec.Dec, string)
+  fullName.vb: Dec.Database.Rename(Dec.Dec, String)
+  nameWithType: Database.Rename(Dec, string)
+  nameWithType.vb: Database.Rename(Dec, String)
 - uid: Dec.Database.Rename*
   name: Rename
   href: api/Dec.Database.html#Dec_Database_Rename_
@@ -458,12 +471,13 @@ references:
   nameWithType: Database<T>.Count
   nameWithType.vb: Database(Of T).Count
 - uid: Dec.Database`1.Get(System.String)
-  name: Get(String)
+  name: Get(string)
   href: api/Dec.Database-1.html#Dec_Database_1_Get_System_String_
   commentId: M:Dec.Database`1.Get(System.String)
-  fullName: Dec.Database<T>.Get(System.String)
-  fullName.vb: Dec.Database(Of T).Get(System.String)
-  nameWithType: Database<T>.Get(String)
+  name.vb: Get(String)
+  fullName: Dec.Database<T>.Get(string)
+  fullName.vb: Dec.Database(Of T).Get(String)
+  nameWithType: Database<T>.Get(string)
   nameWithType.vb: Database(Of T).Get(String)
 - uid: Dec.Database`1.Get*
   name: Get
@@ -497,14 +511,14 @@ references:
   commentId: T:Dec.Dec
   fullName: Dec.Dec
   nameWithType: Dec
-- uid: Dec.Dec.ConfigErrors(Action{System.String})
-  name: ConfigErrors(Action<String>)
-  href: api/Dec.Dec.html#Dec_Dec_ConfigErrors_Action_System_String__
-  commentId: M:Dec.Dec.ConfigErrors(Action{System.String})
+- uid: Dec.Dec.ConfigErrors(System.Action{System.String})
+  name: ConfigErrors(Action<string>)
+  href: api/Dec.Dec.html#Dec_Dec_ConfigErrors_System_Action_System_String__
+  commentId: M:Dec.Dec.ConfigErrors(System.Action{System.String})
   name.vb: ConfigErrors(Action(Of String))
-  fullName: Dec.Dec.ConfigErrors(Action<System.String>)
-  fullName.vb: Dec.Dec.ConfigErrors(Action(Of System.String))
-  nameWithType: Dec.ConfigErrors(Action<String>)
+  fullName: Dec.Dec.ConfigErrors(System.Action<string>)
+  fullName.vb: Dec.Dec.ConfigErrors(System.Action(Of String))
+  nameWithType: Dec.ConfigErrors(Action<string>)
   nameWithType.vb: Dec.ConfigErrors(Action(Of String))
 - uid: Dec.Dec.ConfigErrors*
   name: ConfigErrors
@@ -526,14 +540,14 @@ references:
   isSpec: "True"
   fullName: Dec.Dec.DecName
   nameWithType: Dec.DecName
-- uid: Dec.Dec.PostLoad(Action{System.String})
-  name: PostLoad(Action<String>)
-  href: api/Dec.Dec.html#Dec_Dec_PostLoad_Action_System_String__
-  commentId: M:Dec.Dec.PostLoad(Action{System.String})
+- uid: Dec.Dec.PostLoad(System.Action{System.String})
+  name: PostLoad(Action<string>)
+  href: api/Dec.Dec.html#Dec_Dec_PostLoad_System_Action_System_String__
+  commentId: M:Dec.Dec.PostLoad(System.Action{System.String})
   name.vb: PostLoad(Action(Of String))
-  fullName: Dec.Dec.PostLoad(Action<System.String>)
-  fullName.vb: Dec.Dec.PostLoad(Action(Of System.String))
-  nameWithType: Dec.PostLoad(Action<String>)
+  fullName: Dec.Dec.PostLoad(System.Action<string>)
+  fullName.vb: Dec.Dec.PostLoad(System.Action(Of String))
+  nameWithType: Dec.PostLoad(Action<string>)
   nameWithType.vb: Dec.PostLoad(Action(Of String))
 - uid: Dec.Dec.PostLoad*
   name: PostLoad
@@ -555,6 +569,31 @@ references:
   isSpec: "True"
   fullName: Dec.Dec.ToString
   nameWithType: Dec.ToString
+- uid: Dec.IRecordable
+  name: IRecordable
+  href: api/Dec.IRecordable.html
+  commentId: T:Dec.IRecordable
+  fullName: Dec.IRecordable
+  nameWithType: IRecordable
+- uid: Dec.IRecordable.Record(Dec.Recorder)
+  name: Record(Recorder)
+  href: api/Dec.IRecordable.html#Dec_IRecordable_Record_Dec_Recorder_
+  commentId: M:Dec.IRecordable.Record(Dec.Recorder)
+  fullName: Dec.IRecordable.Record(Dec.Recorder)
+  nameWithType: IRecordable.Record(Recorder)
+- uid: Dec.IRecordable.Record*
+  name: Record
+  href: api/Dec.IRecordable.html#Dec_IRecordable_Record_
+  commentId: Overload:Dec.IRecordable.Record
+  isSpec: "True"
+  fullName: Dec.IRecordable.Record
+  nameWithType: IRecordable.Record
+- uid: Dec.IndexAttribute
+  name: IndexAttribute
+  href: api/Dec.IndexAttribute.html
+  commentId: T:Dec.IndexAttribute
+  fullName: Dec.IndexAttribute
+  nameWithType: IndexAttribute
 - uid: Dec.Index`1
   name: Index<T>
   href: api/Dec.Index-1.html
@@ -582,13 +621,14 @@ references:
   nameWithType: Index<T>.Count
   nameWithType.vb: Index(Of T).Count
 - uid: Dec.Index`1.Get(System.Int32)
-  name: Get(Int32)
+  name: Get(int)
   href: api/Dec.Index-1.html#Dec_Index_1_Get_System_Int32_
   commentId: M:Dec.Index`1.Get(System.Int32)
-  fullName: Dec.Index<T>.Get(System.Int32)
-  fullName.vb: Dec.Index(Of T).Get(System.Int32)
-  nameWithType: Index<T>.Get(Int32)
-  nameWithType.vb: Index(Of T).Get(Int32)
+  name.vb: Get(Integer)
+  fullName: Dec.Index<T>.Get(int)
+  fullName.vb: Dec.Index(Of T).Get(Integer)
+  nameWithType: Index<T>.Get(int)
+  nameWithType.vb: Index(Of T).Get(Integer)
 - uid: Dec.Index`1.Get*
   name: Get
   href: api/Dec.Index-1.html#Dec_Index_1_Get_
@@ -615,12 +655,6 @@ references:
   fullName.vb: Dec.Index(Of T).List
   nameWithType: Index<T>.List
   nameWithType.vb: Index(Of T).List
-- uid: Dec.IndexAttribute
-  name: IndexAttribute
-  href: api/Dec.IndexAttribute.html
-  commentId: T:Dec.IndexAttribute
-  fullName: Dec.IndexAttribute
-  nameWithType: IndexAttribute
 - uid: Dec.InputContext
   name: InputContext
   href: api/Dec.InputContext.html
@@ -628,24 +662,33 @@ references:
   fullName: Dec.InputContext
   nameWithType: InputContext
 - uid: Dec.InputContext.#ctor(System.String)
-  name: InputContext(String)
+  name: InputContext(string)
   href: api/Dec.InputContext.html#Dec_InputContext__ctor_System_String_
   commentId: M:Dec.InputContext.#ctor(System.String)
-  fullName: Dec.InputContext.InputContext(System.String)
-  nameWithType: InputContext.InputContext(String)
+  name.vb: New(String)
+  fullName: Dec.InputContext.InputContext(string)
+  fullName.vb: Dec.InputContext.New(String)
+  nameWithType: InputContext.InputContext(string)
+  nameWithType.vb: InputContext.New(String)
 - uid: Dec.InputContext.#ctor(System.String,System.Xml.Linq.XElement)
-  name: InputContext(String, System.Xml.Linq.XElement)
+  name: InputContext(string, XElement)
   href: api/Dec.InputContext.html#Dec_InputContext__ctor_System_String_System_Xml_Linq_XElement_
   commentId: M:Dec.InputContext.#ctor(System.String,System.Xml.Linq.XElement)
-  fullName: Dec.InputContext.InputContext(System.String, System.Xml.Linq.XElement)
-  nameWithType: InputContext.InputContext(String, System.Xml.Linq.XElement)
+  name.vb: New(String, XElement)
+  fullName: Dec.InputContext.InputContext(string, System.Xml.Linq.XElement)
+  fullName.vb: Dec.InputContext.New(String, System.Xml.Linq.XElement)
+  nameWithType: InputContext.InputContext(string, XElement)
+  nameWithType.vb: InputContext.New(String, XElement)
 - uid: Dec.InputContext.#ctor*
   name: InputContext
   href: api/Dec.InputContext.html#Dec_InputContext__ctor_
   commentId: Overload:Dec.InputContext.#ctor
   isSpec: "True"
+  name.vb: New
   fullName: Dec.InputContext.InputContext
+  fullName.vb: Dec.InputContext.New
   nameWithType: InputContext.InputContext
+  nameWithType.vb: InputContext.New
 - uid: Dec.InputContext.ToString
   name: ToString()
   href: api/Dec.InputContext.html#Dec_InputContext_ToString
@@ -659,25 +702,6 @@ references:
   isSpec: "True"
   fullName: Dec.InputContext.ToString
   nameWithType: InputContext.ToString
-- uid: Dec.IRecordable
-  name: IRecordable
-  href: api/Dec.IRecordable.html
-  commentId: T:Dec.IRecordable
-  fullName: Dec.IRecordable
-  nameWithType: IRecordable
-- uid: Dec.IRecordable.Record(Dec.Recorder)
-  name: Record(Recorder)
-  href: api/Dec.IRecordable.html#Dec_IRecordable_Record_Dec_Recorder_
-  commentId: M:Dec.IRecordable.Record(Dec.Recorder)
-  fullName: Dec.IRecordable.Record(Dec.Recorder)
-  nameWithType: IRecordable.Record(Recorder)
-- uid: Dec.IRecordable.Record*
-  name: Record
-  href: api/Dec.IRecordable.html#Dec_IRecordable_Record_
-  commentId: Overload:Dec.IRecordable.Record
-  isSpec: "True"
-  fullName: Dec.IRecordable.Record
-  nameWithType: IRecordable.Record
 - uid: Dec.Parser
   name: Parser
   href: api/Dec.Parser.html
@@ -688,21 +712,30 @@ references:
   name: Parser()
   href: api/Dec.Parser.html#Dec_Parser__ctor
   commentId: M:Dec.Parser.#ctor
+  name.vb: New()
   fullName: Dec.Parser.Parser()
+  fullName.vb: Dec.Parser.New()
   nameWithType: Parser.Parser()
+  nameWithType.vb: Parser.New()
 - uid: Dec.Parser.#ctor*
   name: Parser
   href: api/Dec.Parser.html#Dec_Parser__ctor_
   commentId: Overload:Dec.Parser.#ctor
   isSpec: "True"
+  name.vb: New
   fullName: Dec.Parser.Parser
+  fullName.vb: Dec.Parser.New
   nameWithType: Parser.Parser
+  nameWithType.vb: Parser.New
 - uid: Dec.Parser.AddDirectory(System.String)
-  name: AddDirectory(String)
+  name: AddDirectory(string)
   href: api/Dec.Parser.html#Dec_Parser_AddDirectory_System_String_
   commentId: M:Dec.Parser.AddDirectory(System.String)
-  fullName: Dec.Parser.AddDirectory(System.String)
-  nameWithType: Parser.AddDirectory(String)
+  name.vb: AddDirectory(String)
+  fullName: Dec.Parser.AddDirectory(string)
+  fullName.vb: Dec.Parser.AddDirectory(String)
+  nameWithType: Parser.AddDirectory(string)
+  nameWithType.vb: Parser.AddDirectory(String)
 - uid: Dec.Parser.AddDirectory*
   name: AddDirectory
   href: api/Dec.Parser.html#Dec_Parser_AddDirectory_
@@ -711,11 +744,14 @@ references:
   fullName: Dec.Parser.AddDirectory
   nameWithType: Parser.AddDirectory
 - uid: Dec.Parser.AddFile(Dec.Parser.FileType,System.String,System.String)
-  name: AddFile(Parser.FileType, String, String)
+  name: AddFile(FileType, string, string)
   href: api/Dec.Parser.html#Dec_Parser_AddFile_Dec_Parser_FileType_System_String_System_String_
   commentId: M:Dec.Parser.AddFile(Dec.Parser.FileType,System.String,System.String)
-  fullName: Dec.Parser.AddFile(Dec.Parser.FileType, System.String, System.String)
-  nameWithType: Parser.AddFile(Parser.FileType, String, String)
+  name.vb: AddFile(FileType, String, String)
+  fullName: Dec.Parser.AddFile(Dec.Parser.FileType, string, string)
+  fullName.vb: Dec.Parser.AddFile(Dec.Parser.FileType, String, String)
+  nameWithType: Parser.AddFile(Parser.FileType, string, string)
+  nameWithType.vb: Parser.AddFile(Parser.FileType, String, String)
 - uid: Dec.Parser.AddFile*
   name: AddFile
   href: api/Dec.Parser.html#Dec_Parser_AddFile_
@@ -723,12 +759,15 @@ references:
   isSpec: "True"
   fullName: Dec.Parser.AddFile
   nameWithType: Parser.AddFile
-- uid: Dec.Parser.AddStream(Dec.Parser.FileType,Stream,System.String)
-  name: AddStream(Parser.FileType, Stream, String)
-  href: api/Dec.Parser.html#Dec_Parser_AddStream_Dec_Parser_FileType_Stream_System_String_
-  commentId: M:Dec.Parser.AddStream(Dec.Parser.FileType,Stream,System.String)
-  fullName: Dec.Parser.AddStream(Dec.Parser.FileType, Stream, System.String)
-  nameWithType: Parser.AddStream(Parser.FileType, Stream, String)
+- uid: Dec.Parser.AddStream(Dec.Parser.FileType,System.IO.Stream,System.String)
+  name: AddStream(FileType, Stream, string)
+  href: api/Dec.Parser.html#Dec_Parser_AddStream_Dec_Parser_FileType_System_IO_Stream_System_String_
+  commentId: M:Dec.Parser.AddStream(Dec.Parser.FileType,System.IO.Stream,System.String)
+  name.vb: AddStream(FileType, Stream, String)
+  fullName: Dec.Parser.AddStream(Dec.Parser.FileType, System.IO.Stream, string)
+  fullName.vb: Dec.Parser.AddStream(Dec.Parser.FileType, System.IO.Stream, String)
+  nameWithType: Parser.AddStream(Parser.FileType, Stream, string)
+  nameWithType.vb: Parser.AddStream(Parser.FileType, Stream, String)
 - uid: Dec.Parser.AddStream*
   name: AddStream
   href: api/Dec.Parser.html#Dec_Parser_AddStream_
@@ -737,11 +776,14 @@ references:
   fullName: Dec.Parser.AddStream
   nameWithType: Parser.AddStream
 - uid: Dec.Parser.AddString(Dec.Parser.FileType,System.String,System.String)
-  name: AddString(Parser.FileType, String, String)
+  name: AddString(FileType, string, string)
   href: api/Dec.Parser.html#Dec_Parser_AddString_Dec_Parser_FileType_System_String_System_String_
   commentId: M:Dec.Parser.AddString(Dec.Parser.FileType,System.String,System.String)
-  fullName: Dec.Parser.AddString(Dec.Parser.FileType, System.String, System.String)
-  nameWithType: Parser.AddString(Parser.FileType, String, String)
+  name.vb: AddString(FileType, String, String)
+  fullName: Dec.Parser.AddString(Dec.Parser.FileType, string, string)
+  fullName.vb: Dec.Parser.AddString(Dec.Parser.FileType, String, String)
+  nameWithType: Parser.AddString(Parser.FileType, string, string)
+  nameWithType.vb: Parser.AddString(Parser.FileType, String, String)
 - uid: Dec.Parser.AddString*
   name: AddString
   href: api/Dec.Parser.html#Dec_Parser_AddString_
@@ -784,21 +826,30 @@ references:
   name: ParserModular()
   href: api/Dec.ParserModular.html#Dec_ParserModular__ctor
   commentId: M:Dec.ParserModular.#ctor
+  name.vb: New()
   fullName: Dec.ParserModular.ParserModular()
+  fullName.vb: Dec.ParserModular.New()
   nameWithType: ParserModular.ParserModular()
+  nameWithType.vb: ParserModular.New()
 - uid: Dec.ParserModular.#ctor*
   name: ParserModular
   href: api/Dec.ParserModular.html#Dec_ParserModular__ctor_
   commentId: Overload:Dec.ParserModular.#ctor
   isSpec: "True"
+  name.vb: New
   fullName: Dec.ParserModular.ParserModular
+  fullName.vb: Dec.ParserModular.New
   nameWithType: ParserModular.ParserModular
+  nameWithType.vb: ParserModular.New
 - uid: Dec.ParserModular.CreateModule(System.String)
-  name: CreateModule(String)
+  name: CreateModule(string)
   href: api/Dec.ParserModular.html#Dec_ParserModular_CreateModule_System_String_
   commentId: M:Dec.ParserModular.CreateModule(System.String)
-  fullName: Dec.ParserModular.CreateModule(System.String)
-  nameWithType: ParserModular.CreateModule(String)
+  name.vb: CreateModule(String)
+  fullName: Dec.ParserModular.CreateModule(string)
+  fullName.vb: Dec.ParserModular.CreateModule(String)
+  nameWithType: ParserModular.CreateModule(string)
+  nameWithType.vb: ParserModular.CreateModule(String)
 - uid: Dec.ParserModular.CreateModule*
   name: CreateModule
   href: api/Dec.ParserModular.html#Dec_ParserModular_CreateModule_
@@ -826,11 +877,14 @@ references:
   fullName: Dec.ParserModular.Module
   nameWithType: ParserModular.Module
 - uid: Dec.ParserModular.Module.AddDirectory(System.String)
-  name: AddDirectory(String)
+  name: AddDirectory(string)
   href: api/Dec.ParserModular.Module.html#Dec_ParserModular_Module_AddDirectory_System_String_
   commentId: M:Dec.ParserModular.Module.AddDirectory(System.String)
-  fullName: Dec.ParserModular.Module.AddDirectory(System.String)
-  nameWithType: ParserModular.Module.AddDirectory(String)
+  name.vb: AddDirectory(String)
+  fullName: Dec.ParserModular.Module.AddDirectory(string)
+  fullName.vb: Dec.ParserModular.Module.AddDirectory(String)
+  nameWithType: ParserModular.Module.AddDirectory(string)
+  nameWithType.vb: ParserModular.Module.AddDirectory(String)
 - uid: Dec.ParserModular.Module.AddDirectory*
   name: AddDirectory
   href: api/Dec.ParserModular.Module.html#Dec_ParserModular_Module_AddDirectory_
@@ -839,11 +893,14 @@ references:
   fullName: Dec.ParserModular.Module.AddDirectory
   nameWithType: ParserModular.Module.AddDirectory
 - uid: Dec.ParserModular.Module.AddFile(Dec.Parser.FileType,System.String,System.String)
-  name: AddFile(Parser.FileType, String, String)
+  name: AddFile(FileType, string, string)
   href: api/Dec.ParserModular.Module.html#Dec_ParserModular_Module_AddFile_Dec_Parser_FileType_System_String_System_String_
   commentId: M:Dec.ParserModular.Module.AddFile(Dec.Parser.FileType,System.String,System.String)
-  fullName: Dec.ParserModular.Module.AddFile(Dec.Parser.FileType, System.String, System.String)
-  nameWithType: ParserModular.Module.AddFile(Parser.FileType, String, String)
+  name.vb: AddFile(FileType, String, String)
+  fullName: Dec.ParserModular.Module.AddFile(Dec.Parser.FileType, string, string)
+  fullName.vb: Dec.ParserModular.Module.AddFile(Dec.Parser.FileType, String, String)
+  nameWithType: ParserModular.Module.AddFile(Parser.FileType, string, string)
+  nameWithType.vb: ParserModular.Module.AddFile(Parser.FileType, String, String)
 - uid: Dec.ParserModular.Module.AddFile*
   name: AddFile
   href: api/Dec.ParserModular.Module.html#Dec_ParserModular_Module_AddFile_
@@ -851,12 +908,15 @@ references:
   isSpec: "True"
   fullName: Dec.ParserModular.Module.AddFile
   nameWithType: ParserModular.Module.AddFile
-- uid: Dec.ParserModular.Module.AddStream(Dec.Parser.FileType,Stream,System.String)
-  name: AddStream(Parser.FileType, Stream, String)
-  href: api/Dec.ParserModular.Module.html#Dec_ParserModular_Module_AddStream_Dec_Parser_FileType_Stream_System_String_
-  commentId: M:Dec.ParserModular.Module.AddStream(Dec.Parser.FileType,Stream,System.String)
-  fullName: Dec.ParserModular.Module.AddStream(Dec.Parser.FileType, Stream, System.String)
-  nameWithType: ParserModular.Module.AddStream(Parser.FileType, Stream, String)
+- uid: Dec.ParserModular.Module.AddStream(Dec.Parser.FileType,System.IO.Stream,System.String)
+  name: AddStream(FileType, Stream, string)
+  href: api/Dec.ParserModular.Module.html#Dec_ParserModular_Module_AddStream_Dec_Parser_FileType_System_IO_Stream_System_String_
+  commentId: M:Dec.ParserModular.Module.AddStream(Dec.Parser.FileType,System.IO.Stream,System.String)
+  name.vb: AddStream(FileType, Stream, String)
+  fullName: Dec.ParserModular.Module.AddStream(Dec.Parser.FileType, System.IO.Stream, string)
+  fullName.vb: Dec.ParserModular.Module.AddStream(Dec.Parser.FileType, System.IO.Stream, String)
+  nameWithType: ParserModular.Module.AddStream(Parser.FileType, Stream, string)
+  nameWithType.vb: ParserModular.Module.AddStream(Parser.FileType, Stream, String)
 - uid: Dec.ParserModular.Module.AddStream*
   name: AddStream
   href: api/Dec.ParserModular.Module.html#Dec_ParserModular_Module_AddStream_
@@ -865,11 +925,14 @@ references:
   fullName: Dec.ParserModular.Module.AddStream
   nameWithType: ParserModular.Module.AddStream
 - uid: Dec.ParserModular.Module.AddString(Dec.Parser.FileType,System.String,System.String)
-  name: AddString(Parser.FileType, String, String)
+  name: AddString(FileType, string, string)
   href: api/Dec.ParserModular.Module.html#Dec_ParserModular_Module_AddString_Dec_Parser_FileType_System_String_System_String_
   commentId: M:Dec.ParserModular.Module.AddString(Dec.Parser.FileType,System.String,System.String)
-  fullName: Dec.ParserModular.Module.AddString(Dec.Parser.FileType, System.String, System.String)
-  nameWithType: ParserModular.Module.AddString(Parser.FileType, String, String)
+  name.vb: AddString(FileType, String, String)
+  fullName: Dec.ParserModular.Module.AddString(Dec.Parser.FileType, string, string)
+  fullName.vb: Dec.ParserModular.Module.AddString(Dec.Parser.FileType, String, String)
+  nameWithType: ParserModular.Module.AddString(Parser.FileType, string, string)
+  nameWithType.vb: ParserModular.Module.AddString(Parser.FileType, String, String)
 - uid: Dec.ParserModular.Module.AddString*
   name: AddString
   href: api/Dec.ParserModular.Module.html#Dec_ParserModular_Module_AddString_
@@ -927,15 +990,6 @@ references:
   isSpec: "True"
   fullName: Dec.Recorder.Parameters.Record
   nameWithType: Recorder.Parameters.Record
-- uid: Dec.Recorder.Parameters.Record``1(``0@,System.String)
-  name: Record<T>(ref T, String)
-  href: api/Dec.Recorder.Parameters.html#Dec_Recorder_Parameters_Record__1___0__System_String_
-  commentId: M:Dec.Recorder.Parameters.Record``1(``0@,System.String)
-  name.vb: Record(Of T)(ByRef T, String)
-  fullName: Dec.Recorder.Parameters.Record<T>(ref T, System.String)
-  fullName.vb: Dec.Recorder.Parameters.Record(Of T)(ByRef T, System.String)
-  nameWithType: Recorder.Parameters.Record<T>(ref T, String)
-  nameWithType.vb: Recorder.Parameters.Record(Of T)(ByRef T, String)
 - uid: Dec.Recorder.Parameters.RecordAsThis*
   name: RecordAsThis
   href: api/Dec.Recorder.Parameters.html#Dec_Recorder_Parameters_RecordAsThis_
@@ -947,11 +1001,20 @@ references:
   name: RecordAsThis<T>(ref T)
   href: api/Dec.Recorder.Parameters.html#Dec_Recorder_Parameters_RecordAsThis__1___0__
   commentId: M:Dec.Recorder.Parameters.RecordAsThis``1(``0@)
-  name.vb: RecordAsThis(Of T)(ByRef T)
+  name.vb: RecordAsThis(Of T)(T)
   fullName: Dec.Recorder.Parameters.RecordAsThis<T>(ref T)
-  fullName.vb: Dec.Recorder.Parameters.RecordAsThis(Of T)(ByRef T)
+  fullName.vb: Dec.Recorder.Parameters.RecordAsThis(Of T)(T)
   nameWithType: Recorder.Parameters.RecordAsThis<T>(ref T)
-  nameWithType.vb: Recorder.Parameters.RecordAsThis(Of T)(ByRef T)
+  nameWithType.vb: Recorder.Parameters.RecordAsThis(Of T)(T)
+- uid: Dec.Recorder.Parameters.Record``1(``0@,System.String)
+  name: Record<T>(ref T, string)
+  href: api/Dec.Recorder.Parameters.html#Dec_Recorder_Parameters_Record__1___0__System_String_
+  commentId: M:Dec.Recorder.Parameters.Record``1(``0@,System.String)
+  name.vb: Record(Of T)(T, String)
+  fullName: Dec.Recorder.Parameters.Record<T>(ref T, string)
+  fullName.vb: Dec.Recorder.Parameters.Record(Of T)(T, String)
+  nameWithType: Recorder.Parameters.Record<T>(ref T, string)
+  nameWithType.vb: Recorder.Parameters.Record(Of T)(T, String)
 - uid: Dec.Recorder.Parameters.Shared
   name: Shared()
   href: api/Dec.Recorder.Parameters.html#Dec_Recorder_Parameters_Shared
@@ -965,14 +1028,14 @@ references:
   isSpec: "True"
   fullName: Dec.Recorder.Parameters.Shared
   nameWithType: Recorder.Parameters.Shared
-- uid: Dec.Recorder.Parameters.WithFactory(Dictionary{Type,Func{Type,System.Object}})
-  name: WithFactory(Dictionary<Type, Func<Type, Object>>)
-  href: api/Dec.Recorder.Parameters.html#Dec_Recorder_Parameters_WithFactory_Dictionary_Type_Func_Type_System_Object___
-  commentId: M:Dec.Recorder.Parameters.WithFactory(Dictionary{Type,Func{Type,System.Object}})
+- uid: Dec.Recorder.Parameters.WithFactory(System.Collections.Generic.Dictionary{System.Type,System.Func{System.Type,System.Object}})
+  name: WithFactory(Dictionary<Type, Func<Type, object>>)
+  href: api/Dec.Recorder.Parameters.html#Dec_Recorder_Parameters_WithFactory_System_Collections_Generic_Dictionary_System_Type_System_Func_System_Type_System_Object___
+  commentId: M:Dec.Recorder.Parameters.WithFactory(System.Collections.Generic.Dictionary{System.Type,System.Func{System.Type,System.Object}})
   name.vb: WithFactory(Dictionary(Of Type, Func(Of Type, Object)))
-  fullName: Dec.Recorder.Parameters.WithFactory(Dictionary<Type, Func<Type, System.Object>>)
-  fullName.vb: Dec.Recorder.Parameters.WithFactory(Dictionary(Of Type, Func(Of Type, System.Object)))
-  nameWithType: Recorder.Parameters.WithFactory(Dictionary<Type, Func<Type, Object>>)
+  fullName: Dec.Recorder.Parameters.WithFactory(System.Collections.Generic.Dictionary<System.Type, System.Func<System.Type, object>>)
+  fullName.vb: Dec.Recorder.Parameters.WithFactory(System.Collections.Generic.Dictionary(Of System.Type, System.Func(Of System.Type, Object)))
+  nameWithType: Recorder.Parameters.WithFactory(Dictionary<Type, Func<Type, object>>)
   nameWithType.vb: Recorder.Parameters.WithFactory(Dictionary(Of Type, Func(Of Type, Object)))
 - uid: Dec.Recorder.Parameters.WithFactory*
   name: WithFactory
@@ -989,13 +1052,13 @@ references:
   fullName: Dec.Recorder.Read
   nameWithType: Recorder.Read
 - uid: Dec.Recorder.Read``1(System.String,System.String)
-  name: Read<T>(String, String)
+  name: Read<T>(string, string)
   href: api/Dec.Recorder.html#Dec_Recorder_Read__1_System_String_System_String_
   commentId: M:Dec.Recorder.Read``1(System.String,System.String)
   name.vb: Read(Of T)(String, String)
-  fullName: Dec.Recorder.Read<T>(System.String, System.String)
-  fullName.vb: Dec.Recorder.Read(Of T)(System.String, System.String)
-  nameWithType: Recorder.Read<T>(String, String)
+  fullName: Dec.Recorder.Read<T>(string, string)
+  fullName.vb: Dec.Recorder.Read(Of T)(String, String)
+  nameWithType: Recorder.Read<T>(string, string)
   nameWithType.vb: Recorder.Read(Of T)(String, String)
 - uid: Dec.Recorder.Record*
   name: Record
@@ -1004,15 +1067,6 @@ references:
   isSpec: "True"
   fullName: Dec.Recorder.Record
   nameWithType: Recorder.Record
-- uid: Dec.Recorder.Record``1(``0@,System.String)
-  name: Record<T>(ref T, String)
-  href: api/Dec.Recorder.html#Dec_Recorder_Record__1___0__System_String_
-  commentId: M:Dec.Recorder.Record``1(``0@,System.String)
-  name.vb: Record(Of T)(ByRef T, String)
-  fullName: Dec.Recorder.Record<T>(ref T, System.String)
-  fullName.vb: Dec.Recorder.Record(Of T)(ByRef T, System.String)
-  nameWithType: Recorder.Record<T>(ref T, String)
-  nameWithType.vb: Recorder.Record(Of T)(ByRef T, String)
 - uid: Dec.Recorder.RecordAsThis*
   name: RecordAsThis
   href: api/Dec.Recorder.html#Dec_Recorder_RecordAsThis_
@@ -1024,11 +1078,20 @@ references:
   name: RecordAsThis<T>(ref T)
   href: api/Dec.Recorder.html#Dec_Recorder_RecordAsThis__1___0__
   commentId: M:Dec.Recorder.RecordAsThis``1(``0@)
-  name.vb: RecordAsThis(Of T)(ByRef T)
+  name.vb: RecordAsThis(Of T)(T)
   fullName: Dec.Recorder.RecordAsThis<T>(ref T)
-  fullName.vb: Dec.Recorder.RecordAsThis(Of T)(ByRef T)
+  fullName.vb: Dec.Recorder.RecordAsThis(Of T)(T)
   nameWithType: Recorder.RecordAsThis<T>(ref T)
-  nameWithType.vb: Recorder.RecordAsThis(Of T)(ByRef T)
+  nameWithType.vb: Recorder.RecordAsThis(Of T)(T)
+- uid: Dec.Recorder.Record``1(``0@,System.String)
+  name: Record<T>(ref T, string)
+  href: api/Dec.Recorder.html#Dec_Recorder_Record__1___0__System_String_
+  commentId: M:Dec.Recorder.Record``1(``0@,System.String)
+  name.vb: Record(Of T)(T, String)
+  fullName: Dec.Recorder.Record<T>(ref T, string)
+  fullName.vb: Dec.Recorder.Record(Of T)(T, String)
+  nameWithType: Recorder.Record<T>(ref T, string)
+  nameWithType.vb: Recorder.Record(Of T)(T, String)
 - uid: Dec.Recorder.Shared
   name: Shared()
   href: api/Dec.Recorder.html#Dec_Recorder_Shared
@@ -1042,14 +1105,14 @@ references:
   isSpec: "True"
   fullName: Dec.Recorder.Shared
   nameWithType: Recorder.Shared
-- uid: Dec.Recorder.WithFactory(Dictionary{Type,Func{Type,System.Object}})
-  name: WithFactory(Dictionary<Type, Func<Type, Object>>)
-  href: api/Dec.Recorder.html#Dec_Recorder_WithFactory_Dictionary_Type_Func_Type_System_Object___
-  commentId: M:Dec.Recorder.WithFactory(Dictionary{Type,Func{Type,System.Object}})
+- uid: Dec.Recorder.WithFactory(System.Collections.Generic.Dictionary{System.Type,System.Func{System.Type,System.Object}})
+  name: WithFactory(Dictionary<Type, Func<Type, object>>)
+  href: api/Dec.Recorder.html#Dec_Recorder_WithFactory_System_Collections_Generic_Dictionary_System_Type_System_Func_System_Type_System_Object___
+  commentId: M:Dec.Recorder.WithFactory(System.Collections.Generic.Dictionary{System.Type,System.Func{System.Type,System.Object}})
   name.vb: WithFactory(Dictionary(Of Type, Func(Of Type, Object)))
-  fullName: Dec.Recorder.WithFactory(Dictionary<Type, Func<Type, System.Object>>)
-  fullName.vb: Dec.Recorder.WithFactory(Dictionary(Of Type, Func(Of Type, System.Object)))
-  nameWithType: Recorder.WithFactory(Dictionary<Type, Func<Type, Object>>)
+  fullName: Dec.Recorder.WithFactory(System.Collections.Generic.Dictionary<System.Type, System.Func<System.Type, object>>)
+  fullName.vb: Dec.Recorder.WithFactory(System.Collections.Generic.Dictionary(Of System.Type, System.Func(Of System.Type, Object)))
+  nameWithType: Recorder.WithFactory(Dictionary<Type, Func<Type, object>>)
   nameWithType.vb: Recorder.WithFactory(Dictionary(Of Type, Func(Of Type, Object)))
 - uid: Dec.Recorder.WithFactory*
   name: WithFactory
@@ -1065,15 +1128,6 @@ references:
   isSpec: "True"
   fullName: Dec.Recorder.Write
   nameWithType: Recorder.Write
-- uid: Dec.Recorder.Write``1(``0,System.Boolean)
-  name: Write<T>(T, Boolean)
-  href: api/Dec.Recorder.html#Dec_Recorder_Write__1___0_System_Boolean_
-  commentId: M:Dec.Recorder.Write``1(``0,System.Boolean)
-  name.vb: Write(Of T)(T, Boolean)
-  fullName: Dec.Recorder.Write<T>(T, System.Boolean)
-  fullName.vb: Dec.Recorder.Write(Of T)(T, System.Boolean)
-  nameWithType: Recorder.Write<T>(T, Boolean)
-  nameWithType.vb: Recorder.Write(Of T)(T, Boolean)
 - uid: Dec.Recorder.WriteValidation*
   name: WriteValidation
   href: api/Dec.Recorder.html#Dec_Recorder_WriteValidation_
@@ -1090,6 +1144,15 @@ references:
   fullName.vb: Dec.Recorder.WriteValidation(Of T)(T)
   nameWithType: Recorder.WriteValidation<T>(T)
   nameWithType.vb: Recorder.WriteValidation(Of T)(T)
+- uid: Dec.Recorder.Write``1(``0,System.Boolean)
+  name: Write<T>(T, bool)
+  href: api/Dec.Recorder.html#Dec_Recorder_Write__1___0_System_Boolean_
+  commentId: M:Dec.Recorder.Write``1(``0,System.Boolean)
+  name.vb: Write(Of T)(T, Boolean)
+  fullName: Dec.Recorder.Write<T>(T, bool)
+  fullName.vb: Dec.Recorder.Write(Of T)(T, Boolean)
+  nameWithType: Recorder.Write<T>(T, bool)
+  nameWithType.vb: Recorder.Write(Of T)(T, Boolean)
 - uid: Dec.StaticReferencesAttribute
   name: StaticReferencesAttribute
   href: api/Dec.StaticReferencesAttribute.html
