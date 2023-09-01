@@ -5,6 +5,8 @@ on:
     branches:
     - '**'
 
+concurrency: documentation
+
 jobs:
   build:
     runs-on: ubuntu-22.04
@@ -24,9 +26,6 @@ jobs:
         dotnet tool install -g coveralls.net --version 1.0.0
     - name: Test documentation
       run: docfx.console.*/tools/docfx.exe doc/docfx.json
-    - uses: shogo82148/actions-mutex@v1
-      with:
-        key: documentation
     - name: Extract branch name
       run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
     - name: Check out repo shadow copy

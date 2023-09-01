@@ -5,6 +5,8 @@ on:
     tags:
       - v0.*
 
+concurrency: documentation
+
 jobs:
   build:
     runs-on: ubuntu-22.04
@@ -24,9 +26,6 @@ jobs:
         dotnet tool install -g coveralls.net --version 1.0.0
     - name: Test documentation
       run: docfx.console.*/tools/docfx.exe doc/docfx.json
-    - uses: shogo82148/actions-mutex@v1
-      with:
-        key: documentation
     - name: Check out repo shadow copy
       uses: actions/checkout@v2
       with:
