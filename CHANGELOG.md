@@ -13,6 +13,9 @@ All notable changes to this project will be documented in this file.
 ### Improved
 * Internal validation checks in unit tests.
 
+### Documentation
+* Picked a more modern and less awkwardly stifling visual style.
+
 ### Fixed
 * Minor errors in several error messages.
 * Comment typos in unit tests.
