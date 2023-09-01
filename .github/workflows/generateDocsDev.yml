@@ -21,10 +21,9 @@ jobs:
       run: dotnet restore
     - name: Setup tooling
       run: |
-        sudo apt install nuget
-        nuget install docfx.console
-    - name: Test documentation
-      run: docfx.console.*/tools/docfx.exe doc/docfx.json
+        dotnet tool install --global docfx
+    - name: Build documentation
+      run: docfx doc/docfx.json
     - name: Extract branch name
       run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
     - name: Check out repo shadow copy
