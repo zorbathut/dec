@@ -157,5 +157,41 @@ namespace DecTest
             Assert.AreEqual(result.dataEmpty, new[] { 10, 9, 8, 0, 6 });
             Assert.AreEqual(result.dataProvided, new[] { 10, 9, 8, 0, 6 });
         }
+
+        [Test]
+        public void BadTags([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <ArrayDec decName=""TestDec"">
+                        <dataEmpty>
+                            <horse>10</horse>
+                            <li>9</li>
+                            <li>8</li>
+                            <li>7</li>
+                            <li>6</li>
+                        </dataEmpty>
+                        <dataProvided>
+                            <li>10</li>
+                            <li>9</li>
+                            <rhino>8</rhino>
+                            <li>7</li>
+                            <li>6</li>
+                        </dataProvided>
+                    </ArrayDec>
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoParserTests(mode);
+
+            var result = Dec.Database<ArrayDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(result.dataEmpty, new[] { 10, 9, 8, 7, 6 });
+            Assert.AreEqual(result.dataProvided, new[] { 10, 9, 8, 7, 6 });
+        }
     }
 }
