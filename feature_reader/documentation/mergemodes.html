@@ -76,14 +76,14 @@
 
 <h2 id="introduction">Introduction</h2>
 <p>Dec now supports two different ways of combining Decs, <a href="inheritance.html">inheritance</a> and <a href="modding.html">modules</a>. In both cases the Dec writer is likely to need to override or modify existing properties. Control over this can be complicated; there isn't a single default behavior that works in all cases.</p>
-<p>Imagine a modder who wants to take an existing bronze sword:</p>
+<p>Imagine a developer who wants to take an existing bronze sword:</p>
 <pre><code class="lang-xml">&lt;WeaponDec decName=&quot;BronzeSword&quot;&gt;
   &lt;damage&gt;1&lt;/damage&gt;
   &lt;damageType&gt;Sharp&lt;/damageType&gt;
   &lt;materials&gt;&lt;Bronze&gt;10&lt;/Bronze&gt;&lt;/materials&gt;
 &lt;/WeaponDec&gt;
 </code></pre>
-<p>and turn it into a chainsaw:</p>
+<p>and use it to make a chainsaw:</p>
 <pre><code class="lang-xml">&lt;WeaponDec decName=&quot;Chainsaw&quot; parent=&quot;BronzeSword&quot;&gt;
   &lt;damage&gt;10&lt;/damage&gt;
   &lt;materials&gt;&lt;Steel&gt;10&lt;/Steel&gt;&lt;/materials&gt;
@@ -120,12 +120,12 @@
   &lt;/drops&gt;
 &lt;/CreatureDec&gt;
 </code></pre>
-<p>This seems like a good idea - animals have a position and biological health behavior, and then you just add an appropriate brain to the squirrel, right? But now we're relying on the list to append the new component, while in our previous example we expected the Fur to be replaced with Iron.</p>
-<p>Dec's solution is to fall back on reasonable defaults that are also designed to fail noisily with mistakes, and allow <code>mode=</code> tags to override those defaults.  Importantly, <strong>these tags apply only to a single element</strong>; they do not persist through children, the parsing immediately reverts back to reasonable-defaults.</p>
+<p>This seems like a good idea - animals have a position and biological health behavior, and then you just add an appropriate brain to the squirrel, right? But now we're relying on the list to append the new component, while in our previous example we expected the Bronze to be replaced with Steel.</p>
+<p>Dec's solution is to fall back on reasonable defaults that are also designed to fail noisily when mistakes are made, and allow <code>mode=</code> tags to override those defaults.</p>
 <p>Dec supports three standard merge modes to help issues of this sort: <code>replace</code>, <code>patch</code>, and <code>append</code>.</p>
 <h2 id="standard-merge-modes">Standard Merge Modes</h2>
 <h3 id="replace">replace</h3>
-<p><code>replace</code> is the default merge mode for values and collections. It clears the existing element and replaces it from scratch. A list with existing elements will be deleted entirely.</p>
+<p><code>replace</code> is the default merge mode for values and collections. It clears the existing element and replaces it from scratch. A list with existing elements will be rebuilt from empty.</p>
 <pre><code class="lang-xml">&lt;WeaponDec decName=&quot;IronSword&quot; parent=&quot;BronzeSword&quot;&gt;
   &lt;!-- replace the weapon damage --&gt;
   &lt;damage&gt;4&lt;/damage&gt;
@@ -135,7 +135,7 @@
 &lt;/WeaponDec&gt;
 </code></pre>
 <h3 id="append">append</h3>
-<p><code>append</code> is valid only for collections. For List-style collections, it adds more elements to the end; for HashSets or Dictionaries, it adds elements to the container. Key collisions are an error.</p>
+<p><code>append</code> is valid only for collections. For List-style collections, it adds more elements to the end; for HashSets or Dictionaries, it adds new elements to the container, but key collisions are an error.</p>
 <pre><code class="lang-xml">&lt;CreatureDec decName=&quot;Rabbit&quot; parent=&quot;Animal&quot;&gt;
   &lt;!-- add a new Brain component to the end of the array --&gt;
   &lt;components mode=&quot;append&quot;&gt;
@@ -145,7 +145,7 @@
   &lt;/components&gt;
 
   &lt;!-- standard animal drops, but add a rabbit pelt --&gt;
-  &lt;drops  mode=&quot;append&quot;&gt;
+  &lt;drops mode=&quot;append&quot;&gt;
     &lt;RabbitPelt&gt;1&lt;/RabbitPelt&gt;
   &lt;/drops&gt;
 &lt;/CreatureDec&gt;
@@ -154,12 +154,12 @@
 <p><code>patch</code> is the default merge mode for dec inheritance, classes, and structs, and valid for associative containers such as Dictionary or HashSet. It leaves existing elements in place but overrides the existing items with new items.</p>
 <pre><code class="lang-xml">&lt;CreatureDec decName=&quot;Cow&quot; parent=&quot;Herbivore&quot;&gt;
   &lt;!-- Cows are big and should drop a lot of meat, but leave the rest of the drops alone. --&gt;
-  &lt;drops  mode=&quot;patch&quot;&gt;
+  &lt;drops mode=&quot;patch&quot;&gt;
     &lt;Meat&gt;40&lt;/Meat&gt;
   &lt;/drops&gt;
 &lt;/CreatureDec&gt;
 </code></pre>
-<h2 id="decs-module-merge-modes">Dec's Module Merge Modes</h2>
+<h2 id="dec-module-merge-modes">Dec Module Merge Modes</h2>
 <p>As mentioned above, both inheritance and modules allow some form of compositing. Inheritance itself, however, is <em>always</em> done with <code>patch</code> semantics. (<code>append</code> isn't valid for Decs, and if you wanted <code>replace</code>, you could accomplish that by just not doing inheritance!)</p>
 <p>The above three modes work fine for most data types, but Decs themselves are significantly more complicated. Mods may want to create new Decs, modify existing Decs, replace Decs entirely, or even simply delete them.</p>
 <h3 id="common-merge-modes">Common Merge Modes</h3>
@@ -352,11 +352,11 @@
   </tr>
 </table>
 <h2 id="subtleties">Subtleties</h2>
-<p>Merge modes do not persist through the hierarchy. Setting a <code>patch</code> mode does not mean that all children inherit <code>patch</code>; they revert to their default behavior immediately.</p>
+<p>For the sake of local comprehension, <strong>these tags apply only to a single element</strong>; they do not persist through children, the parsing immediately reverts back to reasonable defaults. Setting a <code>patch</code> mode does not mean that all children inherit <code>patch</code>! They revert to their default behavior immediately.</p>
 <pre><code class="lang-xml">&lt;CreatureDec decName=&quot;Rabbit&quot; mode=&quot;patch&quot;&gt;
   &lt;!-- After this module, the modded rabbit now drops fur, guts, a rabbit pelt, *and* a holy hand grenade --&gt;
   &lt;!-- Without the mode tag, this would revert back to `replace`, and the rabbit would drop only the hand grenade --&gt;
-  &lt;drops  mode=&quot;patch&quot;&gt;
+  &lt;drops mode=&quot;patch&quot;&gt;
     &lt;HolyHandGrenade&gt;1&lt;/HolyHandGrenade&gt;
   &lt;/drops&gt;
 &lt;/CreatureDec&gt;
