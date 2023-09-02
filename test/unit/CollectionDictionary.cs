@@ -301,5 +301,65 @@ namespace DecTest
                 { "Key", "Value" },
             });
         }
+
+        public enum MissingItemsSettings
+        {
+            Key,
+            Value,
+            Both,
+        }
+        [Test]
+        public void MissingLiItems([Values] ParserMode mode, [Values] MissingItemsSettings mis)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryStringDec) } });
+
+            string midpoint;
+            if (mis == MissingItemsSettings.Key)
+            {
+                midpoint = "<li><value>Value</value></li>";
+            }
+            else if (mis == MissingItemsSettings.Value)
+            {
+                midpoint = "<li><key>Key</key></li>";
+            }
+            else if (mis == MissingItemsSettings.Both)
+            {
+                midpoint = "<li></li>";
+            }
+            else
+            {
+                throw new System.ArgumentException();
+            }
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, $@"
+                <Decs>
+                    <DictionaryStringDec decName=""TestDec"">
+                        <data>
+                            <li>
+                                <key>Prefix</key>
+                                <value>Prefix</value>
+                            </li>
+                            {midpoint}
+                            <li>
+                                <key>Postfix</key>
+                                <value>Postfix</value>
+                            </li>
+                        </data>
+                    </DictionaryStringDec>
+                </Decs>");
+
+            ExpectErrors(() => parser.Finish());
+
+            DoParserTests(mode);
+
+            var result = Dec.Database<DictionaryStringDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(result.data, new Dictionary<string, string> {
+                { "Prefix", "Prefix" },
+                { "Postfix", "Postfix" },
+            });
+        }
     }
 }
