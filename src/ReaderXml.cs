@@ -358,13 +358,22 @@ namespace Dec
                         continue;
                     }
 
-                    if (dict.Contains(key) && (writtenFields == null || writtenFields.Contains(key)))
+                    object originalValue = null;
+                    if (dict.Contains(key))
                     {
-                        Dbg.Err($"{elementContext}: Dictionary includes duplicate key `{key.ToString()}`");
+                        // Annoyingly the IDictionary interface does not allow for simultaneous retrieval and existence check a la .TryGetValue(), so we get to do a second lookup here
+                        // This is definitely not the common path, though, so, fine
+                        originalValue = dict[key];
+
+                        if (writtenFields == null || writtenFields.Contains(key))
+                        {
+                            Dbg.Err($"{elementContext}: Dictionary includes duplicate key `{key.ToString()}`");
+                        }
                     }
+                    
                     writtenFields?.Add(key);
 
-                    dict[key] = Serialization.ParseElement(new List<ReaderNode>() { new ReaderNodeXml(valueNode, fileIdentifier) }, referencedValueType, null, readerContext, recorderChildContext);
+                    dict[key] = Serialization.ParseElement(new List<ReaderNode>() { new ReaderNodeXml(valueNode, fileIdentifier) }, referencedValueType, originalValue, readerContext, recorderChildContext);
                 }
                 else
                 {
@@ -384,13 +393,22 @@ namespace Dec
                         continue;
                     }
 
-                    if (dict.Contains(key) && (writtenFields == null || writtenFields.Contains(key)))
+                    object originalValue = null;
+                    if (dict.Contains(key))
                     {
-                        Dbg.Err($"{elementContext}: Dictionary includes duplicate key `{key.ToString()}`");
+                        // Annoyingly the IDictionary interface does not allow for simultaneous retrieval and existence check a la .TryGetValue(), so we get to do a second lookup here
+                        // This is definitely not the common path, though, so, fine
+                        originalValue = dict[key];
+
+                        if (writtenFields == null || writtenFields.Contains(key))
+                        {
+                            Dbg.Err($"{elementContext}: Dictionary includes duplicate key `{key.ToString()}`");
+                        }
                     }
+
                     writtenFields?.Add(key);
 
-                    dict[key] = Serialization.ParseElement(new List<ReaderNode>() { new ReaderNodeXml(fieldElement, fileIdentifier) }, referencedValueType, null, readerContext, recorderChildContext);
+                    dict[key] = Serialization.ParseElement(new List<ReaderNode>() { new ReaderNodeXml(fieldElement, fileIdentifier) }, referencedValueType, originalValue, readerContext, recorderChildContext);
                 }
             }
         }
