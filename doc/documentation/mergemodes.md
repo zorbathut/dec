@@ -4,7 +4,7 @@
 
 Dec now supports two different ways of combining Decs, [inheritance](inheritance.md) and [modules](modding.md). In both cases the Dec writer is likely to need to override or modify existing properties. Control over this can be complicated; there isn't a single default behavior that works in all cases.
 
-Imagine a modder who wants to take an existing bronze sword:
+Imagine a developer who wants to take an existing bronze sword:
 
 ```xml
 <WeaponDec decName="BronzeSword">
@@ -14,7 +14,7 @@ Imagine a modder who wants to take an existing bronze sword:
 </WeaponDec>
 ```
 
-and turn it into a chainsaw:
+and use it to make a chainsaw:
 
 ```xml
 <WeaponDec decName="Chainsaw" parent="BronzeSword">
@@ -58,9 +58,9 @@ We run into further potential problems with a component-based system and inherit
 </CreatureDec>
 ```
 
-This seems like a good idea - animals have a position and biological health behavior, and then you just add an appropriate brain to the squirrel, right? But now we're relying on the list to append the new component, while in our previous example we expected the Fur to be replaced with Iron.
+This seems like a good idea - animals have a position and biological health behavior, and then you just add an appropriate brain to the squirrel, right? But now we're relying on the list to append the new component, while in our previous example we expected the Bronze to be replaced with Steel.
 
-Dec's solution is to fall back on reasonable defaults that are also designed to fail noisily with mistakes, and allow `mode=` tags to override those defaults.  Importantly, **these tags apply only to a single element**; they do not persist through children, the parsing immediately reverts back to reasonable-defaults.
+Dec's solution is to fall back on reasonable defaults that are also designed to fail noisily when mistakes are made, and allow `mode=` tags to override those defaults.
 
 Dec supports three standard merge modes to help issues of this sort: `replace`, `patch`, and `append`.
 
@@ -68,7 +68,7 @@ Dec supports three standard merge modes to help issues of this sort: `replace`, 
 
 ### replace
 
-`replace` is the default merge mode for values and collections. It clears the existing element and replaces it from scratch. A list with existing elements will be deleted entirely.
+`replace` is the default merge mode for values and collections. It clears the existing element and replaces it from scratch. A list with existing elements will be rebuilt from empty.
 
 ```xml
 <WeaponDec decName="IronSword" parent="BronzeSword">
@@ -82,7 +82,7 @@ Dec supports three standard merge modes to help issues of this sort: `replace`, 
 
 ### append
 
-`append` is valid only for collections. For List-style collections, it adds more elements to the end; for HashSets or Dictionaries, it adds elements to the container. Key collisions are an error.
+`append` is valid only for collections. For List-style collections, it adds more elements to the end; for HashSets or Dictionaries, it adds new elements to the container, but key collisions are an error.
 
 ```xml
 <CreatureDec decName="Rabbit" parent="Animal">
@@ -94,7 +94,7 @@ Dec supports three standard merge modes to help issues of this sort: `replace`, 
   </components>
 
   <!-- standard animal drops, but add a rabbit pelt -->
-  <drops  mode="append">
+  <drops mode="append">
     <RabbitPelt>1</RabbitPelt>
   </drops>
 </CreatureDec>
@@ -107,13 +107,13 @@ Dec supports three standard merge modes to help issues of this sort: `replace`, 
 ```xml
 <CreatureDec decName="Cow" parent="Herbivore">
   <!-- Cows are big and should drop a lot of meat, but leave the rest of the drops alone. -->
-  <drops  mode="patch">
+  <drops mode="patch">
     <Meat>40</Meat>
   </drops>
 </CreatureDec>
 ```
 
-## Dec's Module Merge Modes
+## Dec Module Merge Modes
 
 As mentioned above, both inheritance and modules allow some form of compositing. Inheritance itself, however, is *always* done with `patch` semantics. (`append` isn't valid for Decs, and if you wanted `replace`, you could accomplish that by just not doing inheritance!)
 
@@ -348,13 +348,13 @@ Empty spaces are errors; green spaces are default behavior.
 
 ## Subtleties
 
-Merge modes do not persist through the hierarchy. Setting a `patch` mode does not mean that all children inherit `patch`; they revert to their default behavior immediately.
+For the sake of local comprehension, **these tags apply only to a single element**; they do not persist through children, the parsing immediately reverts back to reasonable defaults. Setting a `patch` mode does not mean that all children inherit `patch`! They revert to their default behavior immediately.
 
 ```xml
 <CreatureDec decName="Rabbit" mode="patch">
   <!-- After this module, the modded rabbit now drops fur, guts, a rabbit pelt, *and* a holy hand grenade -->
   <!-- Without the mode tag, this would revert back to `replace`, and the rabbit would drop only the hand grenade -->
-  <drops  mode="patch">
+  <drops mode="patch">
     <HolyHandGrenade>1</HolyHandGrenade>
   </drops>
 </CreatureDec>
