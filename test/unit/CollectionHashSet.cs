@@ -38,6 +38,58 @@ namespace DecTest
         }
 
         [Test]
+        public void InvalidDataElement([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetStringDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <HashSetStringDec decName=""TestDec"">
+                        <data>
+                            <Hello />
+                            <Catastrophe><elem></elem></Catastrophe>
+                            <li>Goodbye</li>
+                        </data>
+                    </HashSetStringDec>
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoParserTests(mode);
+
+            var result = Dec.Database<HashSetStringDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(result.data, new HashSet<string> { "Hello", "Catastrophe", "Goodbye" });
+        }
+
+        [Test]
+        public void InvalidDataText([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetStringDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <HashSetStringDec decName=""TestDec"">
+                        <data>
+                            <Hello />
+                            <Catastrophe>no</Catastrophe>
+                            <li>Goodbye</li>
+                        </data>
+                    </HashSetStringDec>
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoParserTests(mode);
+
+            var result = Dec.Database<HashSetStringDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(result.data, new HashSet<string> { "Hello", "Catastrophe", "Goodbye" });
+        }
+
+        [Test]
         public void Duplicate([Values] ParserMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetStringDec) } });

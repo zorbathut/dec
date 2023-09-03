@@ -83,5 +83,10 @@ namespace Dec
             values.CopyTo(result, 0);
             return result;
         }
+
+        internal static bool IsNullOrEmpty(this string str)
+        {
+            return str == null || str == "";
+        }
     }
 }

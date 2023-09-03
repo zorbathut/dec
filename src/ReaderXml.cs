@@ -455,7 +455,7 @@ namespace Dec
                 }
                 else
                 {
-                    if (fieldElement.HasElements)
+                    if (fieldElement.HasElements || !fieldElement.GetText().IsNullOrEmpty())
                     {
                         Dbg.Err($"{elementContext}: HashSet non-li member includes data, ignoring");
                     }
