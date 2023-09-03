@@ -439,6 +439,35 @@ namespace DecTest
             Assert.AreEqual(63, result.kbn.nikto);
         }
 
+        [Test]
+        public void Duplicate([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(NamedDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <NamedDec decName=""TestDec"">
+                        <kbn>
+                            <klaatu>61</klaatu>
+                            <barada>62</barada>
+                            <barada>64</barada>
+                            <nikto>63</nikto>
+                        </kbn>
+                    </NamedDec>
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoParserTests(mode, xmlValidator: xml => xml.Contains("klaatu") && xml.Contains("barada") && xml.Contains("nikto"));
+
+            var result = Dec.Database<NamedDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(61, result.kbn.klaatu);
+            Assert.AreEqual(64, result.kbn.barada);
+            Assert.AreEqual(63, result.kbn.nikto);
+        }
+
         public class NamedAsLiDec : Dec.Dec
         {
             public (int klaatu, int li, int nikto) kbn;
