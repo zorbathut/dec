@@ -361,5 +361,44 @@ namespace DecTest
                 { "Postfix", "Postfix" },
             });
         }
+
+        [Test]
+        public void Duplicates([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryStringDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, $@"
+                <Decs>
+                    <DictionaryStringDec decName=""TestDec"">
+                        <data>
+                            <li>
+                                <key>Alpha</key>
+                                <value>Alpha</value>
+                            </li>
+                            <li>
+                                <key>Beta</key>
+                                <value>Beta</value>
+                            </li>
+                            <li>
+                                <key>Beta</key>
+                                <value>Gamma</value>
+                            </li>
+                        </data>
+                    </DictionaryStringDec>
+                </Decs>");
+
+            ExpectErrors(() => parser.Finish());
+
+            DoParserTests(mode);
+
+            var result = Dec.Database<DictionaryStringDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(result.data, new Dictionary<string, string> {
+                { "Alpha", "Alpha" },
+                { "Beta", "Gamma" },
+            });
+        }
     }
 }
