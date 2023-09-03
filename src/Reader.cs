@@ -79,18 +79,5 @@ namespace Dec
                 default: Dbg.Err($"Unknown attribute type {metadata}"); return "UNKNOWN";
             }
         }
-
-        public static ReaderNode.Metadata MetadataFromLowerString(string metadata)
-        {
-            // Convert lowercase version of the enum name back to the enum.
-            switch (metadata)
-            {
-                case "null": return ReaderNode.Metadata.Null;
-                case "ref": return ReaderNode.Metadata.Ref;
-                case "class": return ReaderNode.Metadata.Class;
-                case "mode": return ReaderNode.Metadata.Mode;
-                default: Dbg.Err($"Unknown attribute name {metadata}"); return ReaderNode.Metadata.Null;
-            }
-        }
     }
 }
