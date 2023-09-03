@@ -90,7 +90,7 @@ namespace DecTest
         }
 
         [Test]
-        public void Duplicate([Values] ParserMode mode)
+        public void DuplicateLi([Values] ParserMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetStringDec) } });
 
@@ -103,6 +103,33 @@ namespace DecTest
                             <li>Dupe</li>
                             <li>Dupe</li>
                             <li>Suffix</li>
+                        </data>
+                    </HashSetStringDec>
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoParserTests(mode);
+
+            var result = Dec.Database<HashSetStringDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(result.data, new HashSet<string> { "Prefix", "Dupe", "Suffix" });
+        }
+
+        [Test]
+        public void DuplicateTag([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HashSetStringDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <HashSetStringDec decName=""TestDec"">
+                        <data>
+                            <Prefix />
+                            <Dupe />
+                            <Dupe />
+                            <Suffix />
                         </data>
                     </HashSetStringDec>
                 </Decs>");

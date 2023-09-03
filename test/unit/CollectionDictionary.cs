@@ -97,7 +97,7 @@ namespace DecTest
         }
 
         [Test]
-        public void Duplicate([Values] ParserMode mode)
+        public void DuplicateTag([Values] ParserMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(DictionaryStringDec) } });
 
@@ -363,7 +363,7 @@ namespace DecTest
         }
 
         [Test]
-        public void Duplicates([Values] ParserMode mode)
+        public void DuplicateLi([Values] ParserMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryStringDec) } });
 
