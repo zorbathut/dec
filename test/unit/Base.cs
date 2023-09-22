@@ -12,6 +12,9 @@ namespace DecTest
         [SetUp] [TearDown]
         public void Clean()
         {
+            // stop verifying things
+            errorValidator = null;
+
             // we turn on error handling so that Clear can work even if we're in the wrong mode
             handlingErrors = true;
 

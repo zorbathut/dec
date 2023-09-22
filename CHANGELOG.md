@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Testing
+* Made test harness more durable of errors happening during parsing.
 
 ## [v0.5.0]
 ### Added
