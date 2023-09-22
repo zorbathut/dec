@@ -850,11 +850,12 @@ namespace Dec
             }
 
             // All our standard text-using options
-            if (hasText ||
-                (typeof(Dec).IsAssignableFrom(type) && !isRootDec) ||
-                type == typeof(Type) ||
-                type == typeof(string) ||
-                type.IsPrimitive)
+            if ((typeof(Dec).IsAssignableFrom(type) && !isRootDec) ||
+                    type == typeof(Type) ||
+                    type == typeof(string) ||
+                    type.IsPrimitive ||
+                    (TypeDescriptor.GetConverter(type)?.CanConvertFrom(typeof(string)) ?? false)   // this is last because it's slow
+                )
             {
                 foreach (var (parseCommand, node) in orders)
                 {
@@ -884,6 +885,7 @@ namespace Dec
             if (hasText)
             {
                 Dbg.Err($"{hasTextNode.GetInputContext()}: Text detected in a situation where it is invalid; will be ignored");
+                return result;
             }
 
             // Special case: Lists

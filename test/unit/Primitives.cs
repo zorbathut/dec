@@ -788,6 +788,28 @@ namespace DecTest
         }
 
         [Test]
+        public void StubWithString([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(NullDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <NullDec decName=""TestDec"">
+                        <setToNull>horse</setToNull>
+                    </NullDec>
+                </Decs>");
+            ExpectErrors(() => parser.Finish(), errorValidator: error => error.Contains("Text detected"));
+
+            DoParserTests(mode);
+
+            var testDec = Dec.Database<NullDec>.Get("TestDec");
+            Assert.IsNotNull(testDec);
+            Assert.IsNotNull(testDec.initialized);
+            Assert.IsNull(testDec.setToNull);
+        }
+
+        [Test]
         public void FloatLocale([Values] ParserMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(FloatDec) } });

@@ -537,6 +537,7 @@ namespace Dec
                 || (!isRootDec && typeof(Dec).IsAssignableFrom(type)) // unnecessary isRootDec test here is to shortcut the expensive IsAssignableFrom call
                 || typeof(Enum).IsAssignableFrom(type)
                 || converter is ConverterString
+                || (System.ComponentModel.TypeDescriptor.GetConverter(type)?.CanConvertFrom(typeof(string)) ?? false)   // this is last because it's slow
             )
             {
                 return ParseModeCategory.Value;
