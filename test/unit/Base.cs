@@ -86,6 +86,11 @@ namespace DecTest
                 // Check to see if this is considered a "valid" error.
                 Assert.IsTrue(errorValidator == null || errorValidator(str));
 
+                if (str.Contains("Internal error", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    throw new InvalidOperationException(str);
+                }
+
                 if (handlingErrors)
                 {
                     // If we're handling it, don't throw - this way we can validate that fallback behavior is working right

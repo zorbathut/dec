@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 ### Testing
 * Made test harness more durable of errors happening during parsing.
 * Fixed a test that was accidentally testing the wrong thing.
+* Detect internal errors and report them as true test failures.
 
 
 ## [v0.5.0]
