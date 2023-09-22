@@ -193,10 +193,9 @@ namespace Dec
             Patch,
             Append,
         }
-        // this interface is pretty janky and takes this form entirely because it's what I needed at the time
-        internal static List<(ParseCommand command, T node)> CompileOrders<T>(UtilType.ParseModeCategory modeCategory, IEnumerable<(T, ReaderNode)> nodes)
+        internal static List<(ParseCommand command, ReaderNode node)> CompileOrders(UtilType.ParseModeCategory modeCategory, List<ReaderNode> nodes)
         {
-            var orders = new List<(ParseCommand command, T payload)>();
+            var orders = new List<(ParseCommand command, ReaderNode payload)>();
 
             if (modeCategory == UtilType.ParseModeCategory.Dec)
             {
@@ -204,7 +203,7 @@ namespace Dec
                 return orders;
             }
 
-            foreach (var (payload, node) in nodes)
+            foreach (var node in nodes)
             {
                 var inputContext = node.GetInputContext();
                 var s_parseMode = ParseModeFromString(inputContext, node.GetMetadata(ReaderNode.Metadata.Mode));
@@ -289,7 +288,7 @@ namespace Dec
                     orders.Clear();
                 }
 
-                orders.Add((s_parseCommand, payload));
+                orders.Add((s_parseCommand, node));
             }
 
             return orders;
@@ -547,7 +546,7 @@ namespace Dec
 
             // Now we traverse the Mode attributes as prep for our final parse pass.
             // ordersOverride makes `nodes` admittedly a little unnecessary.
-            List<(ParseCommand command, ReaderNode node)> orders = ordersOverride ?? CompileOrders(type.CalculateSerializationModeCategory(converter, isRootDec), nodes.Select(node => (node, node)));
+            List<(ParseCommand command, ReaderNode node)> orders = ordersOverride ?? CompileOrders(type.CalculateSerializationModeCategory(converter, isRootDec), nodes);
 
             // Gather info
             bool hasChildren = false;
