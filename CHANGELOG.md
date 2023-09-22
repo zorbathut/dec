@@ -2,9 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
-
 ### Testing
 * Made test harness more durable of errors happening during parsing.
+* * Fixed a test that was accidentally testing the wrong thing.
 
 ## [v0.5.0]
 ### Added

@@ -324,12 +324,12 @@ namespace DecTest
         {
             public override ExceptionPayload Read(string input, Dec.InputContext inputContext)
             {
-                throw new InvalidOperationException();
+                throw new InvalidOperationException("EasilyDetectableMessage");
             }
 
             public override string Write(ExceptionPayload input)
             {
-                throw new InvalidOperationException();
+                throw new InvalidOperationException("EasilyDetectableMessage");
             }
         }
 
@@ -337,12 +337,12 @@ namespace DecTest
         {
             public override ExceptionPayloadStruct Read(string input, Dec.InputContext inputContext)
             {
-                throw new InvalidOperationException();
+                throw new InvalidOperationException("EasilyDetectableMessage");
             }
 
             public override string Write(ExceptionPayloadStruct input)
             {
-                throw new InvalidOperationException();
+                throw new InvalidOperationException("EasilyDetectableMessage");
             }
         }
 
@@ -365,7 +365,7 @@ namespace DecTest
                         <after>4</after>
                     </ExceptionDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), errorValidator: error => error.Contains("EasilyDetectableMessage"));
 
             DoParserTests(mode);
 
@@ -385,7 +385,7 @@ namespace DecTest
         [Test]
         public void ExceptionRecoveryNull()
         {
-            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExceptionRecoveryDec) }, explicitConverters = new Type[] { typeof(ExceptionPayloadStructConverter) } });
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExceptionRecoveryDec) }, explicitConverters = new Type[] { typeof(ExceptionPayloadConverter), typeof(ExceptionPayloadStructConverter) } });
 
             var parser = new Dec.Parser();
             parser.AddString(Dec.Parser.FileType.Xml, @"
@@ -394,7 +394,7 @@ namespace DecTest
                         <payloadNull>cube</payloadNull>
                     </ExceptionRecoveryDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), errorValidator: error => error.Contains("EasilyDetectableMessage"));
 
             DoParserTests(ParserMode.Bare);
 
@@ -404,7 +404,7 @@ namespace DecTest
         [Test]
         public void ExceptionRecoveryNonNull()
         {
-            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExceptionRecoveryDec) }, explicitConverters = new Type[] { typeof(ExceptionPayloadStructConverter) } });
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ExceptionRecoveryDec) }, explicitConverters = new Type[] { typeof(ExceptionPayloadConverter), typeof(ExceptionPayloadStructConverter) } });
 
             var parser = new Dec.Parser();
             parser.AddString(Dec.Parser.FileType.Xml, @"
@@ -413,7 +413,7 @@ namespace DecTest
                         <payloadNonNull>cube</payloadNonNull>
                     </ExceptionRecoveryDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), errorValidator: error => error.Contains("EasilyDetectableMessage"));
 
             DoParserTests(ParserMode.Bare);
 
@@ -433,7 +433,7 @@ namespace DecTest
                         <payloadStruct><li>cube</li></payloadStruct>
                     </ExceptionRecoveryDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), errorValidator: error => error.Contains("EasilyDetectableMessage"));
 
             DoParserTests(ParserMode.Bare);
 
