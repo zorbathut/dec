@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	<Configurations>Debug 2.1;Release 2.1;Debug 3.1;Release 3.1;Debug 7.0;Release 7.0</Configurations>
+    <TargetFramework>netcoreapp7.0</TargetFramework>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="$(Configuration.Contains('2.1'))">
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(Configuration.Contains('3.1'))">
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../../src/dec.csproj" />
+  </ItemGroup>
+  
+</Project>
