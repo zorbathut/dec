@@ -318,12 +318,42 @@ namespace DecTest
             // Make everything possible into a ref.
             RefEverything,
 
+            // Use the Clone function instead of a write/read pair.
+            Clone,
+
             // Generate validation code beforehand, then run that code.
             Validation,
         }
 
         public T DoRecorderRoundTrip<T>(T input, RecorderMode mode, Action<string> testSerializedResult = null, bool expectWriteErrors = false, bool expectWriteWarnings = false, bool expectReadErrors = false, bool expectReadWarnings = false)
         {
+            if (mode == RecorderMode.Clone)
+            {
+                bool expectErrors = expectWriteErrors || expectReadErrors;
+                bool expectWarnings = expectWriteWarnings || expectReadWarnings;
+                Assert.IsFalse(expectErrors && expectWarnings);
+
+                T result = default;
+                void DoClone()
+                {
+                    result = Dec.Recorder.Clone(input);
+                }
+                if (expectErrors)
+                {
+                    ExpectErrors(DoClone, "DoRecorder.Clone");
+                }
+                else if (expectWarnings)
+                {
+                    ExpectWarnings(DoClone, "DoRecorder.Clone");
+                }
+                else
+                {
+                    DoClone();
+                }
+
+                return result;
+            }
+
             UpdateTestRefEverything(mode == RecorderMode.RefEverything);
 
             if (mode == RecorderMode.Validation)

@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 * Converters now support generic arguments; they must be converting a generic with the same number of arguments in the same order. This might get changed later.
+* Recorder.Clone() function to duplicate objects.
 
 ### Improved
 * Improved error message when trying to initialize a composite with a string.

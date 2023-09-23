@@ -406,6 +406,18 @@ namespace Dec
                 return (T)Serialization.ParseElement(new List<ReaderNode>() { parseNode }, typeof(T), null, readerContext, new Recorder.Context() { shared = Context.Shared.Flexible });
             }
         }
+
+        /// <summary>
+        /// Makes a copy of an object.
+        /// </summary>
+        /// <remarks>
+        /// This is logically equivalent to Write(Read(obj)), but may be much faster.
+        /// </remarks>
+        public static T Clone<T>(T obj)
+        {
+            var stringized = Write(obj);
+            return Read<T>(stringized);
+        }
     }
 
     internal class RecorderWriter : Recorder
