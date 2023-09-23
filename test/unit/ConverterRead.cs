@@ -577,5 +577,47 @@ namespace DecTest
             Assert.AreEqual(dat.listA, deserialized.listA);
             Assert.AreSame(dat.listA, dat.listB);
         }
+
+        public class GenericClass<T>
+        {
+            public T item;
+        }
+
+        public class GenericConverter<T> : Dec.ConverterRecord<GenericClass<T>>
+        {
+            public override void Record(ref GenericClass<T> input, Dec.Recorder recorder)
+            {
+                recorder.RecordAsThis(ref input.item);
+            }
+        }
+
+        public class GenericConverterDec : Dec.Dec
+        {
+            public GenericClass<int> genericInt;
+            public GenericClass<string> genericString;
+        }
+
+        [Test]
+        public void Generic([ValuesExcept(ParserMode.Validation)] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(GenericConverterDec) }, explicitConverters = new Type[] { typeof(GenericConverter<>) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <GenericConverterDec decName=""TestDec"">
+                        <genericInt>42</genericInt>
+                        <genericString>hello</genericString>
+                    </GenericConverterDec>
+                </Decs>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            var dec = Dec.Database<GenericConverterDec>.Get("TestDec");
+            Assert.IsNotNull(dec);
+            Assert.AreEqual(42, dec.genericInt.item);
+            Assert.AreEqual("hello", dec.genericString.item);
+        }
     }
 }

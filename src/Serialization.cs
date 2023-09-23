@@ -51,11 +51,44 @@ namespace Dec
     {
         // Initialize it to empty in order to support Recorder operations without Dec initialization.
         // At some point we'll figure out how to support Converters at that point as well.
-        internal static Dictionary<Type, Converter> Converters = new Dictionary<Type, Converter>();
+        internal static Dictionary<Type, Converter> ConverterObjects = new Dictionary<Type, Converter>();
+        internal static Dictionary<Type, Type> ConverterGenericPrototypes = new Dictionary<Type, Type>();
+
+        internal static Converter ConverterFor(Type inputType)
+        {
+            if (ConverterObjects.TryGetValue(inputType, out var converter))
+            {
+                return converter;
+            }
+
+            if (inputType.IsConstructedGenericType)
+            {
+                var genericType = inputType.GetGenericTypeDefinition();
+                if (ConverterGenericPrototypes.TryGetValue(genericType, out var converterType))
+                {
+                    // construct `prototype` with the same generic arguments that `type` has
+                    var concreteConverterType = converterType.MakeGenericType(inputType.GenericTypeArguments);
+                    converter = (Converter)concreteConverterType.CreateInstanceSafe("converter", null);
+
+                    // yes, do this even if it's null
+                    ConverterObjects[inputType] = converter;
+
+                    return converter;
+                }
+                else
+                {
+                    // stub it out so we can do the fast path next time
+                    ConverterObjects[inputType] = null;
+                }
+            }
+            
+            return null;
+        }
+
 
         internal static void Initialize()
         {
-            Converters = new Dictionary<Type, Converter>();
+            ConverterObjects = new Dictionary<Type, Converter>();
 
             IEnumerable<Type> conversionTypes;
             if (Config.TestParameters == null)
@@ -73,24 +106,51 @@ namespace Dec
 
             foreach (var type in conversionTypes)
             {
-                if (type.IsAbstract || type.IsGenericType)
+                if (type.IsAbstract)
                 {
-                    // not really valid, just move on
-                    // we could do this up in the linq expression but that would be harder to test
+                    Dbg.Err($"Found converter {type} which is abstract. This is not allowed.");
+                    continue;
+                }
+
+                if (type.IsGenericType)
+                {
+                    var baseConverterType = type;
+                    while (baseConverterType.BaseType != typeof(ConverterString) && baseConverterType.BaseType != typeof(ConverterRecord) && baseConverterType.BaseType != typeof(ConverterFactory))
+                    {
+                        baseConverterType = baseConverterType.BaseType;
+                    }
+
+                    // we are now, presumably, at ConverterString<T> or ConverterRecord<T> or ConverterFactory<T>
+                    // this *really* needs more error checking
+                    Type converterTarget = baseConverterType.GenericTypeArguments[0];
+
+                    if (!converterTarget.IsGenericType)
+                    {
+                        Dbg.Err($"Found generic converter {type} which is not referring to a generic constructed type.");
+                        continue;
+                    }
+
+                    converterTarget = converterTarget.GetGenericTypeDefinition();
+                    if (ConverterGenericPrototypes.ContainsKey(converterTarget))
+                    {
+                        Dbg.Err($"Found multiple converters for {converterTarget}: {ConverterGenericPrototypes[converterTarget]} and {type}");
+                    }
+
+                    ConverterGenericPrototypes[converterTarget] = type;
                     continue;
                 }
 
                 var converter = (Converter)type.CreateInstanceSafe("converter", null);
-
                 if (converter != null && (converter is ConverterString || converter is ConverterRecord || converter is ConverterFactory))
                 {
                     Type convertedType = converter.GetConvertedType();
-                    if (Converters.ContainsKey(convertedType))
+                    if (ConverterObjects.ContainsKey(convertedType))
                     {
-                        Dbg.Err($"Converters {Converters[convertedType].GetType()} and {type} both generate result {convertedType}");
+                        Dbg.Err($"Found multiple converters for {convertedType}: {ConverterObjects[convertedType]} and {type}");
                     }
 
-                    Converters[convertedType] = converter;
+                    ConverterObjects[convertedType] = converter;
+                    continue;
                 }
             }
         }
@@ -542,7 +602,7 @@ namespace Dec
                 }
             }
 
-            var converter = Converters.TryGetValue(type);
+            var converter = ConverterFor(type);
 
             // Now we traverse the Mode attributes as prep for our final parse pass.
             // ordersOverride makes `nodes` admittedly a little unnecessary.
@@ -1197,7 +1257,7 @@ namespace Dec
         {
             // Special case: Converter override
             // This is redundant if we're being called from ParseElement, but we aren't always.
-            if (Converters.TryGetValue(type, out Converter converter))
+            if (ConverterFor(type) is Converter converter)
             {
                 object result = original;
 
@@ -1504,7 +1564,7 @@ namespace Dec
 
             {
                 // Look for a converter; that's the only way to handle this before we fall back to reflection
-                var converter = Serialization.Converters.TryGetValue(valType);
+                var converter = Serialization.ConverterFor(valType);
                 if (converter != null)
                 {
                     node.WriteConvertible(converter, value);
@@ -1530,7 +1590,8 @@ namespace Dec
 
         internal static void Clear()
         {
-            Converters = new Dictionary<Type, Converter>();
+            ConverterObjects = new Dictionary<Type, Converter>();
+            ConverterGenericPrototypes = new Dictionary<Type, Type>();
         }
     }
 }

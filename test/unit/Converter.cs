@@ -96,7 +96,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(RetemplatedConverter<>) } });
 
             // so what happens here?
-            new Dec.Parser().Finish();
+            ExpectErrors(() => new Dec.Parser().Finish());
         }
 
         public abstract class AbstractConverter : Dec.ConverterRecord<Stub>
@@ -110,7 +110,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(AbstractConverter) } });
 
             // so what happens here?
-            new Dec.Parser().Finish();
+            ExpectErrors(() => new Dec.Parser().Finish());
         }
     }
 }

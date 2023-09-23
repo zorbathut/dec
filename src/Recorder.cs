@@ -319,7 +319,7 @@ namespace Dec
                 foreach (var reference in refs)
                 {
                     object refInstance = null;
-                    if (Serialization.Converters.TryGetValue(reference.type, out var converter))
+                    if (Serialization.ConverterFor(reference.type) is Converter converter)
                     {
                         if (converter is ConverterString converterString)
                         {
