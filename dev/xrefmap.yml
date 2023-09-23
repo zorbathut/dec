@@ -946,6 +946,22 @@ references:
   commentId: T:Dec.Recorder
   fullName: Dec.Recorder
   nameWithType: Recorder
+- uid: Dec.Recorder.Clone*
+  name: Clone
+  href: api/Dec.Recorder.html#Dec_Recorder_Clone_
+  commentId: Overload:Dec.Recorder.Clone
+  isSpec: "True"
+  fullName: Dec.Recorder.Clone
+  nameWithType: Recorder.Clone
+- uid: Dec.Recorder.Clone``1(``0)
+  name: Clone<T>(T)
+  href: api/Dec.Recorder.html#Dec_Recorder_Clone__1___0_
+  commentId: M:Dec.Recorder.Clone``1(``0)
+  name.vb: Clone(Of T)(T)
+  fullName: Dec.Recorder.Clone<T>(T)
+  fullName.vb: Dec.Recorder.Clone(Of T)(T)
+  nameWithType: Recorder.Clone<T>(T)
+  nameWithType.vb: Recorder.Clone(Of T)(T)
 - uid: Dec.Recorder.Direction
   name: Recorder.Direction
   href: api/Dec.Recorder.Direction.html
