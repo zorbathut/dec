@@ -76,11 +76,6 @@ namespace Dec
             }
         }
 
-        internal static IEnumerable<Type> GetAllTypes()
-        {
-            return AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes());
-        }
-
         internal static bool IsUserAssembly(this Assembly asm)
         {
             var name = asm.FullName;

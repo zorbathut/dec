@@ -93,7 +93,7 @@ namespace Dec
             IEnumerable<Type> conversionTypes;
             if (Config.TestParameters == null)
             {
-                conversionTypes = UtilReflection.GetAllTypes().Where(t => t.IsSubclassOf(typeof(Converter)));
+                conversionTypes = UtilReflection.GetAllUserTypes().Where(t => t.IsSubclassOf(typeof(Converter)));
             }
             else if (Config.TestParameters.explicitConverters != null)
             {
