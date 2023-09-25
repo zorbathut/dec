@@ -81,8 +81,10 @@ namespace Dec
                     ConverterObjects[inputType] = null;
                 }
             }
-            
-            return null;
+
+            var factoriedConverter = Config.ConverterFactory?.Invoke(inputType);
+            ConverterObjects[inputType] = factoriedConverter;   // cache this so we don't generate a million of them
+            return factoriedConverter;
         }
 
 

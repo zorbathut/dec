@@ -120,6 +120,14 @@ namespace Dec
         private static string[] UsingNamespaceBacking = new string[0];
 
         /// <summary>
+        /// A factory function that can be used to provide custom converters.
+        /// </summary>
+        /// <remarks>
+        /// This is a tool of last resort; in most cases you should just be inheriting from ConverterString<T> et al. This is intended for converters from non-public classes, which can be access through (ab)use of reflection.
+        /// </remarks>
+        public static Func<Type, Converter> ConverterFactory;
+
+        /// <summary>
         /// Used for unit tests. Not recommended or supported for actual code.
         /// </summary>
         public class UnitTestParameters
