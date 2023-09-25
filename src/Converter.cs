@@ -68,6 +68,39 @@ namespace Dec
     }
 
     /// <summary>
+    /// Alternate dynamic-typed class for converting to arbitrary types via strings.
+    /// </summary>
+    /// <remarks>
+    /// This is a variant of ConverterString that allows you to use arbitrary types, which is helpful if you're trying to convert non-public types.
+    ///
+    /// In most cases it should be avoided.
+    /// </remarks>
+    public abstract class ConverterStringDynamic : ConverterString
+    {
+        /// <summary>
+        /// Converts an object to a string.
+        /// </summary>
+        public abstract string Write(object input);
+
+        /// <summary>
+        /// Converts a string to a suitable object type.
+        /// </summary>
+        /// <remarks>
+        /// In case of error, call Dec.Dbg.Err with some appropriately useful message and return default. Message should be formatted as $"{context}: Something went wrong".
+        /// </remarks>
+        public abstract object Read(string input, InputContext context);
+
+        override internal string WriteObj(object input)
+        {
+            return Write(input);
+        }
+        override internal object ReadObj(string input, InputContext context)
+        {
+            return Read(input, context);
+        }
+    }
+
+    /// <summary>
     /// Internal class for Converter systems.
     /// </summary>
     /// <remarks>
@@ -114,6 +147,31 @@ namespace Dec
     }
 
     /// <summary>
+    /// Alternate dynamic-typed class for converting to arbitrary types via the Recorder API.
+    /// </summary>
+    /// <remarks>
+    /// This is a variant of ConverterRecord that allows you to use arbitrary types, which is helpful if you're trying to convert non-public types.
+    ///
+    /// In most cases it should be avoided.
+    /// </remarks>
+    public abstract class ConverterRecordDynamic : ConverterRecord
+    {
+        /// <summary>
+        /// Records an object.
+        /// </summary>
+        /// <remarks>
+        /// See [`Dec.IRecordable.Record`](xref:Dec.IRecordable.Record*) for details, although you'll need to use `this` instead of `input`.
+        /// </remarks>
+        public abstract object Record(ref object input, Recorder recorder);
+
+        override internal object RecordObj(object input, Recorder recorder)
+        {
+            Record(ref input, recorder);
+            return input;
+        }
+    }
+
+    /// <summary>
     /// Internal class for Converter systems.
     /// </summary>
     /// <remarks>
@@ -128,7 +186,7 @@ namespace Dec
     }
 
     /// <summary>
-    /// Base class for converting to arbitrary types via the Recorder API.
+    /// Base class for converting to arbitrary types via the Recorder API, with full control over the object creation process.
     /// </summary>
     /// <remarks>
     /// This is a standalone class to allow implementation of converters of third-party types. It's useful when implementing converters for types that were not created by you (ex: UnityEngine.Vector).
@@ -184,6 +242,58 @@ namespace Dec
             T var = (T)input;
             Read(ref var, recorder);
             return var;
+        }
+    }
+
+    /// <summary>
+    /// Alternate dynamic-typed class for converting to arbitrary types via the Recorder API, with full control over the object creation process.
+    /// </summary>
+    /// <remarks>
+    /// This is a variant of ConverterFactory that allows you to use arbitrary types, which is helpful if you're trying to convert non-public types.
+    ///
+    /// In most cases it should be avoided.
+    /// </remarks>
+    public abstract class ConverterFactoryDynamic : ConverterFactory
+    {
+        /// <summary>
+        /// Writes an object.
+        /// </summary>
+        /// <remarks>
+        /// See [`Dec.IRecordable.Record`](xref:Dec.IRecordable.Record*) for details, although you'll need to use `this` instead of `input`.
+        /// </remarks>
+        public abstract void Write(object input, Recorder recorder);
+
+        /// <summary>
+        /// Creates an object.
+        /// </summary>
+        /// <remarks>
+        /// This is similar to [`Dec.IRecordable.Record`](xref:Dec.IRecordable.Record*), although you'll need to use `this` instead of `input`.
+        ///
+        /// This function will not be called if an instance already exists. In addition, you *cannot* reference other shared objects within Create, even transitively. Those must be referenced within Read. It is recommended that you do the bare minimum here to create the necessary object.
+        /// </remarks>
+        public abstract object Create(Recorder recorder);
+
+        /// <summary>
+        /// Reads an object.
+        /// </summary>
+        /// <remarks>
+        /// This is similar to [`Dec.IRecordable.Record`](xref:Dec.IRecordable.Record*), although you'll need to use `this` instead of `input`.
+        /// </remarks>
+        public abstract void Read(ref object input, Recorder recorder);
+
+        override internal void WriteObj(object input, Recorder recorder)
+        {
+            Write(input, recorder);
+        }
+
+        override internal object CreateObj(Recorder recorder)
+        {
+            return Create(recorder);
+        }
+        override internal object ReadObj(object input, Recorder recorder)
+        {
+            Read(ref input, recorder);
+            return input;
         }
     }
 }
