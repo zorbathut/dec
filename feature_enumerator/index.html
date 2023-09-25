@@ -1,0 +1,157 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>dec </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="dec ">
+      
+      <link rel="icon" href="favicon.ico">
+      <link rel="stylesheet" href="public/docfx.min.css">
+      <link rel="stylesheet" href="public/main.css">
+      <meta name="docfx:navrel" content="toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/zorbathut/dec/blob/feature_enumerator/doc/index.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+  </head>
+
+  <script type="module">
+    import options from './public/main.js'
+    import { init } from './public/docfx.min.js'
+    init(options)
+  </script>
+
+  <script>
+    const theme = localStorage.getItem('theme') || 'auto'
+    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+  </script>
+
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="index.html">
+            <img id="logo" class="svg" src="logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="dec">dec</h1>
+
+<h2 id="summary">Summary</h2>
+<p>Dec is a C# library for <strong>dec</strong>laring game asset types in XML. It includes extensive error reporting and recovery for ease of development, uses reflection to prevent writing lots of boilerplate code, is designed to allow easy moddability moddable by endusers (though not yet implemented), and includes a serialization system (intended for savegames, but often used for other things) that integrates cleanly with the underlying Dec types.</p>
+<p>Dec instances are intended to represent immutable classes of thing rather than specific things. As an example, you might have <code>ObjectDec.Chair</code> and <code>MonsterDec.Goblin</code>, but you wouldn't have a Dec instance for each individual chair or goblin in a level. Individual chairs or goblins would contain references to the <code>ObjectDec.Chair</code>/<code>MonsterDec.Goblin</code> Dec instances, in whatever way is easiest for your level editor or entity system.</p>
+<p>The Dec library does not tie itself to any particular engine and works within Godot, Unity, MonoGame, or any other C# environment.</p>
+<h2 id="why-should-i-use-dec">Why should I use dec?</h2>
+<p>Declaring types of things is a common thing to do in game engines, and the Dec library is intended as a one-stop-shop to allow declaring anything which may need to be declared, from in-game objects like monsters or weapons to conceptual things like actor behaviors.</p>
+<ul>
+<li><p>Declaring new types is easy thanks to reflection-based parsing.</p>
+</li>
+<li><p>Full support for cross-referenced objects, preventing consistency-check issues involved in string references.</p>
+</li>
+<li><p>Your data is stored in human-readable XML and can be organized in whatever manner best suits your project.</p>
+</li>
+<li><p>Extensive internal validation tests for anything that's disallowed, with full filename and line number information.</p>
+</li>
+<li><p>Recovery code capable of continuing after almost any data error, if configured to do so.</p>
+</li>
+<li><p>Unit test suite to guard against unexpected regressions.</p>
+</li>
+<li><p>Zero CPU use at runtime; most uses of the Dec library are simple class member accesses.</p>
+</li>
+<li><p>Full open source package, available under both MIT license and the Unlicense.</p>
+</li>
+</ul>
+<h2 id="why-shouldnt-i-use-dec-yet">Why shouldn't I use dec yet?</h2>
+<ul>
+<li><p>While the Dec library takes design cues from several well-tested production libraries, it has not yet been used in any released commercial product.</p>
+</li>
+<li><p>Many desired features are planned, but few are currently implemented.</p>
+</li>
+<li><p>No development community yet except for the author.</p>
+</li>
+</ul>
+<p>I plan to use this tool in all of my upcoming projects; it remains to be seen if it will gain traction outside of that.</p>
+<h2 id="why-shouldnt-i-use-dec-ever">Why shouldn't I use dec ever?</h2>
+<ul>
+<li><p>If your project has hundreds of thousands of Dec instances, the Dec library may experience scaling issues due to keeping all instances in memory at all times. This is not likely to be an issue for any game except MMOs.</p>
+</li>
+<li><p>Secret items, transmitted at runtime from a server, are not practical because the Dec library requires all data to be available at startup. This may present problems for always-online games that are intended to have live-but-undiscovered secrets.</p>
+</li>
+<li><p>The Dec library's design relies heavily on static typing and reflection, which limits the number of languages it could easily be ported to. At the moment, its sole implementation is in C#, and there are no plans for other implementations. If your game logic is not written in C# you probably shouldn't be using this.</p>
+</li>
+</ul>
+<hr>
+<p>If you'd like to delve more deeply, I recommend starting at <a href="quickstart/introduction.html">Quick Start</a>.</p>
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/zorbathut/dec/blob/feature_enumerator/doc/index.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+        
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

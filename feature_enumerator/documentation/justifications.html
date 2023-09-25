@@ -1,0 +1,131 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Justifications </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Justifications ">
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/zorbathut/dec/blob/feature_enumerator/doc/documentation/justifications.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+  </head>
+
+  <script type="module">
+    import options from './../public/main.js'
+    import { init } from './../public/docfx.min.js'
+    init(options)
+  </script>
+
+  <script>
+    const theme = localStorage.getItem('theme') || 'auto'
+    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+  </script>
+
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="justifications">Justifications</h1>
+
+<h2 id="text-formats">Text formats</h2>
+<p>I suspect it's only a matter of time before someone asks me why I'm using XML.</p>
+<p>XML is definitely not perfect, but it has a set of features which I want that other text-based data descriptors don't have. I'll list alternatives and explain why they fall short.</p>
+<h3 id="json">JSON</h3>
+<p>JSON is designed as a computer-to-computer descriptive language, not a human-facing written language. The big dealbreaker here is a lack of comments, which are near-crucial for large human-authored files, but there's other human-antifeatures like a lack of trailing commas in lists.</p>
+<p>On top of that, it's more typed than I prefer; I'd like to keep typing data in exactly one place, and that's the C# class definitions. JSON understands strings, integers, booleans, lists, and dictionaries, and that's about three more things than I want it to know about.</p>
+<h3 id="json5jsonc">JSON5/JSONC</h3>
+<p>JSON5 and JSONC are basically &quot;JSON, with trailing commas and comments&quot;. They're definitely better than JSON, but support is lacking; as of today there's a single C# implementation with almost no usage and less documentation than dec. They also share the typing issues of JSON.</p>
+<h3 id="yaml">YAML</h3>
+<p>YAML includes comments and better human-intended features, but has worse typing issues than JSON, with many documented cases where naive but reasonable input results in completely incorrect data. YAML is also a whitespace-sensitive language; I admit I'm not a fan of that in general, but in my experience it's devastating for data markup languages, where it's common to have <em>extremely</em> large blocks containing a lot of information.</p>
+<h3 id="strictyaml">StrictYAML</h3>
+<p>Similar to the JSON5/JSON comparison, StrictYAML is a modified version of YAML, mostly removing YAML's weird typing behavior. I actually rather like StrictYAML and use it on other projects; however, the only StrictYAML parser that exists today is in Python.</p>
+<p>It shares the whitespace-sensitive behavior of YAML.</p>
+<h3 id="ini">.ini</h3>
+<p>Classic Windows INIs are an untyped configuration language. They're actually rather nice for simple configurations, but they don't have native support for nested structures, which makes them somewhat unusable for this application.</p>
+<h3 id="toml">TOML</h3>
+<p>TOML is basically a better .ini. It's great for simple configurations (or even slightly-less-simple configurations) but is not suited for deeply nested data.</p>
+<h3 id="custom-written-format">Custom-written format</h3>
+<p>I'm not a big fan of reinventing the wheel, especially when I have something that's Good Enough. Why bother when I can just use XML?</p>
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/zorbathut/dec/blob/feature_enumerator/doc/documentation/justifications.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+        
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

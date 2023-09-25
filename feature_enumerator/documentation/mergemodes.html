@@ -1,0 +1,402 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Merge Modes </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Merge Modes ">
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/zorbathut/dec/blob/feature_enumerator/doc/documentation/mergemodes.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+  </head>
+
+  <script type="module">
+    import options from './../public/main.js'
+    import { init } from './../public/docfx.min.js'
+    init(options)
+  </script>
+
+  <script>
+    const theme = localStorage.getItem('theme') || 'auto'
+    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+  </script>
+
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="merge-modes">Merge Modes</h1>
+
+<h2 id="introduction">Introduction</h2>
+<p>Dec now supports two different ways of combining Decs, <a href="inheritance.html">inheritance</a> and <a href="modding.html">modules</a>. In both cases the Dec writer is likely to need to override or modify existing properties. Control over this can be complicated; there isn't a single default behavior that works in all cases.</p>
+<p>Imagine a developer who wants to take an existing bronze sword:</p>
+<pre><code class="lang-xml">&lt;WeaponDec decName=&quot;BronzeSword&quot;&gt;
+  &lt;damage&gt;1&lt;/damage&gt;
+  &lt;damageType&gt;Sharp&lt;/damageType&gt;
+  &lt;materials&gt;&lt;Bronze&gt;10&lt;/Bronze&gt;&lt;/materials&gt;
+&lt;/WeaponDec&gt;
+</code></pre>
+<p>and use it to make a chainsaw:</p>
+<pre><code class="lang-xml">&lt;WeaponDec decName=&quot;Chainsaw&quot; parent=&quot;BronzeSword&quot;&gt;
+  &lt;damage&gt;10&lt;/damage&gt;
+  &lt;materials&gt;&lt;Steel&gt;10&lt;/Steel&gt;&lt;/materials&gt;
+&lt;/WeaponDec&gt;
+</code></pre>
+<p>This example introduces questions. Have we replaced the Bronze with Steel, or have we merely added some steel? Does it still do Sharp damage?</p>
+<p>We run into further potential problems with a component-based system and inheritance:</p>
+<pre><code class="lang-xml">&lt;CreatureDec decName=&quot;Animal&quot; abstract=&quot;true&quot;&gt;
+  &lt;intelligence&gt;Animal&lt;/intelligence&gt;
+
+  &lt;components&gt;
+    &lt;li class=&quot;Component.WorldPosition&quot; /&gt;
+    &lt;li class=&quot;Component.HealthBehavior&quot;&gt;
+      &lt;type&gt;Biological&lt;/type&gt;
+    &lt;/li&gt;
+  &lt;/components&gt;
+
+  &lt;drops&gt;
+    &lt;Meat&gt;5&lt;/Meat&gt;
+    &lt;AnimalGuts&gt;1&lt;/AnimalGuts&gt;
+  &lt;/drops&gt;
+&lt;/CreatureDec&gt;
+
+&lt;CreatureDec decName=&quot;Squirrel&quot; parent=&quot;Animal&quot;&gt;
+  &lt;components&gt;
+    &lt;li class=&quot;Component.Brain&quot;&gt;
+      &lt;type&gt;Herbivore&lt;/type&gt;
+    &lt;/li&gt;
+  &lt;/components&gt;
+
+  &lt;drops&gt;
+    &lt;Fur&gt;1&lt;/Fur&gt;
+    &lt;Meat&gt;2&lt;/Meat&gt;
+  &lt;/drops&gt;
+&lt;/CreatureDec&gt;
+</code></pre>
+<p>This seems like a good idea - animals have a position and biological health behavior, and then you just add an appropriate brain to the squirrel, right? But now we're relying on the list to append the new component, while in our previous example we expected the Bronze to be replaced with Steel.</p>
+<p>Dec's solution is to fall back on reasonable defaults that are also designed to fail noisily when mistakes are made, and allow <code>mode=</code> tags to override those defaults.</p>
+<p>Dec supports three standard merge modes to help issues of this sort: <code>replace</code>, <code>patch</code>, and <code>append</code>.</p>
+<h2 id="standard-merge-modes">Standard Merge Modes</h2>
+<h3 id="replace">replace</h3>
+<p><code>replace</code> is the default merge mode for values and collections. It clears the existing element and replaces it from scratch. A list with existing elements will be rebuilt from empty.</p>
+<pre><code class="lang-xml">&lt;WeaponDec decName=&quot;IronSword&quot; parent=&quot;BronzeSword&quot;&gt;
+  &lt;!-- replace the weapon damage --&gt;
+  &lt;damage&gt;4&lt;/damage&gt;
+
+  &lt;!-- replace the material requirements; Bronze is removed entirely --&gt;
+  &lt;materials&gt;&lt;Iron&gt;10&lt;/Iron&gt;&lt;/materials&gt;
+&lt;/WeaponDec&gt;
+</code></pre>
+<h3 id="append">append</h3>
+<p><code>append</code> is valid only for collections. For List-style collections, it adds more elements to the end; for HashSets or Dictionaries, it adds new elements to the container, but key collisions are an error.</p>
+<pre><code class="lang-xml">&lt;CreatureDec decName=&quot;Rabbit&quot; parent=&quot;Animal&quot;&gt;
+  &lt;!-- add a new Brain component to the end of the array --&gt;
+  &lt;components mode=&quot;append&quot;&gt;
+    &lt;li class=&quot;Component.Brain&quot;&gt;
+      &lt;type&gt;Herbivore&lt;/type&gt;
+    &lt;/li&gt;
+  &lt;/components&gt;
+
+  &lt;!-- standard animal drops, but add a rabbit pelt --&gt;
+  &lt;drops mode=&quot;append&quot;&gt;
+    &lt;RabbitPelt&gt;1&lt;/RabbitPelt&gt;
+  &lt;/drops&gt;
+&lt;/CreatureDec&gt;
+</code></pre>
+<h3 id="patch">patch</h3>
+<p><code>patch</code> is the default merge mode for dec inheritance, classes, and structs, and valid for associative containers such as Dictionary or HashSet. It leaves existing elements in place but overrides the existing items with new items.</p>
+<pre><code class="lang-xml">&lt;CreatureDec decName=&quot;Cow&quot; parent=&quot;Herbivore&quot;&gt;
+  &lt;!-- Cows are big and should drop a lot of meat, but leave the rest of the drops alone. --&gt;
+  &lt;drops mode=&quot;patch&quot;&gt;
+    &lt;Meat&gt;40&lt;/Meat&gt;
+  &lt;/drops&gt;
+&lt;/CreatureDec&gt;
+</code></pre>
+<h2 id="dec-module-merge-modes">Dec Module Merge Modes</h2>
+<p>As mentioned above, both inheritance and modules allow some form of compositing. Inheritance itself, however, is <em>always</em> done with <code>patch</code> semantics. (<code>append</code> isn't valid for Decs, and if you wanted <code>replace</code>, you could accomplish that by just not doing inheritance!)</p>
+<p>The above three modes work fine for most data types, but Decs themselves are significantly more complicated. Mods may want to create new Decs, modify existing Decs, replace Decs entirely, or even simply delete them.</p>
+<h3 id="common-merge-modes">Common Merge Modes</h3>
+<p>These four merge modes will solve most of your problems and should be used when possible.</p>
+<h4 id="create"><code>create</code></h4>
+<p>Decs default to the <code>create</code> mode, which creates a Dec with a new name.</p>
+<p>It's an error to <code>create</code> a dec that already exists; this is to help detect conflicts between mods that may be trying to use the same Dec name.</p>
+<h4 id="patch-1"><code>patch</code></h4>
+<p>This lets you modify individual fields in an already-existing Dec. This is by far the most common merge mode to use explicitly; if you're trying to figure out how to modify core game data, this is it!</p>
+<p>It's an error to <code>patch</code> a Dec that doesn't exist.</p>
+<h4 id="replace-1"><code>replace</code></h4>
+<p>Similar to the non-Dec <code>replace</code>, this erases a Dec entirely and starts over from scratch.</p>
+<p>It's an error to <code>replace</code> a Dec that doesn't exist.</p>
+<h4 id="delete"><code>delete</code></h4>
+<p>This allows you to remove a Dec from the game entirely.</p>
+<p>It's an error to <code>delete</code> a Dec that never existed. If one module creates a Dec, it can be deleted by any number of following modules.</p>
+<h3 id="hybrid-merge-modes">Hybrid Merge Modes</h3>
+<p>Sometimes a mod will find itself needing to modify <em>another</em> mod, or will be in a situation where the exact Decs available aren't perfectly known. These merge modes are designed for those purposes. They should generally be avoided unless needed.</p>
+<h4 id="createorreplace"><code>createOrReplace</code></h4>
+<p>Creates a Dec if it doesn't exist; replaces a Dec if it does exist.</p>
+<p>Useful if you want to ensure that your definition is the one that is used no matter what.</p>
+<h4 id="createorpatch"><code>createOrPatch</code></h4>
+<p>Creates a Dec if it doesn't exist; patches a Dec if it does exist.</p>
+<p>Useful if you would leave some fields as default values, and want previously-loaded mods to be able to set those.</p>
+<h4 id="createorignore"><code>createOrIgnore</code></h4>
+<p>Creates a Dec if it doesn't exist. Does nothing if it already does exist.</p>
+<p>Useful if you're trying to create a fallback option for Decs that would be generated inside a mod that may or may not be loaded.</p>
+<h4 id="replaceifexists"><code>replaceIfExists</code></h4>
+<p>Replaces a Dec if it already exists; does nothing if it doesn't exist.</p>
+<p>Useful if you need to significantly change the behavior of a mod that may or may not be loaded.</p>
+<h4 id="patchifexists"><code>patchIfExists</code></h4>
+<p>Patches a Dec if it already exists; does nothing if it doesn't exist.</p>
+<p>Useful if you're trying to make minor adjustments to a mod that may or may not be loaded.</p>
+<h4 id="deleteifexists"><code>deleteIfExists</code></h4>
+<p>Deletes a Dec if it exists; does nothing if it doesn't exist.</p>
+<p>Useful if you're trying to remove items from a mod that may or may not be loaded.</p>
+<h2 id="full-behavior-reference-table">Full Behavior Reference Table</h2>
+<p>Empty spaces are errors; green spaces are default behavior.</p>
+<table>
+  <tr>
+    <td>Merge mode</td>
+    <td>Dec (new)</td>
+    <td>Dec (existing)</td>
+    <td>class/struct</td>
+    <td>List&lt;&gt;</td>
+    <td>Dictionary&lt;&gt;/<wbr>HashSet&lt;&gt;</td>
+    <td>Value (int, string, etc)</td>
+  </tr>
+  <tr>
+    <td><pre>replace</pre></td>
+    <td></td>
+    <td>
+        Created from constructor.
+    </td>
+    <td></td>
+    <td class="mergeModeDefault">Erased and replaced with new data.</td>
+    <td class="mergeModeDefault">Erased and replaced with new data.</td>
+    <td class="mergeModeDefault">Replaced with new data.</td>
+  </tr>
+  <tr>
+    <td><pre>append</pre></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>
+        New data appended to end of list.
+    </td>
+    <td>
+        New elements added by key.
+        Error if a key already exists.
+    </td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><pre>patch</pre></td>
+    <td></td>
+    <td>
+        Individual elements replaced by name.
+    </td>
+    <td class="mergeModeDefault">
+        Individual elements replaced by name.
+    </td>
+    <td></td>
+    <td>
+        Individual elements replaced by key.
+    </td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><pre>create</pre></td>
+    <td class="mergeModeDefault">
+        Created from constructor.
+    </td>
+    <td class="mergeModeDefault"></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><pre>delete</pre></td>
+    <td>
+        If the Dec previously existed, do nothing. Otherwise, error.
+    </td>
+    <td>
+        Deleted from database.
+    </td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><pre>createOrReplace</pre></td>
+    <td>
+        Created from constructor.
+    </td>
+    <td>
+        Created from constructor.
+    </td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><pre>createOrPatch</pre></td>
+    <td>
+        Created from constructor.
+    </td>
+    <td>
+        Individual elements replaced by name.
+    </td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><pre>createOrIgnore</pre></td>
+    <td>
+        Created from constructor.
+    </td>
+    <td>
+        Do nothing.
+    </td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><pre>replaceIfExists</pre></td>
+    <td>
+        Do nothing.
+    </td>
+    <td>
+        Created from constructor.
+    </td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><pre>patchIfExists</pre></td>
+    <td>
+        Do nothing.
+    </td>
+    <td>
+        Individual elements replaced by name.
+    </td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><pre>deleteIfExists</pre></td>
+    <td>
+        Do nothing.
+    </td>
+    <td>
+        Deleted from database.
+    </td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
+<h2 id="subtleties">Subtleties</h2>
+<p>For the sake of local comprehension, <strong>these tags apply only to a single element</strong>; they do not persist through children, the parsing immediately reverts back to reasonable defaults. Setting a <code>patch</code> mode does not mean that all children inherit <code>patch</code>! They revert to their default behavior immediately.</p>
+<pre><code class="lang-xml">&lt;CreatureDec decName=&quot;Rabbit&quot; mode=&quot;patch&quot;&gt;
+  &lt;!-- After this module, the modded rabbit now drops fur, guts, a rabbit pelt, *and* a holy hand grenade --&gt;
+  &lt;!-- Without the mode tag, this would revert back to `replace`, and the rabbit would drop only the hand grenade --&gt;
+  &lt;drops mode=&quot;patch&quot;&gt;
+    &lt;HolyHandGrenade&gt;1&lt;/HolyHandGrenade&gt;
+  &lt;/drops&gt;
+&lt;/CreatureDec&gt;
+</code></pre>
+<h2 id="epilogue">Epilogue</h2>
+<p>More options may be added in the future; current possibilities include <code>prepend</code>, <code>patchToConstructor</code>, <code>patchToOriginal</code>, <code>appendToOriginal</code>, and the ability to use Dec merge modes for Dictionary/HashSet keys. If you need something specific, please ask on Discord.</p>
+<p>The patch system is not likely to become turing-complete; if you need functionality that includes conditionals, loops, or matches, it is <em>strongly</em> recommended to just do it in C#.</p>
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/zorbathut/dec/blob/feature_enumerator/doc/documentation/mergemodes.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+        
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

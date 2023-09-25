@@ -1,0 +1,216 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Custom deserialization </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Custom deserialization ">
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/zorbathut/dec/blob/feature_enumerator/doc/documentation/custom.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+  </head>
+
+  <script type="module">
+    import options from './../public/main.js'
+    import { init } from './../public/docfx.min.js'
+    init(options)
+  </script>
+
+  <script>
+    const theme = localStorage.getItem('theme') || 'auto'
+    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+  </script>
+
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="custom-deserialization">Custom deserialization</h1>
+
+<p>Providing custom deserializers for your own classes, or third-party classes, requires defining classes that derive from <a class="xref" href="Dec.Converter.html"><code>Dec.Converter</code></a>. <a class="xref" href="../api/Dec.Parser.html"><code>Dec.Parser</code></a> will automatically find them during startup and register them. (Note: At this time, it is <em>required</em> to run Parser first. If you want to use Converters in a pre-parser Recorder, come pester me on Discord and I'll get it working for you.)</p>
+<p>There are three converter types available. In increasing order of complexity, <a class="xref" href="../api/Dec.ConverterString-1.html"><code>Dec.ConverterString</code></a> is most useful for simple objects that fit inside a string, <a class="xref" href="../api/Dec.ConverterRecord-1.html"><code>Dec.ConverterRecord</code></a> is suitable for larger hierarchies that have a default constructor, <a class="xref" href="../api/Dec.ConverterFactory-1.html"><code>Dec.ConverterFactory</code></a> is best for anything that needs to insert complicated objects created outside the Dec system. It is recommended that you consider them in that order.</p>
+<h2 id="converterstring">ConverterString</h2>
+<p><a class="xref" href="../api/Dec.ConverterString-1.html"><code>Dec.ConverterString</code></a> is designed for converting to and from simple string objects. It's not suitable for objects that reference other objects, nor does it allow you to do per-field default overrides. If your data plausibly fits in a single short human-readable string, ConverterString is a great choice.</p>
+<p>It is most often used for simple small data classes; vectors, colors, quaternions, die rolls such as &quot;3d6&quot;. Unlike ConverterRecord, it also allows you to return your own objects, created using constructors or provided by other libraries. This means you can use it for references to assets or handles to other objects; &quot;/monster/goblin/goblinTexture.png&quot; could plausibly resolve to an externally-created Texture object.</p>
+<pre><code class="lang-cs">public class ColorConverter : Dec.ConverterString&lt;Color&gt;
+{
+    public override Color Read(string input, Dec.InputContext inputContext)
+    {
+        // Implementation of ParseColorFromString left as an exercise for the reader
+        return Util.ParseColorFromString(input);
+    }
+
+    public override string Write(Color val)
+    {
+        return val.ToString();
+    }
+}
+
+public class ExampleDec : Dec.Dec
+{
+    Color tintA;
+    Color tintB;
+}
+</code></pre>
+<pre><code class="lang-xml">&lt;ExampleDec decName=&quot;Example&quot;&gt;
+  &lt;tintA&gt;(0.3, 0.5, 0.8)&lt;/tintA&gt;
+  &lt;tintB&gt;#4C7FCC&lt;/tintB&gt;
+&lt;/ExampleDec&gt;
+</code></pre>
+<h2 id="converterrecord">ConverterRecord</h2>
+<p><a class="xref" href="../api/Dec.ConverterRecord-1.html"><code>Dec.ConverterRecord</code></a> is designed for larger and more complicated objects, possibly including entity hierarchies. It is able to reference other objects in non-tree arrangements, even with circular dependencies. Its major limitation is that ConverterRecord-created objects <em>must</em> be creatable directly from the Dec library with a default constructor.</p>
+<p>It essentially provides the <a class="xref" href="../api/Dec.IRecordable.html"><code>Dec.IRecordable</code></a> interface to things that you cannot attach that interface to (but given the choice, we recommend using IRecordable instead). This means that both serialization and deserialization are packed into a single general-purpose function.</p>
+<p>This is suitable for larger structured items such as matrices, quaternions, or meshes. If you didn't make the class yourself, and it doesn't fit into a string, this should be your first stop.</p>
+<p>In most cases this is probably going to be used as part of savegames, not embedded in Decs.</p>
+<pre><code class="lang-cs">public class MeshConverter : Dec.ConverterString&lt;Mesh&gt;
+{
+    public override void Record(Mesh input, Dec.Recorder recorder)
+    {
+        // Pretend &quot;vertices&quot; here is a List&lt;Point2&gt;
+        // Point2 itself is serialized by a ConverterString.
+        recorder.Record(ref input.vertices, &quot;vertices&quot;);
+
+        // Pretend &quot;triangles&quot; is a List&lt;TriangleIdx&gt;
+        // TriangleIdx is also serialized by a ConverterString.
+        recorder.Record(ref input.triangles, &quot;triangles&quot;);
+    }
+}
+
+public class ExampleDec : Dec.Dec
+{
+    Mesh mesh;
+}
+</code></pre>
+<pre><code class="lang-xml">&lt;ExampleDec decName=&quot;Square&quot;&gt;
+  &lt;mesh&gt;
+    &lt;vertices&gt;
+      &lt;li&gt;0, 0&lt;/li&gt;
+      &lt;li&gt;0, 1&lt;/li&gt;
+      &lt;li&gt;1, 0&lt;/li&gt;
+      &lt;li&gt;1, 1&lt;/li&gt;
+    &lt;/vertices&gt;
+    &lt;indices&gt;
+      &lt;li&gt;0, 1, 2&lt;/li&gt;
+      &lt;li&gt;1, 3, 2&lt;/li&gt;
+    &lt;/indices&gt;
+  &lt;/mesh&gt;
+&lt;/ExampleDec&gt;
+</code></pre>
+<h2 id="converterfactory">ConverterFactory</h2>
+<p><a class="xref" href="../api/Dec.ConverterFactory-1.html"><code>Dec.ConverterFactory</code></a> is the most powerful and expressive converter, coupled inevitably with the most complicated interface. In most cases, you should probably not use this! It's available for the special situations where you really need it.</p>
+<p>ConverterFactory is able to reference other objects in non-tree arrangements, even with circular dependencies. It can override default-provided parameters piecemeal. It can also provide preconstructed or custom-constructed objects as needed. Its biggest downside is complexity; it splits functionality into three separate functions, <a class="xref" href="../api/Dec.ConverterFactory-1.html#Dec_ConverterFactory_1_Create_">Create()</a>, <a class="xref" href="../api/Dec.ConverterFactory-1.html#Dec_ConverterFactory_1_Read_">Read()</a>, and <a class="xref" href="../api/Dec.ConverterFactory-1.html#Dec_ConverterFactory_1_Write_">Write()</a>.</p>
+<p>Create() <em>may</em> be called first if an instance needs to be generated. If it has already been provided with an instance, Create() will be skipped entirely. Create() has a Recorder interface, but attempting to make a Shared reference is an error; don't do that. We recommend putting only the minimum required to construct an object in here.</p>
+<p>Read() is called next, and it also has Recorder interface, this time fully-functional. Put all the rest of your data parsing in here.</p>
+<p>Write() is used for serialization. This will probably look very similar to Read(), except plus whatever data will need to be stashed away for Create() to work during loading.</p>
+<p>This example is for a hypothetical entity system that requires Entity objects to be constructed in specific buckets.</p>
+<pre><code class="lang-cs">public class EntityConverter : Dec.ConverterFactory&lt;Entity&gt;
+{
+    public override Entity Create(Recorder recorder)
+    {
+        EntityBucket bucket = EntityBucket.Default;
+        recorder.Record(ref bucket, &quot;bucket&quot;);
+
+        return EntityManager.CreateInBucket(bucket);
+    }
+
+    public override void Read(ref Entity input, Recorder recorder)
+    {
+        recorder.Record(ref input.health, &quot;health&quot;);
+    }
+
+    public override void Write(Entity input, Recorder recorder)
+    {
+        recorder.Record(ref input.bucket, &quot;bucket&quot;);
+        recorder.Record(ref input.health, &quot;health&quot;);
+    }
+}
+</code></pre>
+<pre><code class="lang-xml">&lt;!-- Assume this exists inside a Recorder xml file --&gt;
+&lt;entity&gt;
+  &lt;bucket&gt;Priority&lt;/bucket&gt;
+  &lt;health&gt;12&lt;/health&gt;
+&lt;/entity&gt;
+</code></pre>
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/zorbathut/dec/blob/feature_enumerator/doc/documentation/custom.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+        
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

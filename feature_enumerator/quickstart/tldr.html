@@ -1,0 +1,246 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Too Long, Didn&#39;t Read </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Too Long, Didn&#39;t Read ">
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/zorbathut/dec/blob/feature_enumerator/doc/quickstart/tldr.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+  </head>
+
+  <script type="module">
+    import options from './../public/main.js'
+    import { init } from './../public/docfx.min.js'
+    init(options)
+  </script>
+
+  <script>
+    const theme = localStorage.getItem('theme') || 'auto'
+    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+  </script>
+
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="too-long-didnt-read">Too Long, Didn't Read</h1>
+
+<h2 id="set-up-dec-and-add-your-xml-directory">Set up Dec and add your XML directory.</h2>
+<pre><code class="lang-cs">void CalledOnceDuringGameStartup()
+{
+    // If your game code isn't in a namespace, you don't need this.
+    // If it is, update this to the appropriate namespace.
+    Dec.Config.UsingNamespaces = new string[] { &quot;YourGame&quot; };
+
+    var parser = new Dec.Parser();
+    parser.AddDirectory(&quot;data&quot;);
+    parser.Finish();
+}
+</code></pre>
+<h2 id="define-some-classes-derived-from-decdec">Define some classes derived from <a class="xref" href="../api/Dec.Dec.html"><code>Dec.Dec</code></a>.</h2>
+<pre><code class="lang-cs">// Here, we're declaring a general template for monsters.
+// This goes somewhere appropriate in your C# game code.
+class MonsterDec : Dec.Dec
+{
+  // Most types can be defined as simple fields.
+  public float maxHP;
+  
+  // Fields can have default values.
+  public float renderScale = 1;
+  
+  // Classes and structs can also have defaults.
+  public Color tint = Color.White;
+  
+  // Decs can reference other decs.
+  public SpriteSheetDec spriteSheet;
+  
+  // Dec references are not limited to tree structures.
+  // Decs can reference other decs in circles, reference other decs of the same type,
+  // and even reference themselves.
+  public MonsterDec evolvedVariant = null;
+}
+</code></pre>
+<h2 id="write-xml-to-declare-our-actual-objects">Write XML to declare our actual objects.</h2>
+<pre><code class="lang-xml">&lt;Decs&gt;
+  &lt;!-- Here's a basic goblin. --&gt;
+  &lt;!-- We've overridden the defaults we want changed and ignored the rest. --&gt;
+  &lt;!-- Every dec must be named via the decName attribute. --&gt;
+  &lt;!-- These names must be unique within dec type, but can overlap across different types. --&gt;
+  &lt;!-- They are intended to be human-readable for debug and development purposes, --&gt;
+  &lt;!-- but not user-visible. --&gt;
+  &lt;!-- They must be valid C# identifiers (unicode accepted.) --&gt;
+  &lt;MonsterDec decName=&quot;Goblin&quot;&gt;
+    &lt;maxHP&gt;20&lt;/maxHP&gt;
+    
+    &lt;!-- This connects MonsterDec.Goblin's spriteSheet to SpriteSheetDec.Goblin. --&gt;
+    &lt;spriteSheet&gt;Goblin&lt;/spriteSheet&gt;
+  &lt;/MonsterDec&gt;
+
+  &lt;!-- This is a larger goblin. --&gt;
+  &lt;!-- We've given it a new name, a larger render scale, and more health. --&gt;
+  &lt;MonsterDec decName=&quot;MegaGoblin&quot;&gt;
+    &lt;maxHP&gt;100&lt;/maxHP&gt;
+    &lt;renderScale&gt;3&lt;/renderScale&gt;
+    &lt;spriteSheet&gt;Goblin&lt;/spriteSheet&gt;
+  &lt;/MonsterDec&gt;
+
+  &lt;!-- Here, we've defined a new tint for the DarkGoblin. --&gt;
+  &lt;!-- Modifying members of included classes works like you'd expect XML to. --&gt;
+  &lt;MonsterDec decName=&quot;DarkGoblin&quot;&gt;
+    &lt;maxHP&gt;40&lt;/maxHP&gt;
+    &lt;tint&gt;
+      &lt;r&gt;0.3&lt;/r&gt;
+      &lt;g&gt;0.3&lt;/g&gt;
+      &lt;b&gt;0.4&lt;/b&gt;
+    &lt;/tint&gt;
+    &lt;spriteSheet&gt;Goblin&lt;/spriteSheet&gt;
+  &lt;/MonsterDec&gt;
+
+  &lt;!-- Referencing other decs is as simple as typing their decName. --&gt;
+  &lt;!-- All dec references are validated at load time. --&gt;
+  &lt;MonsterDec decName=&quot;AlchemyGoblin&quot;&gt;
+    &lt;maxHP&gt;10&lt;/maxHP&gt;
+    &lt;spriteSheet&gt;Goblin&lt;/spriteSheet&gt;
+    &lt;evolvedVariant&gt;MegaGoblin&lt;/evolvedVariant&gt;
+  &lt;/MonsterDec&gt;
+
+  &lt;!-- Decs can be referenced before they're declared, or even from other files. --&gt;
+  &lt;!-- XML order is irrelevant. --&gt;
+  &lt;SpriteSheetDec decName=&quot;Goblin&quot;&gt;
+    &lt;filename&gt;goblin.png&lt;/filename&gt;
+  &lt;/SpriteSheetDec&gt;
+&lt;/Decs&gt;
+</code></pre>
+<h2 id="declare-some-static-references">Declare some static references.</h2>
+<pre><code class="lang-cs">// The attribute lets dec know that it should fill this static class with data.
+[Dec.StaticReferences]
+public static class MonsterDecs
+{
+  // This bit of copy-pasted code is required to automatically detect some errors.
+  // dec will also detect if you haven't included this code and warn you about it.
+  static MonsterDecs() { Dec.StaticReferencesAttribute.Initialized(); }
+
+  // Include static members for any decs you want to reference directly.
+  public static MonsterDec Goblin;
+  public static MonsterDec DarkGoblin;
+  
+  // You don't have to include all decs here - in fact,
+  // it's recommended that you only include decs that you plan to reference by name.
+}
+</code></pre>
+<h2 id="use-decs-in-code">Use decs in code.</h2>
+<pre><code class="lang-cs">// This is an example of an actual monster.
+// There's no requirement that it be named &quot;Monster&quot;;
+// dec does not care what you do with the data it's generated.
+public class Monster
+{
+  public Monster(MonsterDec dec)
+  {
+    // It's common for objects to keep a reference to the dec that they're created from.
+    this.dec = dec;
+    
+    // decs are just classes; using things from them is simple.
+    hp = dec.maxHP;
+  }
+  
+  private MonsterDec dec;
+  
+  private float hp;
+}
+
+public class GoblinGenerator
+{
+  public Generate()
+  {
+    // If you need to use a static reference, just pull it out of the static reference class.
+    // (We're assuming that you have an Entity system in this project already.
+    // The details are up to you; dec doesn't specify anything about entities.)
+    Entity.Spawn(MonsterDecs.Goblin);
+  }
+}
+</code></pre>
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/zorbathut/dec/blob/feature_enumerator/doc/quickstart/tldr.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+        
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
