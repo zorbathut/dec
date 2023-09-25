@@ -10,7 +10,7 @@ namespace Dec
     /// </remarks>
     public abstract class Converter
     {
-        internal abstract Type GetConvertedType();
+        internal virtual Type GetConvertedTypeHint() { return null; }
     }
 
     /// <summary>
@@ -52,7 +52,7 @@ namespace Dec
         /// </remarks>
         public abstract T Read(string input, InputContext context);
 
-        override internal Type GetConvertedType()
+        override internal Type GetConvertedTypeHint()
         {
             return typeof(T);
         }
@@ -100,7 +100,7 @@ namespace Dec
         /// </remarks>
         public abstract void Record(ref T input, Recorder recorder);
 
-        override internal Type GetConvertedType()
+        override internal Type GetConvertedTypeHint()
         {
             return typeof(T);
         }
@@ -165,7 +165,7 @@ namespace Dec
         /// </remarks>
         public abstract void Read(ref T input, Recorder recorder);
 
-        override internal Type GetConvertedType()
+        override internal Type GetConvertedTypeHint()
         {
             return typeof(T);
         }

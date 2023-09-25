@@ -143,7 +143,7 @@ namespace Dec
                 var converter = (Converter)type.CreateInstanceSafe("converter", null);
                 if (converter != null && (converter is ConverterString || converter is ConverterRecord || converter is ConverterFactory))
                 {
-                    Type convertedType = converter.GetConvertedType();
+                    Type convertedType = converter.GetConvertedTypeHint();
                     if (ConverterObjects.ContainsKey(convertedType))
                     {
                         Dbg.Err($"Found multiple converters for {convertedType}: {ConverterObjects[convertedType]} and {type}");
