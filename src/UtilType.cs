@@ -107,7 +107,8 @@ namespace Dec
             if (text[0] == '.')
             {
                 // This is a member class of a class
-                int end = Math.Min(text.IndexOfUnbounded('<', 1), text.IndexOfUnbounded('.', 1));
+                // Might actually start with < if it's compiler-generated!
+                int end = Math.Min(text.IndexOfUnbounded('<', 2), text.IndexOfUnbounded('.', 1));
                 string memberName = text.Substring(1, end - 1);
 
                 // Get our type
@@ -226,8 +227,16 @@ namespace Dec
         {
             // At this point we've dealt with the whole Using thing, we just need to deal with this class on its own.
 
+            // This is now extra complicated because compiler tools can generate class names with <'s in them.
+            // So far, at least, the < is always the first character in the class name
+
             // We definitely stop at the first < - that has to be a class or we're done for - so let's figure out our stopping point.
             int stringEnd = text.IndexOfUnbounded('<');
+            while (stringEnd > 0 && stringEnd < text.Length && text[stringEnd - 1] == '.')
+            {
+                // get the next <
+                stringEnd = text.IndexOfUnbounded('<', stringEnd + 1);
+            }
 
             int tokenNext = 0;
             while (true)

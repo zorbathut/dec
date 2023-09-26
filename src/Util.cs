@@ -25,6 +25,11 @@ namespace Dec
 
         internal static int IndexOfUnbounded(this string input, char character, int start)
         {
+            if (start >= input.Length)
+            {
+                return input.Length;
+            }
+
             int index = input.IndexOf(character, start);
             if (index == -1)
             {
