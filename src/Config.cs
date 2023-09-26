@@ -123,7 +123,7 @@ namespace Dec
         /// A factory function that can be used to provide custom converters.
         /// </summary>
         /// <remarks>
-        /// This is a tool of last resort; in most cases you should just be inheriting from ConverterString<T> et al. This is intended for converters from non-public classes, which can be access through (ab)use of reflection.
+        /// This is a tool of last resort; in most cases you should just be inheriting from ConverterString'1 et al. This is intended for converters from non-public classes, which can be access through (ab)use of reflection.
         /// </remarks>
         public static Func<Type, Converter> ConverterFactory;
 
