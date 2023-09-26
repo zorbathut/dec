@@ -136,7 +136,8 @@ Initialize as soon as possible.</p>
   <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/feature_enumerator/src/Config.cs/#L128"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>A factory function that can be used to provide custom converters.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
@@ -156,6 +157,9 @@ Initialize as soon as possible.</p>
 
 
 
+  <h4 class="section" id="Dec_Config_ConverterFactory_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>This is a tool of last resort; in most cases you should just be inheriting from ConverterString'1 et al. This is intended for converters from non-public classes, which can be access through (ab)use of reflection.</p>
+</div>
 
 
 
