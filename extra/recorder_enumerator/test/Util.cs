@@ -1,4 +1,4 @@
-namespace RecorderCoroutineTest
+namespace RecorderEnumeratorTest
 {
     using System;
     using System.Collections.Generic;

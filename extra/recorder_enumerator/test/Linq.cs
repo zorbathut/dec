@@ -1,4 +1,4 @@
-namespace RecorderCoroutineTest
+namespace RecorderEnumeratorTest
 {
     using DecTest;
     using NUnit.Framework;

@@ -1,4 +1,4 @@
-namespace Dec.RecorderCoroutine
+namespace Dec.RecorderEnumerator
 {
     using System;
     using System.Reflection;

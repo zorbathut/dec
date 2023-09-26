@@ -1,4 +1,4 @@
-namespace RecorderCoroutineTest
+namespace RecorderEnumeratorTest
 {
     using Dec;
     using NUnit.Framework;
@@ -14,7 +14,7 @@ namespace RecorderCoroutineTest
         [OneTimeSetUp]
         public void PrepConfig()
         {
-            Config.ConverterFactory = global::Dec.RecorderCoroutine.Config.ConverterFactory;
+            Config.ConverterFactory = global::Dec.RecorderEnumerator.Config.ConverterFactory;
         }
     }
 }
