@@ -17,10 +17,8 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 * Type caching system no longer results in silent errors.
-
-### Fixed
 * Missing Mode property on Recorder.Parameters.
-* 
+
 ### Testing
 * Made test harness more durable of errors happening during parsing.
 * Fixed a test that was accidentally testing the wrong thing.
