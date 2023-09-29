@@ -24,6 +24,7 @@ namespace Dec
         }
         private static readonly PrimitiveTypeLookup[] PrimitiveTypes = new PrimitiveTypeLookup[]
         {
+            new PrimitiveTypeLookup { type = typeof(bool), str = "bool" },
             new PrimitiveTypeLookup { type = typeof(int), str = "int" },
             new PrimitiveTypeLookup { type = typeof(byte), str = "byte" },
             new PrimitiveTypeLookup { type = typeof(sbyte), str = "sbyte" },

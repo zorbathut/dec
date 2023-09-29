@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 * Type caching system no longer results in silent errors.
 * Missing Mode property on Recorder.Parameters.
+* `bool` not recognized as a primitive type.
 
 ### Testing
 * Made test harness more durable of errors happening during parsing.
