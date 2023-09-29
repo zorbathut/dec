@@ -551,7 +551,7 @@ namespace DecTest
             parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <TypeDec decName=""TestDec"">
-                        <type>DecTest.Primitives+Example</type> <!-- conveniently tests both namespaces and classes at the same time -->
+                        <type>DecTest.Primitives.Example</type> <!-- conveniently tests both namespaces and classes at the same time -->
                     </TypeDec>
                 </Decs>");
             parser.Finish();

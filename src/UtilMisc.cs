@@ -41,6 +41,19 @@ namespace Dec
             }
         }
 
+        internal static string SubstringSafe(this string input, int start)
+        {
+            start = Math.Clamp(start, 0, input.Length);
+            return input.Substring(start);
+        }
+
+        internal static string SubstringSafe(this string input, int start, int count)
+        {
+            start = Math.Clamp(start, 0, input.Length);
+            count = Math.Clamp(count, 0, input.Length - start);
+            return input.Substring(start, count);
+        }
+
         internal static string[] DefaultTupleNames = new string[]
         {
             "Item1",

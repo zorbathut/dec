@@ -7,9 +7,16 @@ All notable changes to this project will be documented in this file.
 * Converters now support generic arguments; they must be converting a generic with the same number of arguments in the same order. This might get changed later.
 * Recorder.Clone() function to duplicate objects.
 
+### Breaking
+* Type parsing system no longer supports + separator for nested types, but it never wrote these in the first place, so this shouldn't be a big problem. If you have to edit some xml files, sorry 'bout that, this was an oversight.
+
 ### Improved
 * Improved error message when trying to initialize a composite with a string.
 * First-time Parser startup speed now faster.
+* Type parsing system now properly supports generic nested types of generics.
+
+### Fixed
+* Type caching system no longer results in silent errors.
 
 ### Fixed
 * Missing Mode property on Recorder.Parameters.
