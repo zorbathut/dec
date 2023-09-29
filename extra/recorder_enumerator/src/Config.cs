@@ -8,6 +8,8 @@ namespace Dec.RecorderEnumerator
     public static class Config
     {
         private static readonly Regex UserCreatedEnumerableRegex = new Regex(@"^<([^>]+)>d__([0-9]+)(?:`([0-9]+))?$", RegexOptions.Compiled);
+        private static readonly Regex RecordableClosureRegex = new Regex(@"^<>c__DisplayClass([0-9]+)_([0-9]+)$", RegexOptions.Compiled);
+
 
         public static Converter ConverterFactory(Type type)
         {
@@ -16,29 +18,78 @@ namespace Dec.RecorderEnumerator
                 return new SystemLinqEnumerable_RangeIterator_Converter();
             }
 
-            if (type.Name[0] == '<' && UserCreatedEnumerableRegex.Match(type.Name) is var result && result.Success && type.GetCustomAttribute<CompilerGeneratedAttribute>() != null)
+            if (typeof(MethodInfo).IsAssignableFrom(type))
             {
-                // Now we're going to see if the attribute exists
-                string functionName = result.Groups[1].Value;
-                int functionIndex = int.Parse(result.Groups[2].Value);
+                return new MethodInfo_Converter();
+            }
 
-                var owningType = type.DeclaringType;
-                var owningTypeFunctions = owningType.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+            if (type.IsGenericType)
+            {
+                var genericTypeDefinition = type.GetGenericTypeDefinition();
 
-                var function = owningTypeFunctions[functionIndex];
-                if (function.Name != functionName)
+                if (genericTypeDefinition == SystemLinqEnumerable_WhereIterator_Converter.RelevantType)
                 {
-                    Dbg.Err($"Function name mismatch: {functionName} vs {function.Name}");
-                    return null;
+                    return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_WhereIterator_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
                 }
 
-                if (function.GetCustomAttribute<RecordableAttribute>() == null)
+                if (System_Func_Converter.IsGenericTypeFunc(genericTypeDefinition))
                 {
-                    Dbg.Err($"Attempting to serialize an enumerable {type} without a Dec.RecorderEnumerator.Recordable applied to its function");
+                    return new System_Func_Converter(type);
+                }
+            }
+
+            if (type.Name[0] == '<')
+            {
+                // compiler-generated stuff
+                if (type.GetCustomAttribute<CompilerGeneratedAttribute>() == null)
+                {
+                    Dbg.Err($"Internal error; presumed compiler-generated type {type} does not have CompilerGeneratedAttribute");
                     return null;
                 }
+            
+                if (UserCreatedEnumerableRegex.Match(type.Name) is var ucer && ucer.Success)
+                {
+                    // Now we're going to see if the attribute exists
+                    string functionName = ucer.Groups[1].Value;
+                    int functionIndex = int.Parse(ucer.Groups[2].Value);
+
+                    var owningType = type.DeclaringType;
+                    var owningTypeFunctions = owningType.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+
+                    var function = owningTypeFunctions[functionIndex];
+                    if (function.Name != functionName)
+                    {
+                        Dbg.Err($"Function name mismatch: {functionName} vs {function.Name}");
+                        return null;
+                    }
+
+                    if (function.GetCustomAttribute<RecordableEnumerableAttribute>() == null)
+                    {
+                        Dbg.Err($"Attempting to serialize an enumerable {type} without a Dec.RecorderEnumerator.Recordable applied to its function");
+                        return null;
+                    }
                 
-                return new UserCreatedEnumerableConverter(type);
+                    return new UserCreatedEnumerableConverter(type);
+                }
+
+                if (RecordableClosureRegex.Match(type.Name) is var vcr && vcr.Success)
+                {
+                    int functionIndex = int.Parse(vcr.Groups[1].Value);
+
+                    var owningType = type.DeclaringType;
+                    var owningTypeFunctions = owningType.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+
+                    var function = owningTypeFunctions[functionIndex];
+                    // No function name test, unfortunately
+
+                    if (function.GetCustomAttribute<RecordableClosuresAttribute>() == null)
+                    {
+                        Dbg.Err($"Attempting to serialize an enumerable {type} without a Dec.RecorderEnumerator.Recordable applied to its function");
+                        return null;
+                    }
+
+                    return new RecordableClosureConverter(type);
+                }
             }
 
             return null;

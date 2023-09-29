@@ -4,20 +4,20 @@ namespace Dec.RecorderEnumerator
     using System.Reflection;
 
     [AttributeUsage(AttributeTargets.Method)]
-    public class RecordableEnumerableAttribute : Attribute { }
+    public class RecordableClosuresAttribute : Attribute { }
 
-    public class UserCreatedEnumerableConverter : ConverterFactoryDynamic
+    public class RecordableClosureConverter : ConverterFactoryDynamic
     {
         Type enumerableType;
 
-        public UserCreatedEnumerableConverter(Type type)
+        public RecordableClosureConverter(Type type)
         {
             enumerableType = type;
         }
 
         public override void Write(object input, Recorder recorder)
         {
-            foreach (var field in enumerableType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance))
+            foreach (var field in enumerableType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
             {
                 if (global::Dec.Util.CanBeShared(field.FieldType))
                 {
@@ -32,9 +32,7 @@ namespace Dec.RecorderEnumerator
 
         public override object Create(Recorder recorder)
         {
-            // appears to be a sentinel value for "hasn't yet 'created' an 'instance'", which this currently hasn't
-            // we'll overwrite this later though
-            return Activator.CreateInstance(enumerableType, -2);
+            return Activator.CreateInstance(enumerableType);
         }
 
         public override void Read(ref object input, Recorder recorder)

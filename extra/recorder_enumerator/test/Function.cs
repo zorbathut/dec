@@ -12,7 +12,7 @@ namespace RecorderEnumeratorTest
     {
         static int beef() { return 42; }
 
-        [Dec.RecorderEnumerator.Recordable]
+        [Dec.RecorderEnumerator.RecordableEnumerable]
         private IEnumerable<int> PrintSomeNumbers()
         {
             for (int i = 0; i < 10; ++i)
@@ -47,7 +47,7 @@ namespace RecorderEnumeratorTest
             Assert.IsTrue(Util.AreEquivalentEnumerators(val, result));
         }
 
-        [Dec.RecorderEnumerator.Recordable]
+        [Dec.RecorderEnumerator.RecordableEnumerable]
         private IEnumerable<int> PrintMoreNumbers<T, U, V>()
         {
             yield return typeof(T).GetHashCode();

@@ -3,6 +3,9 @@ namespace RecorderEnumeratorTest
     using DecTest;
     using NUnit.Framework;
     using System.Linq;
+    using System;
+    using System.Reflection;
+    using Dec.RecorderEnumerator;
 
     [TestFixture]
     public class Linq : Base
@@ -68,6 +71,21 @@ namespace RecorderEnumeratorTest
         public void Range([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
         {
             var range = Enumerable.Range(5, 15).GetEnumerator();
+            range.MoveNext();
+            range.MoveNext();
+            range.MoveNext();
+
+            var result = DoRecorderRoundTrip(range, recorderMode);
+
+            Assert.IsTrue(Util.AreEquivalentEnumerators(range, result));
+        }
+
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void Where([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            int k = 3;
+            var range = Enumerable.Range(0, 20).Where(i => i % k == 0).GetEnumerator();
             range.MoveNext();
             range.MoveNext();
             range.MoveNext();
