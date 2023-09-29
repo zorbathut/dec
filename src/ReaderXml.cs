@@ -78,7 +78,7 @@ namespace Dec
                     }
 
                     readerDec.name = decElement.Attribute("decName").Value;
-                    if (!Util.ValidateDecName(readerDec.name, readerDec.inputContext))
+                    if (!UtilMisc.ValidateDecName(readerDec.name, readerDec.inputContext))
                     {
                         continue;
                     }
@@ -271,7 +271,7 @@ namespace Dec
             return xml.Attribute(metadata.ToLowerString())?.Value;
         }
 
-        private readonly HashSet<string> metadataNames = Util.GetEnumValues<Metadata>().Select(metadata => metadata.ToLowerString()).ToHashSet();
+        private readonly HashSet<string> metadataNames = UtilMisc.GetEnumValues<Metadata>().Select(metadata => metadata.ToLowerString()).ToHashSet();
         public override string GetMetadataUnrecognized()
         {
             if (!xml.HasAttributes)
@@ -523,7 +523,7 @@ namespace Dec
                 // We're doing named lookups instead
                 if (parameterNames == null)
                 {
-                    parameterNames = Util.DefaultTupleNames;
+                    parameterNames = UtilMisc.DefaultTupleNames;
                 }
 
                 if (parameterNames.Count < expectedCount)
@@ -591,11 +591,11 @@ namespace Dec
                 {
                     // Try to find a close match, if we can, just for a better error message
                     string match = null;
-                    string canonicalFieldName = Util.LooseMatchCanonicalize(fieldName);
+                    string canonicalFieldName = UtilMisc.LooseMatchCanonicalize(fieldName);
 
                     foreach (var testField in type.GetSerializableFieldsFromHierarchy())
                     {
-                        if (Util.LooseMatchCanonicalize(testField.Name) == canonicalFieldName)
+                        if (UtilMisc.LooseMatchCanonicalize(testField.Name) == canonicalFieldName)
                         {
                             match = testField.Name;
 

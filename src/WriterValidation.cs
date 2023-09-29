@@ -310,12 +310,12 @@ namespace Dec
             var args = value.GetType().GenericTypeArguments;
             var length = args.Length;
 
-            var nameArray = names?.TransformNames ?? Util.DefaultTupleNames;
+            var nameArray = names?.TransformNames ?? UtilMisc.DefaultTupleNames;
 
             for (int i = 0; i < length; ++i)
             {
                 var propertyName = nameArray[i];
-                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}.{propertyName}"), value.GetType().GetProperty(Util.DefaultTupleNames[i]).GetValue(value), args[i]);
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}.{propertyName}"), value.GetType().GetProperty(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
             }
         }
 
@@ -324,12 +324,12 @@ namespace Dec
             var args = value.GetType().GenericTypeArguments;
             var length = args.Length;
 
-            var nameArray = names?.TransformNames ?? Util.DefaultTupleNames;
+            var nameArray = names?.TransformNames ?? UtilMisc.DefaultTupleNames;
 
             for (int i = 0; i < length; ++i)
             {
                 var propertyName = nameArray[i];
-                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}.{propertyName}"), value.GetType().GetField(Util.DefaultTupleNames[i]).GetValue(value), args[i]);
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}.{propertyName}"), value.GetType().GetField(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
             }
         }
 

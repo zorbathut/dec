@@ -1313,7 +1313,7 @@ namespace Dec
                     Dec result = Database.Get(type, text);
                     if (result == null)
                     {
-                        if (Util.ValidateDecName(text, context))
+                        if (UtilMisc.ValidateDecName(text, context))
                         {
                             Dbg.Err($"{context}: Couldn't find {type} named `{text}`");
                         }

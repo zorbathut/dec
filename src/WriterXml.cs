@@ -484,7 +484,7 @@ namespace Dec
 
             for (int i = 0; i < length; ++i)
             {
-                Serialization.ComposeElement(CreateChild(nameArray != null ? nameArray[i] : "li", RecorderContext.CreateChild()), value.GetType().GetProperty(Util.DefaultTupleNames[i]).GetValue(value), args[i]);
+                Serialization.ComposeElement(CreateChild(nameArray != null ? nameArray[i] : "li", RecorderContext.CreateChild()), value.GetType().GetProperty(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
             }
         }
 
@@ -497,7 +497,7 @@ namespace Dec
 
             for (int i = 0; i < length; ++i)
             {
-                Serialization.ComposeElement(CreateChild(nameArray != null ? nameArray[i] : "li", RecorderContext.CreateChild()), value.GetType().GetField(Util.DefaultTupleNames[i]).GetValue(value), args[i]);
+                Serialization.ComposeElement(CreateChild(nameArray != null ? nameArray[i] : "li", RecorderContext.CreateChild()), value.GetType().GetField(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
             }
         }
 
