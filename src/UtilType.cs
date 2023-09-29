@@ -192,7 +192,7 @@ namespace Dec
                             {
                                 types = new List<Type>();
                             }
-                            types.Add(UtilType.ParseDecFormatted(tstring.Substring(typeStart, endIndex - typeStart), context));
+                            types.Add(UtilType.ParseDecFormatted(tstring.Substring(typeStart, endIndex - typeStart).Trim(), context));
                             typeStart = endIndex + 1;
                         }
                         break;

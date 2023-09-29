@@ -251,6 +251,9 @@ namespace DecTest
 
             TypeConversionBidirectional(typeof(Generic2Param<int, double>), "Generic2Param<int, double>");
             Assert.AreEqual(typeof(Generic2Param<int, double>), parseType("Generic2Param<int,double>"));
+
+            // this specifically tests for spaces in parameter names that are not the trailing parameter
+            TypeConversionBidirectional(typeof(Func<int, string, double, bool>), "System.Func<int, string, double, bool>");
         }
 
         /*
