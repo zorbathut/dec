@@ -256,7 +256,6 @@ namespace DecTest
             TypeConversionBidirectional(typeof(Func<int, string, double, bool>), "System.Func<int, string, double, bool>");
         }
 
-        /*
         // These currently don't work because nested generics turn out to not function like I expected.
         // I'm gonna worry about this later - I don't know if anyone will *ever* use this functionality.
         [Test]
@@ -273,7 +272,7 @@ namespace DecTest
             Dec.Config.UsingNamespaces = new string[] { "DecTest.TypeSerialization" };
 
             TypeConversionBidirectional(typeof(Generic<int>.NestedGeneric<double>), "Generic<int>.NestedGeneric<double>");
-        }*/
+        }
 
         [Test]
         public void GenericRecursive()
@@ -321,27 +320,26 @@ namespace DecTest
         public void OverloadedNames()
         {
             Dec.Config.UsingNamespaces = new string[] { "DecTest.OverloadedNames" };
+            
+            TypeConversionBidirectional(typeof(OverloadedNames.Foo.Solo), "Foo.Solo");
+            TypeConversionBidirectional(typeof(OverloadedNames.Foo.Generic<int>), "Foo.Generic<int>");
+            TypeConversionBidirectional(typeof(OverloadedNames.Foo.Overloaded), "Foo.Overloaded");
+            TypeConversionBidirectional(typeof(OverloadedNames.Foo.Overloaded<string>), "Foo.Overloaded<string>");
+            TypeConversionBidirectional(typeof(OverloadedNames.Foo.Overloaded<int, string>), "Foo.Overloaded<int, string>");
 
-            Assert.AreEqual(typeof(OverloadedNames.Foo.Solo), parseType("Foo.Solo"));
-            Assert.AreEqual(typeof(OverloadedNames.Foo.Generic<int>), parseType("Foo.Generic<int>"));
-            Assert.AreEqual(typeof(OverloadedNames.Foo.Overloaded), parseType("Foo.Overloaded"));
-            Assert.AreEqual(typeof(OverloadedNames.Foo.Overloaded<string>), parseType("Foo.Overloaded<string>"));
-            Assert.AreEqual(typeof(OverloadedNames.Foo.Overloaded<int, string>), parseType("Foo.Overloaded<int, string>"));
+            TypeConversionBidirectional(typeof(OverloadedNames.Foo<int>.Solo), "Foo<int>.Solo");
+            TypeConversionBidirectional(typeof(OverloadedNames.Foo<int>.Generic<double>), "Foo<int>.Generic<double>");
+            TypeConversionBidirectional(typeof(OverloadedNames.Foo<int>.Overloaded), "Foo<int>.Overloaded");
+            TypeConversionBidirectional(typeof(OverloadedNames.Foo<int>.Overloaded<char>), "Foo<int>.Overloaded<char>");
+            TypeConversionBidirectional(typeof(OverloadedNames.Foo<int>.Overloaded<double, char>), "Foo<int>.Overloaded<double, char>");
 
-            Assert.AreEqual(typeof(OverloadedNames.Foo<int>.Solo), parseType("Foo<int>.Solo"));
-            Assert.AreEqual(typeof(OverloadedNames.Foo<int>.Generic<double>), parseType("Foo<int>.Generic<double>"));
-            Assert.AreEqual(typeof(OverloadedNames.Foo<int>.Overloaded), parseType("Foo<int>.Overloaded"));
-            Assert.AreEqual(typeof(OverloadedNames.Foo<int>.Overloaded<char>), parseType("Foo<int>.Overloaded<char>"));
-            Assert.AreEqual(typeof(OverloadedNames.Foo<int>.Overloaded<double, char>), parseType("Foo<int>.Overloaded<double, char>"));
+            TypeConversionBidirectional(typeof(OverloadedNames.Foo<int, double>.Solo), "Foo<int, double>.Solo");
+            TypeConversionBidirectional(typeof(OverloadedNames.Foo<int, double>.Generic<string>), "Foo<int, double>.Generic<string>");
+            TypeConversionBidirectional(typeof(OverloadedNames.Foo<int, double>.Overloaded), "Foo<int, double>.Overloaded");
+            TypeConversionBidirectional(typeof(OverloadedNames.Foo<int, double>.Overloaded<float>), "Foo<int, double>.Overloaded<float>");
+            TypeConversionBidirectional(typeof(OverloadedNames.Foo<int, double>.Overloaded<string, float>), "Foo<int, double>.Overloaded<string, float>");
 
-            Assert.AreEqual(typeof(OverloadedNames.Foo<int, double>.Solo), parseType("Foo<int, double>.Solo"));
-            Assert.AreEqual(typeof(OverloadedNames.Foo<int, double>.Generic<string>), parseType("Foo<int, double>.Generic<string>"));
-            Assert.AreEqual(typeof(OverloadedNames.Foo<int, double>.Overloaded), parseType("Foo<int, double>.Overloaded"));
-            Assert.AreEqual(typeof(OverloadedNames.Foo<int, double>.Overloaded<float>), parseType("Foo<int, double>.Overloaded<float>"));
-            Assert.AreEqual(typeof(OverloadedNames.Foo<int, double>.Overloaded<string, float>), parseType("Foo<int, double>.Overloaded<string, float>"));
-
-            //Assert.AreEqual(typeof(OverloadedNames.Foo<Dictionary<int, double>, double>.Overloaded<string, float>), parseType("OverloadedNames.Foo<Dictionary<int, double>, double>.Overloaded<string, Dictionary<int, double>>"));
-
+            TypeConversionBidirectional(typeof(OverloadedNames.Foo<Dictionary<int, double>, double>.Overloaded<string, Dictionary<int, double>>), "Foo<System.Collections.Generic.Dictionary<int, double>, double>.Overloaded<string, System.Collections.Generic.Dictionary<int, double>>");
         }
     }
 

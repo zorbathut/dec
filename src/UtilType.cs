@@ -359,6 +359,7 @@ namespace Dec
             return result;
         }
 
+        private static readonly Regex GenericParameterReplacementRegex = new Regex(@"`\d+", RegexOptions.Compiled);
         private static Dictionary<Type, string> ComposeDecCache = new Dictionary<Type, string>();
         internal static string ComposeDecFormatted(this Type type)
         {
@@ -400,21 +401,24 @@ namespace Dec
                     }
                 }
 
-                // Strip out the generic parameter count
-                int genericVariableSpecifier = baseString.IndexOfUnbounded('`');
-
-                string baseTypeString = baseString.Substring(bestPrefix.Length, genericVariableSpecifier - bestPrefix.Length);
+                baseString = baseString.Remove(0, bestPrefix.Length);
 
                 string result;
                 if (type.IsConstructedGenericType)
                 {
-                    // Assemble the generic types on top of this
-                    string genericTypes = string.Join(", ", type.GenericTypeArguments.Select(t => t.ComposeDecFormatted()));
-                    result = $"{baseTypeString}<{genericTypes}>";
+                    var genericTypes = type.GenericTypeArguments.Select(t => t.ComposeDecFormatted()).ToList();
+                    int paramIndex = 0;
+                    result = GenericParameterReplacementRegex.Replace(baseString, match =>
+                        {
+                            int numParams = int.Parse(match.Value.Substring(1));
+                            var replacement = string.Join(", ", genericTypes.GetRange(paramIndex, numParams));
+                            paramIndex += numParams;
+                            return $"<{replacement}>";
+                        });
                 }
                 else
                 {
-                    result = baseTypeString;
+                    result = baseString;
                 }
 
                 ComposeDecCache[type] = result;
