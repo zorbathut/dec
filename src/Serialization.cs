@@ -1234,7 +1234,7 @@ namespace Dec
                     }
                 }
 
-                // If we haven't been given a template class from our parent, go ahead and init to defaults
+                // If we haven't been given a generic class from our parent, go ahead and init to defaults
                 if (result == null)
                 {
                     result = type.CreateInstanceSafe("object", node);

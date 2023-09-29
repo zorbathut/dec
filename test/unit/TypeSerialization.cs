@@ -288,7 +288,7 @@ namespace DecTest
         {
             Dec.Config.UsingNamespaces = new string[] { "DecTest.TypeSerialization" };
 
-            // This is just me verifying a bunch of template error behaviors.
+            // This is just me verifying a bunch of generic error behaviors.
             ExpectErrors(() => parseType("int<int>"));
             ExpectErrors(() => parseType("Generic<>"));
             ExpectErrors(() => parseType("Generic<int"));

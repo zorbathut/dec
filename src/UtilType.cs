@@ -12,8 +12,8 @@ namespace Dec
         // Namespaces are separated by .'s, for example, LowerNamespace.UpperNamespace.ClassName
         // Member classes are also separted by .'s, which means you can have LowerNamespace.ClassName.MemberClass
         // C# wants to do those with +'s, but we're using .'s for readability and XML compatibility reasons.
-        // Templates currently use <>'s as you would expect. This isn't compatible with XML tags but I'm just kind of living with it for now.
-        // And yes, this also isn't compatible with C#.
+        // Generics currently use <>'s as you would expect. This isn't compatible with XML tags but I'm just kind of living with it for now.
+        // And yes, this also isn't compatible with C#'s internal types.
 
         // When serializing types, we chop off as much of the prefix as we can. When deserializing types, we error if there's ambiguity based on existing prefixes.
 
@@ -47,7 +47,7 @@ namespace Dec
         private static Type GetTypeFromAnyAssembly(string text, int gparams, InputContext context)
         {
             // This is technically unnecessary if we're not parsing a generic, but we may as well do it because the cache will still be faster for nongenerics.
-            // If we really wanted a perf boost here, we'd do one pass for non-template objects, then do it again on a cache miss to fill it with template stuff.
+            // If we really wanted a perf boost here, we'd do one pass for non-generic objects, then do it again on a cache miss to fill it with generic stuff.
             // But there's probably much better performance boosts to be seen throughout this.
             if (StrippedTypeCache == null)
             {
@@ -141,7 +141,7 @@ namespace Dec
             if (nameEnd < input.Length && input[nameEnd] == '<')
             {
                 int endOfGenericsAdjustment = 0;
-                if (!ParseTemplateParams(input.Substring(nameEnd + 1), context, out endOfGenericsAdjustment, ref types))
+                if (!ParseGenericParams(input.Substring(nameEnd + 1), context, out endOfGenericsAdjustment, ref types))
                 {
                     // just kinda give up to ensure we don't get trapped in a loop
                     Dbg.Err($"{context}: Failed to parse generic arguments for type containing {input}");
@@ -165,7 +165,7 @@ namespace Dec
         }
 
         // returns false on error
-        internal static bool ParseTemplateParams(string tstring, InputContext context, out int endIndex, ref List<Type> types)
+        internal static bool ParseGenericParams(string tstring, InputContext context, out int endIndex, ref List<Type> types)
         {
             int depth = 0;
             endIndex = 0;
@@ -234,7 +234,7 @@ namespace Dec
             // Our challenge is to find a function with the right ordering of generic arguments. NS.Foo`1.Bar is different from NS.Foo.Bar`1, for example.
             // We're actually going to transform our input into C#'s generic-argument layout so we can find the right instance easily.
 
-            // This is complicated by the fact that the compiler can generate class names with <> in them - that is, the *name*, not the template specialization.
+            // This is complicated by the fact that the compiler can generate class names with <> in them - that is, the *name*, not the generic specialization.
             // As an added bonus, the namespace is signaled differently, so we're going to be chopping this up awkwardly as we do it.
 
             int nextTokenEnd = 0;
@@ -326,7 +326,7 @@ namespace Dec
                 text = text.Substring(0, text.Length - 2);
             }
 
-            // We need to find a class that matches the least number of tokens. Namespaces can't be templates so at most this continues until we hit a namespace.
+            // We need to find a class that matches the least number of tokens. Namespaces can't be generics so at most this continues until we hit a namespace.
             var possibleTypes = Config.UsingNamespaces
                 .Select(ns => ParseIndependentType($"{ns}.{text}", context))
                 .Concat(ParseIndependentType(text, context))

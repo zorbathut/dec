@@ -82,7 +82,7 @@ namespace DecTest
             Assert.AreEqual(root.GetType(), deserialized.GetType());
         }
 
-        public class RetemplatedConverter<T> : Dec.ConverterRecord<T>
+        public class RegenericedConverter<T> : Dec.ConverterRecord<T>
         {
             public override void Record(ref T input, Dec.Recorder recorder)
             {
@@ -91,9 +91,9 @@ namespace DecTest
         }
 
         [Test]
-        public void Retemplated()
+        public void Regenericed()
         {
-            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(RetemplatedConverter<>) } });
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(RegenericedConverter<>) } });
 
             // so what happens here?
             ExpectErrors(() => new Dec.Parser().Finish());
