@@ -259,6 +259,10 @@ namespace Dec
         {
             if (ParseCache.TryGetValue(text, out Type cacheVal))
             {
+                if (cacheVal == null)
+                {
+                    Dbg.Err($"{context}: Repeating previous failure to parse type named `{text}`");
+                }
                 return cacheVal;
             }
 
