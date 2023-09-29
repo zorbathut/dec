@@ -144,6 +144,11 @@ namespace Dec
                 return parameters;
             }
 
+            /// <summary>
+            /// Indicates whether this Recorder is being used for reading or writing.
+            /// </summary>
+            public Direction Mode { get => recorder.Mode; }
+
             internal Context CreateContext()
             {
                 return new Context() { factories = factories, shared = shared ? Context.Shared.Allow : Context.Shared.Deny };

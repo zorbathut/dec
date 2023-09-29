@@ -11,6 +11,9 @@ All notable changes to this project will be documented in this file.
 * Improved error message when trying to initialize a composite with a string.
 * First-time Parser startup speed now faster.
 
+### Fixed
+* Missing Mode property on Recorder.Parameters.
+* 
 ### Testing
 * Made test harness more durable of errors happening during parsing.
 * Fixed a test that was accidentally testing the wrong thing.
