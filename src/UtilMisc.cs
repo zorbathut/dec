@@ -3,7 +3,7 @@ namespace Dec
     using System;
     using System.Text.RegularExpressions;
 
-    internal static class Util
+    internal static class UtilMisc
     {
         internal static string LooseMatchCanonicalize(string input)
         {
