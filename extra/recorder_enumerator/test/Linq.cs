@@ -94,5 +94,21 @@ namespace RecorderEnumeratorTest
 
             Assert.IsTrue(Util.AreEquivalentEnumerators(range, result));
         }
+
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void WhereArray([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            int k = 3;
+            var array = Enumerable.Range(0, 20).ToArray();
+            var range = array.Where(i => i % k == 0).GetEnumerator();
+            range.MoveNext();
+            range.MoveNext();
+            range.MoveNext();
+
+            var result = DoRecorderRoundTrip(range, recorderMode);
+
+            Assert.IsTrue(Util.AreEquivalentEnumerators(range, result));
+        }
     }
 }

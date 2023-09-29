@@ -32,6 +32,11 @@ namespace Dec.RecorderEnumerator
                     return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_WhereIterator_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
                 }
 
+                if (genericTypeDefinition == SystemLinqEnumerable_WhereArray_Converter.RelevantType)
+                {
+                    return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_WhereArray_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
+                }
+
                 if (System_Func_Converter.IsGenericTypeFunc(genericTypeDefinition))
                 {
                     return new System_Func_Converter(type);
