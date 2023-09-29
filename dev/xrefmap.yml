@@ -1188,6 +1188,25 @@ references:
   isSpec: "True"
   fullName: Dec.StaticReferencesAttribute.Initialized
   nameWithType: StaticReferencesAttribute.Initialized
+- uid: Dec.Util
+  name: Util
+  href: api/Dec.Util.html
+  commentId: T:Dec.Util
+  fullName: Dec.Util
+  nameWithType: Util
+- uid: Dec.Util.CanBeShared(System.Type)
+  name: CanBeShared(Type)
+  href: api/Dec.Util.html#Dec_Util_CanBeShared_System_Type_
+  commentId: M:Dec.Util.CanBeShared(System.Type)
+  fullName: Dec.Util.CanBeShared(System.Type)
+  nameWithType: Util.CanBeShared(Type)
+- uid: Dec.Util.CanBeShared*
+  name: CanBeShared
+  href: api/Dec.Util.html#Dec_Util_CanBeShared_
+  commentId: Overload:Dec.Util.CanBeShared
+  isSpec: "True"
+  fullName: Dec.Util.CanBeShared
+  nameWithType: Util.CanBeShared
 - uid: future_csv
   name: CSV Support
   href: future/csv.html

@@ -255,6 +255,16 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Dec.Util.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.Util.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Dec.yml",
       "output": {
         ".html": {
