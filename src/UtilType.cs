@@ -41,14 +41,9 @@ namespace Dec
             new PrimitiveTypeLookup { type = typeof(string), str = "string" },
         };
 
-        private static bool MatchesWithGeneric(string typeName, string decType)
-        {
-            return typeName.StartsWith(decType) && typeName[decType.Length] == '`';
-        }
-
         private static Regex GenericParameterMatcher = new Regex("`[0-9]+", RegexOptions.Compiled);
-        private static Dictionary<string, Type[]> StrippedTypeCache = null;
-        private static Type GetTypeFromAnyAssembly(string text, InputContext context)
+        private static Dictionary<(string, int), Type[]> StrippedTypeCache = null;
+        private static Type GetTypeFromAnyAssembly(string text, int gparams, InputContext context)
         {
             // This is technically unnecessary if we're not parsing a generic, but we may as well do it because the cache will still be faster for nongenerics.
             // If we really wanted a perf boost here, we'd do one pass for non-template objects, then do it again on a cache miss to fill it with template stuff.
@@ -68,14 +63,24 @@ namespace Dec
                             return reflectionException.Types.Where(t => t != null);
                         }
                     })
+                    .Where(t => t.DeclaringType == null)    // we have to split these up anyway, so including declaring types just makes our life a little harder
                     .Distinct()
-                    .GroupBy(t => GenericParameterMatcher.Replace(t.FullName, ""))
+                    .GroupBy(t => {
+                        if (t.IsGenericType)
+                        {
+                            return (t.FullName.Substring(0, t.FullName.IndexOfUnbounded('`')), t.GetGenericArguments().Length);
+                        }
+                        else
+                        {
+                            return (t.FullName, 0);
+                        }
+                    })
                     .ToDictionary(
                         group => group.Key,
                         group => group.ToArray());
             }
 
-            var result = StrippedTypeCache.TryGetValue(text);
+            var result = StrippedTypeCache.TryGetValue((text, gparams));
 
             if (result == null)
             {
@@ -92,7 +97,7 @@ namespace Dec
             }
         }
 
-        private static Type ParseWithoutNamespace(Type root, string text, InputContext context)
+        private static Type ParseSubtype(Type root, string text, ref List<Type> genericTypes, InputContext context)
         {
             if (root == null)
             {
@@ -104,159 +109,194 @@ namespace Dec
                 return root;
             }
 
-            if (text[0] == '.')
+            int previousTypes = genericTypes?.Count ?? 0;
+            if (!ParsePiece(text, context, out int endIndex, out string token, ref genericTypes))
             {
-                // This is a member class of a class
-                int end = Math.Min(text.IndexOfUnbounded('<', 1), text.IndexOfUnbounded('.', 1));
-                string memberName = text.Substring(1, end - 1);
-
-                // Get our type
-                Type chosenType = root.GetNestedType(memberName, BindingFlags.Public | BindingFlags.NonPublic);
-
-                // Ho ho! We have gotten a type! It has definitely not failed!
-                // Unless it's a generic type in which case it might have failed.
-                if (chosenType == null)
-                {
-                    foreach (var prospectiveType in root.GetNestedTypes(BindingFlags.Public | BindingFlags.NonPublic))
-                    {
-                        if (MatchesWithGeneric(prospectiveType.Name, memberName))
-                        {
-                            chosenType = prospectiveType;
-                            break;
-                        }
-                    }
-                }
-
-                // Chain on to another call in case we have a further-nested class-of-class
-                return ParseWithoutNamespace(chosenType, text.Substring(end), context);
+                return null;
             }
-            else if (text[0] == '<')
+            int addedTypes = (genericTypes?.Count ?? 0) - previousTypes;
+
+            Type chosenType;
+            if (addedTypes == 0)
             {
-                if (!root.IsGenericTypeDefinition)
-                {
-                    Dbg.Err($"{context}: Found generic specification on non-generic type {root}");
-                    return null;
-                }
-
-                // This is a template
-                // Parsing this is going to be a bit tricky; in theory it's C#-regex-able but I haven't been able to find a good simple example
-                // So we're doing it by hand
-                // Which is slow
-                // Definitely gonna want caching for this at some point.
-                var parsedTypes = new List<Type>();
-                void AddParsedType(string type)
-                {
-                    parsedTypes.Add(ParseDecFormatted(type.Trim(), context));
-                }
-
-                int tokenStart = 1;
-                while (tokenStart < text.Length && text[tokenStart] != '>')
-                {
-                    int tokenEnd = tokenStart;
-
-                    int nestedBrackets = 0;
-                    while (true)
-                    {
-                        // just so we can stop calling this function
-                        char kar = text[tokenEnd];
-
-                        if (kar == ',')
-                        {
-                            AddParsedType(text.Substring(tokenStart, tokenEnd - tokenStart));
-                            tokenStart = tokenEnd + 1;
-                            tokenEnd = tokenStart;
-                            continue;
-                        }
-                        else if (kar == '<')
-                        {
-                            ++nestedBrackets;
-                        }
-                        else if (kar == '>' && nestedBrackets > 0)
-                        {
-                            --nestedBrackets;
-                        }
-                        else if (kar == '>')
-                        {
-                            // we have reached the end of the templates
-                            AddParsedType(text.Substring(tokenStart, tokenEnd - tokenStart));
-                            tokenStart = tokenEnd;
-                            break;
-                        }
-
-                        // consume another character!
-                        ++tokenEnd;
-
-                        if (tokenEnd >= text.Length)
-                        {
-                            // We've hit the end; this is a failure, but it'll be picked up by the below error
-                            tokenStart = tokenEnd;
-                            break;
-                        }
-                    }
-                }
-
-                if (tokenStart >= text.Length || text[tokenStart] != '>')
-                {
-                    Dbg.Err($"{context}: Failed to find closing angle bracket in type");
-                    return null;
-                }
-
-                if (parsedTypes.Count != root.GetGenericArguments().Length)
-                {
-                    Dbg.Err($"{context}: Wrong number of generic arguments for type {root}");
-                    return null;
-                }
-
-                // Alright, we have a valid set of brackets, and a parsed set of types!
-                Type specifiedType = root.MakeGenericType(parsedTypes.ToArray());
-
-                // yay!
-
-                // We also might have more type to parse.
-                return ParseWithoutNamespace(specifiedType, text.Substring(tokenStart + 1), context);
+                chosenType = root.GetNestedType(token, BindingFlags.Public | BindingFlags.NonPublic);
             }
             else
             {
-                // nope.
-                return null;
+                chosenType = root.GetNestedType($"{token}`{addedTypes}", BindingFlags.Public | BindingFlags.NonPublic);
             }
+
+            // Chain on to another call in case we have a further-nested class-of-class
+            return ParseSubtype(chosenType, text.SubstringSafe(endIndex), ref genericTypes, context);
         }
 
-        private static Type ParseWithNamespace(string text, InputContext context)
+        internal static bool ParsePiece(string input, InputContext context, out int endIndex, out string name, ref List<Type> types)
         {
-            // At this point we've dealt with the whole Using thing, we just need to deal with this class on its own.
+            // Isolate the first token; this is the distance from our current index to the first . or < that *isn't* the beginning of a class name.
+            int nameEnd = Math.Min(input.IndexOfUnbounded('.'), input.IndexOfUnbounded('<', 1));
+            name = input.Substring(0, nameEnd);
 
-            // We definitely stop at the first < - that has to be a class or we're done for - so let's figure out our stopping point.
-            int stringEnd = text.IndexOfUnbounded('<');
-
-            int tokenNext = 0;
-            while (true)
+            // If we have a < we need to extract generic arguments.
+            if (nameEnd < input.Length && input[nameEnd] == '<')
             {
-                int tokenEnd = text.IndexOf('.', tokenNext);
-                if (tokenEnd == -1 || tokenEnd > stringEnd)
+                int endOfGenericsAdjustment = 0;
+                if (!ParseTemplateParams(input.Substring(nameEnd + 1), context, out endOfGenericsAdjustment, ref types))
                 {
-                    tokenEnd = stringEnd;
+                    // just kinda give up to ensure we don't get trapped in a loop
+                    Dbg.Err($"{context}: Failed to parse generic arguments for type containing {input}");
+                    endIndex = input.Length;
+                    return false;
+                }
+                endIndex = nameEnd + endOfGenericsAdjustment + 3; // adjustment for <>.
+                // . . . but also, make sure we don't have a trailing dot!
+                if (endIndex == input.Length && input[endIndex - 1] == '.')
+                {
+                    Dbg.Err($"{context}: Type containing `{input}` has trailing .");
+                    return false;
+                }
+            }
+            else
+            {
+                endIndex = nameEnd + 1; // adjustment for .
+            }
+
+            return true;
+        }
+
+        // returns false on error
+        internal static bool ParseTemplateParams(string tstring, InputContext context, out int endIndex, ref List<Type> types)
+        {
+            int depth = 0;
+            endIndex = 0;
+
+            int typeStart = 0;
+
+            for (endIndex = 0; endIndex < tstring.Length; ++endIndex)
+            {
+                char c = tstring[endIndex];
+                switch (c)
+                {
+                    case '<':
+                        depth++;
+                        break;
+
+                    case '>':
+                        depth--;
+                        break;
+
+                    case ',':
+                        if (depth == 0)
+                        {
+                            if (types == null)
+                            {
+                                types = new List<Type>();
+                            }
+                            types.Add(UtilType.ParseDecFormatted(tstring.Substring(typeStart, endIndex - typeStart), context));
+                            typeStart = endIndex + 1;
+                        }
+                        break;
                 }
 
-                string token = text.Substring(0, tokenEnd);
-                Type parsedType = GetTypeFromAnyAssembly(token, context);
+                if (depth < 0)
+                {
+                    break;
+                }
+            }
+
+            if (depth != -1)
+            {
+                Dbg.Err($"{context}: Mismatched angle brackets when parsing generic type component `{tstring}`");
+                return false;
+            }
+
+            if (endIndex + 1 < tstring.Length && tstring[endIndex + 1] != '.')
+            {
+                Dbg.Err($"{context}: Unexpected character after end of generic type definition");
+                return false;
+            }
+
+            if (endIndex != typeStart)
+            {
+                if (types == null)
+                {
+                    types = new List<Type>();
+                }
+                types.Add(UtilType.ParseDecFormatted(tstring.Substring(typeStart, endIndex - typeStart).Trim(), context));
+            }
+
+            return true;
+        }
+
+        private static Type ParseIndependentType(string text, InputContext context)
+        {
+            // This function just tries to find a class with a specific namespace; we no longer worry about `using`.
+            // Our challenge is to find a function with the right ordering of generic arguments. NS.Foo`1.Bar is different from NS.Foo.Bar`1, for example.
+            // We're actually going to transform our input into C#'s generic-argument layout so we can find the right instance easily.
+
+            // This is complicated by the fact that the compiler can generate class names with <> in them - that is, the *name*, not the template specialization.
+            // As an added bonus, the namespace is signaled differently, so we're going to be chopping this up awkwardly as we do it.
+
+            int nextTokenEnd = 0;
+            string currentPrefix = "";
+            while (nextTokenEnd < text.Length)
+            {
+                // Parse another chunk
+                // This involves an unnecessary amount of copying - this should be fixed, but this is currently not the bottleneck anywhere I've seen.
+                List<Type> genericParameters = null; // avoid churn if we can
+                if (!ParsePiece(text.Substring(nextTokenEnd), context, out int currentTokenLength, out string tokenText, ref genericParameters))
+                {
+                    // parse error, abort
+                    return null;
+                }
+
+                // update next token position
+                nextTokenEnd += currentTokenLength;
+
+                // update our currentPrefix
+                if (currentPrefix.Length == 0)
+                {
+                    currentPrefix = tokenText;
+                }
+                else
+                {
+                    currentPrefix += "." + tokenText;
+                }
+
+                // This is the thing we're going to test to see if is a class.
+                var parsedType = GetTypeFromAnyAssembly(currentPrefix, genericParameters?.Count ?? 0, context);
+
                 if (parsedType != null)
                 {
-                    return ParseWithoutNamespace(parsedType, text.Substring(tokenEnd), context);
+                    // We found the root! Keep on digging.
+                    Type primitiveType = ParseSubtype(parsedType, text.SubstringSafe(nextTokenEnd), ref genericParameters, context);
+                    if (primitiveType != null && genericParameters != null)
+                    {
+                        primitiveType = primitiveType.MakeGenericType(genericParameters.ToArray());
+                    }
+                    return primitiveType;
                 }
 
-                tokenNext = tokenEnd + 1;
-                if (tokenNext >= stringEnd)
+                // We did not! Continue on.
+                if (genericParameters != null)
                 {
-                    // We failed to find anything.
+                    // . . . but we can't go past a set of generics, namespace generics aren't a thing. So we're done.
                     return null;
                 }
             }
+
+            // Ran out of string, no match.
+            return null;
         }
 
         private static Dictionary<string, Type> ParseCache = new Dictionary<string, Type>();
         internal static Type ParseDecFormatted(string text, InputContext context)
         {
+            if (text == "")
+            {
+                Dbg.Err($"{context}: The empty string is not a valid type");
+                return null;
+            }
+
             if (ParseCache.TryGetValue(text, out Type cacheVal))
             {
                 if (cacheVal == null)
@@ -287,8 +327,8 @@ namespace Dec
 
             // We need to find a class that matches the least number of tokens. Namespaces can't be templates so at most this continues until we hit a namespace.
             var possibleTypes = Config.UsingNamespaces
-                .Select(ns => ParseWithNamespace($"{ns}.{text}", context))
-                .Concat(ParseWithNamespace(text, context))
+                .Select(ns => ParseIndependentType($"{ns}.{text}", context))
+                .Concat(ParseIndependentType(text, context))
                 .Where(t => t != null)
                 .ToArray();
 

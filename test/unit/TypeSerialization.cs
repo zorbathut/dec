@@ -304,19 +304,71 @@ namespace DecTest
         }
 
         [Test]
+        public void ErrorCache()
+        {
+            Dec.Config.UsingNamespaces = new string[] { "DecTest.TypeSerialization" };
+
+            // make sure caching doesn't suppress errors
+            ExpectErrors(() => parseType("horse"));
+            ExpectErrors(() => parseType("horse"));
+        }
+
+        [Test]
         public void OverloadedNames()
         {
             Dec.Config.UsingNamespaces = new string[] { "DecTest.OverloadedNames" };
 
-            // In theory we could handle this one properly; right now, we don't, though, and I want to make sure it does the right thing when it stops generating errors
-            ExpectErrors(() => parseType("Foo"));
-            ExpectErrors(() => parseType("Foo<int>"));
+            Assert.AreEqual(typeof(OverloadedNames.Foo.Solo), parseType("Foo.Solo"));
+            Assert.AreEqual(typeof(OverloadedNames.Foo.Generic<int>), parseType("Foo.Generic<int>"));
+            Assert.AreEqual(typeof(OverloadedNames.Foo.Overloaded), parseType("Foo.Overloaded"));
+            Assert.AreEqual(typeof(OverloadedNames.Foo.Overloaded<string>), parseType("Foo.Overloaded<string>"));
+            Assert.AreEqual(typeof(OverloadedNames.Foo.Overloaded<int, string>), parseType("Foo.Overloaded<int, string>"));
+
+            Assert.AreEqual(typeof(OverloadedNames.Foo<int>.Solo), parseType("Foo<int>.Solo"));
+            Assert.AreEqual(typeof(OverloadedNames.Foo<int>.Generic<double>), parseType("Foo<int>.Generic<double>"));
+            Assert.AreEqual(typeof(OverloadedNames.Foo<int>.Overloaded), parseType("Foo<int>.Overloaded"));
+            Assert.AreEqual(typeof(OverloadedNames.Foo<int>.Overloaded<char>), parseType("Foo<int>.Overloaded<char>"));
+            Assert.AreEqual(typeof(OverloadedNames.Foo<int>.Overloaded<double, char>), parseType("Foo<int>.Overloaded<double, char>"));
+
+            Assert.AreEqual(typeof(OverloadedNames.Foo<int, double>.Solo), parseType("Foo<int, double>.Solo"));
+            Assert.AreEqual(typeof(OverloadedNames.Foo<int, double>.Generic<string>), parseType("Foo<int, double>.Generic<string>"));
+            Assert.AreEqual(typeof(OverloadedNames.Foo<int, double>.Overloaded), parseType("Foo<int, double>.Overloaded"));
+            Assert.AreEqual(typeof(OverloadedNames.Foo<int, double>.Overloaded<float>), parseType("Foo<int, double>.Overloaded<float>"));
+            Assert.AreEqual(typeof(OverloadedNames.Foo<int, double>.Overloaded<string, float>), parseType("Foo<int, double>.Overloaded<string, float>"));
+
+            //Assert.AreEqual(typeof(OverloadedNames.Foo<Dictionary<int, double>, double>.Overloaded<string, float>), parseType("OverloadedNames.Foo<Dictionary<int, double>, double>.Overloaded<string, Dictionary<int, double>>"));
+
         }
     }
 
     namespace OverloadedNames
     {
-        public class Foo { }
-        public class Foo<T> { }
+        public class Foo
+        {
+            public class Solo { }
+            public class Generic<T> { }
+
+            public class Overloaded { }
+            public class Overloaded<T> { }
+            public class Overloaded<T, U> { }
+        }
+        public class Foo<T>
+        {
+            public class Solo { }
+            public class Generic<T> { }
+
+            public class Overloaded { }
+            public class Overloaded<T> { }
+            public class Overloaded<T, U> { }
+        }
+        public class Foo<T, U>
+        {
+            public class Solo { }
+            public class Generic<T> { }
+
+            public class Overloaded { }
+            public class Overloaded<T> { }
+            public class Overloaded<T, U> { }
+        }
     }
 }
