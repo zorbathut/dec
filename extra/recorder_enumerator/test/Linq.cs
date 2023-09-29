@@ -82,7 +82,7 @@ namespace RecorderEnumeratorTest
 
         [Test]
         [Dec.RecorderEnumerator.RecordableClosures]
-        public void Where([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        public void WhereEnumerable([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
         {
             int k = 3;
             var range = Enumerable.Range(0, 20).Where(i => i % k == 0).GetEnumerator();
