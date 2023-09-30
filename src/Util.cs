@@ -12,5 +12,13 @@ namespace Dec
         {
             return !type.IsValueType && !typeof(Dec).IsAssignableFrom(type) && type != typeof(string) && type != typeof(Type);
         }
+
+        /// <summary>
+        /// The internal collection version applied to collections on deserialization.
+        /// </summary>
+        /// <remarks>
+        /// This should not matter to you unless you're doing deep black magic.
+        /// </remarks>
+        public const int CollectionDeserializationVersion = 424242;
     }
 }

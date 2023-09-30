@@ -302,6 +302,8 @@ namespace Dec
 
                 list.Add(Serialization.ParseElement(new List<ReaderNode>() { new ReaderNodeXml(fieldElement, fileIdentifier) }, referencedType, null, readerContext, recorderChildContext));
             }
+
+            list.GetType().GetField("_version", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(list, Util.CollectionDeserializationVersion);
         }
 
         public override void ParseArray(Array array, Type referencedType, ReaderContext readerContext, Recorder.Context recorderContext, int startOffset)

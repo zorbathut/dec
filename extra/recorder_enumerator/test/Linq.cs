@@ -110,5 +110,43 @@ namespace RecorderEnumeratorTest
 
             Assert.IsTrue(Util.AreEquivalentEnumerators(range, result));
         }
+
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void WhereList([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            int k = 3;
+            var list = Enumerable.Range(0, 20).ToList();
+            var range = list.Where(i => i % k == 0).GetEnumerator();
+            range.MoveNext();
+            range.MoveNext();
+            range.MoveNext();
+
+            var result = DoRecorderRoundTrip(range, recorderMode);
+
+            Assert.IsTrue(Util.AreEquivalentEnumerators(range, result));
+        }
+
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void WhereListOutOfDate([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            var list = Enumerable.Range(0, 5).ToList();
+            var range = list.GetEnumerator();
+            list.Add(1);
+
+            var result = DoRecorderRoundTrip((list, range), recorderMode);
+
+            Assert.AreEqual(list, result.list);
+
+            try
+            {
+                result.range.MoveNext();
+                Assert.Fail("Expected InvalidOperationException");
+            }
+            catch (InvalidOperationException)
+            {
+            }
+        }
     }
 }
