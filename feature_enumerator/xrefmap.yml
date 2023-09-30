@@ -1337,6 +1337,12 @@ references:
   isSpec: "True"
   fullName: Dec.Util.CanBeShared
   nameWithType: Util.CanBeShared
+- uid: Dec.Util.CollectionDeserializationVersion
+  name: CollectionDeserializationVersion
+  href: api/Dec.Util.html#Dec_Util_CollectionDeserializationVersion
+  commentId: F:Dec.Util.CollectionDeserializationVersion
+  fullName: Dec.Util.CollectionDeserializationVersion
+  nameWithType: Util.CollectionDeserializationVersion
 - uid: future_csv
   name: CSV Support
   href: future/csv.html
