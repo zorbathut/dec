@@ -95,6 +95,21 @@ namespace Dec.RecorderEnumerator
 
                     return new RecordableClosureConverter(type);
                 }
+
+                if (type.Name == "<>c")
+                {
+                    // it is currently unclear to me what the purpose of this class is
+                    // I get that this is a place for shoving inline functions without closures
+                    // but why aren't those functions static? why do they need to refer to an instance of the class?
+
+                    // I'm a little worried that I'm going to break something horribly by creating more instances of this class, but nothing seems to stop me from doing so, so, uh
+                    // okay
+
+                    // I should probably be rigging this up to hackily refer to the internal static instance but for now I'm just not going to
+
+                    // anyway, this isn't meant for this, but it'll work for now
+                    return new RecordableClosureConverter(type);
+                }
             }
 
             return null;

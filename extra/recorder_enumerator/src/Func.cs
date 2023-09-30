@@ -13,11 +13,18 @@ namespace Dec.RecorderEnumerator
         }
 
         private Type localType;
+        private MethodInfo localReturnDefault;
 
         private static MethodInfo bindToMethodInfo = typeof(Delegate).GetMethod("BindToMethodInfo", BindingFlags.NonPublic | BindingFlags.Instance);
         private static MethodInfo runtimeMethodHandle_getDeclaringType;
 
         private static int delegateBindingFlags = 0; //CalculateDelegateBindingFlags();
+
+        private static MethodInfo[] ReturnDefaultLookup = typeof(System_Func_Converter)
+            .GetMethods(BindingFlags.NonPublic | BindingFlags.Static)
+            .Where(m => m.Name == "ReturnDefault" && m.IsGenericMethod)
+            .OrderBy(m => m.GetGenericArguments().Length)
+            .ToArray();
 
         static System_Func_Converter()
         {
@@ -38,6 +45,11 @@ namespace Dec.RecorderEnumerator
         public System_Func_Converter(Type type)
         {
             localType = type;
+
+            // Find the appropriate ReturnDefault
+            var meds = typeof(System_Func_Converter).GetMethods(BindingFlags.NonPublic | BindingFlags.Static);
+            var genericArguments = type.GetGenericArguments();
+            localReturnDefault = ReturnDefaultLookup[genericArguments.Length - 1].MakeGenericMethod(genericArguments);
         }
 
         public override void Write(Delegate input, Recorder recorder)
@@ -48,12 +60,23 @@ namespace Dec.RecorderEnumerator
             recorder.Shared().Record(ref target, "target");
         }
 
+        static Result ReturnDefault<Result>() { return default; }
+        static Result ReturnDefault<T0, Result>(T0 t0) { return default; }
+        static Result ReturnDefault<T0, T1, Result>(T0 t0, T1 t1) { return default; }
+        static Result ReturnDefault<T0, T1, T2, Result>(T0 t0, T1 t1, T2 t2) { return default; }
+        static Result ReturnDefault<T0, T1, T2, T3, Result>(T0 t0, T1 t1, T2 t2, T3 t3) { return default; }
+        static Result ReturnDefault<T0, T1, T2, T3, T4, Result>(T0 t0, T1 t1, T2 t2, T3 t3, T4 t4) { return default; }
+        static Result ReturnDefault<T0, T1, T2, T3, T4, T5, Result>(T0 t0, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5) { return default; }
+        static Result ReturnDefault<T0, T1, T2, T3, T4, T5, T6, Result>(T0 t0, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6) { return default; }
+        static Result ReturnDefault<T0, T1, T2, T3, T4, T5, T6, T7, Result>(T0 t0, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7) { return default; }
+
+
         public override Delegate Create(Recorder recorder)
         {
-            // beyond this point, there lie demons
-            //return (Delegate)System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(localType);
-
-            return new Func<int, bool>((int x) => false);
+            // We need to create an appropriate Delegate, but this is hard to do; Delegate refuses to play nice with GetUninitializedObject and its constructor does a lot of error checking.
+            // So instead, we just create a Delegate straight out of a MethodInfo with the appropriate prototype.
+            // We'll swap out the guts of the Delegate later.
+            return localReturnDefault.CreateDelegate(localType, null);
         }
 
         public override void Read(ref Delegate input, Recorder recorder)
