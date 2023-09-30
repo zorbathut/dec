@@ -132,7 +132,7 @@ namespace Dec
             if (xelement == null)
             {
                 // This is an unreferencable object! We are in trouble.
-                Dbg.Err("Attempt to create a new reference to an unreferenceable object. Will be left with default values.");
+                Dbg.Err("Attempt to create a new reference to an unreferenceable object. Will be left with default values. If this is coming from a Recorder setup, perhaps you need a .Shared() decorator.");
                 return true;
             }
 
