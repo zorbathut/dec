@@ -239,6 +239,21 @@ namespace RecorderEnumeratorTest
 
         [Test]
         [Dec.RecorderEnumerator.RecordableClosures]
+        public void SelectRange([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            int k = 3;
+            var range = Enumerable.Range(0, 20).Select(i => i.ToString()).GetEnumerator();
+            range.MoveNext();
+            range.MoveNext();
+            range.MoveNext();
+
+            var result = DoRecorderRoundTrip(range, recorderMode);
+
+            Assert.IsTrue(Util.AreEquivalentEnumerators(range, result));
+        }
+
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
         public void SelectArray([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
         {
             int k = 3;

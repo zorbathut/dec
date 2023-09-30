@@ -105,4 +105,38 @@ namespace Dec.RecorderEnumerator
             Write(input, recorder);
         }
     }
+
+    public static class SystemLinqEnumerable_SelectRange_Converter
+    {
+        internal static Type RelevantType = typeof(System.Linq.Enumerable).GetNestedType("SelectRangeIterator`1", System.Reflection.BindingFlags.NonPublic);
+    }
+
+    public class SystemLinqEnumerable_SelectRange_Converter<Iterator, T> : ConverterFactoryDynamic
+    {
+        internal FieldInfo field_Start = typeof(Iterator).GetField("_start", BindingFlags.NonPublic | BindingFlags.Instance);
+        internal FieldInfo field_End = typeof(Iterator).GetField("_end", BindingFlags.NonPublic | BindingFlags.Instance);
+        internal FieldInfo field_Selector = typeof(Iterator).GetField("_selector", BindingFlags.NonPublic | BindingFlags.Instance);
+        internal FieldInfo field_State = typeof(Iterator).GetField("_state", BindingFlags.NonPublic | BindingFlags.Instance);
+        internal FieldInfo field_Current = typeof(Iterator).GetField("_current", BindingFlags.NonPublic | BindingFlags.Instance);
+
+        public override void Write(object input, Recorder recorder)
+        {
+            recorder.RecordPrivate(input, field_Start, "start");
+            recorder.RecordPrivate(input, field_End, "end");
+            recorder.Shared().RecordPrivate(input, field_Selector, "selector");
+            recorder.RecordPrivate(input, field_State, "state");
+            recorder.SharedIfPossible<T>().RecordPrivate(input, field_Current, "current");
+        }
+
+        public override object Create(Recorder recorder)
+        {
+            return Activator.CreateInstance(typeof(Iterator), new object[] { 0, 0, null });
+        }
+
+        public override void Read(ref object input, Recorder recorder)
+        {
+            // it's the same code, we only need this for the funky Create
+            Write(input, recorder);
+        }
+    }
 }
