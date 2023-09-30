@@ -42,6 +42,21 @@ namespace Dec.RecorderEnumerator
                     return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_WhereList_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
                 }
 
+                if (genericTypeDefinition == SystemLinqEnumerable_WhereSelectIterator_Converter.RelevantType)
+                {
+                    return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_WhereSelectIterator_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
+                }
+
+                if (genericTypeDefinition == SystemLinqEnumerable_WhereSelectArray_Converter.RelevantType)
+                {
+                    return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_WhereSelectArray_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
+                }
+
+                if (genericTypeDefinition == SystemLinqEnumerable_WhereSelectList_Converter.RelevantType)
+                {
+                    return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_WhereSelectList_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
+                }
+
                 if (genericTypeDefinition == SystemCollections_List_Enumerator_Converter.RelevantType)
                 {
                     return (Converter)Activator.CreateInstance(typeof(SystemCollections_List_Enumerator_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));

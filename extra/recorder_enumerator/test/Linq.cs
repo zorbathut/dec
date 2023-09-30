@@ -148,5 +148,55 @@ namespace RecorderEnumeratorTest
             {
             }
         }
+
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void WhereSelectEnumerable([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            int k = 3;
+            int m = 2;
+            var range = Enumerable.Range(0, 20).Where(i => i % k == 0).Select(i => i * m).GetEnumerator();
+            range.MoveNext();
+            range.MoveNext();
+            range.MoveNext();
+
+            var result = DoRecorderRoundTrip(range, recorderMode);
+
+            Assert.IsTrue(Util.AreEquivalentEnumerators(range, result));
+        }
+
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void WhereSelectArray([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            int k = 3;
+            int m = 2;
+            var array = Enumerable.Range(0, 20).ToArray();
+            var range = array.Where(i => i % k == 0).Select(i => i * m).GetEnumerator();
+            range.MoveNext();
+            range.MoveNext();
+            range.MoveNext();
+
+            var result = DoRecorderRoundTrip(range, recorderMode);
+
+            Assert.IsTrue(Util.AreEquivalentEnumerators(range, result));
+        }
+
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void WhereSelectList([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            int k = 3;
+            int m = 2;
+            var list = Enumerable.Range(0, 20).ToList();
+            var range = list.Where(i => i % k == 0).Select(i => i * m).GetEnumerator();
+            range.MoveNext();
+            range.MoveNext();
+            range.MoveNext();
+
+            var result = DoRecorderRoundTrip(range, recorderMode);
+
+            Assert.IsTrue(Util.AreEquivalentEnumerators(range, result));
+        }
     }
 }
