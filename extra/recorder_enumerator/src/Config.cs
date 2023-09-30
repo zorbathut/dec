@@ -27,6 +27,8 @@ namespace Dec.RecorderEnumerator
             {
                 var genericTypeDefinition = type.GetGenericTypeDefinition();
 
+                // Where
+
                 if (genericTypeDefinition == SystemLinqEnumerable_WhereEnumerable_Converter.RelevantType)
                 {
                     return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_WhereEnumerable_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
@@ -57,10 +59,31 @@ namespace Dec.RecorderEnumerator
                     return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_WhereSelectList_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
                 }
 
+                // Select
+
+                if (genericTypeDefinition == SystemLinqEnumerable_SelectEnumerable_Converter.RelevantType)
+                {
+                    return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_SelectEnumerable_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[1]));
+                }
+
+                if (genericTypeDefinition == SystemLinqEnumerable_SelectArray_Converter.RelevantType)
+                {
+                    return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_SelectArray_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[1]));
+                }
+
+                if (genericTypeDefinition == SystemLinqEnumerable_SelectList_Converter.RelevantType)
+                {
+                    return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_SelectList_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[1]));
+                }
+
+                // List enumerator
+
                 if (genericTypeDefinition == SystemCollections_List_Enumerator_Converter.RelevantType)
                 {
                     return (Converter)Activator.CreateInstance(typeof(SystemCollections_List_Enumerator_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
                 }
+
+                // Delegate
 
                 if (System_Delegate_Converter.IsGenericDelegate(genericTypeDefinition))
                 {
@@ -102,7 +125,7 @@ namespace Dec.RecorderEnumerator
 
                     if (function.GetCustomAttribute<RecordableEnumerableAttribute>() == null)
                     {
-                        Dbg.Err($"Attempting to serialize an enumerable {type} without a Dec.RecorderEnumerator.Recordable applied to its function");
+                        Dbg.Err($"Attempting to serialize an enumerable {type} without a Dec.RecorderEnumerator.RecordableEnumerable applied to its function");
                         return null;
                     }
                 
@@ -121,7 +144,7 @@ namespace Dec.RecorderEnumerator
 
                     if (function.GetCustomAttribute<RecordableClosuresAttribute>() == null)
                     {
-                        Dbg.Err($"Attempting to serialize an enumerable {type} without a Dec.RecorderEnumerator.Recordable applied to its function");
+                        Dbg.Err($"Attempting to serialize a closure {type} without a Dec.RecorderEnumerator.RecordableClosure applied to its function");
                         return null;
                     }
 

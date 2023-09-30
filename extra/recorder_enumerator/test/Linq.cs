@@ -66,6 +66,15 @@ namespace RecorderEnumeratorTest
             // once I find something that supports Reset(), gotta make sure that test works as well
         }
 
+        [Dec.RecorderEnumerator.RecordableEnumerable]
+        public IEnumerable<int> FakeRange()
+        {
+            for (int i = 0; i < 20; ++i)
+            {
+                yield return i;
+            }
+        }
+
         [Test]
         public void Range([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
         {
@@ -211,6 +220,53 @@ namespace RecorderEnumeratorTest
             var result = DoRecorderRoundTrip((list, range), recorderMode);
 
             Assert.AreSame(result.range.Current, result.list[0]);
+        }
+
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void SelectEnumerable([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            int k = 3;
+            var range = FakeRange().Select(i => i.ToString()).GetEnumerator();
+            range.MoveNext();
+            range.MoveNext();
+            range.MoveNext();
+
+            var result = DoRecorderRoundTrip(range, recorderMode);
+
+            Assert.IsTrue(Util.AreEquivalentEnumerators(range, result));
+        }
+
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void SelectArray([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            int k = 3;
+            var array = Enumerable.Range(0, 20).ToArray();
+            var range = array.Select(i => i.ToString()).GetEnumerator();
+            range.MoveNext();
+            range.MoveNext();
+            range.MoveNext();
+
+            var result = DoRecorderRoundTrip(range, recorderMode);
+
+            Assert.IsTrue(Util.AreEquivalentEnumerators(range, result));
+        }
+
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void SelectList([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            int k = 3;
+            var list = Enumerable.Range(0, 20).ToList();
+            var range = list.Select(i => i.ToString()).GetEnumerator();
+            range.MoveNext();
+            range.MoveNext();
+            range.MoveNext();
+
+            var result = DoRecorderRoundTrip(range, recorderMode);
+
+            Assert.IsTrue(Util.AreEquivalentEnumerators(range, result));
         }
     }
 }
