@@ -27,9 +27,9 @@ namespace Dec.RecorderEnumerator
             {
                 var genericTypeDefinition = type.GetGenericTypeDefinition();
 
-                if (genericTypeDefinition == SystemLinqEnumerable_WhereIterator_Converter.RelevantType)
+                if (genericTypeDefinition == SystemLinqEnumerable_WhereEnumerable_Converter.RelevantType)
                 {
-                    return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_WhereIterator_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
+                    return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_WhereEnumerable_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
                 }
 
                 if (genericTypeDefinition == SystemLinqEnumerable_WhereArray_Converter.RelevantType)

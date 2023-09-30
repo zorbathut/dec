@@ -5,12 +5,12 @@ namespace Dec.RecorderEnumerator
     using System.Linq;
     using System.Reflection;
 
-    public static class SystemLinqEnumerable_WhereIterator_Converter
+    public static class SystemLinqEnumerable_WhereEnumerable_Converter
     {
         internal static Type RelevantType = typeof(System.Linq.Enumerable).GetNestedType("WhereEnumerableIterator`1", System.Reflection.BindingFlags.NonPublic);
     }
 
-    public class SystemLinqEnumerable_WhereIterator_Converter<Iterator, T> : ConverterFactoryDynamic
+    public class SystemLinqEnumerable_WhereEnumerable_Converter<Iterator, T> : ConverterFactoryDynamic
     {
         internal FieldInfo field_Source = typeof(Iterator).GetField("_source", BindingFlags.NonPublic | BindingFlags.Instance);
         internal FieldInfo field_Predicate = typeof(Iterator).GetField("_predicate", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -25,11 +25,6 @@ namespace Dec.RecorderEnumerator
             recorder.Shared().RecordPrivate(input, field_Enumerator, "enumerator");
             recorder.RecordPrivate(input, field_State, "state");
             recorder.SharedIfPossible<T>().RecordPrivate(input, field_Current, "current");
-        }
-
-        private static bool False(T input)
-        {
-            return false;
         }
 
         public override object Create(Recorder recorder)
@@ -64,11 +59,6 @@ namespace Dec.RecorderEnumerator
             recorder.SharedIfPossible<T>().RecordPrivate(input, field_Current, "current");
         }
 
-        private static bool False(T input)
-        {
-            return false;
-        }
-
         public override object Create(Recorder recorder)
         {
             return Activator.CreateInstance(typeof(Iterator), new object[] { null, null });
@@ -101,11 +91,6 @@ namespace Dec.RecorderEnumerator
             recorder.RecordPrivate(input, field_Enumerator, "enumerator");
             recorder.RecordPrivate(input, field_State, "state");
             recorder.SharedIfPossible<T>().RecordPrivate(input, field_Current, "current");
-        }
-
-        private static bool False(T input)
-        {
-            return false;
         }
 
         public override object Create(Recorder recorder)
@@ -144,11 +129,6 @@ namespace Dec.RecorderEnumerator
             recorder.SharedIfPossible<T>().RecordPrivate(input, field_Current, "current");
         }
 
-        private static bool False(T input)
-        {
-            return false;
-        }
-
         public override object Create(Recorder recorder)
         {
             return Activator.CreateInstance(typeof(Iterator), new object[] { null, null, null });
@@ -181,11 +161,6 @@ namespace Dec.RecorderEnumerator
             recorder.Shared().RecordPrivate(input, field_Selector, "selector");
             recorder.RecordPrivate(input, field_State, "state");
             recorder.SharedIfPossible<T>().RecordPrivate(input, field_Current, "current");
-        }
-
-        private static bool False(T input)
-        {
-            return false;
         }
 
         public override object Create(Recorder recorder)
@@ -222,11 +197,6 @@ namespace Dec.RecorderEnumerator
             recorder.RecordPrivate(input, field_Enumerator, "enumerator");
             recorder.RecordPrivate(input, field_State, "state");
             recorder.SharedIfPossible<T>().RecordPrivate(input, field_Current, "current");
-        }
-
-        private static bool False(T input)
-        {
-            return false;
         }
 
         public override object Create(Recorder recorder)
