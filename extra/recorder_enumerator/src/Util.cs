@@ -53,5 +53,20 @@ namespace Dec.RecorderEnumerator
         {
             return input.Replace("<", "LAB").Replace(">", "RAB");
         }
+
+        internal static Recorder.Parameters SharedIfPossible<T>(this Recorder recorder)
+        {
+            if (global::Dec.Util.CanBeShared(typeof(T)))
+            {
+                return recorder.Shared();
+            }
+            else
+            {
+                // okay this is nasty; I'm taking advantage of the fact that I know how the internals work
+                // I really should come up with a better approach here
+                // admittedly, that better approach might be "structify recorder", I'd love to get rid of that object churn
+                return recorder.WithFactory(null);
+            }
+        }
     }
 }

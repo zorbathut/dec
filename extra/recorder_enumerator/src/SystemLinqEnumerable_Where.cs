@@ -24,7 +24,7 @@ namespace Dec.RecorderEnumerator
             recorder.Shared().RecordPrivate(input, field_Predicate, "predicate");
             recorder.Shared().RecordPrivate(input, field_Enumerator, "enumerator");
             recorder.RecordPrivate(input, field_State, "state");
-            recorder.RecordPrivate(input, field_Current, "current");
+            recorder.SharedIfPossible<T>().RecordPrivate(input, field_Current, "current");
         }
 
         private static bool False(T input)
@@ -61,7 +61,7 @@ namespace Dec.RecorderEnumerator
             recorder.Shared().RecordPrivate(input, field_Source, "source");
             recorder.Shared().RecordPrivate(input, field_Predicate, "predicate");
             recorder.RecordPrivate(input, field_State, "state");
-            recorder.RecordPrivate(input, field_Current, "current");
+            recorder.SharedIfPossible<T>().RecordPrivate(input, field_Current, "current");
         }
 
         private static bool False(T input)
@@ -100,7 +100,7 @@ namespace Dec.RecorderEnumerator
             recorder.Shared().RecordPrivate(input, field_Predicate, "predicate");
             recorder.RecordPrivate(input, field_Enumerator, "enumerator");
             recorder.RecordPrivate(input, field_State, "state");
-            recorder.RecordPrivate(input, field_Current, "current");
+            recorder.SharedIfPossible<T>().RecordPrivate(input, field_Current, "current");
         }
 
         private static bool False(T input)
@@ -141,7 +141,7 @@ namespace Dec.RecorderEnumerator
             recorder.Shared().RecordPrivate(input, field_Selector, "selector");
             recorder.Shared().RecordPrivate(input, field_Enumerator, "enumerator");
             recorder.RecordPrivate(input, field_State, "state");
-            recorder.RecordPrivate(input, field_Current, "current");
+            recorder.SharedIfPossible<T>().RecordPrivate(input, field_Current, "current");
         }
 
         private static bool False(T input)
@@ -180,7 +180,7 @@ namespace Dec.RecorderEnumerator
             recorder.Shared().RecordPrivate(input, field_Predicate, "predicate");
             recorder.Shared().RecordPrivate(input, field_Selector, "selector");
             recorder.RecordPrivate(input, field_State, "state");
-            recorder.RecordPrivate(input, field_Current, "current");
+            recorder.SharedIfPossible<T>().RecordPrivate(input, field_Current, "current");
         }
 
         private static bool False(T input)
@@ -221,7 +221,7 @@ namespace Dec.RecorderEnumerator
             recorder.Shared().RecordPrivate(input, field_Selector, "selector");
             recorder.RecordPrivate(input, field_Enumerator, "enumerator");
             recorder.RecordPrivate(input, field_State, "state");
-            recorder.RecordPrivate(input, field_Current, "current");
+            recorder.SharedIfPossible<T>().RecordPrivate(input, field_Current, "current");
         }
 
         private static bool False(T input)

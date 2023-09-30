@@ -16,7 +16,7 @@ namespace Dec.RecorderEnumerator
 
         public override void Write(object input, Recorder recorder)
         {
-            recorder.RecordPrivate(input, Field_Current, "current");
+            recorder.SharedIfPossible<int>().RecordPrivate(input, Field_Current, "current");
             recorder.RecordPrivate(input, Field_State, "state");
             recorder.RecordPrivate(input, Field_Start, "start");
             recorder.RecordPrivate(input, Field_End, "end");
@@ -35,7 +35,7 @@ namespace Dec.RecorderEnumerator
 
         public override void Read(ref object input, Recorder recorder)
         {
-            recorder.RecordPrivate(input, Field_Current, "current");
+            recorder.SharedIfPossible<int>().RecordPrivate(input, Field_Current, "current");
             recorder.RecordPrivate(input, Field_State, "state");
         }
     }

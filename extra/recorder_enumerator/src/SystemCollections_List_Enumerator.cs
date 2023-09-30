@@ -22,14 +22,14 @@ namespace Dec.RecorderEnumerator
         {
             recorder.Shared().RecordPrivate(input, field_List, "list");
             recorder.RecordPrivate(input, field_Index, "index");
-            recorder.RecordPrivate(input, field_Current, "current");
+            recorder.SharedIfPossible<T>().RecordPrivate(input, field_Current, "current");
         }
 
         public override object Record(ref object input, Recorder recorder)
         {
             recorder.Shared().RecordPrivate(input, field_List, "list");
             recorder.RecordPrivate(input, field_Index, "index");
-            recorder.RecordPrivate(input, field_Current, "current");
+            recorder.SharedIfPossible<T>().RecordPrivate(input, field_Current, "current");
 
             if (recorder.Mode == Recorder.Direction.Write)
             {

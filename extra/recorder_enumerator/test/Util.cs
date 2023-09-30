@@ -2,6 +2,7 @@ namespace RecorderEnumeratorTest
 {
     using System;
     using System.Collections.Generic;
+    using DecTest.AssertWrapper;
 
     internal static class Util
     {
@@ -10,6 +11,12 @@ namespace RecorderEnumeratorTest
             if (lhs == rhs)
             {
                 // no, can't be the *same* enumerator, stop that
+                return false;
+            }
+
+            // Make sure the Current field has been prepped properly
+            if (!object.Equals(lhs.Current, rhs.Current))
+            {
                 return false;
             }
 

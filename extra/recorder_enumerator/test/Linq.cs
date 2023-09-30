@@ -2,10 +2,9 @@ namespace RecorderEnumeratorTest
 {
     using DecTest;
     using NUnit.Framework;
-    using System.Linq;
     using System;
-    using System.Reflection;
-    using Dec.RecorderEnumerator;
+    using System.Collections.Generic;
+    using System.Linq;
 
     [TestFixture]
     public class Linq : Base
@@ -197,6 +196,21 @@ namespace RecorderEnumeratorTest
             var result = DoRecorderRoundTrip(range, recorderMode);
 
             Assert.IsTrue(Util.AreEquivalentEnumerators(range, result));
+        }
+
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void ObjectEnumerable([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            var list = new List<StubRecordable>();
+            list.Add(new StubRecordable());
+            var range = list.GetEnumerator();
+            range.MoveNext();
+            Assert.AreSame(range.Current, list[0]);
+
+            var result = DoRecorderRoundTrip((list, range), recorderMode);
+
+            Assert.AreSame(result.range.Current, result.list[0]);
         }
     }
 }
