@@ -36,8 +36,8 @@ namespace RecorderEnumeratorTest
         public void FuncMultipleInternal([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
         {
             // I'm slightly worried that the way I'm generating functions could create *one* function, then overwrite it, so here's a test for that.
-            var fa = () => 42;
-            var fb = () => 100;
+            Func<int> fa = () => 42;
+            Func<int> fb = () => 100;
 
             var pair = (fa, fb);
 
