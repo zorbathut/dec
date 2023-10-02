@@ -283,5 +283,20 @@ namespace RecorderEnumeratorTest
 
             Assert.IsTrue(Util.AreEquivalentEnumerators(range, result));
         }
+
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void SelectMany([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            int k = 3;
+            var range = Enumerable.Range(0, 5).SelectMany(i => Enumerable.Range(0, i)).GetEnumerator();
+            range.MoveNext();
+            range.MoveNext();
+            range.MoveNext();
+
+            var result = DoRecorderRoundTrip(range, recorderMode);
+
+            Assert.IsTrue(Util.AreEquivalentEnumerators(range, result));
+        }
     }
 }
