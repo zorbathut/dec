@@ -1,13 +1,14 @@
 namespace Dec.RecorderEnumerator
 {
     using System;
+    using System.Linq;
     using System.Reflection;
     using System.Runtime.CompilerServices;
     using System.Text.RegularExpressions;
 
     public static class Config
     {
-        private static readonly Regex UserCreatedEnumerableRegex = new Regex(@"^<([^>]+)>d__([0-9]+)(?:`([0-9]+))?$", RegexOptions.Compiled);
+        private static readonly Regex UserCreatedEnumerableRegex = new Regex(@"^<([^>]+)>d__[0-9]+(?:`([0-9]+))?$", RegexOptions.Compiled);
         private static readonly Regex RecordableClosureRegex = new Regex(@"^<>c__DisplayClass([0-9]+)_([0-9]+)$", RegexOptions.Compiled);
 
 
@@ -121,21 +122,30 @@ namespace Dec.RecorderEnumerator
                 {
                     // Now we're going to see if the attribute exists
                     string functionName = ucer.Groups[1].Value;
-                    int functionIndex = int.Parse(ucer.Groups[2].Value);
 
                     var owningType = type.DeclaringType;
                     var owningTypeFunctions = owningType.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
 
-                    var function = owningTypeFunctions[functionIndex];
-                    if (function.Name != functionName)
-                    {
-                        Dbg.Err($"Function name mismatch: {functionName} vs {function.Name}");
-                        return null;
-                    }
+                    // This code works most of the time!
+                    // It doesn't work all the time. Sucks to be me, right?
+                    //int functionIndex = int.Parse(ucer.Groups[2].Value);
+                    //var function = owningTypeFunctions[functionIndex];
 
-                    if (function.GetCustomAttribute<RecordableEnumerableAttribute>() == null)
+                    // We're going to rely on people tagging *all* functions of a name with the attribute, and spit out errors if that doesn't happen.
+                    // This solution sucks. :shrug:
+
+                    var functions = owningTypeFunctions.Where(f => f.Name == functionName).ToArray();
+
+                    int tags = functions.Count(f => f.GetCustomAttribute<RecordableEnumerableAttribute>() != null);
+
+                    if (tags == 0)
                     {
                         Dbg.Err($"Attempting to serialize an enumerable {type} without a Dec.RecorderEnumerator.RecordableEnumerable applied to its function");
+                        return null;
+                    }
+                    else if (tags != functions.Length)
+                    {
+                        Dbg.Err($"Attempting to serialize an enumerable {type} without a Dec.RecorderEnumerator.RecordableEnumerable applied to all functions with that name; sorry, it's gotta be all of them right now");
                         return null;
                     }
                 
