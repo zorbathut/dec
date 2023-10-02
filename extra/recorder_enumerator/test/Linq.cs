@@ -298,5 +298,47 @@ namespace RecorderEnumeratorTest
 
             Assert.IsTrue(Util.AreEquivalentEnumerators(range, result));
         }
+
+        [Test]
+        [Ignore("This is hard to support due to Join using Lookup and Grouping.")]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void JoinEnumeratorTest([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            var outer = Enumerable.Range(1, 10);
+            var inner = Enumerable.Range(1, 20);
+            Func<int, int> outerKeySelector = i => i;
+            Func<int, int> innerKeySelector = i => i % 3;
+            Func<int, int, string> resultSelector = (a, b) => $"({a}, {b})";
+
+            var joinEnumerator = outer.Join(inner, outerKeySelector, innerKeySelector, resultSelector).GetEnumerator();
+            joinEnumerator.MoveNext();
+            joinEnumerator.MoveNext();
+            joinEnumerator.MoveNext();
+
+            var result = DoRecorderRoundTrip(joinEnumerator, recorderMode);
+
+            Assert.IsTrue(Util.AreEquivalentEnumerators(joinEnumerator, result));
+        }
+
+        [Test]
+        [Ignore("This is hard to support due to Join using Lookup and Grouping.")]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void GroupJoinEnumeratorTest([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            var outer = Enumerable.Range(1, 3);
+            var inner = Enumerable.Range(1, 5);
+            Func<int, int> outerKeySelector = i => i;
+            Func<int, int> innerKeySelector = i => i % 3;
+            Func<int, IEnumerable<int>, string> resultSelector = (key, group) => $"({key}, {string.Join(", ", group)})";
+
+            var groupJoinEnumerator = outer.GroupJoin(inner, outerKeySelector, innerKeySelector, resultSelector).GetEnumerator();
+            groupJoinEnumerator.MoveNext();
+            groupJoinEnumerator.MoveNext();
+            groupJoinEnumerator.MoveNext();
+
+            var result = DoRecorderRoundTrip(groupJoinEnumerator, recorderMode);
+
+            Assert.IsTrue(Util.AreEquivalentEnumerators(groupJoinEnumerator, result));
+        }
     }
 }
