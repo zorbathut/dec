@@ -39,4 +39,116 @@ namespace Dec.RecorderEnumerator
             recorder.RecordPrivate(input, Field_State, "state");
         }
     }
+
+    public static class SystemLinqEnumerable_DistinctIterator_Converter
+    {
+        internal static Type RelevantType = typeof(System.Linq.Enumerable).GetNestedType("DistinctIterator`1", System.Reflection.BindingFlags.NonPublic);
+    }
+
+    public class SystemLinqEnumerable_DistinctIterator_Converter<Iterator, T> : ConverterFactoryDynamic
+    {
+        internal FieldInfo field_Source = typeof(Iterator).GetField("_source", BindingFlags.NonPublic | BindingFlags.Instance);
+        internal FieldInfo field_Comparer = typeof(Iterator).GetField("_comparer", BindingFlags.NonPublic | BindingFlags.Instance);
+        internal FieldInfo field_Set = typeof(Iterator).GetField("_set", BindingFlags.NonPublic | BindingFlags.Instance);
+        internal FieldInfo field_Enumerator = typeof(Iterator).GetField("_enumerator", BindingFlags.NonPublic | BindingFlags.Instance);
+        internal FieldInfo field_State = typeof(Iterator).GetField("_state", BindingFlags.NonPublic | BindingFlags.Instance);
+        internal FieldInfo field_Current = typeof(Iterator).GetField("_current", BindingFlags.NonPublic | BindingFlags.Instance);
+
+        public override void Write(object input, Recorder recorder)
+        {
+            recorder.Shared().RecordPrivate(input, field_Source, "source");
+            recorder.Shared().RecordPrivate(input, field_Comparer, "comparer");
+            recorder.Shared().RecordPrivate(input, field_Set, "selector");
+            recorder.Shared().RecordPrivate(input, field_Enumerator, "enumerator");
+            recorder.RecordPrivate(input, field_State, "state");
+            recorder.SharedIfPossible<T>().RecordPrivate(input, field_Current, "current");
+        }
+
+        public override object Create(Recorder recorder)
+        {
+            return Activator.CreateInstance(typeof(Iterator), new object[] { null, null });
+        }
+
+        public override void Read(ref object input, Recorder recorder)
+        {
+            // it's the same code, we only need this for the funky Create
+            Write(input, recorder);
+        }
+    }
+
+    public static class SystemLinqEnumerable_UnionIterator2_Converter
+    {
+        internal static Type RelevantType = typeof(System.Linq.Enumerable).GetNestedType("UnionIterator2`1", System.Reflection.BindingFlags.NonPublic);
+    }
+
+    public class SystemLinqEnumerable_UnionIterator2_Converter<Iterator, T> : ConverterFactoryDynamic
+    {
+        internal FieldInfo field_First = typeof(Iterator).GetPrivateFieldInHierarchy("_first");
+        internal FieldInfo field_Second = typeof(Iterator).GetPrivateFieldInHierarchy("_second");
+        internal FieldInfo field_Comparer = typeof(Iterator).GetPrivateFieldInHierarchy("_comparer");
+        internal FieldInfo field_Enumerator = typeof(Iterator).GetPrivateFieldInHierarchy("_enumerator");
+        internal FieldInfo field_Set = typeof(Iterator).GetPrivateFieldInHierarchy("_set");
+        internal FieldInfo field_State = typeof(Iterator).GetPrivateFieldInHierarchy("_state");
+        internal FieldInfo field_Current = typeof(Iterator).GetPrivateFieldInHierarchy("_current");
+
+        public override void Write(object input, Recorder recorder)
+        {
+            recorder.Shared().RecordPrivate(input, field_First, "first");
+            recorder.Shared().RecordPrivate(input, field_Second, "second");
+            recorder.Shared().RecordPrivate(input, field_Comparer, "comparer");
+            recorder.Shared().RecordPrivate(input, field_Enumerator, "enumerator");
+            recorder.Shared().RecordPrivate(input, field_Set, "selector");
+            recorder.RecordPrivate(input, field_State, "state");
+            recorder.SharedIfPossible<T>().RecordPrivate(input, field_Current, "current");
+        }
+
+        public override object Create(Recorder recorder)
+        {
+            return Activator.CreateInstance(typeof(Iterator), new object[] { null, null, null });
+        }
+
+        public override void Read(ref object input, Recorder recorder)
+        {
+            // it's the same code, we only need this for the funky Create
+            Write(input, recorder);
+        }
+    }
+
+    public static class SystemLinqEnumerable_UnionIteratorN_Converter
+    {
+        internal static Type RelevantType = typeof(System.Linq.Enumerable).GetNestedType("UnionIteratorN`1", System.Reflection.BindingFlags.NonPublic);
+    }
+
+    public class SystemLinqEnumerable_UnionIteratorN_Converter<Iterator, T> : ConverterFactoryDynamic
+    {
+        internal FieldInfo field_Sources = typeof(Iterator).GetPrivateFieldInHierarchy("_sources");
+        internal FieldInfo field_HeadIndex = typeof(Iterator).GetPrivateFieldInHierarchy("_headIndex");
+        internal FieldInfo field_Comparer = typeof(Iterator).GetPrivateFieldInHierarchy("_comparer");
+        internal FieldInfo field_Enumerator = typeof(Iterator).GetPrivateFieldInHierarchy("_enumerator");
+        internal FieldInfo field_Set = typeof(Iterator).GetPrivateFieldInHierarchy("_set");
+        internal FieldInfo field_State = typeof(Iterator).GetPrivateFieldInHierarchy("_state");
+        internal FieldInfo field_Current = typeof(Iterator).GetPrivateFieldInHierarchy("_current");
+
+        public override void Write(object input, Recorder recorder)
+        {
+            recorder.Shared().RecordPrivate(input, field_Sources, "sources");
+            recorder.RecordPrivate(input, field_HeadIndex, "headIndex");
+            recorder.Shared().RecordPrivate(input, field_Comparer, "comparer");
+            recorder.Shared().RecordPrivate(input, field_Enumerator, "enumerator");
+            recorder.Shared().RecordPrivate(input, field_Set, "selector");
+            recorder.RecordPrivate(input, field_State, "state");
+            recorder.SharedIfPossible<T>().RecordPrivate(input, field_Current, "current");
+        }
+
+        public override object Create(Recorder recorder)
+        {
+            return Activator.CreateInstance(typeof(Iterator), new object[] { null, 0, null });
+        }
+
+        public override void Read(ref object input, Recorder recorder)
+        {
+            // it's the same code, we only need this for the funky Create
+            Write(input, recorder);
+        }
+    }
 }

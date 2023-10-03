@@ -340,5 +340,120 @@ namespace RecorderEnumeratorTest
 
             Assert.IsTrue(Util.AreEquivalentEnumerators(groupJoinEnumerator, result));
         }
+
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void DistinctEnumeratorTest([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            var source = Enumerable.Range(0, 40).Select(i => i % 5).Distinct().GetEnumerator();
+            source.MoveNext();
+            source.MoveNext();
+            source.MoveNext();
+            var result = DoRecorderRoundTrip(source, recorderMode);
+            Assert.IsTrue(Util.AreEquivalentEnumerators(source, result));
+        }
+
+        #if NET6_0_OR_GREATER
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void DistinctByEnumeratorTest([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            var source = Enumerable.Range(0, 40).Select(i => i % 5).DistinctBy(x => x % 4).GetEnumerator();
+            source.MoveNext();
+            source.MoveNext();
+            source.MoveNext();
+            var result = DoRecorderRoundTrip(source, recorderMode);
+            Assert.IsTrue(Util.AreEquivalentEnumerators(source, result));
+        }
+        #endif
+
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void UnionEnumerator2Test([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            var first = Enumerable.Range(0, 20).Select(x => x * 2);
+            var second = Enumerable.Range(0, 20).Select(x => x * 3);
+            var unionEnumerator = first.Union(second).GetEnumerator();
+            unionEnumerator.MoveNext();
+            unionEnumerator.MoveNext();
+            unionEnumerator.MoveNext();
+            var result = DoRecorderRoundTrip(unionEnumerator, recorderMode);
+            Assert.IsTrue(Util.AreEquivalentEnumerators(unionEnumerator, result));
+        }
+
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void UnionEnumerator3Test([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            var first = Enumerable.Range(0, 20).Select(x => x * 2);
+            var second = Enumerable.Range(0, 20).Select(x => x * 3);
+            var third = Enumerable.Range(0, 20).Select(x => x * 5);
+            var unionEnumerator = first.Union(second).Union(third).GetEnumerator();
+            unionEnumerator.MoveNext();
+            unionEnumerator.MoveNext();
+            unionEnumerator.MoveNext();
+            var result = DoRecorderRoundTrip(unionEnumerator, recorderMode);
+            Assert.IsTrue(Util.AreEquivalentEnumerators(unionEnumerator, result));
+        }
+
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void IntersectEnumeratorTest([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            var first = Enumerable.Range(0, 20);
+            var second = Enumerable.Range(15, 20);
+            var intersectEnumerator = first.Intersect(second).GetEnumerator();
+            intersectEnumerator.MoveNext();
+            intersectEnumerator.MoveNext();
+            intersectEnumerator.MoveNext();
+            var result = DoRecorderRoundTrip(intersectEnumerator, recorderMode);
+            Assert.IsTrue(Util.AreEquivalentEnumerators(intersectEnumerator, result));
+        }
+
+        #if NET6_0_OR_GREATER
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void IntersectByEnumeratorTest([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            var first = Enumerable.Range(0, 20);
+            var second = Enumerable.Range(15, 20);
+            var intersectEnumerator = first.IntersectBy(second, x => x % 17).GetEnumerator();
+            intersectEnumerator.MoveNext();
+            intersectEnumerator.MoveNext();
+            intersectEnumerator.MoveNext();
+            var result = DoRecorderRoundTrip(intersectEnumerator, recorderMode);
+            Assert.IsTrue(Util.AreEquivalentEnumerators(intersectEnumerator, result));
+        }
+        #endif
+
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void ExceptEnumeratorTest([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            var first = Enumerable.Range(0, 20);
+            var second = Enumerable.Range(15, 20);
+            var exceptEnumerator = first.Except(second).GetEnumerator();
+            exceptEnumerator.MoveNext();
+            exceptEnumerator.MoveNext();
+            exceptEnumerator.MoveNext();
+            var result = DoRecorderRoundTrip(exceptEnumerator, recorderMode);
+            Assert.IsTrue(Util.AreEquivalentEnumerators(exceptEnumerator, result));
+        }
+
+#if NET6_0_OR_GREATER
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void ExceptByEnumeratorTest([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            var first = Enumerable.Range(0, 20);
+            var second = Enumerable.Range(15, 20);
+            var exceptEnumerator = first.ExceptBy(second, x => x % 3).GetEnumerator();
+            exceptEnumerator.MoveNext();
+            exceptEnumerator.MoveNext();
+            exceptEnumerator.MoveNext();
+            var result = DoRecorderRoundTrip(exceptEnumerator, recorderMode);
+            Assert.IsTrue(Util.AreEquivalentEnumerators(exceptEnumerator, result));
+        }
+#endif
     }
 }

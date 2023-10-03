@@ -1,6 +1,7 @@
 namespace Dec.RecorderEnumerator
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
     using System.Runtime.CompilerServices;
@@ -11,6 +12,15 @@ namespace Dec.RecorderEnumerator
         private static readonly Regex UserCreatedEnumerableRegex = new Regex(@"^<([^>]+)>d__[0-9]+(?:`([0-9]+))?$", RegexOptions.Compiled);
         private static readonly Regex RecordableClosureRegex = new Regex(@"^<>c__DisplayClass([0-9]+)_([0-9]+)$", RegexOptions.Compiled);
 
+
+        private static HashSet<(string, string)> InternalRegexSupportOverride = new HashSet<(string, string)>
+        {
+            ("System.Linq", "DistinctByIterator"),
+            ("System.Linq", "ExceptIterator"),
+            ("System.Linq", "ExceptByIterator"),
+            ("System.Linq", "IntersectIterator"),
+            ("System.Linq", "IntersectByIterator"),
+        };
 
         public static Converter ConverterFactory(Type type)
         {
@@ -87,12 +97,37 @@ namespace Dec.RecorderEnumerator
                     return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_SelectMany_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[1]));
                 }
 
+                // Set-related
+
+                if (genericTypeDefinition == SystemLinqEnumerable_DistinctIterator_Converter.RelevantType)
+                {
+                    return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_DistinctIterator_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
+                }
+
+                if (genericTypeDefinition == SystemLinqEnumerable_UnionIterator2_Converter.RelevantType)
+                {
+                    return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_UnionIterator2_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
+                }
+
+                if (genericTypeDefinition == SystemLinqEnumerable_UnionIteratorN_Converter.RelevantType)
+                {
+                    return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_UnionIteratorN_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
+                }
+
                 // List enumerator
 
                 if (genericTypeDefinition == SystemCollections_List_Enumerator_Converter.RelevantType)
                 {
                     return (Converter)Activator.CreateInstance(typeof(SystemCollections_List_Enumerator_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
                 }
+
+                // SystemLinq
+
+                if (genericTypeDefinition == SystemLinq_SingleLinkedNode_Converter.RelevantType)
+                {
+                    return (Converter)Activator.CreateInstance(typeof(SystemLinq_SingleLinkedNode_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
+                }
+
 
                 // Delegate
 
@@ -138,12 +173,20 @@ namespace Dec.RecorderEnumerator
 
                     int tags = functions.Count(f => f.GetCustomAttribute<RecordableEnumerableAttribute>() != null);
 
-                    if (tags == 0)
+                    if (tags == functions.Length)
+                    {
+
+                    }
+                    else if (InternalRegexSupportOverride.Contains((type.Namespace, functionName)))
+                    {
+
+                    }
+                    else if (tags == 0)
                     {
                         Dbg.Err($"Attempting to serialize an enumerable {type} without a Dec.RecorderEnumerator.RecordableEnumerable applied to its function");
                         return null;
                     }
-                    else if (tags != functions.Length)
+                    else // tags != functionLength
                     {
                         Dbg.Err($"Attempting to serialize an enumerable {type} without a Dec.RecorderEnumerator.RecordableEnumerable applied to all functions with that name; sorry, it's gotta be all of them right now");
                         return null;

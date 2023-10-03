@@ -68,5 +68,20 @@ namespace Dec.RecorderEnumerator
                 return recorder.WithFactory(null);
             }
         }
+
+        internal static FieldInfo GetPrivateFieldInHierarchy(this Type type, string name)
+        {
+            while (type != null)
+            {
+                var field = type.GetField(name, BindingFlags.Instance | BindingFlags.NonPublic);
+                if (field != null)
+                {
+                    return field;
+                }
+                type = type.BaseType;
+            }
+
+            return null;
+        }
     }
 }
