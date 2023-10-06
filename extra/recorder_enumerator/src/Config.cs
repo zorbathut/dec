@@ -15,11 +15,14 @@ namespace Dec.RecorderEnumerator
 
         private static HashSet<(string, string)> InternalRegexSupportOverride = new HashSet<(string, string)>
         {
+            ("System.Linq.Enumerable", "CastIterator"),
             ("System.Linq.Enumerable", "DistinctByIterator"),
             ("System.Linq.Enumerable", "ExceptIterator"),
             ("System.Linq.Enumerable", "ExceptByIterator"),
             ("System.Linq.Enumerable", "IntersectIterator"),
             ("System.Linq.Enumerable", "IntersectByIterator"),
+            ("System.Linq.Enumerable", "OfTypeIterator"),
+            ("System.Linq.Lookup", "GetEnumerator"),
             ("System.Linq.OrderedEnumerable`1", "GetEnumerator"),
         };
 
@@ -28,6 +31,11 @@ namespace Dec.RecorderEnumerator
             if (type == SystemLinqEnumerable_RangeIterator_Converter.RelevantType)
             {
                 return new SystemLinqEnumerable_RangeIterator_Converter();
+            }
+
+            if (type == System_ArrayEnumerator_Converter.RelevantType)
+            {
+                return new System_ArrayEnumerator_Converter();
             }
 
             if (typeof(MethodInfo).IsAssignableFrom(type))

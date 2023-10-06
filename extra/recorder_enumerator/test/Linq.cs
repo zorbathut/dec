@@ -515,5 +515,45 @@ namespace RecorderEnumeratorTest
             var result = DoRecorderRoundTrip(source, recorderMode);
             Assert.IsTrue(Util.AreEquivalentEnumerators(source, result));
         }
+
+        [Test]
+        [Ignore("This is hard to support due to Grouping.")]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void GroupByEnumeratorTest([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            var source = Enumerable.Range(0, 20).GroupBy(i => i % 3).GetEnumerator();
+            source.MoveNext();
+            source.MoveNext();
+            source.MoveNext();
+            var result = DoRecorderRoundTrip(source, recorderMode);
+            Assert.IsTrue(Util.AreEquivalentEnumerators(source, result));
+        }
+
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void OfTypeEnumeratorTest([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            var mixedSource = new object[] { 0, 1, "two", 3, "four", 5 };
+            var source = mixedSource.OfType<int>().GetEnumerator();
+            source.MoveNext();
+            source.MoveNext();
+            source.MoveNext();
+            var result = DoRecorderRoundTrip(source, recorderMode);
+            Assert.IsTrue(Util.AreEquivalentEnumerators(source, result));
+        }
+
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void CastEnumeratorTest([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            var objectSource = new object[] { 0, 1, 2, 3, 4, 5 };
+            var source = objectSource.Cast<int>().GetEnumerator();
+            source.MoveNext();
+            source.MoveNext();
+            source.MoveNext();
+            var result = DoRecorderRoundTrip(source, recorderMode);
+            Assert.IsTrue(Util.AreEquivalentEnumerators(source, result));
+        }
+
     }
 }
