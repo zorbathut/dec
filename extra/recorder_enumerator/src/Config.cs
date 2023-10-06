@@ -132,6 +132,11 @@ namespace Dec.RecorderEnumerator
                     return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_ReverseIterator_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
                 }
 
+                if (genericTypeDefinition == System_SZGenericArrayEnumerator_Converter.RelevantType)
+                {
+                    return (Converter)Activator.CreateInstance(typeof(System_SZGenericArrayEnumerator_Converter<>).MakeGenericType(type));
+                }
+
                 // List enumerator
 
                 if (genericTypeDefinition == SystemCollections_List_Enumerator_Converter.RelevantType)
