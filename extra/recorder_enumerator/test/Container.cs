@@ -1,3 +1,4 @@
+#if NET7_0_OR_GREATER
 namespace RecorderEnumeratorTest
 {
     using DecTest;
@@ -32,3 +33,4 @@ namespace RecorderEnumeratorTest
         }
     }
 }
+#endif

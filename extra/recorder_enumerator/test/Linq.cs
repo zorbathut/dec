@@ -1,3 +1,4 @@
+#if NET6_0_OR_GREATER
 namespace RecorderEnumeratorTest
 {
     using DecTest;
@@ -353,7 +354,6 @@ namespace RecorderEnumeratorTest
             Assert.IsTrue(Util.AreEquivalentEnumerators(source, result));
         }
 
-        #if NET6_0_OR_GREATER
         [Test]
         [Dec.RecorderEnumerator.RecordableClosures]
         public void DistinctByEnumeratorTest([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
@@ -365,7 +365,6 @@ namespace RecorderEnumeratorTest
             var result = DoRecorderRoundTrip(source, recorderMode);
             Assert.IsTrue(Util.AreEquivalentEnumerators(source, result));
         }
-        #endif
 
         [Test]
         [Dec.RecorderEnumerator.RecordableClosures]
@@ -410,7 +409,6 @@ namespace RecorderEnumeratorTest
             Assert.IsTrue(Util.AreEquivalentEnumerators(intersectEnumerator, result));
         }
 
-        #if NET6_0_OR_GREATER
         [Test]
         [Dec.RecorderEnumerator.RecordableClosures]
         public void IntersectByEnumeratorTest([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
@@ -424,7 +422,6 @@ namespace RecorderEnumeratorTest
             var result = DoRecorderRoundTrip(intersectEnumerator, recorderMode);
             Assert.IsTrue(Util.AreEquivalentEnumerators(intersectEnumerator, result));
         }
-        #endif
 
         [Test]
         [Dec.RecorderEnumerator.RecordableClosures]
@@ -440,7 +437,6 @@ namespace RecorderEnumeratorTest
             Assert.IsTrue(Util.AreEquivalentEnumerators(exceptEnumerator, result));
         }
 
-#if NET6_0_OR_GREATER
         [Test]
         [Dec.RecorderEnumerator.RecordableClosures]
         public void ExceptByEnumeratorTest([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
@@ -454,7 +450,6 @@ namespace RecorderEnumeratorTest
             var result = DoRecorderRoundTrip(exceptEnumerator, recorderMode);
             Assert.IsTrue(Util.AreEquivalentEnumerators(exceptEnumerator, result));
         }
-#endif
 
         [Test]
         [Dec.RecorderEnumerator.RecordableClosures]
@@ -604,3 +599,4 @@ namespace RecorderEnumeratorTest
         }
     }
 }
+#endif
