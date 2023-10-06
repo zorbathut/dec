@@ -15,11 +15,11 @@ namespace Dec.RecorderEnumerator
 
         private static HashSet<(string, string)> InternalRegexSupportOverride = new HashSet<(string, string)>
         {
-            ("System.Linq", "DistinctByIterator"),
-            ("System.Linq", "ExceptIterator"),
-            ("System.Linq", "ExceptByIterator"),
-            ("System.Linq", "IntersectIterator"),
-            ("System.Linq", "IntersectByIterator"),
+            ("System.Linq.Enumerable", "DistinctByIterator"),
+            ("System.Linq.Enumerable", "ExceptIterator"),
+            ("System.Linq.Enumerable", "ExceptByIterator"),
+            ("System.Linq.Enumerable", "IntersectIterator"),
+            ("System.Linq.Enumerable", "IntersectByIterator"),
         };
 
         public static Converter ConverterFactory(Type type)
@@ -173,11 +173,12 @@ namespace Dec.RecorderEnumerator
 
                     int tags = functions.Count(f => f.GetCustomAttribute<RecordableEnumerableAttribute>() != null);
 
+                    string parent = type.DeclaringType?.FullName ?? type.Namespace;
                     if (tags == functions.Length)
                     {
 
                     }
-                    else if (InternalRegexSupportOverride.Contains((type.Namespace, functionName)))
+                    else if (InternalRegexSupportOverride.Contains((parent, functionName)))
                     {
 
                     }
