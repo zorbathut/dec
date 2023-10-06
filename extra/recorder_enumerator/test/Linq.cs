@@ -455,5 +455,65 @@ namespace RecorderEnumeratorTest
             Assert.IsTrue(Util.AreEquivalentEnumerators(exceptEnumerator, result));
         }
 #endif
+
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void OrderByEnumeratorTest([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            var source = Enumerable.Range(0, 20).OrderBy(i => i % 3).GetEnumerator();
+            source.MoveNext();
+            source.MoveNext();
+            source.MoveNext();
+            var result = DoRecorderRoundTrip(source, recorderMode);
+            Assert.IsTrue(Util.AreEquivalentEnumerators(source, result));
+        }
+
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void OrderByDescendingEnumeratorTest([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            var source = Enumerable.Range(0, 20).OrderByDescending(i => i % 3).GetEnumerator();
+            source.MoveNext();
+            source.MoveNext();
+            source.MoveNext();
+            var result = DoRecorderRoundTrip(source, recorderMode);
+            Assert.IsTrue(Util.AreEquivalentEnumerators(source, result));
+        }
+
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void ThenByEnumeratorTest([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            var source = Enumerable.Range(0, 20).OrderBy(i => i % 3).ThenBy(i => i).GetEnumerator();
+            source.MoveNext();
+            source.MoveNext();
+            source.MoveNext();
+            var result = DoRecorderRoundTrip(source, recorderMode);
+            Assert.IsTrue(Util.AreEquivalentEnumerators(source, result));
+        }
+
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void ThenByDescendingEnumeratorTest([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            var source = Enumerable.Range(0, 20).OrderBy(i => i % 3).ThenByDescending(i => i).GetEnumerator();
+            source.MoveNext();
+            source.MoveNext();
+            source.MoveNext();
+            var result = DoRecorderRoundTrip(source, recorderMode);
+            Assert.IsTrue(Util.AreEquivalentEnumerators(source, result));
+        }
+
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void ReverseEnumeratorTest([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            var source = Enumerable.Range(0, 20).Reverse().GetEnumerator();
+            source.MoveNext();
+            source.MoveNext();
+            source.MoveNext();
+            var result = DoRecorderRoundTrip(source, recorderMode);
+            Assert.IsTrue(Util.AreEquivalentEnumerators(source, result));
+        }
     }
 }

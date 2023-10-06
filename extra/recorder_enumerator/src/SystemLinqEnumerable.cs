@@ -151,4 +151,36 @@ namespace Dec.RecorderEnumerator
             Write(input, recorder);
         }
     }
+
+    public static class SystemLinqEnumerable_ReverseIterator_Converter
+    {
+        internal static Type RelevantType = typeof(System.Linq.Enumerable).GetNestedType("ReverseIterator`1", System.Reflection.BindingFlags.NonPublic);
+    }
+
+    public class SystemLinqEnumerable_ReverseIterator_Converter<Iterator, T> : ConverterFactoryDynamic
+    {
+        internal FieldInfo field_Source = typeof(Iterator).GetPrivateFieldInHierarchy("_source");
+        internal FieldInfo field_Buffer = typeof(Iterator).GetPrivateFieldInHierarchy("_buffer");
+        internal FieldInfo field_State = typeof(Iterator).GetPrivateFieldInHierarchy("_state");
+        internal FieldInfo field_Current = typeof(Iterator).GetPrivateFieldInHierarchy("_current");
+
+        public override void Write(object input, Recorder recorder)
+        {
+            recorder.Shared().RecordPrivate(input, field_Source, "source");
+            recorder.Shared().RecordPrivate(input, field_Buffer, "buffer");
+            recorder.RecordPrivate(input, field_State, "state");
+            recorder.SharedIfPossible<T>().RecordPrivate(input, field_Current, "current");
+        }
+
+        public override object Create(Recorder recorder)
+        {
+            return Activator.CreateInstance(typeof(Iterator), new object[] { null });
+        }
+
+        public override void Read(ref object input, Recorder recorder)
+        {
+            // it's the same code, we only need this for the funky Create
+            Write(input, recorder);
+        }
+    }
 }

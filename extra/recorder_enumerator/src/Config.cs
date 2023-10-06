@@ -20,6 +20,7 @@ namespace Dec.RecorderEnumerator
             ("System.Linq.Enumerable", "ExceptByIterator"),
             ("System.Linq.Enumerable", "IntersectIterator"),
             ("System.Linq.Enumerable", "IntersectByIterator"),
+            ("System.Linq.OrderedEnumerable`1", "GetEnumerator"),
         };
 
         public static Converter ConverterFactory(Type type)
@@ -114,6 +115,13 @@ namespace Dec.RecorderEnumerator
                     return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_UnionIteratorN_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
                 }
 
+                // Misc
+
+                if (genericTypeDefinition == SystemLinqEnumerable_ReverseIterator_Converter.RelevantType)
+                {
+                    return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_ReverseIterator_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
+                }
+
                 // List enumerator
 
                 if (genericTypeDefinition == SystemCollections_List_Enumerator_Converter.RelevantType)
@@ -128,6 +136,10 @@ namespace Dec.RecorderEnumerator
                     return (Converter)Activator.CreateInstance(typeof(SystemLinq_SingleLinkedNode_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
                 }
 
+                if (genericTypeDefinition == SystemLinq_Buffer_Converter.RelevantType)
+                {
+                    return (Converter)Activator.CreateInstance(typeof(SystemLinq_Buffer_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
+                }
 
                 // Delegate
 
