@@ -555,5 +555,52 @@ namespace RecorderEnumeratorTest
             Assert.IsTrue(Util.AreEquivalentEnumerators(source, result));
         }
 
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void TakeEnumeratorTest([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            var source = Enumerable.Range(0, 20).Take(10).GetEnumerator();
+            source.MoveNext();
+            source.MoveNext();
+            source.MoveNext();
+            var result = DoRecorderRoundTrip(source, recorderMode);
+            Assert.IsTrue(Util.AreEquivalentEnumerators(source, result));
+        }
+
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void SkipEnumeratorTest([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            var source = Enumerable.Range(0, 20).Skip(10).GetEnumerator();
+            source.MoveNext();
+            source.MoveNext();
+            source.MoveNext();
+            var result = DoRecorderRoundTrip(source, recorderMode);
+            Assert.IsTrue(Util.AreEquivalentEnumerators(source, result));
+        }
+
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void TakeWhileEnumeratorTest([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            var source = Enumerable.Range(0, 20).TakeWhile(i => i < 10).GetEnumerator();
+            source.MoveNext();
+            source.MoveNext();
+            source.MoveNext();
+            var result = DoRecorderRoundTrip(source, recorderMode);
+            Assert.IsTrue(Util.AreEquivalentEnumerators(source, result));
+        }
+
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void SkipWhileEnumeratorTest([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            var source = Enumerable.Range(0, 20).SkipWhile(i => i < 10).GetEnumerator();
+            source.MoveNext();
+            source.MoveNext();
+            source.MoveNext();
+            var result = DoRecorderRoundTrip(source, recorderMode);
+            Assert.IsTrue(Util.AreEquivalentEnumerators(source, result));
+        }
     }
 }

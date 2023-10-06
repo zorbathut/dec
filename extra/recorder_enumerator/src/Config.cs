@@ -22,6 +22,8 @@ namespace Dec.RecorderEnumerator
             ("System.Linq.Enumerable", "IntersectIterator"),
             ("System.Linq.Enumerable", "IntersectByIterator"),
             ("System.Linq.Enumerable", "OfTypeIterator"),
+            ("System.Linq.Enumerable", "SkipWhileIterator"),
+            ("System.Linq.Enumerable", "TakeWhileIterator"),
             ("System.Linq.Lookup", "GetEnumerator"),
             ("System.Linq.OrderedEnumerable`1", "GetEnumerator"),
         };
