@@ -175,6 +175,11 @@ public class GoblinGenerator
 ```
 
 
+### Extras
+
+Dec includes a few extra packages providing functionality which may not be desired, for reasons of functionality, security, or stability. I recommend [browsing them](https://github.com/zorbathut/dec/tree/dev/extra) to see what's available.
+
+
 ### Support
 
 * [Discord server](https://discord.gg/vQv9DMA)

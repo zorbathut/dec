@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 * Converters now support generic arguments; they must be converting a generic with the same number of arguments in the same order. This might get changed later.
 * Recorder.Clone() function to duplicate objects.
+* Added the first extra package, recorder_enumerator, capable of serializing and deserializing both Linq and user-defined enumerators mid-iteration.
 
 ### Breaking
 * Type parsing system no longer supports + separator for nested types, but it never wrote these in the first place, so this shouldn't be a big problem. If you have to edit some xml files, sorry 'bout that, this was an oversight.
@@ -21,9 +22,9 @@ All notable changes to this project will be documented in this file.
 * `bool` not recognized as a primitive type.
 
 ### Testing
-* Made test harness more durable of errors happening during parsing.
+* Made test harness more durable regarding errors happening during parsing.
 * Fixed a test that was accidentally testing the wrong thing.
-* Detect internal errors and report them as true test failures.
+* Detect internal errors and report them as true test failures, even if a failure was expected.
 
 
 ## [v0.5.0]
