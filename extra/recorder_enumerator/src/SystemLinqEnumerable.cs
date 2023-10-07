@@ -183,4 +183,80 @@ namespace Dec.RecorderEnumerator
             Write(input, recorder);
         }
     }
+
+    public static class SystemLinqEnumerable_Concat2Iterator_Converter
+    {
+        internal static Type RelevantType = typeof(System.Linq.Enumerable).GetNestedType("Concat2Iterator`1", System.Reflection.BindingFlags.NonPublic);
+    }
+
+    public class SystemLinqEnumerable_Concat2Iterator_Converter<Iterator, T> : ConverterFactoryDynamic
+    {
+        internal FieldInfo field_First = typeof(Iterator).GetPrivateFieldInHierarchy("_first");
+        internal FieldInfo field_Second = typeof(Iterator).GetPrivateFieldInHierarchy("_second");
+        internal FieldInfo field_Enumerator = typeof(Iterator).GetPrivateFieldInHierarchy("_enumerator");
+        internal FieldInfo field_State = typeof(Iterator).GetPrivateFieldInHierarchy("_state");
+        internal FieldInfo field_Current = typeof(Iterator).GetPrivateFieldInHierarchy("_current");
+
+        internal ConstructorInfo constructor = typeof(Iterator).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic)[0];
+
+        public override void Write(object input, Recorder recorder)
+        {
+            recorder.Shared().RecordPrivate(input, field_First, "first");
+            recorder.Shared().RecordPrivate(input, field_Second, "second");
+            recorder.Shared().RecordPrivate(input, field_Enumerator, "enumerator");
+            recorder.RecordPrivate(input, field_State, "state");
+            recorder.SharedIfPossible<T>().RecordPrivate(input, field_Current, "current");
+        }
+
+        public override object Create(Recorder recorder)
+        {
+            return constructor.Invoke(new object[] { null, null });
+        }
+
+        public override void Read(ref object input, Recorder recorder)
+        {
+            // it's the same code, we only need this for the funky Create
+            Write(input, recorder);
+        }
+    }
+
+    public static class SystemLinqEnumerable_ConcatNIterator_Converter
+    {
+        internal static Type RelevantType = typeof(System.Linq.Enumerable).GetNestedType("ConcatNIterator`1", System.Reflection.BindingFlags.NonPublic);
+    }
+
+    public class SystemLinqEnumerable_ConcatNIterator_Converter<Iterator, T> : ConverterFactoryDynamic
+    {
+        internal FieldInfo field_Tail = typeof(Iterator).GetPrivateFieldInHierarchy("_tail");
+        internal FieldInfo field_Head = typeof(Iterator).GetPrivateFieldInHierarchy("_head");
+        internal FieldInfo field_HeadIndex = typeof(Iterator).GetPrivateFieldInHierarchy("_headIndex");
+        internal FieldInfo field_HasOnlyCollections = typeof(Iterator).GetPrivateFieldInHierarchy("_hasOnlyCollections");
+        internal FieldInfo field_Enumerator = typeof(Iterator).GetPrivateFieldInHierarchy("_enumerator");
+        internal FieldInfo field_State = typeof(Iterator).GetPrivateFieldInHierarchy("_state");
+        internal FieldInfo field_Current = typeof(Iterator).GetPrivateFieldInHierarchy("_current");
+
+        internal ConstructorInfo constructor = typeof(Iterator).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic)[0];
+
+        public override void Write(object input, Recorder recorder)
+        {
+            recorder.Shared().RecordPrivate(input, field_Tail, "tail");
+            recorder.Shared().RecordPrivate(input, field_Head, "head");
+            recorder.RecordPrivate(input, field_HeadIndex, "headIndex");
+            recorder.RecordPrivate(input, field_HasOnlyCollections, "hasOnlyCollections");
+            recorder.Shared().RecordPrivate(input, field_Enumerator, "enumerator");
+            recorder.RecordPrivate(input, field_State, "state");
+            recorder.SharedIfPossible<T>().RecordPrivate(input, field_Current, "current");
+        }
+
+        public override object Create(Recorder recorder)
+        {
+            return constructor.Invoke(new object[] { null, null, 0, false });
+        }
+
+        public override void Read(ref object input, Recorder recorder)
+        {
+            // it's the same code, we only need this for the funky Create
+            Write(input, recorder);
+        }
+    }
 }

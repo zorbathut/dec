@@ -10,6 +10,8 @@ namespace Dec.RecorderEnumerator
         internal FieldInfo field_Array = RelevantType.GetPrivateFieldInHierarchy("_array");
         internal FieldInfo field_Index = RelevantType.GetPrivateFieldInHierarchy("_index");
 
+        internal ConstructorInfo constructor = RelevantType.GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic)[0];
+
         public override void Write(object input, Recorder recorder)
         {
             recorder.Shared().RecordPrivate(input, field_Array, "array");
@@ -23,9 +25,7 @@ namespace Dec.RecorderEnumerator
 
         public override object Create(Recorder recorder)
         {
-            // I am frankly bewildered as to why Activator.CreateInstance() doesn't work here.
-            var cs = RelevantType.GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic);
-            return cs[0].Invoke(new object[] { null });
+            return constructor.Invoke(new object[] { null });
         }
 
         public override void Read(ref object input, Recorder recorder)

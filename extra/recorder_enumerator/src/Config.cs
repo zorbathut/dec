@@ -137,6 +137,16 @@ namespace Dec.RecorderEnumerator
                     return (Converter)Activator.CreateInstance(typeof(System_SZGenericArrayEnumerator_Converter<>).MakeGenericType(type));
                 }
 
+                if (genericTypeDefinition == SystemLinqEnumerable_Concat2Iterator_Converter.RelevantType)
+                {
+                    return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_Concat2Iterator_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
+                }
+
+                if (genericTypeDefinition == SystemLinqEnumerable_ConcatNIterator_Converter.RelevantType)
+                {
+                    return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_ConcatNIterator_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
+                }
+
                 // List enumerator
 
                 if (genericTypeDefinition == SystemCollections_List_Enumerator_Converter.RelevantType)

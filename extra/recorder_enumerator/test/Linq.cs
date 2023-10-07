@@ -597,6 +597,35 @@ namespace RecorderEnumeratorTest
             var result = DoRecorderRoundTrip(source, recorderMode);
             Assert.IsTrue(Util.AreEquivalentEnumerators(source, result));
         }
+
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void ConcatEnumerator2Test([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            var first = Enumerable.Range(0, 20);
+            var second = Enumerable.Range(20, 20);
+            var source = first.Concat(second).GetEnumerator();
+            source.MoveNext();
+            source.MoveNext();
+            source.MoveNext();
+            var result = DoRecorderRoundTrip(source, recorderMode);
+            Assert.IsTrue(Util.AreEquivalentEnumerators(source, result));
+        }
+
+        [Test]
+        [Dec.RecorderEnumerator.RecordableClosures]
+        public void ConcatEnumeratorNTest([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            var first = Enumerable.Range(0, 20);
+            var second = Enumerable.Range(20, 20);
+            var third = Enumerable.Range(40, 20);
+            var source = first.Concat(second).Concat(third).GetEnumerator();
+            source.MoveNext();
+            source.MoveNext();
+            source.MoveNext();
+            var result = DoRecorderRoundTrip(source, recorderMode);
+            Assert.IsTrue(Util.AreEquivalentEnumerators(source, result));
+        }
     }
 }
 #endif
