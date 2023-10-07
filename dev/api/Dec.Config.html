@@ -131,6 +131,40 @@ Initialize as soon as possible.</p>
 
 
 
+  <h3 id="Dec_Config_ConverterFactory" data-uid="Dec.Config.ConverterFactory">
+  ConverterFactory
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Config.cs/#L128"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>A factory function that can be used to provide custom converters.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Func&lt;Type, Converter&gt; ConverterFactory</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Type</a>, <a class="xref" href="Dec.Converter.html">Converter</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+  <h4 class="section" id="Dec_Config_ConverterFactory_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>This is a tool of last resort; in most cases you should just be inheriting from ConverterString'1 et al. This is intended for converters from non-public classes, which can be access through (ab)use of reflection.</p>
+</div>
+
+
+
+
+
   <h3 id="Dec_Config_CultureInfo" data-uid="Dec.Config.CultureInfo">
   CultureInfo
   <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Config.cs/#L98"><i class="bi bi-code-slash"></i></a>

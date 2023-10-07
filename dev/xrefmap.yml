@@ -66,6 +66,12 @@ references:
   commentId: T:Dec.Config
   fullName: Dec.Config
   nameWithType: Config
+- uid: Dec.Config.ConverterFactory
+  name: ConverterFactory
+  href: api/Dec.Config.html#Dec_Config_ConverterFactory
+  commentId: F:Dec.Config.ConverterFactory
+  fullName: Dec.Config.ConverterFactory
+  nameWithType: Config.ConverterFactory
 - uid: Dec.Config.CultureInfo
   name: CultureInfo
   href: api/Dec.Config.html#Dec_Config_CultureInfo
@@ -197,6 +203,57 @@ references:
   isSpec: "True"
   fullName: Dec.Config.WarningHandler
   nameWithType: Config.WarningHandler
+- uid: Dec.ConverterFactoryDynamic
+  name: ConverterFactoryDynamic
+  href: api/Dec.ConverterFactoryDynamic.html
+  commentId: T:Dec.ConverterFactoryDynamic
+  fullName: Dec.ConverterFactoryDynamic
+  nameWithType: ConverterFactoryDynamic
+- uid: Dec.ConverterFactoryDynamic.Create(Dec.Recorder)
+  name: Create(Recorder)
+  href: api/Dec.ConverterFactoryDynamic.html#Dec_ConverterFactoryDynamic_Create_Dec_Recorder_
+  commentId: M:Dec.ConverterFactoryDynamic.Create(Dec.Recorder)
+  fullName: Dec.ConverterFactoryDynamic.Create(Dec.Recorder)
+  nameWithType: ConverterFactoryDynamic.Create(Recorder)
+- uid: Dec.ConverterFactoryDynamic.Create*
+  name: Create
+  href: api/Dec.ConverterFactoryDynamic.html#Dec_ConverterFactoryDynamic_Create_
+  commentId: Overload:Dec.ConverterFactoryDynamic.Create
+  isSpec: "True"
+  fullName: Dec.ConverterFactoryDynamic.Create
+  nameWithType: ConverterFactoryDynamic.Create
+- uid: Dec.ConverterFactoryDynamic.Read(System.Object@,Dec.Recorder)
+  name: Read(ref object, Recorder)
+  href: api/Dec.ConverterFactoryDynamic.html#Dec_ConverterFactoryDynamic_Read_System_Object__Dec_Recorder_
+  commentId: M:Dec.ConverterFactoryDynamic.Read(System.Object@,Dec.Recorder)
+  name.vb: Read(Object, Recorder)
+  fullName: Dec.ConverterFactoryDynamic.Read(ref object, Dec.Recorder)
+  fullName.vb: Dec.ConverterFactoryDynamic.Read(Object, Dec.Recorder)
+  nameWithType: ConverterFactoryDynamic.Read(ref object, Recorder)
+  nameWithType.vb: ConverterFactoryDynamic.Read(Object, Recorder)
+- uid: Dec.ConverterFactoryDynamic.Read*
+  name: Read
+  href: api/Dec.ConverterFactoryDynamic.html#Dec_ConverterFactoryDynamic_Read_
+  commentId: Overload:Dec.ConverterFactoryDynamic.Read
+  isSpec: "True"
+  fullName: Dec.ConverterFactoryDynamic.Read
+  nameWithType: ConverterFactoryDynamic.Read
+- uid: Dec.ConverterFactoryDynamic.Write(System.Object,Dec.Recorder)
+  name: Write(object, Recorder)
+  href: api/Dec.ConverterFactoryDynamic.html#Dec_ConverterFactoryDynamic_Write_System_Object_Dec_Recorder_
+  commentId: M:Dec.ConverterFactoryDynamic.Write(System.Object,Dec.Recorder)
+  name.vb: Write(Object, Recorder)
+  fullName: Dec.ConverterFactoryDynamic.Write(object, Dec.Recorder)
+  fullName.vb: Dec.ConverterFactoryDynamic.Write(Object, Dec.Recorder)
+  nameWithType: ConverterFactoryDynamic.Write(object, Recorder)
+  nameWithType.vb: ConverterFactoryDynamic.Write(Object, Recorder)
+- uid: Dec.ConverterFactoryDynamic.Write*
+  name: Write
+  href: api/Dec.ConverterFactoryDynamic.html#Dec_ConverterFactoryDynamic_Write_
+  commentId: Overload:Dec.ConverterFactoryDynamic.Write
+  isSpec: "True"
+  fullName: Dec.ConverterFactoryDynamic.Write
+  nameWithType: ConverterFactoryDynamic.Write
 - uid: Dec.ConverterFactory`1
   name: ConverterFactory<T>
   href: api/Dec.ConverterFactory-1.html
@@ -258,6 +315,28 @@ references:
   fullName.vb: Dec.ConverterFactory(Of T).Write
   nameWithType: ConverterFactory<T>.Write
   nameWithType.vb: ConverterFactory(Of T).Write
+- uid: Dec.ConverterRecordDynamic
+  name: ConverterRecordDynamic
+  href: api/Dec.ConverterRecordDynamic.html
+  commentId: T:Dec.ConverterRecordDynamic
+  fullName: Dec.ConverterRecordDynamic
+  nameWithType: ConverterRecordDynamic
+- uid: Dec.ConverterRecordDynamic.Record(System.Object@,Dec.Recorder)
+  name: Record(ref object, Recorder)
+  href: api/Dec.ConverterRecordDynamic.html#Dec_ConverterRecordDynamic_Record_System_Object__Dec_Recorder_
+  commentId: M:Dec.ConverterRecordDynamic.Record(System.Object@,Dec.Recorder)
+  name.vb: Record(Object, Recorder)
+  fullName: Dec.ConverterRecordDynamic.Record(ref object, Dec.Recorder)
+  fullName.vb: Dec.ConverterRecordDynamic.Record(Object, Dec.Recorder)
+  nameWithType: ConverterRecordDynamic.Record(ref object, Recorder)
+  nameWithType.vb: ConverterRecordDynamic.Record(Object, Recorder)
+- uid: Dec.ConverterRecordDynamic.Record*
+  name: Record
+  href: api/Dec.ConverterRecordDynamic.html#Dec_ConverterRecordDynamic_Record_
+  commentId: Overload:Dec.ConverterRecordDynamic.Record
+  isSpec: "True"
+  fullName: Dec.ConverterRecordDynamic.Record
+  nameWithType: ConverterRecordDynamic.Record
 - uid: Dec.ConverterRecord`1
   name: ConverterRecord<T>
   href: api/Dec.ConverterRecord-1.html
@@ -285,6 +364,44 @@ references:
   fullName.vb: Dec.ConverterRecord(Of T).Record
   nameWithType: ConverterRecord<T>.Record
   nameWithType.vb: ConverterRecord(Of T).Record
+- uid: Dec.ConverterStringDynamic
+  name: ConverterStringDynamic
+  href: api/Dec.ConverterStringDynamic.html
+  commentId: T:Dec.ConverterStringDynamic
+  fullName: Dec.ConverterStringDynamic
+  nameWithType: ConverterStringDynamic
+- uid: Dec.ConverterStringDynamic.Read(System.String,Dec.InputContext)
+  name: Read(string, InputContext)
+  href: api/Dec.ConverterStringDynamic.html#Dec_ConverterStringDynamic_Read_System_String_Dec_InputContext_
+  commentId: M:Dec.ConverterStringDynamic.Read(System.String,Dec.InputContext)
+  name.vb: Read(String, InputContext)
+  fullName: Dec.ConverterStringDynamic.Read(string, Dec.InputContext)
+  fullName.vb: Dec.ConverterStringDynamic.Read(String, Dec.InputContext)
+  nameWithType: ConverterStringDynamic.Read(string, InputContext)
+  nameWithType.vb: ConverterStringDynamic.Read(String, InputContext)
+- uid: Dec.ConverterStringDynamic.Read*
+  name: Read
+  href: api/Dec.ConverterStringDynamic.html#Dec_ConverterStringDynamic_Read_
+  commentId: Overload:Dec.ConverterStringDynamic.Read
+  isSpec: "True"
+  fullName: Dec.ConverterStringDynamic.Read
+  nameWithType: ConverterStringDynamic.Read
+- uid: Dec.ConverterStringDynamic.Write(System.Object)
+  name: Write(object)
+  href: api/Dec.ConverterStringDynamic.html#Dec_ConverterStringDynamic_Write_System_Object_
+  commentId: M:Dec.ConverterStringDynamic.Write(System.Object)
+  name.vb: Write(Object)
+  fullName: Dec.ConverterStringDynamic.Write(object)
+  fullName.vb: Dec.ConverterStringDynamic.Write(Object)
+  nameWithType: ConverterStringDynamic.Write(object)
+  nameWithType.vb: ConverterStringDynamic.Write(Object)
+- uid: Dec.ConverterStringDynamic.Write*
+  name: Write
+  href: api/Dec.ConverterStringDynamic.html#Dec_ConverterStringDynamic_Write_
+  commentId: Overload:Dec.ConverterStringDynamic.Write
+  isSpec: "True"
+  fullName: Dec.ConverterStringDynamic.Write
+  nameWithType: ConverterStringDynamic.Write
 - uid: Dec.ConverterString`1
   name: ConverterString<T>
   href: api/Dec.ConverterString-1.html
@@ -999,6 +1116,19 @@ references:
   commentId: T:Dec.Recorder.Parameters
   fullName: Dec.Recorder.Parameters
   nameWithType: Recorder.Parameters
+- uid: Dec.Recorder.Parameters.Mode
+  name: Mode
+  href: api/Dec.Recorder.Parameters.html#Dec_Recorder_Parameters_Mode
+  commentId: P:Dec.Recorder.Parameters.Mode
+  fullName: Dec.Recorder.Parameters.Mode
+  nameWithType: Recorder.Parameters.Mode
+- uid: Dec.Recorder.Parameters.Mode*
+  name: Mode
+  href: api/Dec.Recorder.Parameters.html#Dec_Recorder_Parameters_Mode_
+  commentId: Overload:Dec.Recorder.Parameters.Mode
+  isSpec: "True"
+  fullName: Dec.Recorder.Parameters.Mode
+  nameWithType: Recorder.Parameters.Mode
 - uid: Dec.Recorder.Parameters.Record*
   name: Record
   href: api/Dec.Recorder.Parameters.html#Dec_Recorder_Parameters_Record_
@@ -1207,6 +1337,12 @@ references:
   isSpec: "True"
   fullName: Dec.Util.CanBeShared
   nameWithType: Util.CanBeShared
+- uid: Dec.Util.CollectionDeserializationVersion
+  name: CollectionDeserializationVersion
+  href: api/Dec.Util.html#Dec_Util_CollectionDeserializationVersion
+  commentId: F:Dec.Util.CollectionDeserializationVersion
+  fullName: Dec.Util.CollectionDeserializationVersion
+  nameWithType: Util.CollectionDeserializationVersion
 - uid: future_csv
   name: CSV Support
   href: future/csv.html

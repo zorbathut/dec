@@ -1,5 +1,4 @@
 {
-  "homepages": [],
   "source_base_path": "/home/runner/work/dec/dec/doc",
   "xrefmap": "xrefmap.yml",
   "files": [
@@ -85,6 +84,16 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Dec.ConverterFactoryDynamic.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.ConverterFactoryDynamic.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Dec.ConverterRecord-1.yml",
       "output": {
         ".html": {
@@ -95,10 +104,30 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Dec.ConverterRecordDynamic.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.ConverterRecordDynamic.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Dec.ConverterString-1.yml",
       "output": {
         ".html": {
           "relative_path": "api/Dec.ConverterString-1.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.ConverterStringDynamic.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.ConverterStringDynamic.html"
         }
       },
       "version": ""
@@ -689,7 +718,6 @@
       "version": ""
     }
   ],
-  "version_info": {},
   "groups": [
     {
       "xrefmap": "xrefmap.yml"

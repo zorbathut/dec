@@ -2,10 +2,10 @@
 <html>
   <head>
     <meta charset="utf-8">
-      <title>Enum Recorder.Direction
+      <title>Class ConverterRecordDynamic
  </title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="title" content="Enum Recorder.Direction
+      <meta name="title" content="Class ConverterRecordDynamic
  ">
       
       <link rel="icon" href="../favicon.ico">
@@ -17,7 +17,7 @@
       
       
       
-      <meta name="docfx:docurl" content="https://github.com/zorbathut/dec/new/dev/apiSpec/new?filename=Dec_Recorder_Direction.md&amp;value=---%0Auid%3A%20Dec.Recorder.Direction%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/zorbathut/dec/new/dev/apiSpec/new?filename=Dec_ConverterRecordDynamic.md&amp;value=---%0Auid%3A%20Dec.ConverterRecordDynamic%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -84,14 +84,13 @@
           <nav id="breadcrumb"></nav>
         </div>
 
-        <article data-uid="Dec.Recorder.Direction">
+        <article data-uid="Dec.ConverterRecordDynamic">
 
 
 
-
-  <h1 id="Dec_Recorder_Direction" data-uid="Dec.Recorder.Direction" class="text-break">
-    Enum Recorder.Direction
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L263"><i class="bi bi-code-slash"></i></a>
+  <h1 id="Dec_ConverterRecordDynamic" data-uid="Dec.ConverterRecordDynamic" class="text-break">
+    Class ConverterRecordDynamic
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Converter.cs/#L157"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -99,37 +98,90 @@
   <dl><dt>Assembly</dt><dd>dec.dll</dd></dl>
   </div>
 
-  <div class="markdown summary"><p>Indicates whether this Recorder is being used for reading or writing.</p>
+  <div class="markdown summary"><p>Alternate dynamic-typed class for converting to arbitrary types via the Recorder API.</p>
 </div>
   <div class="markdown conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public enum Recorder.Direction</code></pre>
+    <pre><code class="lang-csharp hljs">public abstract class ConverterRecordDynamic : ConverterRecord</code></pre>
   </div>
 
 
 
 
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><a class="xref" href="Dec.Converter.html">Converter</a></div>
+      <div><a class="xref" href="Dec.ConverterRecord.html">ConverterRecord</a></div>
+      <div><span class="xref">ConverterRecordDynamic</span></div>
+    </dd>
+  </dl>
 
 
 
 
 
-  <h2 id="fields">Fields
+
+
+  <h2 id="Dec_ConverterRecordDynamic_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>This is a variant of ConverterRecord that allows you to use arbitrary types, which is helpful if you're trying to convert non-public types.</p>
+<p>In most cases it should be avoided.</p>
+</div>
+
+
+  <h2 class="section" id="methods">Methods
 </h2>
+
+
+  <a id="Dec_ConverterRecordDynamic_Record_" data-uid="Dec.ConverterRecordDynamic.Record*"></a>
+
+  <h3 id="Dec_ConverterRecordDynamic_Record_System_Object__Dec_Recorder_" data-uid="Dec.ConverterRecordDynamic.Record(System.Object@,Dec.Recorder)">
+  Record(ref object, Recorder)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Converter.cs/#L165"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Records an object.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract object Record(ref object input, Recorder recorder)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
   <dl class="parameters">
-    <dt id="Dec_Recorder_Direction_Read"><code>Read = 0</code></dt>
+    <dt><code>input</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
     <dd></dd>
-    <dt id="Dec_Recorder_Direction_Write"><code>Write = 1</code></dt>
+    <dt><code>recorder</code> <a class="xref" href="Dec.Recorder.html">Recorder</a></dt>
     <dd></dd>
   </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="Dec_ConverterRecordDynamic_Record_System_Object__Dec_Recorder__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>See <a class="xref" href="Dec.IRecordable.html#Dec_IRecordable_Record_"><code>Dec.IRecordable.Record</code></a> for details, although you'll need to use <code>this</code> instead of <code>input</code>.</p>
+</div>
+
+
 
 
 
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L263" class="edit-link">Edit this page</a>
+          <a href="https://github.com/zorbathut/dec/blob/dev/src/Converter.cs/#L157" class="edit-link">Edit this page</a>
         </div>
 
         
