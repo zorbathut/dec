@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 * Improved error message when trying to initialize a composite with a string.
 * First-time Parser startup speed now faster.
 * Type parsing system now properly supports generic nested types of generics.
+* User-types now don't include anything under the Dec namespace.
 
 ### Fixed
 * Type caching system no longer results in silent errors.

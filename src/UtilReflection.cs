@@ -120,7 +120,15 @@ namespace Dec
 
         internal static IEnumerable<Type> GetAllUserTypes()
         {
-            return GetAllUserAssemblies().SelectMany(a => a.GetTypes());
+            return GetAllUserAssemblies().SelectMany(a => a.GetTypes()).Where(t => {
+                var ns = t.Namespace;
+                if (ns == null)
+                {
+                    return true;
+                }
+
+                return !t.Namespace.StartsWith("Dec.") && t.Namespace != "Dec";
+            });
         }
 
         internal struct IndexInfo
