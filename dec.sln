@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30503.244
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dec", "src\dec.csproj", "{B57A7C73-7542-4F8A-A662-2EB70C2E7C37}"
 EndProject
@@ -20,6 +20,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "recorder_enumerator", "extra\recorder_enumerator\src\recorder_enumerator.csproj", "{4F96BCA5-4888-4622-9A4B-68AF4CCF34F5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "recorder_enumerator-test", "extra\recorder_enumerator\test\recorder_enumerator-test.csproj", "{FBF98AB1-913B-4FE6-99A5-C704197A83D2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dec-test-integration-unified", "test\integration_unified\dec-test-integration-unified.csproj", "{DB698BF5-758E-4169-9F1F-6E57866FF2CD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -129,6 +131,18 @@ Global
 		{FBF98AB1-913B-4FE6-99A5-C704197A83D2}.Release 3.1|Any CPU.Build.0 = Release 3.1|Any CPU
 		{FBF98AB1-913B-4FE6-99A5-C704197A83D2}.Release 7.0|Any CPU.ActiveCfg = Release 7.0|Any CPU
 		{FBF98AB1-913B-4FE6-99A5-C704197A83D2}.Release 7.0|Any CPU.Build.0 = Release 7.0|Any CPU
+		{DB698BF5-758E-4169-9F1F-6E57866FF2CD}.Debug 2.1|Any CPU.ActiveCfg = Debug 2.1|Any CPU
+		{DB698BF5-758E-4169-9F1F-6E57866FF2CD}.Debug 2.1|Any CPU.Build.0 = Debug 2.1|Any CPU
+		{DB698BF5-758E-4169-9F1F-6E57866FF2CD}.Debug 3.1|Any CPU.ActiveCfg = Debug 3.1|Any CPU
+		{DB698BF5-758E-4169-9F1F-6E57866FF2CD}.Debug 3.1|Any CPU.Build.0 = Debug 3.1|Any CPU
+		{DB698BF5-758E-4169-9F1F-6E57866FF2CD}.Debug 7.0|Any CPU.ActiveCfg = Debug 7.0|Any CPU
+		{DB698BF5-758E-4169-9F1F-6E57866FF2CD}.Debug 7.0|Any CPU.Build.0 = Debug 7.0|Any CPU
+		{DB698BF5-758E-4169-9F1F-6E57866FF2CD}.Release 2.1|Any CPU.ActiveCfg = Release 2.1|Any CPU
+		{DB698BF5-758E-4169-9F1F-6E57866FF2CD}.Release 2.1|Any CPU.Build.0 = Release 2.1|Any CPU
+		{DB698BF5-758E-4169-9F1F-6E57866FF2CD}.Release 3.1|Any CPU.ActiveCfg = Release 3.1|Any CPU
+		{DB698BF5-758E-4169-9F1F-6E57866FF2CD}.Release 3.1|Any CPU.Build.0 = Release 3.1|Any CPU
+		{DB698BF5-758E-4169-9F1F-6E57866FF2CD}.Release 7.0|Any CPU.ActiveCfg = Release 7.0|Any CPU
+		{DB698BF5-758E-4169-9F1F-6E57866FF2CD}.Release 7.0|Any CPU.Build.0 = Release 7.0|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
