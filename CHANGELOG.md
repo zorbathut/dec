@@ -28,6 +28,7 @@ All notable changes to this project will be documented in this file.
 * Detect internal errors and report them as true test failures, even if a failure was expected.
 * Added an integration-unified test for the case where people are just copypasting source files into their project.
 * Improved testing of locale issues.
+* Reduced compiler warnings in test suite.
 
 
 ## [v0.5.0]

@@ -348,29 +348,29 @@ namespace DecTest
         public class Foo
         {
             public class Solo { }
-            public class Generic<T> { }
+            public class Generic<U> { }
 
             public class Overloaded { }
-            public class Overloaded<T> { }
-            public class Overloaded<T, U> { }
+            public class Overloaded<U> { }
+            public class Overloaded<U, V> { }
         }
         public class Foo<T>
         {
             public class Solo { }
-            public class Generic<T> { }
+            public class Generic<U> { }
 
             public class Overloaded { }
-            public class Overloaded<T> { }
-            public class Overloaded<T, U> { }
+            public class Overloaded<U> { }
+            public class Overloaded<U, V> { }
         }
         public class Foo<T, U>
         {
             public class Solo { }
-            public class Generic<T> { }
+            public class Generic<U> { }
 
             public class Overloaded { }
-            public class Overloaded<T> { }
-            public class Overloaded<T, U> { }
+            public class Overloaded<U> { }
+            public class Overloaded<U, V> { }
         }
     }
 }
