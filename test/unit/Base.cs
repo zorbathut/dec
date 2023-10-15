@@ -12,6 +12,9 @@ namespace DecTest
         [SetUp] [TearDown]
         public void Clean()
         {
+            // Turns out Hebrew is basically the worst-case scenario for parsing of this sort.
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("he-IL");
+
             // stop verifying things
             errorValidator = null;
 
@@ -41,9 +44,6 @@ namespace DecTest
         [OneTimeSetUp]
         public void PrepHooks()
         {
-            // Turns out Hebrew is basically the worst-case scenario for parsing of this sort.
-            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("he-IL");
-
             Dec.Config.InfoHandler = str =>
             {
                 System.Diagnostics.Debug.Print(str);
