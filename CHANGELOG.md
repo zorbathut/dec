@@ -2,7 +2,10 @@
 All notable changes to this project will be documented in this file.
 
 
-## [Unreleased]
+## [v0.5.1]
+### Notes
+* Despite the length of this changelog, this is mostly minor bugfixes and documentation. The "big feature" is an Extra package that I do not recommend using in production until it has a *lot* more work.
+
 ### Added
 * Converters now support generic arguments; they must be converting a generic with the same number of arguments in the same order. This might get changed later.
 * Recorder.Clone() function to duplicate objects.
