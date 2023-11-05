@@ -27,13 +27,10 @@
       <meta name="loc:themeAuto" content="Auto">
       <meta name="loc:changeTheme" content="Change theme">
       <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
   </head>
 
-  <script type="module">
-    import options from './../public/main.js'
-    import { init } from './../public/docfx.min.js'
-    init(options)
-  </script>
+  <script type="module" src="./../public/docfx.min.js"></script>
 
   <script>
     const theme = localStorage.getItem('theme') || 'auto'
@@ -187,6 +184,7 @@ public class CarrierDec : Dec.Dec
 </code></pre>
 <p><code>Valid</code>'s IndexedItem will have its index set to a valid number. <code>NotValid</code>'s IndexedItem is never traversed by Dec and may have any index, including something completely invalid, or even the same value as Valid's IndexedItem.</p>
 <p>This is not an ideal behavior, but it's hard to fix and I haven't gotten there yet. If this is an actual problem for you, please pester me on Discord! I have a fix in mind.</p>
+
 </article>
 
         <div class="contribution d-print-none">
@@ -194,7 +192,7 @@ public class CarrierDec : Dec.Dec
         </div>
 
         <div class="next-article d-print-none border-top" id="nextArticle"></div>
-        
+
       </div>
 
       <div class="affix">
@@ -203,7 +201,7 @@ public class CarrierDec : Dec.Dec
     </main>
 
 
-    <footer class="border-top">
+    <footer class="border-top text-secondary">
       <div class="container-xxl">
         <div class="flex-fill">
           <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>

@@ -27,13 +27,10 @@
       <meta name="loc:themeAuto" content="Auto">
       <meta name="loc:changeTheme" content="Change theme">
       <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
   </head>
 
-  <script type="module">
-    import options from './../public/main.js'
-    import { init } from './../public/docfx.min.js'
-    init(options)
-  </script>
+  <script type="module" src="./../public/docfx.min.js"></script>
 
   <script>
     const theme = localStorage.getItem('theme') || 'auto'
@@ -89,6 +86,7 @@
 <p>Normally, the user then has to transcribe the changed value into the .xml files. But it sure would be cool if dec could do that on its own! The XML library it uses provides enough metadata to regenerate the same file byte-for-byte; injecting modified data at the same time wouldn't be too hard.</p>
 <p>Dec now supports serializing the dec database into an .xml file, via the Composer class. But it's limited and doesn't produce good human-readable output.</p>
 <p>This is likely going to happen after I have the appropriate UI rewritten.</p>
+
 </article>
 
         <div class="contribution d-print-none">
@@ -96,7 +94,7 @@
         </div>
 
         <div class="next-article d-print-none border-top" id="nextArticle"></div>
-        
+
       </div>
 
       <div class="affix">
@@ -105,7 +103,7 @@
     </main>
 
 
-    <footer class="border-top">
+    <footer class="border-top text-secondary">
       <div class="container-xxl">
         <div class="flex-fill">
           <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>

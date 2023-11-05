@@ -27,13 +27,10 @@
       <meta name="loc:themeAuto" content="Auto">
       <meta name="loc:changeTheme" content="Change theme">
       <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
   </head>
 
-  <script type="module">
-    import options from './../public/main.js'
-    import { init } from './../public/docfx.min.js'
-    init(options)
-  </script>
+  <script type="module" src="./../public/docfx.min.js"></script>
 
   <script>
     const theme = localStorage.getItem('theme') || 'auto'
@@ -375,6 +372,7 @@
 <h2 id="epilogue">Epilogue</h2>
 <p>More options may be added in the future; current possibilities include <code>prepend</code>, <code>patchToConstructor</code>, <code>patchToOriginal</code>, <code>appendToOriginal</code>, and the ability to use Dec merge modes for Dictionary/HashSet keys. If you need something specific, please ask on Discord.</p>
 <p>The patch system is not likely to become turing-complete; if you need functionality that includes conditionals, loops, or matches, it is <em>strongly</em> recommended to just do it in C#.</p>
+
 </article>
 
         <div class="contribution d-print-none">
@@ -382,7 +380,7 @@
         </div>
 
         <div class="next-article d-print-none border-top" id="nextArticle"></div>
-        
+
       </div>
 
       <div class="affix">
@@ -391,7 +389,7 @@
     </main>
 
 
-    <footer class="border-top">
+    <footer class="border-top text-secondary">
       <div class="container-xxl">
         <div class="flex-fill">
           <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
