@@ -1151,6 +1151,92 @@ namespace Dec
                 return result;
             }
 
+            // Special case: Stack
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Stack<>))
+            {
+                // Stack<> handling
+                // Again, no sensible non-generic interface to use, so we're stuck with reflection
+
+                foreach (var (parseCommand, node) in orders)
+                {
+                    switch (parseCommand)
+                    {
+                        case ParseCommand.Replace:
+                            // If you have a default stack, but specify it in XML, we assume this is a full override. Clear the original stack to cut down on GC churn.
+                            // TODO: Is some bozo going to store the same "constant" global stack on init, then be surprised when we re-use the stack instead of creating a new one? Detect this and yell about it I guess.
+                            // If you are reading this because you're the bozo, [insert angry emoji here], but also feel free to be annoyed that I haven't fixed it yet despite realizing it's a problem. Ping me on Discord, I'll take care of it, sorry 'bout that.
+                            if (result != null)
+                            {
+                                var clearFunction = result.GetType().GetMethod("Clear");
+                                clearFunction.Invoke(result, null);
+                            }
+                            break;
+
+                        case ParseCommand.Append:
+                            break;
+
+                        // There definitely starts being an argument for prepend.
+
+                        default:
+                            Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                            break;
+                    }
+
+                    Type keyType = type.GetGenericArguments()[0];
+
+                    var set = result ?? Activator.CreateInstance(type);
+
+                    node.ParseStack(set, keyType, context, recContext);
+
+                    result = set;
+                }
+
+                return result;
+            }
+
+            // Special case: Queue
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Queue<>))
+            {
+                // Queue<> handling
+                // Again, no sensible non-generic interface to use, so we're stuck with reflection
+
+                foreach (var (parseCommand, node) in orders)
+                {
+                    switch (parseCommand)
+                    {
+                        case ParseCommand.Replace:
+                            // If you have a default queue, but specify it in XML, we assume this is a full override. Clear the original queue to cut down on GC churn.
+                            // TODO: Is some bozo going to store the same "constant" global queue on init, then be surprised when we re-use the queue instead of creating a new one? Detect this and yell about it I guess.
+                            // If you are reading this because you're the bozo, [insert angry emoji here], but also feel free to be annoyed that I haven't fixed it yet despite realizing it's a problem. Ping me on Discord, I'll take care of it, sorry 'bout that.
+                            if (result != null)
+                            {
+                                var clearFunction = result.GetType().GetMethod("Clear");
+                                clearFunction.Invoke(result, null);
+                            }
+                            break;
+
+                        case ParseCommand.Append:
+                            break;
+
+                        // There definitely starts being an argument for prepend.
+
+                        default:
+                            Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                            break;
+                    }
+
+                    Type keyType = type.GetGenericArguments()[0];
+
+                    var set = result ?? Activator.CreateInstance(type);
+
+                    node.ParseQueue(set, keyType, context, recContext);
+
+                    result = set;
+                }
+
+                return result;
+            }
+
             // Special case: A bucket of tuples
             // These are all basically identical, but AFAIK there's no good way to test them all in a better way.
             if (type.IsGenericType && (
@@ -1521,6 +1607,20 @@ namespace Dec
             if (valType.IsGenericType && valType.GetGenericTypeDefinition() == typeof(HashSet<>))
             {
                 node.WriteHashSet(value as IEnumerable);
+
+                return;
+            }
+
+            if (valType.IsGenericType && valType.GetGenericTypeDefinition() == typeof(Queue<>))
+            {
+                node.WriteQueue(value as IEnumerable);
+
+                return;
+            }
+
+            if (valType.IsGenericType && valType.GetGenericTypeDefinition() == typeof(Stack<>))
+            {
+                node.WriteStack(value as IEnumerable);
 
                 return;
             }

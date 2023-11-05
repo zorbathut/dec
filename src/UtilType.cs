@@ -593,7 +593,9 @@ namespace Dec
             }
             else if (
                 (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>)) ||
-                type.IsArray
+                type.IsArray ||
+                (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Stack<>)) ||
+                (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Queue<>))
             )
             {
                 return ParseModeCategory.OrderedContainer;

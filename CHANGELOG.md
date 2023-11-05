@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 * Converters now support generic arguments; they must be converting a generic with the same number of arguments in the same order. This might get changed later.
 * Recorder.Clone() function to duplicate objects.
 * Added the first extra package, recorder_enumerator, capable of serializing and deserializing both Linq and user-defined enumerators mid-iteration.
+* Added support for Stack and Queue.
 
 ### Breaking
 * Type parsing system no longer supports + separator for nested types, but it never wrote these in the first place, so this shouldn't be a big problem. If you have to edit some xml files, sorry 'bout that, this was an oversight.

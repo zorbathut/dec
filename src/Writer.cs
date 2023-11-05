@@ -44,6 +44,8 @@ namespace Dec
         public abstract void WriteList(IList value);
         public abstract void WriteDictionary(IDictionary value);
         public abstract void WriteHashSet(IEnumerable value);
+        public abstract void WriteQueue(IEnumerable value);
+        public abstract void WriteStack(IEnumerable value);
         public abstract void WriteTuple(object value, System.Runtime.CompilerServices.TupleElementNamesAttribute names);
         public abstract void WriteValueTuple(object value, System.Runtime.CompilerServices.TupleElementNamesAttribute names);
         public abstract void WriteRecord(IRecordable value);

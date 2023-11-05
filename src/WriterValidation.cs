@@ -305,6 +305,56 @@ namespace Dec
             writer.AppendLine($"Assert.AreEqual({accessor}.Count, {count});");
         }
 
+        public override void WriteQueue(IEnumerable value)
+        {
+            Type referencedType = value.GetType().GetGenericArguments()[0];
+
+            var count = (int)value.GetType().GetProperty("Count").GetValue(value);
+
+            // Maybe this should just be a giant AreEqual with a dynamically allocated list?
+            writer.AppendLine($"Assert.AreEqual({accessor}.Count, {count});");
+            writer.AppendLine($"if ({accessor}.Count == {count}) {{");
+
+            // this is just easier
+            writer.AppendLine($"var tempArray = new {referencedType.ComposeCSFormatted()}[{count}];");
+            writer.AppendLine($"{accessor}.CopyTo(tempArray, 0);");
+
+            // and meanwhile . . .
+            var array = value.GetType().GetMethod("ToArray").Invoke(value, new object[] { }) as Array;
+
+            for (int i = 0; i < count; ++i)
+            {
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"tempArray[{i}]"), array.GetValue(i), referencedType);
+            }
+
+            writer.AppendLine($"}}");
+        }
+
+        public override void WriteStack(IEnumerable value)
+        {
+            Type referencedType = value.GetType().GetGenericArguments()[0];
+
+            var count = (int)value.GetType().GetProperty("Count").GetValue(value);
+
+            // Maybe this should just be a giant AreEqual with a dynamically allocated list?
+            writer.AppendLine($"Assert.AreEqual({accessor}.Count, {count});");
+            writer.AppendLine($"if ({accessor}.Count == {count}) {{");
+
+            // this is just easier
+            writer.AppendLine($"var tempArray = new {referencedType.ComposeCSFormatted()}[{count}];");
+            writer.AppendLine($"{accessor}.CopyTo(tempArray, 0);");
+
+            // and meanwhile . . .
+            var array = value.GetType().GetMethod("ToArray").Invoke(value, new object[] { }) as Array;
+
+            for (int i = 0; i < count; ++i)
+            {
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"tempArray[{i}]"), array.GetValue(i), referencedType);
+            }
+
+            writer.AppendLine($"}}");
+        }
+
         public override void WriteTuple(object value, System.Runtime.CompilerServices.TupleElementNamesAttribute names)
         {
             var args = value.GetType().GenericTypeArguments;
@@ -404,6 +454,16 @@ namespace Dec
         }
 
         public override void WriteHashSet(IEnumerable value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void WriteStack(IEnumerable value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void WriteQueue(IEnumerable value)
         {
             throw new NotImplementedException();
         }

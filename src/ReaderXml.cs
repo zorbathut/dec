@@ -484,6 +484,44 @@ namespace Dec
             }
         }
 
+        public override void ParseStack(object stack, Type referencedType, ReaderContext readerContext, Recorder.Context recorderContext)
+        {
+            var pushFunction = stack.GetType().GetMethod("Push");
+
+            var recorderChildContext = recorderContext.CreateChild();
+
+            int i = 0;
+            foreach (var fieldElement in xml.Elements())
+            {
+                if (fieldElement.Name.LocalName != "li")
+                {
+                    var elementContext = new InputContext(fileIdentifier, fieldElement);
+                    Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
+                }
+
+                pushFunction.Invoke(stack, new object[] { Serialization.ParseElement(new List<ReaderNode>() { new ReaderNodeXml(fieldElement, fileIdentifier) }, referencedType, null, readerContext, recorderChildContext) });
+            }
+        }
+
+        public override void ParseQueue(object queue, Type referencedType, ReaderContext readerContext, Recorder.Context recorderContext)
+        {
+            var enqueueFunction = queue.GetType().GetMethod("Enqueue");
+
+            var recorderChildContext = recorderContext.CreateChild();
+
+            int i = 0;
+            foreach (var fieldElement in xml.Elements())
+            {
+                if (fieldElement.Name.LocalName != "li")
+                {
+                    var elementContext = new InputContext(fileIdentifier, fieldElement);
+                    Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
+                }
+
+                enqueueFunction.Invoke(queue, new object[] { Serialization.ParseElement(new List<ReaderNode>() { new ReaderNodeXml(fieldElement, fileIdentifier) }, referencedType, null, readerContext, recorderChildContext) });
+            }
+        }
+
         public override void ParseTuple(object[] parameters, Type referencedType, IList<string> parameterNames, ReaderContext readerContext, Recorder.Context recorderContext)
         {
             int expectedCount = referencedType.GenericTypeArguments.Length;
