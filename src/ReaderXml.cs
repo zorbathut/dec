@@ -91,8 +91,7 @@ namespace Dec
                         var abstractAttribute = decElement.Attribute("abstract");
                         if (abstractAttribute != null)
                         {
-                            bool abstrct;
-                            if (!bool.TryParse(abstractAttribute.Value, out abstrct))
+                            if (!bool.TryParse(abstractAttribute.Value, out bool abstrct))
                             {
                                 Dbg.Err($"{readerDec.inputContext}: Error encountered when parsing abstract attribute");
                             }

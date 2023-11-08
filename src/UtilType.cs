@@ -140,8 +140,7 @@ namespace Dec
             // If we have a < we need to extract generic arguments.
             if (nameEnd < input.Length && input[nameEnd] == '<')
             {
-                int endOfGenericsAdjustment = 0;
-                if (!ParseGenericParams(input.Substring(nameEnd + 1), context, out endOfGenericsAdjustment, ref types))
+                if (!ParseGenericParams(input.Substring(nameEnd + 1), context, out int endOfGenericsAdjustment, ref types))
                 {
                     // just kinda give up to ensure we don't get trapped in a loop
                     Dbg.Err($"{context}: Failed to parse generic arguments for type containing {input}");

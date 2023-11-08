@@ -240,7 +240,7 @@ namespace Dec
                             var collidingDec = seenDecs.TryGetValue(id);
                             if (collidingDec != null)
                             {
-                                Dbg.Err($"{collidingDec.GetInputContext()} / {readerDec.node.GetInputContext()}: Dec [{id.Item1}:{id.Item2}] defined twice");
+                                Dbg.Err($"{collidingDec.GetInputContext()} / {readerDec.node.GetInputContext()}: Dec [{id.Item1}:{id.name}] defined twice");
 
                                 // If the already-parsed one is abstract, we throw it away and go with the non-abstract one, because it's arguably more likely to be the one the user wants.
                                 if (!(registeredDecs[id].Select(dec => dec.abstrct).LastOrDefault(abstrct => abstrct.HasValue) ?? false))

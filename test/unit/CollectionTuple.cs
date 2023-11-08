@@ -9,15 +9,15 @@ namespace DecTest
     {
         public class SimpleDec : Dec.Dec
         {
-            public Tuple<int, string> t_is;
-            public Tuple<string, int> t_si;
-            public Tuple<List<int>, Dictionary<string, int>> t_ld;
+            public Tuple<int, string> tupleIs;
+            public Tuple<string, int> tupleSi;
+            public Tuple<List<int>, Dictionary<string, int>> tupleLd;
 
-            public Tuple<int> t_1;
-            public Tuple<int, int> t_2;
-            public Tuple<int, int, int> t_3;
-            public Tuple<int, int, int, int> t_4;
-            public Tuple<int, int, int, int, int, int, int> t_7;
+            public Tuple<int> tuple1;
+            public Tuple<int, int> tuple2;
+            public Tuple<int, int, int> tuple3;
+            public Tuple<int, int, int, int> tuple4;
+            public Tuple<int, int, int, int, int, int, int> tuple7;
         }
 
         [Test]
@@ -29,15 +29,15 @@ namespace DecTest
             parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <SimpleDec decName=""TestDec"">
-                        <t_is>
+                        <tupleIs>
                             <li>4</li>
                             <li>cows</li>
-                        </t_is>
-                        <t_si>
+                        </tupleIs>
+                        <tupleSi>
                             <li>horses</li>
                             <li>8</li>
-                        </t_si>
-                        <t_ld>
+                        </tupleSi>
+                        <tupleLd>
                             <li>
                                 <li>1</li>
                                 <li>2</li>
@@ -47,27 +47,27 @@ namespace DecTest
                                 <sheep>9</sheep>
                                 <goats>99</goats>
                             </li>
-                        </t_ld>
+                        </tupleLd>
 
-                        <t_1>
+                        <tuple1>
                             <li>11</li>
-                        </t_1>
-                        <t_2>
+                        </tuple1>
+                        <tuple2>
                             <li>21</li>
                             <li>22</li>
-                        </t_2>
-                        <t_3>
+                        </tuple2>
+                        <tuple3>
                             <li>31</li>
                             <li>32</li>
                             <li>33</li>
-                        </t_3>
-                        <t_4>
+                        </tuple3>
+                        <tuple4>
                             <li>41</li>
                             <li>42</li>
                             <li>43</li>
                             <li>44</li>
-                        </t_4>
-                        <t_7>
+                        </tuple4>
+                        <tuple7>
                             <li>51</li>
                             <li>52</li>
                             <li>53</li>
@@ -75,7 +75,7 @@ namespace DecTest
                             <li>55</li>
                             <li>56</li>
                             <li>57</li>
-                        </t_7>
+                        </tuple7>
                     </SimpleDec>
                 </Decs>");
             parser.Finish();
@@ -85,28 +85,28 @@ namespace DecTest
             var result = Dec.Database<SimpleDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
-            Assert.AreEqual(Tuple.Create(4, "cows"), result.t_is);
-            Assert.AreEqual(Tuple.Create("horses", 8), result.t_si);
-            Assert.AreEqual(Tuple.Create(new List<int>() { 1, 2, 3 }, new Dictionary<string, int> { { "sheep", 9 }, { "goats", 99 } }), result.t_ld);
+            Assert.AreEqual(Tuple.Create(4, "cows"), result.tupleIs);
+            Assert.AreEqual(Tuple.Create("horses", 8), result.tupleSi);
+            Assert.AreEqual(Tuple.Create(new List<int>() { 1, 2, 3 }, new Dictionary<string, int> { { "sheep", 9 }, { "goats", 99 } }), result.tupleLd);
 
-            Assert.AreEqual(Tuple.Create(11), result.t_1);
-            Assert.AreEqual(Tuple.Create(21, 22), result.t_2);
-            Assert.AreEqual(Tuple.Create(31, 32, 33), result.t_3);
-            Assert.AreEqual(Tuple.Create(41, 42, 43, 44), result.t_4);
-            Assert.AreEqual(Tuple.Create(51, 52, 53, 54, 55, 56, 57), result.t_7);
+            Assert.AreEqual(Tuple.Create(11), result.tuple1);
+            Assert.AreEqual(Tuple.Create(21, 22), result.tuple2);
+            Assert.AreEqual(Tuple.Create(31, 32, 33), result.tuple3);
+            Assert.AreEqual(Tuple.Create(41, 42, 43, 44), result.tuple4);
+            Assert.AreEqual(Tuple.Create(51, 52, 53, 54, 55, 56, 57), result.tuple7);
         }
 
         public class ValueDec : Dec.Dec
         {
-            public (int, string) t_is;
-            public (string, int) t_si;
-            public (List<int>, Dictionary<string, int>) t_ld;
+            public (int, string) tupleIs;
+            public (string, int) tupleSi;
+            public (List<int>, Dictionary<string, int>) tupleLd;
 
-            public ValueTuple<int> t_1; // syntactic sugar doesn't work for this one, but it's still valid
-            public (int, int) t_2;
-            public (int, int, int) t_3;
-            public (int, int, int, int) t_4;
-            public (int, int, int, int, int, int, int) t_7;
+            public ValueTuple<int> tuple1; // syntactic sugar doesn't work for this one, but it's still valid
+            public (int, int) tuple2;
+            public (int, int, int) tuple3;
+            public (int, int, int, int) tuple4;
+            public (int, int, int, int, int, int, int) tuple7;
         }
 
         [Test]
@@ -118,15 +118,15 @@ namespace DecTest
             parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <ValueDec decName=""TestDec"">
-                        <t_is>
+                        <tupleIs>
                             <li>4</li>
                             <li>cows</li>
-                        </t_is>
-                        <t_si>
+                        </tupleIs>
+                        <tupleSi>
                             <li>horses</li>
                             <li>8</li>
-                        </t_si>
-                        <t_ld>
+                        </tupleSi>
+                        <tupleLd>
                             <li>
                                 <li>1</li>
                                 <li>2</li>
@@ -136,27 +136,27 @@ namespace DecTest
                                 <sheep>9</sheep>
                                 <goats>99</goats>
                             </li>
-                        </t_ld>
+                        </tupleLd>
 
-                        <t_1>
+                        <tuple1>
                             <li>11</li>
-                        </t_1>
-                        <t_2>
+                        </tuple1>
+                        <tuple2>
                             <li>21</li>
                             <li>22</li>
-                        </t_2>
-                        <t_3>
+                        </tuple2>
+                        <tuple3>
                             <li>31</li>
                             <li>32</li>
                             <li>33</li>
-                        </t_3>
-                        <t_4>
+                        </tuple3>
+                        <tuple4>
                             <li>41</li>
                             <li>42</li>
                             <li>43</li>
                             <li>44</li>
-                        </t_4>
-                        <t_7>
+                        </tuple4>
+                        <tuple7>
                             <li>51</li>
                             <li>52</li>
                             <li>53</li>
@@ -164,7 +164,7 @@ namespace DecTest
                             <li>55</li>
                             <li>56</li>
                             <li>57</li>
-                        </t_7>
+                        </tuple7>
                     </ValueDec>
                 </Decs>");
             parser.Finish();
@@ -174,15 +174,15 @@ namespace DecTest
             var result = Dec.Database<ValueDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
-            Assert.AreEqual(ValueTuple.Create(4, "cows"), result.t_is);
-            Assert.AreEqual(ValueTuple.Create("horses", 8), result.t_si);
-            Assert.AreEqual(ValueTuple.Create(new List<int>() { 1, 2, 3 }, new Dictionary<string, int> { { "sheep", 9 }, { "goats", 99 } }), result.t_ld);
+            Assert.AreEqual(ValueTuple.Create(4, "cows"), result.tupleIs);
+            Assert.AreEqual(ValueTuple.Create("horses", 8), result.tupleSi);
+            Assert.AreEqual(ValueTuple.Create(new List<int>() { 1, 2, 3 }, new Dictionary<string, int> { { "sheep", 9 }, { "goats", 99 } }), result.tupleLd);
 
-            Assert.AreEqual(ValueTuple.Create(11), result.t_1);
-            Assert.AreEqual(ValueTuple.Create(21, 22), result.t_2);
-            Assert.AreEqual(ValueTuple.Create(31, 32, 33), result.t_3);
-            Assert.AreEqual(ValueTuple.Create(41, 42, 43, 44), result.t_4);
-            Assert.AreEqual(ValueTuple.Create(51, 52, 53, 54, 55, 56, 57), result.t_7);
+            Assert.AreEqual(ValueTuple.Create(11), result.tuple1);
+            Assert.AreEqual(ValueTuple.Create(21, 22), result.tuple2);
+            Assert.AreEqual(ValueTuple.Create(31, 32, 33), result.tuple3);
+            Assert.AreEqual(ValueTuple.Create(41, 42, 43, 44), result.tuple4);
+            Assert.AreEqual(ValueTuple.Create(51, 52, 53, 54, 55, 56, 57), result.tuple7);
         }
 
         public class RecordableType : Dec.IRecordable
