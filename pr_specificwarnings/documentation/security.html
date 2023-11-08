@@ -1,0 +1,127 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Security </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Security ">
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/zorbathut/dec/blob/pr_specificwarnings/doc/documentation/security.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+  </head>
+
+  <script type="module" src="./../public/docfx.min.js"></script>
+
+  <script>
+    const theme = localStorage.getItem('theme') || 'auto'
+    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+  </script>
+
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="security">Security</h1>
+
+<h2 id="parser">Parser</h2>
+<p>Dec is currently not intended to be secure in any way. It is expected to be used in an environment where all pieces - the assemblies running, the function calls made on it, and the XML data passed in - are trusted. If you want to use it in a partially-untrusted environment I strongly recommend doing a security audit beforehand.</p>
+<p>That said, it shouldn't be unnecessarily insecure. Most of what it does is text parsing, and aside from obvious things like a malicious attacker sending a literally infinite XML document, it should generally not be exploitable in any way. Even though security is not a goal of this project, exploits that can be fixed without removing features are considered bugs.</p>
+<p>Some things an attacker can do that you may wish to be aware of:</p>
+<ul>
+<li>By choosing which class to create, an attacker may be ale to create classes of any type that inherit from types used as members in Decs. This will cause the default constructor to be executed. This can be mitigated by initializing all class members in Decs to non-null values; by modifying source, one could mostly remove the ability of this library to create new classes.</li>
+<li>This also applies to Decs themselves. Any Dec-inheriting class can be instantiated. This is harder to remove without eliminating necessary functionality.</li>
+<li>It's common for Decs to include Type members, usually as a factory pattern to create objects with complicated behavior. Type members are entirely unconstrained and can refer to any type, even types without the expected base class. This is best mitigated by implementing <a href="../future/typeconstraints.html">type constraints</a>.</li>
+<li>Dec will happily allow people to change both public and private members, including private members in base classes. This behavior is not always expected and can easily put objects in internally inconsistent states. This can be avoided by tagging internal-only fields with System.NonSerializedAttribute and accepting any input on any other field.</li>
+</ul>
+<p>If you think of another possible attack, please let me know and I'll add it to this list.</p>
+<h2 id="recorder">Recorder</h2>
+<p>While Dec XML data is expected to come from a secure source, savegames are not. People commonly trade savegames around and would be surprised if this turned out to be a major security issue.</p>
+<p>To mitigate this, Recorder saves do not support reflection-based serialization or deserialization. They also carefully enforce the type of class that can be created, preventing it from being instantiated in the first place if it is not a match for the underlying variable.</p>
+<p>This isn't capable of solving everything. <code>object</code> fields will allow any type to be instantiated, and <code>Type</code> fields can accept any type (at least until <a href="../future/typeconstraints.html">type constraints</a> are added.) However, most of these issues now rely on the game programmer instead of Recorder's infrastructure.</p>
+<p>I suspect there remain vulnerabilities. Please report them and I'll do my best to fix them.</p>
+<p>In the end, this is a client-side video game library, and you should not install mods or run savegames from untrusted sources; this has been a vulnerability in games for many years and it's unlikely to stop now.</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/zorbathut/dec/blob/pr_specificwarnings/doc/documentation/security.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

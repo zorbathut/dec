@@ -1,0 +1,160 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Setup </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Setup ">
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/zorbathut/dec/blob/pr_specificwarnings/doc/quickstart/setup.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+  </head>
+
+  <script type="module" src="./../public/docfx.min.js"></script>
+
+  <script>
+    const theme = localStorage.getItem('theme') || 'auto'
+    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+  </script>
+
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="setup">Setup</h1>
+
+<p>Dec is designed to be initialized exactly once, at the beginning of your program. Normally you'll want to initialize it after displaying your initial loading screen but before displaying the main menu. This allows you to include Dec-authored information within the main menu, such as difficulty settings, keybinds, or savegame metadata.</p>
+<p>The exact way of accomplishing this will depend on your engine and your game architecture. On Unity, we recommend <a href="https://docs.unity3d.com/ScriptReference/RuntimeInitializeOnLoadMethodAttribute-ctor.html">RuntimeInitializeOnLoadMethod</a>; on Godot, <a href="https://docs.godotengine.org/en/stable/getting_started/step_by_step/singletons_autoload.html">AutoLoad</a>. These are not the only solutions and you should use whatever you feel most comfortable with, as long as you can guarantee that the following code will be run exactly once each time the game is started.</p>
+<h2 id="summary">Summary</h2>
+<p>Most initial Dec initialization routines will look like this.</p>
+<pre><code class="lang-cs">void StartupDec()
+{
+    // If your game code isn't in a namespace, you don't need this.
+    // If it is, update this to the appropriate namespace.
+    Dec.Config.UsingNamespaces = new string[] { &quot;YourGame&quot; };
+
+    var parser = new Dec.Parser();
+    parser.AddDirectory(&quot;data&quot;);
+    parser.Finish();
+}
+</code></pre>
+<p>Read on for more explanation.</p>
+<h2 id="logging">Logging</h2>
+<p>Dec will generate warning and error messages. <i>It is strongly recommended that you make these unignorable to developers.</i> Popup windows and modal dialogs may be appropriate here; Dec does its best to recover from errors, which is great for mod compatibility but can be frustrating for developers if the error message is easily missable.</p>
+<p>By default, Dec will output to your normal system error log (Unity log for Unity programs, C# console otherwise). If you have your own logging framework, or want to decorate Dec messages with a recognizable tag, this is the place to do it. <a class="xref" href="../api/Dec.Config.html#Dec_Config_InfoHandler">Dec.Config.InfoHandler</a>, <a class="xref" href="../api/Dec.Config.html#Dec_Config_WarningHandler">Dec.Config.WarningHandler</a>, <a class="xref" href="../api/Dec.Config.html#Dec_Config_ErrorHandler">Dec.Config.ErrorHandler</a>, and <a class="xref" href="../api/Dec.Config.html#Dec_Config_ExceptionHandler">Dec.Config.ExceptionHandler</a> can all be assigned separately for their respective type of log message.</p>
+<pre><code class="lang-cs">Dec.Config.InfoHandler = str =&gt; YourGame.Logging.LogInfoMessage(str);
+Dec.Config.WarningHandler = str =&gt; YourGame.Logging.LogWarningMessage(str);
+Dec.Config.ErrorHandler = str =&gt; YourGame.Logging.LogErrorMessage(str);
+Dec.Config.ExceptionHandler = e =&gt; YourGame.Logging.LogException(e);
+</code></pre>
+<h2 id="exceptions">Exceptions</h2>
+<p>As mentioned above, Dec attempts to recover from errors whenever possible. However, we've found that new Dec developers often miss error messages and end up very confused. To help with that, Dec's default log handler throws exceptions on warnings and errors, along with an explanatory message about how this can be suppressed; specifically, through <a class="xref" href="../api/Dec.Config.html#Dec_Config_DefaultHandlerThrowExceptions">Dec.Config.DefaultHandlerThrowExceptions</a>.</p>
+<pre><code class="lang-cs">Dec.Config.DefaultHandlerThrowExceptions = Dec.Config.DefaultExceptionBehavior.Never;
+</code></pre>
+<p>If you want to keep the exception behavior, but don't want the message, the message alone can be suppressed with <a class="xref" href="../api/Dec.Config.html#Dec_Config_DefaultHandlerShowConfigOnException">Dec.Config.DefaultHandlerShowConfigOnException</a>.</p>
+<pre><code class="lang-cs">Dec.Config.DefaultHandlerShowConfigOnException = false;
+</code></pre>
+<p>If you've defined your own logging handlers, Dec's default exception throwing will be automatically disabled. You can throw your own exceptions if you prefer that behavior.</p>
+<h2 id="namespaces">Namespaces</h2>
+<p>It's common to specify classes within Dec XML. It's also common for games to be contained within their own namespaces, which makes class names verbose and slow to type. <a class="xref" href="../api/Dec.Config.html#Dec_Config_UsingNamespaces">Dec.Config.UsingNamespaces</a> lets you provide Dec with your game namespaces in the manner of a C# <code>using</code> directive. You can specify as many namespaces as you like.</p>
+<pre><code class="lang-cs">Dec.Config.UsingNamespaces = new string[] { &quot;YourGame&quot;, &quot;YourGame.Gameplay&quot; };
+</code></pre>
+<h2 id="parsing">Parsing</h2>
+<p>Dec construction is done via a class named <a class="xref" href="../api/Dec.Parser.html">Dec.Parser</a>. At some point in the future Parser will support multithreaded parsing and incremental parsing. That day is not today, and at the moment it's a simple interface for feeding in XML data.</p>
+<p>Dec files are simple XML files, normally stored along with the rest of your game data. Most people will simply put these in a dedicated subdirectory and <a class="xref" href="../api/Dec.Parser.html#Dec_Parser_AddDirectory_">Dec.Parser.AddDirectory()</a> will scan the entire directory for <code>*.xml</code> files (or other extensions, provided as a parameter to the function) to make this as easy as possible.</p>
+<pre><code class="lang-cs">var parser = new Dec.Parser();
+parser.AddDirectory(&quot;data&quot;);
+parser.Finish();
+</code></pre>
+<p>Parser can be garbage-collected after this completes.</p>
+<p>If you need to add files manually, <a class="xref" href="../api/Dec.Parser.html#Dec_Parser_AddFile_">Dec.Parser.AddFile()</a> exists; if your XML data is stored in some format besides plain files, <a class="xref" href="../api/Dec.Parser.html#Dec_Parser_AddStream_">Dec.Parser.AddStream()</a> or <a class="xref" href="../api/Dec.Parser.html#Dec_Parser_AddString_">Dec.Parser.AddString()</a> allows you to add raw XML data.</p>
+<p>On Unity, it's likely that you'll place XML files inside the StreamingAssets directory, in which case you'd want to read them using Unity's <a href="https://docs.unity3d.com/ScriptReference/Application-streamingAssetsPath.html">Application.streamingAssetsPath</a> property.</p>
+<pre><code class="lang-cs">var parser = new Dec.Parser();
+parser.AddDirectory(Application.streamingAssetsPath);
+parser.Finish();
+</code></pre>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/zorbathut/dec/blob/pr_specificwarnings/doc/quickstart/setup.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
