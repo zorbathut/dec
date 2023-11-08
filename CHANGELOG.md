@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 
 
+## [Unreleased]
+### Fixed
+* A lot of warnings.
+
+
 ## [v0.5.1]
 ### Notes
 * Despite the length of this changelog, this is mostly minor bugfixes and documentation. The "big feature" is an Extra package that I do not recommend using in production until it has a *lot* more work.

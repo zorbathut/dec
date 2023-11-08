@@ -366,11 +366,11 @@ namespace DecTest
         public class Foo<T, U>
         {
             public class Solo { }
-            public class Generic<U> { }
+            public class Generic<K> { }
 
             public class Overloaded { }
-            public class Overloaded<U> { }
-            public class Overloaded<U, V> { }
+            public class Overloaded<K> { }
+            public class Overloaded<K, V> { }
         }
     }
 }

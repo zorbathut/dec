@@ -490,7 +490,6 @@ namespace Dec
 
             var recorderChildContext = recorderContext.CreateChild();
 
-            int i = 0;
             foreach (var fieldElement in xml.Elements())
             {
                 if (fieldElement.Name.LocalName != "li")
@@ -509,7 +508,6 @@ namespace Dec
 
             var recorderChildContext = recorderContext.CreateChild();
 
-            int i = 0;
             foreach (var fieldElement in xml.Elements())
             {
                 if (fieldElement.Name.LocalName != "li")

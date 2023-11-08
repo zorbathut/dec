@@ -227,7 +227,6 @@ namespace RecorderEnumeratorTest
         [Dec.RecorderEnumerator.RecordableClosures]
         public void SelectEnumerable([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
         {
-            int k = 3;
             var range = FakeRange().Select(i => i.ToString()).GetEnumerator();
             range.MoveNext();
             range.MoveNext();
@@ -242,7 +241,6 @@ namespace RecorderEnumeratorTest
         [Dec.RecorderEnumerator.RecordableClosures]
         public void SelectRange([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
         {
-            int k = 3;
             var range = Enumerable.Range(0, 20).Select(i => i.ToString()).GetEnumerator();
             range.MoveNext();
             range.MoveNext();
@@ -257,7 +255,6 @@ namespace RecorderEnumeratorTest
         [Dec.RecorderEnumerator.RecordableClosures]
         public void SelectArray([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
         {
-            int k = 3;
             var array = Enumerable.Range(0, 20).ToArray();
             var range = array.Select(i => i.ToString()).GetEnumerator();
             range.MoveNext();
@@ -273,7 +270,6 @@ namespace RecorderEnumeratorTest
         [Dec.RecorderEnumerator.RecordableClosures]
         public void SelectList([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
         {
-            int k = 3;
             var list = Enumerable.Range(0, 20).ToList();
             var range = list.Select(i => i.ToString()).GetEnumerator();
             range.MoveNext();
@@ -289,7 +285,6 @@ namespace RecorderEnumeratorTest
         [Dec.RecorderEnumerator.RecordableClosures]
         public void SelectMany([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
         {
-            int k = 3;
             var range = Enumerable.Range(0, 5).SelectMany(i => Enumerable.Range(0, i)).GetEnumerator();
             range.MoveNext();
             range.MoveNext();

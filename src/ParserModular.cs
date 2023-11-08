@@ -142,14 +142,6 @@ namespace Dec
         // Modules
         internal List<Module> modules = new List<Module>();
 
-        // A list of inheritance-based work that still has to be resolved
-        private struct InheritanceJob
-        {
-            public Dec target;
-            public ReaderNode node;
-            public string parent;
-        }
-
         // Used for static reference validation
         private static Action s_StaticReferenceHandler = null;
 
