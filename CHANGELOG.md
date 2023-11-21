@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 
 
 ## [Unreleased]
+### Improved
+* Error messages when passing null or empty strings to Parser.
+
 ### Fixed
 * A lot of warnings.
 * TypeSerialization.Overloaded test inconsistencies.

@@ -29,6 +29,12 @@ namespace Dec
             /// <param name="directory">The directory to look for files in.</param>
             public void AddDirectory(string directory)
             {
+                if (directory.IsNullOrEmpty())
+                {
+                    Dbg.Err("Attempted to add a null or empty directory to the parser; this is probably wrong");
+                    return;
+                }
+
                 foreach (var file in Directory.GetFiles(directory, "*.xml"))
                 {
                     if (!System.IO.Path.GetFileName(file).StartsWith("."))
@@ -52,6 +58,12 @@ namespace Dec
             /// <param name="stringName">A human-readable identifier useful for debugging. Generally, the name of the file that the string was read from. Not required; will be derived from filename automatically.</param>
             public void AddFile(Parser.FileType fileType, string filename, string identifier = null)
             {
+                if (filename.IsNullOrEmpty())
+                {
+                    Dbg.Err("Attempted to add a null or empty filename to the parser; this is probably wrong");
+                    return;
+                }
+
                 if (identifier == null)
                 {
                     // This is imperfect, but good enough. People can pass their own identifier in if they want something clever.
@@ -70,6 +82,12 @@ namespace Dec
             /// <param name="identifier">A human-readable identifier useful for debugging. Generally, the name of the file that the stream was built from. Not required; will be derived from filename automatically</param>
             public void AddStream(Parser.FileType fileType, Stream stream, string identifier = "(unnamed)")
             {
+                if (stream == null)
+                {
+                    Dbg.Err("Attempted to add a null stream to the parser; this is probably wrong");
+                    return;
+                }
+
                 using (var reader = new StreamReader(stream))
                 {
                     AddTextReader(fileType, reader, identifier);
@@ -82,6 +100,12 @@ namespace Dec
             /// <param name="identifier">A human-readable identifier useful for debugging. Generally, the name of the file that the string was built from. Not required, but helpful.</param>
             public void AddString(Parser.FileType fileType, string contents, string identifier = "(unnamed)")
             {
+                if (contents.IsNullOrEmpty())
+                {
+                    Dbg.Err("Attempted to add a null or empty string to the parser; this is probably wrong");
+                    return;
+                }
+
                 // This is a really easy error to make; we might as well handle it.
                 if (contents.EndsWith(".xml"))
                 {
@@ -236,7 +260,7 @@ namespace Dec
                         foreach (var readerDec in reader.ParseDecs())
                         {
                             var id = (readerDec.type.GetDecRootType(), readerDec.name);
-                            
+
                             var collidingDec = seenDecs.TryGetValue(id);
                             if (collidingDec != null)
                             {
@@ -250,7 +274,7 @@ namespace Dec
 
                                 registeredDecs.Remove(id);
                             }
-                            
+
                             seenDecs[id] = readerDec.node;
 
                             if (!registeredDecs.TryGetValue(id, out var list))
@@ -418,7 +442,7 @@ namespace Dec
                             // Otherwise we shouldn't even expect this to have been registered, but at least there's literally no fields in it so it doesn't matter
                             Dbg.Err($"Failed to properly register {stat}; you may be missing a call to Dec.StaticReferencesAttribute.Initialized() in its static constructor, or the class may already have been initialized elsewhere (this should have thrown an error)");
                         }
-                        
+
                         s_StaticReferenceHandler = null;
                     }
                 }

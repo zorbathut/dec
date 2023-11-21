@@ -266,5 +266,89 @@ namespace DecTest
             Assert.AreEqual(40, Dec.Database<IntDec>.Get("TestDec1").value);
             Assert.AreEqual(80, Dec.Database<IntDec>.Get("TestDec2").value);
         }
+
+        [Test]
+        public void NullDirectory([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
+
+            var parser = new Dec.Parser();
+            ExpectErrors((() => parser.AddDirectory(null)));
+            parser.Finish();
+
+            DoParserTests(mode);
+        }
+
+        [Test]
+        public void EmptyStringDirectory([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
+
+            var parser = new Dec.Parser();
+            ExpectErrors((() => parser.AddDirectory("")));
+            parser.Finish();
+
+            DoParserTests(mode);
+        }
+
+        [Test]
+        public void NullFilename([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
+
+            var parser = new Dec.Parser();
+            ExpectErrors((() => parser.AddFile(Dec.Parser.FileType.Xml, null)));
+            parser.Finish();
+
+            DoParserTests(mode);
+        }
+
+        [Test]
+        public void EmptyStringFilename([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
+
+            var parser = new Dec.Parser();
+            ExpectErrors((() => parser.AddFile(Dec.Parser.FileType.Xml, "")));
+            parser.Finish();
+
+            DoParserTests(mode);
+        }
+
+        [Test]
+        public void NullString([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
+
+            var parser = new Dec.Parser();
+            ExpectErrors((() => parser.AddString(Dec.Parser.FileType.Xml, null)));
+            parser.Finish();
+
+            DoParserTests(mode);
+        }
+
+        [Test]
+        public void EmptyStringString([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
+
+            var parser = new Dec.Parser();
+            ExpectErrors((() => parser.AddString(Dec.Parser.FileType.Xml, "")));
+            parser.Finish();
+
+            DoParserTests(mode);
+        }
+
+        [Test]
+        public void NullStream([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
+
+            var parser = new Dec.Parser();
+            ExpectErrors((() => parser.AddStream(Dec.Parser.FileType.Xml, null)));
+            parser.Finish();
+
+            DoParserTests(mode);
+        }
     }
 }
