@@ -7,6 +7,9 @@ namespace DecTest
     using System.Reflection;
     using System.Xml.Linq;
 
+    namespace OverloadedSampleA { public class TooManyOfThese { } }
+    namespace OverloadedSampleB { public class TooManyOfThese { } }
+
     public class WithinNamespace
     {
         public class NestedClass
@@ -106,10 +109,9 @@ namespace DecTest
         [Test]
         public void Overloaded()
         {
-            // I'm not really guaranteed any of these besides System.IO, but this way at least I've got a good shot.
-            Dec.Config.UsingNamespaces = new string[] { "System.IO", "System.Internal", "NUnit.VisualStudio.TestAdapter.Dump" };
+            Dec.Config.UsingNamespaces = new string[] { "DecTest.OverloadedSampleA", "DecTest.OverloadedSampleB" };
 
-            ExpectErrors(() => Assert.IsNotNull(parseType("File")));
+            ExpectErrors(() => Assert.IsNotNull(parseType("TooManyOfThese")));
         }
 
         [Test]
@@ -320,7 +322,7 @@ namespace DecTest
         public void OverloadedNames()
         {
             Dec.Config.UsingNamespaces = new string[] { "DecTest.OverloadedNames" };
-            
+
             TypeConversionBidirectional(typeof(OverloadedNames.Foo.Solo), "Foo.Solo");
             TypeConversionBidirectional(typeof(OverloadedNames.Foo.Generic<int>), "Foo.Generic<int>");
             TypeConversionBidirectional(typeof(OverloadedNames.Foo.Overloaded), "Foo.Overloaded");
