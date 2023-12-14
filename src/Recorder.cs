@@ -405,7 +405,7 @@ namespace Dec
 
                                 if (refInstance != refInstanceOutput)
                                 {
-                                    Dbg.Err($"{reference.node.GetInputContext()}: Something really bizarre has happened and we got the wrong object back. Things are probably irrevocably broken. Please report this as a bug in Dec.");
+                                    Dbg.Err($"{reference.node.GetInputContext()}: Internal error, got the wrong object back from ParseElement. Things are probably irrevocably broken. Please report this as a bug in Dec.");
                                 }
                             });
                         }

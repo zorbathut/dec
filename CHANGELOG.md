@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 * Error messages when passing null or empty strings to Parser.
 * Project configuration revamp to follow established standards for framework choice.
 * Better error reporting for Converter read exceptions.
+* Tagged an internal-error message as an internal error.
 
 ### Fixed
 * A lot of warnings.
