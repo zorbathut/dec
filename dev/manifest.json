@@ -94,6 +94,16 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Dec.ConverterReadException.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.ConverterReadException.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Dec.ConverterRecord-1.yml",
       "output": {
         ".html": {

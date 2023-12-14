@@ -315,6 +315,31 @@ references:
   fullName.vb: Dec.ConverterFactory(Of T).Write
   nameWithType: ConverterFactory<T>.Write
   nameWithType.vb: ConverterFactory(Of T).Write
+- uid: Dec.ConverterReadException
+  name: ConverterReadException
+  href: api/Dec.ConverterReadException.html
+  commentId: T:Dec.ConverterReadException
+  fullName: Dec.ConverterReadException
+  nameWithType: ConverterReadException
+- uid: Dec.ConverterReadException.#ctor(Dec.InputContext,System.Object,System.Exception)
+  name: ConverterReadException(InputContext, object, Exception)
+  href: api/Dec.ConverterReadException.html#Dec_ConverterReadException__ctor_Dec_InputContext_System_Object_System_Exception_
+  commentId: M:Dec.ConverterReadException.#ctor(Dec.InputContext,System.Object,System.Exception)
+  name.vb: New(InputContext, Object, Exception)
+  fullName: Dec.ConverterReadException.ConverterReadException(Dec.InputContext, object, System.Exception)
+  fullName.vb: Dec.ConverterReadException.New(Dec.InputContext, Object, System.Exception)
+  nameWithType: ConverterReadException.ConverterReadException(InputContext, object, Exception)
+  nameWithType.vb: ConverterReadException.New(InputContext, Object, Exception)
+- uid: Dec.ConverterReadException.#ctor*
+  name: ConverterReadException
+  href: api/Dec.ConverterReadException.html#Dec_ConverterReadException__ctor_
+  commentId: Overload:Dec.ConverterReadException.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: Dec.ConverterReadException.ConverterReadException
+  fullName.vb: Dec.ConverterReadException.New
+  nameWithType: ConverterReadException.ConverterReadException
+  nameWithType.vb: ConverterReadException.New
 - uid: Dec.ConverterRecordDynamic
   name: ConverterRecordDynamic
   href: api/Dec.ConverterRecordDynamic.html
