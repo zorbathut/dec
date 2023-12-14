@@ -1,0 +1,141 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Modding </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Modding ">
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/zorbathut/dec/blob/feature_framework/doc/documentation/modding.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+  </head>
+
+  <script type="module" src="./../public/docfx.min.js"></script>
+
+  <script>
+    const theme = localStorage.getItem('theme') || 'auto'
+    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+  </script>
+
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="modding">Modding</h1>
+
+<p>A major goal of Dec is to make it easy to support user-created game mods. This feature contains a few major parts:</p>
+<ul>
+<li>Standard descriptors for defining mods and defining mods' interactions with each other (see <a href="https://wiki.factorio.com/Tutorial:Mod_structure#info.json">Factorio's info.json file</a> for an example of this)</li>
+<li>A load system that loads mod .dll's and code in an appropriate order</li>
+<li>The ability to override and modify Dec data within mods, with appropriate error messages and diagnostics</li>
+</ul>
+<p>This feature is currently highly unfinished and only the third part is implemented. However, the third part is the only part that strictly needs to be provided by Dec itself, so Dec is now technically capable of supporting game mods.</p>
+<h2 id="fundamentals">Fundamentals</h2>
+<p>Dec organizes its input into groups of files called &quot;modules&quot;, defined by <a class="xref" href="../api/Dec.ParserModular.Module.html"><code>Dec.ParserModular.Module</code></a>. Each module represents a single mod's worth of data. Modules are created via <a class="xref" href="../api/Dec.ParserModular.html"><code>Dec.ParserModular</code></a>, which is a mod-capable replacement for <a class="xref" href="../api/Dec.Parser.html"><code>Dec.Parser</code></a>.</p>
+<p>(Dec.Parser is just a thin wrapper around Dec.ParserModule to make it easier to develop non-moddable games.)</p>
+<p>Be aware that module load order is <em>critical</em>, and right now, this is defined simply as the order in which Module objects are created.</p>
+<pre><code class="lang-cs">var parser = new Dec.ParserModular();
+parser.CreateModule(&quot;Base&quot;).AddDirectory(&quot;XML&quot;);
+
+// Order alphabetically to ensure that the load order is consistent
+var modDirectories = Directory.GetDirectories(&quot;Mods&quot;).OrderBy(d =&gt; d);
+foreach (var modDirectory in modDirectories)
+{
+    var modName = Path.GetFileName(modDirectory);
+    parser.CreateModule(modName).AddDirectory(Path.Combine(modDirectory, &quot;XML&quot;));
+}
+
+parser.Finish();
+</code></pre>
+<h2 id="merge-modes">Merge Modes</h2>
+<p>Mods often want to modify existing Decs in various ways. This behavior is similar to how <a href="inheritance.html">inheritance</a> works. See <a href="mergemodes.html">merge modes</a> for details.</p>
+<h2 id="security">Security</h2>
+<p>Dec is designed for an environment where mod developers will be able to create mods based around C# DLLs. As it's nearly impossible to sandbox a C# DLL, Dec makes very little effort to add more security through the .xml files themselves. To make matters worse, a major tool for C# modding is <a href="https://github.com/pardeike/Harmony">Harmony</a>, which monkeypatches the C# runtime through inserting machine-code changes at runtime. This is also essentially impossible to sandbox.</p>
+<p>Historically, this seems to mostly work out; modders are generally not malicious. This is also not solvable without either requiring some form of sandboxable user-provided code, or without removing code entirely from the modding system.</p>
+<p>I'd like to solve this, but practically speaking this will not be solvable without either major engine-level changes or a completely separate programming language; the latter I consider undesirable, the former is extraordinarily unlikely for Unity.</p>
+<p>If your game design requires security against malicious mods, you should not use Dec.</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/zorbathut/dec/blob/feature_framework/doc/documentation/modding.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,121 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Introduction </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Introduction ">
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/zorbathut/dec/blob/feature_framework/doc/quickstart/introduction.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+  </head>
+
+  <script type="module" src="./../public/docfx.min.js"></script>
+
+  <script>
+    const theme = localStorage.getItem('theme') || 'auto'
+    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+  </script>
+
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="introduction">Introduction</h1>
+
+<p>Dec is a library for declaring asset types in XML. It includes extensive error reporting and recovery for ease of development, uses reflection to prevent writing lots of boilerplate code, is designed to allow easy moddability moddable by endusers (though not yet implemented), and includes a serialization system (intended for savegames, but often used for other things) that integrates cleanly with the underlying Dec types.</p>
+<h2 id="the-basics">The Basics</h2>
+<p>Dec types represent general categories of thing, such as &quot;monster&quot; or &quot;inventory item&quot;. They're C# classes that inherit from <a class="xref" href="../api/Dec.Dec.html">Dec.Dec</a>.</p>
+<p>Dec instances represent specific types of thing, such as &quot;Goblin&quot; or &quot;Cheese&quot;. They don't represent specific goblins or cheese items in the world, only the template that Goblins or Cheeses are based on. Dec instances are instances of Dec types, declared in XML files and created at runtime by the Dec library. Dec instances should be immutable during runtime; if you attack a goblin, it doesn't wound the global concept of a goblin, it wounds a specific goblin.</p>
+<p>Dec instances are created in XML (<a class="xref" href="../future/csv.html">with plans for CSV</a>), usually using a text editor.</p>
+<h2 id="examples">Examples</h2>
+<p>A Dec type <code>class MonsterDec</code> could refer to any monster that the player may fight. The class would include properties for maximum health, attacks, and loot tables. Dec instances would include Goblin, Bugbear, and GnollKing, all declared in XML. At runtime, you might create hundreds of monsters that refer to the Goblin dec for their stats, each with their own current health.</p>
+<p>A Dec type <code>class CardDec</code> could refer to a collectible card that the player assembles into decks. Hundreds of CardDec instances are declared in XML, although the player may see only a handful of them during each game. The class includes properties for cost, effects, and card art. Individual <code>class Card</code>s are created at runtime; each card can be upgraded or damaged during play, and <code>Card</code> contains both the card's Dec and the mutable status of that specific card.</p>
+<p>A Dec type <code>class KeybindDec</code> could refer to a single configurable keybind used during gameplay and displayed in the main menu under &quot;Options&quot;. The game creates a number of <code>class Keybind</code>s which store the actual keybind information. This data is then saved to disk using the serialization system and loaded on startup.</p>
+<p>A Dec type <code>class ItemDec</code> could refer to anything the player can pick up and store in their inventory. <code>class WeaponDec</code> and <code>class ArmorDec</code> inherit from it. <code>ItemDec</code> lists name, weight, value, and description. <code>WeaponDec</code> includes damage and attack types, <code>ArmorDec</code> includes detailed stats that describe how it resists damage. When an item is dropped, the game instantiates a <code>class Item</code> that links to an <code>ItemDec</code> and includes extra per-item information, like wear and random stats.</p>
+<p>In addition, a Dec type <code>class AlchemyEffectDec</code> could refer to any possible effect that can be added to potions via a player Alchemy skill. The potions themselves would be a specific <code>ItemDec</code> Dec instance, but because there are literally trillions of possible player-crafted potion combinations, it would be impossible to make one Dec instance for each unique potion. As a result, there's a single <code>class Potion</code> that inherits from <code>Item</code> and includes properties listing which set of <code>AlchemyEffectDec</code>'s would occur if the player drank (or threw) this potion.</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/zorbathut/dec/blob/feature_framework/doc/quickstart/introduction.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

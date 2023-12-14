@@ -1,0 +1,545 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class Recorder
+ </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class Recorder
+ ">
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/zorbathut/dec/new/feature_framework/apiSpec/new?filename=Dec_Recorder.md&amp;value=---%0Auid%3A%20Dec.Recorder%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+  </head>
+
+  <script type="module" src="./../public/docfx.min.js"></script>
+
+  <script>
+    const theme = localStorage.getItem('theme') || 'auto'
+    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+  </script>
+
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Dec.Recorder">
+
+
+
+  <h1 id="Dec_Recorder" data-uid="Dec.Recorder" class="text-break">
+    Class Recorder
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/feature_framework/src/Recorder.cs/#L60"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="Dec.html">Dec</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>dec.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Main class for the serialization/deserialization system.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract class Recorder</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">Recorder</span></div>
+    </dd>
+  </dl>
+
+
+
+
+
+
+
+  <h2 id="Dec_Recorder_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>Recorder is used to call the main functions for serialization/deserialization. This includes both the static initiation functions (Read, Write) and the per-element status functions.</p>
+<p>To start serializing or deserializing an object, see Recorder.Read and Recorder.Write.</p>
+</div>
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Dec_Recorder_Mode_" data-uid="Dec.Recorder.Mode*"></a>
+
+  <h3 id="Dec_Recorder_Mode" data-uid="Dec.Recorder.Mode">
+  Mode
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/feature_framework/src/Recorder.cs/#L271"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Indicates whether this Recorder is being used for reading or writing.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract Recorder.Direction Mode { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dec.Recorder.html">Recorder</a>.<a class="xref" href="Dec.Recorder.Direction.html">Direction</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dec_Recorder_Clone_" data-uid="Dec.Recorder.Clone*"></a>
+
+  <h3 id="Dec_Recorder_Clone__1___0_" data-uid="Dec.Recorder.Clone``1(``0)">
+  Clone&lt;T&gt;(T)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/feature_framework/src/Recorder.cs/#L421"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Makes a copy of an object.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static T Clone&lt;T&gt;(T obj)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>obj</code> <span class="xref">T</span></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><span class="xref">T</span></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+  <h4 class="section" id="Dec_Recorder_Clone__1___0__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>This is logically equivalent to Write(Read(obj)), but may be much faster.</p>
+</div>
+
+
+
+
+  <a id="Dec_Recorder_Read_" data-uid="Dec.Recorder.Read*"></a>
+
+  <h3 id="Dec_Recorder_Read__1_System_String_System_String_" data-uid="Dec.Recorder.Read``1(System.String,System.String)">
+  Read&lt;T&gt;(string, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/feature_framework/src/Recorder.cs/#L306"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Parses the output of Write, generating an object and all its related serialized data.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static T Read&lt;T&gt;(string input, string stringName = &quot;input&quot;)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>input</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>stringName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><span class="xref">T</span></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Dec_Recorder_RecordAsThis_" data-uid="Dec.Recorder.RecordAsThis*"></a>
+
+  <h3 id="Dec_Recorder_RecordAsThis__1___0__" data-uid="Dec.Recorder.RecordAsThis``1(``0@)">
+  RecordAsThis&lt;T&gt;(ref T)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/feature_framework/src/Recorder.cs/#L208"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Serialize or deserialize a member of a class as if it were this class.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void RecordAsThis&lt;T&gt;(ref T value)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>value</code> <span class="xref">T</span></dt>
+    <dd></dd>
+  </dl>
+
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+  <h4 class="section" id="Dec_Recorder_RecordAsThis__1___0___remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>This function serializes or deserializes a class member as if it were this entire class. Call it with a reference to the member.</p>
+<p>This is intended for cases where a class's contents are a single method and where an extra level of indirection in XML files isn't desired.</p>
+<p>In most cases, you don't need to do anything different for read vs. write; this function will figure out the details and do the right thing.</p>
+<p>This does not work, at all, if any of the classes in the <code>this</code> chain are inherited; it needs to be able to fall back on default types.</p>
+</div>
+
+
+
+
+  <a id="Dec_Recorder_Record_" data-uid="Dec.Recorder.Record*"></a>
+
+  <h3 id="Dec_Recorder_Record__1___0__System_String_" data-uid="Dec.Recorder.Record``1(``0@,System.String)">
+  Record&lt;T&gt;(ref T, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/feature_framework/src/Recorder.cs/#L191"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Serialize or deserialize a member of a class.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Record&lt;T&gt;(ref T value, string label)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>value</code> <span class="xref">T</span></dt>
+    <dd></dd>
+    <dt><code>label</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+  <h4 class="section" id="Dec_Recorder_Record__1___0__System_String__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>This function serializes or deserializes a class member. Call it with a reference to the member and a label for the member (usually the member's name.)</p>
+<p>In most cases, you don't need to do anything different for read vs. write; this function will figure out the details and do the right thing.</p>
+</div>
+
+
+
+
+  <a id="Dec_Recorder_Shared_" data-uid="Dec.Recorder.Shared*"></a>
+
+  <h3 id="Dec_Recorder_Shared" data-uid="Dec.Recorder.Shared">
+  Shared()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/feature_framework/src/Recorder.cs/#L255"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Allow sharing for class objects referenced during this call.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Recorder.Parameters Shared()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dec.Recorder.html">Recorder</a>.<a class="xref" href="Dec.Recorder.Parameters.html">Parameters</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="Dec_Recorder_Shared_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Shared objects can be referenced from multiple classes. During serialization, these links will be stored; during deserialization, these links will be recreated.
+This is handy if (for example) your entities need to refer to each other for AI or targeting reasons.</p>
+<p>However, when reading, shared Recorder fields <em>must</em> be initially set to <code>null</code>.</p>
+<p>Dec objects are essentially treated as value types, and will be referenced appropriately even without this.</p>
+<p>This is incompatible with WithFactory().</p>
+</div>
+
+
+
+
+  <a id="Dec_Recorder_WithFactory_" data-uid="Dec.Recorder.WithFactory*"></a>
+
+  <h3 id="Dec_Recorder_WithFactory_System_Collections_Generic_Dictionary_System_Type_System_Func_System_Type_System_Object___" data-uid="Dec.Recorder.WithFactory(System.Collections.Generic.Dictionary{System.Type,System.Func{System.Type,System.Object}})">
+  WithFactory(Dictionary&lt;Type, Func&lt;Type, object&gt;&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/feature_framework/src/Recorder.cs/#L237"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Add a factory layer to objects created during this call.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Recorder.Parameters WithFactory(Dictionary&lt;Type, Func&lt;Type, object&gt;&gt; factories)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>factories</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Type</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Type</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dec.Recorder.html">Recorder</a>.<a class="xref" href="Dec.Recorder.Parameters.html">Parameters</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="Dec_Recorder_WithFactory_System_Collections_Generic_Dictionary_System_Type_System_Func_System_Type_System_Object____remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>This allows you to create your own object initializer for things deserialized during this call. Standard Recorder functionality will apply on the object returned.
+This is sometimes a convenient way to set per-object defaults when deserializing.</p>
+<p>The initializer layout takes the form of a dictionary from Type to Func&lt;Type, object&gt;.
+When creating a new object, Dec will first look for a dictionary key of that type, then continue checking base types iteratively until it either finds a callback or passes <code>object</code>.
+That callback will be given a desired type and must return either an object of that type, an object of a type derived from that type, or <code>null</code>.
+On <code>null</code>, Dec will fall back to its default behavior. In each other case, it will then be deserialized as usual.</p>
+<p>The factory callback will persist until the next Recorder is called; recursive calls past that will be reset to default behavior.
+This means that it will effectively tunnel through supported containers such as List&lt;&gt; and Dictionary&lt;&gt;, allowing you to control the constructor of <code>CustomType</code> in <code> List&lt;CustomType&gt;</code>.</p>
+<p>Be aware that any classes created with a factory callback added <em>cannot</em> be referenced from multiple places in Record hierarchy - the normal ref structure does not function with them.
+Also, be aware that excessively deep hierarchies full of factory callbacks may result in performance issues when writing pretty-print XML; this is not likely to be a problem in normal code, however.
+For performance's sake, this function does not duplicate <code>factories</code> and may modify it for efficiency reasons.
+It can be reused, but should not be modified by the user once passed into a function once.</p>
+<p>This is incompatible with Shared().</p>
+</div>
+
+
+
+
+  <a id="Dec_Recorder_WriteValidation_" data-uid="Dec.Recorder.WriteValidation*"></a>
+
+  <h3 id="Dec_Recorder_WriteValidation__1___0_" data-uid="Dec.Recorder.WriteValidation``1(``0)">
+  WriteValidation&lt;T&gt;(T)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/feature_framework/src/Recorder.cs/#L291"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns C# validation code starting at an option.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string WriteValidation&lt;T&gt;(T target)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>target</code> <span class="xref">T</span></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Dec_Recorder_Write_" data-uid="Dec.Recorder.Write*"></a>
+
+  <h3 id="Dec_Recorder_Write__1___0_System_Boolean_" data-uid="Dec.Recorder.Write``1(``0,System.Boolean)">
+  Write&lt;T&gt;(T, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/feature_framework/src/Recorder.cs/#L276"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns a fully-formed XML document starting at an object.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string Write&lt;T&gt;(T target, bool pretty = false)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>target</code> <span class="xref">T</span></dt>
+    <dd></dd>
+    <dt><code>pretty</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/zorbathut/dec/blob/feature_framework/src/Recorder.cs/#L60" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
