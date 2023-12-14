@@ -364,8 +364,8 @@ namespace DecTest
                         <payload />
                         <after>4</after>
                     </ExceptionDec>
-                </Decs>");
-            ExpectErrors(() => parser.Finish(), errorValidator: error => error.Contains("EasilyDetectableMessage"));
+                </Decs>", identifier: "UniqueIdentifier");
+            ExpectErrors(() => parser.Finish(), errorValidator: error => error.Contains("EasilyDetectableMessage") && error.Contains("UniqueIdentifier"));
 
             DoParserTests(mode);
 
@@ -439,6 +439,221 @@ namespace DecTest
 
             // won't overwrite it
             Assert.AreEqual(1, Dec.Database<ExceptionRecoveryDec>.Get("TestDec").payloadStruct.Count);
+        }
+
+        public class ExceptionConverterHolder : Dec.IRecordable
+        {
+            public ExceptionConverterClass a;
+            public ExceptionConverterClass b;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Shared().Record(ref a, "a");
+                recorder.Shared().Record(ref b, "b");
+            }
+        }
+
+        public class ExceptionConverterDict : Dec.IRecordable
+        {
+            public Dictionary<ExceptionConverterClass, int> data;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Shared().Record(ref data, "data");
+            }
+        }
+
+        public class ExceptionConverterClass
+        {
+            public string payload;
+        }
+
+        public class ExceptionStringConverter : Dec.ConverterString<ExceptionConverterClass>
+        {
+            public override ExceptionConverterClass Read(string input, Dec.InputContext context)
+            {
+                throw new InvalidOperationException("EasilyDetectableMessage");
+            }
+
+            public override string Write(ExceptionConverterClass input)
+            {
+                return input.payload;
+            }
+        }
+
+        public class ExceptionRecordConverter : Dec.ConverterRecord<ExceptionConverterClass>
+        {
+            public override void Record(ref ExceptionConverterClass input, Dec.Recorder recorder)
+            {
+                if (recorder.Mode == Dec.Recorder.Direction.Read)
+                {
+                    throw new InvalidOperationException("EasilyDetectableMessage");
+                }
+
+                recorder.Record(ref input.payload, "payload");
+            }
+        }
+
+        public class ExceptionFactoryCreateConverter : Dec.ConverterFactory<ExceptionConverterClass>
+        {
+            public override void Write(ExceptionConverterClass input, Dec.Recorder recorder)
+            {
+                recorder.Record(ref input.payload, "payload");
+            }
+
+            public override ExceptionConverterClass Create(Dec.Recorder recorder)
+            {
+                throw new InvalidOperationException("EasilyDetectableMessage");
+            }
+
+            public override void Read(ref ExceptionConverterClass input, Dec.Recorder recorder)
+            {
+                recorder.Record(ref input.payload, "payload");
+            }
+        }
+
+        public class ExceptionFactoryReadConverter : Dec.ConverterFactory<ExceptionConverterClass>
+        {
+            public override void Write(ExceptionConverterClass input, Dec.Recorder recorder)
+            {
+                recorder.Record(ref input.payload, "payload");
+            }
+
+            public override ExceptionConverterClass Create(Dec.Recorder recorder)
+            {
+                return new ExceptionConverterClass();
+            }
+
+            public override void Read(ref ExceptionConverterClass input, Dec.Recorder recorder)
+            {
+                throw new InvalidOperationException("EasilyDetectableMessage");
+            }
+        }
+
+        [Test]
+        public void ExceptionStringRead([ValuesExcept(RecorderMode.Clone, RecorderMode.Validation)] RecorderMode mode, [Values] bool asRef)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ExceptionStringConverter) } });
+            new Dec.Parser().Finish(); // we're only doing this to kick off the converter init; this is bad and I should fix it
+
+            var dat = new ExceptionConverterHolder();
+            dat.a = new ExceptionConverterClass();
+            dat.a.payload = "hello";
+
+            if (asRef)
+            {
+                dat.b = dat.a;
+            }
+
+            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: true, readErrorValidator: err => err.Contains("EasilyDetectableMessage") && err.Contains("recorderTestInput"));
+
+            // not readable gets the firehose
+            Assert.IsNull(deserialized.a);
+            Assert.IsNull(deserialized.b);
+        }
+
+        [Test]
+        public void ExceptionStringReadAsKey([ValuesExcept(RecorderMode.Clone, RecorderMode.Validation)] RecorderMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ExceptionStringConverter) } });
+            new Dec.Parser().Finish(); // we're only doing this to kick off the converter init; this is bad and I should fix it
+
+            var dat = new ExceptionConverterDict();
+            dat.data = new Dictionary<ExceptionConverterClass, int>();
+            dat.data[new ExceptionConverterClass() { payload = "hello" }] = 42;
+
+            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: true, readErrorValidator: err =>
+            {
+                if (err.Contains("EasilyDetectableMessage") && err.Contains("recorderTestInput"))
+                {
+                    return true;
+                }
+
+                // multiple errors here
+                return err.Contains("Dictionary includes null key");
+            });
+
+            Assert.AreEqual(0, deserialized.data.Count);
+        }
+
+        [Test]
+        public void ExceptionRecordRead([ValuesExcept(RecorderMode.Clone, RecorderMode.Validation)] RecorderMode mode, [Values] bool asRef)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ExceptionRecordConverter) } });
+            new Dec.Parser().Finish(); // we're only doing this to kick off the converter init; this is bad and I should fix it
+
+            var dat = new ExceptionConverterHolder();
+            dat.a = new ExceptionConverterClass();
+            dat.a.payload = "hello";
+
+            if (asRef)
+            {
+                dat.b = dat.a;
+            }
+
+            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: true, readErrorValidator: err => err.Contains("EasilyDetectableMessage") && err.Contains("recorderTestInput"));
+
+            // should I clear this? I don't know
+            Assert.IsNotNull(deserialized.a);
+            if (asRef)
+            {
+                Assert.AreSame(deserialized.a, deserialized.b);
+            }
+            else
+            {
+                Assert.IsNull(deserialized.b);
+            }
+        }
+
+        [Test]
+        public void ExceptionFactoryCreate([ValuesExcept(RecorderMode.Clone, RecorderMode.Validation)] RecorderMode mode, [Values] bool asRef)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ExceptionFactoryCreateConverter) } });
+            new Dec.Parser().Finish(); // we're only doing this to kick off the converter init; this is bad and I should fix it
+
+            var dat = new ExceptionConverterHolder();
+            dat.a = new ExceptionConverterClass();
+            dat.a.payload = "hello";
+
+            if (asRef)
+            {
+                dat.b = dat.a;
+            }
+
+            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: true, readErrorValidator: err => err.Contains("EasilyDetectableMessage") && err.Contains("recorderTestInput"));
+
+            // not readable gets the firehose
+            Assert.IsNull(deserialized.a);
+            Assert.IsNull(deserialized.b);
+        }
+
+        [Test]
+        public void ExceptionFactoryRead([ValuesExcept(RecorderMode.Clone, RecorderMode.Validation)] RecorderMode mode, [Values] bool asRef)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ExceptionFactoryReadConverter) } });
+            new Dec.Parser().Finish(); // we're only doing this to kick off the converter init; this is bad and I should fix it
+
+            var dat = new ExceptionConverterHolder();
+            dat.a = new ExceptionConverterClass();
+            dat.a.payload = "hello";
+
+            if (asRef)
+            {
+                dat.b = dat.a;
+            }
+
+            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: true, readErrorValidator: err => err.Contains("EasilyDetectableMessage") && err.Contains("recorderTestInput"));
+
+            // should I clear this? I don't know
+            Assert.IsNotNull(deserialized.a);
+            if (asRef)
+            {
+                Assert.AreSame(deserialized.a, deserialized.b);
+            }
+            else
+            {
+                Assert.IsNull(deserialized.b);
+            }
         }
 
         public class RefsForThings

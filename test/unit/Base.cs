@@ -325,7 +325,7 @@ namespace DecTest
             Validation,
         }
 
-        public T DoRecorderRoundTrip<T>(T input, RecorderMode mode, Action<string> testSerializedResult = null, bool expectWriteErrors = false, bool expectWriteWarnings = false, bool expectReadErrors = false, bool expectReadWarnings = false)
+        public T DoRecorderRoundTrip<T>(T input, RecorderMode mode, Action<string> testSerializedResult = null, bool expectWriteErrors = false, bool expectWriteWarnings = false, bool expectReadErrors = false, bool expectReadWarnings = false, Func<string, bool> readErrorValidator = null)
         {
             if (mode == RecorderMode.Clone)
             {
@@ -340,7 +340,7 @@ namespace DecTest
                 }
                 if (expectErrors)
                 {
-                    ExpectErrors(DoClone, "DoRecorder.Clone");
+                    ExpectErrors(DoClone, "DoRecorder.Clone", errorValidator: readErrorValidator);
                 }
                 else if (expectWarnings)
                 {
@@ -407,12 +407,12 @@ namespace DecTest
             T deserialized = default;
             void DoDeserialize()
             {
-                deserialized = Dec.Recorder.Read<T>(serialized);
+                deserialized = Dec.Recorder.Read<T>(serialized, stringName: "recorderTestInput");
             }
             Assert.IsFalse(expectReadErrors && expectReadWarnings); // nyi
             if (expectReadErrors)
             {
-                ExpectErrors(DoDeserialize, "DoRecorder.Read");
+                ExpectErrors(DoDeserialize, "DoRecorder.Read", errorValidator: readErrorValidator);
             }
             else if (expectReadWarnings)
             {

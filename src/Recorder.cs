@@ -328,7 +328,16 @@ namespace Dec
                     {
                         if (converter is ConverterString converterString)
                         {
-                            refInstance = converterString.ReadObj(reference.node.GetText(), reference.node.GetInputContext());
+                            try
+                            {
+                                refInstance = converterString.ReadObj(reference.node.GetText(), reference.node.GetInputContext());
+                            }
+                            catch (Exception e)
+                            {
+                                Dbg.Ex(new ConverterReadException(reference.node.GetInputContext(), converter, e));
+
+                                refInstance = Serialization.GenerateResultFallback(refInstance, reference.type);
+                            }
 
                             // this does not need to be queued for parsing
                         }
@@ -338,15 +347,42 @@ namespace Dec
                             refInstance = reference.type.CreateInstanceSafe("object", reference.node);
 
                             // the next parse step
-                            furtherParsing.Add(() => converterRecord.RecordObj(refInstance, new RecorderReader(reference.node, readerContext)));
+                            furtherParsing.Add(() =>
+                            {
+                                try
+                                {
+                                    converterRecord.RecordObj(refInstance, new RecorderReader(reference.node, readerContext));
+                                }
+                                catch (Exception e)
+                                {
+                                    Dbg.Ex(new ConverterReadException(reference.node.GetInputContext(), converter, e));
+                                }
+                            });
                         }
                         else if (converter is ConverterFactory converterFactory)
                         {
                             // create the basic object
-                            refInstance = converterFactory.CreateObj(new RecorderReader(reference.node, readerContext, disallowShared: true));
+                            try
+                            {
+                                refInstance = converterFactory.CreateObj(new RecorderReader(reference.node, readerContext, disallowShared: true));
 
-                            // the next parse step
-                            furtherParsing.Add(() => converterFactory.ReadObj(refInstance, new RecorderReader(reference.node, readerContext)));
+                                // the next parse step, if we have one
+                                furtherParsing.Add(() =>
+                                {
+                                    try
+                                    {
+                                        converterFactory.ReadObj(refInstance, new RecorderReader(reference.node, readerContext));
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        Dbg.Ex(new ConverterReadException(reference.node.GetInputContext(), converter, e));
+                                    }
+                                });
+                            }
+                            catch (Exception e)
+                            {
+                                Dbg.Ex(new ConverterReadException(reference.node.GetInputContext(), converter, e));
+                            }
                         }
                         else
                         {
@@ -375,11 +411,7 @@ namespace Dec
                         }
                     }
 
-                    // If this is null, CreateInstanceSafe has done the error reporting, but we still don't want it in the array because it will break stuff downstream
-                    if (refInstance != null)
-                    {
-                        refDict[reference.id] = refInstance;
-                    }
+                    refDict[reference.id] = refInstance;
                 }
 
                 // link up the ref dict; we do this afterwards so we can verify that the object creation code is not using refs

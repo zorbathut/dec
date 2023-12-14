@@ -652,6 +652,12 @@ namespace Dec
                 }
 
                 object refObject = context.refs[refKey];
+                if (refObject == null && !type.IsValueType)
+                {
+                    // okay, good enough
+                    return refObject;
+                }
+
                 if (!type.IsAssignableFrom(refObject.GetType()))
                 {
                     Dbg.Err($"{refKeyNode.GetInputContext()}: Reference object {refKey} is of type {refObject.GetType()}, which cannot be converted to expected type {type}");
@@ -717,7 +723,7 @@ namespace Dec
                         }
                         catch (Exception e)
                         {
-                            Dbg.Ex(e);
+                            Dbg.Ex(new ConverterReadException(node.GetInputContext(), converter, e));
 
                             result = GenerateResultFallback(result, type);
                         }
@@ -766,7 +772,7 @@ namespace Dec
                             }
                             catch (Exception e)
                             {
-                                Dbg.Ex(e);
+                                Dbg.Ex(new ConverterReadException(node.GetInputContext(), converter, e));
 
                                 // no fallback needed, we already have a result
                             }
@@ -794,7 +800,14 @@ namespace Dec
 
                         if (result == null)
                         {
-                            result = converterFactory.CreateObj(new RecorderReader(node, context, disallowShared: true));
+                            try
+                            {
+                                result = converterFactory.CreateObj(new RecorderReader(node, context, disallowShared: true));
+                            }
+                            catch (Exception e)
+                            {
+                                Dbg.Ex(new ConverterReadException(node.GetInputContext(), converter, e));
+                            }
                         }
 
                         // context might be null; that's OK at the moment
@@ -806,7 +819,7 @@ namespace Dec
                             }
                             catch (Exception e)
                             {
-                                Dbg.Ex(e);
+                                Dbg.Ex(new ConverterReadException(node.GetInputContext(), converter, e));
 
                                 // no fallback needed, we already have a result
                             }
@@ -1355,7 +1368,16 @@ namespace Dec
                     if (converter is ConverterString converterString)
                     {
                         // context might be null; that's OK at the moment
-                        result = converterString.ReadObj(text, context);
+                        try
+                        {
+                            result = converterString.ReadObj(text, context);
+                        }
+                        catch (Exception e)
+                        {
+                            Dbg.Ex(new ConverterReadException(context, converter, e));
+
+                            result = GenerateResultFallback(result, type);
+                        }
                     }
                     else if (converter is ConverterRecord converterRecord)
                     {

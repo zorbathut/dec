@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 ### Improved
 * Error messages when passing null or empty strings to Parser.
 * Project configuration revamp to follow established standards for framework choice.
+* Better error reporting for Converter read exceptions.
 
 ### Fixed
 * A lot of warnings.
