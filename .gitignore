@@ -11,3 +11,6 @@
 # Built assets
 **/bin
 **/obj
+
+# Code coverage
+lcov.*.info
