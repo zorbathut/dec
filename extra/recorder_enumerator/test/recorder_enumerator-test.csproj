@@ -1,28 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Configurations>Debug 2.1;Release 2.1;Debug 3.1;Release 3.1;Debug 7.0;Release 7.0</Configurations>
+    <Configurations>Release;Debug</Configurations>
+    <TargetFrameworks>net6.0</TargetFrameworks>
     
     <!-- 0649: "is never assigned to, and will always have its default value null". This is obviously pointless with such a reflection-heavy library. -->
     <NoWarn>0649</NoWarn>
   </PropertyGroup>
-  
-  <PropertyGroup>
-    <TargetFramework>netcoreapp7.0</TargetFramework>
-  </PropertyGroup>
-  
-  <PropertyGroup Condition="$(Configuration.Contains('2.1'))">
-    <TargetFramework>netcoreapp2.1</TargetFramework>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="$(Configuration.Contains('3.1'))">
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-  </PropertyGroup>
-  
+    
   <PropertyGroup Condition="$(Configuration.Contains('Debug'))">
     <Optimize>false</Optimize>
   </PropertyGroup>
-
   
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="1.3.0">

@@ -1,16 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	<Configurations>Debug 2.1;Release 2.1;Debug 3.1;Release 3.1;Debug 7.0;Release 7.0</Configurations>
-    <TargetFramework>netcoreapp7.0</TargetFramework>
-  </PropertyGroup>
-  
-  <PropertyGroup Condition="$(Configuration.Contains('2.1'))">
-    <TargetFramework>netcoreapp2.1</TargetFramework>
-  </PropertyGroup>
+    <Configurations>Release;Debug</Configurations>
+    <TargetFrameworks>netcoreapp2.1;netcoreapp3.1;net6.0;net7.0;net8.0</TargetFrameworks>
 
-  <PropertyGroup Condition="$(Configuration.Contains('3.1'))">
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <!-- NU1902, NU1903: "Package 'Microsoft.NETCore.App' 2.1.0 has a known high severity vulnerability." - yeah it's pretty bad if you're sending HTTPS requests to untrusted servers. Which I'm not. Blame Unity for this version still being needed. -->
+    <NoWarn>NU1902;NU1903</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

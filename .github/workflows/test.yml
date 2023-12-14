@@ -8,30 +8,31 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dotnet-version: ["2.1", "3.1", "7.0"]
+        dotnet-version: ["2.1", "3.1", "6.0", "7.0", "8.0"]
     steps:
     - uses: actions/checkout@v3
-    
-    # Annoyingly, it seems like merely having different targets in our .csproj requires us to have all the SDKs available when doing setup
-    # This is pretty silly.
-    # But hey, at least it's fast.
+
+    # This is unnecessary for 6.0 and later, but is still needed for 2.1/3.1.
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: |
-            2.1.x
-            3.1.x
-            7.0.x
-        
-    - name: Build
-      # this seems to fail intermittently on 2.1 so now we're trying it repeatedly *which is terrible* but 2.1 is rapidly bitrotting
-      # my kingdom for unity updating its damn mono implementation
-      run: |
-        for i in {1..5}; do 
-          dotnet build --configuration "Debug ${{ matrix.dotnet-version }}" && break
-        done
+        dotnet-version: ${{ matrix.dotnet-version }}.x
+
+    # I used to have a separate build step here
+    # it's hard to implement now because not every package type supports every framework
+    # todo: this, at some point?
     - name: Test
-      run: dotnet test -c "Debug ${{ matrix.dotnet-version }}" --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+      run: |
+        dotnet_version=${{ matrix.dotnet-version }}
+        first_digit=${dotnet_version:0:1}
+
+        if [[ $first_digit -lt 5 ]]; then
+            framework="netcoreapp${dotnet_version}"
+        else
+            framework="net${dotnet_version}"
+        fi
+
+        dotnet test -f $framework --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
     - name: Upload coverage files
       uses: actions/upload-artifact@v3
       with:
@@ -44,7 +45,7 @@ jobs:
     steps:
     # this appears to be needed for some part of the setup process; it's unclear why
     - uses: actions/checkout@v3
-    
+
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v3
       with:
@@ -64,17 +65,17 @@ jobs:
 
   docs:
     runs-on: ubuntu-22.04
-    
+
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Setup 7.0
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 7.0.x
+    - name: Setup environment
+      run: dotnet restore
+    - name: Setup tooling
+      run: dotnet tool install --global docfx
     - name: Test documentation
-      run: |
-        sudo apt install nuget
-        nuget install docfx.console
-        docfx.console.*/tools/docfx.exe doc/docfx.json --warningsAsErrors
-        
+      run: docfx doc/docfx.json --warningsAsErrors

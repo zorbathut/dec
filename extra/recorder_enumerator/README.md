@@ -3,7 +3,7 @@ recorder_enumerator
 
 This provides a wide set of converters and other functionality to serialize and deserialize enumerators, both for built-in containers and Linq functions and for user-created enumerators.
 
-This entire system relies on deep reflection into classes and structures whose consistent behavior is not guaranteed by .NET. As of right now, it's supported only on .NET 7.0; it may partially work on other versions, and it should be possible to make it work on other versions, but there are definitely going to be issues right now. If you try using it, let me know!
+This entire system relies on deep reflection into classes and structures whose consistent behavior is not guaranteed by .NET. As of right now, it's supported only on .NET 6.0; it may partially work on other versions, and it should be possible to make it work on other versions, but there are definitely going to be issues right now. If you try using it, let me know!
 
 ### Installation instructions
 
