@@ -67,7 +67,7 @@ namespace Dec
                     readerDec.type = UtilType.ParseDecFormatted(typeName, readerDec.inputContext);
                     if (readerDec.type == null || !typeof(Dec).IsAssignableFrom(readerDec.type))
                     {
-                        Dbg.Err($"{readerDec.inputContext}: {typeName} is not a valid root Dec type");
+                        Dbg.Err($"{readerDec.inputContext}: {typeName} is being used as a Dec but does not inherit from Dec.Dec");
                         continue;
                     }
 
@@ -371,7 +371,7 @@ namespace Dec
                             Dbg.Err($"{elementContext}: Dictionary includes duplicate key `{key.ToString()}`");
                         }
                     }
-                    
+
                     writtenFields?.Add(key);
 
                     dict[key] = Serialization.ParseElement(new List<ReaderNode>() { new ReaderNodeXml(valueNode, fileIdentifier) }, referencedValueType, originalValue, readerContext, recorderChildContext);
@@ -445,7 +445,7 @@ namespace Dec
                     }
 
                     keyParam[0] = key;
-                    
+
                     if ((bool)containsFunction.Invoke(hashset, keyParam) && (writtenFields == null || writtenFields.Contains(key)))
                     {
                         Dbg.Err($"{elementContext}: HashSet includes duplicate key `{key.ToString()}`");
