@@ -610,10 +610,6 @@ namespace DecTest
             Assert.AreEqual(double.PositiveInfinity, result.doubleInf);
             Assert.AreEqual(double.NegativeInfinity, result.doubleNinf);
             Assert.AreEqual(double.Epsilon, result.doubleEpsilon);
-
-            // We currently don't support NaN-boxed values or signaling NaN.
-            // Maybe someday we will.
-            // (Does C# even accept those?)
         }
 
         public class StructConstructionDec : Dec.Dec
@@ -829,6 +825,70 @@ namespace DecTest
             Assert.IsNotNull(result);
 
             Assert.AreEqual(2.34f, result.value);
+        }
+
+        [Test]
+        public void NaNBoxFloat([Values] RecorderMode mode)
+        {
+            var list = new List<float>()
+            {
+                float.NaN,
+                BitConverter.Int32BitsToSingle(0x7fc0beef),
+                BitConverter.Int32BitsToSingle(0x7fc01234),
+            };
+
+            for (int i = 1; i < list.Count; ++i)
+            {
+                // make sure nan boxing actually worked
+                Assert.AreNotEqual(BitConverter.SingleToInt32Bits(list[0]), BitConverter.SingleToInt32Bits(list[i]));
+                Assert.IsTrue(float.IsNaN(list[i]));
+            }
+
+            var deserialized = DoRecorderRoundTrip(list, RecorderMode.Bare);
+
+            for (int i = 0; i < list.Count; ++i)
+            {
+                Assert.AreEqual(BitConverter.SingleToInt32Bits(list[i]), BitConverter.SingleToInt32Bits(deserialized[i]));
+            }
+        }
+
+        [Test]
+        public void NaNBoxDouble([Values] RecorderMode mode)
+        {
+            var list = new List<double>()
+            {
+                double.NaN,
+                BitConverter.Int64BitsToDouble(0x7ffcbeefbeefbeef),
+                BitConverter.Int64BitsToDouble(0x7ffc123412341234),
+            };
+
+            for (int i = 1; i < list.Count; ++i)
+            {
+                // make sure nan boxing actually worked
+                Assert.AreNotEqual(BitConverter.DoubleToInt64Bits(list[0]), BitConverter.DoubleToInt64Bits(list[i]));
+                Assert.IsTrue(double.IsNaN(list[i]));
+            }
+
+            var deserialized = DoRecorderRoundTrip(list, mode);
+
+            for (int i = 0; i < list.Count; ++i)
+            {
+                Assert.AreEqual(BitConverter.DoubleToInt64Bits(list[i]), BitConverter.DoubleToInt64Bits(deserialized[i]));
+            }
+        }
+
+        [Test]
+        public void SignalingNaN([Values] RecorderMode mode)
+        {
+            var pair = (
+                flt: BitConverter.Int32BitsToSingle(0x7fa00000),
+                dbl: BitConverter.Int64BitsToDouble(0x7ffa000000000000)
+            );
+
+            var deserialized = DoRecorderRoundTrip(pair, mode);
+
+            Assert.AreEqual(BitConverter.SingleToInt32Bits(pair.flt), BitConverter.SingleToInt32Bits(deserialized.flt));
+            Assert.AreEqual(BitConverter.DoubleToInt64Bits(pair.dbl), BitConverter.DoubleToInt64Bits(deserialized.dbl));
         }
     }
 }

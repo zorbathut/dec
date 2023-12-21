@@ -1451,6 +1451,37 @@ namespace Dec
                 // If we've got text, treat us as an object of appropriate type
                 try
                 {
+                    if ((type == typeof(float) || type == typeof(double)) && text != "NaN" && text.StartsWith("NaNbox"))
+                    {
+                        // oops, time for nan-boxed values
+
+                        const int expectedFloatSize = 6 + 8;
+                        const int expectedDoubleSize = 6 + 16;
+
+                        if (type == typeof(float) && text.Length != expectedFloatSize)
+                        {
+                            Dbg.Err($"{context}: Found nanboxed value without the expected number of characters, expected {expectedFloatSize} but got {text.Length}");
+                            return float.NaN;
+                        }
+                        else if (type == typeof(double) && text.Length != expectedDoubleSize)
+                        {
+                            Dbg.Err($"{context}: Found nanboxed value without the expected number of characters, expected {expectedDoubleSize} but got {text.Length}");
+                            return double.NaN;
+                        }
+
+                        if (type == typeof(float))
+                        {
+                            long number = Convert.ToInt64(text.Substring(6), 16);
+                            return BitConverter.Int32BitsToSingle((int)number);
+                        }
+                        else
+                        {
+                            // gotta be double
+                            long number = Convert.ToInt64(text.Substring(6), 16);
+                            return BitConverter.Int64BitsToDouble(number);
+                        }
+                    }
+
                     return TypeDescriptor.GetConverter(type).ConvertFromInvariantString(text);
                 }
                 catch (System.Exception e)  // I would normally not catch System.Exception, but TypeConverter is wrapping FormatException in an Exception for some reason
@@ -1506,7 +1537,7 @@ namespace Dec
                     // We do, however, tag it with the root type, not the derived type; this is the most general type that still lets us search things in the future.
                     node.TagClass(rootType);
                 }
-                
+
                 node.WriteDec(value as Dec);
 
                 return;
@@ -1703,7 +1734,7 @@ namespace Dec
             }
 
             // We absolutely should not be doing reflection when in recorder mode; that way lies madness.
-            
+
             foreach (var field in valType.GetSerializableFieldsFromHierarchy())
             {
                 ComposeElement(node.CreateMember(field, node.RecorderContext), field.GetValue(value), field.FieldType, fieldInfo: field);

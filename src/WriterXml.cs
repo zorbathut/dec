@@ -338,24 +338,36 @@ namespace Dec
         {
             if (value.GetType() == typeof(double))
             {
-                if (Compat.FloatRoundtripBroken)
+                double val = (double)value;
+                if (double.IsNaN(val) && BitConverter.DoubleToInt64Bits(val) != BitConverter.DoubleToInt64Bits(double.NaN))
                 {
-                    node.Add(new XText(((double)value).ToString("G17", System.Globalization.CultureInfo.InvariantCulture)));
+                    // oops, all nan boxing!
+                    node.Add(new XText("NaNbox" + BitConverter.DoubleToInt64Bits(val).ToString("X16", System.Globalization.CultureInfo.InvariantCulture)));
+                }
+                else if (Compat.FloatRoundtripBroken)
+                {
+                    node.Add(new XText(val.ToString("G17", System.Globalization.CultureInfo.InvariantCulture)));
                 }
                 else
                 {
-                    node.Add(new XText(((double)value).ToString(System.Globalization.CultureInfo.InvariantCulture)));
+                    node.Add(new XText(val.ToString(System.Globalization.CultureInfo.InvariantCulture)));
                 }
             }
             else if (value.GetType() == typeof(float))
             {
-                if (Compat.FloatRoundtripBroken)
+                float val = (float)value;
+                if (float.IsNaN(val) && BitConverter.SingleToInt32Bits(val) != BitConverter.SingleToInt32Bits(float.NaN))
                 {
-                    node.Add(new XText(((float)value).ToString("G9", System.Globalization.CultureInfo.InvariantCulture)));
+                    // oops, all nan boxing!
+                    node.Add(new XText("NaNbox" + BitConverter.SingleToInt32Bits(val).ToString("X8", System.Globalization.CultureInfo.InvariantCulture)));
+                }
+                else if (Compat.FloatRoundtripBroken)
+                {
+                    node.Add(new XText(val.ToString("G9", System.Globalization.CultureInfo.InvariantCulture)));
                 }
                 else
                 {
-                    node.Add(new XText(((float)value).ToString(System.Globalization.CultureInfo.InvariantCulture)));
+                    node.Add(new XText(val.ToString(System.Globalization.CultureInfo.InvariantCulture)));
                 }
             }
             else

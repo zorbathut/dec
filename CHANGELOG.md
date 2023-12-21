@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 
 
 ## [Unreleased]
+### Added
+* Now properly serializes NaN-boxed floats and doubles without loss of information.
+
 ### Improved
 * Error messages when passing null or empty strings to Parser.
 * Project configuration revamp to follow established standards for framework choice.
