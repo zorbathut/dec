@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 
-## [Unreleased]
+## [v0.5.2]
 ### Added
 * Now properly serializes NaN-boxed floats and doubles without loss of information.
 
