@@ -433,13 +433,43 @@ namespace Dec
             return writer.RegisterReference(value, node, RecorderContext);
         }
 
+        private void WriteArrayRank(WriterNode node, Array value, Type referencedType, int rank, int[] indices)
+        {
+            if (rank == value.Rank)
+            {
+                Serialization.ComposeElement(node, value.GetValue(indices), referencedType);
+            }
+            else
+            {
+                for (int i = 0; i < value.GetLength(rank); ++i)
+                {
+                    var child = node.CreateChild("li", RecorderContext.CreateChild());
+
+                    indices[rank] = i;
+                    WriteArrayRank(child, value, referencedType, rank + 1, indices);
+                }
+            }
+        }
+
         public override void WriteArray(Array value)
         {
             Type referencedType = value.GetType().GetElementType();
 
-            for (int i = 0; i < value.Length; ++i)
+            if (value.Rank == 1)
             {
-                Serialization.ComposeElement(CreateChild("li", RecorderContext.CreateChild()), value.GetValue(i), referencedType);
+                // fast path
+                for (int i = 0; i < value.Length; ++i)
+                {
+                    Serialization.ComposeElement(CreateChild("li", RecorderContext.CreateChild()), value.GetValue(i), referencedType);
+                }
+
+                return;
+            }
+            else
+            {
+                // slow path
+                int[] indices = new int[value.Rank];
+                WriteArrayRank(this, value, referencedType, 0, indices);
             }
         }
 

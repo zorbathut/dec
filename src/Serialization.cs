@@ -617,7 +617,7 @@ namespace Dec
             ReaderNode hasTextNode = null;
             foreach (var (_, node) in orders)
             {
-                if (!hasChildren && node.GetChildCount() > 0)
+                if (!hasChildren && node.HasChildren())
                 {
                     hasChildren = true;
                     hasChildrenNode = node;
@@ -1009,28 +1009,49 @@ namespace Dec
 
                 foreach (var (parseCommand, node) in orders)
                 {
-                    Array array;
+                    Array array = null;
                     int startOffset = 0;
 
                     // This is a bit extra-complicated because we can't append stuff after the fact, we need to figure out what our length is when we create the object.
                     switch (parseCommand)
                     {
                         case ParseCommand.Replace:
-                            /// This is a full override, so we're going to create it here.
-                            if (result != null && result.GetType() == type && ((Array)result).Length == node.GetChildCount())
+                        {
+                            // This is a full override, so we're going to create it here.
+                            // It is actually vitally important that we fall back on the model when possible, because the Recorder Ref system requires it.
+                            bool match = result != null && result.GetType() == type;
+                            var arrayDimensions = node.GetArrayDimensions(type.GetArrayRank());
+                            if (match)
                             {
-                                // It is actually vitally important that we fall back on the model when possible, because the Recorder Ref system requires it.
                                 array = (Array)result;
+                                if (array.Rank != type.GetArrayRank())
+                                {
+                                    match = false;
+                                }
+                                else
+                                {
+                                    for (int i = 0; i < array.Rank; i++)
+                                    {
+                                        if (array.GetLength(i) != arrayDimensions[i])
+                                        {
+                                            match = false;
+                                            break;
+                                        }
+                                    }
+                                }
                             }
-                            else
+
+                            if (!match)
                             {
                                 // Otherwise just make a new one, no harm done.
-                                array = (Array)Activator.CreateInstance(type, new object[] { node.GetChildCount() });
+                                array = Array.CreateInstance(referencedType, arrayDimensions);
                             }
 
                             break;
+                        }
 
                         case ParseCommand.Append:
+                        {
                             if (result == null)
                             {
                                 goto case ParseCommand.Replace;
@@ -1040,10 +1061,40 @@ namespace Dec
                             // (yes, I know, that's the point of arrays, I'm not complaining, just . . . grumbling a little)
                             var oldArray = (Array)result;
                             startOffset = oldArray.Length;
-                            array = (Array)Activator.CreateInstance(type, new object[] { startOffset + node.GetChildCount() });
-                            oldArray.CopyTo(array, 0);
+                            var arrayDimensions = node.GetArrayDimensions(type.GetArrayRank());
+                            arrayDimensions[0] += startOffset;
+                            array = Array.CreateInstance(referencedType, arrayDimensions);
+                            if (arrayDimensions.Length == 1)
+                            {
+                                oldArray.CopyTo(array, 0);
+                            }
+                            else
+                            {
+                                // oy
+                                void CopyArray(Array source, Array destination, int[] indices, int rank = 0)
+                                {
+                                    if (rank < source.Rank)
+                                    {
+                                        for (int i = 0; i < source.GetLength(rank); i++)
+                                        {
+                                            indices[rank] = i;
+                                            CopyArray(source, destination, indices, rank + 1);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        destination.SetValue(source.GetValue(indices), indices);
+                                    }
+                                }
+
+                                {
+                                    int[] indices = new int[arrayDimensions.Length];
+                                    CopyArray(oldArray, array, indices, 0);
+                                }
+                            }
 
                             break;
+                        }
 
                         default:
                             Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");

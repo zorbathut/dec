@@ -288,6 +288,7 @@ namespace Dec
             return null;
         }
 
+        private static Regex ArrayRankParser = new Regex(@"\[([,]*)\]$", RegexOptions.Compiled);
         private static Dictionary<string, Type> ParseCache = new Dictionary<string, Type>();
         internal static Type ParseDecFormatted(string text, InputContext context)
         {
@@ -319,10 +320,11 @@ namespace Dec
                 }
             }
 
-            bool isArray = text.EndsWith("[]");
-            if (isArray)
+            int arrayRanks = 0;
+            if (ArrayRankParser.Match(text) is Match match && match.Success)
             {
-                text = text.Substring(0, text.Length - 2);
+                arrayRanks = match.Groups[1].Length + 1;
+                text = text.Substring(0, text.Length - match.Length);
             }
 
             // We need to find a class that matches the least number of tokens. Namespaces can't be generics so at most this continues until we hit a namespace.
@@ -348,10 +350,14 @@ namespace Dec
                 result = possibleTypes[0];
             }
 
-            if (isArray)
+            if (arrayRanks == 1)
             {
-                // TODO: multiple-dimension arrays?
+                // I'm not totally sure why MakeArrayType(1) does the wrong thing here
                 result = result.MakeArrayType();
+            }
+            else if (arrayRanks > 1)
+            {
+                result = result.MakeArrayType(arrayRanks);
             }
 
             ParseCache[text] = result;

@@ -282,9 +282,29 @@ namespace Dec
             return unrecognized == string.Empty ? null : unrecognized;
         }
 
-        public override int GetChildCount()
+        public override bool HasChildren()
         {
-            return xml.Elements().Count();
+            return xml.Elements().Any();
+        }
+
+        public override int[] GetArrayDimensions(int rank)
+        {
+            // The actual processing will be handled by ParseArray, so we're not doing much validation here right now
+            int[] results = new int[rank];
+            var tier = xml;
+            for (int i = 0; i < rank; ++i)
+            {
+                results[i] = tier.Elements().Count();
+
+                tier = tier.Elements().FirstOrDefault();
+                if (tier == null)
+                {
+                    // ran out of elements; stop now, we'll leave them full of 0's
+                    break;
+                }
+            }
+
+            return results;
         }
 
         public override void ParseList(IList list, Type referencedType, ReaderContext readerContext, Recorder.Context recorderContext)
@@ -305,20 +325,74 @@ namespace Dec
             list.GetType().GetField("_version", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(list, Util.CollectionDeserializationVersion);
         }
 
+        private void ParseArrayRank(ReaderNodeXml node, ReaderContext readerContext, Recorder.Context recorderContext, Array value, Type referencedType, int rank, int[] indices, int startAt)
+        {
+            if (rank == indices.Length)
+            {
+                value.SetValue(Serialization.ParseElement(new List<ReaderNode>() { node }, referencedType, null, readerContext, recorderContext), indices);
+            }
+            else
+            {
+                // this is kind of unnecessary but it's also an irrelevant perf hit
+                var recorderChildContext = recorderContext.CreateChild();
+
+                int elementCount = node.xml.Elements().Count();
+                int rankLength = value.GetLength(rank);
+                if (elementCount > rankLength)
+                {
+                    Dbg.Err($"{node.GetInputContext()}: Array dimension {rank} expects {rankLength} elements but got {elementCount}; truncating");
+                }
+                else if (elementCount < rankLength)
+                {
+                    Dbg.Err($"{node.GetInputContext()}: Array dimension {rank} expects {rankLength} elements but got {elementCount}; padding with default values");
+                }
+
+                int i = 0;
+                foreach (var fieldElement in node.xml.Elements())
+                {
+                    if (i >= rankLength)
+                    {
+                        // truncate, we're done here
+                        break;
+                    }
+
+                    if (fieldElement.Name.LocalName != "li")
+                    {
+                        var elementContext = new InputContext(fileIdentifier, fieldElement);
+                        Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
+                    }
+
+                    indices[rank] = startAt + i++;
+                    ParseArrayRank(new ReaderNodeXml(fieldElement, fileIdentifier), readerContext, recorderChildContext, value, referencedType, rank + 1, indices, 0);
+                }
+            }
+
+        }
+
         public override void ParseArray(Array array, Type referencedType, ReaderContext readerContext, Recorder.Context recorderContext, int startOffset)
         {
             var recorderChildContext = recorderContext.CreateChild();
 
-            int i = 0;
-            foreach (var fieldElement in xml.Elements())
+            if (array.Rank == 1)
             {
-                if (fieldElement.Name.LocalName != "li")
+                // fast path
+                int i = 0;
+                foreach (var fieldElement in xml.Elements())
                 {
-                    var elementContext = new InputContext(fileIdentifier, fieldElement);
-                    Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
-                }
+                    if (fieldElement.Name.LocalName != "li")
+                    {
+                        var elementContext = new InputContext(fileIdentifier, fieldElement);
+                        Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
+                    }
 
-                array.SetValue(Serialization.ParseElement(new List<ReaderNode>() { new ReaderNodeXml(fieldElement, fileIdentifier) }, referencedType, null, readerContext, recorderChildContext), startOffset + i++);
+                    array.SetValue(Serialization.ParseElement(new List<ReaderNode>() { new ReaderNodeXml(fieldElement, fileIdentifier) }, referencedType, null, readerContext, recorderChildContext), startOffset + i++);
+                }
+            }
+            else
+            {
+                // slow path
+                var indices = new int[array.Rank];
+                ParseArrayRank(this, readerContext, recorderChildContext, array, referencedType, 0, indices, startOffset);
             }
         }
 

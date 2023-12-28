@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 
 
 ## [Unreleased]
+### Added
+* Proper support for multidimensional arrays.
 
 ### Improved
 * Error messages for database queries interacting with AbstractAttribute.

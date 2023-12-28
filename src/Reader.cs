@@ -48,13 +48,14 @@ namespace Dec
             Mode,
         }
 
-        
+
         public abstract InputContext GetInputContext(); // note: this function must be really fast!
         public abstract string GetMetadata(Metadata metadata);
         public abstract string GetMetadataUnrecognized();
         public abstract string GetText();
 
-        public abstract int GetChildCount();
+        public abstract bool HasChildren();
+        public abstract int[] GetArrayDimensions(int rank);
         public abstract ReaderNode GetChildNamed(string name);
 
         public abstract void ParseList(IList list, Type referencedType, ReaderContext readerContext, Recorder.Context recorderContext);

@@ -71,7 +71,7 @@ namespace Dec
                     yield return field;
                     seenFields.Add(field.Name);
                 }
-                
+
                 curType = curType.BaseType;
             }
         }
@@ -210,9 +210,9 @@ namespace Dec
             }
             else if (type.IsArray)
             {
-                // Special handling, we need a fancy constructor with an int parameter
+                // Special handling, we need a fancy constructor with an int array parameter
                 // Conveniently, arrays are really easy to deal with in this pathway :D
-                return Activator.CreateInstance(type, node.GetChildCount());
+                return Array.CreateInstance(type.GetElementType(), node.GetArrayDimensions(type.GetArrayRank()));
             }
             else if (!type.IsValueType && type.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { }, null) == null)
             {
