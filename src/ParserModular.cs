@@ -503,7 +503,7 @@ namespace Dec
                 return;
             }
 
-            Dbg.Err($"Initializing static reference class at an inappropriate time - this probably means you accessed a static reference class before it was ready");
+            Dbg.Err($"Initializing static reference class at an inappropriate time. Either you forgot to add [StaticReferences] to the class, or you accessed it before it was ready.");
         }
     }
 }

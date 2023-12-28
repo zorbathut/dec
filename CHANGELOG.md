@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Improved
 * Error messages for database queries interacting with AbstractAttribute.
+* Error message for inappropriately-timed StaticReferences initialization.
 
 ### Testing
 * Added proper testing for AbstractAttribute.
