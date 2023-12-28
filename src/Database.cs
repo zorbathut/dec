@@ -343,6 +343,20 @@ namespace Dec
             }
         }
 
+        static Database()
+        {
+            var databaseStatus = UtilType.GetDecDatabaseStatus(typeof(T));
+
+            if (databaseStatus == UtilType.DecDatabaseStatus.Invalid)
+            {
+                Dbg.Err($"Attempting to create a Database<T> for {typeof(T)}, which is not a valid Dec");
+            }
+            else if (databaseStatus == UtilType.DecDatabaseStatus.Abstract)
+            {
+                Dbg.Err($"Attempting to create a Database<T> for {typeof(T)}, which is an abstract Dec and cannot be used as a database root");
+            }
+        }
+
         /// <summary>
         /// Returns a dec of this type by name.
         /// </summary>
