@@ -222,6 +222,24 @@ namespace DecTest
             var deserialized = DoRecorderRoundTrip(rec, mode, expectWriteWarnings: true, expectReadWarnings: true);
         }
 
-        // ALSO DOC ADJUSTMENTS
+        public class SharedRoot : Dec.IRecordable
+        {
+            public SharedRoot root;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Shared().Record(ref root, "root");
+            }
+        }
+        [Test]
+        public void SharedRootClass([Values] RecorderMode mode)
+        {
+            var rec = new SharedRoot();
+            rec.root = rec;
+
+            var deserialized = DoRecorderRoundTrip(rec, mode);
+
+            Assert.AreSame(deserialized, deserialized.root);
+        }
     }
 }

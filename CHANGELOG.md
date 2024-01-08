@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 
 ### Testing
 * Added proper testing for AbstractAttribute.
+* Add a self-reference test that might be redundant.
  
 
 ## [v0.5.2]
