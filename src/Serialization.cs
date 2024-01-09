@@ -1502,38 +1502,73 @@ namespace Dec
                 // If we've got text, treat us as an object of appropriate type
                 try
                 {
-                    if ((type == typeof(float) || type == typeof(double)) && text != "NaN" && text.StartsWith("NaNbox"))
+                    if (type == typeof(float))
                     {
-                        // oops, time for nan-boxed values
-
-                        const int expectedFloatSize = 6 + 8;
-                        const int expectedDoubleSize = 6 + 16;
-
-                        if (type == typeof(float) && text.Length != expectedFloatSize)
+                        // first check the various strings, case-insensitive
+                        if (String.Compare(text, "nan", true) == 0)
                         {
-                            Dbg.Err($"{context}: Found nanboxed value without the expected number of characters, expected {expectedFloatSize} but got {text.Length}");
                             return float.NaN;
                         }
-                        else if (type == typeof(double) && text.Length != expectedDoubleSize)
+
+                        if (String.Compare(text, "infinity", true) == 0)
                         {
-                            Dbg.Err($"{context}: Found nanboxed value without the expected number of characters, expected {expectedDoubleSize} but got {text.Length}");
+                            return float.PositiveInfinity;
+                        }
+
+                        if (String.Compare(text, "-infinity", true) == 0)
+                        {
+                            return float.NegativeInfinity;
+                        }
+
+                        if (text.StartsWith("nanbox", StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            const int expectedFloatSize = 6 + 8;
+
+                            if (type == typeof(float) && text.Length != expectedFloatSize)
+                            {
+                                Dbg.Err($"{context}: Found nanboxed value without the expected number of characters, expected {expectedFloatSize} but got {text.Length}");
+                                return float.NaN;
+                            }
+
+                            int number = Convert.ToInt32(text.Substring(6), 16);
+                            return BitConverter.Int32BitsToSingle(number);
+                        }
+                    }
+
+                    if (type == typeof(double))
+                    {
+                        // first check the various strings, case-insensitive
+                        if (String.Compare(text, "nan", true) == 0)
+                        {
                             return double.NaN;
                         }
 
-                        if (type == typeof(float))
+                        if (String.Compare(text, "infinity", true) == 0)
                         {
-                            long number = Convert.ToInt64(text.Substring(6), 16);
-                            return BitConverter.Int32BitsToSingle((int)number);
+                            return double.PositiveInfinity;
                         }
-                        else
+
+                        if (String.Compare(text, "-infinity", true) == 0)
                         {
-                            // gotta be double
+                            return double.NegativeInfinity;
+                        }
+
+                        if (text.StartsWith("nanbox", StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            const int expectedDoubleSize = 6 + 16;
+
+                            if (type == typeof(double) && text.Length != expectedDoubleSize)
+                            {
+                                Dbg.Err($"{context}: Found nanboxed value without the expected number of characters, expected {expectedDoubleSize} but got {text.Length}");
+                                return double.NaN;
+                            }
+
                             long number = Convert.ToInt64(text.Substring(6), 16);
                             return BitConverter.Int64BitsToDouble(number);
                         }
                     }
 
-                    return TypeDescriptor.GetConverter(type).ConvertFromInvariantString(text);
+                    return TypeDescriptor.GetConverter(type).ConvertFromString(text);
                 }
                 catch (System.Exception e)  // I would normally not catch System.Exception, but TypeConverter is wrapping FormatException in an Exception for some reason
                 {

@@ -39,7 +39,7 @@ namespace Dec
         /// </summary>
         /// <remarks>
         /// This should be made unmissably visible to developers and testers, ideally with a popup or a modal dialog.
-        /// 
+        ///
         /// Can be made to throw an exception. If it does, the exception will propagate to the caller. Otherwise, dec will attempt to recover from the error.
         ///
         /// If you're using any multithreading, this must be threadsafe.
@@ -51,7 +51,7 @@ namespace Dec
         /// </summary>
         /// <remarks>
         /// This should be made unmissably visible to developers and testers, ideally with a popup or a modal dialog.
-        /// 
+        ///
         /// Can be made to rethrow the exception or throw a new exception. If it does, the exception will propagate to the caller. Otherwise, dec will attempt to recover from the error.
         ///
         /// If you're using any multithreading, this must be threadsafe.
@@ -91,11 +91,13 @@ namespace Dec
         /// The culture to use for parsing and writing values.
         /// </summary>
         /// <remarks>
-        /// This must be set statically, rather than loaded from the user's system, or parsing might break unpredictably. Recommend leaving this set to `en-US` for compatibility with the general Dec ecosystem; other options may have bugs (but report them and I'll fix them.)
+        /// This must be set statically, rather than loaded from the user's system, or parsing might break unpredictably. Recommend leaving this set to InvariantCulture for compatibility with the general Dec ecosystem; other options may have bugs (but report them and I'll fix them!)
         ///
-        /// Changing this while Dec is running is undefined behavior. Don't do that. Dec may be unable to read files written under a different CultureInfo.    
+        /// Changing this while Dec is running is undefined behavior. Don't do that. Dec may be unable to read files written under a different CultureInfo; if you don't want that to be a problem, well, choose today, and choose wisely.
+        ///
+        /// (just leave it set to its default for christ's sake)
         /// </remarks>
-        public static System.Globalization.CultureInfo CultureInfo = new System.Globalization.CultureInfo("en-US"); 
+        public static System.Globalization.CultureInfo CultureInfo = System.Globalization.CultureInfo.InvariantCulture;
 
         /// <summary>
         /// The list of namespaces that dec can access transparently.

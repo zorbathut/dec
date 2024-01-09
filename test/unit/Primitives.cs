@@ -567,12 +567,20 @@ namespace DecTest
         public class Ieee754SpecialDec : Dec.Dec
         {
             public float floatNan;
-            public float floatInf;
-            public float floatNinf;
+            public float floatInfUpper;
+            public float floatInfLower;
+            public float floatInfSymbol;
+            public float floatNinfUpper;
+            public float floatNinfLower;
+            public float floatNinfSymbol;
             public float floatEpsilon;
             public double doubleNan;
-            public double doubleInf;
-            public double doubleNinf;
+            public double doubleInfUpper;
+            public double doubleInfLower;
+            public double doubleInfSymbol;
+            public double doubleNinfUpper;
+            public double doubleNinfLower;
+            public double doubleNinfSymbol;
             public double doubleEpsilon;
         }
 
@@ -586,12 +594,20 @@ namespace DecTest
                 <Decs>
                     <Ieee754SpecialDec decName=""TestDec"">
                         <floatNan>NaN</floatNan>
-                        <floatInf>Infinity</floatInf>
-                        <floatNinf>-Infinity</floatNinf>
+                        <floatInfUpper>Infinity</floatInfUpper>
+                        <floatInfLower>infinity</floatInfLower>
+                        <floatInfSymbol>∞</floatInfSymbol>
+                        <floatNinfUpper>-Infinity</floatNinfUpper>
+                        <floatNinfLower>-infinity</floatNinfLower>
+                        <floatNinfSymbol>-∞</floatNinfSymbol>
                         <floatEpsilon>1.401298E-45</floatEpsilon>
                         <doubleNan>NaN</doubleNan>
-                        <doubleInf>Infinity</doubleInf>
-                        <doubleNinf>-Infinity</doubleNinf>
+                        <doubleInfUpper>Infinity</doubleInfUpper>
+                        <doubleInfLower>infinity</doubleInfLower>
+                        <doubleInfSymbol>∞</doubleInfSymbol>
+                        <doubleNinfUpper>-Infinity</doubleNinfUpper>
+                        <doubleNinfLower>-infinity</doubleNinfLower>
+                        <doubleNinfSymbol>-∞</doubleNinfSymbol>
                         <doubleEpsilon>4.94065645841247E-324</doubleEpsilon>
                     </Ieee754SpecialDec>
                 </Decs>");
@@ -603,12 +619,20 @@ namespace DecTest
             Assert.IsNotNull(result);
 
             Assert.AreEqual(float.NaN, result.floatNan);
-            Assert.AreEqual(float.PositiveInfinity, result.floatInf);
-            Assert.AreEqual(float.NegativeInfinity, result.floatNinf);
+            Assert.AreEqual(float.PositiveInfinity, result.floatInfUpper);
+            Assert.AreEqual(float.PositiveInfinity, result.floatInfLower);
+            Assert.AreEqual(float.PositiveInfinity, result.floatInfSymbol);
+            Assert.AreEqual(float.NegativeInfinity, result.floatNinfUpper);
+            Assert.AreEqual(float.NegativeInfinity, result.floatNinfLower);
+            Assert.AreEqual(float.NegativeInfinity, result.floatNinfSymbol);
             Assert.AreEqual(float.Epsilon, result.floatEpsilon);
             Assert.AreEqual(double.NaN, result.doubleNan);
-            Assert.AreEqual(double.PositiveInfinity, result.doubleInf);
-            Assert.AreEqual(double.NegativeInfinity, result.doubleNinf);
+            Assert.AreEqual(double.PositiveInfinity, result.doubleInfUpper);
+            Assert.AreEqual(double.PositiveInfinity, result.doubleInfLower);
+            Assert.AreEqual(double.PositiveInfinity, result.doubleInfSymbol);
+            Assert.AreEqual(double.NegativeInfinity, result.doubleNinfUpper);
+            Assert.AreEqual(double.NegativeInfinity, result.doubleNinfLower);
+            Assert.AreEqual(double.NegativeInfinity, result.doubleNinfSymbol);
             Assert.AreEqual(double.Epsilon, result.doubleEpsilon);
         }
 

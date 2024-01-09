@@ -6,9 +6,14 @@ All notable changes to this project will be documented in this file.
 ### Added
 * Proper support for multidimensional arrays.
 
+### Possibly Breaking
+* Changed default culture from `en-US` to `InvariantCulture`. I don't think this should have any effects given the manual string parsing for Infinity, but I may be missing something; report problems, please.
+
 ### Improved
 * Error messages for database queries interacting with AbstractAttribute.
 * Error message for inappropriately-timed StaticReferences initialization.
+* More consistent usage of the Dec.Config culture.
+* Support case-insensitive nan/infinity float/double parsing.
 
 ### Testing
 * Added proper testing for AbstractAttribute.

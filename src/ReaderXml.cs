@@ -460,7 +460,7 @@ namespace Dec
                         Dbg.Err($"{elementContext}: Dictionary includes null key, skipping pair");
 
                         // just in case . . .
-                        if (string.Compare(fieldElement.Name.LocalName, "li", true, System.Globalization.CultureInfo.InvariantCulture) == 0)
+                        if (string.Compare(fieldElement.Name.LocalName, "li", true) == 0)
                         {
                             Dbg.Err($"{elementContext}: Did you mean to write `li`? This field is case-sensitive.");
                         }

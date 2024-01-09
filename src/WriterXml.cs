@@ -342,15 +342,15 @@ namespace Dec
                 if (double.IsNaN(val) && BitConverter.DoubleToInt64Bits(val) != BitConverter.DoubleToInt64Bits(double.NaN))
                 {
                     // oops, all nan boxing!
-                    node.Add(new XText("NaNbox" + BitConverter.DoubleToInt64Bits(val).ToString("X16", System.Globalization.CultureInfo.InvariantCulture)));
+                    node.Add(new XText("NaNbox" + BitConverter.DoubleToInt64Bits(val).ToString("X16")));
                 }
                 else if (Compat.FloatRoundtripBroken)
                 {
-                    node.Add(new XText(val.ToString("G17", System.Globalization.CultureInfo.InvariantCulture)));
+                    node.Add(new XText(val.ToString("G17")));
                 }
                 else
                 {
-                    node.Add(new XText(val.ToString(System.Globalization.CultureInfo.InvariantCulture)));
+                    node.Add(new XText(val.ToString()));
                 }
             }
             else if (value.GetType() == typeof(float))
@@ -359,15 +359,15 @@ namespace Dec
                 if (float.IsNaN(val) && BitConverter.SingleToInt32Bits(val) != BitConverter.SingleToInt32Bits(float.NaN))
                 {
                     // oops, all nan boxing!
-                    node.Add(new XText("NaNbox" + BitConverter.SingleToInt32Bits(val).ToString("X8", System.Globalization.CultureInfo.InvariantCulture)));
+                    node.Add(new XText("NaNbox" + BitConverter.SingleToInt32Bits(val).ToString("X8")));
                 }
                 else if (Compat.FloatRoundtripBroken)
                 {
-                    node.Add(new XText(val.ToString("G9", System.Globalization.CultureInfo.InvariantCulture)));
+                    node.Add(new XText(val.ToString("G9")));
                 }
                 else
                 {
-                    node.Add(new XText(val.ToString(System.Globalization.CultureInfo.InvariantCulture)));
+                    node.Add(new XText(val.ToString()));
                 }
             }
             else

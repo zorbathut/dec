@@ -34,7 +34,7 @@ namespace Dec
             }
 
             // check to see if we have a case-insensitive match
-            result = root.Elements().Where(child => string.Compare(child.Name.LocalName, name, true, System.Globalization.CultureInfo.InvariantCulture) == 0).FirstOrDefault();
+            result = root.Elements().Where(child => string.Compare(child.Name.LocalName, name, true) == 0).FirstOrDefault();
             if (result != null)
             {
                 Dbg.Err($"{context}: {errorPrefix}; falling back on `{result.Name.LocalName}`, which is not the right case!");
