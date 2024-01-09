@@ -130,7 +130,7 @@ Initialize as soon as possible.</p>
 
   <h3 id="Dec_Config_ConverterFactory" data-uid="Dec.Config.ConverterFactory">
   ConverterFactory
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Config.cs/#L128"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Config.cs/#L130"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>A factory function that can be used to provide custom converters.</p>
@@ -164,7 +164,7 @@ Initialize as soon as possible.</p>
 
   <h3 id="Dec_Config_CultureInfo" data-uid="Dec.Config.CultureInfo">
   CultureInfo
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Config.cs/#L98"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Config.cs/#L100"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The culture to use for parsing and writing values.</p>
@@ -189,8 +189,9 @@ Initialize as soon as possible.</p>
 
 
   <h4 class="section" id="Dec_Config_CultureInfo_remarks">Remarks</h4>
-  <div class="markdown level1 remarks"><p>This must be set statically, rather than loaded from the user's system, or parsing might break unpredictably. Recommend leaving this set to <code>en-US</code> for compatibility with the general Dec ecosystem; other options may have bugs (but report them and I'll fix them.)</p>
-<p>Changing this while Dec is running is undefined behavior. Don't do that. Dec may be unable to read files written under a different CultureInfo.</p>
+  <div class="markdown level1 remarks"><p>This must be set statically, rather than loaded from the user's system, or parsing might break unpredictably. Recommend leaving this set to InvariantCulture for compatibility with the general Dec ecosystem; other options may have bugs (but report them and I'll fix them!)</p>
+<p>Changing this while Dec is running is undefined behavior. Don't do that. Dec may be unable to read files written under a different CultureInfo; if you don't want that to be a problem, well, choose today, and choose wisely.</p>
+<p>(just leave it set to its default for christ's sake)</p>
 </div>
 
 
@@ -385,7 +386,7 @@ Initialize as soon as possible.</p>
 
   <h3 id="Dec_Config_UsingNamespaces" data-uid="Dec.Config.UsingNamespaces">
   UsingNamespaces
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Config.cs/#L111"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Config.cs/#L113"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The list of namespaces that dec can access transparently.</p>
