@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 
 
+## [Unreleased]
+### Testing
+* Improved consistency of a few tests.
+
+
 ## [v0.5.3]
 ### Added
 * Proper support for multidimensional arrays.

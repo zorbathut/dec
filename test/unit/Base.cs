@@ -18,6 +18,9 @@ namespace DecTest
             // But reset this just in case.
             Dec.Config.CultureInfo = new System.Globalization.CultureInfo("en-US");
 
+            // flatten these entirely for the sake of tests that don't list anything
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] {}, explicitConverters = new Type[] {}, explicitStaticRefs = new Type[] {}});
+
             // stop verifying things
             errorValidator = null;
 
