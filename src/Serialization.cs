@@ -255,9 +255,9 @@ namespace Dec
             Patch,
             Append,
         }
-        internal static List<(ParseCommand command, ReaderNode node)> CompileOrders(UtilType.ParseModeCategory modeCategory, List<ReaderNode> nodes)
+        internal static List<(ParseCommand command, ReaderNodeParseable node)> CompileOrders(UtilType.ParseModeCategory modeCategory, List<ReaderNodeParseable> nodes)
         {
-            var orders = new List<(ParseCommand command, ReaderNode payload)>();
+            var orders = new List<(ParseCommand command, ReaderNodeParseable payload)>();
 
             if (modeCategory == UtilType.ParseModeCategory.Dec)
             {
@@ -268,7 +268,7 @@ namespace Dec
             foreach (var node in nodes)
             {
                 var inputContext = node.GetInputContext();
-                var s_parseMode = ParseModeFromString(inputContext, node.GetMetadata(ReaderNode.Metadata.Mode));
+                var s_parseMode = ParseModeFromString(inputContext, node.GetMetadata(ReaderNodeParseable.Metadata.Mode));
 
                 ParseCommand s_parseCommand;
 
@@ -362,7 +362,7 @@ namespace Dec
             bool everExisted = false;
             foreach (var item in decs)
             {
-                var s_parseMode = ParseModeFromString(item.inputContext, item.node.GetMetadata(ReaderNode.Metadata.Mode));
+                var s_parseMode = ParseModeFromString(item.inputContext, item.node.GetMetadata(ReaderNodeParseable.Metadata.Mode));
 
                 switch (s_parseMode)
                 {
@@ -453,7 +453,7 @@ namespace Dec
             return orders;
         }
 
-        internal static object ParseElement(List<ReaderNode> nodes, Type type, object original, ReaderContext context, Recorder.Context recContext, FieldInfo fieldInfo = null, bool isRootDec = false, bool hasReferenceId = false, bool asThis = false, List<(ParseCommand command, ReaderNode node)> ordersOverride = null)
+        internal static object ParseElement(List<ReaderNodeParseable> nodes, Type type, object original, ReaderContext context, Recorder.Context recContext, FieldInfo fieldInfo = null, bool isRootDec = false, bool hasReferenceId = false, bool asThis = false, List<(ParseCommand command, ReaderNodeParseable node)> ordersOverride = null)
         {
             if (nodes == null || nodes.Count == 0)
             {
@@ -491,10 +491,10 @@ namespace Dec
             // This could definitely be more efficient and skip at least one traversal pass
             foreach (var s_node in nodes)
             {
-                string nullAttribute = s_node.GetMetadata(ReaderNode.Metadata.Null);
-                string refAttribute = s_node.GetMetadata(ReaderNode.Metadata.Ref);
-                string classAttribute = s_node.GetMetadata(ReaderNode.Metadata.Class);
-                string modeAttribute = s_node.GetMetadata(ReaderNode.Metadata.Mode);
+                string nullAttribute = s_node.GetMetadata(ReaderNodeParseable.Metadata.Null);
+                string refAttribute = s_node.GetMetadata(ReaderNodeParseable.Metadata.Ref);
+                string classAttribute = s_node.GetMetadata(ReaderNodeParseable.Metadata.Class);
+                string modeAttribute = s_node.GetMetadata(ReaderNodeParseable.Metadata.Mode);
 
                 // Some of these are redundant and that's OK
                 if (nullAttribute != null && (refAttribute != null || classAttribute != null || modeAttribute != null))
@@ -529,7 +529,7 @@ namespace Dec
                 refKey = null;
                 foreach (var s_node in nodes)
                 {
-                    string nodeRefAttribute = s_node.GetMetadata(ReaderNode.Metadata.Ref);
+                    string nodeRefAttribute = s_node.GetMetadata(ReaderNodeParseable.Metadata.Ref);
                     if (nodeRefAttribute != null)
                     {
                         Dbg.Err($"{s_node.GetInputContext()}: Found a reference tag while not evaluating Recorder mode, ignoring it");
@@ -538,7 +538,7 @@ namespace Dec
             }
             else
             {
-                (refKey, refKeyNode) = nodes.Select(node => (node.GetMetadata(ReaderNode.Metadata.Ref), node)).Where(anp => anp.Item1 != null).LastOrDefault();
+                (refKey, refKeyNode) = nodes.Select(node => (node.GetMetadata(ReaderNodeParseable.Metadata.Ref), node)).Where(anp => anp.Item1 != null).LastOrDefault();
             }
 
             // First figure out type. We actually need type to be set before we can properly analyze and validate the mode flags.
@@ -552,7 +552,7 @@ namespace Dec
                 foreach (var s_node in nodes)
                 {
                     // However, we do need to watch for Replace, because that means we should nuke the class attribute and start over.
-                    string modeAttribute = s_node.GetMetadata(ReaderNode.Metadata.Mode);
+                    string modeAttribute = s_node.GetMetadata(ReaderNodeParseable.Metadata.Mode);
                     ParseMode s_parseMode = ParseModeFromString(s_node.GetInputContext(), modeAttribute);
                     if (s_parseMode == ParseMode.Replace)
                     {
@@ -564,7 +564,7 @@ namespace Dec
                     // if we get nulled, we kill the class tag and basically treat it like a delete
                     // but we also reset the null tag on every entry
                     isNull = false;
-                    string nullAttribute = s_node.GetMetadata(ReaderNode.Metadata.Null);
+                    string nullAttribute = s_node.GetMetadata(ReaderNodeParseable.Metadata.Null);
                     if (nullAttribute != null)
                     {
                         if (!bool.TryParse(nullAttribute, out bool nullValue))
@@ -578,7 +578,7 @@ namespace Dec
                     }
 
                     // update the class based on whatever this says
-                    string localClassAttribute = s_node.GetMetadata(ReaderNode.Metadata.Class);
+                    string localClassAttribute = s_node.GetMetadata(ReaderNodeParseable.Metadata.Class);
                     if (localClassAttribute != null)
                     {
                         classAttribute = localClassAttribute;
@@ -608,7 +608,7 @@ namespace Dec
 
             // Now we traverse the Mode attributes as prep for our final parse pass.
             // ordersOverride makes `nodes` admittedly a little unnecessary.
-            List<(ParseCommand command, ReaderNode node)> orders = ordersOverride ?? CompileOrders(type.CalculateSerializationModeCategory(converter, isRootDec), nodes);
+            List<(ParseCommand command, ReaderNodeParseable node)> orders = ordersOverride ?? CompileOrders(type.CalculateSerializationModeCategory(converter, isRootDec), nodes);
 
             // Gather info
             bool hasChildren = false;

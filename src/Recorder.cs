@@ -401,7 +401,7 @@ namespace Dec
                             {
                                 // Do our actual parsing
                                 // We know this *was* shared or it wouldn't be a ref now, so we tag it again in case it's a List<SomeClass> so we can share its children as well.
-                                var refInstanceOutput = Serialization.ParseElement(new List<ReaderNode>() { reference.node }, refInstance.GetType(), refInstance, readerContext, new Recorder.Context() { shared = Context.Shared.Allow }, hasReferenceId: true);
+                                var refInstanceOutput = Serialization.ParseElement(new List<ReaderNodeParseable>() { reference.node }, refInstance.GetType(), refInstance, readerContext, new Recorder.Context() { shared = Context.Shared.Allow }, hasReferenceId: true);
 
                                 if (refInstance != refInstanceOutput)
                                 {
@@ -440,7 +440,7 @@ namespace Dec
 
                 // And now, we can finally parse our actual root element!
                 // (which accounts for a tiny percentage of things that need to be parsed)
-                return (T)Serialization.ParseElement(new List<ReaderNode>() { parseNode }, typeof(T), null, readerContext, new Recorder.Context() { shared = Context.Shared.Flexible });
+                return (T)Serialization.ParseElement(new List<ReaderNodeParseable>() { parseNode }, typeof(T), null, readerContext, new Recorder.Context() { shared = Context.Shared.Flexible });
             }
         }
 
@@ -545,12 +545,13 @@ namespace Dec
                 return;
             }
 
-            if (parameters.asThis)
+            // If this isn't parseable, we just ignore the asThis flag, we're doing a clone process and asThis semantics are irrelevant.
+            if (parameters.asThis && (node is ReaderNodeParseable nodeParseable))
             {
                 asThis = true;
 
                 // Explicit cast here because we want an error if we have the wrong type!
-                value = (T)Serialization.ParseElement(new List<ReaderNode>() { node }, typeof(T), value, readerContext, parameters.CreateContext(), asThis: true);
+                value = (T)Serialization.ParseElement(new List<ReaderNodeParseable>() { nodeParseable }, typeof(T), value, readerContext, parameters.CreateContext(), asThis: true);
 
                 return;
             }
