@@ -307,6 +307,11 @@ namespace Dec
             return results;
         }
 
+        public override object ParseElement(Type type, object model, ReaderContext readerContext, Recorder.Context recorderContext)
+        {
+            return Serialization.ParseElement(new List<ReaderNode>() { this }, type, model, readerContext, recorderContext);
+        }
+
         public override void ParseList(IList list, Type referencedType, ReaderContext readerContext, Recorder.Context recorderContext)
         {
             var recorderChildContext = recorderContext.CreateChild();

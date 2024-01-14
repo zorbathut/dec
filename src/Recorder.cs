@@ -567,7 +567,7 @@ namespace Dec
             }
 
             // Explicit cast here because we want an error if we have the wrong type!
-            value = (T)Serialization.ParseElement(new List<ReaderNode>() { recorded }, typeof(T), value, readerContext, parameters.CreateContext());
+            value = (T)recorded.ParseElement(typeof(T), value, readerContext, parameters.CreateContext());
         }
 
         public override Direction Mode { get => Direction.Read; }
