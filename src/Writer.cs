@@ -28,10 +28,8 @@ namespace Dec
             context = context.CreateChild();
         }
 
-        // this needs to be more abstract
-        public abstract WriterNode CreateChild(string label, Recorder.Context context);
-
-        public abstract WriterNode CreateMember(System.Reflection.FieldInfo field, Recorder.Context context);
+        public abstract WriterNode CreateRecorderChild(string label, Recorder.Context context);
+        public abstract WriterNode CreateReflectionChild(System.Reflection.FieldInfo field, Recorder.Context context);
 
         public abstract void WritePrimitive(object value);
         public abstract void WriteEnum(object value);

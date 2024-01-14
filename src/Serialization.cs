@@ -1823,7 +1823,7 @@ namespace Dec
 
             foreach (var field in valType.GetSerializableFieldsFromHierarchy())
             {
-                ComposeElement(node.CreateMember(field, node.RecorderContext), field.GetValue(value), field.FieldType, fieldInfo: field);
+                ComposeElement(node.CreateReflectionChild(field, node.RecorderContext), field.GetValue(value), field.FieldType, fieldInfo: field);
             }
 
             return;

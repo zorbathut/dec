@@ -118,7 +118,7 @@ namespace Dec
                     Dbg.Err("Recorder.WithFactory() called on a Shared Recorder.Parameters. This is disallowed; currently overriding Shared with factories.");
                     parameters.shared = false;
                 }
-                
+
                 parameters.factories = factories;
 
                 return parameters;
@@ -505,7 +505,7 @@ namespace Dec
 
             fields.Add(label);
 
-            Serialization.ComposeElement(node.CreateChild(label, parameters.CreateContext()), value, typeof(T));
+            Serialization.ComposeElement(node.CreateRecorderChild(label, parameters.CreateContext()), value, typeof(T));
         }
 
         public override Direction Mode { get => Direction.Write; }

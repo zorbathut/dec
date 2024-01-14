@@ -324,12 +324,19 @@ namespace Dec
             return new WriterNodeXml(writer, decRoot, name, 0, new Recorder.Context() { shared = Recorder.Context.Shared.Flexible });
         }
 
-        public override WriterNode CreateChild(string label, Recorder.Context context)
+        internal WriterNodeXml CreateNamedChild(string label, Recorder.Context context)
         {
             return new WriterNodeXml(writer, node, label, depth + 1, context);
         }
 
-        public override WriterNode CreateMember(System.Reflection.FieldInfo field, Recorder.Context context)
+        // this should be WriterNodeXml but this C# doesn't support that
+        public override WriterNode CreateRecorderChild(string label, Recorder.Context context)
+        {
+            return new WriterNodeXml(writer, node, label, depth + 1, context);
+        }
+
+        // this should be WriterNodeXml but this C# doesn't support that
+        public override WriterNode CreateReflectionChild(System.Reflection.FieldInfo field, Recorder.Context context)
         {
             return new WriterNodeXml(writer, node, field.Name, depth + 1, context);
         }
@@ -433,7 +440,7 @@ namespace Dec
             return writer.RegisterReference(value, node, RecorderContext);
         }
 
-        private void WriteArrayRank(WriterNode node, Array value, Type referencedType, int rank, int[] indices)
+        private void WriteArrayRank(WriterNodeXml node, Array value, Type referencedType, int rank, int[] indices)
         {
             if (rank == value.Rank)
             {
@@ -443,7 +450,7 @@ namespace Dec
             {
                 for (int i = 0; i < value.GetLength(rank); ++i)
                 {
-                    var child = node.CreateChild("li", RecorderContext.CreateChild());
+                    var child = node.CreateNamedChild("li", RecorderContext.CreateChild());
 
                     indices[rank] = i;
                     WriteArrayRank(child, value, referencedType, rank + 1, indices);
@@ -460,7 +467,7 @@ namespace Dec
                 // fast path
                 for (int i = 0; i < value.Length; ++i)
                 {
-                    Serialization.ComposeElement(CreateChild("li", RecorderContext.CreateChild()), value.GetValue(i), referencedType);
+                    Serialization.ComposeElement(CreateNamedChild("li", RecorderContext.CreateChild()), value.GetValue(i), referencedType);
                 }
 
                 return;
@@ -479,7 +486,7 @@ namespace Dec
 
             for (int i = 0; i < value.Count; ++i)
             {
-                Serialization.ComposeElement(CreateChild("li", RecorderContext.CreateChild()), value[i], referencedType);
+                Serialization.ComposeElement(CreateNamedChild("li", RecorderContext.CreateChild()), value[i], referencedType);
             }
         }
 
@@ -495,10 +502,10 @@ namespace Dec
                 // In theory, some dicts support inline format, not li format. Inline format is cleaner and smaller and we should be using it when possible.
                 // In practice, it's hard and I'm lazy and this always works, and we're not providing any guarantees about cleanliness of serialized output.
                 // Revisit this later when someone (possibly myself) really wants it improved.
-                var li = CreateChild("li", RecorderContext);
+                var li = CreateNamedChild("li", RecorderContext);
 
-                Serialization.ComposeElement(li.CreateChild("key", RecorderContext.CreateChild()), iterator.Key, keyType);
-                Serialization.ComposeElement(li.CreateChild("value", RecorderContext.CreateChild()), iterator.Value, valueType);
+                Serialization.ComposeElement(li.CreateNamedChild("key", RecorderContext.CreateChild()), iterator.Key, keyType);
+                Serialization.ComposeElement(li.CreateNamedChild("value", RecorderContext.CreateChild()), iterator.Value, valueType);
             }
         }
 
@@ -513,7 +520,7 @@ namespace Dec
                 // In theory, some sets support inline format, not li format. Inline format is cleaner and smaller and we should be using it when possible.
                 // In practice, it's hard and I'm lazy and this always works, and we're not providing any guarantees about cleanliness of serialized output.
                 // Revisit this later when someone (possibly myself) really wants it improved.
-                Serialization.ComposeElement(CreateChild("li", RecorderContext.CreateChild()), iterator.Current, keyType);
+                Serialization.ComposeElement(CreateNamedChild("li", RecorderContext.CreateChild()), iterator.Current, keyType);
             }
         }
 
@@ -549,7 +556,7 @@ namespace Dec
 
             for (int i = 0; i < length; ++i)
             {
-                Serialization.ComposeElement(CreateChild(nameArray != null ? nameArray[i] : "li", RecorderContext.CreateChild()), value.GetType().GetProperty(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
+                Serialization.ComposeElement(CreateNamedChild(nameArray != null ? nameArray[i] : "li", RecorderContext.CreateChild()), value.GetType().GetProperty(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
             }
         }
 
@@ -562,7 +569,7 @@ namespace Dec
 
             for (int i = 0; i < length; ++i)
             {
-                Serialization.ComposeElement(CreateChild(nameArray != null ? nameArray[i] : "li", RecorderContext.CreateChild()), value.GetType().GetField(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
+                Serialization.ComposeElement(CreateNamedChild(nameArray != null ? nameArray[i] : "li", RecorderContext.CreateChild()), value.GetType().GetField(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
             }
         }
 

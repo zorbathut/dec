@@ -153,12 +153,12 @@ namespace Dec
             this.accessor = accessor;
         }
 
-        public override WriterNode CreateChild(string label, Recorder.Context context)
+        public override WriterNode CreateRecorderChild(string label, Recorder.Context context)
         {
             return new WriterNodeValidation(writer, $"{accessor}.{label}");
         }
 
-        public override WriterNode CreateMember(System.Reflection.FieldInfo field, Recorder.Context context)
+        public override WriterNode CreateReflectionChild(System.Reflection.FieldInfo field, Recorder.Context context)
         {
             if (field.IsPublic)
             {
@@ -183,7 +183,7 @@ namespace Dec
         public override void TagClass(Type type)
         {
             FlagAsClass();
-            
+
             if (type == typeof(Type))
             {
                 // Special case: Sometimes we convert System.RuntimeType to System.Type, because System.RuntimeType is a compatible C# implementation detail that we don't want to preserve.
@@ -408,12 +408,12 @@ namespace Dec
             SerializedString = token;
         }
 
-        public override WriterNode CreateChild(string label, Recorder.Context context)
+        public override WriterNode CreateRecorderChild(string label, Recorder.Context context)
         {
             throw new NotImplementedException();
         }
 
-        public override WriterNode CreateMember(System.Reflection.FieldInfo field, Recorder.Context context)
+        public override WriterNode CreateReflectionChild(System.Reflection.FieldInfo field, Recorder.Context context)
         {
             throw new NotImplementedException();
         }
