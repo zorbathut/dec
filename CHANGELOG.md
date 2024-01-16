@@ -6,6 +6,9 @@ All notable changes to this project will be documented in this file.
 ### Improved
 * Major revamp of Recorder.Clone functionality to dramatically improve performance.
 
+### Improved
+* Recorder no longer depends on Parser.Finish() to find Converters.
+
 ### Testing
 * Improved consistency of a few tests.
 

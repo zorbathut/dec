@@ -37,9 +37,6 @@ namespace DecTest
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
-            var parser = new Dec.Parser();
-            parser.Finish();
-
             var refs = new RefsRootRecordable();
             refs.childAone = new RefsChildRecordable();
             refs.childAtwo = refs.childAone;
@@ -83,9 +80,6 @@ namespace DecTest
         public void ContainerRecursive([Values] RecorderMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { });
-
-            var parser = new Dec.Parser();
-            parser.Finish();
 
             var parent = new RecursiveParent();
             parent.children = new List<RecursiveNode>();
@@ -138,9 +132,6 @@ namespace DecTest
 
             UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
-            var parser = new Dec.Parser();
-            parser.Finish();
-
             var root = new DoubleLinkedRecorder();
 
             {
@@ -179,9 +170,6 @@ namespace DecTest
             const int depth = 10_000;
 
             UpdateTestParameters(new Dec.Config.UnitTestParameters { });
-
-            var parser = new Dec.Parser();
-            parser.Finish();
 
             var root = new DoubleLinkedRecorder();
 
@@ -233,9 +221,6 @@ namespace DecTest
             const int depth = 130;
 
             UpdateTestParameters(new Dec.Config.UnitTestParameters { });
-
-            var parser = new Dec.Parser();
-            parser.Finish();
 
             var root = new UnsharedRecorder();
 

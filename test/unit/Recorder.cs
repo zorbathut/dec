@@ -32,9 +32,6 @@ namespace DecTest
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
-            var parser = new Dec.Parser();
-            parser.Finish();
-
             var primitives = new PrimitivesRecordable();
             primitives.intValue = 42;
             primitives.floatValue = 0.1234f;
@@ -77,9 +74,6 @@ namespace DecTest
         public void Enum([Values] RecorderMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { });
-
-            var parser = new Dec.Parser();
-            parser.Finish();
 
             var enums = new EnumRecordable();
             enums.alph = EnumRecordable.Enum.Alpha;
@@ -218,9 +212,6 @@ namespace DecTest
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
-            var parser = new Dec.Parser();
-            parser.Finish();
-
             var containers = new ContainersRecordable();
             containers.intList.Add(42);
             containers.intList.Add(1234);
@@ -252,9 +243,6 @@ namespace DecTest
         public void ContainersNested([Values] RecorderMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { });
-
-            var parser = new Dec.Parser();
-            parser.Finish();
 
             var nested = new ContainersNestedRecordable();
             nested.intLL.Add(new List<int>());

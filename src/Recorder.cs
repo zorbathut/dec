@@ -326,6 +326,8 @@ namespace Dec
         /// </summary>
         public static string Write<T>(T target, bool pretty = false)
         {
+            Serialization.Initialize();
+
             using (var _ = new CultureInfoScope(Config.CultureInfo))
             {
                 var writerContext = new WriterXmlRecord();
@@ -356,6 +358,8 @@ namespace Dec
         /// </summary>
         public static T Read<T>(string input, string stringName = "input")
         {
+            Serialization.Initialize();
+
             using (var _ = new CultureInfoScope(Config.CultureInfo))
             {
                 ReaderFileRecorder reader = ReaderFileRecorderXml.Create(input, stringName);
@@ -507,6 +511,8 @@ namespace Dec
         /// </remarks>
         public static T Clone<T>(T obj)
         {
+            Serialization.Initialize();
+
             using (var _ = new CultureInfoScope(Config.CultureInfo))
             {
                 var writerContext = new WriterClone();

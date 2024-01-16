@@ -14,9 +14,6 @@ namespace DecTest
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
-            var parser = new Dec.Parser();
-            parser.Finish();
-
             var deserialized = Dec.Recorder.Read<int>(@"
                 <Record>
                   <recordFormatVersion>1</recordFormatVersion>

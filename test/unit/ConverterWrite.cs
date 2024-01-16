@@ -44,9 +44,6 @@ namespace DecTest
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterString) } });
 
-            var parser = new Dec.Parser();
-            parser.Finish();
-
             var converted = new ConverterRecordable();
             converted.convertible = new Converted();
             converted.convertible.a = 42;
@@ -74,9 +71,6 @@ namespace DecTest
         public void ConverterRecord([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterRecord) } });
-
-            var parser = new Dec.Parser();
-            parser.Finish();
 
             var converted = new ConverterRecordable();
             converted.convertible = new Converted();

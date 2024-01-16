@@ -51,6 +51,7 @@ namespace Dec
     {
         // Initialize it to empty in order to support Recorder operations without Dec initialization.
         // At some point we'll figure out how to support Converters at that point as well.
+        internal static bool ConverterInitialized = false;
         internal static Dictionary<Type, Converter> ConverterObjects = new Dictionary<Type, Converter>();
         internal static Dictionary<Type, Type> ConverterGenericPrototypes = new Dictionary<Type, Type>();
 
@@ -90,6 +91,14 @@ namespace Dec
 
         internal static void Initialize()
         {
+            if (ConverterInitialized)
+            {
+                return;
+            }
+
+            // this is here just so we don't keep thrashing if something breaks
+            ConverterInitialized = true;
+
             ConverterObjects = new Dictionary<Type, Converter>();
 
             IEnumerable<Type> conversionTypes;
@@ -1779,6 +1788,7 @@ namespace Dec
 
         internal static void Clear()
         {
+            ConverterInitialized = false;
             ConverterObjects = new Dictionary<Type, Converter>();
             ConverterGenericPrototypes = new Dictionary<Type, Type>();
         }
