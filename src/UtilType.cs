@@ -569,6 +569,10 @@ namespace Dec
         {
             return Util.CanBeShared(type);
         }
+        internal static bool CanBeCloneCopied(this Type type)
+        {
+            return type.IsPrimitive || typeof(Dec).IsAssignableFrom(type) || type == typeof(string) || type == typeof(Type);
+        }
 
         internal enum ParseModeCategory
         {

@@ -264,10 +264,18 @@ namespace Dec
                 var originalArray = original as Array;
                 var resultArray = result as Array;
 
-                int[] dimensions = Enumerable.Range(0, originalArray.Rank).Select(i => originalArray.GetLength(i)).ToArray();
-                int[] index = new int[originalArray.Rank];
+                // if the array members are valuelike, we can just copy the whole thing
+                if (UtilType.CanBeCloneCopied(originalArray.GetType().GetElementType()))
+                {
+                    Array.Copy(originalArray, resultArray, originalArray.Length);
+                }
+                else
+                {
+                    int[] dimensions = Enumerable.Range(0, originalArray.Rank).Select(i => originalArray.GetLength(i)).ToArray();
+                    int[] index = new int[originalArray.Rank];
 
-                DoArrayRecursive(originalArray, resultArray, dimensions, index, 0, resetDepth);
+                    DoArrayRecursive(originalArray, resultArray, dimensions, index, 0, resetDepth);
+                }
             }
             else if (valType.IsGenericType && valType.GetGenericTypeDefinition() == typeof(List<>))
             {
@@ -277,9 +285,19 @@ namespace Dec
                 // just in case; maybe we should be reusing originals as models?
                 resultList.Clear();
 
-                for (int i = 0; i < originalList.Count; i++)
+                // if the list members are valuelike, we can just copy the whole thing
+                if (UtilType.CanBeCloneCopied(originalList.GetType().GetGenericArguments()[0]))
                 {
-                    resultList.Add(CloneChild(originalList[i], resetDepth));
+                    // use AddRange to copy
+                    var addRangeFunction = resultList.GetType().GetMethod("AddRange");
+                    addRangeFunction.Invoke(resultList, new object[] { originalList });
+                }
+                else
+                {
+                    for (int i = 0; i < originalList.Count; i++)
+                    {
+                        resultList.Add(CloneChild(originalList[i], resetDepth));
+                    }
                 }
 
                 resultList.GetType().GetField("_version", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).SetValue(resultList, Util.CollectionDeserializationVersion);
@@ -292,10 +310,21 @@ namespace Dec
                 // just in case; maybe we should be reusing originals as models?
                 resultDict.Clear();
 
-                foreach (var key in originalDict.Keys)
+                // if the dictionary members are valuelike, we can just copy the whole thing
+                // in theory we could do this for partial valuelikes also, just cloning one side of it?
+                if (UtilType.CanBeCloneCopied(originalDict.GetType().GetGenericArguments()[0]) && UtilType.CanBeCloneCopied(originalDict.GetType().GetGenericArguments()[1]))
                 {
-                    // this is a kind of crummy way to do this since we're doing a search for each one
-                    resultDict[CloneChild(key, resetDepth)] = CloneChild(originalDict[key], resetDepth);
+                    foreach (DictionaryEntry kvp in originalDict)
+                    {
+                        resultDict[kvp.Key] = kvp.Value;
+                    }
+                }
+                else
+                {
+                    foreach (DictionaryEntry kvp in originalDict)
+                    {
+                        resultDict[CloneChild(kvp.Key, resetDepth)] = CloneChild(kvp.Value, resetDepth);
+                    }
                 }
             }
             else if (valType.IsGenericType && valType.GetGenericTypeDefinition() == typeof(HashSet<>))
@@ -306,11 +335,22 @@ namespace Dec
                 var clearFunction = result.GetType().GetMethod("Clear");
                 clearFunction.Invoke(result, null);
 
-
-                var addFunction = result.GetType().GetMethod("Add");
-                foreach (var item in originalSet)
+                // if the dictionary members are valuelike, we can just copy the whole thing
+                if (UtilType.CanBeCloneCopied(originalSet.GetType().GetGenericArguments()[0]))
                 {
-                    addFunction.Invoke(result, new object[] { CloneChild(item, resetDepth) });
+                    var addFunction = result.GetType().GetMethod("Add");
+                    foreach (var item in originalSet)
+                    {
+                        addFunction.Invoke(result, new object[] { item });
+                    }
+                }
+                else
+                {
+                    var addFunction = result.GetType().GetMethod("Add");
+                    foreach (var item in originalSet)
+                    {
+                        addFunction.Invoke(result, new object[] { CloneChild(item, resetDepth) });
+                    }
                 }
             }
             else if (valType.IsGenericType && valType.GetGenericTypeDefinition() == typeof(Queue<>))
@@ -319,10 +359,27 @@ namespace Dec
                 var resultQueueClearFunction = result.GetType().GetMethod("Clear");
                 resultQueueClearFunction.Invoke(result, null);
 
-                var resultQueueEnqueueFunction = result.GetType().GetMethod("Enqueue");
-                foreach (var item in originalQueue)
+                // just in case; maybe we should be reusing originals as models?
+                var clearFunction = result.GetType().GetMethod("Clear");
+                clearFunction.Invoke(result, null);
+
+                // if the dictionary members are valuelike, we can just copy the whole thing
+                if (UtilType.CanBeCloneCopied(originalQueue.GetType().GetGenericArguments()[0]))
                 {
-                    resultQueueEnqueueFunction.Invoke(result, new object[] { CloneChild(item, resetDepth) });
+                    // there might be a faster way to do this?
+                    var resultQueueEnqueueFunction = result.GetType().GetMethod("Enqueue");
+                    foreach (var item in originalQueue)
+                    {
+                        resultQueueEnqueueFunction.Invoke(result, new object[] { item });
+                    }
+                }
+                else
+                {
+                    var resultQueueEnqueueFunction = result.GetType().GetMethod("Enqueue");
+                    foreach (var item in originalQueue)
+                    {
+                        resultQueueEnqueueFunction.Invoke(result, new object[] { CloneChild(item, resetDepth) });
+                    }
                 }
             }
             else if (valType.IsGenericType && valType.GetGenericTypeDefinition() == typeof(Stack<>))
@@ -330,18 +387,42 @@ namespace Dec
                 var originalStack = original as IEnumerable;
                 var tempStack = new Stack<object>();
 
-                foreach (var item in originalStack)
+                // just in case; maybe we should be reusing originals as models?
+                var clearFunction = result.GetType().GetMethod("Clear");
+                clearFunction.Invoke(result, null);
+
+                // if the dictionary members are valuelike, we can just copy the whole thing
+                if (UtilType.CanBeCloneCopied(originalStack.GetType().GetGenericArguments()[0]))
                 {
-                    tempStack.Push(CloneChild(item, resetDepth));
+                    foreach (var item in originalStack)
+                    {
+                        tempStack.Push(CloneChild(item, resetDepth));
+                    }
+
+                    var resultStackClearFunction = result.GetType().GetMethod("Clear");
+                    resultStackClearFunction.Invoke(result, null);
+
+                    var resultStackPushFunction = result.GetType().GetMethod("Push");
+                    while (tempStack.Count > 0)
+                    {
+                        resultStackPushFunction.Invoke(result, new object[] { tempStack.Pop() });
+                    }
                 }
-
-                var resultStackClearFunction = result.GetType().GetMethod("Clear");
-                resultStackClearFunction.Invoke(result, null);
-
-                var resultStackPushFunction = result.GetType().GetMethod("Push");
-                while (tempStack.Count > 0)
+                else
                 {
-                    resultStackPushFunction.Invoke(result, new object[] { tempStack.Pop() });
+                    foreach (var item in originalStack)
+                    {
+                        tempStack.Push(CloneChild(item, resetDepth));
+                    }
+
+                    var resultStackClearFunction = result.GetType().GetMethod("Clear");
+                    resultStackClearFunction.Invoke(result, null);
+
+                    var resultStackPushFunction = result.GetType().GetMethod("Push");
+                    while (tempStack.Count > 0)
+                    {
+                        resultStackPushFunction.Invoke(result, new object[] { tempStack.Pop() });
+                    }
                 }
             }
             else if (valType.IsGenericType && (
