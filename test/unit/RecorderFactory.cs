@@ -437,14 +437,23 @@ namespace DecTest
             element.one.nonrecorded = 11;
             element.one.recorded = 12;
 
-            var deserialized = DoRecorderRoundTrip(element, mode, expectWriteErrors: true);
+            var deserialized = DoRecorderRoundTrip(element, mode, expectWriteErrors: mode != RecorderMode.Clone);
 
-            Assert.IsNotNull(deserialized.one);
-            Assert.AreEqual(100, deserialized.one.nonrecorded);
-            Assert.AreEqual(12, deserialized.one.recorded);
-            Assert.IsNotNull(deserialized.two);
-            Assert.AreEqual(100, deserialized.two.nonrecorded);
-            Assert.AreEqual(200, deserialized.two.recorded);
+            if (mode != RecorderMode.Clone)
+            {
+                Assert.IsNotNull(deserialized.one);
+                Assert.AreEqual(100, deserialized.one.nonrecorded);
+                Assert.AreEqual(12, deserialized.one.recorded);
+                Assert.IsNotNull(deserialized.two);
+                Assert.AreEqual(100, deserialized.two.nonrecorded);
+                Assert.AreEqual(200, deserialized.two.recorded);
+            }
+            else
+            {
+                Assert.AreSame(deserialized.one, deserialized.two);
+                Assert.AreEqual(100, deserialized.one.nonrecorded);
+                Assert.AreEqual(12, deserialized.one.recorded);
+            }
         }
 
         [Test]

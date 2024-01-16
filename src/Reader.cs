@@ -40,6 +40,8 @@ namespace Dec
 
     internal abstract class ReaderNode
     {
+        public virtual bool AllowAsThis { get => true; }
+
         public abstract InputContext GetInputContext(); // note: this function must be really fast!
 
         public abstract ReaderNode GetChildNamed(string name);

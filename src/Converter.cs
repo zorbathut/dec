@@ -10,6 +10,7 @@ namespace Dec
     /// </remarks>
     public abstract class Converter
     {
+        // This is `internal virtual` because there's no way I can find to specify `internal abstract`.
         internal virtual Type GetConvertedTypeHint() { return null; }
     }
 

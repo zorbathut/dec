@@ -178,6 +178,57 @@ namespace Dec
                 }
                 return rv;
             }
+
+            internal IRecordable CreateRecordableFromFactory(Type type, string name, ReaderNode node)
+            {
+                // Iterate back to the appropriate type.
+                Type targetType = type;
+                Func<Type, object> maker = null;
+                while (targetType != null)
+                {
+                    if (factories.TryGetValue(targetType, out maker))
+                    {
+                        break;
+                    }
+
+                    targetType = targetType.BaseType;
+                }
+
+                if (maker == null)
+                {
+                    return (IRecordable)type.CreateInstanceSafe(name, node);
+                }
+                else
+                {
+                    // want to propogate this throughout the factories list to save on time later
+                    // we're actually doing the same BaseType thing again, starting from scratch
+                    Type writeType = type;
+                    while (writeType != targetType)
+                    {
+                        factories[writeType] = maker;
+                        writeType = writeType.BaseType;
+                    }
+
+                    // oh right and I guess we should actually make the thing too
+                    var obj = maker(type);
+
+                    if (obj == null)
+                    {
+                        // fall back to default behavior
+                        return (IRecordable)type.CreateInstanceSafe(name, node);
+                    }
+                    else if (!type.IsAssignableFrom(obj.GetType()))
+                    {
+                        Dbg.Err($"Custom factory generated {obj.GetType()} when {type} was expected; falling back on a default object");
+                        return (IRecordable)type.CreateInstanceSafe(name, node);
+                    }
+                    else
+                    {
+                        // now that we've checked this is of the right type
+                        return (IRecordable)obj;
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -448,12 +499,27 @@ namespace Dec
         /// Makes a copy of an object.
         /// </summary>
         /// <remarks>
-        /// This is logically equivalent to Write(Read(obj)), but may be much faster.
+        /// This is logically equivalent to Write(Read(obj)), but much faster.
+        ///
+        /// Clone() is guaranteed to accept everything that Write(Read(obj)) does, but the reverse is not true; Clone is sometimes more permissive than the disk serialization system. Don't expect to use this as complete validation for Write.
+        ///
+        /// This is a new feature and should be considered experimental. It is currently undertested, and I cannot stress this enough, Dec is a library full of weird edge cases and extremely carefully chosen behaviors, I *guarantee* many of those are handled wrong with Clone. If performance is not critical I currently strongly recommend using Write(Read(obj)).
         /// </remarks>
         public static T Clone<T>(T obj)
         {
-            var stringized = Write(obj);
-            return Read<T>(stringized);
+            using (var _ = new CultureInfoScope(Config.CultureInfo))
+            {
+                var writerContext = new WriterClone();
+
+                var writerNode = writerContext.StartData(typeof(T));
+
+                Serialization.ComposeElement(writerNode, obj, typeof(T));
+                var output = writerNode.GetResult();
+
+                writerContext.FinalizePendingWrites();
+
+                return (T)output;
+            }
         }
     }
 
@@ -492,9 +558,12 @@ namespace Dec
                     return;
                 }
 
-                Serialization.ComposeElement(node, value, typeof(T), asThis: true);
+                if (node.AllowAsThis)
+                {
+                    Serialization.ComposeElement(node, value, typeof(T), asThis: true);
 
-                return;
+                    return;
+                }
             }
 
             if (fields.Contains(label))
@@ -545,15 +614,17 @@ namespace Dec
                 return;
             }
 
-            // If this isn't parseable, we just ignore the asThis flag, we're doing a clone process and asThis semantics are irrelevant.
-            if (parameters.asThis && (node is ReaderNodeParseable nodeParseable))
+            if (parameters.asThis)
             {
                 asThis = true;
 
-                // Explicit cast here because we want an error if we have the wrong type!
-                value = (T)Serialization.ParseElement(new List<ReaderNodeParseable>() { nodeParseable }, typeof(T), value, readerContext, parameters.CreateContext(), asThis: true);
+                if (node.AllowAsThis && (node is ReaderNodeParseable nodeParseable))
+                {
+                    // Explicit cast here because we want an error if we have the wrong type!
+                    value = (T)Serialization.ParseElement(new List<ReaderNodeParseable>() { nodeParseable }, typeof(T), value, readerContext, parameters.CreateContext(), asThis: true);
 
-                return;
+                    return;
+                }
             }
 
             if (disallowShared && parameters.shared)

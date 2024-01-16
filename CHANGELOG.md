@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 
 
 ## [Unreleased]
+### Improved
+* Major revamp of Recorder.Clone functionality to dramatically improve performance.
+
 ### Testing
 * Improved consistency of a few tests.
 

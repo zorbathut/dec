@@ -54,7 +54,7 @@ namespace DecTest
         {
             public override void Record(ref Stub input, Dec.Recorder recorder)
             {
-                
+
             }
         }
 
@@ -688,7 +688,7 @@ namespace DecTest
 
             public override void Read(ref RefsForThings input, Dec.Recorder recorder)
             {
-                
+
             }
 
             public override void Write(RefsForThings input, Dec.Recorder recorder)
@@ -729,8 +729,8 @@ namespace DecTest
             var dat = new RefsForThings();
             dat.listA = dat.listB = new List<int>() { 1, 3, 5, 7, 11 };
 
-            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: true);
-            
+            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: mode != RecorderMode.Clone);
+
             if (mode != RecorderMode.RefEverything)
             {
                 // this actually *can* work because the RefsForThings instance is not, itself, shared
@@ -740,7 +740,7 @@ namespace DecTest
             {
                 Assert.IsNull(deserialized.listA);
             }
-            
+
             Assert.AreSame(dat.listA, dat.listB);
         }
 
@@ -753,7 +753,7 @@ namespace DecTest
             var dat = new RefsForThings();
             // these are null, so we'll get the right result, but we want to make sure the errors happen as well
 
-            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: true);
+            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: mode != RecorderMode.Clone);
 
             Assert.IsNull(deserialized.listA);
             Assert.IsNull(deserialized.listB);
@@ -769,13 +769,16 @@ namespace DecTest
             dat.a = dat.b = new RefsForThings();
             dat.a.listA = dat.a.listB = new List<int>() { 1, 3, 5, 7, 11 };
 
-            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: true);
+            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: mode != RecorderMode.Clone);
 
             Assert.IsNotNull(deserialized.a);
             Assert.AreSame(deserialized.a, deserialized.b);
 
-            Assert.IsNull(deserialized.a.listA);
-            Assert.IsNull(deserialized.a.listB);
+            if (mode != RecorderMode.Clone)
+            {
+                Assert.IsNull(deserialized.a.listA);
+                Assert.IsNull(deserialized.a.listB);
+            }
         }
 
         [Test]

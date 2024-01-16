@@ -490,6 +490,12 @@ namespace Dec
 
         public override void ParseHashset(object hashset, Type referencedType, ReaderContext readerContext, Recorder.Context recorderContext, bool permitPatch)
         {
+            // This is a gigantic pain because HashSet<> doesn't inherit from any non-generic interface that provides the functionality we want
+            // So we're stuck doing it all through object and reflection
+            // Thanks, HashSet
+            // This might be a performance problem and we'll . . . deal with it later I guess?
+            // This might actually be a good first place to use IL generation.
+
             var containsFunction = hashset.GetType().GetMethod("Contains");
             var addFunction = hashset.GetType().GetMethod("Add");
 

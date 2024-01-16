@@ -250,7 +250,9 @@ namespace DecTest
                 }
             }
 
-            var deserialized = DoRecorderRoundTrip(root, mode, expectWriteErrors: true);
+            // I'm divided on whether Clone should spit out errors for this or not
+            // but I *think* it's harmless if it doesn't
+            var deserialized = DoRecorderRoundTrip(root, mode, expectWriteErrors: mode != RecorderMode.Clone);
 
             {
                 var seen = new HashSet<UnsharedRecorder>();

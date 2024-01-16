@@ -51,7 +51,9 @@ namespace Dec.RecorderEnumerator
 
         public override object Create(Recorder recorder)
         {
-            return Activator.CreateInstance(typeof(Node), new object[] { Enumerable.Empty<T>() });
+            // private constructor requires jumping through some hoops
+            var constructor = typeof(Node).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, null, new Type[] { typeof(System.Collections.Generic.IEnumerable<T>) }, null);
+            return constructor.Invoke(new object[] { Enumerable.Empty<T>() });
         }
 
         public override void Read(ref object input, Recorder recorder)

@@ -129,7 +129,7 @@ namespace DecTest
             var item = new ThisThenClassOuter();
             item.data = new ThisThenClassInnerDerived();
 
-            var deserialized = DoRecorderRoundTrip(item, mode, expectWriteErrors: true);
+            var deserialized = DoRecorderRoundTrip(item, mode, expectWriteErrors: mode != RecorderMode.Clone);
         }
 
         public class ClassThenThisOuterBase : Dec.IRecordable
@@ -149,7 +149,7 @@ namespace DecTest
             var item = new ClassThenThisOuterDerived();
             ClassThenThisOuterBase itemBase = item;
 
-            var deserialized = DoRecorderRoundTrip(itemBase, mode, expectReadErrors: true, expectWriteErrors: true);
+            var deserialized = DoRecorderRoundTrip(itemBase, mode, expectReadErrors: mode != RecorderMode.Clone, expectWriteErrors: mode != RecorderMode.Clone);
         }
 
         public class Inner : Dec.IRecordable

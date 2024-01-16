@@ -3,7 +3,7 @@ namespace DecTest
     using NUnit.Framework;
     using System;
     using System.Collections.Generic;
-    
+
     [TestFixture]
     public class Recorder : Base
     {
@@ -190,9 +190,12 @@ namespace DecTest
 
             Dec.Database.Delete(StaticReferenceDecs.TestDecA);
 
-            var deserialized = DoRecorderRoundTrip(decs, mode, expectWriteErrors: true, expectReadErrors: true);
+            var deserialized = DoRecorderRoundTrip(decs, mode, expectWriteErrors: mode != RecorderMode.Clone, expectReadErrors: mode != RecorderMode.Clone);
 
-            Assert.IsNull(deserialized.a);
+            if (mode != RecorderMode.Clone)
+            {
+                Assert.IsNull(deserialized.a);
+            }
             Assert.AreEqual(decs.b, deserialized.b);
         }
 
@@ -298,8 +301,11 @@ namespace DecTest
 
             Assert.IsNotNull(deserialized);
 
-            // should just leave this alone
-            Assert.IsNotNull(deserialized.unparseable);
+            if (mode != RecorderMode.Clone)
+            {
+                // should just leave this alone
+                Assert.IsNotNull(deserialized.unparseable);
+            }
         }
 
         public class RecursiveSquaredRecorder : Dec.IRecordable
@@ -726,7 +732,7 @@ namespace DecTest
 
         public class DerivedType : BaseType
         {
-            
+
         }
 
         [Test]

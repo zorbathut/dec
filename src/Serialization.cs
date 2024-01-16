@@ -862,53 +862,7 @@ namespace Dec
                     }
                     else
                     {
-                        // Iterate back to the appropriate type.
-                        Type targetType = type;
-                        Func<Type, object> maker = null;
-                        while (targetType != null)
-                        {
-                            if (recContext.factories.TryGetValue(targetType, out maker))
-                            {
-                                break;
-                            }
-
-                            targetType = targetType.BaseType;
-                        }
-
-                        if (maker == null)
-                        {
-                            recordable = (IRecordable)type.CreateInstanceSafe("recordable", node);
-                        }
-                        else
-                        {
-                            // want to propogate this throughout the factories list to save on time later
-                            // we're actually doing the same BaseType thing again, starting from scratch
-                            Type writeType = type;
-                            while (writeType != targetType)
-                            {
-                                recContext.factories[writeType] = maker;
-                                writeType = writeType.BaseType;
-                            }
-
-                            // oh right and I guess we should actually make the thing too
-                            var obj = maker(type);
-
-                            if (obj == null)
-                            {
-                                // fall back to default behavior
-                                recordable = (IRecordable)type.CreateInstanceSafe("recordable", node);
-                            }
-                            else if (!type.IsAssignableFrom(obj.GetType()))
-                            {
-                                Dbg.Err($"Custom factory generated {obj.GetType()} when {type} was expected; falling back on a default object");
-                                recordable = (IRecordable)type.CreateInstanceSafe("recordable", node);
-                            }
-                            else
-                            {
-                                // now that we've checked this is of the right type
-                                recordable = (IRecordable)obj;
-                            }
-                        }
+                        recordable = recContext.CreateRecordableFromFactory(type, "recordable", node);
                     }
 
                     if (recordable != null)
@@ -1161,13 +1115,6 @@ namespace Dec
             // Special case: HashSet
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(HashSet<>))
             {
-                // HashSet<> handling
-                // This is a gigantic pain because HashSet<> doesn't inherit from any non-generic interface that provides the functionality we want
-                // So we're stuck doing it all through object and reflection
-                // Thanks, HashSet
-                // This might be a performance problem and we'll . . . deal with it later I guess?
-                // This might actually be a good first place to use IL generation.
-
                 foreach (var (parseCommand, node) in orders)
                 {
                     bool permitPatch = false;
@@ -1816,6 +1763,7 @@ namespace Dec
             if (!node.AllowReflection)
             {
                 Dbg.Err($"Couldn't find a composition method for type {valType}; either you shouldn't be trying to serialize it, or it should implement Dec.IRecorder (https://zorbathut.github.io/dec/release/documentation/serialization.html), or you need a Dec.Converter (https://zorbathut.github.io/dec/release/documentation/custom.html)");
+                node.WriteError();
                 return;
             }
 
