@@ -246,13 +246,13 @@ namespace Dec
                     var readerClone = new ReaderNodeCloneRecorder(recorderChildren);
 
                     // object already exists
-                    converterRecord.RecordObj(result, new RecorderReader(readerClone, new ReaderContext()));
+                    result = converterRecord.RecordObj(result, new RecorderReader(readerClone, new ReaderContext()));
                 }
                 else if (originalConverter is ConverterFactory converterFactory)
                 {
                     // the rest of this was done earlier
                     var readerClone = new ReaderNodeCloneRecorder(recorderChildren);
-                    converterFactory.ReadObj(result, new RecorderReader(readerClone, new ReaderContext()));
+                    result = converterFactory.ReadObj(result, new RecorderReader(readerClone, new ReaderContext()));
                 }
                 else
                 {

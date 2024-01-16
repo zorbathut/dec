@@ -15,7 +15,7 @@ namespace DecTest
 
             public override void Record(ref Stub input, Dec.Recorder recorder)
             {
-                
+
             }
         }
 
@@ -34,7 +34,7 @@ namespace DecTest
 
             public override void Record(ref Stub input, Dec.Recorder recorder)
             {
-                
+
             }
         }
 
@@ -64,7 +64,7 @@ namespace DecTest
         {
             public override void Record(ref DerivedType input, Dec.Recorder recorder)
             {
-                
+
             }
         }
 
@@ -101,7 +101,7 @@ namespace DecTest
 
         public abstract class AbstractConverter : Dec.ConverterRecord<Stub>
         {
-            
+
         }
 
         [Test]
@@ -111,6 +111,83 @@ namespace DecTest
 
             // so what happens here?
             ExpectErrors(() => new Dec.Parser().Finish());
+        }
+
+        public struct Number
+        {
+            public int x;
+        }
+
+        public class NumberConverterString : Dec.ConverterString<Number>
+        {
+            public override string Write(Number input)
+            {
+                return input.x.ToString();
+            }
+
+            public override Number Read(string input, Dec.InputContext context)
+            {
+                return new Number { x = int.Parse(input) };
+            }
+        }
+
+        [Test]
+        public void NumberConverterStringTest([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(NumberConverterString) } });
+
+            Number root = new Number { x = 42 };
+            var deserialized = DoRecorderRoundTrip(root, mode);
+
+            Assert.AreEqual(root.x, deserialized.x);
+        }
+
+        public class NumberConverterRecord : Dec.ConverterRecord<Number>
+        {
+            public override void Record(ref Number input, Dec.Recorder recorder)
+            {
+                recorder.Record(ref input.x, "x");
+            }
+        }
+
+        [Test]
+        public void NumberConverterRecordTest([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(NumberConverterRecord) } });
+
+            Number root = new Number { x = 42 };
+            var deserialized = DoRecorderRoundTrip(root, mode);
+
+            Assert.AreEqual(root.x, deserialized.x);
+        }
+
+        public class NumberConverterFactory : Dec.ConverterFactory<Number>
+        {
+            public override void Write(Number input, Dec.Recorder recorder)
+            {
+                recorder.Record(ref input.x, "x");
+            }
+
+            public override Number Create(Dec.Recorder recorder)
+            {
+                return new Number { };
+            }
+
+            public override void Read(ref Number input, Dec.Recorder recorder)
+            {
+                recorder.Record(ref input.x, "x");
+            }
+        }
+
+        [Test]
+        public void NumberConverterFactoryTest([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(NumberConverterFactory) } });
+
+            Number root = new Number { x = 42 };
+            var deserialized = DoRecorderRoundTrip(root, mode);
+
+            Assert.AreEqual(root.x, deserialized.x);
         }
     }
 }
