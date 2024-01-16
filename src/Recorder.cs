@@ -503,7 +503,7 @@ namespace Dec
         /// Makes a copy of an object.
         /// </summary>
         /// <remarks>
-        /// This is logically equivalent to Write(Read(obj)), but much faster.
+        /// This is logically equivalent to Write(Read(obj)), but much faster (approx 15x in one real-world testcase.)
         ///
         /// Clone() is guaranteed to accept everything that Write(Read(obj)) does, but the reverse is not true; Clone is sometimes more permissive than the disk serialization system. Don't expect to use this as complete validation for Write.
         ///
