@@ -1678,6 +1678,13 @@ namespace Dec
 
             // Now we have things that *could* be references, but aren't.
 
+            if (node.AllowCloning && valType.GetCustomAttribute<CloneWithAssignmentAttribute>() != null)
+            {
+                node.WriteCloneCopy(value);
+
+                return;
+            }
+
             if (valType.IsArray)
             {
                 node.WriteArray(value as Array);

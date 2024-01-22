@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace Dec
@@ -65,6 +66,7 @@ namespace Dec
 
         public override bool AllowReflection { get => writer.AllowReflection; }
         public override bool AllowAsThis { get => false; }
+        public override bool AllowCloning { get => true;  }
 
         private WriterNodeClone(WriterClone writer, int depth, Recorder.Context context) : base(context)
         {
@@ -165,7 +167,14 @@ namespace Dec
             // tuples are sort of busted and we're going to punt on them for now
             // this needs to deal with anything that has complicated constructor behavior
             var originalType = original.GetType();
-            if (originalConverter is ConverterFactory converterFactory)
+            bool done = false;
+            if (originalType.GetCustomAttribute<CloneWithAssignmentAttribute>() != null)
+            {
+                // okay
+                result = original;
+                done = true;
+            }
+            else if (originalConverter is ConverterFactory converterFactory)
             {
                 // this calls CreateRecorderChild a bunch and fills it out
                 converterFactory.WriteObj(original, new RecorderWriter(this));
@@ -196,13 +205,16 @@ namespace Dec
 
             // at this point we have the right object even if we don't have enough room on the stack
             // although that's not as useful if this is a struct
-            if (depth > 20 && !result.GetType().IsValueType)
+            if (!done)
             {
-                writer.RegisterPendingWrite(() => CreateResult_Resolve(originalType, resetDepth: true));
-            }
-            else
-            {
-                CreateResult_Resolve(originalType);
+                if (depth > 20 && !result.GetType().IsValueType)
+                {
+                    writer.RegisterPendingWrite(() => CreateResult_Resolve(originalType, resetDepth: true));
+                }
+                else
+                {
+                    CreateResult_Resolve(originalType);
+                }
             }
 
             // this is a hacky way of getting around the Tuple problem. this should really be fixed.
@@ -608,6 +620,11 @@ namespace Dec
         public override void WriteConvertible(Converter converter, object value)
         {
             SetOriginal(value, converter);
+        }
+
+        public override void WriteCloneCopy(object value)
+        {
+            SetOriginal(value);
         }
 
         public override void WriteError()

@@ -571,7 +571,7 @@ namespace Dec
         }
         internal static bool CanBeCloneCopied(this Type type)
         {
-            return type.IsPrimitive || typeof(Dec).IsAssignableFrom(type) || type == typeof(string) || type == typeof(Type);
+            return type.IsPrimitive || typeof(Dec).IsAssignableFrom(type) || type == typeof(string) || type == typeof(Type) || type.GetCustomAttribute<CloneWithAssignmentAttribute>() != null;
         }
 
         internal enum ParseModeCategory

@@ -22,6 +22,7 @@ namespace Dec
         public Recorder.Context RecorderContext { get { return context; } }
         public abstract bool AllowReflection { get; }
         public virtual bool AllowAsThis { get => true; }
+        public virtual bool AllowCloning { get => false; }
 
         // I'm not real happy with the existence of this function; it's kind of a hack so that a shared Converter that writes a string or an int can avoid errors
         public void MakeRecorderContextChild()
@@ -49,6 +50,7 @@ namespace Dec
         public abstract void WriteValueTuple(object value, System.Runtime.CompilerServices.TupleElementNamesAttribute names);
         public abstract void WriteRecord(IRecordable value);
         public abstract void WriteConvertible(Converter converter, object value);
+        public virtual void WriteCloneCopy(object value) { Dbg.Err("Internal error, attempting to clone an object without being in clone mode"); }
         public virtual void WriteError() { }  // "this should be a thing, but it isn't, sorry"
 
         public abstract void TagClass(Type type);

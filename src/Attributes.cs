@@ -10,7 +10,7 @@ namespace Dec
     /// <remarks>
     /// In addition, the class's static constructor should call StaticReferencesAttribute.Initialized().
     /// </remarks>
-    [AttributeUsage(AttributeTargets.Class)]  
+    [AttributeUsage(AttributeTargets.Class)]
     public class StaticReferencesAttribute : Attribute
     {
         // This keeps track of which static references we actually have filled. It exists largely for Database.Clear().
@@ -37,6 +37,20 @@ namespace Dec
     /// </remarks>
     [AttributeUsage(AttributeTargets.Class)]
     public class AbstractAttribute : Attribute
+    {
+
+    }
+
+    /// <summary>
+    /// Signals that class should be cloned with standard assignment.
+    /// </summary>
+    /// <remarks>
+    /// This is most useful for collections of objects, where it can rely on the collection's own cloning behavior to clone a vast swath of objects at once.
+    ///
+    /// For structs, this becomes a shallow copy. For classes, this becomes a reference copy.
+    /// </remarks>
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
+    public class CloneWithAssignmentAttribute : Attribute
     {
 
     }
