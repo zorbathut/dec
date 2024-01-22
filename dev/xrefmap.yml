@@ -25,6 +25,12 @@ references:
   commentId: T:Dec.Bespoke.IgnoreRecordDuringParserAttribute
   fullName: Dec.Bespoke.IgnoreRecordDuringParserAttribute
   nameWithType: IgnoreRecordDuringParserAttribute
+- uid: Dec.CloneWithAssignmentAttribute
+  name: CloneWithAssignmentAttribute
+  href: api/Dec.CloneWithAssignmentAttribute.html
+  commentId: T:Dec.CloneWithAssignmentAttribute
+  fullName: Dec.CloneWithAssignmentAttribute
+  nameWithType: CloneWithAssignmentAttribute
 - uid: Dec.Composer
   name: Composer
   href: api/Dec.Composer.html
