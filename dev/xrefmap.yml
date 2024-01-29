@@ -717,25 +717,44 @@ references:
   isSpec: "True"
   fullName: Dec.Dec.ToString
   nameWithType: Dec.ToString
-- uid: Dec.IPostClone
-  name: IPostClone
-  href: api/Dec.IPostClone.html
-  commentId: T:Dec.IPostClone
-  fullName: Dec.IPostClone
-  nameWithType: IPostClone
-- uid: Dec.IPostClone.PostClone
-  name: PostClone()
-  href: api/Dec.IPostClone.html#Dec_IPostClone_PostClone
-  commentId: M:Dec.IPostClone.PostClone
-  fullName: Dec.IPostClone.PostClone()
-  nameWithType: IPostClone.PostClone()
-- uid: Dec.IPostClone.PostClone*
-  name: PostClone
-  href: api/Dec.IPostClone.html#Dec_IPostClone_PostClone_
-  commentId: Overload:Dec.IPostClone.PostClone
+- uid: Dec.IPostCloneNew
+  name: IPostCloneNew
+  href: api/Dec.IPostCloneNew.html
+  commentId: T:Dec.IPostCloneNew
+  fullName: Dec.IPostCloneNew
+  nameWithType: IPostCloneNew
+- uid: Dec.IPostCloneNew.PostCloneNew
+  name: PostCloneNew()
+  href: api/Dec.IPostCloneNew.html#Dec_IPostCloneNew_PostCloneNew
+  commentId: M:Dec.IPostCloneNew.PostCloneNew
+  fullName: Dec.IPostCloneNew.PostCloneNew()
+  nameWithType: IPostCloneNew.PostCloneNew()
+- uid: Dec.IPostCloneNew.PostCloneNew*
+  name: PostCloneNew
+  href: api/Dec.IPostCloneNew.html#Dec_IPostCloneNew_PostCloneNew_
+  commentId: Overload:Dec.IPostCloneNew.PostCloneNew
   isSpec: "True"
-  fullName: Dec.IPostClone.PostClone
-  nameWithType: IPostClone.PostClone
+  fullName: Dec.IPostCloneNew.PostCloneNew
+  nameWithType: IPostCloneNew.PostCloneNew
+- uid: Dec.IPostCloneOriginal
+  name: IPostCloneOriginal
+  href: api/Dec.IPostCloneOriginal.html
+  commentId: T:Dec.IPostCloneOriginal
+  fullName: Dec.IPostCloneOriginal
+  nameWithType: IPostCloneOriginal
+- uid: Dec.IPostCloneOriginal.PostCloneOriginal
+  name: PostCloneOriginal()
+  href: api/Dec.IPostCloneOriginal.html#Dec_IPostCloneOriginal_PostCloneOriginal
+  commentId: M:Dec.IPostCloneOriginal.PostCloneOriginal
+  fullName: Dec.IPostCloneOriginal.PostCloneOriginal()
+  nameWithType: IPostCloneOriginal.PostCloneOriginal()
+- uid: Dec.IPostCloneOriginal.PostCloneOriginal*
+  name: PostCloneOriginal
+  href: api/Dec.IPostCloneOriginal.html#Dec_IPostCloneOriginal_PostCloneOriginal_
+  commentId: Overload:Dec.IPostCloneOriginal.PostCloneOriginal
+  isSpec: "True"
+  fullName: Dec.IPostCloneOriginal.PostCloneOriginal
+  nameWithType: IPostCloneOriginal.PostCloneOriginal
 - uid: Dec.IRecordable
   name: IRecordable
   href: api/Dec.IRecordable.html
