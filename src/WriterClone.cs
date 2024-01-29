@@ -205,16 +205,27 @@ namespace Dec
 
             // at this point we have the right object even if we don't have enough room on the stack
             // although that's not as useful if this is a struct
+            bool deferred = false;
             if (!done)
             {
                 if (depth > 20 && !result.GetType().IsValueType)
                 {
-                    writer.RegisterPendingWrite(() => CreateResult_Resolve(originalType, resetDepth: true));
+                    writer.RegisterPendingWrite(() =>
+                    {
+                        CreateResult_Resolve(originalType, resetDepth: true);
+                        (result as IPostClone)?.PostClone();
+                    });
+                    deferred = true;
                 }
                 else
                 {
                     CreateResult_Resolve(originalType);
                 }
+            }
+
+            if (!deferred)
+            {
+                (result as IPostClone)?.PostClone();
             }
 
             // this is a hacky way of getting around the Tuple problem. this should really be fixed.
