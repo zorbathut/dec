@@ -213,7 +213,8 @@ namespace Dec
                     writer.RegisterPendingWrite(() =>
                     {
                         CreateResult_Resolve(originalType, resetDepth: true);
-                        (result as IPostClone)?.PostClone();
+                        (original as IPostCloneOriginal)?.PostCloneOriginal();
+                        (result as IPostCloneNew)?.PostCloneNew();
                     });
                     deferred = true;
                 }
@@ -225,7 +226,8 @@ namespace Dec
 
             if (!deferred)
             {
-                (result as IPostClone)?.PostClone();
+                (original as IPostCloneOriginal)?.PostCloneOriginal();
+                (result as IPostCloneNew)?.PostCloneNew();
             }
 
             // this is a hacky way of getting around the Tuple problem. this should really be fixed.

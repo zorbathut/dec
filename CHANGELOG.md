@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 * CloneWithAssignmentAttribute can now be used to specify that objects can be cloned with basic assignment, speeding up array cloning considerably.
+* IPostCloneOriginal/IPostCloneNew interfaces that can be used to perform post-clone operations on objects.
 
 ### Improved
 * Major revamp of Recorder.Clone functionality to dramatically improve performance (approx 200x in one real-life test case.)
