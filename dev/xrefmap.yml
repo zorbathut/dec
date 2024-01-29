@@ -717,6 +717,25 @@ references:
   isSpec: "True"
   fullName: Dec.Dec.ToString
   nameWithType: Dec.ToString
+- uid: Dec.IPostClone
+  name: IPostClone
+  href: api/Dec.IPostClone.html
+  commentId: T:Dec.IPostClone
+  fullName: Dec.IPostClone
+  nameWithType: IPostClone
+- uid: Dec.IPostClone.PostClone
+  name: PostClone()
+  href: api/Dec.IPostClone.html#Dec_IPostClone_PostClone
+  commentId: M:Dec.IPostClone.PostClone
+  fullName: Dec.IPostClone.PostClone()
+  nameWithType: IPostClone.PostClone()
+- uid: Dec.IPostClone.PostClone*
+  name: PostClone
+  href: api/Dec.IPostClone.html#Dec_IPostClone_PostClone_
+  commentId: Overload:Dec.IPostClone.PostClone
+  isSpec: "True"
+  fullName: Dec.IPostClone.PostClone
+  nameWithType: IPostClone.PostClone
 - uid: Dec.IRecordable
   name: IRecordable
   href: api/Dec.IRecordable.html

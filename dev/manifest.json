@@ -184,6 +184,16 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Dec.IPostClone.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.IPostClone.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Dec.IRecordable.yml",
       "output": {
         ".html": {
