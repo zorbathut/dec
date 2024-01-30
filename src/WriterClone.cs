@@ -23,8 +23,14 @@ namespace Dec
         }
 
         public bool AllowReflection { get => false; }
+        public Recorder.IUserSettings UserSettings { get; }
 
         internal Dictionary<object, object> cloneReferences = new Dictionary<object, object>();
+
+        public WriterClone(Recorder.IUserSettings userSettings)
+        {
+            this.UserSettings = userSettings;
+        }
 
         public WriterNodeClone StartData(Type type)
         {
@@ -67,6 +73,7 @@ namespace Dec
         public override bool AllowReflection { get => writer.AllowReflection; }
         public override bool AllowAsThis { get => false; }
         public override bool AllowCloning { get => true;  }
+        public override Recorder.IUserSettings UserSettings { get => writer.UserSettings; }
 
         private WriterNodeClone(WriterClone writer, int depth, Recorder.Context context) : base(context)
         {
@@ -180,18 +187,18 @@ namespace Dec
                 converterFactory.WriteObj(original, new RecorderWriter(this));
 
                 // now we create the object itself
-                var readerClone = new ReaderNodeCloneRecorder(recorderChildren);
+                var readerClone = new ReaderNodeCloneRecorder(recorderChildren, UserSettings);
                 result = converterFactory.CreateObj(new RecorderReader(readerClone, new ReaderContext()));
             }
             else if (RecorderContext.factories != null && original is IRecordable)
             {
-                result = RecorderContext.CreateRecordableFromFactory(originalType, "clone", new ReaderNodeCloneCreator(original));
+                result = RecorderContext.CreateRecordableFromFactory(originalType, "clone", new ReaderNodeCloneCreator(original, UserSettings));
             }
             else if ((model == null || model.GetType() != original.GetType()) && !typeof(ITuple).IsAssignableFrom(originalType))
             {
                 // derive an appropriate type; we're just yanking this out of the original type right now (is this always right?)
                 // this is kind of awful in terms of perf ;.;
-                result = original.GetType().CreateInstanceSafe("recordable", new ReaderNodeCloneCreator(original));
+                result = original.GetType().CreateInstanceSafe("recordable", new ReaderNodeCloneCreator(original, UserSettings));
             }
             else
             {
@@ -268,7 +275,7 @@ namespace Dec
                     // this calls CreateRecorderChild a bunch and fills it out
                     converterRecord.RecordObj(original, new RecorderWriter(this));
 
-                    var readerClone = new ReaderNodeCloneRecorder(recorderChildren);
+                    var readerClone = new ReaderNodeCloneRecorder(recorderChildren, UserSettings);
 
                     // object already exists
                     result = converterRecord.RecordObj(result, new RecorderReader(readerClone, new ReaderContext()));
@@ -276,7 +283,7 @@ namespace Dec
                 else if (originalConverter is ConverterFactory converterFactory)
                 {
                     // the rest of this was done earlier
-                    var readerClone = new ReaderNodeCloneRecorder(recorderChildren);
+                    var readerClone = new ReaderNodeCloneRecorder(recorderChildren, UserSettings);
                     result = converterFactory.ReadObj(result, new RecorderReader(readerClone, new ReaderContext()));
                 }
                 else
@@ -489,7 +496,7 @@ namespace Dec
                 // this calls CreateRecorderChild a bunch and fills it out
                 originalRecordable.Record(new RecorderWriter(this));
 
-                var readerClone = new ReaderNodeCloneRecorder(recorderChildren);
+                var readerClone = new ReaderNodeCloneRecorder(recorderChildren, UserSettings);
 
                 // do the dupe
                 (result as IRecordable).Record(new RecorderReader(readerClone, new ReaderContext()));
@@ -650,11 +657,13 @@ namespace Dec
     internal class ReaderNodeCloneRecorder : ReaderNode
     {
         public override bool AllowAsThis { get => false; }
+        public override Recorder.IUserSettings UserSettings { get; }
 
         private Dictionary<string, WriterNodeClone> recorderChildren;
         private HashSet<string> recorderChildrenConsumed = new HashSet<string>();
-        public ReaderNodeCloneRecorder(Dictionary<string, WriterNodeClone> recorderChildren)
+        public ReaderNodeCloneRecorder(Dictionary<string, WriterNodeClone> recorderChildren, Recorder.IUserSettings userSettings)
         {
+            this.UserSettings = userSettings;
             this.recorderChildren = recorderChildren;
         }
 
@@ -680,7 +689,7 @@ namespace Dec
                 }
 
                 recorderChildrenConsumed.Add(name);
-                return new ReaderNodeCloneRecorderItem(child);
+                return new ReaderNodeCloneRecorderItem(child, UserSettings);
             }
             else
             {
@@ -698,10 +707,12 @@ namespace Dec
     internal class ReaderNodeCloneRecorderItem : ReaderNode
     {
         public override bool AllowAsThis { get => false; }
+        public override Recorder.IUserSettings UserSettings { get; }
 
         private WriterNodeClone item;
-        public ReaderNodeCloneRecorderItem(WriterNodeClone item)
+        public ReaderNodeCloneRecorderItem(WriterNodeClone item, Recorder.IUserSettings userSettings)
         {
+            this.UserSettings = userSettings;
             this.item = item;
         }
 
@@ -732,9 +743,12 @@ namespace Dec
 
     internal class ReaderNodeCloneCreator : ReaderNode
     {
+        public override Recorder.IUserSettings UserSettings { get; }
+
         private object original;
-        public ReaderNodeCloneCreator(object original)
+        public ReaderNodeCloneCreator(object original, Recorder.IUserSettings userSettings)
         {
+            this.UserSettings = userSettings;
             this.original = original;
         }
 

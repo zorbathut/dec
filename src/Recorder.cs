@@ -40,6 +40,20 @@ namespace Dec
         void Record(Recorder recorder);
     }
 
+    /// <summary>
+    /// Allows the Recordable aspect to be disabled based on local properties, usersettings, or other factors.
+    /// </summary>
+    public interface IConditionalRecordable : IRecordable
+    {
+        /// <summary>
+        /// Indicates whether this should be treated like an IRecordable.
+        /// </summary>
+        /// <remarks>
+        /// If this function returns false, Dec will either use reflection (if available) or return an error as if the object was not serializable.
+        /// </remarks>
+        bool ShouldRecord(Recorder.IUserSettings userSettings);
+    }
+
     // This exists solely to ensure I always remember to add the right functions both to Parameter and Recorder.
     internal interface IRecorder
     {
@@ -59,6 +73,8 @@ namespace Dec
     /// </remarks>
     public abstract class Recorder : IRecorder
     {
+        public interface IUserSettings { }
+
         public struct Parameters : IRecorder
         {
             internal Recorder recorder;
@@ -231,6 +247,8 @@ namespace Dec
             }
         }
 
+        public abstract IUserSettings UserSettings { get; }
+
         /// <summary>
         /// Serialize or deserialize a member of a class.
         /// </summary>
@@ -324,13 +342,13 @@ namespace Dec
         /// <summary>
         /// Returns a fully-formed XML document starting at an object.
         /// </summary>
-        public static string Write<T>(T target, bool pretty = false)
+        public static string Write<T>(T target, bool pretty = false, IUserSettings userSettings = null)
         {
             Serialization.Initialize();
 
             using (var _ = new CultureInfoScope(Config.CultureInfo))
             {
-                var writerContext = new WriterXmlRecord();
+                var writerContext = new WriterXmlRecord(userSettings);
 
                 Serialization.ComposeElement(writerContext.StartData(typeof(T)), target, typeof(T));
 
@@ -341,11 +359,11 @@ namespace Dec
         /// <summary>
         /// Returns C# validation code starting at an option.
         /// </summary>
-        public static string WriteValidation<T>(T target)
+        public static string WriteValidation<T>(T target, Recorder.IUserSettings userSettings = null)
         {
             using (var _ = new CultureInfoScope(Config.CultureInfo))
             {
-                var writerContext = new WriterValidationRecord();
+                var writerContext = new WriterValidationRecord(userSettings);
 
                 Serialization.ComposeElement(writerContext.StartData(), target, typeof(T));
 
@@ -356,13 +374,13 @@ namespace Dec
         /// <summary>
         /// Parses the output of Write, generating an object and all its related serialized data.
         /// </summary>
-        public static T Read<T>(string input, string stringName = "input")
+        public static T Read<T>(string input, string stringName = "input", IUserSettings userSettings = null)
         {
             Serialization.Initialize();
 
             using (var _ = new CultureInfoScope(Config.CultureInfo))
             {
-                ReaderFileRecorder reader = ReaderFileRecorderXml.Create(input, stringName);
+                ReaderFileRecorder reader = ReaderFileRecorderXml.Create(input, stringName, userSettings);
                 if (reader == null)
                 {
                     return default;
@@ -509,13 +527,13 @@ namespace Dec
         ///
         /// This is a new feature and should be considered experimental. It is currently undertested, and I cannot stress this enough, Dec is a library full of weird edge cases and extremely carefully chosen behaviors, I *guarantee* many of those are handled wrong with Clone. If performance is not critical I currently strongly recommend using Write(Read(obj)).
         /// </remarks>
-        public static T Clone<T>(T obj)
+        public static T Clone<T>(T obj, IUserSettings userSettings = null)
         {
             Serialization.Initialize();
 
             using (var _ = new CultureInfoScope(Config.CultureInfo))
             {
-                var writerContext = new WriterClone();
+                var writerContext = new WriterClone(userSettings);
 
                 var writerNode = writerContext.StartData(typeof(T));
 
@@ -539,6 +557,8 @@ namespace Dec
         {
             this.node = node;
         }
+
+        public override IUserSettings UserSettings { get => node.UserSettings; }
 
         internal override void Record<T>(ref T value, string label, Parameters parameters)
         {
@@ -611,6 +631,8 @@ namespace Dec
             this.readerContext = context;
             this.disallowShared = disallowShared;
         }
+
+        public override IUserSettings UserSettings { get => node.UserSettings; }
 
         internal override void Record<T>(ref T value, string label, Parameters parameters)
         {

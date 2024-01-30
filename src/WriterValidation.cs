@@ -14,6 +14,12 @@ namespace Dec
         private WriterUtil.PendingWriteCoordinator pendingWriteCoordinator = new WriterUtil.PendingWriteCoordinator();
 
         public abstract bool AllowReflection { get; }
+        public Recorder.IUserSettings UserSettings { get; }
+
+        public WriterValidation(Recorder.IUserSettings userSettings)
+        {
+            UserSettings = userSettings;
+        }
 
         public void AppendLine(string line)
         {
@@ -37,6 +43,10 @@ namespace Dec
     {
         public override bool AllowReflection { get => true; }
 
+        public WriterValidationCompose(Recorder.IUserSettings userSettings) : base(userSettings)
+        {
+        }
+
         public WriterNode StartDec(Type type, string decName)
         {
             return new WriterNodeValidation(this, $"Dec.Database<{type.ComposeCSFormatted()}>.Get(\"{decName}\")");
@@ -46,6 +56,10 @@ namespace Dec
     internal class WriterValidationRecord : WriterValidation
     {
         public override bool AllowReflection { get => false; }
+
+        public WriterValidationRecord(Recorder.IUserSettings userSettings) : base(userSettings)
+        {
+        }
 
         public WriterNode StartData()
         {
@@ -148,6 +162,7 @@ namespace Dec
         private string accessor;
 
         public override bool AllowReflection { get => writer.AllowReflection; }
+        public override Recorder.IUserSettings UserSettings { get => writer.UserSettings; }
 
         public WriterNodeValidation(WriterValidation writer, string accessor)
         {
@@ -276,7 +291,7 @@ namespace Dec
             IDictionaryEnumerator iterator = value.GetEnumerator();
             while (iterator.MoveNext())
             {
-                var keyNode = new WriterNodeStringize();
+                var keyNode = new WriterNodeStringize(UserSettings);
                 Serialization.ComposeElement(keyNode, iterator.Key, keyType);
 
                 writer.AppendLine($"if ({accessor}.ContainsKey({keyNode.SerializedString})) {{");
@@ -295,7 +310,7 @@ namespace Dec
             IEnumerator iterator = value.GetEnumerator();
             while (iterator.MoveNext())
             {
-                var keyNode = new WriterNodeStringize();
+                var keyNode = new WriterNodeStringize(UserSettings);
                 Serialization.ComposeElement(keyNode, iterator.Current, keyType);
 
                 // You might think "Assert.Contains" would do what we want, but it doesn't - it requires an ICollection and HashSet isn't an ICollection.
@@ -397,8 +412,14 @@ namespace Dec
     internal sealed class WriterNodeStringize : WriterNodeCS
     {
         public override bool AllowReflection { get => false; }
+        public override Recorder.IUserSettings UserSettings { get; }
 
         public string SerializedString { get; private set; }
+
+        public WriterNodeStringize(Recorder.IUserSettings userSettings)
+        {
+            UserSettings = userSettings;
+        }
 
         public override void WriteToken(string token)
         {

@@ -17,6 +17,7 @@ namespace Dec
         private WriterUtil.PendingWriteCoordinator pendingWriteCoordinator = new WriterUtil.PendingWriteCoordinator();
 
         public abstract bool AllowReflection { get; }
+        public abstract Recorder.IUserSettings UserSettings { get; }
 
         public abstract bool RegisterReference(object referenced, XElement element, Recorder.Context recContext);
 
@@ -34,12 +35,15 @@ namespace Dec
     internal class WriterXmlCompose : WriterXml
     {
         public override bool AllowReflection { get => true; }
+        public override Recorder.IUserSettings UserSettings { get; }
 
         private XDocument doc;
         private XElement decs;
 
-        public WriterXmlCompose()
+        public WriterXmlCompose(Recorder.IUserSettings userSettings)
         {
+            this.UserSettings = userSettings;
+
             doc = new XDocument();
 
             decs = new XElement("Decs");
@@ -68,6 +72,7 @@ namespace Dec
     internal class WriterXmlRecord : WriterXml
     {
         public override bool AllowReflection { get => false; }
+        public override Recorder.IUserSettings UserSettings { get; }
 
         // Maps between object and the in-place element. This does *not* yet have the ref ID tagged, and will have to be extracted into a new Element later.
         private Dictionary<object, XElement> refToElement = new Dictionary<object, XElement>();
@@ -85,8 +90,10 @@ namespace Dec
         private XElement refs;
         private XElement rootElement;
 
-        public WriterXmlRecord()
+        public WriterXmlRecord(Recorder.IUserSettings userSettings)
         {
+            this.UserSettings = userSettings;
+
             doc = new XDocument();
 
             record = new XElement("Record");
@@ -304,6 +311,7 @@ namespace Dec
         private const int MaxRecursionDepth = 100;
 
         public override bool AllowReflection { get => writer.AllowReflection; }
+        public override Recorder.IUserSettings UserSettings { get => writer.UserSettings; }
 
         private WriterNodeXml(WriterXml writer, XElement parent, string label, int depth, Recorder.Context context) : base(context)
         {

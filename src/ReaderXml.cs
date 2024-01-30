@@ -11,7 +11,11 @@ namespace Dec
 
     internal class ReaderFileDecXml : ReaderFileDec
     {
-        public static ReaderFileDecXml Create(TextReader input, string identifier)
+        private XDocument doc;
+        private string fileIdentifier;
+        private Recorder.IUserSettings userSettings;
+
+        public static ReaderFileDecXml Create(TextReader input, string identifier, Recorder.IUserSettings userSettings)
         {
             XDocument doc;
 
@@ -36,6 +40,7 @@ namespace Dec
             var result = new ReaderFileDecXml();
             result.doc = doc;
             result.fileIdentifier = identifier;
+            result.userSettings = userSettings;
             return result;
         }
 
@@ -113,7 +118,7 @@ namespace Dec
                     }
 
                     // Everything looks good!
-                    readerDec.node = new ReaderNodeXml(decElement, fileIdentifier);
+                    readerDec.node = new ReaderNodeXml(decElement, fileIdentifier, userSettings);
 
                     result.Add(readerDec);
                 }
@@ -121,14 +126,15 @@ namespace Dec
 
             return result;
         }
-
-        private XDocument doc;
-        private string fileIdentifier;
     }
 
     internal class ReaderFileRecorderXml : ReaderFileRecorder
     {
-        public static ReaderFileRecorderXml Create(string input, string identifier)
+        private XElement record;
+        private string fileIdentifier;
+        private Recorder.IUserSettings userSettings;
+
+        public static ReaderFileRecorderXml Create(string input, string identifier, Recorder.IUserSettings userSettings)
         {
             XDocument doc;
 
@@ -170,6 +176,7 @@ namespace Dec
             var result = new ReaderFileRecorderXml();
             result.record = record;
             result.fileIdentifier = identifier;
+            result.userSettings = userSettings;
 
             return result;
         }
@@ -216,7 +223,7 @@ namespace Dec
                         continue;
                     }
 
-                    readerRef.node = new ReaderNodeXml(reference, fileIdentifier);
+                    readerRef.node = new ReaderNodeXml(reference, fileIdentifier, userSettings);
                     result.Add(readerRef);
                 }
             }
@@ -234,17 +241,17 @@ namespace Dec
                 return null;
             }
 
-            return new ReaderNodeXml(data, fileIdentifier);
+            return new ReaderNodeXml(data, fileIdentifier, userSettings);
         }
-
-        private XElement record;
-        private string fileIdentifier;
     }
 
     internal class ReaderNodeXml : ReaderNodeParseable
     {
-        public ReaderNodeXml(XElement xml, string fileIdentifier)
+        public override Recorder.IUserSettings UserSettings { get; }
+
+        public ReaderNodeXml(XElement xml, string fileIdentifier, Recorder.IUserSettings userSettings)
         {
+            this.UserSettings = userSettings;
             this.xml = xml;
             this.fileIdentifier = fileIdentifier;
         }
@@ -257,7 +264,7 @@ namespace Dec
         public override ReaderNode GetChildNamed(string name)
         {
             var child = xml.ElementNamed(name);
-            return child == null ? null : new ReaderNodeXml(child, fileIdentifier);
+            return child == null ? null : new ReaderNodeXml(child, fileIdentifier, UserSettings);
         }
 
         public override string GetText()
@@ -319,7 +326,7 @@ namespace Dec
                     Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                 }
 
-                list.Add(Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier) }, referencedType, null, readerContext, recorderChildContext));
+                list.Add(Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, UserSettings) }, referencedType, null, readerContext, recorderChildContext));
             }
 
             list.GetType().GetField("_version", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(list, Util.CollectionDeserializationVersion);
@@ -363,10 +370,9 @@ namespace Dec
                     }
 
                     indices[rank] = startAt + i++;
-                    ParseArrayRank(new ReaderNodeXml(fieldElement, fileIdentifier), readerContext, recorderChildContext, value, referencedType, rank + 1, indices, 0);
+                    ParseArrayRank(new ReaderNodeXml(fieldElement, fileIdentifier, UserSettings), readerContext, recorderChildContext, value, referencedType, rank + 1, indices, 0);
                 }
             }
-
         }
 
         public override void ParseArray(Array array, Type referencedType, ReaderContext readerContext, Recorder.Context recorderContext, int startOffset)
@@ -385,7 +391,7 @@ namespace Dec
                         Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                     }
 
-                    array.SetValue(Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier) }, referencedType, null, readerContext, recorderChildContext), startOffset + i++);
+                    array.SetValue(Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, UserSettings) }, referencedType, null, readerContext, recorderChildContext), startOffset + i++);
                 }
             }
             else
@@ -425,7 +431,7 @@ namespace Dec
                         continue;
                     }
 
-                    var key = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(keyNode, fileIdentifier) }, referencedKeyType, null, readerContext, recorderChildContext);
+                    var key = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(keyNode, fileIdentifier, UserSettings) }, referencedKeyType, null, readerContext, recorderChildContext);
 
                     if (key == null)
                     {
@@ -448,7 +454,7 @@ namespace Dec
 
                     writtenFields?.Add(key);
 
-                    dict[key] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(valueNode, fileIdentifier) }, referencedValueType, originalValue, readerContext, recorderChildContext);
+                    dict[key] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(valueNode, fileIdentifier,UserSettings) }, referencedValueType, originalValue, readerContext, recorderChildContext);
                 }
                 else
                 {
@@ -483,7 +489,7 @@ namespace Dec
 
                     writtenFields?.Add(key);
 
-                    dict[key] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier) }, referencedValueType, originalValue, readerContext, recorderChildContext);
+                    dict[key] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, UserSettings) }, referencedValueType, originalValue, readerContext, recorderChildContext);
                 }
             }
         }
@@ -516,7 +522,7 @@ namespace Dec
                 if (fieldElement.Name.LocalName == "li")
                 {
                     // Treat this like a full node
-                    var key = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier) }, referencedType, null, readerContext, recorderChildContext);
+                    var key = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, UserSettings) }, referencedType, null, readerContext, recorderChildContext);
 
                     if (key == null)
                     {
@@ -577,7 +583,7 @@ namespace Dec
                     Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                 }
 
-                pushFunction.Invoke(stack, new object[] { Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier) }, referencedType, null, readerContext, recorderChildContext) });
+                pushFunction.Invoke(stack, new object[] { Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, UserSettings) }, referencedType, null, readerContext, recorderChildContext) });
             }
         }
 
@@ -595,7 +601,7 @@ namespace Dec
                     Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                 }
 
-                enqueueFunction.Invoke(queue, new object[] { Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier) }, referencedType, null, readerContext, recorderChildContext) });
+                enqueueFunction.Invoke(queue, new object[] { Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, UserSettings) }, referencedType, null, readerContext, recorderChildContext) });
             }
         }
 
@@ -626,7 +632,7 @@ namespace Dec
 
                 for (int i = 0; i < Math.Min(parameters.Length, elements.Count); ++i)
                 {
-                    parameters[i] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(elements[i], fileIdentifier) }, referencedType.GenericTypeArguments[i], null, readerContext, recorderChildContext);
+                    parameters[i] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(elements[i], fileIdentifier, UserSettings) }, referencedType.GenericTypeArguments[i], null, readerContext, recorderChildContext);
                 }
 
                 // fill in anything missing
@@ -669,7 +675,7 @@ namespace Dec
                     }
 
                     seen[index] = true;
-                    parameters[index] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(elementItem, fileIdentifier) }, referencedType.GenericTypeArguments[index], null, readerContext, recorderChildContext);
+                    parameters[index] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(elementItem, fileIdentifier, UserSettings) }, referencedType.GenericTypeArguments[index], null, readerContext, recorderChildContext);
                 }
 
                 for (int i = 0; i < seen.Length; ++i)
@@ -745,7 +751,7 @@ namespace Dec
                     continue;
                 }
 
-                fieldElementInfo.SetValue(obj, Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier) }, fieldElementInfo.FieldType, fieldElementInfo.GetValue(obj), readerContext, recorderChildContext, fieldInfo: fieldElementInfo));
+                fieldElementInfo.SetValue(obj, Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, UserSettings) }, fieldElementInfo.FieldType, fieldElementInfo.GetValue(obj), readerContext, recorderChildContext, fieldInfo: fieldElementInfo));
             }
         }
 

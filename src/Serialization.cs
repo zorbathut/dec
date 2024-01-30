@@ -844,47 +844,58 @@ namespace Dec
             }
 
             // Special case: IRecordables
+            IRecordable recordableBuffered = null;
             if (typeof(IRecordable).IsAssignableFrom(type) && (context.recorderMode || type.GetMethod("Record").GetCustomAttribute<Bespoke.IgnoreRecordDuringParserAttribute>() == null))
             {
-                foreach (var (parseCommand, node) in orders)
+                // we're going to need to make one anyway so let's just go ahead and do that
+                IRecordable recordable = null;
+
+                if (result != null)
                 {
-                    switch (parseCommand)
-                    {
-                        case ParseCommand.Patch:
-                            // easy, done
-                            break;
+                    recordable = (IRecordable)result;
+                }
+                else if (recContext.factories == null)
+                {
+                    recordable = (IRecordable)type.CreateInstanceSafe("recordable", orders[0].node);
+                }
+                else
+                {
+                    recordable = recContext.CreateRecordableFromFactory(type, "recordable", orders[0].node);
+                }
 
-                        default:
-                            Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
-                            break;
-                    }
+                // we hold on to this so that, *if* we end up not using this object, we can optionally reuse it later for reflection
+                // in an ideal world we wouldn't create it at all in the first place, but we need to create it to call IConditionalRecordable's function
+                recordableBuffered = recordable;
 
-                    IRecordable recordable = null;
+                var conditionalRecordable = recordable as IConditionalRecordable;
+                if (conditionalRecordable == null || conditionalRecordable.ShouldRecord(nodes[0].UserSettings))
+                {
+                    foreach (var (parseCommand, node) in orders)
+                    {
+                        switch (parseCommand)
+                        {
+                            case ParseCommand.Patch:
+                                // easy, done
+                                break;
 
-                    if (result != null)
-                    {
-                        recordable = (IRecordable)result;
-                    }
-                    else if (recContext.factories == null)
-                    {
-                        recordable = (IRecordable)type.CreateInstanceSafe("recordable", node);
-                    }
-                    else
-                    {
-                        recordable = recContext.CreateRecordableFromFactory(type, "recordable", node);
-                    }
+                            default:
+                                Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                                break;
+                        }
 
-                    if (recordable != null)
-                    {
-                        recordable.Record(new RecorderReader(node, context));
+                        if (recordable != null)
+                        {
+                            recordable.Record(new RecorderReader(node, context));
 
-                        // TODO: support indices if this is within the Dec system?
+                            // TODO: support indices if this is within the Dec system?
+                        }
                     }
 
                     result = recordable;
+                    return result;
                 }
 
-                return result;
+                // otherwise we just fall through
             }
 
             // All our standard text-using options
@@ -1341,8 +1352,14 @@ namespace Dec
                 }
 
                 // If we haven't been given a generic class from our parent, go ahead and init to defaults
+                if (result == null && recordableBuffered != null)
+                {
+                    result = recordableBuffered;
+                }
+
                 if (result == null)
                 {
+                    // okay fine
                     result = type.CreateInstanceSafe("object", node);
 
                     if (result == null)
@@ -1759,7 +1776,9 @@ namespace Dec
                 return;
             }
 
-            if (value is IRecordable && (!node.AllowReflection || value.GetType().GetMethod("Record").GetCustomAttribute<Bespoke.IgnoreRecordDuringParserAttribute>() == null))
+            if (value is IRecordable
+                && (!(value is IConditionalRecordable) || (value as IConditionalRecordable).ShouldRecord(node.UserSettings))
+                && (!node.AllowReflection || value.GetType().GetMethod("Record").GetCustomAttribute<Bespoke.IgnoreRecordDuringParserAttribute>() == null))
             {
                 node.WriteRecord(value as IRecordable);
 

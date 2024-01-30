@@ -37,9 +37,9 @@ namespace Dec
             Xml,
         }
 
-        public Parser()
+        public Parser(Recorder.IUserSettings userSettings = null)
         {
-            parserModdable = new ParserModular();
+            parserModdable = new ParserModular(userSettings);
             coreModule = parserModdable.CreateModule("core");
         }
 

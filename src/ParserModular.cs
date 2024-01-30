@@ -19,6 +19,12 @@ namespace Dec
         {
             internal string name;
             internal readonly List<ReaderFileDec> readers = new List<ReaderFileDec>();
+            internal Recorder.IUserSettings userSettings;
+
+            internal Module(Recorder.IUserSettings userSettings)
+            {
+                this.userSettings = userSettings;
+            }
 
             /// <summary>
             /// Pass a directory in for recursive processing.
@@ -131,7 +137,7 @@ namespace Dec
 
                 if (fileType == Parser.FileType.Xml)
                 {
-                    reader = ReaderFileDecXml.Create(textReader, bakedIdentifier);
+                    reader = ReaderFileDecXml.Create(textReader, bakedIdentifier, userSettings);
                 }
                 else
                 {
@@ -162,6 +168,7 @@ namespace Dec
 
         // Data stored from initialization parameters
         private List<Type> staticReferences = new List<Type>();
+        private Recorder.IUserSettings userSettings;
 
         // Modules
         internal List<Module> modules = new List<Module>();
@@ -172,8 +179,10 @@ namespace Dec
         /// <summary>
         /// Creates a Parser.
         /// </summary>
-        public ParserModular()
+        public ParserModular(Recorder.IUserSettings userSettings = null)
         {
+            this.userSettings = userSettings;
+
             if (s_Status != Status.Uninitialized)
             {
                 Dbg.Err($"Parser created while the world is in {s_Status} state; should be {Status.Uninitialized} state");
@@ -221,7 +230,7 @@ namespace Dec
         /// </summary>
         public Module CreateModule(string name)
         {
-            var module = new Module();
+            var module = new Module(userSettings);
             module.name = name;
 
             if (modules.Any(mod => mod.name == name))

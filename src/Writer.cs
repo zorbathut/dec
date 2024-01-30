@@ -18,6 +18,7 @@ namespace Dec
         public abstract bool AllowReflection { get; }
         public virtual bool AllowAsThis { get => true; }
         public virtual bool AllowCloning { get => false; }
+        public abstract Recorder.IUserSettings UserSettings { get; }
 
         // I'm not real happy with the existence of this function; it's kind of a hack so that a shared Converter that writes a string or an int can avoid errors
         public void MakeRecorderContextChild()

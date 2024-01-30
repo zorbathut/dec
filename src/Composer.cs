@@ -10,11 +10,11 @@ namespace Dec
     /// </remarks>
     public class Composer
     {
-        public string ComposeXml(bool pretty)
+        public string ComposeXml(bool pretty, Recorder.IUserSettings userSettings = null)
         {
             using (var _ = new CultureInfoScope(Config.CultureInfo))
             {
-                var writerContext = new WriterXmlCompose();
+                var writerContext = new WriterXmlCompose(userSettings);
 
                 foreach (var decObj in Database.List)
                 {
@@ -25,11 +25,11 @@ namespace Dec
             }
         }
 
-        public string ComposeValidation()
+        public string ComposeValidation(Recorder.IUserSettings userSettings = null)
         {
             using (var _ = new CultureInfoScope(Config.CultureInfo))
             {
-                var writerContext = new WriterValidationCompose();
+                var writerContext = new WriterValidationCompose(userSettings);
 
                 foreach (var decObj in Database.List)
                 {
