@@ -129,8 +129,8 @@ Class Composer  <a class="header-action link-secondary" title="View source" href
 
   <a id="Dec_Composer_ComposeValidation_" data-uid="Dec.Composer.ComposeValidation*"></a>
 
-  <h3 id="Dec_Composer_ComposeValidation" data-uid="Dec.Composer.ComposeValidation">
-  ComposeValidation()
+  <h3 id="Dec_Composer_ComposeValidation_Dec_Recorder_IUserSettings_" data-uid="Dec.Composer.ComposeValidation(Dec.Recorder.IUserSettings)">
+  ComposeValidation(IUserSettings)
   <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Composer.cs/#L28"><i class="bi bi-code-slash"></i></a>
   </h3>
 
@@ -138,9 +138,14 @@ Class Composer  <a class="header-action link-secondary" title="View source" href
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public string ComposeValidation()</code></pre>
+    <pre><code class="lang-csharp hljs">public string ComposeValidation(Recorder.IUserSettings userSettings = null)</code></pre>
   </div>
 
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>userSettings</code> <a class="xref" href="Dec.Recorder.html">Recorder</a>.<a class="xref" href="Dec.Recorder.IUserSettings.html">IUserSettings</a></dt>
+    <dd></dd>
+  </dl>
 
   <h4 class="section">Returns</h4>
   <dl class="parameters">
@@ -160,8 +165,8 @@ Class Composer  <a class="header-action link-secondary" title="View source" href
 
   <a id="Dec_Composer_ComposeXml_" data-uid="Dec.Composer.ComposeXml*"></a>
 
-  <h3 id="Dec_Composer_ComposeXml_System_Boolean_" data-uid="Dec.Composer.ComposeXml(System.Boolean)">
-  ComposeXml(bool)
+  <h3 id="Dec_Composer_ComposeXml_System_Boolean_Dec_Recorder_IUserSettings_" data-uid="Dec.Composer.ComposeXml(System.Boolean,Dec.Recorder.IUserSettings)">
+  ComposeXml(bool, IUserSettings)
   <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Composer.cs/#L13"><i class="bi bi-code-slash"></i></a>
   </h3>
 
@@ -169,12 +174,14 @@ Class Composer  <a class="header-action link-secondary" title="View source" href
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public string ComposeXml(bool pretty)</code></pre>
+    <pre><code class="lang-csharp hljs">public string ComposeXml(bool pretty, Recorder.IUserSettings userSettings = null)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
     <dt><code>pretty</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+    <dt><code>userSettings</code> <a class="xref" href="Dec.Recorder.html">Recorder</a>.<a class="xref" href="Dec.Recorder.IUserSettings.html">IUserSettings</a></dt>
     <dd></dd>
   </dl>
 

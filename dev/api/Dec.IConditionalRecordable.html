@@ -2,11 +2,11 @@
 <html>
   <head>
     <meta charset="utf-8">
-      <title>Class ParserModular </title>
+      <title>Interface IConditionalRecordable </title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="title" content="Class ParserModular ">
+      <meta name="title" content="Interface IConditionalRecordable ">
       
-      <meta name="description" content="Handles all parsing and initialization of dec structures. Intended for moddable games; use Parser for non-moddable or prototype games.">
+      <meta name="description" content="Allows the Recordable aspect to be disabled based on local properties, usersettings, or other factors.">
       <link rel="icon" href="../favicon.ico">
       <link rel="stylesheet" href="../public/docfx.min.css">
       <link rel="stylesheet" href="../public/main.css">
@@ -16,7 +16,7 @@
       
       
       
-      <meta name="docfx:docurl" content="https://github.com/zorbathut/dec/new/dev/apiSpec/new?filename=Dec_ParserModular.md&amp;value=---%0Auid%3A%20Dec.ParserModular%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/zorbathut/dec/new/dev/apiSpec/new?filename=Dec_IConditionalRecordable.md&amp;value=---%0Auid%3A%20Dec.IConditionalRecordable%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -80,12 +80,12 @@
           <nav id="breadcrumb"></nav>
         </div>
 
-        <article data-uid="Dec.ParserModular">
+        <article data-uid="Dec.IConditionalRecordable">
 
 
 
-  <h1 id="Dec_ParserModular" data-uid="Dec.ParserModular" class="text-break">
-Class ParserModular  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/ParserModular.cs/#L16"><i class="bi bi-code-slash"></i></a>
+  <h1 id="Dec_IConditionalRecordable" data-uid="Dec.IConditionalRecordable" class="text-break">
+Interface IConditionalRecordable  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L46"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -93,64 +93,27 @@ Class ParserModular  <a class="header-action link-secondary" title="View source"
   <dl><dt>Assembly</dt><dd>dec.dll</dd></dl>
   </div>
 
-  <div class="markdown summary"><p>Handles all parsing and initialization of dec structures.</p>
-<p>Intended for moddable games; use Parser for non-moddable or prototype games.</p>
+  <div class="markdown summary"><p>Allows the Recordable aspect to be disabled based on local properties, usersettings, or other factors.</p>
 </div>
   <div class="markdown conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class ParserModular</code></pre>
+    <pre><code class="lang-csharp hljs">public interface IConditionalRecordable : IRecordable</code></pre>
   </div>
 
 
 
 
-  <dl class="typelist inheritance">
-    <dt>Inheritance</dt>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
     <dd>
-      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
-      <div><span class="xref">ParserModular</span></div>
-    </dd>
-  </dl>
-
-
-
-
-
-
-
-
-
-  <h2 class="section" id="constructors">Constructors
-</h2>
-
-
-  <a id="Dec_ParserModular__ctor_" data-uid="Dec.ParserModular.#ctor*"></a>
-
-  <h3 id="Dec_ParserModular__ctor_Dec_Recorder_IUserSettings_" data-uid="Dec.ParserModular.#ctor(Dec.Recorder.IUserSettings)">
-  ParserModular(IUserSettings)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/ParserModular.cs/#L182"><i class="bi bi-code-slash"></i></a>
-  </h3>
-
-  <div class="markdown level1 summary"><p>Creates a Parser.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ParserModular(Recorder.IUserSettings userSettings = null)</code></pre>
-  </div>
-
-  <h4 class="section">Parameters</h4>
-  <dl class="parameters">
-    <dt><code>userSettings</code> <a class="xref" href="Dec.Recorder.html">Recorder</a>.<a class="xref" href="Dec.Recorder.IUserSettings.html">IUserSettings</a></dt>
-    <dd></dd>
-  </dl>
-
-
-
-
-
-
+    <div>
+      <a class="xref" href="Dec.IRecordable.html#Dec_IRecordable_Record_Dec_Recorder_">IRecordable.Record(Recorder)</a>
+    </div>
+  </dd></dl>
 
 
 
@@ -161,30 +124,30 @@ Class ParserModular  <a class="header-action link-secondary" title="View source"
 </h2>
 
 
-  <a id="Dec_ParserModular_CreateModule_" data-uid="Dec.ParserModular.CreateModule*"></a>
+  <a id="Dec_IConditionalRecordable_ShouldRecord_" data-uid="Dec.IConditionalRecordable.ShouldRecord*"></a>
 
-  <h3 id="Dec_ParserModular_CreateModule_System_String_" data-uid="Dec.ParserModular.CreateModule(System.String)">
-  CreateModule(string)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/ParserModular.cs/#L231"><i class="bi bi-code-slash"></i></a>
+  <h3 id="Dec_IConditionalRecordable_ShouldRecord_Dec_Recorder_IUserSettings_" data-uid="Dec.IConditionalRecordable.ShouldRecord(Dec.Recorder.IUserSettings)">
+  ShouldRecord(IUserSettings)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L54"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"><p>Creates and registers a new module with a given name.</p>
+  <div class="markdown level1 summary"><p>Indicates whether this should be treated like an IRecordable.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ParserModular.Module CreateModule(string name)</code></pre>
+    <pre><code class="lang-csharp hljs">bool ShouldRecord(Recorder.IUserSettings userSettings)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
-    <dt><code>name</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dt><code>userSettings</code> <a class="xref" href="Dec.Recorder.html">Recorder</a>.<a class="xref" href="Dec.Recorder.IUserSettings.html">IUserSettings</a></dt>
     <dd></dd>
   </dl>
 
   <h4 class="section">Returns</h4>
   <dl class="parameters">
-    <dt><a class="xref" href="Dec.ParserModular.html">ParserModular</a>.<a class="xref" href="Dec.ParserModular.Module.html">Module</a></dt>
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
     <dd></dd>
   </dl>
 
@@ -194,33 +157,9 @@ Class ParserModular  <a class="header-action link-secondary" title="View source"
 
 
 
-
-
-
-
-  <a id="Dec_ParserModular_Finish_" data-uid="Dec.ParserModular.Finish*"></a>
-
-  <h3 id="Dec_ParserModular_Finish" data-uid="Dec.ParserModular.Finish">
-  Finish()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/ParserModular.cs/#L248"><i class="bi bi-code-slash"></i></a>
-  </h3>
-
-  <div class="markdown level1 summary"><p>Finish all parsing.</p>
+  <h4 class="section" id="Dec_IConditionalRecordable_ShouldRecord_Dec_Recorder_IUserSettings__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>If this function returns false, Dec will either use reflection (if available) or return an error as if the object was not serializable.</p>
 </div>
-  <div class="markdown level1 conceptual"></div>
-
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void Finish()</code></pre>
-  </div>
-
-
-
-
-
-
-
-
-
 
 
 
@@ -229,7 +168,7 @@ Class ParserModular  <a class="header-action link-secondary" title="View source"
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/zorbathut/dec/blob/dev/src/ParserModular.cs/#L16" class="edit-link">Edit this page</a>
+          <a href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L46" class="edit-link">Edit this page</a>
         </div>
 
 

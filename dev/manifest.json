@@ -184,6 +184,16 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Dec.IConditionalRecordable.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.IConditionalRecordable.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Dec.IPostCloneNew.yml",
       "output": {
         ".html": {
@@ -288,6 +298,16 @@
       "output": {
         ".html": {
           "relative_path": "api/Dec.Recorder.Direction.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.Recorder.IUserSettings.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.Recorder.IUserSettings.html"
         }
       },
       "version": ""

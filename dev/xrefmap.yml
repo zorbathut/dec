@@ -37,12 +37,12 @@ references:
   commentId: T:Dec.Composer
   fullName: Dec.Composer
   nameWithType: Composer
-- uid: Dec.Composer.ComposeValidation
-  name: ComposeValidation()
-  href: api/Dec.Composer.html#Dec_Composer_ComposeValidation
-  commentId: M:Dec.Composer.ComposeValidation
-  fullName: Dec.Composer.ComposeValidation()
-  nameWithType: Composer.ComposeValidation()
+- uid: Dec.Composer.ComposeValidation(Dec.Recorder.IUserSettings)
+  name: ComposeValidation(IUserSettings)
+  href: api/Dec.Composer.html#Dec_Composer_ComposeValidation_Dec_Recorder_IUserSettings_
+  commentId: M:Dec.Composer.ComposeValidation(Dec.Recorder.IUserSettings)
+  fullName: Dec.Composer.ComposeValidation(Dec.Recorder.IUserSettings)
+  nameWithType: Composer.ComposeValidation(Recorder.IUserSettings)
 - uid: Dec.Composer.ComposeValidation*
   name: ComposeValidation
   href: api/Dec.Composer.html#Dec_Composer_ComposeValidation_
@@ -50,15 +50,15 @@ references:
   isSpec: "True"
   fullName: Dec.Composer.ComposeValidation
   nameWithType: Composer.ComposeValidation
-- uid: Dec.Composer.ComposeXml(System.Boolean)
-  name: ComposeXml(bool)
-  href: api/Dec.Composer.html#Dec_Composer_ComposeXml_System_Boolean_
-  commentId: M:Dec.Composer.ComposeXml(System.Boolean)
-  name.vb: ComposeXml(Boolean)
-  fullName: Dec.Composer.ComposeXml(bool)
-  fullName.vb: Dec.Composer.ComposeXml(Boolean)
-  nameWithType: Composer.ComposeXml(bool)
-  nameWithType.vb: Composer.ComposeXml(Boolean)
+- uid: Dec.Composer.ComposeXml(System.Boolean,Dec.Recorder.IUserSettings)
+  name: ComposeXml(bool, IUserSettings)
+  href: api/Dec.Composer.html#Dec_Composer_ComposeXml_System_Boolean_Dec_Recorder_IUserSettings_
+  commentId: M:Dec.Composer.ComposeXml(System.Boolean,Dec.Recorder.IUserSettings)
+  name.vb: ComposeXml(Boolean, IUserSettings)
+  fullName: Dec.Composer.ComposeXml(bool, Dec.Recorder.IUserSettings)
+  fullName.vb: Dec.Composer.ComposeXml(Boolean, Dec.Recorder.IUserSettings)
+  nameWithType: Composer.ComposeXml(bool, Recorder.IUserSettings)
+  nameWithType.vb: Composer.ComposeXml(Boolean, Recorder.IUserSettings)
 - uid: Dec.Composer.ComposeXml*
   name: ComposeXml
   href: api/Dec.Composer.html#Dec_Composer_ComposeXml_
@@ -717,6 +717,25 @@ references:
   isSpec: "True"
   fullName: Dec.Dec.ToString
   nameWithType: Dec.ToString
+- uid: Dec.IConditionalRecordable
+  name: IConditionalRecordable
+  href: api/Dec.IConditionalRecordable.html
+  commentId: T:Dec.IConditionalRecordable
+  fullName: Dec.IConditionalRecordable
+  nameWithType: IConditionalRecordable
+- uid: Dec.IConditionalRecordable.ShouldRecord(Dec.Recorder.IUserSettings)
+  name: ShouldRecord(IUserSettings)
+  href: api/Dec.IConditionalRecordable.html#Dec_IConditionalRecordable_ShouldRecord_Dec_Recorder_IUserSettings_
+  commentId: M:Dec.IConditionalRecordable.ShouldRecord(Dec.Recorder.IUserSettings)
+  fullName: Dec.IConditionalRecordable.ShouldRecord(Dec.Recorder.IUserSettings)
+  nameWithType: IConditionalRecordable.ShouldRecord(Recorder.IUserSettings)
+- uid: Dec.IConditionalRecordable.ShouldRecord*
+  name: ShouldRecord
+  href: api/Dec.IConditionalRecordable.html#Dec_IConditionalRecordable_ShouldRecord_
+  commentId: Overload:Dec.IConditionalRecordable.ShouldRecord
+  isSpec: "True"
+  fullName: Dec.IConditionalRecordable.ShouldRecord
+  nameWithType: IConditionalRecordable.ShouldRecord
 - uid: Dec.IPostCloneNew
   name: IPostCloneNew
   href: api/Dec.IPostCloneNew.html
@@ -894,15 +913,15 @@ references:
   commentId: T:Dec.Parser
   fullName: Dec.Parser
   nameWithType: Parser
-- uid: Dec.Parser.#ctor
-  name: Parser()
-  href: api/Dec.Parser.html#Dec_Parser__ctor
-  commentId: M:Dec.Parser.#ctor
-  name.vb: New()
-  fullName: Dec.Parser.Parser()
-  fullName.vb: Dec.Parser.New()
-  nameWithType: Parser.Parser()
-  nameWithType.vb: Parser.New()
+- uid: Dec.Parser.#ctor(Dec.Recorder.IUserSettings)
+  name: Parser(IUserSettings)
+  href: api/Dec.Parser.html#Dec_Parser__ctor_Dec_Recorder_IUserSettings_
+  commentId: M:Dec.Parser.#ctor(Dec.Recorder.IUserSettings)
+  name.vb: New(IUserSettings)
+  fullName: Dec.Parser.Parser(Dec.Recorder.IUserSettings)
+  fullName.vb: Dec.Parser.New(Dec.Recorder.IUserSettings)
+  nameWithType: Parser.Parser(Recorder.IUserSettings)
+  nameWithType.vb: Parser.New(Recorder.IUserSettings)
 - uid: Dec.Parser.#ctor*
   name: Parser
   href: api/Dec.Parser.html#Dec_Parser__ctor_
@@ -1008,15 +1027,15 @@ references:
   commentId: T:Dec.ParserModular
   fullName: Dec.ParserModular
   nameWithType: ParserModular
-- uid: Dec.ParserModular.#ctor
-  name: ParserModular()
-  href: api/Dec.ParserModular.html#Dec_ParserModular__ctor
-  commentId: M:Dec.ParserModular.#ctor
-  name.vb: New()
-  fullName: Dec.ParserModular.ParserModular()
-  fullName.vb: Dec.ParserModular.New()
-  nameWithType: ParserModular.ParserModular()
-  nameWithType.vb: ParserModular.New()
+- uid: Dec.ParserModular.#ctor(Dec.Recorder.IUserSettings)
+  name: ParserModular(IUserSettings)
+  href: api/Dec.ParserModular.html#Dec_ParserModular__ctor_Dec_Recorder_IUserSettings_
+  commentId: M:Dec.ParserModular.#ctor(Dec.Recorder.IUserSettings)
+  name.vb: New(IUserSettings)
+  fullName: Dec.ParserModular.ParserModular(Dec.Recorder.IUserSettings)
+  fullName.vb: Dec.ParserModular.New(Dec.Recorder.IUserSettings)
+  nameWithType: ParserModular.ParserModular(Recorder.IUserSettings)
+  nameWithType.vb: ParserModular.New(Recorder.IUserSettings)
 - uid: Dec.ParserModular.#ctor*
   name: ParserModular
   href: api/Dec.ParserModular.html#Dec_ParserModular__ctor_
@@ -1139,15 +1158,15 @@ references:
   isSpec: "True"
   fullName: Dec.Recorder.Clone
   nameWithType: Recorder.Clone
-- uid: Dec.Recorder.Clone``1(``0)
-  name: Clone<T>(T)
-  href: api/Dec.Recorder.html#Dec_Recorder_Clone__1___0_
-  commentId: M:Dec.Recorder.Clone``1(``0)
-  name.vb: Clone(Of T)(T)
-  fullName: Dec.Recorder.Clone<T>(T)
-  fullName.vb: Dec.Recorder.Clone(Of T)(T)
-  nameWithType: Recorder.Clone<T>(T)
-  nameWithType.vb: Recorder.Clone(Of T)(T)
+- uid: Dec.Recorder.Clone``1(``0,Dec.Recorder.IUserSettings)
+  name: Clone<T>(T, IUserSettings)
+  href: api/Dec.Recorder.html#Dec_Recorder_Clone__1___0_Dec_Recorder_IUserSettings_
+  commentId: M:Dec.Recorder.Clone``1(``0,Dec.Recorder.IUserSettings)
+  name.vb: Clone(Of T)(T, IUserSettings)
+  fullName: Dec.Recorder.Clone<T>(T, Dec.Recorder.IUserSettings)
+  fullName.vb: Dec.Recorder.Clone(Of T)(T, Dec.Recorder.IUserSettings)
+  nameWithType: Recorder.Clone<T>(T, Recorder.IUserSettings)
+  nameWithType.vb: Recorder.Clone(Of T)(T, Recorder.IUserSettings)
 - uid: Dec.Recorder.Direction
   name: Recorder.Direction
   href: api/Dec.Recorder.Direction.html
@@ -1166,6 +1185,12 @@ references:
   commentId: F:Dec.Recorder.Direction.Write
   fullName: Dec.Recorder.Direction.Write
   nameWithType: Recorder.Direction.Write
+- uid: Dec.Recorder.IUserSettings
+  name: Recorder.IUserSettings
+  href: api/Dec.Recorder.IUserSettings.html
+  commentId: T:Dec.Recorder.IUserSettings
+  fullName: Dec.Recorder.IUserSettings
+  nameWithType: Recorder.IUserSettings
 - uid: Dec.Recorder.Mode
   name: Mode
   href: api/Dec.Recorder.html#Dec_Recorder_Mode
@@ -1266,15 +1291,15 @@ references:
   isSpec: "True"
   fullName: Dec.Recorder.Read
   nameWithType: Recorder.Read
-- uid: Dec.Recorder.Read``1(System.String,System.String)
-  name: Read<T>(string, string)
-  href: api/Dec.Recorder.html#Dec_Recorder_Read__1_System_String_System_String_
-  commentId: M:Dec.Recorder.Read``1(System.String,System.String)
-  name.vb: Read(Of T)(String, String)
-  fullName: Dec.Recorder.Read<T>(string, string)
-  fullName.vb: Dec.Recorder.Read(Of T)(String, String)
-  nameWithType: Recorder.Read<T>(string, string)
-  nameWithType.vb: Recorder.Read(Of T)(String, String)
+- uid: Dec.Recorder.Read``1(System.String,System.String,Dec.Recorder.IUserSettings)
+  name: Read<T>(string, string, IUserSettings)
+  href: api/Dec.Recorder.html#Dec_Recorder_Read__1_System_String_System_String_Dec_Recorder_IUserSettings_
+  commentId: M:Dec.Recorder.Read``1(System.String,System.String,Dec.Recorder.IUserSettings)
+  name.vb: Read(Of T)(String, String, IUserSettings)
+  fullName: Dec.Recorder.Read<T>(string, string, Dec.Recorder.IUserSettings)
+  fullName.vb: Dec.Recorder.Read(Of T)(String, String, Dec.Recorder.IUserSettings)
+  nameWithType: Recorder.Read<T>(string, string, Recorder.IUserSettings)
+  nameWithType.vb: Recorder.Read(Of T)(String, String, Recorder.IUserSettings)
 - uid: Dec.Recorder.Record*
   name: Record
   href: api/Dec.Recorder.html#Dec_Recorder_Record_
@@ -1320,6 +1345,19 @@ references:
   isSpec: "True"
   fullName: Dec.Recorder.Shared
   nameWithType: Recorder.Shared
+- uid: Dec.Recorder.UserSettings
+  name: UserSettings
+  href: api/Dec.Recorder.html#Dec_Recorder_UserSettings
+  commentId: P:Dec.Recorder.UserSettings
+  fullName: Dec.Recorder.UserSettings
+  nameWithType: Recorder.UserSettings
+- uid: Dec.Recorder.UserSettings*
+  name: UserSettings
+  href: api/Dec.Recorder.html#Dec_Recorder_UserSettings_
+  commentId: Overload:Dec.Recorder.UserSettings
+  isSpec: "True"
+  fullName: Dec.Recorder.UserSettings
+  nameWithType: Recorder.UserSettings
 - uid: Dec.Recorder.WithFactory(System.Collections.Generic.Dictionary{System.Type,System.Func{System.Type,System.Object}})
   name: WithFactory(Dictionary<Type, Func<Type, object>>)
   href: api/Dec.Recorder.html#Dec_Recorder_WithFactory_System_Collections_Generic_Dictionary_System_Type_System_Func_System_Type_System_Object___
@@ -1350,24 +1388,24 @@ references:
   isSpec: "True"
   fullName: Dec.Recorder.WriteValidation
   nameWithType: Recorder.WriteValidation
-- uid: Dec.Recorder.WriteValidation``1(``0)
-  name: WriteValidation<T>(T)
-  href: api/Dec.Recorder.html#Dec_Recorder_WriteValidation__1___0_
-  commentId: M:Dec.Recorder.WriteValidation``1(``0)
-  name.vb: WriteValidation(Of T)(T)
-  fullName: Dec.Recorder.WriteValidation<T>(T)
-  fullName.vb: Dec.Recorder.WriteValidation(Of T)(T)
-  nameWithType: Recorder.WriteValidation<T>(T)
-  nameWithType.vb: Recorder.WriteValidation(Of T)(T)
-- uid: Dec.Recorder.Write``1(``0,System.Boolean)
-  name: Write<T>(T, bool)
-  href: api/Dec.Recorder.html#Dec_Recorder_Write__1___0_System_Boolean_
-  commentId: M:Dec.Recorder.Write``1(``0,System.Boolean)
-  name.vb: Write(Of T)(T, Boolean)
-  fullName: Dec.Recorder.Write<T>(T, bool)
-  fullName.vb: Dec.Recorder.Write(Of T)(T, Boolean)
-  nameWithType: Recorder.Write<T>(T, bool)
-  nameWithType.vb: Recorder.Write(Of T)(T, Boolean)
+- uid: Dec.Recorder.WriteValidation``1(``0,Dec.Recorder.IUserSettings)
+  name: WriteValidation<T>(T, IUserSettings)
+  href: api/Dec.Recorder.html#Dec_Recorder_WriteValidation__1___0_Dec_Recorder_IUserSettings_
+  commentId: M:Dec.Recorder.WriteValidation``1(``0,Dec.Recorder.IUserSettings)
+  name.vb: WriteValidation(Of T)(T, IUserSettings)
+  fullName: Dec.Recorder.WriteValidation<T>(T, Dec.Recorder.IUserSettings)
+  fullName.vb: Dec.Recorder.WriteValidation(Of T)(T, Dec.Recorder.IUserSettings)
+  nameWithType: Recorder.WriteValidation<T>(T, Recorder.IUserSettings)
+  nameWithType.vb: Recorder.WriteValidation(Of T)(T, Recorder.IUserSettings)
+- uid: Dec.Recorder.Write``1(``0,System.Boolean,Dec.Recorder.IUserSettings)
+  name: Write<T>(T, bool, IUserSettings)
+  href: api/Dec.Recorder.html#Dec_Recorder_Write__1___0_System_Boolean_Dec_Recorder_IUserSettings_
+  commentId: M:Dec.Recorder.Write``1(``0,System.Boolean,Dec.Recorder.IUserSettings)
+  name.vb: Write(Of T)(T, Boolean, IUserSettings)
+  fullName: Dec.Recorder.Write<T>(T, bool, Dec.Recorder.IUserSettings)
+  fullName.vb: Dec.Recorder.Write(Of T)(T, Boolean, Dec.Recorder.IUserSettings)
+  nameWithType: Recorder.Write<T>(T, bool, Recorder.IUserSettings)
+  nameWithType.vb: Recorder.Write(Of T)(T, Boolean, Recorder.IUserSettings)
 - uid: Dec.StaticReferencesAttribute
   name: StaticReferencesAttribute
   href: api/Dec.StaticReferencesAttribute.html

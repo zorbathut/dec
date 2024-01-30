@@ -98,6 +98,7 @@ Class IgnoreRecordDuringParserAttribute  <a class="header-action link-secondary"
 
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">[AttributeUsage(AttributeTargets.Method)]
+[Obsolete(&quot;This will be removed shortly. Reimplement this functionality in terms of IUserSettings and IConditionalRecordable.&quot;)]
 public class IgnoreRecordDuringParserAttribute : Attribute</code></pre>
   </div>
 

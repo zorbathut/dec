@@ -85,7 +85,7 @@
 
 
   <h1 id="Dec_Recorder" data-uid="Dec.Recorder" class="text-break">
-Class Recorder  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L60"><i class="bi bi-code-slash"></i></a>
+Class Recorder  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L74"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -132,7 +132,7 @@ Class Recorder  <a class="header-action link-secondary" title="View source" href
 
   <h3 id="Dec_Recorder_Mode" data-uid="Dec.Recorder.Mode">
   Mode
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L322"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L340"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Indicates whether this Recorder is being used for reading or writing.</p>
@@ -160,15 +160,46 @@ Class Recorder  <a class="header-action link-secondary" title="View source" href
 
 
 
+  <a id="Dec_Recorder_UserSettings_" data-uid="Dec.Recorder.UserSettings*"></a>
+
+  <h3 id="Dec_Recorder_UserSettings" data-uid="Dec.Recorder.UserSettings">
+  UserSettings
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L250"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract Recorder.IUserSettings UserSettings { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dec.Recorder.html">Recorder</a>.<a class="xref" href="Dec.Recorder.IUserSettings.html">IUserSettings</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <h2 class="section" id="methods">Methods
 </h2>
 
 
   <a id="Dec_Recorder_Clone_" data-uid="Dec.Recorder.Clone*"></a>
 
-  <h3 id="Dec_Recorder_Clone__1___0_" data-uid="Dec.Recorder.Clone``1(``0)">
-  Clone&lt;T&gt;(T)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L512"><i class="bi bi-code-slash"></i></a>
+  <h3 id="Dec_Recorder_Clone__1___0_Dec_Recorder_IUserSettings_" data-uid="Dec.Recorder.Clone``1(``0,Dec.Recorder.IUserSettings)">
+  Clone&lt;T&gt;(T, IUserSettings)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L530"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Makes a copy of an object.</p>
@@ -176,12 +207,14 @@ Class Recorder  <a class="header-action link-secondary" title="View source" href
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static T Clone&lt;T&gt;(T obj)</code></pre>
+    <pre><code class="lang-csharp hljs">public static T Clone&lt;T&gt;(T obj, Recorder.IUserSettings userSettings = null)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
     <dt><code>obj</code> <span class="xref">T</span></dt>
+    <dd></dd>
+    <dt><code>userSettings</code> <a class="xref" href="Dec.Recorder.html">Recorder</a>.<a class="xref" href="Dec.Recorder.IUserSettings.html">IUserSettings</a></dt>
     <dd></dd>
   </dl>
 
@@ -202,7 +235,7 @@ Class Recorder  <a class="header-action link-secondary" title="View source" href
 
 
 
-  <h4 class="section" id="Dec_Recorder_Clone__1___0__remarks">Remarks</h4>
+  <h4 class="section" id="Dec_Recorder_Clone__1___0_Dec_Recorder_IUserSettings__remarks">Remarks</h4>
   <div class="markdown level1 remarks"><p>This is logically equivalent to Write(Read(obj)), but much faster (approx 200x in one real-world testcase.)</p>
 <p>Clone() is guaranteed to accept everything that Write(Read(obj)) does, but the reverse is not true; Clone is sometimes more permissive than the disk serialization system. Don't expect to use this as complete validation for Write.</p>
 <p>This is a new feature and should be considered experimental. It is currently undertested, and I cannot stress this enough, Dec is a library full of weird edge cases and extremely carefully chosen behaviors, I <em>guarantee</em> many of those are handled wrong with Clone. If performance is not critical I currently strongly recommend using Write(Read(obj)).</p>
@@ -213,9 +246,9 @@ Class Recorder  <a class="header-action link-secondary" title="View source" href
 
   <a id="Dec_Recorder_Read_" data-uid="Dec.Recorder.Read*"></a>
 
-  <h3 id="Dec_Recorder_Read__1_System_String_System_String_" data-uid="Dec.Recorder.Read``1(System.String,System.String)">
-  Read&lt;T&gt;(string, string)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L359"><i class="bi bi-code-slash"></i></a>
+  <h3 id="Dec_Recorder_Read__1_System_String_System_String_Dec_Recorder_IUserSettings_" data-uid="Dec.Recorder.Read``1(System.String,System.String,Dec.Recorder.IUserSettings)">
+  Read&lt;T&gt;(string, string, IUserSettings)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L377"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Parses the output of Write, generating an object and all its related serialized data.</p>
@@ -223,7 +256,7 @@ Class Recorder  <a class="header-action link-secondary" title="View source" href
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static T Read&lt;T&gt;(string input, string stringName = &quot;input&quot;)</code></pre>
+    <pre><code class="lang-csharp hljs">public static T Read&lt;T&gt;(string input, string stringName = &quot;input&quot;, Recorder.IUserSettings userSettings = null)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
@@ -231,6 +264,8 @@ Class Recorder  <a class="header-action link-secondary" title="View source" href
     <dt><code>input</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
     <dd></dd>
     <dt><code>stringName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>userSettings</code> <a class="xref" href="Dec.Recorder.html">Recorder</a>.<a class="xref" href="Dec.Recorder.IUserSettings.html">IUserSettings</a></dt>
     <dd></dd>
   </dl>
 
@@ -259,7 +294,7 @@ Class Recorder  <a class="header-action link-secondary" title="View source" href
 
   <h3 id="Dec_Recorder_RecordAsThis__1___0__" data-uid="Dec.Recorder.RecordAsThis``1(``0@)">
   RecordAsThis&lt;T&gt;(ref T)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L259"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L277"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Serialize or deserialize a member of a class as if it were this class.</p>
@@ -302,7 +337,7 @@ Class Recorder  <a class="header-action link-secondary" title="View source" href
 
   <h3 id="Dec_Recorder_Record__1___0__System_String_" data-uid="Dec.Recorder.Record``1(``0@,System.String)">
   Record&lt;T&gt;(ref T, string)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L242"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L260"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Serialize or deserialize a member of a class.</p>
@@ -345,7 +380,7 @@ Class Recorder  <a class="header-action link-secondary" title="View source" href
 
   <h3 id="Dec_Recorder_Shared" data-uid="Dec.Recorder.Shared">
   Shared()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L306"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L324"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Allow sharing for class objects referenced during this call.</p>
@@ -384,7 +419,7 @@ This is handy if (for example) your entities need to refer to each other for AI 
 
   <h3 id="Dec_Recorder_WithFactory_System_Collections_Generic_Dictionary_System_Type_System_Func_System_Type_System_Object___" data-uid="Dec.Recorder.WithFactory(System.Collections.Generic.Dictionary{System.Type,System.Func{System.Type,System.Object}})">
   WithFactory(Dictionary&lt;Type, Func&lt;Type, object&gt;&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L288"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L306"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Add a factory layer to objects created during this call.</p>
@@ -434,9 +469,9 @@ It can be reused, but should not be modified by the user once passed into a func
 
   <a id="Dec_Recorder_WriteValidation_" data-uid="Dec.Recorder.WriteValidation*"></a>
 
-  <h3 id="Dec_Recorder_WriteValidation__1___0_" data-uid="Dec.Recorder.WriteValidation``1(``0)">
-  WriteValidation&lt;T&gt;(T)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L344"><i class="bi bi-code-slash"></i></a>
+  <h3 id="Dec_Recorder_WriteValidation__1___0_Dec_Recorder_IUserSettings_" data-uid="Dec.Recorder.WriteValidation``1(``0,Dec.Recorder.IUserSettings)">
+  WriteValidation&lt;T&gt;(T, IUserSettings)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L362"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Returns C# validation code starting at an option.</p>
@@ -444,12 +479,14 @@ It can be reused, but should not be modified by the user once passed into a func
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static string WriteValidation&lt;T&gt;(T target)</code></pre>
+    <pre><code class="lang-csharp hljs">public static string WriteValidation&lt;T&gt;(T target, Recorder.IUserSettings userSettings = null)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
     <dt><code>target</code> <span class="xref">T</span></dt>
+    <dd></dd>
+    <dt><code>userSettings</code> <a class="xref" href="Dec.Recorder.html">Recorder</a>.<a class="xref" href="Dec.Recorder.IUserSettings.html">IUserSettings</a></dt>
     <dd></dd>
   </dl>
 
@@ -476,9 +513,9 @@ It can be reused, but should not be modified by the user once passed into a func
 
   <a id="Dec_Recorder_Write_" data-uid="Dec.Recorder.Write*"></a>
 
-  <h3 id="Dec_Recorder_Write__1___0_System_Boolean_" data-uid="Dec.Recorder.Write``1(``0,System.Boolean)">
-  Write&lt;T&gt;(T, bool)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L327"><i class="bi bi-code-slash"></i></a>
+  <h3 id="Dec_Recorder_Write__1___0_System_Boolean_Dec_Recorder_IUserSettings_" data-uid="Dec.Recorder.Write``1(``0,System.Boolean,Dec.Recorder.IUserSettings)">
+  Write&lt;T&gt;(T, bool, IUserSettings)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L345"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Returns a fully-formed XML document starting at an object.</p>
@@ -486,7 +523,7 @@ It can be reused, but should not be modified by the user once passed into a func
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static string Write&lt;T&gt;(T target, bool pretty = false)</code></pre>
+    <pre><code class="lang-csharp hljs">public static string Write&lt;T&gt;(T target, bool pretty = false, Recorder.IUserSettings userSettings = null)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
@@ -494,6 +531,8 @@ It can be reused, but should not be modified by the user once passed into a func
     <dt><code>target</code> <span class="xref">T</span></dt>
     <dd></dd>
     <dt><code>pretty</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+    <dt><code>userSettings</code> <a class="xref" href="Dec.Recorder.html">Recorder</a>.<a class="xref" href="Dec.Recorder.IUserSettings.html">IUserSettings</a></dt>
     <dd></dd>
   </dl>
 
@@ -522,7 +561,7 @@ It can be reused, but should not be modified by the user once passed into a func
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L60" class="edit-link">Edit this page</a>
+          <a href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L74" class="edit-link">Edit this page</a>
         </div>
 
 
