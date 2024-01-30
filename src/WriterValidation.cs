@@ -6,12 +6,14 @@ namespace Dec
     using System.Text;
     using System.Xml.Linq;
 
-    internal abstract class WriterValidation : Writer
+    internal abstract class WriterValidation
     {
         private StringBuilder sb = new StringBuilder();
 
         internal Dictionary<object, string> referenceLookup = new Dictionary<object, string>();
         private WriterUtil.PendingWriteCoordinator pendingWriteCoordinator = new WriterUtil.PendingWriteCoordinator();
+
+        public abstract bool AllowReflection { get; }
 
         public void AppendLine(string line)
         {

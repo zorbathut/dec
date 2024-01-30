@@ -5,11 +5,6 @@ namespace Dec
     using System.Collections.Generic;
     using System.Xml.Linq;
 
-    internal abstract class Writer
-    {
-        public abstract bool AllowReflection { get; }
-    }
-
     internal abstract class WriterNode
     {
         private Recorder.Context context;

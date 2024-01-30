@@ -8,7 +8,7 @@ namespace Dec
     using System.Collections.Generic;
     using System.Linq;
 
-    internal class WriterClone : Writer
+    internal class WriterClone
     {
         private WriterUtil.PendingWriteCoordinator pendingWriteCoordinator = new WriterUtil.PendingWriteCoordinator();
 
@@ -22,7 +22,7 @@ namespace Dec
             pendingWriteCoordinator.DequeuePendingWrites();
         }
 
-        public override bool AllowReflection { get => false; }
+        public bool AllowReflection { get => false; }
 
         internal Dictionary<object, object> cloneReferences = new Dictionary<object, object>();
 

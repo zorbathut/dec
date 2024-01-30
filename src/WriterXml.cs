@@ -9,12 +9,14 @@ namespace Dec
     using System.Xml;
     using System.Xml.Linq;
 
-    internal abstract class WriterXml : Writer
+    internal abstract class WriterXml
     {
         // A list of writes that still have to happen. This is used so we don't have to do deep recursive dives and potentially blow our stack.
         // I think this is only used for WriterXmlRecord, but right now this all goes through WriterNodeXml which is meant to work with both of these.
         // The inheritance tree is kind of messed up right now and should be fixed.
         private WriterUtil.PendingWriteCoordinator pendingWriteCoordinator = new WriterUtil.PendingWriteCoordinator();
+
+        public abstract bool AllowReflection { get; }
 
         public abstract bool RegisterReference(object referenced, XElement element, Recorder.Context recContext);
 
