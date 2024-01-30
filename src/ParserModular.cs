@@ -238,8 +238,6 @@ namespace Dec
         /// </summary>
         public void Finish()
         {
-            System.GC.Collect();
-
             using (var _ = new CultureInfoScope(Config.CultureInfo))
             {
                 if (s_Status != Status.Accumulating)
