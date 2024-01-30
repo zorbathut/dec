@@ -43,7 +43,7 @@ namespace Dec
         };
 
         private static Regex GenericParameterMatcher = new Regex("`[0-9]+", RegexOptions.Compiled);
-        private static Dictionary<(string, int), Type[]> StrippedTypeCache = null;
+        private static Dictionary<(string, int), Type[]> StrippedTypeCache = null;  // this is fine not being concurrent; it's set once and then never modified
         private static Type GetTypeFromAnyAssembly(string text, int gparams, InputContext context)
         {
             // This is technically unnecessary if we're not parsing a generic, but we may as well do it because the cache will still be faster for nongenerics.

@@ -52,8 +52,8 @@ namespace Dec
         // Initialize it to empty in order to support Recorder operations without Dec initialization.
         // At some point we'll figure out how to support Converters at that point as well.
         internal static bool ConverterInitialized = false;
-        internal static Dictionary<Type, Converter> ConverterObjects = new Dictionary<Type, Converter>();
-        internal static Dictionary<Type, Type> ConverterGenericPrototypes = new Dictionary<Type, Type>();
+        internal static System.Collections.Concurrent.ConcurrentDictionary<Type, Converter> ConverterObjects = new System.Collections.Concurrent.ConcurrentDictionary<Type, Converter>();
+        internal static System.Collections.Concurrent.ConcurrentDictionary<Type, Type> ConverterGenericPrototypes = new System.Collections.Concurrent.ConcurrentDictionary<Type, Type>();
 
         internal static Converter ConverterFor(Type inputType)
         {
@@ -99,7 +99,7 @@ namespace Dec
             // this is here just so we don't keep thrashing if something breaks
             ConverterInitialized = true;
 
-            ConverterObjects = new Dictionary<Type, Converter>();
+            ConverterObjects = new System.Collections.Concurrent.ConcurrentDictionary<Type, Converter>();
 
             IEnumerable<Type> conversionTypes;
             if (Config.TestParameters == null)
@@ -1815,8 +1815,8 @@ namespace Dec
         internal static void Clear()
         {
             ConverterInitialized = false;
-            ConverterObjects = new Dictionary<Type, Converter>();
-            ConverterGenericPrototypes = new Dictionary<Type, Type>();
+            ConverterObjects = new System.Collections.Concurrent.ConcurrentDictionary<Type, Converter>();
+            ConverterGenericPrototypes = new System.Collections.Concurrent.ConcurrentDictionary<Type, Type>();
         }
     }
 }

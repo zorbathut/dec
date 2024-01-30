@@ -136,7 +136,7 @@ namespace Dec
             public Type type;
             public FieldInfo field;
         }
-        internal static Dictionary<Type, IndexInfo[]> IndexInfoCached = new Dictionary<Type, IndexInfo[]>();
+        internal static System.Collections.Concurrent.ConcurrentDictionary<Type, IndexInfo[]> IndexInfoCached = new System.Collections.Concurrent.ConcurrentDictionary<Type, IndexInfo[]>();
         internal static IndexInfo[] GetIndicesForType(Type type)
         {
             if (IndexInfoCached.TryGetValue(type, out var result))
