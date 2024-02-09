@@ -645,7 +645,7 @@ namespace Dec
 
                 if (recContext.shared == Recorder.Context.Shared.Deny)
                 {
-                    Dbg.Err($"{refKeyNode.GetInputContext()}: Found a reference in a non-.Shared() context, using it anyway but this might produce unexpected results");
+                    Dbg.Err($"{refKeyNode.GetInputContext()}: Found a reference in a non-.Shared() context; this should happen only if you've removed the .Shared() tag since the file was generated, or if you hand-wrote a file that is questionably valid. Using the reference anyway but this might produce unexpected results");
                 }
 
                 if (context.refs == null)
