@@ -1567,12 +1567,14 @@ namespace Dec
         {
             // Verify our Shared flags as the *very* first step to ensure nothing gets past us.
             // In theory this should be fine with Flexible; Flexible only happens on an outer wrapper that was shared, and therefore was null, and therefore this is default also
+            bool canBeShared = fieldType.CanBeShared();
             if (node.RecorderContext.shared == Recorder.Context.Shared.Allow && !asThis)
             {
                 // If this is an `asThis` parameter, then we may not be writing the field type it looks like, and we're just going to trust that they're doing something sensible.
-                if (!fieldType.CanBeShared())
+                if (!canBeShared)
                 {
                     // If shared, make sure our type is appropriate for sharing
+                    // this really needs the recorder name and the field name too
                     Dbg.Wrn($"Value type `{fieldType}` tagged as Shared in recorder, this is meaningless but harmless");
                 }
             }
@@ -1661,7 +1663,7 @@ namespace Dec
             // Check to see if we should make this into a ref (yes, even if we're not tagged as Shared)
             // Do this *before* we do the class tagging, otherwise we may add ref/class tags to a single node, which is invalid.
             // Note that it's important we don't write a reference if we had an unreferenceable; it's unnecessarily slow and some of our writer types don't support it.
-            if (!valType.IsValueType && !unreferenceableComplete && !asThis)
+            if (Util.CanBeShared(valType) && !asThis)
             {
                 if (node.WriteReference(value))
                 {

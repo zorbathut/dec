@@ -10,7 +10,14 @@ namespace Dec
         /// </summary>
         public static bool CanBeShared(Type type)
         {
-            return !type.IsValueType && !typeof(Dec).IsAssignableFrom(type) && type != typeof(string) && type != typeof(Type);
+            bool canBeShared = !type.IsValueType && !typeof(Dec).IsAssignableFrom(type) && !typeof(Enum).IsAssignableFrom(type) && type != typeof(string) && type != typeof(Type);
+            if (!canBeShared)
+            {
+                return false;
+            }
+
+            var converter = Serialization.ConverterFor(type);
+            return !converter?.TreatAsValuelike() ?? true;
         }
 
         /// <summary>

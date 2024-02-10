@@ -12,6 +12,16 @@ namespace Dec
     {
         // This is `internal virtual` because there's no way I can find to specify `internal abstract`.
         internal virtual Type GetConvertedTypeHint() { return null; }
+
+        /// <summary>
+        /// Signals whether to treat this like a valuelike object.
+        /// </summary>
+        /// <remarks>
+        /// Valuelikes cannot be shared and do not produce warnings if "the same object" is not shared.
+        ///
+        /// This is appropriate for stuff like `string`, `Type`, `MethodInfo`, etc, which are technically classes but act more like immutable value types.
+        /// </remarks>
+        public virtual bool TreatAsValuelike() { return false; }
     }
 
     /// <summary>

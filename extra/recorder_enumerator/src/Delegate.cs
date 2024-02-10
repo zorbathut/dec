@@ -17,6 +17,11 @@ namespace Dec.RecorderEnumerator
             return type == typeof(Action);
         }
 
+        public override bool TreatAsValuelike()
+        {
+            return true;
+        }
+
         private Type localType;
         private MethodInfo localReturnDefault;
 

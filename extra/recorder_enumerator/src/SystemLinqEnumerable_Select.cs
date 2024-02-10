@@ -22,7 +22,7 @@ namespace Dec.RecorderEnumerator
         public override void Write(object input, Recorder recorder)
         {
             recorder.Shared().RecordPrivate(input, field_Source, "source");
-            recorder.Shared().RecordPrivate(input, field_Selector, "selector");
+            recorder.RecordPrivate(input, field_Selector, "selector");
             recorder.Shared().RecordPrivate(input, field_Enumerator, "enumerator");
             recorder.RecordPrivate(input, field_State, "state");
             recorder.SharedIfPossible<T>().RecordPrivate(input, field_Current, "current");
@@ -55,7 +55,7 @@ namespace Dec.RecorderEnumerator
         public override void Write(object input, Recorder recorder)
         {
             recorder.Shared().RecordPrivate(input, field_Source, "source");
-            recorder.Shared().RecordPrivate(input, field_Selector, "selector");
+            recorder.RecordPrivate(input, field_Selector, "selector");
             recorder.RecordPrivate(input, field_State, "state");
             recorder.SharedIfPossible<T>().RecordPrivate(input, field_Current, "current");
         }
@@ -88,7 +88,7 @@ namespace Dec.RecorderEnumerator
         public override void Write(object input, Recorder recorder)
         {
             recorder.Shared().RecordPrivate(input, field_Source, "source");
-            recorder.Shared().RecordPrivate(input, field_Selector, "selector");
+            recorder.RecordPrivate(input, field_Selector, "selector");
             recorder.RecordPrivate(input, field_Enumerator, "enumerator");
             recorder.RecordPrivate(input, field_State, "state");
             recorder.SharedIfPossible<T>().RecordPrivate(input, field_Current, "current");
@@ -123,7 +123,7 @@ namespace Dec.RecorderEnumerator
         {
             recorder.RecordPrivate(input, field_Start, "start");
             recorder.RecordPrivate(input, field_End, "end");
-            recorder.Shared().RecordPrivate(input, field_Selector, "selector");
+            recorder.RecordPrivate(input, field_Selector, "selector");
             recorder.RecordPrivate(input, field_State, "state");
             recorder.SharedIfPossible<T>().RecordPrivate(input, field_Current, "current");
         }
@@ -157,7 +157,7 @@ namespace Dec.RecorderEnumerator
         public override void Write(object input, Recorder recorder)
         {
             recorder.Shared().RecordPrivate(input, field_Source, "source");
-            recorder.Shared().RecordPrivate(input, field_Selector, "selector");
+            recorder.RecordPrivate(input, field_Selector, "selector");
             recorder.Shared().RecordPrivate(input, field_SourceEnumerator, "sourceEnumerator");
             recorder.Shared().RecordPrivate(input, field_SubEnumerator, "subEnumerator");
             recorder.RecordPrivate(input, field_State, "state");

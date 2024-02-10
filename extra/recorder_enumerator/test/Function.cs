@@ -68,5 +68,61 @@ namespace RecorderEnumeratorTest
 
             Assert.IsTrue(Util.AreEquivalentEnumerators(val, result));
         }
+
+        class RecordableLocalClosureClass : Dec.IRecordable
+        {
+            public Func<bool> func;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref func, nameof(func));
+            }
+        }
+
+        private static bool RecordableLocalClosureVal = false;
+        [Dec.RecorderEnumerator.RecordableClosures]
+        [Test]
+        public void RecordableLocalClosure([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            RecordableLocalClosureClass rlcc = new RecordableLocalClosureClass();
+            Func<bool> func = () => RecordableLocalClosureVal;
+            rlcc.func = func;
+
+            var dupe = DoRecorderRoundTrip(rlcc, recorderMode);
+
+            RecordableLocalClosureVal = false;
+            Assert.AreEqual(rlcc.func(), dupe.func());
+            RecordableLocalClosureVal = true;
+            Assert.AreEqual(rlcc.func(), dupe.func());
+        }
+
+        public static bool ReturnFalse()
+        {
+            return false;
+        }
+        public struct DoubleFunctionStruct : Dec.IRecordable
+        {
+            public Func<bool> one;
+            public Func<bool> two;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref one, nameof(one));
+                recorder.Record(ref two, nameof(two));
+            }
+        }
+
+        [Test]
+        public void DoubleFunction([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            // this is mostly to ensure that delegates are handled as value types; they're doing GetHashCode()/Equals() magic to make them seem like it, even if they're not
+            // and I'm just gonna play along and pretend they're value types
+            // hopefully I don't regret this but seriously if you're using `unsafe` pointers to test equality then I don't know what you were expecting
+            var val = new DoubleFunctionStruct();
+            val.one = ReturnFalse;
+            val.two = ReturnFalse;
+
+            var result = DoRecorderRoundTrip(val, recorderMode);
+        }
     }
 }

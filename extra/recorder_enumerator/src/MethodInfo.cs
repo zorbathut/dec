@@ -7,6 +7,11 @@ namespace Dec.RecorderEnumerator
 
     public class MethodInfo_Converter : ConverterFactory<MethodInfo>
     {
+        public override bool TreatAsValuelike()
+        {
+            return true;
+        }
+
         public override void Write(MethodInfo input, Recorder recorder)
         {
             Type type = input.DeclaringType;
