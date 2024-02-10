@@ -141,14 +141,14 @@ namespace Dec
             if (xelement == null)
             {
                 // This is an unreferencable object! We are in trouble.
-                Dbg.Err("Attempt to create a new reference to an unreferenceable object. Will be left with default values. If this is coming from a Recorder setup, perhaps you need a .Shared() decorator.");
+                Dbg.Err("Attempted to create a shared reference to an unshared object. This may result in an invalid serialization. If this is coming from a Recorder setup, perhaps you need a .Shared() decorator.");
                 return true;
             }
 
             // We have a referenceable target, but do *we* allow a reference?
             if (recContext.shared == Recorder.Context.Shared.Deny)
             {
-                Dbg.Err("Attempt to create a new unreferenceable recording of a referenceable object. Will be left with default values.");
+                Dbg.Err("Attempted to create a new unshared reference to a previously-shared object. This may result in an invalid serialization. If this is coming from a Recorder setup, either perhaps you need a .Shared() decorator, or you need to ensure that this object is not serialized elsewhere.");
                 return true;
             }
 
