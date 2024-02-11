@@ -114,7 +114,7 @@ namespace Dec.RecorderEnumerator
         {
             // We need to create an appropriate Delegate, but this is hard to do; Delegate refuses to play nice with GetUninitializedObject and its constructor does a lot of error checking.
             // So instead, we just create a Delegate straight out of a MethodInfo with the appropriate prototype.
-            // We'll swap out the guts of the Delegate later.
+            // We'll replace the Delegate later.
             return localReturnDefault.CreateDelegate(localType, null);
         }
 
@@ -125,9 +125,10 @@ namespace Dec.RecorderEnumerator
             recorder.Record(ref method, "method");
             recorder.Shared().Record(ref target, "target");
 
-            // now we have to actually jam this into our fake uninitialized Delegate
-            // this is shamelessly cannibalized from https://github.com/microsoft/referencesource/blob/master/mscorlib/system/delegate.cs
-            bindToMethodInfo.Invoke(input, new object[] { target, method, runtimeMethodHandle_getDeclaringType.Invoke(null, new object[] { method }), delegateBindingFlags });
+            // BEHOLD
+            // This is an order of magnitude easier than trying to do cutesy things with reflection to replace the guts.
+            // However, this is viable *only* because of TreatAsValuelike(), which ensures that it isn't shared.
+            input = method.CreateDelegate(localType, target);
         }
     }
 }

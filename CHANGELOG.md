@@ -19,6 +19,11 @@ All notable changes to this project will be documented in this file.
 * Better support for parallel operations in multiple threads (but not Parser.)
 * Fleshed out an error message.
 
+### Fixed
+* Inconsistent behavior in Extra RecorderEnumerator Delegate deserialization. (Hopefully.)
+* Improper storage of `this` with Extra RecorderEnumerator iterators.
+* Unexpected shrapnel caused by the above two fixes.
+
 ### Testing
 * Improved consistency of a few tests.
 

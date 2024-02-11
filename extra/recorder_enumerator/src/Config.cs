@@ -147,11 +147,16 @@ namespace Dec.RecorderEnumerator
                     return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_ConcatNIterator_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
                 }
 
-                // List enumerator
+                // SystemCollections
 
                 if (genericTypeDefinition == SystemCollections_List_Enumerator_Converter.RelevantType)
                 {
                     return (Converter)Activator.CreateInstance(typeof(SystemCollections_List_Enumerator_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
+                }
+
+                if (genericTypeDefinition == SystemCollections_Generic_GenericComparer.RelevantType)
+                {
+                    return (Converter)Activator.CreateInstance(typeof(SystemCollections_Generic_GenericComparer<>).MakeGenericType(type.GenericTypeArguments[0]));
                 }
 
                 // SystemLinq
@@ -164,6 +169,11 @@ namespace Dec.RecorderEnumerator
                 if (genericTypeDefinition == SystemLinq_Buffer_Converter.RelevantType)
                 {
                     return (Converter)Activator.CreateInstance(typeof(SystemLinq_Buffer_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
+                }
+
+                if (genericTypeDefinition == SystemLinq_OrderedEnumerable_Converter.RelevantType)
+                {
+                    return (Converter)Activator.CreateInstance(typeof(SystemLinq_OrderedEnumerable_Converter<,,>).MakeGenericType(type, type.GenericTypeArguments[0], type.GenericTypeArguments[1]));
                 }
 
                 // Delegate
@@ -189,7 +199,7 @@ namespace Dec.RecorderEnumerator
                     Dbg.Err($"Internal error; presumed compiler-generated type {type} does not have CompilerGeneratedAttribute");
                     return null;
                 }
-            
+
                 if (UserCreatedEnumerableRegex.Match(type.Name) is var ucer && ucer.Success)
                 {
                     // Now we're going to see if the attribute exists
@@ -229,7 +239,7 @@ namespace Dec.RecorderEnumerator
                         Dbg.Err($"Attempting to serialize an enumerable {type} without a Dec.RecorderEnumerator.RecordableEnumerable applied to all functions with that name; sorry, it's gotta be all of them right now");
                         return null;
                     }
-                
+
                     return new UserCreatedEnumerableConverter(type);
                 }
 

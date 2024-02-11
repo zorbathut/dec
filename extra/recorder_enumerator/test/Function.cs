@@ -13,7 +13,7 @@ namespace RecorderEnumeratorTest
         static int beef() { return 42; }
 
         [Dec.RecorderEnumerator.RecordableEnumerable]
-        private IEnumerable<int> PrintSomeNumbers()
+        private static IEnumerable<int> PrintSomeNumbers()
         {
             for (int i = 0; i < 10; ++i)
             {
@@ -48,7 +48,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Dec.RecorderEnumerator.RecordableEnumerable]
-        private IEnumerable<int> PrintMoreNumbers<T, U, V>()
+        private static IEnumerable<int> PrintMoreNumbers<T, U, V>()
         {
             yield return typeof(T).GetHashCode();
             yield return typeof(U).GetHashCode();

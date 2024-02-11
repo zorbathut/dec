@@ -1,0 +1,55 @@
+namespace RecorderEnumeratorTest
+{
+    using DecTest;
+    using NUnit.Framework;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
+
+    [TestFixture]
+    public class Enumer : Base
+    {
+        class DataReporter : Dec.IRecordable
+        {
+            public int data;
+            public IEnumerator<int> reporter;
+
+            [Dec.RecorderEnumerator.RecordableEnumerable]
+            public IEnumerable<int> PrintTheNumber()
+            {
+                while (true)
+                {
+                    yield return data;
+                }
+            }
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref data, nameof(data));
+                recorder.Record(ref reporter, nameof(reporter));
+            }
+        }
+
+        [Test]
+        public void EnumerableMember([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            var dataReporter = new DataReporter();
+            dataReporter.reporter = dataReporter.PrintTheNumber().GetEnumerator();
+
+            var clone = DoRecorderRoundTrip(dataReporter, recorderMode);
+
+            clone.data = 42;
+            clone.reporter.MoveNext();
+            Assert.AreEqual(clone.data, clone.reporter.Current);
+
+            clone.data = 100;
+            clone.reporter.MoveNext();
+            Assert.AreEqual(clone.data, clone.reporter.Current);
+
+            clone.data = -10;
+            clone.reporter.MoveNext();
+            Assert.AreEqual(clone.data, clone.reporter.Current);
+        }
+    }
+}

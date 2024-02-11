@@ -68,7 +68,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Dec.RecorderEnumerator.RecordableEnumerable]
-        public IEnumerable<int> FakeRange()
+        public static IEnumerable<int> FakeRange()
         {
             for (int i = 0; i < 20; ++i)
             {

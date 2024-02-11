@@ -52,4 +52,19 @@ namespace Dec.RecorderEnumerator
             return input;
         }
     }
+
+    public static class SystemCollections_Generic_GenericComparer
+    {
+        internal static Type RelevantType = typeof(System.Collections.Generic.List<>).Assembly.GetType("System.Collections.Generic.GenericComparer`1");
+    }
+
+    public class SystemCollections_Generic_GenericComparer<Iterator> : ConverterRecordDynamic
+    {
+        public override object Record(ref object input, Recorder recorder)
+        {
+            // there's actually no fields
+            // womp womp
+            return input;
+        }
+    }
 }

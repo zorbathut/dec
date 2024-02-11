@@ -62,4 +62,42 @@ namespace Dec.RecorderEnumerator
             Write(input, recorder);
         }
     }
+
+    public static class SystemLinq_OrderedEnumerable_Converter
+    {
+        internal static Type RelevantType = typeof(System.Linq.Enumerable).Assembly.GetType("System.Linq.OrderedEnumerable`2");
+    }
+
+    public class SystemLinq_OrderedEnumerable_Converter<Iterator, T, K> : ConverterFactoryDynamic
+    {
+        internal FieldInfo field_Parent = typeof(Iterator).GetPrivateFieldInHierarchy("_parent");
+        internal FieldInfo field_KeySelector = typeof(Iterator).GetPrivateFieldInHierarchy("_keySelector");
+        internal FieldInfo field_Comparer = typeof(Iterator).GetPrivateFieldInHierarchy("_comparer");
+        internal FieldInfo field_Descending = typeof(Iterator).GetPrivateFieldInHierarchy("_descending");
+        internal FieldInfo field_Source = typeof(Iterator).GetPrivateFieldInHierarchy("_source");
+
+        internal ConstructorInfo constructor = typeof(Iterator).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic)[0];
+
+        public override void Write(object input, Recorder recorder)
+        {
+            recorder.RecordPrivate(input, field_Parent, "_parent");
+            recorder.RecordPrivate(input, field_KeySelector, "_keySelector");
+            recorder.Shared().RecordPrivate(input, field_Comparer, "_comparer");
+            recorder.RecordPrivate(input, field_Descending, "_descending");
+            recorder.Shared().RecordPrivate(input, field_Source, "_source");
+        }
+
+        private static K DefaultKeySelector(T t) => default;
+
+        public override object Create(Recorder recorder)
+        {
+            return constructor.Invoke(new object[] { Enumerable.Empty<T>(), DefaultKeySelector, null, false, null });
+        }
+
+        public override void Read(ref object input, Recorder recorder)
+        {
+            // it's the same code, we only need this for the funky Create
+            Write(input, recorder);
+        }
+    }
 }

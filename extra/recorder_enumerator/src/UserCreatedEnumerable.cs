@@ -17,7 +17,7 @@ namespace Dec.RecorderEnumerator
 
         public override void Write(object input, Recorder recorder)
         {
-            foreach (var field in enumerableType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance))
+            foreach (var field in enumerableType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
             {
                 if (global::Dec.Util.CanBeShared(field.FieldType))
                 {
