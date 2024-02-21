@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file.
 * Added IConditionalRecorder, which can be used to conditionally record objects.
 * CloneWithAssignmentAttribute can now be used to specify that objects can be cloned with basic assignment, speeding up array cloning considerably.
 * IPostCloneOriginal/IPostCloneNew interfaces that can be used to perform post-clone operations on objects.
-* Converter.TreatAsValuelike() which can be used to treat any type like a valuelike.
+* Converter.TreatAsValuelike() which can be used to treat any type like a valuelike. See documentation for details.
 
 ### Breaking
 * Ignoring provided fields in a Recorder is now considered a warning. Use the new recorder.Ignore() method to explicitly suppress this warning for a field.
