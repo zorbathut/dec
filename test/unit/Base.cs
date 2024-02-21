@@ -46,6 +46,7 @@ namespace DecTest
         private bool handlingErrors = false;
         private bool handledError = false;
         private Func<string, bool> errorValidator = null;
+        private Func<string, bool> warningValidator = null;
 
         [OneTimeSetUp]
         public void PrepHooks()
@@ -68,6 +69,9 @@ namespace DecTest
                 // we forgot to do the string interpolation correctly
                 Assert.IsFalse(str.Contains("{"));
                 Assert.IsFalse(str.Contains("}"));
+
+                // Check to see if this is considered a "valid" warning.
+                Assert.IsTrue(warningValidator == null || warningValidator(str));
 
                 if (handlingWarnings)
                 {
@@ -136,11 +140,12 @@ namespace DecTest
             }
         }
 
-        protected void ExpectWarnings(Action action, string context = "unlabeled context")
+        protected void ExpectWarnings(Action action, string context = "unlabeled context", Func<string, bool> warningValidator = null)
         {
             Assert.IsFalse(handlingWarnings);
             handlingWarnings = true;
             handledWarning = false;
+            this.warningValidator = warningValidator;
 
             action();
 
@@ -148,6 +153,7 @@ namespace DecTest
             Assert.IsTrue(handledWarning, $"Expected warning in {context} but did not generate one");
             handlingWarnings = false;
             handledWarning = false;
+            this.warningValidator = null;
         }
 
         // Return "true" if this is the expected error, "false" if this is a bad error

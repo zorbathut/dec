@@ -10,6 +10,9 @@ All notable changes to this project will be documented in this file.
 * IPostCloneOriginal/IPostCloneNew interfaces that can be used to perform post-clone operations on objects.
 * Converter.TreatAsValuelike() which can be used to treat any type like a valuelike.
 
+### Breaking
+* Ignoring provided fields in a Recorder is now considered a warning. Use the new recorder.Ignore() method to explicitly suppress this warning for a field.
+
 ### Obsoleted
 * Bespoke.IgnoreRecordDuringParserAttribute has been obsoleted in favor of IConditionalRecorder. It remains in the codebase for now but will be removed in the future.
 

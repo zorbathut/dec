@@ -696,6 +696,10 @@ namespace Dec
                 return null;
             }
         }
+        public override string[] GetAllChildren()
+        {
+            return recorderChildren.Keys.ToArray();
+        }
 
         public override object ParseElement(Type type, object model, ReaderContext readerContext, Recorder.Context recorderContext)
         {
@@ -731,6 +735,11 @@ namespace Dec
             // not valid, this is used only for recorders
             throw new NotImplementedException();
         }
+        public override string[] GetAllChildren()
+        {
+            // not valid, this is used only for recorders
+            throw new NotImplementedException();
+        }
 
         public override object ParseElement(Type type, object model, ReaderContext readerContext, Recorder.Context recorderContext)
         {
@@ -758,6 +767,10 @@ namespace Dec
         }
 
         public override ReaderNode GetChildNamed(string name)
+        {
+            throw new NotImplementedException();
+        }
+        public override string[] GetAllChildren()
         {
             throw new NotImplementedException();
         }

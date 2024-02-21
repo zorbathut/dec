@@ -577,6 +577,14 @@ namespace DecTest
             Assert.IsNull(output);
         }
 
+        public class StubRecordableIgnoring : Dec.IRecordable
+        {
+            public void Record(Dec.Recorder record)
+            {
+                record.Ignore("recordable");
+            }
+        }
+
         [Test]
         public void ParameterRef()
         {
@@ -592,8 +600,8 @@ namespace DecTest
                     <recordable ref=""ref00000"" />
                   </data>
                 </Record>";
-            StubRecordable deserialized = null;
-            ExpectErrors(() => deserialized = Dec.Recorder.Read<StubRecordable>(serialized));
+            StubRecordableIgnoring deserialized = null;
+            ExpectErrors(() => deserialized = Dec.Recorder.Read<StubRecordableIgnoring>(serialized));
 
             Assert.IsNotNull(deserialized);
         }

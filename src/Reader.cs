@@ -46,6 +46,7 @@ namespace Dec
         public abstract InputContext GetInputContext(); // note: this function must be really fast!
 
         public abstract ReaderNode GetChildNamed(string name);
+        public abstract string[] GetAllChildren();
 
         public abstract int[] GetArrayDimensions(int rank);
 

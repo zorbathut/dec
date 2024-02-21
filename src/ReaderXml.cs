@@ -266,6 +266,10 @@ namespace Dec
             var child = xml.ElementNamed(name);
             return child == null ? null : new ReaderNodeXml(child, fileIdentifier, UserSettings);
         }
+        public override string[] GetAllChildren()
+        {
+            return xml.Elements().Select(e => e.Name.LocalName).ToArray();
+        }
 
         public override string GetText()
         {

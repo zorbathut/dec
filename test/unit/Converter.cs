@@ -189,5 +189,25 @@ namespace DecTest
 
             Assert.AreEqual(root.x, deserialized.x);
         }
+
+        public class NumberDec : Dec.Dec
+        {
+            public Number n;
+        }
+
+        [Test]
+        public void UnusedField([Values] bool factory)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(NumberDec) }, explicitConverters = new Type[]{ factory ? typeof(NumberConverterFactory) : typeof(NumberConverterRecord) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <NumberDec decName=""TestDecA"">
+                        <n><InvalidField>6</InvalidField></n>
+                    </NumberDec>
+                </Decs>");
+            ExpectWarnings(() => parser.Finish(), warningValidator: err => err.Contains("InvalidField"));
+        }
     }
 }

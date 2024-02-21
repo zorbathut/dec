@@ -765,9 +765,10 @@ namespace Dec
                         // context might be null; that's OK at the moment
                         if (result != null)
                         {
+                            var recorderReader = new RecorderReader(node, context, trackUsage: true);
                             try
                             {
-                                object returnedResult = converterRecord.RecordObj(result, new RecorderReader(node, context));
+                                object returnedResult = converterRecord.RecordObj(result, recorderReader);
 
                                 if (!type.IsValueType && result != returnedResult)
                                 {
@@ -778,6 +779,8 @@ namespace Dec
                                     // for value types, this is fine
                                     result = returnedResult;
                                 }
+
+                                recorderReader.ReportUnusedFields();
                             }
                             catch (Exception e)
                             {
@@ -807,11 +810,12 @@ namespace Dec
                                 break;
                         }
 
+                        var recorderReader = new RecorderReader(node, context, disallowShared: true, trackUsage: true);
                         if (result == null)
                         {
                             try
                             {
-                                result = converterFactory.CreateObj(new RecorderReader(node, context, disallowShared: true));
+                                result = converterFactory.CreateObj(recorderReader);
                             }
                             catch (Exception e)
                             {
@@ -822,9 +826,11 @@ namespace Dec
                         // context might be null; that's OK at the moment
                         if (result != null)
                         {
+                            recorderReader.AllowShared(context);
                             try
                             {
-                                result = converterFactory.ReadObj(result, new RecorderReader(node, context));
+                                result = converterFactory.ReadObj(result, recorderReader);
+                                recorderReader.ReportUnusedFields();
                             }
                             catch (Exception e)
                             {
@@ -885,7 +891,9 @@ namespace Dec
 
                         if (recordable != null)
                         {
-                            recordable.Record(new RecorderReader(node, context));
+                            var recorderReader = new RecorderReader(node, context, trackUsage: true);
+                            recordable.Record(recorderReader);
+                            recorderReader.ReportUnusedFields();
 
                             // TODO: support indices if this is within the Dec system?
                         }

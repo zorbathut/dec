@@ -327,6 +327,16 @@ namespace Dec
         }
 
         /// <summary>
+        /// Indicates that a field is intentionally unused and should be ignored.
+        /// </summary>
+        /// <remarks>
+        /// Dec will output warnings if a field isn't being used, on the assumption that it's probably a mistake.
+        /// 
+        /// Sometimes a field is ignored intentionally, usually for backwards compatibility reasons, and this function can be used to suppress that warning.
+        /// </remarks>
+        public virtual void Ignore(string label) { }
+
+        /// <summary>
         /// Indicates whether this Recorder is being used for reading or writing.
         /// </summary>
         public enum Direction
@@ -422,9 +432,11 @@ namespace Dec
                             // the next parse step
                             furtherParsing.Add(() =>
                             {
+                                var recorderReader = new RecorderReader(reference.node, readerContext, trackUsage: true);
                                 try
                                 {
-                                    converterRecord.RecordObj(refInstance, new RecorderReader(reference.node, readerContext));
+                                    converterRecord.RecordObj(refInstance, recorderReader);
+                                    recorderReader.ReportUnusedFields();
                                 }
                                 catch (Exception e)
                                 {
@@ -437,14 +449,17 @@ namespace Dec
                             // create the basic object
                             try
                             {
-                                refInstance = converterFactory.CreateObj(new RecorderReader(reference.node, readerContext, disallowShared: true));
+                                var recorderReader = new RecorderReader(reference.node, readerContext, disallowShared: true, trackUsage: true);
+                                refInstance = converterFactory.CreateObj(recorderReader);
 
                                 // the next parse step, if we have one
                                 furtherParsing.Add(() =>
                                 {
+                                    recorderReader.AllowShared(readerContext);
                                     try
                                     {
-                                        converterFactory.ReadObj(refInstance, new RecorderReader(reference.node, readerContext));
+                                        converterFactory.ReadObj(refInstance, recorderReader);
+                                        recorderReader.ReportUnusedFields();
                                     }
                                     catch (Exception e)
                                     {
@@ -622,14 +637,30 @@ namespace Dec
     {
         private bool asThis = false;
         private readonly ReaderNode node;
-        private readonly ReaderContext readerContext;
+        private ReaderContext readerContext;
         private bool disallowShared;
+        private HashSet<string> seen;
 
-        internal RecorderReader(ReaderNode node, ReaderContext context, bool disallowShared = false)
+        internal RecorderReader(ReaderNode node, ReaderContext context, bool disallowShared = false, bool trackUsage = false)
         {
             this.node = node;
             this.readerContext = context;
             this.disallowShared = disallowShared;
+
+            if (trackUsage)
+            {
+                seen = new HashSet<string>();
+            }
+        }
+        internal void AllowShared(ReaderContext newContext)
+        {
+            if (!disallowShared)
+            {
+                Dbg.Err($"{node.GetInputContext()}: Internal error, RecorderReader.AllowShared() called on a RecorderReader that does not disallow shared objects");
+            }
+
+            this.readerContext = newContext;
+            disallowShared = false;
         }
 
         public override IUserSettings UserSettings { get => node.UserSettings; }
@@ -666,10 +697,45 @@ namespace Dec
                 return;
             }
 
+            seen?.Add(label);
+
             // Explicit cast here because we want an error if we have the wrong type!
             value = (T)recorded.ParseElement(typeof(T), value, readerContext, parameters.CreateContext());
         }
 
+        public override void Ignore(string label)
+        {
+            seen?.Add(label);
+        }
+
         public override Direction Mode { get => Direction.Read; }
+
+        internal void ReportUnusedFields()
+        {
+            if (seen == null)
+            {
+                Dbg.Err($"{node.GetInputContext()}: Internal error, RecorderReader.HasUnusedFields() called without trackUsage set");
+                return;
+            }
+
+            if (asThis)
+            {
+                // field parsing deferred to our child anyway
+                return;
+            }
+
+            var allChildren = node.GetAllChildren();
+            if (seen.Count == allChildren.Length)
+            {
+                // we only register things that existed
+                // so if "seen" is the same length as "all", then we've seen everything 
+                return;
+            }
+
+            var unused = new HashSet<string>(allChildren);
+            unused.ExceptWith(seen);
+            
+            Dbg.Wrn($"{node.GetInputContext()}: Unused fields: {string.Join(", ", unused)}");
+        }
     }
 }
