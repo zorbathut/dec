@@ -3,7 +3,7 @@ namespace Dec.RecorderEnumerator
     using System;
     using System.Reflection;
 
-    [AttributeUsage(AttributeTargets.Method)]
+    [AttributeUsage(AttributeTargets.Class)]
     public class RecordableClosuresAttribute : Attribute { }
 
     public class RecordableClosureConverter : ConverterFactoryDynamic

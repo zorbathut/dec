@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 
 ### Breaking
 * Ignoring provided fields in a Recorder is now considered a warning. Use the new recorder.Ignore() method to explicitly suppress this warning for a field.
+* Extra RecorderEnumerator's RecordableClosures attribute now needs to be applied to the class instead of the function (but you weren't using this yet, right?)
 
 ### Obsoleted
 * Bespoke.IgnoreRecordDuringParserAttribute has been obsoleted in favor of IConditionalRecorder. It remains in the codebase for now but will be removed in the future.

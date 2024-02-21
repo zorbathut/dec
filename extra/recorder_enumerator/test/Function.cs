@@ -8,6 +8,7 @@ namespace RecorderEnumeratorTest
     using System.Reflection;
 
     [TestFixture]
+    [Dec.RecorderEnumerator.RecordableClosures]
     public class Function : Base
     {
         static int beef() { return 42; }
@@ -80,7 +81,6 @@ namespace RecorderEnumeratorTest
         }
 
         private static bool RecordableLocalClosureVal = false;
-        [Dec.RecorderEnumerator.RecordableClosures]
         [Test]
         public void RecordableLocalClosure([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
         {

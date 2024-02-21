@@ -245,17 +245,18 @@ namespace Dec.RecorderEnumerator
 
                 if (RecordableClosureRegex.Match(type.Name) is var vcr && vcr.Success)
                 {
-                    int functionIndex = int.Parse(vcr.Groups[1].Value);
+                    // I really want to be able to compare this to the actual function the closure is defined in
+                    // but I can't find any way to go from the function index to, like, an actual function :/
+                    // I could in theory reverse engineer the IL to figure out what's calling it, but
+                    // (1) no
+                    // (2) that's probably going to be really broken on stuff like il2cpp
+                    // (3) no
 
                     var owningType = type.DeclaringType;
-                    var owningTypeFunctions = owningType.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
 
-                    var function = owningTypeFunctions[functionIndex];
-                    // No function name test, unfortunately
-
-                    if (function.GetCustomAttribute<RecordableClosuresAttribute>() == null)
+                    if (owningType.GetCustomAttribute<RecordableClosuresAttribute>() == null)
                     {
-                        Dbg.Err($"Attempting to serialize a closure {type} without a Dec.RecorderEnumerator.RecordableClosure applied to its function");
+                        Dbg.Err($"Attempting to serialize a closure {type} without a Dec.RecorderEnumerator.RecordableClosures applied to its class {owningType}");
                         return null;
                     }
 
