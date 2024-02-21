@@ -1191,6 +1191,22 @@ references:
   commentId: T:Dec.Recorder.IUserSettings
   fullName: Dec.Recorder.IUserSettings
   nameWithType: Recorder.IUserSettings
+- uid: Dec.Recorder.Ignore(System.String)
+  name: Ignore(string)
+  href: api/Dec.Recorder.html#Dec_Recorder_Ignore_System_String_
+  commentId: M:Dec.Recorder.Ignore(System.String)
+  name.vb: Ignore(String)
+  fullName: Dec.Recorder.Ignore(string)
+  fullName.vb: Dec.Recorder.Ignore(String)
+  nameWithType: Recorder.Ignore(string)
+  nameWithType.vb: Recorder.Ignore(String)
+- uid: Dec.Recorder.Ignore*
+  name: Ignore
+  href: api/Dec.Recorder.html#Dec_Recorder_Ignore_
+  commentId: Overload:Dec.Recorder.Ignore
+  isSpec: "True"
+  fullName: Dec.Recorder.Ignore
+  nameWithType: Recorder.Ignore
 - uid: Dec.Recorder.Mode
   name: Mode
   href: api/Dec.Recorder.html#Dec_Recorder_Mode
