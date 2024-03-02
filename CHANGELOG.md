@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 
-## [Unreleased]
+## [v0.5.4]
 ### Added
 * Added IUserSettings, which is passed throughout the Dec system and can be used to change the behavior of Parser and Recorder.
 * Added IConditionalRecorder, which can be used to conditionally record objects.
