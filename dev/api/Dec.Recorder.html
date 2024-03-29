@@ -409,7 +409,7 @@ Class Recorder  <a class="header-action link-secondary" title="View source" href
 <p>In most cases, you don't need to do anything different for read vs. write; this function will figure out the details and do the right thing.</p>
 <p>Be aware that if you're reading an object that was serialized as .Shared(), the object may not be fully deserialized by the time this function returns.
 If you aren't completely certain that the object was unshared when serialized, do not access members of the recorded object - they may be in an unknown state.
-See <a href="xref:Dec.IPostRead"><code>Dec.IPostRead</code></a> if you need to do something after all objects are fully deserialized.</p>
+If you need to do something after all objects are fully deserialized, wait until Recorder.Read() is finished and do a post-processing pass.</p>
 </div>
 
 
