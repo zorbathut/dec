@@ -12,6 +12,9 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 * RecorderEnumerator: List<T>.Enumerator would not properly serialize if the enumerator was empty.
 
+### Testing
+* Added a small test.
+
 
 ## [v0.6.0]
 ### Added
