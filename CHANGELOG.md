@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 * Type parsing now accepts curly braces in place of generic angle braces, in order to make XML easier to write.
+* Decs can now include `class` tags, if you need to specify a type that doesn't work as an XML node name.
 
 ### Improved
 * Documentation regarding Recorder load order.

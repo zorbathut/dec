@@ -91,6 +91,30 @@ namespace Dec
                     // Consume decName so we know it's not hanging around
                     decElement.Attribute("decName").Remove();
 
+                    // Parse `class` if we can
+                    if (decElement.Attribute("class") is var classAttribute && classAttribute != null)
+                    {
+                        var parsedClass = (Type)Serialization.ParseString(classAttribute.Value,
+                            typeof(Type), null, readerDec.inputContext);
+
+                        if (parsedClass == null)
+                        {
+                            // we have presumably already reported an error
+                        }
+                        else if (!readerDec.type.IsAssignableFrom(parsedClass))
+                        {
+                            Dbg.Err($"{readerDec.inputContext}: Attribute-parsed class {parsedClass} is not a subclass of {readerDec.type}; using the original class");
+                        }
+                        else
+                        {
+                            // yay
+                            readerDec.type = parsedClass;
+                        }
+
+                        // clean up
+                        classAttribute.Remove();
+                    }
+
                     // Check to see if we're abstract
                     {
                         var abstractAttribute = decElement.Attribute("abstract");

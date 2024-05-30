@@ -163,7 +163,7 @@ namespace DecTest
 
         public class DeepChildDec : DeepParentDec
         {
-            
+
         }
 
         [Test]
@@ -856,6 +856,78 @@ namespace DecTest
             ExpectErrors(() => parser.Finish());
 
             DoParserTests(mode);
+        }
+
+        [Test]
+        public void GenericType([Values] ParserMode mode)
+        {
+            Dec.Config.UsingNamespaces = new string[] { "DecTest.GenericTypes" };
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <GenericBaseDec decName=""TestDec"" class=""GenericDerivedDec{int}"" />
+                </Decs>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            Assert.IsNotNull(Dec.Database<GenericTypes.GenericBaseDec>.Get("TestDec"));
+            Assert.IsNotNull(Dec.Database<GenericTypes.GenericDerivedDec<int>>.Get("TestDec"));
+        }
+
+        [Test]
+        public void InvalidClassAttributeType([Values] ParserMode mode)
+        {
+            Dec.Config.UsingNamespaces = new string[] { "DecTest.GenericTypes" };
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <GenericBaseDec decName=""TestDec"" class=""horsehorsehorse"" />
+                </Decs>");
+            ExpectErrors(() => parser.Finish(), errorValidator: err => err.Contains("Couldn't find type named `horsehorsehorse`"));
+
+            DoParserTests(mode);
+
+            // should make it anyway
+            Assert.IsNotNull(Dec.Database<GenericTypes.GenericBaseDec>.Get("TestDec"));
+        }
+
+        [Test]
+        public void IncompatibleClassAttributeType([Values] ParserMode mode)
+        {
+            Dec.Config.UsingNamespaces = new string[] { "DecTest.GenericTypes" };
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <GenericBaseDec decName=""TestDec"" class=""UnrelatedBaseDec"" />
+                </Decs>");
+            ExpectErrors(() => parser.Finish(), errorValidator: err => err.Contains("Attribute-parsed class DecTest.GenericTypes.UnrelatedBaseDec is not a subclass of DecTest.GenericTypes.GenericBaseDec; using the original class"));
+
+            DoParserTests(mode);
+
+            // should make it anyway at the place where the Dec says
+            Assert.IsNotNull(Dec.Database<GenericTypes.GenericBaseDec>.Get("TestDec"));
+        }
+    }
+
+    namespace GenericTypes
+    {
+        public class GenericBaseDec : Dec.Dec
+        {
+
+        }
+
+        public class GenericDerivedDec<T> : GenericBaseDec
+        {
+
+        }
+
+        public class UnrelatedBaseDec : Dec.Dec
+        {
+
         }
     }
 }
