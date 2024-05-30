@@ -343,6 +343,12 @@ namespace DecTest
 
             TypeConversionBidirectional(typeof(OverloadedNames.Foo<Dictionary<int, double>, double>.Overloaded<string, Dictionary<int, double>>), "Foo<System.Collections.Generic.Dictionary<int, double>, double>.Overloaded<string, System.Collections.Generic.Dictionary<int, double>>");
         }
+
+        [Test]
+        public void BracketReplacement()
+        {
+            Assert.AreEqual(typeof(System.Collections.Generic.List<int>), parseType("System.Collections.Generic.List{int}"));
+        }
     }
 
     namespace OverloadedNames

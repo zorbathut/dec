@@ -298,6 +298,15 @@ namespace Dec
                 return null;
             }
 
+            if (text.Contains("{"))
+            {
+                // There's a bunch of times you might want to put full template typenames in XML and doing so is a pain due to XML treating angled brackets specially
+                // so we allow for {} in its place
+                // "why not ()" because that's tuple syntax
+                // "why not []" because that's array syntax
+                text = text.Replace("{", "<").Replace("}", ">");
+            }
+
             if (ParseCache.TryGetValue(text, out Type cacheVal))
             {
                 if (cacheVal == null)

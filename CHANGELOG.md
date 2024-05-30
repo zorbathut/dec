@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 
 
 ## [Unreleased]
+### Added
+* Type parsing now accepts curly braces in place of generic angle braces, in order to make XML easier to write.
+
 ### Improved
 * Documentation regarding Recorder load order.
 
