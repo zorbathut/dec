@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 * RecorderEnumerator: List<T>.Enumerator would not properly serialize if the enumerator was empty.
+* RecorderEnumerator: Recordable Closures did not serialize properly if they were created in a generic function.
 
 ### Testing
 * Added a small test.

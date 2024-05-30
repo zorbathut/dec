@@ -124,5 +124,23 @@ namespace RecorderEnumeratorTest
 
             var result = DoRecorderRoundTrip(val, recorderMode);
         }
+
+        [Dec.RecorderEnumerator.RecordableClosures]
+        static class ClosureHolder
+        {
+            public static Func<int> GenerateClosure<T>(T val)
+            {
+                return () => val.GetHashCode();
+            }
+        }
+
+        [Test]
+        public void GenericClosure([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        {
+            var val = ClosureHolder.GenerateClosure(42);
+            var result = DoRecorderRoundTrip(val, recorderMode);
+
+            Assert.AreEqual(val(), result());
+        }
     }
 }

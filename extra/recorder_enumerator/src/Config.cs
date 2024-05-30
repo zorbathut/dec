@@ -10,8 +10,7 @@ namespace Dec.RecorderEnumerator
     public static class Config
     {
         private static readonly Regex UserCreatedEnumerableRegex = new Regex(@"^<([^>]+)>d__[0-9]+(?:`([0-9]+))?$", RegexOptions.Compiled);
-        private static readonly Regex RecordableClosureRegex = new Regex(@"^<>c__DisplayClass([0-9]+)_([0-9]+)$", RegexOptions.Compiled);
-
+        private static readonly Regex RecordableClosureRegex = new Regex(@"^<>c__DisplayClass([0-9]+)_([0-9]+)(`[0-9]+)?$", RegexOptions.Compiled);
 
         private static HashSet<(string, string)> InternalRegexSupportOverride = new HashSet<(string, string)>
         {
