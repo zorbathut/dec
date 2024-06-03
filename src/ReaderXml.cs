@@ -76,20 +76,21 @@ namespace Dec
                         continue;
                     }
 
-                    if (decElement.Attribute("decName") == null)
+                    var decNameAttribute = decElement.Attribute("decName");
+                    if (decNameAttribute == null)
                     {
                         Dbg.Err($"{readerDec.inputContext}: No dec name provided, add a `decName=` attribute to the {typeName} tag (example: <{typeName} decName=\"TheNameOfYour{typeName}\">)");
                         continue;
                     }
 
-                    readerDec.name = decElement.Attribute("decName").Value;
+                    readerDec.name = decNameAttribute.Value;
                     if (!UtilMisc.ValidateDecName(readerDec.name, readerDec.inputContext))
                     {
                         continue;
                     }
 
                     // Consume decName so we know it's not hanging around
-                    decElement.Attribute("decName").Remove();
+                    decNameAttribute.Remove();
 
                     // Parse `class` if we can
                     if (decElement.Attribute("class") is var classAttribute && classAttribute != null)
