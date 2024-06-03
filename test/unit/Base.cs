@@ -71,7 +71,7 @@ namespace DecTest
                 Assert.IsFalse(str.Contains("}"));
 
                 // Check to see if this is considered a "valid" warning.
-                Assert.IsTrue(warningValidator == null || warningValidator(str));
+                Assert.IsTrue(warningValidator == null || warningValidator(str), $"Warning message validation failed: {str}");
 
                 if (handlingWarnings)
                 {
@@ -94,7 +94,7 @@ namespace DecTest
                 Assert.IsFalse(str.Contains("}"));
 
                 // Check to see if this is considered a "valid" error.
-                Assert.IsTrue(errorValidator == null || errorValidator(str));
+                Assert.IsTrue(errorValidator == null || errorValidator(str), $"Error message validation failed: {str}");
 
                 if (str.Contains("Internal error", StringComparison.InvariantCultureIgnoreCase))
                 {
