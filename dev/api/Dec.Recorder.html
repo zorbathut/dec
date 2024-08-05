@@ -199,7 +199,7 @@ Class Recorder  <a class="header-action link-secondary" title="View source" href
 
   <h3 id="Dec_Recorder_Clone__1___0_Dec_Recorder_IUserSettings_" data-uid="Dec.Recorder.Clone``1(``0,Dec.Recorder.IUserSettings)">
   Clone&lt;T&gt;(T, IUserSettings)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/RecorderApi.cs/#L201"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/RecorderApi.cs/#L242"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Makes a copy of an object.</p>
@@ -280,11 +280,59 @@ Class Recorder  <a class="header-action link-secondary" title="View source" href
 
 
 
+  <a id="Dec_Recorder_ReadSimple_" data-uid="Dec.Recorder.ReadSimple*"></a>
+
+  <h3 id="Dec_Recorder_ReadSimple__1_System_String_System_String_System_String_Dec_Recorder_IUserSettings_" data-uid="Dec.Recorder.ReadSimple``1(System.String,System.String,System.String,Dec.Recorder.IUserSettings)">
+  ReadSimple&lt;T&gt;(string, string, string, IUserSettings)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/RecorderApi.cs/#L212"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Parses the output of WriteSimple, generating an object and all its related serialized data.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static T ReadSimple&lt;T&gt;(string input, string rootTag, string stringName = &quot;input&quot;, Recorder.IUserSettings userSettings = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>input</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>rootTag</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>stringName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>userSettings</code> <a class="xref" href="Dec.Recorder.html">Recorder</a>.<a class="xref" href="Dec.Recorder.IUserSettings.html">IUserSettings</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><span class="xref">T</span></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
   <a id="Dec_Recorder_Read_" data-uid="Dec.Recorder.Read*"></a>
 
   <h3 id="Dec_Recorder_Read__1_System_String_System_String_Dec_Recorder_IUserSettings_" data-uid="Dec.Recorder.Read``1(System.String,System.String,Dec.Recorder.IUserSettings)">
   Read&lt;T&gt;(string, string, IUserSettings)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/RecorderApi.cs/#L43"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/RecorderApi.cs/#L61"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Parses the output of Write, generating an object and all its related serialized data.</p>
@@ -506,11 +554,57 @@ It can be reused, but should not be modified by the user once passed into a func
 
 
 
+  <a id="Dec_Recorder_WriteSimple_" data-uid="Dec.Recorder.WriteSimple*"></a>
+
+  <h3 id="Dec_Recorder_WriteSimple__1___0_System_String_Dec_Recorder_IUserSettings_" data-uid="Dec.Recorder.WriteSimple``1(``0,System.String,Dec.Recorder.IUserSettings)">
+  WriteSimple&lt;T&gt;(T, string, IUserSettings)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/RecorderApi.cs/#L28"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns a fully-formed XML document starting at an object. Supports tree layouts only; no shared objects, no loops, no self-referencing objects.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string WriteSimple&lt;T&gt;(T target, string rootTag, Recorder.IUserSettings userSettings = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>target</code> <span class="xref">T</span></dt>
+    <dd></dd>
+    <dt><code>rootTag</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>userSettings</code> <a class="xref" href="Dec.Recorder.html">Recorder</a>.<a class="xref" href="Dec.Recorder.IUserSettings.html">IUserSettings</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
   <a id="Dec_Recorder_WriteValidation_" data-uid="Dec.Recorder.WriteValidation*"></a>
 
   <h3 id="Dec_Recorder_WriteValidation__1___0_Dec_Recorder_IUserSettings_" data-uid="Dec.Recorder.WriteValidation``1(``0,Dec.Recorder.IUserSettings)">
   WriteValidation&lt;T&gt;(T, IUserSettings)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/RecorderApi.cs/#L28"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/RecorderApi.cs/#L46"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Returns C# validation code starting at an option.</p>
@@ -557,7 +651,7 @@ It can be reused, but should not be modified by the user once passed into a func
   <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/RecorderApi.cs/#L11"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"><p>Returns a fully-formed XML document starting at an object.</p>
+  <div class="markdown level1 summary"><p>Returns a fully-formed XML document starting at an object. Supports non-tree layouts with shared objects, including loops and self-referencing objects.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
 

@@ -1307,6 +1307,22 @@ references:
   isSpec: "True"
   fullName: Dec.Recorder.Read
   nameWithType: Recorder.Read
+- uid: Dec.Recorder.ReadSimple*
+  name: ReadSimple
+  href: api/Dec.Recorder.html#Dec_Recorder_ReadSimple_
+  commentId: Overload:Dec.Recorder.ReadSimple
+  isSpec: "True"
+  fullName: Dec.Recorder.ReadSimple
+  nameWithType: Recorder.ReadSimple
+- uid: Dec.Recorder.ReadSimple``1(System.String,System.String,System.String,Dec.Recorder.IUserSettings)
+  name: ReadSimple<T>(string, string, string, IUserSettings)
+  href: api/Dec.Recorder.html#Dec_Recorder_ReadSimple__1_System_String_System_String_System_String_Dec_Recorder_IUserSettings_
+  commentId: M:Dec.Recorder.ReadSimple``1(System.String,System.String,System.String,Dec.Recorder.IUserSettings)
+  name.vb: ReadSimple(Of T)(String, String, String, IUserSettings)
+  fullName: Dec.Recorder.ReadSimple<T>(string, string, string, Dec.Recorder.IUserSettings)
+  fullName.vb: Dec.Recorder.ReadSimple(Of T)(String, String, String, Dec.Recorder.IUserSettings)
+  nameWithType: Recorder.ReadSimple<T>(string, string, string, Recorder.IUserSettings)
+  nameWithType.vb: Recorder.ReadSimple(Of T)(String, String, String, Recorder.IUserSettings)
 - uid: Dec.Recorder.Read``1(System.String,System.String,Dec.Recorder.IUserSettings)
   name: Read<T>(string, string, IUserSettings)
   href: api/Dec.Recorder.html#Dec_Recorder_Read__1_System_String_System_String_Dec_Recorder_IUserSettings_
@@ -1397,6 +1413,22 @@ references:
   isSpec: "True"
   fullName: Dec.Recorder.Write
   nameWithType: Recorder.Write
+- uid: Dec.Recorder.WriteSimple*
+  name: WriteSimple
+  href: api/Dec.Recorder.html#Dec_Recorder_WriteSimple_
+  commentId: Overload:Dec.Recorder.WriteSimple
+  isSpec: "True"
+  fullName: Dec.Recorder.WriteSimple
+  nameWithType: Recorder.WriteSimple
+- uid: Dec.Recorder.WriteSimple``1(``0,System.String,Dec.Recorder.IUserSettings)
+  name: WriteSimple<T>(T, string, IUserSettings)
+  href: api/Dec.Recorder.html#Dec_Recorder_WriteSimple__1___0_System_String_Dec_Recorder_IUserSettings_
+  commentId: M:Dec.Recorder.WriteSimple``1(``0,System.String,Dec.Recorder.IUserSettings)
+  name.vb: WriteSimple(Of T)(T, String, IUserSettings)
+  fullName: Dec.Recorder.WriteSimple<T>(T, string, Dec.Recorder.IUserSettings)
+  fullName.vb: Dec.Recorder.WriteSimple(Of T)(T, String, Dec.Recorder.IUserSettings)
+  nameWithType: Recorder.WriteSimple<T>(T, string, Recorder.IUserSettings)
+  nameWithType.vb: Recorder.WriteSimple(Of T)(T, String, Recorder.IUserSettings)
 - uid: Dec.Recorder.WriteValidation*
   name: WriteValidation
   href: api/Dec.Recorder.html#Dec_Recorder_WriteValidation_
