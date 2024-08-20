@@ -1139,6 +1139,19 @@ references:
   commentId: T:Dec.Recorder
   fullName: Dec.Recorder
   nameWithType: Recorder
+- uid: Dec.Recorder.Bespoke_KeyTypeDict
+  name: Bespoke_KeyTypeDict()
+  href: api/Dec.Recorder.html#Dec_Recorder_Bespoke_KeyTypeDict
+  commentId: M:Dec.Recorder.Bespoke_KeyTypeDict
+  fullName: Dec.Recorder.Bespoke_KeyTypeDict()
+  nameWithType: Recorder.Bespoke_KeyTypeDict()
+- uid: Dec.Recorder.Bespoke_KeyTypeDict*
+  name: Bespoke_KeyTypeDict
+  href: api/Dec.Recorder.html#Dec_Recorder_Bespoke_KeyTypeDict_
+  commentId: Overload:Dec.Recorder.Bespoke_KeyTypeDict
+  isSpec: "True"
+  fullName: Dec.Recorder.Bespoke_KeyTypeDict
+  nameWithType: Recorder.Bespoke_KeyTypeDict
 - uid: Dec.Recorder.Clone*
   name: Clone
   href: api/Dec.Recorder.html#Dec_Recorder_Clone_
@@ -1214,6 +1227,19 @@ references:
   commentId: T:Dec.Recorder.Parameters
   fullName: Dec.Recorder.Parameters
   nameWithType: Recorder.Parameters
+- uid: Dec.Recorder.Parameters.Bespoke_KeyTypeDict
+  name: Bespoke_KeyTypeDict()
+  href: api/Dec.Recorder.Parameters.html#Dec_Recorder_Parameters_Bespoke_KeyTypeDict
+  commentId: M:Dec.Recorder.Parameters.Bespoke_KeyTypeDict
+  fullName: Dec.Recorder.Parameters.Bespoke_KeyTypeDict()
+  nameWithType: Recorder.Parameters.Bespoke_KeyTypeDict()
+- uid: Dec.Recorder.Parameters.Bespoke_KeyTypeDict*
+  name: Bespoke_KeyTypeDict
+  href: api/Dec.Recorder.Parameters.html#Dec_Recorder_Parameters_Bespoke_KeyTypeDict_
+  commentId: Overload:Dec.Recorder.Parameters.Bespoke_KeyTypeDict
+  isSpec: "True"
+  fullName: Dec.Recorder.Parameters.Bespoke_KeyTypeDict
+  nameWithType: Recorder.Parameters.Bespoke_KeyTypeDict
 - uid: Dec.Recorder.Parameters.Mode
   name: Mode
   href: api/Dec.Recorder.Parameters.html#Dec_Recorder_Parameters_Mode

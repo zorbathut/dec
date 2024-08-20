@@ -132,7 +132,7 @@ Class Recorder  <a class="header-action link-secondary" title="View source" href
 
   <h3 id="Dec_Recorder_Mode" data-uid="Dec.Recorder.Mode">
   Mode
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L352"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L381"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Indicates whether this Recorder is being used for reading or writing.</p>
@@ -164,7 +164,7 @@ Class Recorder  <a class="header-action link-secondary" title="View source" href
 
   <h3 id="Dec_Recorder_UserSettings" data-uid="Dec.Recorder.UserSettings">
   UserSettings
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L248"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L266"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -193,6 +193,41 @@ Class Recorder  <a class="header-action link-secondary" title="View source" href
 
   <h2 class="section" id="methods">Methods
 </h2>
+
+
+  <a id="Dec_Recorder_Bespoke_KeyTypeDict_" data-uid="Dec.Recorder.Bespoke_KeyTypeDict*"></a>
+
+  <h3 id="Dec_Recorder_Bespoke_KeyTypeDict" data-uid="Dec.Recorder.Bespoke_KeyTypeDict">
+  Bespoke_KeyTypeDict()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L337"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Informs the recorder system that the next parameter will be a Dictionary&lt;Type, V&gt; where the key should be interpreted as the type of the V.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Recorder.Parameters Bespoke_KeyTypeDict()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Dec.Recorder.html">Recorder</a>.<a class="xref" href="Dec.Recorder.Parameters.html">Parameters</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="Dec_Recorder_Bespoke_KeyTypeDict_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>This is a specialty hack added for one specific user and may vanish with little warning, though if it does, it'll be replaced by something at least as capable.</p>
+</div>
+
+
 
 
   <a id="Dec_Recorder_Clone_" data-uid="Dec.Recorder.Clone*"></a>
@@ -248,7 +283,7 @@ Class Recorder  <a class="header-action link-secondary" title="View source" href
 
   <h3 id="Dec_Recorder_Ignore_System_String_" data-uid="Dec.Recorder.Ignore(System.String)">
   Ignore(string)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L339"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L368"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Indicates that a field is intentionally unused and should be ignored.</p>
@@ -378,7 +413,7 @@ Class Recorder  <a class="header-action link-secondary" title="View source" href
 
   <h3 id="Dec_Recorder_RecordAsThis__1___0__" data-uid="Dec.Recorder.RecordAsThis``1(``0@)">
   RecordAsThis&lt;T&gt;(ref T)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L279"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L297"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Serialize or deserialize a member of a class as if it were this class.</p>
@@ -421,7 +456,7 @@ Class Recorder  <a class="header-action link-secondary" title="View source" href
 
   <h3 id="Dec_Recorder_Record__1___0__System_String_" data-uid="Dec.Recorder.Record``1(``0@,System.String)">
   Record&lt;T&gt;(ref T, string)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L262"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L280"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Serialize or deserialize a member of a class.</p>
@@ -467,7 +502,7 @@ If you need to do something after all objects are fully deserialized, wait until
 
   <h3 id="Dec_Recorder_Shared" data-uid="Dec.Recorder.Shared">
   Shared()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L326"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L355"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Allow sharing for class objects referenced during this call.</p>
@@ -506,7 +541,7 @@ This is handy if (for example) your entities need to refer to each other for AI 
 
   <h3 id="Dec_Recorder_WithFactory_System_Collections_Generic_Dictionary_System_Type_System_Func_System_Type_System_Object___" data-uid="Dec.Recorder.WithFactory(System.Collections.Generic.Dictionary{System.Type,System.Func{System.Type,System.Object}})">
   WithFactory(Dictionary&lt;Type, Func&lt;Type, object&gt;&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L308"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L326"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Add a factory layer to objects created during this call.</p>
