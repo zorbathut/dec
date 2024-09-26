@@ -200,9 +200,9 @@ Class ParserModular  <a class="header-action link-secondary" title="View source"
 
   <a id="Dec_ParserModular_Finish_" data-uid="Dec.ParserModular.Finish*"></a>
 
-  <h3 id="Dec_ParserModular_Finish" data-uid="Dec.ParserModular.Finish">
-  Finish()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/ParserModular.cs/#L248"><i class="bi bi-code-slash"></i></a>
+  <h3 id="Dec_ParserModular_Finish_System_Collections_Generic_List_Dec_Dag_System_Type__Dependency__" data-uid="Dec.ParserModular.Finish(System.Collections.Generic.List{Dec.Dag{System.Type}.Dependency})">
+  Finish(List&lt;Dependency&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/ParserModular.cs/#L252"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Finish all parsing.</p>
@@ -210,9 +210,14 @@ Class ParserModular  <a class="header-action link-secondary" title="View source"
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void Finish()</code></pre>
+    <pre><code class="lang-csharp hljs">public void Finish(List&lt;Dag&lt;Type&gt;.Dependency&gt; postLoadDependencies = null)</code></pre>
   </div>
 
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>postLoadDependencies</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="Dec.Dag-1.html">Dag</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Type</a>&gt;.<a class="xref" href="Dec.Dag-1.Dependency.html">Dependency</a>&gt;</dt>
+    <dd></dd>
+  </dl>
 
 
 
@@ -221,6 +226,10 @@ Class ParserModular  <a class="header-action link-secondary" title="View source"
 
 
 
+  <h4 class="section" id="Dec_ParserModular_Finish_System_Collections_Generic_List_Dec_Dag_System_Type__Dependency___remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>The <code>dependencies</code> parameter can be used to feed in dependencies for the PostLoad function.
+This is a placeholder and is probably going to be replaced at some point, though only with something more capable.</p>
+</div>
 
 
 

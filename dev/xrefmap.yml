@@ -465,6 +465,58 @@ references:
   fullName.vb: Dec.ConverterString(Of T).Write
   nameWithType: ConverterString<T>.Write
   nameWithType.vb: ConverterString(Of T).Write
+- uid: Dec.Dag`1
+  name: Dag<T>
+  href: api/Dec.Dag-1.html
+  commentId: T:Dec.Dag`1
+  name.vb: Dag(Of T)
+  fullName: Dec.Dag<T>
+  fullName.vb: Dec.Dag(Of T)
+  nameWithType: Dag<T>
+  nameWithType.vb: Dag(Of T)
+- uid: Dec.Dag`1.CalculateOrder*
+  name: CalculateOrder
+  href: api/Dec.Dag-1.html#Dec_Dag_1_CalculateOrder_
+  commentId: Overload:Dec.Dag`1.CalculateOrder
+  isSpec: "True"
+  fullName: Dec.Dag<T>.CalculateOrder
+  fullName.vb: Dec.Dag(Of T).CalculateOrder
+  nameWithType: Dag<T>.CalculateOrder
+  nameWithType.vb: Dag(Of T).CalculateOrder
+- uid: Dec.Dag`1.CalculateOrder``1(System.Collections.Generic.IEnumerable{`0},System.Collections.Generic.List{Dec.Dag{`0}.Dependency},System.Func{`0,``0})
+  name: CalculateOrder<U>(IEnumerable<T>, List<Dependency>, Func<T, U>)
+  href: api/Dec.Dag-1.html#Dec_Dag_1_CalculateOrder__1_System_Collections_Generic_IEnumerable__0__System_Collections_Generic_List_Dec_Dag__0__Dependency__System_Func__0___0__
+  commentId: M:Dec.Dag`1.CalculateOrder``1(System.Collections.Generic.IEnumerable{`0},System.Collections.Generic.List{Dec.Dag{`0}.Dependency},System.Func{`0,``0})
+  name.vb: CalculateOrder(Of U)(IEnumerable(Of T), List(Of Dependency), Func(Of T, U))
+  fullName: Dec.Dag<T>.CalculateOrder<U>(System.Collections.Generic.IEnumerable<T>, System.Collections.Generic.List<Dec.Dag<T>.Dependency>, System.Func<T, U>)
+  fullName.vb: Dec.Dag(Of T).CalculateOrder(Of U)(System.Collections.Generic.IEnumerable(Of T), System.Collections.Generic.List(Of Dec.Dag(Of T).Dependency), System.Func(Of T, U))
+  nameWithType: Dag<T>.CalculateOrder<U>(IEnumerable<T>, List<Dag<T>.Dependency>, Func<T, U>)
+  nameWithType.vb: Dag(Of T).CalculateOrder(Of U)(IEnumerable(Of T), List(Of Dag(Of T).Dependency), Func(Of T, U))
+- uid: Dec.Dag`1.Dependency
+  name: Dag<T>.Dependency
+  href: api/Dec.Dag-1.Dependency.html
+  commentId: T:Dec.Dag`1.Dependency
+  name.vb: Dag(Of T).Dependency
+  fullName: Dec.Dag<T>.Dependency
+  fullName.vb: Dec.Dag(Of T).Dependency
+  nameWithType: Dag<T>.Dependency
+  nameWithType.vb: Dag(Of T).Dependency
+- uid: Dec.Dag`1.Dependency.after
+  name: after
+  href: api/Dec.Dag-1.Dependency.html#Dec_Dag_1_Dependency_after
+  commentId: F:Dec.Dag`1.Dependency.after
+  fullName: Dec.Dag<T>.Dependency.after
+  fullName.vb: Dec.Dag(Of T).Dependency.after
+  nameWithType: Dag<T>.Dependency.after
+  nameWithType.vb: Dag(Of T).Dependency.after
+- uid: Dec.Dag`1.Dependency.before
+  name: before
+  href: api/Dec.Dag-1.Dependency.html#Dec_Dag_1_Dependency_before
+  commentId: F:Dec.Dag`1.Dependency.before
+  fullName: Dec.Dag<T>.Dependency.before
+  fullName.vb: Dec.Dag(Of T).Dependency.before
+  nameWithType: Dag<T>.Dependency.before
+  nameWithType.vb: Dag(Of T).Dependency.before
 - uid: Dec.Database
   name: Database
   href: api/Dec.Database.html
@@ -564,6 +616,32 @@ references:
   isSpec: "True"
   fullName: Dec.Database.List
   nameWithType: Database.List
+- uid: Dec.Database.ListOfType(System.Type)
+  name: ListOfType(Type)
+  href: api/Dec.Database.html#Dec_Database_ListOfType_System_Type_
+  commentId: M:Dec.Database.ListOfType(System.Type)
+  fullName: Dec.Database.ListOfType(System.Type)
+  nameWithType: Database.ListOfType(Type)
+- uid: Dec.Database.ListOfType*
+  name: ListOfType
+  href: api/Dec.Database.html#Dec_Database_ListOfType_
+  commentId: Overload:Dec.Database.ListOfType
+  isSpec: "True"
+  fullName: Dec.Database.ListOfType
+  nameWithType: Database.ListOfType
+- uid: Dec.Database.ListTypes
+  name: ListTypes
+  href: api/Dec.Database.html#Dec_Database_ListTypes
+  commentId: P:Dec.Database.ListTypes
+  fullName: Dec.Database.ListTypes
+  nameWithType: Database.ListTypes
+- uid: Dec.Database.ListTypes*
+  name: ListTypes
+  href: api/Dec.Database.html#Dec_Database_ListTypes_
+  commentId: Overload:Dec.Database.ListTypes
+  isSpec: "True"
+  fullName: Dec.Database.ListTypes
+  nameWithType: Database.ListTypes
 - uid: Dec.Database.Rename(Dec.Dec,System.String)
   name: Rename(Dec, string)
   href: api/Dec.Database.html#Dec_Database_Rename_Dec_Dec_System_String_
@@ -996,12 +1074,15 @@ references:
   commentId: F:Dec.Parser.FileType.Xml
   fullName: Dec.Parser.FileType.Xml
   nameWithType: Parser.FileType.Xml
-- uid: Dec.Parser.Finish
-  name: Finish()
-  href: api/Dec.Parser.html#Dec_Parser_Finish
-  commentId: M:Dec.Parser.Finish
-  fullName: Dec.Parser.Finish()
-  nameWithType: Parser.Finish()
+- uid: Dec.Parser.Finish(System.Collections.Generic.List{Dec.Dag{System.Type}.Dependency})
+  name: Finish(List<Dependency>)
+  href: api/Dec.Parser.html#Dec_Parser_Finish_System_Collections_Generic_List_Dec_Dag_System_Type__Dependency__
+  commentId: M:Dec.Parser.Finish(System.Collections.Generic.List{Dec.Dag{System.Type}.Dependency})
+  name.vb: Finish(List(Of Dependency))
+  fullName: Dec.Parser.Finish(System.Collections.Generic.List<Dec.Dag<System.Type>.Dependency>)
+  fullName.vb: Dec.Parser.Finish(System.Collections.Generic.List(Of Dec.Dag(Of System.Type).Dependency))
+  nameWithType: Parser.Finish(List<Dag<Type>.Dependency>)
+  nameWithType.vb: Parser.Finish(List(Of Dag(Of Type).Dependency))
 - uid: Dec.Parser.Finish*
   name: Finish
   href: api/Dec.Parser.html#Dec_Parser_Finish_
@@ -1050,12 +1131,15 @@ references:
   isSpec: "True"
   fullName: Dec.ParserModular.CreateModule
   nameWithType: ParserModular.CreateModule
-- uid: Dec.ParserModular.Finish
-  name: Finish()
-  href: api/Dec.ParserModular.html#Dec_ParserModular_Finish
-  commentId: M:Dec.ParserModular.Finish
-  fullName: Dec.ParserModular.Finish()
-  nameWithType: ParserModular.Finish()
+- uid: Dec.ParserModular.Finish(System.Collections.Generic.List{Dec.Dag{System.Type}.Dependency})
+  name: Finish(List<Dependency>)
+  href: api/Dec.ParserModular.html#Dec_ParserModular_Finish_System_Collections_Generic_List_Dec_Dag_System_Type__Dependency__
+  commentId: M:Dec.ParserModular.Finish(System.Collections.Generic.List{Dec.Dag{System.Type}.Dependency})
+  name.vb: Finish(List(Of Dependency))
+  fullName: Dec.ParserModular.Finish(System.Collections.Generic.List<Dec.Dag<System.Type>.Dependency>)
+  fullName.vb: Dec.ParserModular.Finish(System.Collections.Generic.List(Of Dec.Dag(Of System.Type).Dependency))
+  nameWithType: ParserModular.Finish(List<Dag<Type>.Dependency>)
+  nameWithType.vb: ParserModular.Finish(List(Of Dag(Of Type).Dependency))
 - uid: Dec.ParserModular.Finish*
   name: Finish
   href: api/Dec.ParserModular.html#Dec_ParserModular_Finish_
