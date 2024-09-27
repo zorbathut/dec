@@ -616,32 +616,6 @@ references:
   isSpec: "True"
   fullName: Dec.Database.List
   nameWithType: Database.List
-- uid: Dec.Database.ListOfType(System.Type)
-  name: ListOfType(Type)
-  href: api/Dec.Database.html#Dec_Database_ListOfType_System_Type_
-  commentId: M:Dec.Database.ListOfType(System.Type)
-  fullName: Dec.Database.ListOfType(System.Type)
-  nameWithType: Database.ListOfType(Type)
-- uid: Dec.Database.ListOfType*
-  name: ListOfType
-  href: api/Dec.Database.html#Dec_Database_ListOfType_
-  commentId: Overload:Dec.Database.ListOfType
-  isSpec: "True"
-  fullName: Dec.Database.ListOfType
-  nameWithType: Database.ListOfType
-- uid: Dec.Database.ListTypes
-  name: ListTypes
-  href: api/Dec.Database.html#Dec_Database_ListTypes
-  commentId: P:Dec.Database.ListTypes
-  fullName: Dec.Database.ListTypes
-  nameWithType: Database.ListTypes
-- uid: Dec.Database.ListTypes*
-  name: ListTypes
-  href: api/Dec.Database.html#Dec_Database_ListTypes_
-  commentId: Overload:Dec.Database.ListTypes
-  isSpec: "True"
-  fullName: Dec.Database.ListTypes
-  nameWithType: Database.ListTypes
 - uid: Dec.Database.Rename(Dec.Dec,System.String)
   name: Rename(Dec, string)
   href: api/Dec.Database.html#Dec_Database_Rename_Dec_Dec_System_String_
@@ -1074,15 +1048,12 @@ references:
   commentId: F:Dec.Parser.FileType.Xml
   fullName: Dec.Parser.FileType.Xml
   nameWithType: Parser.FileType.Xml
-- uid: Dec.Parser.Finish(System.Collections.Generic.List{Dec.Dag{System.Type}.Dependency})
-  name: Finish(List<Dependency>)
-  href: api/Dec.Parser.html#Dec_Parser_Finish_System_Collections_Generic_List_Dec_Dag_System_Type__Dependency__
-  commentId: M:Dec.Parser.Finish(System.Collections.Generic.List{Dec.Dag{System.Type}.Dependency})
-  name.vb: Finish(List(Of Dependency))
-  fullName: Dec.Parser.Finish(System.Collections.Generic.List<Dec.Dag<System.Type>.Dependency>)
-  fullName.vb: Dec.Parser.Finish(System.Collections.Generic.List(Of Dec.Dag(Of System.Type).Dependency))
-  nameWithType: Parser.Finish(List<Dag<Type>.Dependency>)
-  nameWithType.vb: Parser.Finish(List(Of Dag(Of Type).Dependency))
+- uid: Dec.Parser.Finish
+  name: Finish()
+  href: api/Dec.Parser.html#Dec_Parser_Finish
+  commentId: M:Dec.Parser.Finish
+  fullName: Dec.Parser.Finish()
+  nameWithType: Parser.Finish()
 - uid: Dec.Parser.Finish*
   name: Finish
   href: api/Dec.Parser.html#Dec_Parser_Finish_
@@ -1131,15 +1102,12 @@ references:
   isSpec: "True"
   fullName: Dec.ParserModular.CreateModule
   nameWithType: ParserModular.CreateModule
-- uid: Dec.ParserModular.Finish(System.Collections.Generic.List{Dec.Dag{System.Type}.Dependency})
-  name: Finish(List<Dependency>)
-  href: api/Dec.ParserModular.html#Dec_ParserModular_Finish_System_Collections_Generic_List_Dec_Dag_System_Type__Dependency__
-  commentId: M:Dec.ParserModular.Finish(System.Collections.Generic.List{Dec.Dag{System.Type}.Dependency})
-  name.vb: Finish(List(Of Dependency))
-  fullName: Dec.ParserModular.Finish(System.Collections.Generic.List<Dec.Dag<System.Type>.Dependency>)
-  fullName.vb: Dec.ParserModular.Finish(System.Collections.Generic.List(Of Dec.Dag(Of System.Type).Dependency))
-  nameWithType: ParserModular.Finish(List<Dag<Type>.Dependency>)
-  nameWithType.vb: ParserModular.Finish(List(Of Dag(Of Type).Dependency))
+- uid: Dec.ParserModular.Finish
+  name: Finish()
+  href: api/Dec.ParserModular.html#Dec_ParserModular_Finish
+  commentId: M:Dec.ParserModular.Finish
+  fullName: Dec.ParserModular.Finish()
+  nameWithType: ParserModular.Finish()
 - uid: Dec.ParserModular.Finish*
   name: Finish
   href: api/Dec.ParserModular.html#Dec_ParserModular_Finish_
@@ -1552,6 +1520,31 @@ references:
   fullName.vb: Dec.Recorder.Write(Of T)(T, Boolean, Dec.Recorder.IUserSettings)
   nameWithType: Recorder.Write<T>(T, bool, Recorder.IUserSettings)
   nameWithType.vb: Recorder.Write(Of T)(T, Boolean, Recorder.IUserSettings)
+- uid: Dec.SetupDependsOnAttribute
+  name: SetupDependsOnAttribute
+  href: api/Dec.SetupDependsOnAttribute.html
+  commentId: T:Dec.SetupDependsOnAttribute
+  fullName: Dec.SetupDependsOnAttribute
+  nameWithType: SetupDependsOnAttribute
+- uid: Dec.SetupDependsOnAttribute.#ctor(System.Type)
+  name: SetupDependsOnAttribute(Type)
+  href: api/Dec.SetupDependsOnAttribute.html#Dec_SetupDependsOnAttribute__ctor_System_Type_
+  commentId: M:Dec.SetupDependsOnAttribute.#ctor(System.Type)
+  name.vb: New(Type)
+  fullName: Dec.SetupDependsOnAttribute.SetupDependsOnAttribute(System.Type)
+  fullName.vb: Dec.SetupDependsOnAttribute.New(System.Type)
+  nameWithType: SetupDependsOnAttribute.SetupDependsOnAttribute(Type)
+  nameWithType.vb: SetupDependsOnAttribute.New(Type)
+- uid: Dec.SetupDependsOnAttribute.#ctor*
+  name: SetupDependsOnAttribute
+  href: api/Dec.SetupDependsOnAttribute.html#Dec_SetupDependsOnAttribute__ctor_
+  commentId: Overload:Dec.SetupDependsOnAttribute.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: Dec.SetupDependsOnAttribute.SetupDependsOnAttribute
+  fullName.vb: Dec.SetupDependsOnAttribute.New
+  nameWithType: SetupDependsOnAttribute.SetupDependsOnAttribute
+  nameWithType.vb: SetupDependsOnAttribute.New
 - uid: Dec.StaticReferencesAttribute
   name: StaticReferencesAttribute
   href: api/Dec.StaticReferencesAttribute.html

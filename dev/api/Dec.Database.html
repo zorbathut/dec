@@ -194,42 +194,6 @@ Class Database  <a class="header-action link-secondary" title="View source" href
 
 
 
-  <a id="Dec_Database_ListTypes_" data-uid="Dec.Database.ListTypes*"></a>
-
-  <h3 id="Dec_Database_ListTypes" data-uid="Dec.Database.ListTypes">
-  ListTypes
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Database.cs/#L56"><i class="bi bi-code-slash"></i></a>
-  </h3>
-
-  <div class="markdown level1 summary"><p>All registered dec root types.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static IEnumerable&lt;Type&gt; ListTypes { get; }</code></pre>
-  </div>
-
-
-
-
-
-  <h4 class="section">Property Value</h4>
-  <dl class="parameters">
-    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Type</a>&gt;</dt>
-    <dd></dd>
-  </dl>
-
-
-
-
-  <h4 class="section" id="Dec_Database_ListTypes_remarks">Remarks</h4>
-  <div class="markdown level1 remarks"><p>Types are listed in no guaranteed or stable order.</p>
-<p>As of this writing, this will return only Dec types that have instances. This may change someday.</p>
-</div>
-
-
-
-
   <h2 class="section" id="methods">Methods
 </h2>
 
@@ -238,7 +202,7 @@ Class Database  <a class="header-action link-secondary" title="View source" href
 
   <h3 id="Dec_Database_Clear" data-uid="Dec.Database.Clear">
   Clear()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Database.cs/#L213"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Database.cs/#L180"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Clears all global dec state, preparing the environment for a new Parser run.</p>
@@ -268,7 +232,7 @@ Class Database  <a class="header-action link-secondary" title="View source" href
 
   <h3 id="Dec_Database_Create_System_Type_System_String_" data-uid="Dec.Database.Create(System.Type,System.String)">
   Create(Type, string)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Database.cs/#L107"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Database.cs/#L74"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates a Dec.</p>
@@ -311,7 +275,7 @@ Class Database  <a class="header-action link-secondary" title="View source" href
 
   <h3 id="Dec_Database_Create__1_System_String_" data-uid="Dec.Database.Create``1(System.String)">
   Create&lt;T&gt;(string)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Database.cs/#L132"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Database.cs/#L99"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates a Dec.</p>
@@ -357,7 +321,7 @@ Class Database  <a class="header-action link-secondary" title="View source" href
 
   <h3 id="Dec_Database_Delete_Dec_Dec_" data-uid="Dec.Database.Delete(Dec.Dec)">
   Delete(Dec)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Database.cs/#L165"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Database.cs/#L132"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Deletes an existing dec.</p>
@@ -393,7 +357,7 @@ Class Database  <a class="header-action link-secondary" title="View source" href
 
   <h3 id="Dec_Database_Get_System_Type_System_String_" data-uid="Dec.Database.Get(System.Type,System.String)">
   Get(Type, string)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Database.cs/#L70"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Database.cs/#L54"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Retrieves a dec by base dec type and name.</p>
@@ -431,51 +395,11 @@ Class Database  <a class="header-action link-secondary" title="View source" href
 
 
 
-  <a id="Dec_Database_ListOfType_" data-uid="Dec.Database.ListOfType*"></a>
-
-  <h3 id="Dec_Database_ListOfType_System_Type_" data-uid="Dec.Database.ListOfType(System.Type)">
-  ListOfType(Type)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Database.cs/#L88"><i class="bi bi-code-slash"></i></a>
-  </h3>
-
-  <div class="markdown level1 summary"><p>Retrieves a list of decs of a given type.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static IEnumerable&lt;Dec&gt; ListOfType(Type type)</code></pre>
-  </div>
-
-  <h4 class="section">Parameters</h4>
-  <dl class="parameters">
-    <dt><code>type</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Type</a></dt>
-    <dd></dd>
-  </dl>
-
-  <h4 class="section">Returns</h4>
-  <dl class="parameters">
-    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Dec.Dec.html">Dec</a>&gt;</dt>
-    <dd></dd>
-  </dl>
-
-
-
-
-
-
-
-  <h4 class="section" id="Dec_Database_ListOfType_System_Type__remarks">Remarks</h4>
-  <div class="markdown level1 remarks"><p>Returns null if no such dec exists.</p>
-</div>
-
-
-
-
   <a id="Dec_Database_Rename_" data-uid="Dec.Database.Rename*"></a>
 
   <h3 id="Dec_Database_Rename_Dec_Dec_System_String_" data-uid="Dec.Database.Rename(Dec.Dec,System.String)">
   Rename(Dec, string)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Database.cs/#L185"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Database.cs/#L152"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Renames an existing dec.</p>
