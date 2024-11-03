@@ -72,7 +72,7 @@ namespace Dec
                 if (identifier == null)
                 {
                     // This is imperfect, but good enough. People can pass their own identifier in if they want something clever.
-                    identifier = Path.GetFileName(filename);
+                    identifier = System.IO.Path.GetFileName(filename);
                 }
 
                 using (var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read))

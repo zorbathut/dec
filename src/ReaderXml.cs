@@ -11,22 +11,27 @@ namespace Dec
     {
         public override Recorder.IUserSettings UserSettings { get; }
 
-        public ReaderNodeXml(XElement xml, string fileIdentifier, Recorder.IUserSettings userSettings)
+        private XElement xml;
+        private string fileIdentifier;
+        private Path path;
+
+        public ReaderNodeXml(XElement xml, string fileIdentifier, Path path, Recorder.IUserSettings userSettings)
         {
             this.UserSettings = userSettings;
             this.xml = xml;
             this.fileIdentifier = fileIdentifier;
+            this.path = path;
         }
 
         public override InputContext GetInputContext()
         {
-            return new InputContext(fileIdentifier, xml);
+            return new InputContext(fileIdentifier, xml, path);
         }
 
         public override ReaderNode GetChildNamed(string name)
         {
             var child = xml.ElementNamed(name);
-            return child == null ? null : new ReaderNodeXml(child, fileIdentifier, UserSettings);
+            return child == null ? null : new ReaderNodeXml(child, fileIdentifier, new PathMember(path, name), UserSettings);
         }
         public override string[] GetAllChildren()
         {
@@ -84,15 +89,16 @@ namespace Dec
         {
             var recorderChildContext = recorderContext.CreateChild();
 
+            int index = 0;
             foreach (var fieldElement in xml.Elements())
             {
                 if (fieldElement.Name.LocalName != "li")
                 {
-                    var elementContext = new InputContext(fileIdentifier, fieldElement);
+                    var elementContext = new InputContext(fileIdentifier, fieldElement, path);
                     Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                 }
 
-                list.Add(Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, UserSettings) }, referencedType, null, readerContext, recorderChildContext));
+                list.Add(Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, new PathIndex(path, index++), UserSettings) }, referencedType, null, readerContext, recorderChildContext));
             }
 
             list.GetType().GetField("_version", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(list, Util.CollectionDeserializationVersion);
@@ -129,14 +135,17 @@ namespace Dec
                         break;
                     }
 
+                    var newPath = new PathIndexMultidim(path, indices.ToArray());
+
                     if (fieldElement.Name.LocalName != "li")
                     {
-                        var elementContext = new InputContext(fileIdentifier, fieldElement);
+                        var elementContext = new InputContext(fileIdentifier, fieldElement, newPath);
                         Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                     }
 
                     indices[rank] = startAt + i++;
-                    ParseArrayRank(new ReaderNodeXml(fieldElement, fileIdentifier, UserSettings), readerContext, recorderChildContext, value, referencedType, rank + 1, indices, 0);
+                    // the pathIndexMultidim is kind of slow and I should solve this at some point
+                    ParseArrayRank(new ReaderNodeXml(fieldElement, fileIdentifier, newPath, UserSettings), readerContext, recorderChildContext, value, referencedType, rank + 1, indices, 0);
                 }
             }
         }
@@ -148,16 +157,19 @@ namespace Dec
             if (array.Rank == 1)
             {
                 // fast path
-                int i = 0;
+                int index = 0;
                 foreach (var fieldElement in xml.Elements())
                 {
+                    var newPath = new PathIndex(path, index);
+
                     if (fieldElement.Name.LocalName != "li")
                     {
-                        var elementContext = new InputContext(fileIdentifier, fieldElement);
+                        var elementContext = new InputContext(fileIdentifier, fieldElement, newPath);
                         Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                     }
 
-                    array.SetValue(Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, UserSettings) }, referencedType, null, readerContext, recorderChildContext), startOffset + i++);
+                    array.SetValue(Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, newPath, UserSettings) }, referencedType, null, readerContext, recorderChildContext), startOffset + index);
+                    ++index;
                 }
             }
             else
@@ -197,11 +209,12 @@ namespace Dec
                         continue;
                     }
 
-                    var key = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(keyNode, fileIdentifier, UserSettings) }, referencedKeyType, null, readerContext, recorderChildContext);
+                    var keyPath = new PathDictionaryKey(path);
+                    var key = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(keyNode, fileIdentifier, null, UserSettings) }, referencedKeyType, null, readerContext, recorderChildContext);
 
                     if (key == null)
                     {
-                        Dbg.Err($"{new InputContext(fileIdentifier, keyNode)}: Dictionary includes null key, skipping pair");
+                        Dbg.Err($"{new InputContext(fileIdentifier, keyNode, keyPath)}: Dictionary includes null key, skipping pair");
                         continue;
                     }
 
@@ -220,7 +233,8 @@ namespace Dec
 
                     writtenFields?.Add(key);
 
-                    dict[key] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(valueNode, fileIdentifier,UserSettings) }, referencedValueType, originalValue, readerContext, recorderChildContext);
+                    var valuePath = new PathDictionaryValue(path);
+                    dict[key] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(valueNode, fileIdentifier,valuePath, UserSettings) }, referencedValueType, originalValue, readerContext, recorderChildContext);
                 }
                 else
                 {
@@ -272,7 +286,7 @@ namespace Dec
 
                     writtenFields?.Add(key);
 
-                    dict[key] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, UserSettings) }, valueType, originalValue, readerContext, recorderChildContext);
+                    dict[key] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, null, UserSettings) }, valueType, originalValue, readerContext, recorderChildContext);
                 }
             }
         }
@@ -296,7 +310,8 @@ namespace Dec
 
             foreach (var fieldElement in xml.Elements())
             {
-                var elementContext = new InputContext(fileIdentifier, fieldElement);
+                var keyPath = new PathHashSetElement(path);
+                var elementContext = new InputContext(fileIdentifier, fieldElement, keyPath);
 
                 // There's a potential bit of ambiguity here if someone does <li /> and expects that to be an actual string named "li".
                 // Practically, I think this is less likely than someone doing <li></li> and expecting that to be the empty string.
@@ -305,7 +320,7 @@ namespace Dec
                 if (fieldElement.Name.LocalName == "li")
                 {
                     // Treat this like a full node
-                    var key = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, UserSettings) }, referencedType, null, readerContext, recorderChildContext);
+                    var key = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, keyPath, UserSettings) }, referencedType, null, readerContext, recorderChildContext);
 
                     if (key == null)
                     {
@@ -358,15 +373,19 @@ namespace Dec
 
             var recorderChildContext = recorderContext.CreateChild();
 
+            int index = 0;
             foreach (var fieldElement in xml.Elements())
             {
+                var newPath = new PathIndex(path, index);
+
                 if (fieldElement.Name.LocalName != "li")
                 {
-                    var elementContext = new InputContext(fileIdentifier, fieldElement);
+                    var elementContext = new InputContext(fileIdentifier, fieldElement, newPath);
                     Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                 }
 
-                pushFunction.Invoke(stack, new object[] { Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, UserSettings) }, referencedType, null, readerContext, recorderChildContext) });
+                pushFunction.Invoke(stack, new object[] { Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, newPath, UserSettings) }, referencedType, null, readerContext, recorderChildContext) });
+                ++index;
             }
         }
 
@@ -376,15 +395,19 @@ namespace Dec
 
             var recorderChildContext = recorderContext.CreateChild();
 
+            int index = 0;
             foreach (var fieldElement in xml.Elements())
             {
+                var newPath = new PathIndex(path, index);
+
                 if (fieldElement.Name.LocalName != "li")
                 {
-                    var elementContext = new InputContext(fileIdentifier, fieldElement);
+                    var elementContext = new InputContext(fileIdentifier, fieldElement, newPath);
                     Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                 }
 
-                enqueueFunction.Invoke(queue, new object[] { Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, UserSettings) }, referencedType, null, readerContext, recorderChildContext) });
+                enqueueFunction.Invoke(queue, new object[] { Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, newPath, UserSettings) }, referencedType, null, readerContext, recorderChildContext) });
+                ++index;
             }
         }
 
@@ -415,7 +438,7 @@ namespace Dec
 
                 for (int i = 0; i < Math.Min(parameters.Length, elements.Count); ++i)
                 {
-                    parameters[i] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(elements[i], fileIdentifier, UserSettings) }, referencedType.GenericTypeArguments[i], null, readerContext, recorderChildContext);
+                    parameters[i] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(elements[i], fileIdentifier, new PathIndex(path, i), UserSettings) }, referencedType.GenericTypeArguments[i], null, readerContext, recorderChildContext);
                 }
 
                 // fill in anything missing
@@ -442,7 +465,8 @@ namespace Dec
                 bool[] seen = new bool[expectedCount];
                 foreach (var elementItem in elements)
                 {
-                    var elementContext = new InputContext(fileIdentifier, elementItem);
+                    var newPath = new PathMember(path, elementItem.Name.LocalName); // yeah okay
+                    var elementContext = new InputContext(fileIdentifier, elementItem, newPath);
 
                     int index = parameterNames.FirstIndexOf(n => n == elementItem.Name.LocalName);
 
@@ -458,7 +482,7 @@ namespace Dec
                     }
 
                     seen[index] = true;
-                    parameters[index] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(elementItem, fileIdentifier, UserSettings) }, referencedType.GenericTypeArguments[index], null, readerContext, recorderChildContext);
+                    parameters[index] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(elementItem, fileIdentifier, newPath, UserSettings) }, referencedType.GenericTypeArguments[index], null, readerContext, recorderChildContext);
                 }
 
                 for (int i = 0; i < seen.Length; ++i)
@@ -487,7 +511,7 @@ namespace Dec
                 string fieldName = fieldElement.Name.LocalName;
                 if (setFields.Contains(fieldName))
                 {
-                    Dbg.Err($"{new InputContext(fileIdentifier, fieldElement)}: Duplicate field `{fieldName}`");
+                    Dbg.Err($"{new InputContext(fileIdentifier, fieldElement, path)}: Duplicate field `{fieldName}`");
                     // Just allow us to fall through; it's an error, but one with a reasonably obvious handling mechanism
                 }
                 setFields.Add(fieldName);
@@ -512,11 +536,11 @@ namespace Dec
 
                     if (match != null)
                     {
-                        Dbg.Err($"{new InputContext(fileIdentifier, fieldElement)}: Field `{fieldName}` does not exist in type {type}; did you mean `{match}`?");
+                        Dbg.Err($"{new InputContext(fileIdentifier, fieldElement, path)}: Field `{fieldName}` does not exist in type {type}; did you mean `{match}`?");
                     }
                     else
                     {
-                        Dbg.Err($"{new InputContext(fileIdentifier, fieldElement)}: Field `{fieldName}` does not exist in type {type}");
+                        Dbg.Err($"{new InputContext(fileIdentifier, fieldElement, path)}: Field `{fieldName}` does not exist in type {type}");
                     }
 
                     continue;
@@ -524,21 +548,18 @@ namespace Dec
 
                 if (fieldElementInfo.GetCustomAttribute<IndexAttribute>() != null)
                 {
-                    Dbg.Err($"{new InputContext(fileIdentifier, fieldElement)}: Attempting to set index field `{fieldName}`; these are generated by the dec system");
+                    Dbg.Err($"{new InputContext(fileIdentifier, fieldElement, path)}: Attempting to set index field `{fieldName}`; these are generated by the dec system");
                     continue;
                 }
 
                 if (fieldElementInfo.GetCustomAttribute<NonSerializedAttribute>() != null)
                 {
-                    Dbg.Err($"{new InputContext(fileIdentifier, fieldElement)}: Attempting to set nonserialized field `{fieldName}`");
+                    Dbg.Err($"{new InputContext(fileIdentifier, fieldElement, path)}: Attempting to set nonserialized field `{fieldName}`");
                     continue;
                 }
 
-                fieldElementInfo.SetValue(obj, Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, UserSettings) }, fieldElementInfo.FieldType, fieldElementInfo.GetValue(obj), readerContext, recorderChildContext, fieldInfo: fieldElementInfo));
+                fieldElementInfo.SetValue(obj, Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, new PathMember(path, fieldName), UserSettings) }, fieldElementInfo.FieldType, fieldElementInfo.GetValue(obj), readerContext, recorderChildContext, fieldInfo: fieldElementInfo));
             }
         }
-
-        private XElement xml;
-        private string fileIdentifier;
     }
 }

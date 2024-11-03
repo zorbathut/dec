@@ -94,7 +94,7 @@ namespace Dec
                         continue;
                     }
 
-                    readerRef.node = new ReaderNodeXml(reference, fileIdentifier, userSettings);
+                    readerRef.node = new ReaderNodeXml(reference, fileIdentifier, new PathRef(readerRef.id), userSettings);
                     result.Add(readerRef);
                 }
             }
@@ -112,7 +112,7 @@ namespace Dec
                 return null;
             }
 
-            return new ReaderNodeXml(data, fileIdentifier, userSettings);
+            return new ReaderNodeXml(data, fileIdentifier, new PathRoot("RECORD"), userSettings);
         }
     }
 }

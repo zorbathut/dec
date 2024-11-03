@@ -17,11 +17,13 @@ namespace Dec
     {
         internal string filename;
         internal System.Xml.Linq.XElement element;
+        internal Path path;
 
-        internal InputContext(string filename = null, System.Xml.Linq.XElement element = null)
+        internal InputContext(string filename = null, System.Xml.Linq.XElement element = null, Path path = null)
         {
             this.filename = filename;
             this.element = element;
+            this.path = path;
         }
 
         public override string ToString()
@@ -30,9 +32,18 @@ namespace Dec
             {
                 return $"{filename}:{element.LineNumber()}";
             }
-            else
+            else if (filename != null)
             {
                 return filename;
+            }
+            else if (path != null)
+            {
+                return path.ToString();
+            }
+            else
+            {
+                // shrug
+                return "";
             }
         }
     }

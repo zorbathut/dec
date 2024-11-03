@@ -25,7 +25,7 @@ namespace Dec
                 Dbg.Wrn($"{new InputContext(identifier, record)}: Found root element with name `{record.Name.LocalName}` when it should be `{rootTag}`");
             }
 
-            return new ReaderNodeXml(record, identifier, userSettings);
+            return new ReaderNodeXml(record, identifier, new PathRoot(rootTag), userSettings);
         }
     }
 }

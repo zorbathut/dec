@@ -126,7 +126,7 @@ namespace Dec
                     }
 
                     // Everything looks good!
-                    readerDec.node = new ReaderNodeXml(decElement, fileIdentifier, userSettings);
+                    readerDec.node = new ReaderNodeXml(decElement, fileIdentifier, new PathDec(readerDec.type, readerDec.name), userSettings);
 
                     result.Add(readerDec);
                 }
