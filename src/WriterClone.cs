@@ -282,7 +282,7 @@ namespace Dec
                 if (originalConverter is ConverterString converterString)
                 {
                     // there's kind of not a lot we can do here to speed it up unfortunately
-                    result = converterString.ReadObj(converterString.WriteObj(original), new InputContext("clone"));
+                    result = converterString.ReadObj(converterString.WriteObj(original), new InputContext(filename: "clone"));
                 }
                 else if (originalConverter is ConverterRecord converterRecord)
                 {
@@ -699,7 +699,7 @@ namespace Dec
 
         public override InputContext GetInputContext()
         {
-            return new InputContext("clone");
+            return new InputContext(filename: "clone");
         }
 
         public override int[] GetArrayDimensions(int rank)
@@ -752,7 +752,7 @@ namespace Dec
 
         public override InputContext GetInputContext()
         {
-            return new InputContext("clone");
+            return new InputContext(filename: "clone");
         }
 
         public override int[] GetArrayDimensions(int rank)
@@ -793,7 +793,7 @@ namespace Dec
 
         public override InputContext GetInputContext()
         {
-            return new InputContext("clone");
+            return new InputContext(filename: "clone");
         }
 
         public override ReaderNode GetChildNamed(string name)

@@ -16,25 +16,19 @@ namespace Dec
     public struct InputContext
     {
         internal string filename;
-        internal System.Xml.Linq.XElement handle;
+        internal System.Xml.Linq.XElement element;
 
-        public InputContext(string filename)
+        internal InputContext(string filename = null, System.Xml.Linq.XElement element = null)
         {
             this.filename = filename;
-            this.handle = null;
-        }
-
-        public InputContext(string filename, System.Xml.Linq.XElement handle)
-        {
-            this.filename = filename;
-            this.handle = handle;
+            this.element = element;
         }
 
         public override string ToString()
         {
-            if (this.handle != null)
+            if (this.element != null)
             {
-                return $"{filename}:{handle.LineNumber()}";
+                return $"{filename}:{element.LineNumber()}";
             }
             else
             {
