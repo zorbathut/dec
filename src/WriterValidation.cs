@@ -69,7 +69,7 @@ namespace Dec
     // This is used for things that can be expressed as an easy inline string, which is used as part of the Dictionary-handling code.
     internal abstract class WriterNodeCS : WriterNode
     {
-        public WriterNodeCS() : base(new Recorder.Context())
+        public WriterNodeCS() : base(new Recorder.Settings())
         {
         }
 
@@ -169,12 +169,12 @@ namespace Dec
             this.accessor = accessor;
         }
 
-        public override WriterNode CreateRecorderChild(string label, Recorder.Context context)
+        public override WriterNode CreateRecorderChild(string label, Recorder.Settings settings)
         {
             return new WriterNodeValidation(writer, $"{accessor}.{label}");
         }
 
-        public override WriterNode CreateReflectionChild(System.Reflection.FieldInfo field, Recorder.Context context)
+        public override WriterNode CreateReflectionChild(System.Reflection.FieldInfo field, Recorder.Settings settings)
         {
             if (field.IsPublic)
             {
@@ -430,12 +430,12 @@ namespace Dec
             SerializedString = token;
         }
 
-        public override WriterNode CreateRecorderChild(string label, Recorder.Context context)
+        public override WriterNode CreateRecorderChild(string label, Recorder.Settings settings)
         {
             throw new NotImplementedException();
         }
 
-        public override WriterNode CreateReflectionChild(System.Reflection.FieldInfo field, Recorder.Context context)
+        public override WriterNode CreateReflectionChild(System.Reflection.FieldInfo field, Recorder.Settings settings)
         {
             throw new NotImplementedException();
         }

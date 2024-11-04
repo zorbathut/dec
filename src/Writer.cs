@@ -5,14 +5,14 @@ namespace Dec
 {
     internal abstract class WriterNode
     {
-        private Recorder.Context context;
+        private Recorder.Settings settings;
 
-        public WriterNode(Recorder.Context context)
+        public WriterNode(Recorder.Settings settings)
         {
-            this.context = context;
+            this.settings = settings;
         }
 
-        public Recorder.Context RecorderContext { get { return context; } }
+        public Recorder.Settings RecorderSettings { get { return settings; } }
         public abstract bool AllowReflection { get; }
         public virtual bool AllowAsThis { get => true; }
         public virtual bool AllowCloning { get => false; }
@@ -21,11 +21,11 @@ namespace Dec
         // I'm not real happy with the existence of this function; it's kind of a hack so that a shared Converter that writes a string or an int can avoid errors
         public void MakeRecorderContextChild()
         {
-            context = context.CreateChild();
+            settings = settings.CreateChild();
         }
 
-        public abstract WriterNode CreateRecorderChild(string label, Recorder.Context context);
-        public abstract WriterNode CreateReflectionChild(System.Reflection.FieldInfo field, Recorder.Context context);
+        public abstract WriterNode CreateRecorderChild(string label, Recorder.Settings settings);
+        public abstract WriterNode CreateReflectionChild(System.Reflection.FieldInfo field, Recorder.Settings settings);
 
         public abstract void WritePrimitive(object value);
         public abstract void WriteEnum(object value);

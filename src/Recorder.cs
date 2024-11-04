@@ -179,14 +179,14 @@ namespace Dec
             /// </summary>
             public Direction Mode { get => recorder.Mode; }
 
-            internal Context CreateContext()
+            internal Settings CreateSettings()
             {
-                return new Context() { factories = factories, shared = shared ? Context.Shared.Allow : Context.Shared.Deny, bespoke_keytypedict = bespoke_keytypedict };
+                return new Settings() { factories = factories, shared = shared ? Settings.Shared.Allow : Settings.Shared.Deny, bespoke_keytypedict = bespoke_keytypedict };
             }
         }
 
         // This is used for passing data to the Parse and Compose functions.
-        internal struct Context
+        internal struct Settings
         {
             internal enum Shared
             {
@@ -200,9 +200,9 @@ namespace Dec
 
             public bool bespoke_keytypedict;
 
-            public Context CreateChild()
+            public Settings CreateChild()
             {
-                Context rv = this;
+                Settings rv = this;
                 if (rv.shared == Shared.Allow)
                 {
                     // Downgrade this in case we have something like a List<int>; we don't want to spit out warnings about int not being sharable
@@ -444,7 +444,7 @@ namespace Dec
 
             fields.Add(label);
 
-            Serialization.ComposeElement(node.CreateRecorderChild(label, parameters.CreateContext()), value, typeof(T));
+            Serialization.ComposeElement(node.CreateRecorderChild(label, parameters.CreateSettings()), value, typeof(T));
         }
 
         public override Direction Mode { get => Direction.Write; }
@@ -506,7 +506,7 @@ namespace Dec
                 if (node.AllowAsThis && (node is ReaderNodeParseable nodeParseable))
                 {
                     // Explicit cast here because we want an error if we have the wrong type!
-                    value = (T)Serialization.ParseElement(new List<ReaderNodeParseable>() { nodeParseable }, typeof(T), value, readerContext, parameters.CreateContext(), asThis: true);
+                    value = (T)Serialization.ParseElement(new List<ReaderNodeParseable>() { nodeParseable }, typeof(T), value, readerContext, parameters.CreateSettings(), asThis: true);
 
                     return;
                 }
@@ -526,7 +526,7 @@ namespace Dec
             seen?.Add(label);
 
             // Explicit cast here because we want an error if we have the wrong type!
-            value = (T)recorded.ParseElement(typeof(T), value, readerContext, parameters.CreateContext());
+            value = (T)recorded.ParseElement(typeof(T), value, readerContext, parameters.CreateSettings());
         }
 
         public override void Ignore(string label)

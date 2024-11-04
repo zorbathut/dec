@@ -73,7 +73,7 @@ namespace Dec
         public override bool AllowCloning { get => true;  }
         public override Recorder.IUserSettings UserSettings { get => writer.UserSettings; }
 
-        private WriterNodeClone(WriterClone writer, int depth, Recorder.Context context) : base(context)
+        private WriterNodeClone(WriterClone writer, int depth, Recorder.Settings settings) : base(settings)
         {
             this.writer = writer;
             this.depth = depth;
@@ -188,9 +188,9 @@ namespace Dec
                 var readerClone = new ReaderNodeCloneRecorder(recorderChildren, UserSettings);
                 result = converterFactory.CreateObj(new RecorderReader(readerClone, new ReaderContext()));
             }
-            else if (RecorderContext.factories != null && original is IRecordable)
+            else if (RecorderSettings.factories != null && original is IRecordable)
             {
-                result = RecorderContext.CreateRecordableFromFactory(originalType, "clone", new ReaderNodeCloneCreator(original, UserSettings));
+                result = RecorderSettings.CreateRecordableFromFactory(originalType, "clone", new ReaderNodeCloneCreator(original, UserSettings));
             }
             else if ((model == null || model.GetType() != original.GetType()) && !typeof(ITuple).IsAssignableFrom(originalType))
             {
@@ -540,22 +540,22 @@ namespace Dec
 
         public static WriterNodeClone StartData(WriterClone writer, Type type)
         {
-            return new WriterNodeClone(writer, 0, new Recorder.Context() { shared = Recorder.Context.Shared.Flexible });
+            return new WriterNodeClone(writer, 0, new Recorder.Settings() { shared = Recorder.Settings.Shared.Flexible });
         }
 
-        public override WriterNode CreateRecorderChild(string label, Recorder.Context context)
+        public override WriterNode CreateRecorderChild(string label, Recorder.Settings settings)
         {
             if (recorderChildren == null)
             {
                 recorderChildren = new Dictionary<string, WriterNodeClone>();
             }
 
-            var child = new WriterNodeClone(writer, depth + 1, context);
+            var child = new WriterNodeClone(writer, depth + 1, settings);
             recorderChildren[label] = child;
             return child;
         }
 
-        public override WriterNode CreateReflectionChild(System.Reflection.FieldInfo field, Recorder.Context context)
+        public override WriterNode CreateReflectionChild(System.Reflection.FieldInfo field, Recorder.Settings settings)
         {
             // Not supported.
             Dbg.Err("Internal error: WriterNodeClone attempted to create reflection child");
@@ -571,7 +571,7 @@ namespace Dec
             }
             // maybe I should set up more value-type-ish special cases here?
 
-            var child = new WriterNodeClone(writer, resetDepth ? 0 : depth + 1, RecorderContext.CreateChild());
+            var child = new WriterNodeClone(writer, resetDepth ? 0 : depth + 1, RecorderSettings.CreateChild());
             Serialization.ComposeElement(child, obj, obj.GetType());
             return child.GetResult(false);
         }
@@ -731,7 +731,7 @@ namespace Dec
             return recorderChildren.Keys.ToArray();
         }
 
-        public override object ParseElement(Type type, object model, ReaderContext readerContext, Recorder.Context recorderContext)
+        public override object ParseElement(Type type, object model, ReaderContext readerContext, Recorder.Settings recorderSettings)
         {
             // not valid, this is used only for recorders
             throw new NotImplementedException();
@@ -771,12 +771,12 @@ namespace Dec
             throw new NotImplementedException();
         }
 
-        public override object ParseElement(Type type, object model, ReaderContext readerContext, Recorder.Context recorderContext)
+        public override object ParseElement(Type type, object model, ReaderContext readerContext, Recorder.Settings recorderSettings)
         {
             // we actually just ignore the type right now, we copy off the original
 
             item.SetModel(model);
-            return item.GetResult(recorderContext.shared != Recorder.Context.Shared.Deny);
+            return item.GetResult(recorderSettings.shared != Recorder.Settings.Shared.Deny);
         }
     }
 
@@ -823,7 +823,7 @@ namespace Dec
             return Enumerable.Range(0, rank).Select(i => arr.GetLength(i)).ToArray();
         }
 
-        public override object ParseElement(Type type, object model, ReaderContext readerContext, Recorder.Context recorderContext)
+        public override object ParseElement(Type type, object model, ReaderContext readerContext, Recorder.Settings recorderSettings)
         {
             throw new NotImplementedException();
         }

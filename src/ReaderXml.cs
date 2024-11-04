@@ -85,9 +85,9 @@ namespace Dec
             return results;
         }
 
-        public override void ParseList(IList list, Type referencedType, ReaderContext readerContext, Recorder.Context recorderContext)
+        public override void ParseList(IList list, Type referencedType, ReaderContext readerContext, Recorder.Settings recorderSettings)
         {
-            var recorderChildContext = recorderContext.CreateChild();
+            var recorderChildContext = recorderSettings.CreateChild();
 
             int index = 0;
             foreach (var fieldElement in xml.Elements())
@@ -104,16 +104,16 @@ namespace Dec
             list.GetType().GetField("_version", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(list, Util.CollectionDeserializationVersion);
         }
 
-        private void ParseArrayRank(ReaderNodeXml node, ReaderContext readerContext, Recorder.Context recorderContext, Array value, Type referencedType, int rank, int[] indices, int startAt)
+        private void ParseArrayRank(ReaderNodeXml node, ReaderContext readerContext, Recorder.Settings recorderSettings, Array value, Type referencedType, int rank, int[] indices, int startAt)
         {
             if (rank == indices.Length)
             {
-                value.SetValue(Serialization.ParseElement(new List<ReaderNodeParseable>() { node }, referencedType, null, readerContext, recorderContext), indices);
+                value.SetValue(Serialization.ParseElement(new List<ReaderNodeParseable>() { node }, referencedType, null, readerContext, recorderSettings), indices);
             }
             else
             {
                 // this is kind of unnecessary but it's also an irrelevant perf hit
-                var recorderChildContext = recorderContext.CreateChild();
+                var recorderChildContext = recorderSettings.CreateChild();
 
                 int elementCount = node.xml.Elements().Count();
                 int rankLength = value.GetLength(rank);
@@ -150,9 +150,9 @@ namespace Dec
             }
         }
 
-        public override void ParseArray(Array array, Type referencedType, ReaderContext readerContext, Recorder.Context recorderContext, int startOffset)
+        public override void ParseArray(Array array, Type referencedType, ReaderContext readerContext, Recorder.Settings recorderSettings, int startOffset)
         {
-            var recorderChildContext = recorderContext.CreateChild();
+            var recorderChildContext = recorderSettings.CreateChild();
 
             if (array.Rank == 1)
             {
@@ -180,9 +180,9 @@ namespace Dec
             }
         }
 
-        public override void ParseDictionary(IDictionary dict, Type referencedKeyType, Type referencedValueType, ReaderContext readerContext, Recorder.Context recorderContext, bool permitPatch)
+        public override void ParseDictionary(IDictionary dict, Type referencedKeyType, Type referencedValueType, ReaderContext readerContext, Recorder.Settings recorderSettings, bool permitPatch)
         {
-            var recorderChildContext = recorderContext.CreateChild();
+            var recorderChildContext = recorderSettings.CreateChild();
 
             // avoid the heap allocation if we can
             var writtenFields = permitPatch ? new HashSet<object>() : null;
@@ -268,7 +268,7 @@ namespace Dec
                     }
 
                     Type valueType = referencedValueType;
-                    if (recorderContext.bespoke_keytypedict)
+                    if (recorderSettings.bespoke_keytypedict)
                     {
                         if (referencedKeyType != typeof(Type))
                         {
@@ -291,7 +291,7 @@ namespace Dec
             }
         }
 
-        public override void ParseHashset(object hashset, Type referencedType, ReaderContext readerContext, Recorder.Context recorderContext, bool permitPatch)
+        public override void ParseHashset(object hashset, Type referencedType, ReaderContext readerContext, Recorder.Settings recorderSettings, bool permitPatch)
         {
             // This is a gigantic pain because HashSet<> doesn't inherit from any non-generic interface that provides the functionality we want
             // So we're stuck doing it all through object and reflection
@@ -302,7 +302,7 @@ namespace Dec
             var containsFunction = hashset.GetType().GetMethod("Contains");
             var addFunction = hashset.GetType().GetMethod("Add");
 
-            var recorderChildContext = recorderContext.CreateChild();
+            var recorderChildContext = recorderSettings.CreateChild();
             var keyParam = new object[1];   // this is just to cut down on GC churn
 
             // avoid the heap allocation if we can
@@ -367,11 +367,11 @@ namespace Dec
             }
         }
 
-        public override void ParseStack(object stack, Type referencedType, ReaderContext readerContext, Recorder.Context recorderContext)
+        public override void ParseStack(object stack, Type referencedType, ReaderContext readerContext, Recorder.Settings recorderSettings)
         {
             var pushFunction = stack.GetType().GetMethod("Push");
 
-            var recorderChildContext = recorderContext.CreateChild();
+            var recorderChildContext = recorderSettings.CreateChild();
 
             int index = 0;
             foreach (var fieldElement in xml.Elements())
@@ -389,11 +389,11 @@ namespace Dec
             }
         }
 
-        public override void ParseQueue(object queue, Type referencedType, ReaderContext readerContext, Recorder.Context recorderContext)
+        public override void ParseQueue(object queue, Type referencedType, ReaderContext readerContext, Recorder.Settings recorderSettings)
         {
             var enqueueFunction = queue.GetType().GetMethod("Enqueue");
 
-            var recorderChildContext = recorderContext.CreateChild();
+            var recorderChildContext = recorderSettings.CreateChild();
 
             int index = 0;
             foreach (var fieldElement in xml.Elements())
@@ -411,10 +411,10 @@ namespace Dec
             }
         }
 
-        public override void ParseTuple(object[] parameters, Type referencedType, IList<string> parameterNames, ReaderContext readerContext, Recorder.Context recorderContext)
+        public override void ParseTuple(object[] parameters, Type referencedType, IList<string> parameterNames, ReaderContext readerContext, Recorder.Settings recorderSettings)
         {
             int expectedCount = referencedType.GenericTypeArguments.Length;
-            var recorderChildContext = recorderContext.CreateChild();
+            var recorderChildContext = recorderSettings.CreateChild();
 
             var elements = xml.Elements().ToList();
 
@@ -498,9 +498,9 @@ namespace Dec
             }
         }
 
-        public override void ParseReflection(object obj, ReaderContext readerContext, Recorder.Context recorderContext)
+        public override void ParseReflection(object obj, ReaderContext readerContext, Recorder.Settings recorderSettings)
         {
-            var recorderChildContext = recorderContext.CreateChild();
+            var recorderChildContext = recorderSettings.CreateChild();
             var setFields = new HashSet<string>();
 
             var type = obj.GetType();

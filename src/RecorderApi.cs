@@ -163,7 +163,7 @@ namespace Dec
                             {
                                 // Do our actual parsing
                                 // We know this *was* shared or it wouldn't be a ref now, so we tag it again in case it's a List<SomeClass> so we can share its children as well.
-                                var refInstanceOutput = Serialization.ParseElement(new List<ReaderNodeParseable>() { reference.node }, refInstance.GetType(), refInstance, readerContext, new Recorder.Context() { shared = Context.Shared.Allow }, hasReferenceId: true);
+                                var refInstanceOutput = Serialization.ParseElement(new List<ReaderNodeParseable>() { reference.node }, refInstance.GetType(), refInstance, readerContext, new Recorder.Settings() { shared = Settings.Shared.Allow }, hasReferenceId: true);
 
                                 if (refInstance != refInstanceOutput)
                                 {
@@ -202,7 +202,7 @@ namespace Dec
 
                 // And now, we can finally parse our actual root element!
                 // (which accounts for a tiny percentage of things that need to be parsed)
-                return (T)Serialization.ParseElement(new List<ReaderNodeParseable>() { parseNode }, typeof(T), null, readerContext, new Recorder.Context() { shared = Context.Shared.Flexible });
+                return (T)Serialization.ParseElement(new List<ReaderNodeParseable>() { parseNode }, typeof(T), null, readerContext, new Recorder.Settings() { shared = Settings.Shared.Flexible });
             }
         }
 
@@ -225,7 +225,7 @@ namespace Dec
 
                 // And now, we can finally parse our actual root element!
                 // (which accounts for a tiny percentage of things that need to be parsed)
-                return (T)Serialization.ParseElement(new List<ReaderNodeParseable>() { reader }, typeof(T), null, readerContext, new Recorder.Context() { shared = Context.Shared.Flexible });
+                return (T)Serialization.ParseElement(new List<ReaderNodeParseable>() { reader }, typeof(T), null, readerContext, new Recorder.Settings() { shared = Settings.Shared.Flexible });
             }
         }
 

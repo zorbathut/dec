@@ -601,7 +601,7 @@ namespace Dec
             return orders;
         }
 
-        internal static object ParseElement(List<ReaderNodeParseable> nodes, Type type, object original, ReaderContext context, Recorder.Context recContext, FieldInfo fieldInfo = null, bool isRootDec = false, bool hasReferenceId = false, bool asThis = false, List<(ParseCommand command, ReaderNodeParseable node)> ordersOverride = null)
+        internal static object ParseElement(List<ReaderNodeParseable> nodes, Type type, object original, ReaderContext context, Recorder.Settings recSettings, FieldInfo fieldInfo = null, bool isRootDec = false, bool hasReferenceId = false, bool asThis = false, List<(ParseCommand command, ReaderNodeParseable node)> ordersOverride = null)
         {
             if (nodes == null || nodes.Count == 0)
             {
@@ -619,7 +619,7 @@ namespace Dec
 
             // Verify our Shared flags as the *very* first step to ensure nothing gets past us.
             // In theory this should be fine with Flexible; Flexible only happens on an outer wrapper that was shared, and therefore was null, and therefore this is default also
-            if (recContext.shared == Recorder.Context.Shared.Allow)
+            if (recSettings.shared == Recorder.Settings.Shared.Allow)
             {
                 if (!type.CanBeShared())
                 {
@@ -782,7 +782,7 @@ namespace Dec
             {
                 // Ref is the highest priority, largely because I think it's cool
 
-                if (recContext.shared == Recorder.Context.Shared.Deny)
+                if (recSettings.shared == Recorder.Settings.Shared.Deny)
                 {
                     Dbg.Err($"{refKeyNode.GetInputContext()}: Found a reference in a non-.Shared() context; this should happen only if you've removed the .Shared() tag since the file was generated, or if you hand-wrote a file that is questionably valid. Using the reference anyway but this might produce unexpected results");
                 }
@@ -1034,13 +1034,13 @@ namespace Dec
                 {
                     recordable = (IRecordable)result;
                 }
-                else if (recContext.factories == null)
+                else if (recSettings.factories == null)
                 {
                     recordable = (IRecordable)type.CreateInstanceSafe("recordable", orders[0].node);
                 }
                 else
                 {
-                    recordable = recContext.CreateRecordableFromFactory(type, "recordable", orders[0].node);
+                    recordable = recSettings.CreateRecordableFromFactory(type, "recordable", orders[0].node);
                 }
 
                 // we hold on to this so that, *if* we end up not using this object, we can optionally reuse it later for reflection
@@ -1118,7 +1118,7 @@ namespace Dec
 
                     var list = (IList)(result ?? Activator.CreateInstance(type));
 
-                    node.ParseList(list, referencedType, context, recContext);
+                    node.ParseList(list, referencedType, context, recSettings);
 
                     result = list;
                 }
@@ -1226,7 +1226,7 @@ namespace Dec
                             break;
                     }
 
-                    node.ParseArray(array, referencedType, context, recContext, startOffset);
+                    node.ParseArray(array, referencedType, context, recSettings, startOffset);
 
                     result = array;
                 }
@@ -1274,7 +1274,7 @@ namespace Dec
 
                     var dict = (IDictionary)(result ?? Activator.CreateInstance(type));
 
-                    node.ParseDictionary(dict, keyType, valueType, context, recContext, permitPatch);
+                    node.ParseDictionary(dict, keyType, valueType, context, recSettings, permitPatch);
 
                     result = dict;
                 }
@@ -1324,7 +1324,7 @@ namespace Dec
 
                     var set = result ?? Activator.CreateInstance(type);
 
-                    node.ParseHashset(set, keyType, context, recContext, permitPatch);
+                    node.ParseHashset(set, keyType, context, recSettings, permitPatch);
 
                     result = set;
                 }
@@ -1367,7 +1367,7 @@ namespace Dec
 
                     var set = result ?? Activator.CreateInstance(type);
 
-                    node.ParseStack(set, keyType, context, recContext);
+                    node.ParseStack(set, keyType, context, recSettings);
 
                     result = set;
                 }
@@ -1410,7 +1410,7 @@ namespace Dec
 
                     var set = result ?? Activator.CreateInstance(type);
 
-                    node.ParseQueue(set, keyType, context, recContext);
+                    node.ParseQueue(set, keyType, context, recSettings);
 
                     result = set;
                 }
@@ -1455,7 +1455,7 @@ namespace Dec
                     int expectedCount = type.GenericTypeArguments.Length;
                     object[] parameters = new object[expectedCount];
 
-                    node.ParseTuple(parameters, type, fieldInfo?.GetCustomAttribute<System.Runtime.CompilerServices.TupleElementNamesAttribute>()?.TransformNames, context, recContext);
+                    node.ParseTuple(parameters, type, fieldInfo?.GetCustomAttribute<System.Runtime.CompilerServices.TupleElementNamesAttribute>()?.TransformNames, context, recSettings);
 
                     // construct!
                     result = Activator.CreateInstance(type, parameters);
@@ -1519,7 +1519,7 @@ namespace Dec
                     }
                 }
 
-                node.ParseReflection(result, context, recContext);
+                node.ParseReflection(result, context, recSettings);
             }
 
             // Set up our index fields; this has to happen last in case we're a struct
@@ -1718,7 +1718,7 @@ namespace Dec
             // Verify our Shared flags as the *very* first step to ensure nothing gets past us.
             // In theory this should be fine with Flexible; Flexible only happens on an outer wrapper that was shared, and therefore was null, and therefore this is default also
             bool canBeShared = fieldType.CanBeShared();
-            if (node.RecorderContext.shared == Recorder.Context.Shared.Allow && !asThis)
+            if (node.RecorderSettings.shared == Recorder.Settings.Shared.Allow && !asThis)
             {
                 // If this is an `asThis` parameter, then we may not be writing the field type it looks like, and we're just going to trust that they're doing something sensible.
                 if (!canBeShared)
@@ -1957,7 +1957,7 @@ namespace Dec
 
             foreach (var field in valType.GetSerializableFieldsFromHierarchy())
             {
-                ComposeElement(node.CreateReflectionChild(field, node.RecorderContext), field.GetValue(value), field.FieldType, fieldInfo: field);
+                ComposeElement(node.CreateReflectionChild(field, node.RecorderSettings), field.GetValue(value), field.FieldType, fieldInfo: field);
             }
 
             return;

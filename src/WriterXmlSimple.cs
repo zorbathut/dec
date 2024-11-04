@@ -22,11 +22,11 @@ namespace Dec
             this.rootTag = rootTag;
         }
 
-        public override bool RegisterReference(object referenced, XElement element, Recorder.Context recContext)
+        public override bool RegisterReference(object referenced, XElement element, Recorder.Settings recSettings)
         {
             if (!seenObjects.Add(referenced))
             {
-                Dbg.Err($"{recContext}: Object {referenced} has already been written, and shared objects do not work in simple mode. Skipping to avoid infinite loops.");
+                Dbg.Err($"{recSettings}: Object {referenced} has already been written, and shared objects do not work in simple mode. Skipping to avoid infinite loops.");
                 return true;
             }
 

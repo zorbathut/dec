@@ -23,7 +23,7 @@ namespace Dec
             doc.Add(decs);
         }
 
-        public override bool RegisterReference(object referenced, XElement element, Recorder.Context recContext)
+        public override bool RegisterReference(object referenced, XElement element, Recorder.Settings recSettings)
         {
             // We never register references in Compose mode.
             return false;

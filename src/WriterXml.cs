@@ -14,7 +14,7 @@ namespace Dec
         public abstract bool AllowReflection { get; }
         public abstract Recorder.IUserSettings UserSettings { get; }
 
-        public abstract bool RegisterReference(object referenced, XElement element, Recorder.Context recContext);
+        public abstract bool RegisterReference(object referenced, XElement element, Recorder.Settings recSettings);
 
         public void RegisterPendingWrite(Action action)
         {
@@ -41,7 +41,7 @@ namespace Dec
         public override bool AllowReflection { get => writer.AllowReflection; }
         public override Recorder.IUserSettings UserSettings { get => writer.UserSettings; }
 
-        private WriterNodeXml(WriterXml writer, XContainer parent, string label, int depth, Recorder.Context context) : base(context)
+        private WriterNodeXml(WriterXml writer, XContainer parent, string label, int depth, Recorder.Settings settings) : base(settings)
         {
             this.writer = writer;
             this.depth = depth;
@@ -52,31 +52,31 @@ namespace Dec
 
         public static WriterNodeXml StartDec(WriterXmlCompose writer, XContainer decRoot, string type, string decName)
         {
-            var node = new WriterNodeXml(writer, decRoot, type, 0, new Recorder.Context());
+            var node = new WriterNodeXml(writer, decRoot, type, 0, new Recorder.Settings());
             node.GetXElement().Add(new XAttribute("decName", decName));
             return node;
         }
 
         public static WriterNodeXml StartData(WriterXml writer, XContainer decRoot, string name, Type type)
         {
-            return new WriterNodeXml(writer, decRoot, name, 0, new Recorder.Context() { shared = Recorder.Context.Shared.Flexible });
+            return new WriterNodeXml(writer, decRoot, name, 0, new Recorder.Settings() { shared = Recorder.Settings.Shared.Flexible });
         }
 
-        internal WriterNodeXml CreateNamedChild(string label, Recorder.Context context)
+        internal WriterNodeXml CreateNamedChild(string label, Recorder.Settings settings)
         {
-            return new WriterNodeXml(writer, node, label, depth + 1, context);
-        }
-
-        // this should be WriterNodeXml but this C# doesn't support that
-        public override WriterNode CreateRecorderChild(string label, Recorder.Context context)
-        {
-            return new WriterNodeXml(writer, node, label, depth + 1, context);
+            return new WriterNodeXml(writer, node, label, depth + 1, settings);
         }
 
         // this should be WriterNodeXml but this C# doesn't support that
-        public override WriterNode CreateReflectionChild(System.Reflection.FieldInfo field, Recorder.Context context)
+        public override WriterNode CreateRecorderChild(string label, Recorder.Settings settings)
         {
-            return new WriterNodeXml(writer, node, field.Name, depth + 1, context);
+            return new WriterNodeXml(writer, node, label, depth + 1, settings);
+        }
+
+        // this should be WriterNodeXml but this C# doesn't support that
+        public override WriterNode CreateReflectionChild(System.Reflection.FieldInfo field, Recorder.Settings settings)
+        {
+            return new WriterNodeXml(writer, node, field.Name, depth + 1, settings);
         }
 
         public override void WritePrimitive(object value)
@@ -175,7 +175,7 @@ namespace Dec
 
         public override bool WriteReference(object value)
         {
-            return writer.RegisterReference(value, node, RecorderContext);
+            return writer.RegisterReference(value, node, RecorderSettings);
         }
 
         private void WriteArrayRank(WriterNodeXml node, Array value, Type referencedType, int rank, int[] indices)
@@ -188,7 +188,7 @@ namespace Dec
             {
                 for (int i = 0; i < value.GetLength(rank); ++i)
                 {
-                    var child = node.CreateNamedChild("li", RecorderContext.CreateChild());
+                    var child = node.CreateNamedChild("li", RecorderSettings.CreateChild());
 
                     indices[rank] = i;
                     WriteArrayRank(child, value, referencedType, rank + 1, indices);
@@ -205,7 +205,7 @@ namespace Dec
                 // fast path
                 for (int i = 0; i < value.Length; ++i)
                 {
-                    Serialization.ComposeElement(CreateNamedChild("li", RecorderContext.CreateChild()), value.GetValue(i), referencedType);
+                    Serialization.ComposeElement(CreateNamedChild("li", RecorderSettings.CreateChild()), value.GetValue(i), referencedType);
                 }
 
                 return;
@@ -224,7 +224,7 @@ namespace Dec
 
             for (int i = 0; i < value.Count; ++i)
             {
-                Serialization.ComposeElement(CreateNamedChild("li", RecorderContext.CreateChild()), value[i], referencedType);
+                Serialization.ComposeElement(CreateNamedChild("li", RecorderSettings.CreateChild()), value[i], referencedType);
             }
         }
 
@@ -240,10 +240,10 @@ namespace Dec
                 // In theory, some dicts support inline format, not li format. Inline format is cleaner and smaller and we should be using it when possible.
                 // In practice, it's hard and I'm lazy and this always works, and we're not providing any guarantees about cleanliness of serialized output.
                 // Revisit this later when someone (possibly myself) really wants it improved.
-                var li = CreateNamedChild("li", RecorderContext);
+                var li = CreateNamedChild("li", RecorderSettings);
 
-                Serialization.ComposeElement(li.CreateNamedChild("key", RecorderContext.CreateChild()), iterator.Key, keyType);
-                Serialization.ComposeElement(li.CreateNamedChild("value", RecorderContext.CreateChild()), iterator.Value, valueType);
+                Serialization.ComposeElement(li.CreateNamedChild("key", RecorderSettings.CreateChild()), iterator.Key, keyType);
+                Serialization.ComposeElement(li.CreateNamedChild("value", RecorderSettings.CreateChild()), iterator.Value, valueType);
             }
         }
 
@@ -258,7 +258,7 @@ namespace Dec
                 // In theory, some sets support inline format, not li format. Inline format is cleaner and smaller and we should be using it when possible.
                 // In practice, it's hard and I'm lazy and this always works, and we're not providing any guarantees about cleanliness of serialized output.
                 // Revisit this later when someone (possibly myself) really wants it improved.
-                Serialization.ComposeElement(CreateNamedChild("li", RecorderContext.CreateChild()), iterator.Current, keyType);
+                Serialization.ComposeElement(CreateNamedChild("li", RecorderSettings.CreateChild()), iterator.Current, keyType);
             }
         }
 
@@ -294,7 +294,7 @@ namespace Dec
 
             for (int i = 0; i < length; ++i)
             {
-                Serialization.ComposeElement(CreateNamedChild(nameArray != null ? nameArray[i] : "li", RecorderContext.CreateChild()), value.GetType().GetProperty(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
+                Serialization.ComposeElement(CreateNamedChild(nameArray != null ? nameArray[i] : "li", RecorderSettings.CreateChild()), value.GetType().GetProperty(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
             }
         }
 
@@ -307,7 +307,7 @@ namespace Dec
 
             for (int i = 0; i < length; ++i)
             {
-                Serialization.ComposeElement(CreateNamedChild(nameArray != null ? nameArray[i] : "li", RecorderContext.CreateChild()), value.GetType().GetField(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
+                Serialization.ComposeElement(CreateNamedChild(nameArray != null ? nameArray[i] : "li", RecorderSettings.CreateChild()), value.GetType().GetField(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
             }
         }
 

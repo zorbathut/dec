@@ -41,13 +41,13 @@ namespace Dec
             record.Add(refs);
         }
 
-        public override bool RegisterReference(object referenced, XElement element, Recorder.Context recContext)
+        public override bool RegisterReference(object referenced, XElement element, Recorder.Settings recSettings)
         {
             bool forceProcess = false;
 
             if (!refToElement.TryGetValue(referenced, out var xelement))
             {
-                if (recContext.shared != Recorder.Context.Shared.Deny)
+                if (recSettings.shared != Recorder.Settings.Shared.Deny)
                 {
                     // Insert it into our refToElement mapping
                     refToElement[referenced] = element;
@@ -62,7 +62,7 @@ namespace Dec
                     // and if you split a long hierarchy around a non-referencable barrier, everything breaks!
                 }
 
-                if (Config.TestRefEverything && recContext.shared != Recorder.Context.Shared.Deny)
+                if (Config.TestRefEverything && recSettings.shared != Recorder.Settings.Shared.Deny)
                 {
                     // Test pathway that should only occur during testing.
                     xelement = element;
@@ -82,7 +82,7 @@ namespace Dec
             }
 
             // We have a referenceable target, but do *we* allow a reference?
-            if (recContext.shared == Recorder.Context.Shared.Deny)
+            if (recSettings.shared == Recorder.Settings.Shared.Deny)
             {
                 Dbg.Err("Attempted to create a new unshared reference to a previously-seen object. This may result in an invalid serialization. If this is coming from a Recorder setup, it's likely you either need a .Shared() decorator, or you need to ensure that this object is not serialized elsewhere.");
                 return true;

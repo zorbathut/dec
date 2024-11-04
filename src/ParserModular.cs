@@ -403,7 +403,7 @@ namespace Dec
                     }
 
                     var targetDec = Database.Get(id.Item1, id.Item2);
-                    Serialization.ParseElement(completeOrders.Select(order => order.node).ToList(), targetDec.GetType(), targetDec, readerContext, new Recorder.Context(), isRootDec: true, ordersOverride: completeOrders.Select(order => (Serialization.ParseCommand.Patch, order.node)).ToList());
+                    Serialization.ParseElement(completeOrders.Select(order => order.node).ToList(), targetDec.GetType(), targetDec, readerContext, new Recorder.Settings(), isRootDec: true, ordersOverride: completeOrders.Select(order => (Serialization.ParseCommand.Patch, order.node)).ToList());
                 }
 
                 if (s_Status != Status.Processing)
