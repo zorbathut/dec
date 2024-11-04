@@ -268,6 +268,11 @@ namespace Dec
         public abstract IUserSettings UserSettings { get; }
 
         /// <summary>
+        /// Provide the Context for this serialization step, which can be used to get diagnostic information about "where" it is.
+        /// </summary>
+        public abstract InputContext InputContext { get; }
+
+        /// <summary>
         /// Serialize or deserialize a member of a class.
         /// </summary>
         /// <remarks>
@@ -396,6 +401,9 @@ namespace Dec
 
         public override IUserSettings UserSettings { get => node.UserSettings; }
 
+        // currently no sensible implementation
+        public override InputContext InputContext { get => new InputContext(); }
+
         internal override void Record<T>(ref T value, string label, Parameters parameters)
         {
             if (asThis)
@@ -480,6 +488,8 @@ namespace Dec
         }
 
         public override IUserSettings UserSettings { get => node.UserSettings; }
+
+        public override InputContext InputContext { get => node.GetInputContext(); }
 
         internal override void Record<T>(ref T value, string label, Parameters parameters)
         {
