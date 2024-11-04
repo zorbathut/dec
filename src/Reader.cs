@@ -49,7 +49,7 @@ namespace Dec
 
         public abstract int[] GetArrayDimensions(int rank);
 
-        public abstract object ParseElement(Type type, object model, ReaderContext readerContext, Recorder.Settings recorderSettings);
+        public abstract object ParseElement(Type type, object model, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings);
     }
 
     internal abstract class ReaderNodeParseable : ReaderNode
@@ -62,9 +62,9 @@ namespace Dec
             Mode,
         }
 
-        public override object ParseElement(Type type, object model, ReaderContext readerContext, Recorder.Settings recorderSettings)
+        public override object ParseElement(Type type, object model, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings)
         {
-            return Serialization.ParseElement(new List<ReaderNodeParseable>() { this }, type, model, readerContext, recorderSettings);
+            return Serialization.ParseElement(new List<ReaderNodeParseable>() { this }, type, model, readerGlobals, recorderSettings);
         }
 
         public abstract string GetMetadata(Metadata metadata);
@@ -73,14 +73,14 @@ namespace Dec
 
         public abstract bool HasChildren();
 
-        public abstract void ParseList(IList list, Type referencedType, ReaderContext readerContext, Recorder.Settings recorderSettings);
-        public abstract void ParseArray(Array array, Type referencedType, ReaderContext readerContext, Recorder.Settings recorderSettings, int startOffset);
-        public abstract void ParseDictionary(IDictionary dict, Type referencedKeyType, Type referencedValueType, ReaderContext readerContext, Recorder.Settings recorderSettings, bool permitPatch);
-        public abstract void ParseHashset(object hashset, Type referencedType, ReaderContext readerContext, Recorder.Settings recorderSettings, bool permitPatch);
-        public abstract void ParseStack(object hashset, Type referencedType, ReaderContext readerContext, Recorder.Settings recorderSettings);
-        public abstract void ParseQueue(object hashset, Type referencedType, ReaderContext readerContext, Recorder.Settings recorderSettings);
-        public abstract void ParseTuple(object[] parameters, Type referencedType, IList<string> parameterNames, ReaderContext readerContext, Recorder.Settings recorderSettings);
-        public abstract void ParseReflection(object obj, ReaderContext readerContext, Recorder.Settings recorderSettings);
+        public abstract void ParseList(IList list, Type referencedType, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings);
+        public abstract void ParseArray(Array array, Type referencedType, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings, int startOffset);
+        public abstract void ParseDictionary(IDictionary dict, Type referencedKeyType, Type referencedValueType, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings, bool permitPatch);
+        public abstract void ParseHashset(object hashset, Type referencedType, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings, bool permitPatch);
+        public abstract void ParseStack(object hashset, Type referencedType, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings);
+        public abstract void ParseQueue(object hashset, Type referencedType, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings);
+        public abstract void ParseTuple(object[] parameters, Type referencedType, IList<string> parameterNames, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings);
+        public abstract void ParseReflection(object obj, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings);
     }
 
     internal static class ReaderNodeExtension

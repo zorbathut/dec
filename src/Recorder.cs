@@ -450,7 +450,7 @@ namespace Dec
         public override Direction Mode { get => Direction.Write; }
     }
 
-    internal struct ReaderContext
+    internal struct ReaderGlobals
     {
         public Dictionary<string, object> refs;
         public bool allowRefs;
@@ -461,14 +461,14 @@ namespace Dec
     {
         private bool asThis = false;
         private readonly ReaderNode node;
-        private ReaderContext readerContext;
+        private ReaderGlobals readerGlobals;
         private bool disallowShared;
         private HashSet<string> seen;
 
-        internal RecorderReader(ReaderNode node, ReaderContext context, bool disallowShared = false, bool trackUsage = false)
+        internal RecorderReader(ReaderNode node, ReaderGlobals globals, bool disallowShared = false, bool trackUsage = false)
         {
             this.node = node;
-            this.readerContext = context;
+            this.readerGlobals = globals;
             this.disallowShared = disallowShared;
 
             if (trackUsage)
@@ -476,14 +476,14 @@ namespace Dec
                 seen = new HashSet<string>();
             }
         }
-        internal void AllowShared(ReaderContext newContext)
+        internal void AllowShared(ReaderGlobals newGlobals)
         {
             if (!disallowShared)
             {
                 Dbg.Err($"{node.GetInputContext()}: Internal error, RecorderReader.AllowShared() called on a RecorderReader that does not disallow shared objects");
             }
 
-            this.readerContext = newContext;
+            this.readerGlobals = newGlobals;
             disallowShared = false;
         }
 
@@ -506,7 +506,7 @@ namespace Dec
                 if (node.AllowAsThis && (node is ReaderNodeParseable nodeParseable))
                 {
                     // Explicit cast here because we want an error if we have the wrong type!
-                    value = (T)Serialization.ParseElement(new List<ReaderNodeParseable>() { nodeParseable }, typeof(T), value, readerContext, parameters.CreateSettings(), asThis: true);
+                    value = (T)Serialization.ParseElement(new List<ReaderNodeParseable>() { nodeParseable }, typeof(T), value, readerGlobals, parameters.CreateSettings(), asThis: true);
 
                     return;
                 }
@@ -526,7 +526,7 @@ namespace Dec
             seen?.Add(label);
 
             // Explicit cast here because we want an error if we have the wrong type!
-            value = (T)recorded.ParseElement(typeof(T), value, readerContext, parameters.CreateSettings());
+            value = (T)recorded.ParseElement(typeof(T), value, readerGlobals, parameters.CreateSettings());
         }
 
         public override void Ignore(string label)

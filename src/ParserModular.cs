@@ -258,7 +258,7 @@ namespace Dec
                 }
                 s_Status = Status.Processing;
 
-                var readerContext = new ReaderContext() { allowReflection = true, allowRefs = false };
+                var readerContext = new ReaderGlobals() { allowReflection = true, allowRefs = false };
 
                 // Collate reader decs
                 var registeredDecs = new Dictionary<(Type, string), List<ReaderFileDec.ReaderDec>>();

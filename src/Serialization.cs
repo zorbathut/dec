@@ -601,7 +601,7 @@ namespace Dec
             return orders;
         }
 
-        internal static object ParseElement(List<ReaderNodeParseable> nodes, Type type, object original, ReaderContext context, Recorder.Settings recSettings, FieldInfo fieldInfo = null, bool isRootDec = false, bool hasReferenceId = false, bool asThis = false, List<(ParseCommand command, ReaderNodeParseable node)> ordersOverride = null)
+        internal static object ParseElement(List<ReaderNodeParseable> nodes, Type type, object original, ReaderGlobals globals, Recorder.Settings recSettings, FieldInfo fieldInfo = null, bool isRootDec = false, bool hasReferenceId = false, bool asThis = false, List<(ParseCommand command, ReaderNodeParseable node)> ordersOverride = null)
         {
             if (nodes == null || nodes.Count == 0)
             {
@@ -609,7 +609,7 @@ namespace Dec
                 return original;
             }
 
-            if (!context.allowReflection && nodes.Count > 1)
+            if (!globals.allowReflection && nodes.Count > 1)
             {
                 Dbg.Err("Internal error, multiple nodes provided for recorder-mode behavior. Please report this!");
             }
@@ -672,7 +672,7 @@ namespace Dec
             // Doesn't mean anything outside recorderMode, so we check it for validity just in case
             string refKey;
             ReaderNode refKeyNode = null; // stored entirely for error reporting
-            if (!context.allowRefs)
+            if (!globals.allowRefs)
             {
                 refKey = null;
                 foreach (var s_node in nodes)
@@ -787,19 +787,19 @@ namespace Dec
                     Dbg.Err($"{refKeyNode.GetInputContext()}: Found a reference in a non-.Shared() context; this should happen only if you've removed the .Shared() tag since the file was generated, or if you hand-wrote a file that is questionably valid. Using the reference anyway but this might produce unexpected results");
                 }
 
-                if (context.refs == null)
+                if (globals.refs == null)
                 {
                     Dbg.Err($"{refKeyNode.GetInputContext()}: Found a reference object {refKey} before refs are initialized (is this being used in a ConverterFactory<>.Create()?)");
                     return result;
                 }
 
-                if (!context.refs.ContainsKey(refKey))
+                if (!globals.refs.ContainsKey(refKey))
                 {
                     Dbg.Err($"{refKeyNode.GetInputContext()}: Found a reference object {refKey} without a valid reference mapping");
                     return result;
                 }
 
-                object refObject = context.refs[refKey];
+                object refObject = globals.refs[refKey];
                 if (refObject == null && !type.IsValueType)
                 {
                     // okay, good enough
@@ -906,7 +906,7 @@ namespace Dec
                         // context might be null; that's OK at the moment
                         if (result != null || isNullable)
                         {
-                            var recorderReader = new RecorderReader(node, context, trackUsage: true);
+                            var recorderReader = new RecorderReader(node, globals, trackUsage: true);
                             try
                             {
                                 object returnedResult = converterRecord.RecordObj(result, recorderReader);
@@ -951,7 +951,7 @@ namespace Dec
                                 break;
                         }
 
-                        var recorderReader = new RecorderReader(node, context, disallowShared: true, trackUsage: true);
+                        var recorderReader = new RecorderReader(node, globals, disallowShared: true, trackUsage: true);
                         if (result == null)
                         {
                             try
@@ -967,7 +967,7 @@ namespace Dec
                         // context might be null; that's OK at the moment
                         if (result != null)
                         {
-                            recorderReader.AllowShared(context);
+                            recorderReader.AllowShared(globals);
                             try
                             {
                                 result = converterFactory.ReadObj(result, recorderReader);
@@ -1065,7 +1065,7 @@ namespace Dec
 
                         if (recordable != null)
                         {
-                            var recorderReader = new RecorderReader(node, context, trackUsage: true);
+                            var recorderReader = new RecorderReader(node, globals, trackUsage: true);
                             recordable.Record(recorderReader);
                             recorderReader.ReportUnusedFields();
 
@@ -1118,7 +1118,7 @@ namespace Dec
 
                     var list = (IList)(result ?? Activator.CreateInstance(type));
 
-                    node.ParseList(list, referencedType, context, recSettings);
+                    node.ParseList(list, referencedType, globals, recSettings);
 
                     result = list;
                 }
@@ -1226,7 +1226,7 @@ namespace Dec
                             break;
                     }
 
-                    node.ParseArray(array, referencedType, context, recSettings, startOffset);
+                    node.ParseArray(array, referencedType, globals, recSettings, startOffset);
 
                     result = array;
                 }
@@ -1274,7 +1274,7 @@ namespace Dec
 
                     var dict = (IDictionary)(result ?? Activator.CreateInstance(type));
 
-                    node.ParseDictionary(dict, keyType, valueType, context, recSettings, permitPatch);
+                    node.ParseDictionary(dict, keyType, valueType, globals, recSettings, permitPatch);
 
                     result = dict;
                 }
@@ -1324,7 +1324,7 @@ namespace Dec
 
                     var set = result ?? Activator.CreateInstance(type);
 
-                    node.ParseHashset(set, keyType, context, recSettings, permitPatch);
+                    node.ParseHashset(set, keyType, globals, recSettings, permitPatch);
 
                     result = set;
                 }
@@ -1367,7 +1367,7 @@ namespace Dec
 
                     var set = result ?? Activator.CreateInstance(type);
 
-                    node.ParseStack(set, keyType, context, recSettings);
+                    node.ParseStack(set, keyType, globals, recSettings);
 
                     result = set;
                 }
@@ -1410,7 +1410,7 @@ namespace Dec
 
                     var set = result ?? Activator.CreateInstance(type);
 
-                    node.ParseQueue(set, keyType, context, recSettings);
+                    node.ParseQueue(set, keyType, globals, recSettings);
 
                     result = set;
                 }
@@ -1455,7 +1455,7 @@ namespace Dec
                     int expectedCount = type.GenericTypeArguments.Length;
                     object[] parameters = new object[expectedCount];
 
-                    node.ParseTuple(parameters, type, fieldInfo?.GetCustomAttribute<System.Runtime.CompilerServices.TupleElementNamesAttribute>()?.TransformNames, context, recSettings);
+                    node.ParseTuple(parameters, type, fieldInfo?.GetCustomAttribute<System.Runtime.CompilerServices.TupleElementNamesAttribute>()?.TransformNames, globals, recSettings);
 
                     // construct!
                     result = Activator.CreateInstance(type, parameters);
@@ -1471,7 +1471,7 @@ namespace Dec
             // One big problem here is that I'm OK with security vulnerabilities in dec xmls. Those are either supplied by the developer or by mod authors who are intended to have full code support anyway.
             // I'm less OK with security vulnerabilities in save files. Nobody expects a savefile can compromise their system.
             // And the full reflection system is probably impossible to secure, whereas the Record system should be secureable.
-            if (!context.allowReflection)
+            if (!globals.allowReflection)
             {
                 // just pick the first node to get something to go on
                 Dbg.Err($"{orders[0].node.GetInputContext()}: Falling back to reflection within a Record system while parsing a {type}; this is currently not allowed for security reasons. Either you shouldn't be trying to serialize this, or it should implement Dec.IRecorder (https://zorbathut.github.io/dec/release/documentation/serialization.html), or you need a Dec.Converter (https://zorbathut.github.io/dec/release/documentation/custom.html)");
@@ -1519,7 +1519,7 @@ namespace Dec
                     }
                 }
 
-                node.ParseReflection(result, context, recSettings);
+                node.ParseReflection(result, globals, recSettings);
             }
 
             // Set up our index fields; this has to happen last in case we're a struct

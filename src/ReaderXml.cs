@@ -85,7 +85,7 @@ namespace Dec
             return results;
         }
 
-        public override void ParseList(IList list, Type referencedType, ReaderContext readerContext, Recorder.Settings recorderSettings)
+        public override void ParseList(IList list, Type referencedType, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings)
         {
             var recorderChildContext = recorderSettings.CreateChild();
 
@@ -98,17 +98,17 @@ namespace Dec
                     Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                 }
 
-                list.Add(Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, new PathIndex(path, index++), UserSettings) }, referencedType, null, readerContext, recorderChildContext));
+                list.Add(Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, new PathIndex(path, index++), UserSettings) }, referencedType, null, readerGlobals, recorderChildContext));
             }
 
             list.GetType().GetField("_version", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(list, Util.CollectionDeserializationVersion);
         }
 
-        private void ParseArrayRank(ReaderNodeXml node, ReaderContext readerContext, Recorder.Settings recorderSettings, Array value, Type referencedType, int rank, int[] indices, int startAt)
+        private void ParseArrayRank(ReaderNodeXml node, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings, Array value, Type referencedType, int rank, int[] indices, int startAt)
         {
             if (rank == indices.Length)
             {
-                value.SetValue(Serialization.ParseElement(new List<ReaderNodeParseable>() { node }, referencedType, null, readerContext, recorderSettings), indices);
+                value.SetValue(Serialization.ParseElement(new List<ReaderNodeParseable>() { node }, referencedType, null, readerGlobals, recorderSettings), indices);
             }
             else
             {
@@ -145,12 +145,12 @@ namespace Dec
 
                     indices[rank] = startAt + i++;
                     // the pathIndexMultidim is kind of slow and I should solve this at some point
-                    ParseArrayRank(new ReaderNodeXml(fieldElement, fileIdentifier, newPath, UserSettings), readerContext, recorderChildContext, value, referencedType, rank + 1, indices, 0);
+                    ParseArrayRank(new ReaderNodeXml(fieldElement, fileIdentifier, newPath, UserSettings), readerGlobals, recorderChildContext, value, referencedType, rank + 1, indices, 0);
                 }
             }
         }
 
-        public override void ParseArray(Array array, Type referencedType, ReaderContext readerContext, Recorder.Settings recorderSettings, int startOffset)
+        public override void ParseArray(Array array, Type referencedType, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings, int startOffset)
         {
             var recorderChildContext = recorderSettings.CreateChild();
 
@@ -168,7 +168,7 @@ namespace Dec
                         Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                     }
 
-                    array.SetValue(Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, newPath, UserSettings) }, referencedType, null, readerContext, recorderChildContext), startOffset + index);
+                    array.SetValue(Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, newPath, UserSettings) }, referencedType, null, readerGlobals, recorderChildContext), startOffset + index);
                     ++index;
                 }
             }
@@ -176,11 +176,11 @@ namespace Dec
             {
                 // slow path
                 var indices = new int[array.Rank];
-                ParseArrayRank(this, readerContext, recorderChildContext, array, referencedType, 0, indices, startOffset);
+                ParseArrayRank(this, readerGlobals, recorderChildContext, array, referencedType, 0, indices, startOffset);
             }
         }
 
-        public override void ParseDictionary(IDictionary dict, Type referencedKeyType, Type referencedValueType, ReaderContext readerContext, Recorder.Settings recorderSettings, bool permitPatch)
+        public override void ParseDictionary(IDictionary dict, Type referencedKeyType, Type referencedValueType, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings, bool permitPatch)
         {
             var recorderChildContext = recorderSettings.CreateChild();
 
@@ -210,7 +210,7 @@ namespace Dec
                     }
 
                     var keyPath = new PathDictionaryKey(path);
-                    var key = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(keyNode, fileIdentifier, null, UserSettings) }, referencedKeyType, null, readerContext, recorderChildContext);
+                    var key = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(keyNode, fileIdentifier, null, UserSettings) }, referencedKeyType, null, readerGlobals, recorderChildContext);
 
                     if (key == null)
                     {
@@ -234,7 +234,7 @@ namespace Dec
                     writtenFields?.Add(key);
 
                     var valuePath = new PathDictionaryValue(path);
-                    dict[key] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(valueNode, fileIdentifier,valuePath, UserSettings) }, referencedValueType, originalValue, readerContext, recorderChildContext);
+                    dict[key] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(valueNode, fileIdentifier,valuePath, UserSettings) }, referencedValueType, originalValue, readerGlobals, recorderChildContext);
                 }
                 else
                 {
@@ -286,12 +286,12 @@ namespace Dec
 
                     writtenFields?.Add(key);
 
-                    dict[key] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, null, UserSettings) }, valueType, originalValue, readerContext, recorderChildContext);
+                    dict[key] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, null, UserSettings) }, valueType, originalValue, readerGlobals, recorderChildContext);
                 }
             }
         }
 
-        public override void ParseHashset(object hashset, Type referencedType, ReaderContext readerContext, Recorder.Settings recorderSettings, bool permitPatch)
+        public override void ParseHashset(object hashset, Type referencedType, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings, bool permitPatch)
         {
             // This is a gigantic pain because HashSet<> doesn't inherit from any non-generic interface that provides the functionality we want
             // So we're stuck doing it all through object and reflection
@@ -320,7 +320,7 @@ namespace Dec
                 if (fieldElement.Name.LocalName == "li")
                 {
                     // Treat this like a full node
-                    var key = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, keyPath, UserSettings) }, referencedType, null, readerContext, recorderChildContext);
+                    var key = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, keyPath, UserSettings) }, referencedType, null, readerGlobals, recorderChildContext);
 
                     if (key == null)
                     {
@@ -367,7 +367,7 @@ namespace Dec
             }
         }
 
-        public override void ParseStack(object stack, Type referencedType, ReaderContext readerContext, Recorder.Settings recorderSettings)
+        public override void ParseStack(object stack, Type referencedType, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings)
         {
             var pushFunction = stack.GetType().GetMethod("Push");
 
@@ -384,12 +384,12 @@ namespace Dec
                     Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                 }
 
-                pushFunction.Invoke(stack, new object[] { Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, newPath, UserSettings) }, referencedType, null, readerContext, recorderChildContext) });
+                pushFunction.Invoke(stack, new object[] { Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, newPath, UserSettings) }, referencedType, null, readerGlobals, recorderChildContext) });
                 ++index;
             }
         }
 
-        public override void ParseQueue(object queue, Type referencedType, ReaderContext readerContext, Recorder.Settings recorderSettings)
+        public override void ParseQueue(object queue, Type referencedType, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings)
         {
             var enqueueFunction = queue.GetType().GetMethod("Enqueue");
 
@@ -406,12 +406,12 @@ namespace Dec
                     Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                 }
 
-                enqueueFunction.Invoke(queue, new object[] { Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, newPath, UserSettings) }, referencedType, null, readerContext, recorderChildContext) });
+                enqueueFunction.Invoke(queue, new object[] { Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, newPath, UserSettings) }, referencedType, null, readerGlobals, recorderChildContext) });
                 ++index;
             }
         }
 
-        public override void ParseTuple(object[] parameters, Type referencedType, IList<string> parameterNames, ReaderContext readerContext, Recorder.Settings recorderSettings)
+        public override void ParseTuple(object[] parameters, Type referencedType, IList<string> parameterNames, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings)
         {
             int expectedCount = referencedType.GenericTypeArguments.Length;
             var recorderChildContext = recorderSettings.CreateChild();
@@ -438,7 +438,7 @@ namespace Dec
 
                 for (int i = 0; i < Math.Min(parameters.Length, elements.Count); ++i)
                 {
-                    parameters[i] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(elements[i], fileIdentifier, new PathIndex(path, i), UserSettings) }, referencedType.GenericTypeArguments[i], null, readerContext, recorderChildContext);
+                    parameters[i] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(elements[i], fileIdentifier, new PathIndex(path, i), UserSettings) }, referencedType.GenericTypeArguments[i], null, readerGlobals, recorderChildContext);
                 }
 
                 // fill in anything missing
@@ -482,7 +482,7 @@ namespace Dec
                     }
 
                     seen[index] = true;
-                    parameters[index] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(elementItem, fileIdentifier, newPath, UserSettings) }, referencedType.GenericTypeArguments[index], null, readerContext, recorderChildContext);
+                    parameters[index] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(elementItem, fileIdentifier, newPath, UserSettings) }, referencedType.GenericTypeArguments[index], null, readerGlobals, recorderChildContext);
                 }
 
                 for (int i = 0; i < seen.Length; ++i)
@@ -498,7 +498,7 @@ namespace Dec
             }
         }
 
-        public override void ParseReflection(object obj, ReaderContext readerContext, Recorder.Settings recorderSettings)
+        public override void ParseReflection(object obj, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings)
         {
             var recorderChildContext = recorderSettings.CreateChild();
             var setFields = new HashSet<string>();
@@ -558,7 +558,7 @@ namespace Dec
                     continue;
                 }
 
-                fieldElementInfo.SetValue(obj, Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, new PathMember(path, fieldName), UserSettings) }, fieldElementInfo.FieldType, fieldElementInfo.GetValue(obj), readerContext, recorderChildContext, fieldInfo: fieldElementInfo));
+                fieldElementInfo.SetValue(obj, Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, new PathMember(path, fieldName), UserSettings) }, fieldElementInfo.FieldType, fieldElementInfo.GetValue(obj), readerGlobals, recorderChildContext, fieldInfo: fieldElementInfo));
             }
         }
     }

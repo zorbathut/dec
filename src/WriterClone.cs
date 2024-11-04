@@ -186,7 +186,7 @@ namespace Dec
 
                 // now we create the object itself
                 var readerClone = new ReaderNodeCloneRecorder(recorderChildren, UserSettings);
-                result = converterFactory.CreateObj(new RecorderReader(readerClone, new ReaderContext()));
+                result = converterFactory.CreateObj(new RecorderReader(readerClone, new ReaderGlobals()));
             }
             else if (RecorderSettings.factories != null && original is IRecordable)
             {
@@ -292,13 +292,13 @@ namespace Dec
                     var readerClone = new ReaderNodeCloneRecorder(recorderChildren, UserSettings);
 
                     // object already exists
-                    result = converterRecord.RecordObj(result, new RecorderReader(readerClone, new ReaderContext()));
+                    result = converterRecord.RecordObj(result, new RecorderReader(readerClone, new ReaderGlobals()));
                 }
                 else if (originalConverter is ConverterFactory converterFactory)
                 {
                     // the rest of this was done earlier
                     var readerClone = new ReaderNodeCloneRecorder(recorderChildren, UserSettings);
-                    result = converterFactory.ReadObj(result, new RecorderReader(readerClone, new ReaderContext()));
+                    result = converterFactory.ReadObj(result, new RecorderReader(readerClone, new ReaderGlobals()));
                 }
                 else
                 {
@@ -529,7 +529,7 @@ namespace Dec
                 var readerClone = new ReaderNodeCloneRecorder(recorderChildren, UserSettings);
 
                 // do the dupe
-                (result as IRecordable).Record(new RecorderReader(readerClone, new ReaderContext()));
+                (result as IRecordable).Record(new RecorderReader(readerClone, new ReaderGlobals()));
             }
             else
             {
@@ -731,7 +731,7 @@ namespace Dec
             return recorderChildren.Keys.ToArray();
         }
 
-        public override object ParseElement(Type type, object model, ReaderContext readerContext, Recorder.Settings recorderSettings)
+        public override object ParseElement(Type type, object model, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings)
         {
             // not valid, this is used only for recorders
             throw new NotImplementedException();
@@ -771,7 +771,7 @@ namespace Dec
             throw new NotImplementedException();
         }
 
-        public override object ParseElement(Type type, object model, ReaderContext readerContext, Recorder.Settings recorderSettings)
+        public override object ParseElement(Type type, object model, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings)
         {
             // we actually just ignore the type right now, we copy off the original
 
@@ -823,7 +823,7 @@ namespace Dec
             return Enumerable.Range(0, rank).Select(i => arr.GetLength(i)).ToArray();
         }
 
-        public override object ParseElement(Type type, object model, ReaderContext readerContext, Recorder.Settings recorderSettings)
+        public override object ParseElement(Type type, object model, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings)
         {
             throw new NotImplementedException();
         }

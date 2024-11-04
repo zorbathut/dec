@@ -76,7 +76,7 @@ namespace Dec
                 // We'll be doing a second parse to parse *many* of these, but not all
                 var furtherParsing = new List<Action>();
                 var refDict = new Dictionary<string, object>();
-                var readerContext = new ReaderContext() { allowReflection = false, allowRefs = true };
+                var readerGlobals = new ReaderGlobals() { allowReflection = false, allowRefs = true };
 
                 foreach (var reference in refs)
                 {
@@ -106,7 +106,7 @@ namespace Dec
                             // the next parse step
                             furtherParsing.Add(() =>
                             {
-                                var recorderReader = new RecorderReader(reference.node, readerContext, trackUsage: true);
+                                var recorderReader = new RecorderReader(reference.node, readerGlobals, trackUsage: true);
                                 try
                                 {
                                     converterRecord.RecordObj(refInstance, recorderReader);
@@ -123,13 +123,13 @@ namespace Dec
                             // create the basic object
                             try
                             {
-                                var recorderReader = new RecorderReader(reference.node, readerContext, disallowShared: true, trackUsage: true);
+                                var recorderReader = new RecorderReader(reference.node, readerGlobals, disallowShared: true, trackUsage: true);
                                 refInstance = converterFactory.CreateObj(recorderReader);
 
                                 // the next parse step, if we have one
                                 furtherParsing.Add(() =>
                                 {
-                                    recorderReader.AllowShared(readerContext);
+                                    recorderReader.AllowShared(readerGlobals);
                                     try
                                     {
                                         converterFactory.ReadObj(refInstance, recorderReader);
@@ -163,7 +163,7 @@ namespace Dec
                             {
                                 // Do our actual parsing
                                 // We know this *was* shared or it wouldn't be a ref now, so we tag it again in case it's a List<SomeClass> so we can share its children as well.
-                                var refInstanceOutput = Serialization.ParseElement(new List<ReaderNodeParseable>() { reference.node }, refInstance.GetType(), refInstance, readerContext, new Recorder.Settings() { shared = Settings.Shared.Allow }, hasReferenceId: true);
+                                var refInstanceOutput = Serialization.ParseElement(new List<ReaderNodeParseable>() { reference.node }, refInstance.GetType(), refInstance, readerGlobals, new Recorder.Settings() { shared = Settings.Shared.Allow }, hasReferenceId: true);
 
                                 if (refInstance != refInstanceOutput)
                                 {
@@ -185,7 +185,7 @@ namespace Dec
                 // if so, then are we filling up the heap with stuff?
                 // gotta look into this someday
                 // anyway the good news is that the test suite is testing this pretty extensively, so at least it works right now, even if it's not fast
-                readerContext.refs = refDict;
+                readerGlobals.refs = refDict;
 
                 // finish up our second-stage ref parsing
                 foreach (var action in furtherParsing)
@@ -202,7 +202,7 @@ namespace Dec
 
                 // And now, we can finally parse our actual root element!
                 // (which accounts for a tiny percentage of things that need to be parsed)
-                return (T)Serialization.ParseElement(new List<ReaderNodeParseable>() { parseNode }, typeof(T), null, readerContext, new Recorder.Settings() { shared = Settings.Shared.Flexible });
+                return (T)Serialization.ParseElement(new List<ReaderNodeParseable>() { parseNode }, typeof(T), null, readerGlobals, new Recorder.Settings() { shared = Settings.Shared.Flexible });
             }
         }
 
@@ -221,7 +221,7 @@ namespace Dec
                     return default;
                 }
 
-                var readerContext = new ReaderContext() { allowReflection = false, allowRefs = false };
+                var readerContext = new ReaderGlobals() { allowReflection = false, allowRefs = false };
 
                 // And now, we can finally parse our actual root element!
                 // (which accounts for a tiny percentage of things that need to be parsed)
