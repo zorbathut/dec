@@ -1,9 +1,7 @@
-using DecTest;
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+using DecTest;
+using NUnit.Framework;
 
 namespace RecorderEnumeratorTest
 {

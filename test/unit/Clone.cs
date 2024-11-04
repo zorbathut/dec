@@ -1,8 +1,7 @@
+using System.Collections.Generic;
 using System.Linq;
 using Dec;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
 
 namespace DecTest
 {

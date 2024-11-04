@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 
 namespace Dec
 {
-
     internal static class UtilXml
     {
         internal static int LineNumber(this XElement element)

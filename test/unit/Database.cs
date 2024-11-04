@@ -1,7 +1,7 @@
-using NUnit.Framework;
 using System;
 using System.Linq;
 using System.Reflection;
+using NUnit.Framework;
 
 namespace DecTest
 {

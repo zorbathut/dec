@@ -1,8 +1,8 @@
-using NUnit.Framework;
-using NUnit.Framework.Interfaces;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using NUnit.Framework;
+using NUnit.Framework.Interfaces;
 
 namespace DecTest
 {

@@ -1,6 +1,6 @@
 
-using System.IO;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace DecUtilLib
