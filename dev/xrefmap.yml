@@ -906,34 +906,6 @@ references:
   commentId: T:Dec.InputContext
   fullName: Dec.InputContext
   nameWithType: InputContext
-- uid: Dec.InputContext.#ctor(System.String)
-  name: InputContext(string)
-  href: api/Dec.InputContext.html#Dec_InputContext__ctor_System_String_
-  commentId: M:Dec.InputContext.#ctor(System.String)
-  name.vb: New(String)
-  fullName: Dec.InputContext.InputContext(string)
-  fullName.vb: Dec.InputContext.New(String)
-  nameWithType: InputContext.InputContext(string)
-  nameWithType.vb: InputContext.New(String)
-- uid: Dec.InputContext.#ctor(System.String,System.Xml.Linq.XElement)
-  name: InputContext(string, XElement)
-  href: api/Dec.InputContext.html#Dec_InputContext__ctor_System_String_System_Xml_Linq_XElement_
-  commentId: M:Dec.InputContext.#ctor(System.String,System.Xml.Linq.XElement)
-  name.vb: New(String, XElement)
-  fullName: Dec.InputContext.InputContext(string, System.Xml.Linq.XElement)
-  fullName.vb: Dec.InputContext.New(String, System.Xml.Linq.XElement)
-  nameWithType: InputContext.InputContext(string, XElement)
-  nameWithType.vb: InputContext.New(String, XElement)
-- uid: Dec.InputContext.#ctor*
-  name: InputContext
-  href: api/Dec.InputContext.html#Dec_InputContext__ctor_
-  commentId: Overload:Dec.InputContext.#ctor
-  isSpec: "True"
-  name.vb: New
-  fullName: Dec.InputContext.InputContext
-  fullName.vb: Dec.InputContext.New
-  nameWithType: InputContext.InputContext
-  nameWithType.vb: InputContext.New
 - uid: Dec.InputContext.ToString
   name: ToString()
   href: api/Dec.InputContext.html#Dec_InputContext_ToString
@@ -1185,6 +1157,367 @@ references:
   isSpec: "True"
   fullName: Dec.ParserModular.Module.AddString
   nameWithType: ParserModular.Module.AddString
+- uid: Dec.Path
+  name: Path
+  href: api/Dec.Path.html
+  commentId: T:Dec.Path
+  fullName: Dec.Path
+  nameWithType: Path
+- uid: Dec.Path.Serialize
+  name: Serialize()
+  href: api/Dec.Path.html#Dec_Path_Serialize
+  commentId: M:Dec.Path.Serialize
+  fullName: Dec.Path.Serialize()
+  nameWithType: Path.Serialize()
+- uid: Dec.Path.Serialize*
+  name: Serialize
+  href: api/Dec.Path.html#Dec_Path_Serialize_
+  commentId: Overload:Dec.Path.Serialize
+  isSpec: "True"
+  fullName: Dec.Path.Serialize
+  nameWithType: Path.Serialize
+- uid: Dec.PathDec
+  name: PathDec
+  href: api/Dec.PathDec.html
+  commentId: T:Dec.PathDec
+  fullName: Dec.PathDec
+  nameWithType: PathDec
+- uid: Dec.PathDec.#ctor(System.Type,System.String)
+  name: PathDec(Type, string)
+  href: api/Dec.PathDec.html#Dec_PathDec__ctor_System_Type_System_String_
+  commentId: M:Dec.PathDec.#ctor(System.Type,System.String)
+  name.vb: New(Type, String)
+  fullName: Dec.PathDec.PathDec(System.Type, string)
+  fullName.vb: Dec.PathDec.New(System.Type, String)
+  nameWithType: PathDec.PathDec(Type, string)
+  nameWithType.vb: PathDec.New(Type, String)
+- uid: Dec.PathDec.#ctor*
+  name: PathDec
+  href: api/Dec.PathDec.html#Dec_PathDec__ctor_
+  commentId: Overload:Dec.PathDec.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: Dec.PathDec.PathDec
+  fullName.vb: Dec.PathDec.New
+  nameWithType: PathDec.PathDec
+  nameWithType.vb: PathDec.New
+- uid: Dec.PathDec.Serialize
+  name: Serialize()
+  href: api/Dec.PathDec.html#Dec_PathDec_Serialize
+  commentId: M:Dec.PathDec.Serialize
+  fullName: Dec.PathDec.Serialize()
+  nameWithType: PathDec.Serialize()
+- uid: Dec.PathDec.Serialize*
+  name: Serialize
+  href: api/Dec.PathDec.html#Dec_PathDec_Serialize_
+  commentId: Overload:Dec.PathDec.Serialize
+  isSpec: "True"
+  fullName: Dec.PathDec.Serialize
+  nameWithType: PathDec.Serialize
+- uid: Dec.PathDictionaryKey
+  name: PathDictionaryKey
+  href: api/Dec.PathDictionaryKey.html
+  commentId: T:Dec.PathDictionaryKey
+  fullName: Dec.PathDictionaryKey
+  nameWithType: PathDictionaryKey
+- uid: Dec.PathDictionaryKey.#ctor(Dec.Path)
+  name: PathDictionaryKey(Path)
+  href: api/Dec.PathDictionaryKey.html#Dec_PathDictionaryKey__ctor_Dec_Path_
+  commentId: M:Dec.PathDictionaryKey.#ctor(Dec.Path)
+  name.vb: New(Path)
+  fullName: Dec.PathDictionaryKey.PathDictionaryKey(Dec.Path)
+  fullName.vb: Dec.PathDictionaryKey.New(Dec.Path)
+  nameWithType: PathDictionaryKey.PathDictionaryKey(Path)
+  nameWithType.vb: PathDictionaryKey.New(Path)
+- uid: Dec.PathDictionaryKey.#ctor*
+  name: PathDictionaryKey
+  href: api/Dec.PathDictionaryKey.html#Dec_PathDictionaryKey__ctor_
+  commentId: Overload:Dec.PathDictionaryKey.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: Dec.PathDictionaryKey.PathDictionaryKey
+  fullName.vb: Dec.PathDictionaryKey.New
+  nameWithType: PathDictionaryKey.PathDictionaryKey
+  nameWithType.vb: PathDictionaryKey.New
+- uid: Dec.PathDictionaryKey.Serialize
+  name: Serialize()
+  href: api/Dec.PathDictionaryKey.html#Dec_PathDictionaryKey_Serialize
+  commentId: M:Dec.PathDictionaryKey.Serialize
+  fullName: Dec.PathDictionaryKey.Serialize()
+  nameWithType: PathDictionaryKey.Serialize()
+- uid: Dec.PathDictionaryKey.Serialize*
+  name: Serialize
+  href: api/Dec.PathDictionaryKey.html#Dec_PathDictionaryKey_Serialize_
+  commentId: Overload:Dec.PathDictionaryKey.Serialize
+  isSpec: "True"
+  fullName: Dec.PathDictionaryKey.Serialize
+  nameWithType: PathDictionaryKey.Serialize
+- uid: Dec.PathDictionaryValue
+  name: PathDictionaryValue
+  href: api/Dec.PathDictionaryValue.html
+  commentId: T:Dec.PathDictionaryValue
+  fullName: Dec.PathDictionaryValue
+  nameWithType: PathDictionaryValue
+- uid: Dec.PathDictionaryValue.#ctor(Dec.Path)
+  name: PathDictionaryValue(Path)
+  href: api/Dec.PathDictionaryValue.html#Dec_PathDictionaryValue__ctor_Dec_Path_
+  commentId: M:Dec.PathDictionaryValue.#ctor(Dec.Path)
+  name.vb: New(Path)
+  fullName: Dec.PathDictionaryValue.PathDictionaryValue(Dec.Path)
+  fullName.vb: Dec.PathDictionaryValue.New(Dec.Path)
+  nameWithType: PathDictionaryValue.PathDictionaryValue(Path)
+  nameWithType.vb: PathDictionaryValue.New(Path)
+- uid: Dec.PathDictionaryValue.#ctor*
+  name: PathDictionaryValue
+  href: api/Dec.PathDictionaryValue.html#Dec_PathDictionaryValue__ctor_
+  commentId: Overload:Dec.PathDictionaryValue.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: Dec.PathDictionaryValue.PathDictionaryValue
+  fullName.vb: Dec.PathDictionaryValue.New
+  nameWithType: PathDictionaryValue.PathDictionaryValue
+  nameWithType.vb: PathDictionaryValue.New
+- uid: Dec.PathDictionaryValue.Serialize
+  name: Serialize()
+  href: api/Dec.PathDictionaryValue.html#Dec_PathDictionaryValue_Serialize
+  commentId: M:Dec.PathDictionaryValue.Serialize
+  fullName: Dec.PathDictionaryValue.Serialize()
+  nameWithType: PathDictionaryValue.Serialize()
+- uid: Dec.PathDictionaryValue.Serialize*
+  name: Serialize
+  href: api/Dec.PathDictionaryValue.html#Dec_PathDictionaryValue_Serialize_
+  commentId: Overload:Dec.PathDictionaryValue.Serialize
+  isSpec: "True"
+  fullName: Dec.PathDictionaryValue.Serialize
+  nameWithType: PathDictionaryValue.Serialize
+- uid: Dec.PathHashSetElement
+  name: PathHashSetElement
+  href: api/Dec.PathHashSetElement.html
+  commentId: T:Dec.PathHashSetElement
+  fullName: Dec.PathHashSetElement
+  nameWithType: PathHashSetElement
+- uid: Dec.PathHashSetElement.#ctor(Dec.Path)
+  name: PathHashSetElement(Path)
+  href: api/Dec.PathHashSetElement.html#Dec_PathHashSetElement__ctor_Dec_Path_
+  commentId: M:Dec.PathHashSetElement.#ctor(Dec.Path)
+  name.vb: New(Path)
+  fullName: Dec.PathHashSetElement.PathHashSetElement(Dec.Path)
+  fullName.vb: Dec.PathHashSetElement.New(Dec.Path)
+  nameWithType: PathHashSetElement.PathHashSetElement(Path)
+  nameWithType.vb: PathHashSetElement.New(Path)
+- uid: Dec.PathHashSetElement.#ctor*
+  name: PathHashSetElement
+  href: api/Dec.PathHashSetElement.html#Dec_PathHashSetElement__ctor_
+  commentId: Overload:Dec.PathHashSetElement.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: Dec.PathHashSetElement.PathHashSetElement
+  fullName.vb: Dec.PathHashSetElement.New
+  nameWithType: PathHashSetElement.PathHashSetElement
+  nameWithType.vb: PathHashSetElement.New
+- uid: Dec.PathHashSetElement.Serialize
+  name: Serialize()
+  href: api/Dec.PathHashSetElement.html#Dec_PathHashSetElement_Serialize
+  commentId: M:Dec.PathHashSetElement.Serialize
+  fullName: Dec.PathHashSetElement.Serialize()
+  nameWithType: PathHashSetElement.Serialize()
+- uid: Dec.PathHashSetElement.Serialize*
+  name: Serialize
+  href: api/Dec.PathHashSetElement.html#Dec_PathHashSetElement_Serialize_
+  commentId: Overload:Dec.PathHashSetElement.Serialize
+  isSpec: "True"
+  fullName: Dec.PathHashSetElement.Serialize
+  nameWithType: PathHashSetElement.Serialize
+- uid: Dec.PathIndex
+  name: PathIndex
+  href: api/Dec.PathIndex.html
+  commentId: T:Dec.PathIndex
+  fullName: Dec.PathIndex
+  nameWithType: PathIndex
+- uid: Dec.PathIndex.#ctor(Dec.Path,System.Int32)
+  name: PathIndex(Path, int)
+  href: api/Dec.PathIndex.html#Dec_PathIndex__ctor_Dec_Path_System_Int32_
+  commentId: M:Dec.PathIndex.#ctor(Dec.Path,System.Int32)
+  name.vb: New(Path, Integer)
+  fullName: Dec.PathIndex.PathIndex(Dec.Path, int)
+  fullName.vb: Dec.PathIndex.New(Dec.Path, Integer)
+  nameWithType: PathIndex.PathIndex(Path, int)
+  nameWithType.vb: PathIndex.New(Path, Integer)
+- uid: Dec.PathIndex.#ctor*
+  name: PathIndex
+  href: api/Dec.PathIndex.html#Dec_PathIndex__ctor_
+  commentId: Overload:Dec.PathIndex.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: Dec.PathIndex.PathIndex
+  fullName.vb: Dec.PathIndex.New
+  nameWithType: PathIndex.PathIndex
+  nameWithType.vb: PathIndex.New
+- uid: Dec.PathIndex.Serialize
+  name: Serialize()
+  href: api/Dec.PathIndex.html#Dec_PathIndex_Serialize
+  commentId: M:Dec.PathIndex.Serialize
+  fullName: Dec.PathIndex.Serialize()
+  nameWithType: PathIndex.Serialize()
+- uid: Dec.PathIndex.Serialize*
+  name: Serialize
+  href: api/Dec.PathIndex.html#Dec_PathIndex_Serialize_
+  commentId: Overload:Dec.PathIndex.Serialize
+  isSpec: "True"
+  fullName: Dec.PathIndex.Serialize
+  nameWithType: PathIndex.Serialize
+- uid: Dec.PathIndexMultidim
+  name: PathIndexMultidim
+  href: api/Dec.PathIndexMultidim.html
+  commentId: T:Dec.PathIndexMultidim
+  fullName: Dec.PathIndexMultidim
+  nameWithType: PathIndexMultidim
+- uid: Dec.PathIndexMultidim.#ctor(Dec.Path,System.Int32[])
+  name: PathIndexMultidim(Path, int[])
+  href: api/Dec.PathIndexMultidim.html#Dec_PathIndexMultidim__ctor_Dec_Path_System_Int32___
+  commentId: M:Dec.PathIndexMultidim.#ctor(Dec.Path,System.Int32[])
+  name.vb: New(Path, Integer())
+  fullName: Dec.PathIndexMultidim.PathIndexMultidim(Dec.Path, int[])
+  fullName.vb: Dec.PathIndexMultidim.New(Dec.Path, Integer())
+  nameWithType: PathIndexMultidim.PathIndexMultidim(Path, int[])
+  nameWithType.vb: PathIndexMultidim.New(Path, Integer())
+- uid: Dec.PathIndexMultidim.#ctor*
+  name: PathIndexMultidim
+  href: api/Dec.PathIndexMultidim.html#Dec_PathIndexMultidim__ctor_
+  commentId: Overload:Dec.PathIndexMultidim.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: Dec.PathIndexMultidim.PathIndexMultidim
+  fullName.vb: Dec.PathIndexMultidim.New
+  nameWithType: PathIndexMultidim.PathIndexMultidim
+  nameWithType.vb: PathIndexMultidim.New
+- uid: Dec.PathIndexMultidim.Serialize
+  name: Serialize()
+  href: api/Dec.PathIndexMultidim.html#Dec_PathIndexMultidim_Serialize
+  commentId: M:Dec.PathIndexMultidim.Serialize
+  fullName: Dec.PathIndexMultidim.Serialize()
+  nameWithType: PathIndexMultidim.Serialize()
+- uid: Dec.PathIndexMultidim.Serialize*
+  name: Serialize
+  href: api/Dec.PathIndexMultidim.html#Dec_PathIndexMultidim_Serialize_
+  commentId: Overload:Dec.PathIndexMultidim.Serialize
+  isSpec: "True"
+  fullName: Dec.PathIndexMultidim.Serialize
+  nameWithType: PathIndexMultidim.Serialize
+- uid: Dec.PathMember
+  name: PathMember
+  href: api/Dec.PathMember.html
+  commentId: T:Dec.PathMember
+  fullName: Dec.PathMember
+  nameWithType: PathMember
+- uid: Dec.PathMember.#ctor(Dec.Path,System.String)
+  name: PathMember(Path, string)
+  href: api/Dec.PathMember.html#Dec_PathMember__ctor_Dec_Path_System_String_
+  commentId: M:Dec.PathMember.#ctor(Dec.Path,System.String)
+  name.vb: New(Path, String)
+  fullName: Dec.PathMember.PathMember(Dec.Path, string)
+  fullName.vb: Dec.PathMember.New(Dec.Path, String)
+  nameWithType: PathMember.PathMember(Path, string)
+  nameWithType.vb: PathMember.New(Path, String)
+- uid: Dec.PathMember.#ctor*
+  name: PathMember
+  href: api/Dec.PathMember.html#Dec_PathMember__ctor_
+  commentId: Overload:Dec.PathMember.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: Dec.PathMember.PathMember
+  fullName.vb: Dec.PathMember.New
+  nameWithType: PathMember.PathMember
+  nameWithType.vb: PathMember.New
+- uid: Dec.PathMember.Serialize
+  name: Serialize()
+  href: api/Dec.PathMember.html#Dec_PathMember_Serialize
+  commentId: M:Dec.PathMember.Serialize
+  fullName: Dec.PathMember.Serialize()
+  nameWithType: PathMember.Serialize()
+- uid: Dec.PathMember.Serialize*
+  name: Serialize
+  href: api/Dec.PathMember.html#Dec_PathMember_Serialize_
+  commentId: Overload:Dec.PathMember.Serialize
+  isSpec: "True"
+  fullName: Dec.PathMember.Serialize
+  nameWithType: PathMember.Serialize
+- uid: Dec.PathRef
+  name: PathRef
+  href: api/Dec.PathRef.html
+  commentId: T:Dec.PathRef
+  fullName: Dec.PathRef
+  nameWithType: PathRef
+- uid: Dec.PathRef.#ctor(System.String)
+  name: PathRef(string)
+  href: api/Dec.PathRef.html#Dec_PathRef__ctor_System_String_
+  commentId: M:Dec.PathRef.#ctor(System.String)
+  name.vb: New(String)
+  fullName: Dec.PathRef.PathRef(string)
+  fullName.vb: Dec.PathRef.New(String)
+  nameWithType: PathRef.PathRef(string)
+  nameWithType.vb: PathRef.New(String)
+- uid: Dec.PathRef.#ctor*
+  name: PathRef
+  href: api/Dec.PathRef.html#Dec_PathRef__ctor_
+  commentId: Overload:Dec.PathRef.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: Dec.PathRef.PathRef
+  fullName.vb: Dec.PathRef.New
+  nameWithType: PathRef.PathRef
+  nameWithType.vb: PathRef.New
+- uid: Dec.PathRef.Serialize
+  name: Serialize()
+  href: api/Dec.PathRef.html#Dec_PathRef_Serialize
+  commentId: M:Dec.PathRef.Serialize
+  fullName: Dec.PathRef.Serialize()
+  nameWithType: PathRef.Serialize()
+- uid: Dec.PathRef.Serialize*
+  name: Serialize
+  href: api/Dec.PathRef.html#Dec_PathRef_Serialize_
+  commentId: Overload:Dec.PathRef.Serialize
+  isSpec: "True"
+  fullName: Dec.PathRef.Serialize
+  nameWithType: PathRef.Serialize
+- uid: Dec.PathRoot
+  name: PathRoot
+  href: api/Dec.PathRoot.html
+  commentId: T:Dec.PathRoot
+  fullName: Dec.PathRoot
+  nameWithType: PathRoot
+- uid: Dec.PathRoot.#ctor(System.String)
+  name: PathRoot(string)
+  href: api/Dec.PathRoot.html#Dec_PathRoot__ctor_System_String_
+  commentId: M:Dec.PathRoot.#ctor(System.String)
+  name.vb: New(String)
+  fullName: Dec.PathRoot.PathRoot(string)
+  fullName.vb: Dec.PathRoot.New(String)
+  nameWithType: PathRoot.PathRoot(string)
+  nameWithType.vb: PathRoot.New(String)
+- uid: Dec.PathRoot.#ctor*
+  name: PathRoot
+  href: api/Dec.PathRoot.html#Dec_PathRoot__ctor_
+  commentId: Overload:Dec.PathRoot.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: Dec.PathRoot.PathRoot
+  fullName.vb: Dec.PathRoot.New
+  nameWithType: PathRoot.PathRoot
+  nameWithType.vb: PathRoot.New
+- uid: Dec.PathRoot.Serialize
+  name: Serialize()
+  href: api/Dec.PathRoot.html#Dec_PathRoot_Serialize
+  commentId: M:Dec.PathRoot.Serialize
+  fullName: Dec.PathRoot.Serialize()
+  nameWithType: PathRoot.Serialize()
+- uid: Dec.PathRoot.Serialize*
+  name: Serialize
+  href: api/Dec.PathRoot.html#Dec_PathRoot_Serialize_
+  commentId: Overload:Dec.PathRoot.Serialize
+  isSpec: "True"
+  fullName: Dec.PathRoot.Serialize
+  nameWithType: PathRoot.Serialize
 - uid: Dec.Recorder
   name: Recorder
   href: api/Dec.Recorder.html

@@ -294,6 +294,106 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Dec.Path.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.Path.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.PathDec.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.PathDec.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.PathDictionaryKey.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.PathDictionaryKey.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.PathDictionaryValue.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.PathDictionaryValue.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.PathHashSetElement.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.PathHashSetElement.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.PathIndex.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.PathIndex.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.PathIndexMultidim.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.PathIndexMultidim.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.PathMember.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.PathMember.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.PathRef.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.PathRef.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.PathRoot.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.PathRoot.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Dec.Recorder.Direction.yml",
       "output": {
         ".html": {

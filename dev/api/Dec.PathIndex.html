@@ -2,11 +2,11 @@
 <html>
   <head>
     <meta charset="utf-8">
-      <title>Struct InputContext </title>
+      <title>Class PathIndex </title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="title" content="Struct InputContext ">
+      <meta name="title" content="Class PathIndex ">
       
-      <meta name="description" content="Information on the current cursor position when reading files.">
+      
       <link rel="icon" href="../favicon.ico">
       <link rel="stylesheet" href="../public/docfx.min.css">
       <link rel="stylesheet" href="../public/main.css">
@@ -16,7 +16,7 @@
       
       
       
-      <meta name="docfx:docurl" content="https://github.com/zorbathut/dec/new/dev/apiSpec/new?filename=Dec_InputContext.md&amp;value=---%0Auid%3A%20Dec.InputContext%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/zorbathut/dec/new/dev/apiSpec/new?filename=Dec_PathIndex.md&amp;value=---%0Auid%3A%20Dec.PathIndex%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -80,12 +80,12 @@
           <nav id="breadcrumb"></nav>
         </div>
 
-        <article data-uid="Dec.InputContext">
+        <article data-uid="Dec.PathIndex">
 
 
 
-  <h1 id="Dec_InputContext" data-uid="Dec.InputContext" class="text-break">
-Struct InputContext  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Serialization.cs/#L16"><i class="bi bi-code-slash"></i></a>
+  <h1 id="Dec_PathIndex" data-uid="Dec.PathIndex" class="text-break">
+Class PathIndex  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Path.cs/#L74"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -93,64 +93,93 @@ Struct InputContext  <a class="header-action link-secondary" title="View source"
   <dl><dt>Assembly</dt><dd>dec.dll</dd></dl>
   </div>
 
-  <div class="markdown summary"><p>Information on the current cursor position when reading files.</p>
-</div>
+  <div class="markdown summary"></div>
   <div class="markdown conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public struct InputContext</code></pre>
+    <pre><code class="lang-csharp hljs">public class PathIndex : Path</code></pre>
   </div>
 
 
 
 
-
-
-
-  <dl class="typelist inheritedMembers">
-    <dt>Inherited Members</dt>
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
     <dd>
-    <div>
-      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetype.equals">ValueType.Equals(object)</a>
-    </div>
-    <div>
-      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetype.gethashcode">ValueType.GetHashCode()</a>
-    </div>
-  </dd></dl>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><a class="xref" href="Dec.Path.html">Path</a></div>
+      <div><span class="xref">PathIndex</span></div>
+    </dd>
+  </dl>
 
 
 
 
-  <h2 id="Dec_InputContext_remarks">Remarks</h2>
-  <div class="markdown level0 remarks"><p>Standard output format is $&quot;{inputContext}: Your Error Text Here!&quot;. This abstracts out the requirements for generating the locational-context text.</p>
-</div>
+
+
+
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="Dec_PathIndex__ctor_" data-uid="Dec.PathIndex.#ctor*"></a>
+
+  <h3 id="Dec_PathIndex__ctor_Dec_Path_System_Int32_" data-uid="Dec.PathIndex.#ctor(Dec.Path,System.Int32)">
+  PathIndex(Path, int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Path.cs/#L79"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public PathIndex(Path parent, int index)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>parent</code> <a class="xref" href="Dec.Path.html">Path</a></dt>
+    <dd></dd>
+    <dt><code>index</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
 
 
   <h2 class="section" id="methods">Methods
 </h2>
 
 
-  <a id="Dec_InputContext_ToString_" data-uid="Dec.InputContext.ToString*"></a>
+  <a id="Dec_PathIndex_Serialize_" data-uid="Dec.PathIndex.Serialize*"></a>
 
-  <h3 id="Dec_InputContext_ToString" data-uid="Dec.InputContext.ToString">
-  ToString()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Serialization.cs/#L29"><i class="bi bi-code-slash"></i></a>
+  <h3 id="Dec_PathIndex_Serialize" data-uid="Dec.PathIndex.Serialize">
+  Serialize()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Path.cs/#L85"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"><p>Returns the fully qualified type name of this instance.</p>
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override string ToString()</code></pre>
+    <pre><code class="lang-csharp hljs">public override string Serialize()</code></pre>
   </div>
 
 
   <h4 class="section">Returns</h4>
   <dl class="parameters">
     <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
-    <dd><p>The fully qualified type name.</p>
-</dd>
+    <dd></dd>
   </dl>
 
 
@@ -167,7 +196,7 @@ Struct InputContext  <a class="header-action link-secondary" title="View source"
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/zorbathut/dec/blob/dev/src/Serialization.cs/#L16" class="edit-link">Edit this page</a>
+          <a href="https://github.com/zorbathut/dec/blob/dev/src/Path.cs/#L74" class="edit-link">Edit this page</a>
         </div>
 
 
