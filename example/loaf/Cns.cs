@@ -1,11 +1,11 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+
 namespace Loaf
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Linq;
-    using System.Threading;
-
     // The Cns class handles console output for Loaf. This consists of two pieces of functionality.
     //
     // Cns.Out prints lines and does the slow-modem-transfer effect.

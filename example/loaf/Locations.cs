@@ -1,10 +1,9 @@
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace Loaf.Locations
 {
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-
     // Definitely avoid the urge to *over*generalize.
     // All of these locations require custom code and it's just not worth the effort to try expressing these in XML.
     // Make a class that does your thing, pass it in as a Type, be done with it.

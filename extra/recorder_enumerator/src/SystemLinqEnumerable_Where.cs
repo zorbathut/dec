@@ -1,10 +1,10 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+
 namespace Dec.RecorderEnumerator
 {
-    using System;
-    using System.IO;
-    using System.Linq;
-    using System.Reflection;
-
     public static class SystemLinqEnumerable_WhereEnumerable_Converter
     {
         internal static Type RelevantType = typeof(System.Linq.Enumerable).GetNestedType("WhereEnumerableIterator`1", System.Reflection.BindingFlags.NonPublic);

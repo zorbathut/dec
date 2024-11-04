@@ -1,12 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
+
 namespace Dec.RecorderEnumerator
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using System.Runtime.CompilerServices;
-    using System.Text.RegularExpressions;
-
     public static class Config
     {
         private static readonly Regex UserCreatedEnumerableRegex = new Regex(@"^<([^>]+)>d__[0-9]+(?:`([0-9]+))?$", RegexOptions.Compiled);

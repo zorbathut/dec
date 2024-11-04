@@ -1,8 +1,8 @@
+using System;
+using System.Reflection;
+
 namespace Dec.RecorderEnumerator
 {
-    using System;
-    using System.Reflection;
-
     public class System_ArrayEnumerator_Converter : ConverterFactoryDynamic
     {
         internal static Type RelevantType = typeof(System.Array).Assembly.GetType("System.ArrayEnumerator");

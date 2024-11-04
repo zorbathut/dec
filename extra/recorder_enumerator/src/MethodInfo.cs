@@ -1,10 +1,10 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+
 namespace Dec.RecorderEnumerator
 {
-    using System;
-    using System.IO;
-    using System.Linq;
-    using System.Reflection;
-
     public class MethodInfo_Converter : ConverterFactory<MethodInfo>
     {
         public override bool TreatAsValuelike()

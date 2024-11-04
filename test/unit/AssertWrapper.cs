@@ -1,7 +1,7 @@
+using System;
+
 namespace DecTest.AssertWrapper
 {
-    using System;
-
     // This is a wrapper for a subset of NUnit.Framework.Assert, so we can intercept it and handle it in cases where we expect (and desire) failure.
     public static class Assert
     {

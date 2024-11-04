@@ -1,9 +1,8 @@
+using System.IO;
+using System.Linq;
 
 namespace Loaf
 {
-    using System.IO;
-    using System.Linq;
-
     public static class Game
     {
         // Definitely read the Loaf.Cns documentation if this is your first encounter with Cns.ChoiceDec.

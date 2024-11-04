@@ -1,13 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Xml.Linq;
+
 namespace Dec
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Reflection;
-    using System.Runtime.CompilerServices;
-    using System.Xml.Linq;
-
     /// <summary>
     /// Handles all parsing and initialization of dec structures.
     ///

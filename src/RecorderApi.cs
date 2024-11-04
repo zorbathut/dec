@@ -1,8 +1,8 @@
+using System;
+using System.Collections.Generic;
+
 namespace Dec
 {
-    using System;
-    using System.Collections.Generic;
-
     public partial class Recorder
     {
         /// <summary>

@@ -1,10 +1,10 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Xml.Linq;
+
 namespace Dec
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Xml.Linq;
-
     internal abstract class ReaderFileDec
     {
         public struct ReaderDec

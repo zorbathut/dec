@@ -1,10 +1,10 @@
+using NUnit.Framework;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+
 namespace DecTestIntegrationUnified
 {
-    using NUnit.Framework;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Reflection;
-
     [TestFixture]
     public class Program
     {

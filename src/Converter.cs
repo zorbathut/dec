@@ -1,6 +1,8 @@
+using System;
+
 namespace Dec
 {
-    using System;
+
 
     /// <summary>
     /// Internal class for Converter systems.

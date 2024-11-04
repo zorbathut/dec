@@ -1,10 +1,10 @@
+using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+
 namespace DecTest
 {
-    using NUnit.Framework;
-    using System;
-    using System.Collections.Generic;
-    using System.Text.RegularExpressions;
-
     // Tests designed for V1 of the save format
     [TestFixture]
     public class RecorderV1 : Base

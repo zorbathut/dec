@@ -1,10 +1,10 @@
+using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace DecTest
 {
-    using NUnit.Framework;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
     [TestFixture]
     public class Index : Base
     {
@@ -97,7 +97,7 @@ namespace DecTest
             Assert.AreSame(Dec.Database<IndexLeafDec>.Get("TestDecA"), Dec.Index<IndexLeafDec>.Get(Dec.Database<IndexLeafDec>.Get("TestDecA").index));
             Assert.AreSame(Dec.Database<IndexLeafDec>.Get("TestDecB"), Dec.Index<IndexLeafDec>.Get(Dec.Database<IndexLeafDec>.Get("TestDecB").index));
             Assert.AreSame(Dec.Database<IndexLeafDec>.Get("TestDecC"), Dec.Index<IndexLeafDec>.Get(Dec.Database<IndexLeafDec>.Get("TestDecC").index));
-            
+
             Assert.AreEqual(3, Dec.Index<IndexLeafDec>.Count);
         }
 

@@ -1,9 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+
 namespace Dec
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Runtime.CompilerServices;
-
     /// <summary>
     /// Signals that static references in this class should be filled out after parsing is complete.
     /// </summary>

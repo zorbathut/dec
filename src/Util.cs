@@ -1,8 +1,8 @@
+using System;
+using System.Text.RegularExpressions;
+
 namespace Dec
 {
-    using System;
-    using System.Text.RegularExpressions;
-
     public static class Util
     {
         /// <summary>

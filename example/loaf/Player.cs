@@ -1,12 +1,11 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Loaf
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
     // For the sake of this example, we're just using a player singleton.
-    // It's marked IRecordable so we can save our game. 
+    // It's marked IRecordable so we can save our game.
     public class Player : SingletonManual<Player>, Dec.IRecordable
     {
         private List<ItemDec> inventory = new List<ItemDec>();
@@ -54,7 +53,7 @@ namespace Loaf
         }
 
         // This is the entire serialization and deserialization code.
-        // 
+        //
         // I recognize that this is almost suspiciously simple.
         // It feels like one of those tutorials where it shows you an example that is specifically customized to the abilities of the library,
         // and where any actual real-world implementation is many times more complicated and finicky.

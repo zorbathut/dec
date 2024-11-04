@@ -1,7 +1,7 @@
+using System.Xml.Linq;
+
 namespace Dec
 {
-    using System.Xml.Linq;
-
     /// <summary>
     /// Handles writing dec structures into files. Generally useful for in-game editors.
     /// </summary>

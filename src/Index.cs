@@ -1,10 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+
 namespace Dec
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-
     internal static class Index
     {
         private static readonly HashSet<Type> Indices = new HashSet<Type>();
@@ -74,7 +74,7 @@ namespace Dec
         /// </summary>
         public static int Count
         {
-            get 
+            get
             {
                 return IndexList.Count;
             }

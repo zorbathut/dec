@@ -1,8 +1,8 @@
+using NUnit.Framework;
+using System;
+
 namespace DecTest
 {
-    using NUnit.Framework;
-    using System;
-
     [TestFixture]
     public class Error : Base
     {

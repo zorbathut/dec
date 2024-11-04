@@ -1,8 +1,7 @@
+using System;
 
 namespace Loaf
 {
-    using System;
-
     // Locations, in this game, are declared with subclasses of a class called LocationDec. This demonstrates a few different ways to create classes on demand.
     //
     // The DungeonDec subclass has information tied to that type, and creates an instance type hardcoded into the DungeonDec code.

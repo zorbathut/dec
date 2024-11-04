@@ -1,12 +1,12 @@
+using System;
+
 namespace Dec.RecorderEnumerator
 {
-    using System;
-
     internal static class Dbg
     {
         internal static void Inf(string str)
         {
-            global::Dec.Config.InfoHandler("RecorderEnumerator: " + str);  
+            global::Dec.Config.InfoHandler("RecorderEnumerator: " + str);
         }
 
         internal static void Wrn(string str)

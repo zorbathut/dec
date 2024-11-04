@@ -1,13 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+#if UNITY_5_3_OR_NEWER
+        using UnityEngine;
+#endif
+
 namespace Dec
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
-    #if UNITY_5_3_OR_NEWER
-        using UnityEngine;
-    #endif
-
     /// <summary>
     /// Contains global configuration data that may be needed before parsing.
     /// Initialize as soon as possible.

@@ -1,10 +1,10 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+
 namespace Dec.RecorderEnumerator
 {
-    using System;
-    using System.IO;
-    using System.Linq;
-    using System.Reflection;
-
     public class SystemLinqEnumerable_RangeIterator_Converter : ConverterFactoryDynamic
     {
         internal static Type RelevantType = typeof(System.Linq.Enumerable).GetNestedType("RangeIterator", System.Reflection.BindingFlags.NonPublic);

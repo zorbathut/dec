@@ -1,11 +1,11 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Text;
+using System.Xml.Linq;
+
 namespace Dec
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Text;
-    using System.Xml.Linq;
-
     internal abstract class WriterValidation
     {
         private StringBuilder sb = new StringBuilder();

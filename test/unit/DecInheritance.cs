@@ -1,9 +1,9 @@
+using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+
 namespace DecTest
 {
-    using NUnit.Framework;
-    using System;
-    using System.Collections.Generic;
-
     [TestFixture]
     public class DecInheritance : Base
     {
@@ -39,7 +39,7 @@ namespace DecTest
                             <overridden>80</overridden>
                         </subObject>
                     </SimpleDec>
-  
+
                     <SimpleDec decName=""Thing"" parent=""Base"">
                         <overridden>60</overridden>
                         <subObject>
@@ -74,7 +74,7 @@ namespace DecTest
                           <li>4</li>
                         </list>
                     </SimpleDec>
-  
+
                     <SimpleDec decName=""Thing"" parent=""Base"">
                         <list>
                           <li>50</li>
@@ -108,7 +108,7 @@ namespace DecTest
                             <overridden>80</overridden>
                         </subObject>
                     </SimpleDec>
-  
+
                     <SimpleDec decName=""Thing"" parent=""Base"">
                         <overridden>60</overridden>
                         <subObject>

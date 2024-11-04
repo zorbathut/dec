@@ -1,8 +1,8 @@
+using NUnit.Framework;
+using System;
+
 namespace DecTest
 {
-    using NUnit.Framework;
-    using System;
-
     [TestFixture]
     public class Children : Base
     {
@@ -188,7 +188,7 @@ namespace DecTest
                 <Decs>
                     <ExplicitTypeDec decName=""TestDec"">
                         <child class=""ETBase"">
-                            
+
                         </child>
                     </ExplicitTypeDec>
                 </Decs>");
@@ -214,7 +214,7 @@ namespace DecTest
                 <Decs>
                     <ExplicitTypeDerivedDec decName=""TestDec"">
                         <child class=""ETBase"">
-                            
+
                         </child>
                     </ExplicitTypeDerivedDec>
                 </Decs>");
@@ -282,7 +282,7 @@ namespace DecTest
 
         public class ChildValid
         {
-            
+
         }
 
         public class ContainerDec : Dec.Dec

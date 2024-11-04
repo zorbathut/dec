@@ -1,10 +1,10 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+
 namespace Dec.RecorderEnumerator
 {
-    using System;
-    using System.IO;
-    using System.Linq;
-    using System.Reflection;
-
     public class System_Delegate_Converter : ConverterFactory<Delegate>
     {
         public static bool IsGenericDelegate(Type type)

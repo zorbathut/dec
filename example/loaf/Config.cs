@@ -1,7 +1,7 @@
+using System.Collections.Generic;
+
 namespace Loaf
 {
-    using System.Collections.Generic;
-
     // In many situations I've found it useful to have a ConfigDec class with a bunch of global parameters.
     // This is simply making use of the Dec system to provide a centralized settings registry.
     // It's overkill, but it's effective.

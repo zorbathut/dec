@@ -1,9 +1,10 @@
+using NUnit.Framework;
+using System;
+using System.Linq;
+using System.Reflection;
+
 namespace DecTest
 {
-    using NUnit.Framework;
-    using System;
-    using System.Linq;
-    using System.Reflection;
 
     [TestFixture]
     public class Database : Base

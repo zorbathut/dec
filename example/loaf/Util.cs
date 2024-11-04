@@ -1,9 +1,8 @@
+using System;
+using System.Collections.Generic;
 
 namespace Loaf
 {
-    using System;
-    using System.Collections.Generic;
-
     public static class Util
     {
         public static T MaxOfOrDefault<T>(this IEnumerable<T> data, Func<T, float> func)

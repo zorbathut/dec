@@ -1,8 +1,7 @@
+using System.IO;
 
 namespace Loaf
 {
-    using System.IO;
-
     public static class Bootstrap
     {
         public static void Main()

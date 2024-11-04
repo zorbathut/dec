@@ -1,8 +1,7 @@
+using System.Linq;
 
 namespace Loaf
 {
-    using System.Linq;
-
     // Recommend reading the LocationDec documentation for more information.
     //
     // When creating a builder like this, I recommend passing the Dec in as a constructor parameter.

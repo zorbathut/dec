@@ -1,8 +1,8 @@
+using System;
+using System.Collections.Generic;
+
 namespace Dec
 {
-    using System;
-    using System.Collections.Generic;
-
     internal static class UtilCollection
     {
         internal static V TryGetValue<T, V>(this Dictionary<T, V> dict, T key)

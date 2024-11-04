@@ -1,14 +1,14 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Xml;
+using System.Xml.Linq;
+
 namespace Dec
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Reflection;
-    using System.Xml;
-    using System.Xml.Linq;
-
     internal class ReaderFileRecorderXml : ReaderFileRecorder
     {
         private XElement record;

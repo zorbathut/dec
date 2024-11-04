@@ -1,8 +1,9 @@
+using System;
+using System.Collections.Generic;
+using DecTest.AssertWrapper;
+
 namespace RecorderEnumeratorTest
 {
-    using System;
-    using System.Collections.Generic;
-    using DecTest.AssertWrapper;
 
     internal static class Util
     {
@@ -47,7 +48,7 @@ namespace RecorderEnumeratorTest
             {
                 return true; // First enumerator does not support Reset
             }
-            
+
             rhs.Reset();
 
             // run them again! just in case!

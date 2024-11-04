@@ -1,14 +1,14 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Xml;
+using System.Xml.Linq;
+
 namespace Dec
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Reflection;
-    using System.Xml;
-    using System.Xml.Linq;
-
     internal static class ReaderFileXmlSimple
     {
         public static ReaderNodeParseable Create(string input, string rootTag, string identifier, Recorder.IUserSettings userSettings)

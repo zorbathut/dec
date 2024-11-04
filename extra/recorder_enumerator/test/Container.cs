@@ -1,12 +1,13 @@
 #if NET7_0_OR_GREATER
+
+using DecTest;
+using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace RecorderEnumeratorTest
 {
-    using DecTest;
-    using NUnit.Framework;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
     [TestFixture]
     public class Container : Base
     {

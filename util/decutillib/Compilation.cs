@@ -1,14 +1,14 @@
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using NUnit.Framework;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Loader;
+
 namespace DecUtilLib
 {
-    using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
-    using NUnit.Framework;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Reflection;
-    using System.Runtime.Loader;
-
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public static class Compilation
     {
@@ -41,7 +41,7 @@ namespace DecUtilLib
                     return MetadataReference.CreateFromFile(asm.Location);
                 }
             })).ToArray();
-                    
+
 
             var compilation = CSharpCompilation.Create(
                 assemblyName,

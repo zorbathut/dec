@@ -1,12 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Xml;
+using System.Xml.Linq;
+
 namespace Dec
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Xml;
-    using System.Xml.Linq;
-
     internal class ReaderFileDecXml : ReaderFileDec
     {
         private XDocument doc;

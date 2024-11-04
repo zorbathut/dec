@@ -1,13 +1,13 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Reflection;
+using System.Xml.Schema;
+
 namespace Dec
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Linq;
-    using System.Reflection;
-    using System.Xml.Schema;
-
     /// <summary>
     /// Information on the current cursor position when reading files.
     /// </summary>

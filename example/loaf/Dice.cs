@@ -1,10 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace Loaf
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text.RegularExpressions;
-
     // This is an example of using a custom Converter class.
     // Nobody wants to write <damage><count>4</count><sides>6</sides></damage>, so instead you can just do <damage>4d6</damage>.
     public class Dice

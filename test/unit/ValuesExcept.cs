@@ -1,11 +1,11 @@
+using NUnit.Framework;
+using NUnit.Framework.Interfaces;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+
 namespace DecTest
 {
-    using NUnit.Framework;
-    using NUnit.Framework.Interfaces;
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-
     [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false, Inherited = false)]
     public class ValuesExceptAttribute : System.Attribute, IParameterDataSource
     {

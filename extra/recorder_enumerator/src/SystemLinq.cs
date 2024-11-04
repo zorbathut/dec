@@ -1,10 +1,10 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+
 namespace Dec.RecorderEnumerator
 {
-    using System;
-    using System.IO;
-    using System.Linq;
-    using System.Reflection;
-
     public static class SystemLinq_SingleLinkedNode_Converter
     {
         internal static Type RelevantType = typeof(System.Linq.Enumerable).Assembly.GetType("System.Linq.SingleLinkedNode`1");

@@ -1,9 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace Dec
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
     /// <summary>
     /// Contains information on all decs that exist.
     /// </summary>

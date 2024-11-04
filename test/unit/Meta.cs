@@ -1,10 +1,10 @@
+using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+
 namespace DecTest
 {
-    using NUnit.Framework;
-    using System;
-    using System.Collections.Generic;
-    using System.Reflection;
-
     [TestFixture]
     public class Meta : Base
     {

@@ -1,8 +1,8 @@
+using System;
+using System.Collections.Generic;
+
 namespace Dec.WriterUtil
 {
-    using System;
-    using System.Collections.Generic;
-
     internal class PendingWriteCoordinator
     {
         // A list of writes that still have to happen. This is used so we don't have to do deep recursive dives and potentially blow our stack.

@@ -1,9 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+
 namespace Dec.RecorderEnumerator
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Reflection;
-
     public static class SystemCollections_List_Enumerator_Converter
     {
         internal static Type RelevantType = typeof(System.Collections.Generic.List<>.Enumerator);

@@ -1,13 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Xml.Linq;
+
 namespace Dec
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Reflection;
-    using System.Runtime.CompilerServices;
-    using System.Xml.Linq;
-
     // This exists solely to ensure that I don't accidentally mess up the interfaces.
     internal interface IParser
     {

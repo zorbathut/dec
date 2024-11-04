@@ -1,9 +1,9 @@
+using System;
+using System.Collections;
+using System.Xml.Linq;
+
 namespace Dec
 {
-    using System;
-    using System.Collections;
-    using System.Xml.Linq;
-
     internal class WriterXmlCompose : WriterXml
     {
         public override bool AllowReflection { get => true; }

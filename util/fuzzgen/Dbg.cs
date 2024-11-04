@@ -1,7 +1,7 @@
+using System;
+
 namespace Fuzzgen
 {
-    using System;
-
     internal static class Dbg
     {
         internal static void Inf(string str)

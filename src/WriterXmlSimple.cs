@@ -1,10 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Linq;
+
 namespace Dec
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Xml.Linq;
-
     internal class WriterXmlSimple : WriterXml
     {
         public override bool AllowReflection { get => false; }
