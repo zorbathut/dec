@@ -12,7 +12,7 @@ namespace Dec
             this.settings = settings;
         }
 
-        public Recorder.Settings RecorderSettings { get { return settings; } }
+        public Recorder.Settings RecorderSettings { get => settings; }
         public abstract bool AllowReflection { get; }
         public virtual bool AllowAsThis { get => true; }
         public virtual bool AllowCloning { get => false; }
