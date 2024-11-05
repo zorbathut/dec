@@ -26,23 +26,22 @@ namespace DecTest
         [OneTimeSetUp]
         public void CreateCallbacks()
         {
-            var inputContextConstructor = Assembly
-                .GetAssembly(typeof(Dec.Dec))
-                .GetType("Dec.InputContext")
+            var contextConstructor =
+                typeof(Dec.Context)
                 .GetConstructor(
                     BindingFlags.Instance | BindingFlags.NonPublic,
                     null,
                     new Type[] { typeof(string), typeof(System.Xml.Linq.XElement), typeof(Dec.Path) },
                     null);
-            var inputContext = inputContextConstructor.Invoke(new object[] { "(testing)", null, null });
+            var context = contextConstructor.Invoke(new object[] { "(testing)", null, null });
 
-        var reflectionClass = Assembly.GetAssembly(typeof(Dec.Dec)).GetType("Dec.UtilType");
+            var reflectionClass = Assembly.GetAssembly(typeof(Dec.Dec)).GetType("Dec.UtilType");
 
             var serialize = reflectionClass.GetMethod("ComposeDecFormatted", BindingFlags.NonPublic | BindingFlags.Static);
             serializeType = type => (string)serialize.Invoke(null, new object[] { type });
 
             var parse = reflectionClass.GetMethod("ParseDecFormatted", BindingFlags.NonPublic | BindingFlags.Static);
-            parseType = str => (Type)parse.Invoke(null, new object[] { str, inputContext });
+            parseType = str => (Type)parse.Invoke(null, new object[] { str, context });
         }
 
         [SetUp]

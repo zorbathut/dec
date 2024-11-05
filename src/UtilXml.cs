@@ -23,7 +23,7 @@ namespace Dec
             return root.Elements().Where(child => child.Name.LocalName == name).SingleOrDefaultChecked();
         }
 
-        internal static XElement ElementNamedWithFallback(this XElement root, string name, InputContext context, string errorPrefix)
+        internal static XElement ElementNamedWithFallback(this XElement root, string name, Context context, string errorPrefix)
         {
             var result = ElementNamed(root, name);
             if (result != null)

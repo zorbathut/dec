@@ -68,7 +68,7 @@ namespace Dec
 
         // this should really be yanked out of here
         private static readonly Regex DecNameValidator = new Regex(@"^[\p{Lu}\p{Ll}\p{Lt}\p{Lm}\p{Lo}\p{Nl}][\p{Lu}\p{Ll}\p{Lt}\p{Lm}\p{Lo}\p{Nl}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\p{Cf}]*$", RegexOptions.Compiled);
-        internal static bool ValidateDecName(string name, InputContext context)
+        internal static bool ValidateDecName(string name, Context context)
         {
             if (DecNameValidator.IsMatch(name))
             {

@@ -23,9 +23,9 @@ namespace Dec
             this.path = path;
         }
 
-        public override InputContext GetInputContext()
+        public override Context GetContext()
         {
-            return new InputContext(fileIdentifier, xml, path);
+            return new Context(fileIdentifier, xml, path);
         }
 
         public override ReaderNode GetChildNamed(string name)
@@ -94,7 +94,7 @@ namespace Dec
             {
                 if (fieldElement.Name.LocalName != "li")
                 {
-                    var elementContext = new InputContext(fileIdentifier, fieldElement, path);
+                    var elementContext = new Context(fileIdentifier, fieldElement, path);
                     Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                 }
 
@@ -119,11 +119,11 @@ namespace Dec
                 int rankLength = value.GetLength(rank);
                 if (elementCount > rankLength)
                 {
-                    Dbg.Err($"{node.GetInputContext()}: Array dimension {rank} expects {rankLength} elements but got {elementCount}; truncating");
+                    Dbg.Err($"{node.GetContext()}: Array dimension {rank} expects {rankLength} elements but got {elementCount}; truncating");
                 }
                 else if (elementCount < rankLength)
                 {
-                    Dbg.Err($"{node.GetInputContext()}: Array dimension {rank} expects {rankLength} elements but got {elementCount}; padding with default values");
+                    Dbg.Err($"{node.GetContext()}: Array dimension {rank} expects {rankLength} elements but got {elementCount}; padding with default values");
                 }
 
                 int i = 0;
@@ -139,7 +139,7 @@ namespace Dec
 
                     if (fieldElement.Name.LocalName != "li")
                     {
-                        var elementContext = new InputContext(fileIdentifier, fieldElement, newPath);
+                        var elementContext = new Context(fileIdentifier, fieldElement, newPath);
                         Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                     }
 
@@ -164,7 +164,7 @@ namespace Dec
 
                     if (fieldElement.Name.LocalName != "li")
                     {
-                        var elementContext = new InputContext(fileIdentifier, fieldElement, newPath);
+                        var elementContext = new Context(fileIdentifier, fieldElement, newPath);
                         Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                     }
 
@@ -189,7 +189,7 @@ namespace Dec
 
             foreach (var fieldElement in xml.Elements())
             {
-                var elementContext = new InputContext(fileIdentifier, fieldElement);
+                var elementContext = new Context(fileIdentifier, fieldElement);
 
                 if (fieldElement.Name.LocalName == "li")
                 {
@@ -214,7 +214,7 @@ namespace Dec
 
                     if (key == null)
                     {
-                        Dbg.Err($"{new InputContext(fileIdentifier, keyNode, keyPath)}: Dictionary includes null key, skipping pair");
+                        Dbg.Err($"{new Context(fileIdentifier, keyNode, keyPath)}: Dictionary includes null key, skipping pair");
                         continue;
                     }
 
@@ -311,7 +311,7 @@ namespace Dec
             foreach (var fieldElement in xml.Elements())
             {
                 var keyPath = new PathHashSetElement(path);
-                var elementContext = new InputContext(fileIdentifier, fieldElement, keyPath);
+                var elementContext = new Context(fileIdentifier, fieldElement, keyPath);
 
                 // There's a potential bit of ambiguity here if someone does <li /> and expects that to be an actual string named "li".
                 // Practically, I think this is less likely than someone doing <li></li> and expecting that to be the empty string.
@@ -380,7 +380,7 @@ namespace Dec
 
                 if (fieldElement.Name.LocalName != "li")
                 {
-                    var elementContext = new InputContext(fileIdentifier, fieldElement, newPath);
+                    var elementContext = new Context(fileIdentifier, fieldElement, newPath);
                     Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                 }
 
@@ -402,7 +402,7 @@ namespace Dec
 
                 if (fieldElement.Name.LocalName != "li")
                 {
-                    var elementContext = new InputContext(fileIdentifier, fieldElement, newPath);
+                    var elementContext = new Context(fileIdentifier, fieldElement, newPath);
                     Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                 }
 
@@ -433,7 +433,7 @@ namespace Dec
 
                 if (elements.Count != parameters.Length)
                 {
-                    Dbg.Err($"{GetInputContext()}: Tuple expects {expectedCount} parameters but got {elements.Count}");
+                    Dbg.Err($"{GetContext()}: Tuple expects {expectedCount} parameters but got {elements.Count}");
                 }
 
                 for (int i = 0; i < Math.Min(parameters.Length, elements.Count); ++i)
@@ -457,7 +457,7 @@ namespace Dec
 
                 if (parameterNames.Count < expectedCount)
                 {
-                    Dbg.Err($"{GetInputContext()}: Not enough tuple names (this honestly shouldn't even be possible)");
+                    Dbg.Err($"{GetContext()}: Not enough tuple names (this honestly shouldn't even be possible)");
 
                     // TODO: handle it
                 }
@@ -466,7 +466,7 @@ namespace Dec
                 foreach (var elementItem in elements)
                 {
                     var newPath = new PathMember(path, elementItem.Name.LocalName); // yeah okay
-                    var elementContext = new InputContext(fileIdentifier, elementItem, newPath);
+                    var elementContext = new Context(fileIdentifier, elementItem, newPath);
 
                     int index = parameterNames.FirstIndexOf(n => n == elementItem.Name.LocalName);
 
@@ -489,7 +489,7 @@ namespace Dec
                 {
                     if (!seen[i])
                     {
-                        Dbg.Err($"{GetInputContext()}: Missing field with name `{parameterNames[i]}`");
+                        Dbg.Err($"{GetContext()}: Missing field with name `{parameterNames[i]}`");
 
                         // Patch it up as best we can
                         parameters[i] = Serialization.GenerateResultFallback(null, referencedType.GenericTypeArguments[i]);
@@ -511,7 +511,7 @@ namespace Dec
                 string fieldName = fieldElement.Name.LocalName;
                 if (setFields.Contains(fieldName))
                 {
-                    Dbg.Err($"{new InputContext(fileIdentifier, fieldElement, path)}: Duplicate field `{fieldName}`");
+                    Dbg.Err($"{new Context(fileIdentifier, fieldElement, path)}: Duplicate field `{fieldName}`");
                     // Just allow us to fall through; it's an error, but one with a reasonably obvious handling mechanism
                 }
                 setFields.Add(fieldName);
@@ -536,11 +536,11 @@ namespace Dec
 
                     if (match != null)
                     {
-                        Dbg.Err($"{new InputContext(fileIdentifier, fieldElement, path)}: Field `{fieldName}` does not exist in type {type}; did you mean `{match}`?");
+                        Dbg.Err($"{new Context(fileIdentifier, fieldElement, path)}: Field `{fieldName}` does not exist in type {type}; did you mean `{match}`?");
                     }
                     else
                     {
-                        Dbg.Err($"{new InputContext(fileIdentifier, fieldElement, path)}: Field `{fieldName}` does not exist in type {type}");
+                        Dbg.Err($"{new Context(fileIdentifier, fieldElement, path)}: Field `{fieldName}` does not exist in type {type}");
                     }
 
                     continue;
@@ -548,13 +548,13 @@ namespace Dec
 
                 if (fieldElementInfo.GetCustomAttribute<IndexAttribute>() != null)
                 {
-                    Dbg.Err($"{new InputContext(fileIdentifier, fieldElement, path)}: Attempting to set index field `{fieldName}`; these are generated by the dec system");
+                    Dbg.Err($"{new Context(fileIdentifier, fieldElement, path)}: Attempting to set index field `{fieldName}`; these are generated by the dec system");
                     continue;
                 }
 
                 if (fieldElementInfo.GetCustomAttribute<NonSerializedAttribute>() != null)
                 {
-                    Dbg.Err($"{new InputContext(fileIdentifier, fieldElement, path)}: Attempting to set nonserialized field `{fieldName}`");
+                    Dbg.Err($"{new Context(fileIdentifier, fieldElement, path)}: Attempting to set nonserialized field `{fieldName}`");
                     continue;
                 }
 

@@ -28,12 +28,12 @@ namespace Loaf
         {
             // We don't have to worry *too* much about exceptions here; any exceptions that are thrown are guaranteed to be caught, reported, and recovered from.
             private static Regex Parser = new Regex("(?<count>[0-9]+)d(?<sides>[0-9]+)", RegexOptions.Compiled);
-            public override Dice Read(string input, Dec.InputContext inputContext)
+            public override Dice Read(string input, Dec.Context context)
             {
                 var result = Parser.Match(input);
                 if (result == null)
                 {
-                    Dbg.Err("{inputContext}: Failed to parse dice; {input}");
+                    Dbg.Err("{context}: Failed to parse dice; {input}");
                     return null;
                 }
 

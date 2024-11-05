@@ -270,7 +270,7 @@ namespace Dec
         /// <summary>
         /// Provide the Context for this serialization step, which can be used to get diagnostic information about "where" it is.
         /// </summary>
-        public abstract InputContext InputContext { get; }
+        public abstract Context Context { get; }
 
         /// <summary>
         /// Serialize or deserialize a member of a class.
@@ -402,7 +402,7 @@ namespace Dec
         public override IUserSettings UserSettings { get => node.UserSettings; }
 
         // currently no sensible implementation
-        public override InputContext InputContext { get => new InputContext(); }
+        public override Context Context { get => new Context(); }
 
         internal override void Record<T>(ref T value, string label, Parameters parameters)
         {
@@ -480,7 +480,7 @@ namespace Dec
         {
             if (!disallowShared)
             {
-                Dbg.Err($"{node.GetInputContext()}: Internal error, RecorderReader.AllowShared() called on a RecorderReader that does not disallow shared objects");
+                Dbg.Err($"{node.GetContext()}: Internal error, RecorderReader.AllowShared() called on a RecorderReader that does not disallow shared objects");
             }
 
             this.readerGlobals = newGlobals;
@@ -489,13 +489,13 @@ namespace Dec
 
         public override IUserSettings UserSettings { get => node.UserSettings; }
 
-        public override InputContext InputContext { get => node.GetInputContext(); }
+        public override Context Context { get => node.GetContext(); }
 
         internal override void Record<T>(ref T value, string label, Parameters parameters)
         {
             if (asThis)
             {
-                Dbg.Err($"{node.GetInputContext()}: Attempting to read a second field after a RecordAsThis call");
+                Dbg.Err($"{node.GetContext()}: Attempting to read a second field after a RecordAsThis call");
                 return;
             }
 
@@ -514,7 +514,7 @@ namespace Dec
 
             if (disallowShared && parameters.shared)
             {
-                Dbg.Err($"{node.GetInputContext()}: Shared object used in a context that disallows shared objects (probably ConverterFactory<>.Create())");
+                Dbg.Err($"{node.GetContext()}: Shared object used in a context that disallows shared objects (probably ConverterFactory<>.Create())");
             }
 
             var recorded = node.GetChildNamed(label);
@@ -540,7 +540,7 @@ namespace Dec
         {
             if (seen == null)
             {
-                Dbg.Err($"{node.GetInputContext()}: Internal error, RecorderReader.HasUnusedFields() called without trackUsage set");
+                Dbg.Err($"{node.GetContext()}: Internal error, RecorderReader.HasUnusedFields() called without trackUsage set");
                 return;
             }
 
@@ -561,7 +561,7 @@ namespace Dec
             var unused = new HashSet<string>(allChildren);
             unused.ExceptWith(seen);
 
-            Dbg.Wrn($"{node.GetInputContext()}: Unused fields: {string.Join(", ", unused)}");
+            Dbg.Wrn($"{node.GetContext()}: Unused fields: {string.Join(", ", unused)}");
         }
     }
 }

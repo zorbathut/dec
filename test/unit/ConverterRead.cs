@@ -20,7 +20,7 @@ namespace DecTest
 
         public class ConverterBasicTest : Dec.ConverterString<ConverterTestPayload>
         {
-            public override ConverterTestPayload Read(string input, Dec.InputContext context)
+            public override ConverterTestPayload Read(string input, Dec.Context context)
             {
                 return new ConverterTestPayload() { number = int.Parse(input) };
             }
@@ -83,7 +83,7 @@ namespace DecTest
 
         public class ConverterDictTest : Dec.ConverterString<ConverterStringPayload>
         {
-            public override ConverterStringPayload Read(string input, Dec.InputContext context)
+            public override ConverterStringPayload Read(string input, Dec.Context context)
             {
                 return new ConverterStringPayload() { payload = input };
             }
@@ -159,7 +159,7 @@ namespace DecTest
 
         public class DefaultNullConverter : Dec.ConverterString<ConverterStringPayload>
         {
-            public override ConverterStringPayload Read(string input, Dec.InputContext context)
+            public override ConverterStringPayload Read(string input, Dec.Context context)
             {
                 return null;
             }
@@ -269,7 +269,7 @@ namespace DecTest
 
         public class FallbackConverter : Dec.ConverterString<FallbackPayload>
         {
-            public override FallbackPayload Read(string input, Dec.InputContext inputContext)
+            public override FallbackPayload Read(string input, Dec.Context context)
             {
                 return new FallbackPayload() { number = int.Parse(input) };
             }
@@ -322,7 +322,7 @@ namespace DecTest
 
         public class ExceptionPayloadConverter : Dec.ConverterString<ExceptionPayload>
         {
-            public override ExceptionPayload Read(string input, Dec.InputContext inputContext)
+            public override ExceptionPayload Read(string input, Dec.Context context)
             {
                 throw new InvalidOperationException("EasilyDetectableMessage");
             }
@@ -335,7 +335,7 @@ namespace DecTest
 
         public class ExceptionPayloadStructConverter : Dec.ConverterString<ExceptionPayloadStruct>
         {
-            public override ExceptionPayloadStruct Read(string input, Dec.InputContext inputContext)
+            public override ExceptionPayloadStruct Read(string input, Dec.Context context)
             {
                 throw new InvalidOperationException("EasilyDetectableMessage");
             }
@@ -470,7 +470,7 @@ namespace DecTest
 
         public class ExceptionStringConverter : Dec.ConverterString<ExceptionConverterClass>
         {
-            public override ExceptionConverterClass Read(string input, Dec.InputContext context)
+            public override ExceptionConverterClass Read(string input, Dec.Context context)
             {
                 throw new InvalidOperationException("EasilyDetectableMessage");
             }

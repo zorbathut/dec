@@ -122,7 +122,7 @@ namespace DecTest
                 return input.x.ToString();
             }
 
-            public override Number Read(string input, Dec.InputContext context)
+            public override Number Read(string input, Dec.Context context)
             {
                 return new Number { x = int.Parse(input) };
             }

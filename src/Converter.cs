@@ -35,7 +35,7 @@ namespace Dec
     public abstract class ConverterString : Converter
     {
         internal abstract string WriteObj(object input);
-        internal abstract object ReadObj(string input, InputContext context);
+        internal abstract object ReadObj(string input, Context context);
     }
 
     /// <summary>
@@ -63,7 +63,7 @@ namespace Dec
         /// <remarks>
         /// In case of error, call Dec.Dbg.Err with some appropriately useful message and return default. Message should be formatted as $"{context}: Something went wrong".
         /// </remarks>
-        public abstract T Read(string input, InputContext context);
+        public abstract T Read(string input, Context context);
 
         override internal Type GetConvertedTypeHint()
         {
@@ -74,7 +74,7 @@ namespace Dec
         {
             return Write((T)input);
         }
-        override internal object ReadObj(string input, InputContext context)
+        override internal object ReadObj(string input, Context context)
         {
             return Read(input, context);
         }
@@ -101,13 +101,13 @@ namespace Dec
         /// <remarks>
         /// In case of error, call Dec.Dbg.Err with some appropriately useful message and return default. Message should be formatted as $"{context}: Something went wrong".
         /// </remarks>
-        public abstract object Read(string input, InputContext context);
+        public abstract object Read(string input, Context context);
 
         override internal string WriteObj(object input)
         {
             return Write(input);
         }
-        override internal object ReadObj(string input, InputContext context)
+        override internal object ReadObj(string input, Context context)
         {
             return Read(input, context);
         }

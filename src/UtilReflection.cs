@@ -200,7 +200,7 @@ namespace Dec
         {
             string BuiltContext()
             {
-                return node?.GetInputContext().ToString() ?? "setup";
+                return node?.GetContext().ToString() ?? "setup";
             }
 
             if (type.IsAbstract)

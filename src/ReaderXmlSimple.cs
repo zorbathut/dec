@@ -22,7 +22,7 @@ namespace Dec
             var record = doc.Elements().First();
             if (record.Name.LocalName != rootTag)
             {
-                Dbg.Wrn($"{new InputContext(identifier, record)}: Found root element with name `{record.Name.LocalName}` when it should be `{rootTag}`");
+                Dbg.Wrn($"{new Context(identifier, record)}: Found root element with name `{record.Name.LocalName}` when it should be `{rootTag}`");
             }
 
             return new ReaderNodeXml(record, identifier, new PathRoot(rootTag), userSettings);

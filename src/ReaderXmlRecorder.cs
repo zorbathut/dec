@@ -28,17 +28,17 @@ namespace Dec
             var record = doc.Elements().First();
             if (record.Name.LocalName != "Record")
             {
-                Dbg.Wrn($"{new InputContext(identifier, record)}: Found root element with name `{record.Name.LocalName}` when it should be `Record`");
+                Dbg.Wrn($"{new Context(identifier, record)}: Found root element with name `{record.Name.LocalName}` when it should be `Record`");
             }
 
             var recordFormatVersion = record.ElementNamed("recordFormatVersion");
             if (recordFormatVersion == null)
             {
-                Dbg.Err($"{new InputContext(identifier, record)}: Missing record format version, assuming the data is up-to-date");
+                Dbg.Err($"{new Context(identifier, record)}: Missing record format version, assuming the data is up-to-date");
             }
             else if (recordFormatVersion.GetText() != "1")
             {
-                Dbg.Err($"{new InputContext(identifier, recordFormatVersion)}: Unknown record format version {recordFormatVersion.GetText()}, expected 1 or earlier");
+                Dbg.Err($"{new Context(identifier, recordFormatVersion)}: Unknown record format version {recordFormatVersion.GetText()}, expected 1 or earlier");
 
                 // I would rather not guess about this
                 return null;
@@ -63,7 +63,7 @@ namespace Dec
                 {
                     var readerRef = new ReaderRef();
 
-                    var context = new InputContext(fileIdentifier, reference);
+                    var context = new Context(fileIdentifier, reference);
 
                     if (reference.Name.LocalName != "Ref")
                     {
@@ -107,7 +107,7 @@ namespace Dec
             var data = record.ElementNamed("data");
             if (data == null)
             {
-                Dbg.Err($"{new InputContext(fileIdentifier, record)}: No data element provided. This is not very recoverable.");
+                Dbg.Err($"{new Context(fileIdentifier, record)}: No data element provided. This is not very recoverable.");
 
                 return null;
             }

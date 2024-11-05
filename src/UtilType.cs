@@ -46,7 +46,7 @@ namespace Dec
 
         private static Regex GenericParameterMatcher = new Regex("`[0-9]+", RegexOptions.Compiled);
         private static Dictionary<(string, int), Type[]> StrippedTypeCache = null;  // this is fine not being concurrent; it's set once and then never modified
-        private static Type GetTypeFromAnyAssembly(string text, int gparams, InputContext context)
+        private static Type GetTypeFromAnyAssembly(string text, int gparams, Context context)
         {
             // This is technically unnecessary if we're not parsing a generic, but we may as well do it because the cache will still be faster for nongenerics.
             // If we really wanted a perf boost here, we'd do one pass for non-generic objects, then do it again on a cache miss to fill it with generic stuff.
@@ -100,7 +100,7 @@ namespace Dec
             }
         }
 
-        private static Type ParseSubtype(Type root, string text, ref List<Type> genericTypes, InputContext context)
+        private static Type ParseSubtype(Type root, string text, ref List<Type> genericTypes, Context context)
         {
             if (root == null)
             {
@@ -133,7 +133,7 @@ namespace Dec
             return ParseSubtype(chosenType, text.SubstringSafe(endIndex), ref genericTypes, context);
         }
 
-        internal static bool ParsePiece(string input, InputContext context, out int endIndex, out string name, ref List<Type> types)
+        internal static bool ParsePiece(string input, Context context, out int endIndex, out string name, ref List<Type> types)
         {
             // Isolate the first token; this is the distance from our current index to the first . or < that *isn't* the beginning of a class name.
             int nameEnd = Math.Min(input.IndexOfUnbounded('.'), input.IndexOfUnbounded('<', 1));
@@ -166,7 +166,7 @@ namespace Dec
         }
 
         // returns false on error
-        internal static bool ParseGenericParams(string tstring, InputContext context, out int endIndex, ref List<Type> types)
+        internal static bool ParseGenericParams(string tstring, Context context, out int endIndex, ref List<Type> types)
         {
             int depth = 0;
             endIndex = 0;
@@ -229,7 +229,7 @@ namespace Dec
             return true;
         }
 
-        private static Type ParseIndependentType(string text, InputContext context)
+        private static Type ParseIndependentType(string text, Context context)
         {
             // This function just tries to find a class with a specific namespace; we no longer worry about `using`.
             // Our challenge is to find a function with the right ordering of generic arguments. NS.Foo`1.Bar is different from NS.Foo.Bar`1, for example.
@@ -292,7 +292,7 @@ namespace Dec
 
         private static Regex ArrayRankParser = new Regex(@"\[([,]*)\]$", RegexOptions.Compiled);
         private static Dictionary<string, Type> ParseCache = new Dictionary<string, Type>();
-        internal static Type ParseDecFormatted(string text, InputContext context)
+        internal static Type ParseDecFormatted(string text, Context context)
         {
             if (text == "")
             {

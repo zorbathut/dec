@@ -87,11 +87,11 @@ namespace Dec
                         {
                             try
                             {
-                                refInstance = converterString.ReadObj(reference.node.GetText(), reference.node.GetInputContext());
+                                refInstance = converterString.ReadObj(reference.node.GetText(), reference.node.GetContext());
                             }
                             catch (Exception e)
                             {
-                                Dbg.Ex(new ConverterReadException(reference.node.GetInputContext(), converter, e));
+                                Dbg.Ex(new ConverterReadException(reference.node.GetContext(), converter, e));
 
                                 refInstance = Serialization.GenerateResultFallback(refInstance, reference.type);
                             }
@@ -114,7 +114,7 @@ namespace Dec
                                 }
                                 catch (Exception e)
                                 {
-                                    Dbg.Ex(new ConverterReadException(reference.node.GetInputContext(), converter, e));
+                                    Dbg.Ex(new ConverterReadException(reference.node.GetContext(), converter, e));
                                 }
                             });
                         }
@@ -137,13 +137,13 @@ namespace Dec
                                     }
                                     catch (Exception e)
                                     {
-                                        Dbg.Ex(new ConverterReadException(reference.node.GetInputContext(), converter, e));
+                                        Dbg.Ex(new ConverterReadException(reference.node.GetContext(), converter, e));
                                     }
                                 });
                             }
                             catch (Exception e)
                             {
-                                Dbg.Ex(new ConverterReadException(reference.node.GetInputContext(), converter, e));
+                                Dbg.Ex(new ConverterReadException(reference.node.GetContext(), converter, e));
                             }
                         }
                         else
@@ -167,7 +167,7 @@ namespace Dec
 
                                 if (refInstance != refInstanceOutput)
                                 {
-                                    Dbg.Err($"{reference.node.GetInputContext()}: Internal error, got the wrong object back from ParseElement. Things are probably irrevocably broken. Please report this as a bug in Dec.");
+                                    Dbg.Err($"{reference.node.GetContext()}: Internal error, got the wrong object back from ParseElement. Things are probably irrevocably broken. Please report this as a bug in Dec.");
                                 }
                             });
                         }

@@ -39,7 +39,7 @@ namespace Dec
 
             foreach (var rootElement in doc.Elements())
             {
-                var rootContext = new InputContext(fileIdentifier, rootElement);
+                var rootContext = new Context(fileIdentifier, rootElement);
                 if (rootElement.Name.LocalName != "Decs")
                 {
                     Dbg.Wrn($"{rootContext}: Found root element with name `{rootElement.Name.LocalName}` when it should be `Decs`");
@@ -49,25 +49,25 @@ namespace Dec
                 {
                     var readerDec = new ReaderDec();
 
-                    readerDec.inputContext = new InputContext(fileIdentifier, decElement);
+                    readerDec.context = new Context(fileIdentifier, decElement);
                     string typeName = decElement.Name.LocalName;
 
-                    readerDec.type = UtilType.ParseDecFormatted(typeName, readerDec.inputContext);
+                    readerDec.type = UtilType.ParseDecFormatted(typeName, readerDec.context);
                     if (readerDec.type == null || !typeof(Dec).IsAssignableFrom(readerDec.type))
                     {
-                        Dbg.Err($"{readerDec.inputContext}: {typeName} is being used as a Dec but does not inherit from Dec.Dec");
+                        Dbg.Err($"{readerDec.context}: {typeName} is being used as a Dec but does not inherit from Dec.Dec");
                         continue;
                     }
 
                     var decNameAttribute = decElement.Attribute("decName");
                     if (decNameAttribute == null)
                     {
-                        Dbg.Err($"{readerDec.inputContext}: No dec name provided, add a `decName=` attribute to the {typeName} tag (example: <{typeName} decName=\"TheNameOfYour{typeName}\">)");
+                        Dbg.Err($"{readerDec.context}: No dec name provided, add a `decName=` attribute to the {typeName} tag (example: <{typeName} decName=\"TheNameOfYour{typeName}\">)");
                         continue;
                     }
 
                     readerDec.name = decNameAttribute.Value;
-                    if (!UtilMisc.ValidateDecName(readerDec.name, readerDec.inputContext))
+                    if (!UtilMisc.ValidateDecName(readerDec.name, readerDec.context))
                     {
                         continue;
                     }
@@ -79,7 +79,7 @@ namespace Dec
                     if (decElement.Attribute("class") is var classAttribute && classAttribute != null)
                     {
                         var parsedClass = (Type)Serialization.ParseString(classAttribute.Value,
-                            typeof(Type), null, readerDec.inputContext);
+                            typeof(Type), null, readerDec.context);
 
                         if (parsedClass == null)
                         {
@@ -87,7 +87,7 @@ namespace Dec
                         }
                         else if (!readerDec.type.IsAssignableFrom(parsedClass))
                         {
-                            Dbg.Err($"{readerDec.inputContext}: Attribute-parsed class {parsedClass} is not a subclass of {readerDec.type}; using the original class");
+                            Dbg.Err($"{readerDec.context}: Attribute-parsed class {parsedClass} is not a subclass of {readerDec.type}; using the original class");
                         }
                         else
                         {
@@ -106,7 +106,7 @@ namespace Dec
                         {
                             if (!bool.TryParse(abstractAttribute.Value, out bool abstrct))
                             {
-                                Dbg.Err($"{readerDec.inputContext}: Error encountered when parsing abstract attribute");
+                                Dbg.Err($"{readerDec.context}: Error encountered when parsing abstract attribute");
                             }
                             readerDec.abstrct = abstrct; // little dance to deal with the fact that readerDec.abstrct is a `bool?`
 

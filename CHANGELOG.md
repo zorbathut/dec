@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 ### Breaking
 * Dec doesn't guarantee what order Decs are initialized in, and it still doesn't . . . but it was *pretty consistent*, and boy, did the above change seriously scramble the order they tend to get initialized in! If you have load dependencies, even if you don't realize that you do, don't be surprised if stuff breaks. Future versions of Dec might include a Dev Mode that intentionally randomizes load order (within the bounds of dependencies) to help catch these issues.
 * PostLoad() no longer runs after *all* ConfigErrors(), but only after its own ConfigError(). This was never guaranteed either but you might have been relying on it. This entire system really needs a revamp. Sorry. Come pester me on Discord if you have a strong opinion on how it should work.
+* Rename Dec.InputContext to Dec.Context, since it will now also apply to things that aren't input. Sorry about this one - it'll take some renaming.
 
 ### Fixed
 * Several Clone pathways that would incorrectly Record objects with a TreatAsValuelike converter.

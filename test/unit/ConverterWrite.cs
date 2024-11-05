@@ -26,7 +26,7 @@ namespace DecTest
 
         public class ConvertedConverterString : Dec.ConverterString<Converted>
         {
-            public override Converted Read(string input, Dec.InputContext context)
+            public override Converted Read(string input, Dec.Context context)
             {
                 var match = Regex.Match(input, "(-?[0-9]+) (-?[0-9]+) (-?[0-9]+)");
                 return new Converted { a = int.Parse(match.Groups[1].Value), b = int.Parse(match.Groups[2].Value), c = int.Parse(match.Groups[3].Value) };

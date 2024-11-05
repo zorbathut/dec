@@ -12,7 +12,7 @@ namespace Dec
             public string name;
 
             public ReaderNodeParseable node;
-            public InputContext inputContext;
+            public Context context;
 
             public bool? abstrct;
             public string parent;
@@ -42,7 +42,7 @@ namespace Dec
         public virtual bool AllowAsThis { get => true; }
         public abstract Recorder.IUserSettings UserSettings { get; }
 
-        public abstract InputContext GetInputContext(); // note: this function must be really fast!
+        public abstract Context GetContext(); // note: this function must be really fast!
 
         public abstract ReaderNode GetChildNamed(string name);
         public abstract string[] GetAllChildren();

@@ -11,15 +11,15 @@ namespace Dec
     /// Information on the current cursor position when reading files.
     /// </summary>
     /// <remarks>
-    /// Standard output format is $"{inputContext}: Your Error Text Here!". This abstracts out the requirements for generating the locational-context text.
+    /// Standard output format is $"{context}: Your Error Text Here!". This abstracts out the requirements for generating the locational-context text.
     /// </remarks>
-    public struct InputContext
+    public struct Context
     {
         internal string filename;
         internal System.Xml.Linq.XElement element;
         internal Path path;
 
-        internal InputContext(string filename = null, System.Xml.Linq.XElement element = null, Path path = null)
+        internal Context(string filename = null, System.Xml.Linq.XElement element = null, Path path = null)
         {
             this.filename = filename;
             this.element = element;
@@ -79,7 +79,7 @@ namespace Dec
                 return child.Write(input.Value);
             }
 
-            public override T? Read(string input, InputContext context)
+            public override T? Read(string input, Context context)
             {
                 // if we're null, we must have already handled this elsewhere
                 return child.Read(input, context);
@@ -339,7 +339,7 @@ namespace Dec
             PatchIfExists,
             DeleteIfExists,
         }
-        internal static ParseMode ParseModeFromString(InputContext context, string str)
+        internal static ParseMode ParseModeFromString(Context context, string str)
         {
             if (str == null)
             {
@@ -415,8 +415,8 @@ namespace Dec
 
             foreach (var node in nodes)
             {
-                var inputContext = node.GetInputContext();
-                var s_parseMode = ParseModeFromString(inputContext, node.GetMetadata(ReaderNodeParseable.Metadata.Mode));
+                var context = node.GetContext();
+                var s_parseMode = ParseModeFromString(context, node.GetMetadata(ReaderNodeParseable.Metadata.Mode));
 
                 ParseCommand s_parseCommand;
 
@@ -426,7 +426,7 @@ namespace Dec
                         switch (s_parseMode)
                         {
                             default:
-                                Dbg.Err($"{inputContext}: Invalid mode {s_parseMode} provided for an Object-type parse, defaulting to Patch");
+                                Dbg.Err($"{context}: Invalid mode {s_parseMode} provided for an Object-type parse, defaulting to Patch");
                                 goto case ParseMode.Default;
 
                             case ParseMode.Default:
@@ -439,7 +439,7 @@ namespace Dec
                         switch (s_parseMode)
                         {
                             default:
-                                Dbg.Err($"{inputContext}: Invalid mode {s_parseMode} provided for an ordered-container-type parse, defaulting to Replace");
+                                Dbg.Err($"{context}: Invalid mode {s_parseMode} provided for an ordered-container-type parse, defaulting to Replace");
                                 goto case ParseMode.Default;
 
                             case ParseMode.Default:
@@ -456,7 +456,7 @@ namespace Dec
                         switch (s_parseMode)
                         {
                             default:
-                                Dbg.Err($"{inputContext}: Invalid mode {s_parseMode} provided for an unordered-container-type parse, defaulting to Replace");
+                                Dbg.Err($"{context}: Invalid mode {s_parseMode} provided for an unordered-container-type parse, defaulting to Replace");
                                 goto case ParseMode.Default;
 
                             case ParseMode.Default:
@@ -478,7 +478,7 @@ namespace Dec
                         switch (s_parseMode)
                         {
                             default:
-                                Dbg.Err($"{inputContext}: Invalid mode {s_parseMode} provided for a value-type parse, defaulting to Replace");
+                                Dbg.Err($"{context}: Invalid mode {s_parseMode} provided for a value-type parse, defaulting to Replace");
                                 goto case ParseMode.Default;
 
                             case ParseMode.Default:
@@ -488,7 +488,7 @@ namespace Dec
                         }
                         break;
                     default:
-                        Dbg.Err($"{inputContext}: Internal error, unknown mode category {modeCategory}, please report");
+                        Dbg.Err($"{context}: Internal error, unknown mode category {modeCategory}, please report");
                         s_parseCommand = ParseCommand.Patch;  // . . . I guess?
                         break;
                 }
@@ -510,19 +510,19 @@ namespace Dec
             bool everExisted = false;
             foreach (var item in decs)
             {
-                var s_parseMode = ParseModeFromString(item.inputContext, item.node.GetMetadata(ReaderNodeParseable.Metadata.Mode));
+                var s_parseMode = ParseModeFromString(item.context, item.node.GetMetadata(ReaderNodeParseable.Metadata.Mode));
 
                 switch (s_parseMode)
                 {
                     default:
-                        Dbg.Err($"{item.inputContext}: Invalid mode {s_parseMode} provided for a Dec-type parse, defaulting to Create");
+                        Dbg.Err($"{item.context}: Invalid mode {s_parseMode} provided for a Dec-type parse, defaulting to Create");
                         goto case ParseMode.Default;
 
                     case ParseMode.Default:
                     case ParseMode.Create:
                         if (orders.Count != 0)
                         {
-                            Dbg.Err($"{item.inputContext}: Create mode used when a Dec already exists, falling back to Patch");
+                            Dbg.Err($"{item.context}: Create mode used when a Dec already exists, falling back to Patch");
                             goto case ParseMode.Patch;
                         }
                         orders.Add(item);
@@ -532,7 +532,7 @@ namespace Dec
                     case ParseMode.Replace:
                         if (orders.Count == 0)
                         {
-                            Dbg.Err($"{item.inputContext}: Replace mode used when a Dec doesn't exist, falling back to Create");
+                            Dbg.Err($"{item.context}: Replace mode used when a Dec doesn't exist, falling back to Create");
                             goto case ParseMode.Create;
                         }
                         orders.Clear();
@@ -542,7 +542,7 @@ namespace Dec
                     case ParseMode.Patch:
                         if (orders.Count == 0)
                         {
-                            Dbg.Err($"{item.inputContext}: Patch mode used when a Dec doesn't exist, falling back to Create");
+                            Dbg.Err($"{item.context}: Patch mode used when a Dec doesn't exist, falling back to Create");
                             goto case ParseMode.Create;
                         }
                         orders.Add(item);
@@ -572,7 +572,7 @@ namespace Dec
                     case ParseMode.Delete:
                         if (!everExisted)
                         {
-                            Dbg.Err($"{item.inputContext}: Delete mode used when a Dec doesn't exist; did you want deleteIfExists?");
+                            Dbg.Err($"{item.context}: Delete mode used when a Dec doesn't exist; did you want deleteIfExists?");
                         }
                         orders.Clear();
                         break;
@@ -624,12 +624,12 @@ namespace Dec
                 if (!type.CanBeShared())
                 {
                     // If shared, make sure our input is null and our type is appropriate for sharing
-                    Dbg.Wrn($"{nodes[0].GetInputContext()}: Value type `{type}` tagged as Shared in recorder, this is meaningless but harmless");
+                    Dbg.Wrn($"{nodes[0].GetContext()}: Value type `{type}` tagged as Shared in recorder, this is meaningless but harmless");
                 }
                 else if (original != null && !hasReferenceId)
                 {
                     // We need to create objects without context if it's shared, so we kind of panic in this case
-                    Dbg.Err($"{nodes[0].GetInputContext()}: Shared `{type}` provided with non-null default object, this may result in unexpected behavior");
+                    Dbg.Err($"{nodes[0].GetContext()}: Shared `{type}` provided with non-null default object, this may result in unexpected behavior");
                 }
             }
 
@@ -647,25 +647,25 @@ namespace Dec
                 // Some of these are redundant and that's OK
                 if (nullAttribute != null && (refAttribute != null || classAttribute != null || modeAttribute != null))
                 {
-                    Dbg.Err($"{s_node.GetInputContext()}: Null element may not have ref, class, or mode specified; guessing wildly at intentions");
+                    Dbg.Err($"{s_node.GetContext()}: Null element may not have ref, class, or mode specified; guessing wildly at intentions");
                 }
                 else if (refAttribute != null && (nullAttribute != null || classAttribute != null || modeAttribute != null))
                 {
-                    Dbg.Err($"{s_node.GetInputContext()}: Ref element may not have null, class, or mode specified; guessing wildly at intentions");
+                    Dbg.Err($"{s_node.GetContext()}: Ref element may not have null, class, or mode specified; guessing wildly at intentions");
                 }
                 else if (classAttribute != null && (nullAttribute != null || refAttribute != null))
                 {
-                    Dbg.Err($"{s_node.GetInputContext()}: Class-specified element may not have null or ref specified; guessing wildly at intentions");
+                    Dbg.Err($"{s_node.GetContext()}: Class-specified element may not have null or ref specified; guessing wildly at intentions");
                 }
                 else if (modeAttribute != null && (nullAttribute != null || refAttribute != null))
                 {
-                    Dbg.Err($"{s_node.GetInputContext()}: Mode-specified element may not have null or ref specified; guessing wildly at intentions");
+                    Dbg.Err($"{s_node.GetContext()}: Mode-specified element may not have null or ref specified; guessing wildly at intentions");
                 }
 
                 var unrecognized = s_node.GetMetadataUnrecognized();
                 if (unrecognized != null)
                 {
-                    Dbg.Err($"{s_node.GetInputContext()}: Has unknown attributes {unrecognized}");
+                    Dbg.Err($"{s_node.GetContext()}: Has unknown attributes {unrecognized}");
                 }
             }
 
@@ -680,7 +680,7 @@ namespace Dec
                     string nodeRefAttribute = s_node.GetMetadata(ReaderNodeParseable.Metadata.Ref);
                     if (nodeRefAttribute != null)
                     {
-                        Dbg.Err($"{s_node.GetInputContext()}: Found a reference tag while not evaluating Recorder mode, ignoring it");
+                        Dbg.Err($"{s_node.GetContext()}: Found a reference tag while not evaluating Recorder mode, ignoring it");
                     }
                 }
             }
@@ -701,7 +701,7 @@ namespace Dec
                 {
                     // However, we do need to watch for Replace, because that means we should nuke the class attribute and start over.
                     string modeAttribute = s_node.GetMetadata(ReaderNodeParseable.Metadata.Mode);
-                    ParseMode s_parseMode = ParseModeFromString(s_node.GetInputContext(), modeAttribute);
+                    ParseMode s_parseMode = ParseModeFromString(s_node.GetContext(), modeAttribute);
                     if (s_parseMode == ParseMode.Replace)
                     {
                         // we also should maybe be doing this if we're a list, map, or set?
@@ -717,7 +717,7 @@ namespace Dec
                     {
                         if (!bool.TryParse(nullAttribute, out bool nullValue))
                         {
-                            Dbg.Err($"{s_node.GetInputContext()}: Invalid `null` attribute");
+                            Dbg.Err($"{s_node.GetContext()}: Invalid `null` attribute");
                         }
                         else if (nullValue)
                         {
@@ -736,14 +736,14 @@ namespace Dec
 
                 if (classAttribute != null)
                 {
-                    var possibleType = (Type)ParseString(classAttribute, typeof(Type), null, classAttributeNode.GetInputContext());
+                    var possibleType = (Type)ParseString(classAttribute, typeof(Type), null, classAttributeNode.GetContext());
                     if (!type.IsAssignableFrom(possibleType))
                     {
-                        Dbg.Err($"{classAttributeNode.GetInputContext()}: Explicit type {classAttribute} cannot be assigned to expected type {type}");
+                        Dbg.Err($"{classAttributeNode.GetContext()}: Explicit type {classAttribute} cannot be assigned to expected type {type}");
                     }
                     else if (!replaced && result != null && result.GetType() != possibleType)
                     {
-                        Dbg.Err($"{classAttributeNode.GetInputContext()}: Explicit type {classAttribute} does not match already-provided instance {type}");
+                        Dbg.Err($"{classAttributeNode.GetContext()}: Explicit type {classAttribute} does not match already-provided instance {type}");
                     }
                     else
                     {
@@ -784,18 +784,18 @@ namespace Dec
 
                 if (recSettings.shared == Recorder.Settings.Shared.Deny)
                 {
-                    Dbg.Err($"{refKeyNode.GetInputContext()}: Found a reference in a non-.Shared() context; this should happen only if you've removed the .Shared() tag since the file was generated, or if you hand-wrote a file that is questionably valid. Using the reference anyway but this might produce unexpected results");
+                    Dbg.Err($"{refKeyNode.GetContext()}: Found a reference in a non-.Shared() context; this should happen only if you've removed the .Shared() tag since the file was generated, or if you hand-wrote a file that is questionably valid. Using the reference anyway but this might produce unexpected results");
                 }
 
                 if (globals.refs == null)
                 {
-                    Dbg.Err($"{refKeyNode.GetInputContext()}: Found a reference object {refKey} before refs are initialized (is this being used in a ConverterFactory<>.Create()?)");
+                    Dbg.Err($"{refKeyNode.GetContext()}: Found a reference object {refKey} before refs are initialized (is this being used in a ConverterFactory<>.Create()?)");
                     return result;
                 }
 
                 if (!globals.refs.ContainsKey(refKey))
                 {
-                    Dbg.Err($"{refKeyNode.GetInputContext()}: Found a reference object {refKey} without a valid reference mapping");
+                    Dbg.Err($"{refKeyNode.GetContext()}: Found a reference object {refKey} without a valid reference mapping");
                     return result;
                 }
 
@@ -808,7 +808,7 @@ namespace Dec
 
                 if (!type.IsAssignableFrom(refObject.GetType()))
                 {
-                    Dbg.Err($"{refKeyNode.GetInputContext()}: Reference object {refKey} is of type {refObject.GetType()}, which cannot be converted to expected type {type}");
+                    Dbg.Err($"{refKeyNode.GetContext()}: Reference object {refKey} is of type {refObject.GetType()}, which cannot be converted to expected type {type}");
                     return result;
                 }
 
@@ -827,14 +827,14 @@ namespace Dec
 
             if (hasChildren && hasText)
             {
-                Dbg.Err($"{hasChildrenNode.GetInputContext()} / {hasTextNode.GetInputContext()}: Cannot have both text and child nodes in XML - this is probably a typo, maybe you have the wrong number of close tags or added text somewhere you didn't mean to?");
+                Dbg.Err($"{hasChildrenNode.GetContext()} / {hasTextNode.GetContext()}: Cannot have both text and child nodes in XML - this is probably a typo, maybe you have the wrong number of close tags or added text somewhere you didn't mean to?");
 
                 // we'll just fall through and try to parse anyway, though
             }
 
             if (typeof(Dec).IsAssignableFrom(type) && hasChildren && !isRootDec)
             {
-                Dbg.Err($"{hasChildrenNode.GetInputContext()}: Defining members of an item of type {type}, derived from Dec.Dec, is not supported within an outer Dec. Either reference a {type} defined independently or remove {type}'s inheritance from Dec.");
+                Dbg.Err($"{hasChildrenNode.GetContext()}: Defining members of an item of type {type}, derived from Dec.Dec, is not supported within an outer Dec. Either reference a {type} defined independently or remove {type}'s inheritance from Dec.");
                 return null;
             }
 
@@ -853,13 +853,13 @@ namespace Dec
                                 break;
 
                             default:
-                                Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                                Dbg.Err($"{node.GetContext()}: Internal error, got invalid mode {parseCommand}");
                                 break;
                         }
 
                         if (hasChildren)
                         {
-                            Dbg.Err($"{node.GetInputContext()}: String converter {converter.GetType()} called with child XML nodes, which will be ignored");
+                            Dbg.Err($"{node.GetContext()}: String converter {converter.GetType()} called with child XML nodes, which will be ignored");
                         }
 
                         // We actually accept "no text" here, though, empty-string might be valid!
@@ -867,11 +867,11 @@ namespace Dec
                         // context might be null; that's OK at the moment
                         try
                         {
-                            result = converterString.ReadObj(node.GetText() ?? "", node.GetInputContext());
+                            result = converterString.ReadObj(node.GetText() ?? "", node.GetContext());
                         }
                         catch (Exception e)
                         {
-                            Dbg.Ex(new ConverterReadException(node.GetInputContext(), converter, e));
+                            Dbg.Ex(new ConverterReadException(node.GetContext(), converter, e));
 
                             result = GenerateResultFallback(result, type);
                         }
@@ -892,7 +892,7 @@ namespace Dec
                                 break;
 
                             default:
-                                Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                                Dbg.Err($"{node.GetContext()}: Internal error, got invalid mode {parseCommand}");
                                 break;
                         }
 
@@ -913,7 +913,7 @@ namespace Dec
 
                                 if (!type.IsValueType && result != returnedResult)
                                 {
-                                    Dbg.Err($"{node.GetInputContext()}: Converter {converterRecord.GetType()} changed object instance, this is disallowed");
+                                    Dbg.Err($"{node.GetContext()}: Converter {converterRecord.GetType()} changed object instance, this is disallowed");
                                 }
                                 else
                                 {
@@ -925,7 +925,7 @@ namespace Dec
                             }
                             catch (Exception e)
                             {
-                                Dbg.Ex(new ConverterReadException(node.GetInputContext(), converter, e));
+                                Dbg.Ex(new ConverterReadException(node.GetContext(), converter, e));
 
                                 // no fallback needed, we already have a result
                             }
@@ -947,7 +947,7 @@ namespace Dec
                                 break;
 
                             default:
-                                Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                                Dbg.Err($"{node.GetContext()}: Internal error, got invalid mode {parseCommand}");
                                 break;
                         }
 
@@ -960,7 +960,7 @@ namespace Dec
                             }
                             catch (Exception e)
                             {
-                                Dbg.Ex(new ConverterReadException(node.GetInputContext(), converter, e));
+                                Dbg.Ex(new ConverterReadException(node.GetContext(), converter, e));
                             }
                         }
 
@@ -975,7 +975,7 @@ namespace Dec
                             }
                             catch (Exception e)
                             {
-                                Dbg.Ex(new ConverterReadException(node.GetInputContext(), converter, e));
+                                Dbg.Ex(new ConverterReadException(node.GetContext(), converter, e));
 
                                 // no fallback needed, we already have a result
                             }
@@ -1008,16 +1008,16 @@ namespace Dec
                             break;
 
                         default:
-                            Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                            Dbg.Err($"{node.GetContext()}: Internal error, got invalid mode {parseCommand}");
                             break;
                     }
 
                     if (hasChildren)
                     {
-                        Dbg.Err($"{node.GetInputContext()}: Child nodes are not valid when parsing {type}");
+                        Dbg.Err($"{node.GetContext()}: Child nodes are not valid when parsing {type}");
                     }
 
-                    result = ParseString(node.GetText(), type, result, node.GetInputContext());
+                    result = ParseString(node.GetText(), type, result, node.GetContext());
                 }
 
                 return result;
@@ -1059,7 +1059,7 @@ namespace Dec
                                 break;
 
                             default:
-                                Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                                Dbg.Err($"{node.GetContext()}: Internal error, got invalid mode {parseCommand}");
                                 break;
                         }
 
@@ -1083,7 +1083,7 @@ namespace Dec
             // Nothing past this point even supports text, so let's just get angry and break stuff.
             if (hasText)
             {
-                Dbg.Err($"{hasTextNode.GetInputContext()}: Text detected in a situation where it is invalid; will be ignored");
+                Dbg.Err($"{hasTextNode.GetContext()}: Text detected in a situation where it is invalid; will be ignored");
                 return result;
             }
 
@@ -1109,7 +1109,7 @@ namespace Dec
                             break;
 
                         default:
-                            Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                            Dbg.Err($"{node.GetContext()}: Internal error, got invalid mode {parseCommand}");
                             break;
                     }
 
@@ -1221,7 +1221,7 @@ namespace Dec
                         }
 
                         default:
-                            Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                            Dbg.Err($"{node.GetContext()}: Internal error, got invalid mode {parseCommand}");
                             array = null; // just to break the unassigned-local-variable
                             break;
                     }
@@ -1264,7 +1264,7 @@ namespace Dec
                             break;
 
                         default:
-                            Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                            Dbg.Err($"{node.GetContext()}: Internal error, got invalid mode {parseCommand}");
                             break;
                     }
 
@@ -1316,7 +1316,7 @@ namespace Dec
                             break;
 
                         default:
-                            Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                            Dbg.Err($"{node.GetContext()}: Internal error, got invalid mode {parseCommand}");
                             break;
                     }
 
@@ -1359,7 +1359,7 @@ namespace Dec
                         // There definitely starts being an argument for prepend.
 
                         default:
-                            Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                            Dbg.Err($"{node.GetContext()}: Internal error, got invalid mode {parseCommand}");
                             break;
                     }
 
@@ -1402,7 +1402,7 @@ namespace Dec
                         // There definitely starts being an argument for prepend.
 
                         default:
-                            Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                            Dbg.Err($"{node.GetContext()}: Internal error, got invalid mode {parseCommand}");
                             break;
                     }
 
@@ -1448,7 +1448,7 @@ namespace Dec
                             break;
 
                         default:
-                            Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                            Dbg.Err($"{node.GetContext()}: Internal error, got invalid mode {parseCommand}");
                             break;
                     }
 
@@ -1474,7 +1474,7 @@ namespace Dec
             if (!globals.allowReflection)
             {
                 // just pick the first node to get something to go on
-                Dbg.Err($"{orders[0].node.GetInputContext()}: Falling back to reflection within a Record system while parsing a {type}; this is currently not allowed for security reasons. Either you shouldn't be trying to serialize this, or it should implement Dec.IRecorder (https://zorbathut.github.io/dec/release/documentation/serialization.html), or you need a Dec.Converter (https://zorbathut.github.io/dec/release/documentation/custom.html)");
+                Dbg.Err($"{orders[0].node.GetContext()}: Falling back to reflection within a Record system while parsing a {type}; this is currently not allowed for security reasons. Either you shouldn't be trying to serialize this, or it should implement Dec.IRecorder (https://zorbathut.github.io/dec/release/documentation/serialization.html), or you need a Dec.Converter (https://zorbathut.github.io/dec/release/documentation/custom.html)");
                 return result;
             }
 
@@ -1489,7 +1489,7 @@ namespace Dec
                             break;
 
                         default:
-                            Dbg.Err($"{node.GetInputContext()}: Internal error, got invalid mode {parseCommand}");
+                            Dbg.Err($"{node.GetContext()}: Internal error, got invalid mode {parseCommand}");
                             break;
                     }
                 }
@@ -1497,7 +1497,7 @@ namespace Dec
                 {
                     if (parseCommand != ParseCommand.Patch)
                     {
-                        Dbg.Err($"{node.GetInputContext()}: Mode provided for root Dec; this is currently not supported in any form");
+                        Dbg.Err($"{node.GetContext()}: Mode provided for root Dec; this is currently not supported in any form");
                     }
                 }
 
@@ -1528,7 +1528,7 @@ namespace Dec
             return result;
         }
 
-        internal static object ParseString(string text, Type type, object original, InputContext context)
+        internal static object ParseString(string text, Type type, object original, Context context)
         {
             // Special case: Converter override
             // This is redundant if we're being called from ParseElement, but we aren't always.
