@@ -11,18 +11,19 @@ All notable changes to this project will be documented in this file.
 ### Breaking
 * Dec doesn't guarantee what order Decs are initialized in, and it still doesn't . . . but it was *pretty consistent*, and boy, did the above change seriously scramble the order they tend to get initialized in! If you have load dependencies, even if you don't realize that you do, don't be surprised if stuff breaks. Future versions of Dec might include a Dev Mode that intentionally randomizes load order (within the bounds of dependencies) to help catch these issues.
 * PostLoad() no longer runs after *all* ConfigErrors(), but only after its own ConfigError(). This was never guaranteed either but you might have been relying on it. This entire system really needs a revamp. Sorry. Come pester me on Discord if you have a strong opinion on how it should work.
-* Rename Dec.InputContext to Dec.Context, since it will now also apply to things that aren't input. Sorry about this one - it'll take some renaming.
-* Split CloneWithAssignmentAttribute into CloneStructPiecewiseAttribute and CloneClassAsSharedRef, because the description of CloneWithAssignmentAttribute was just plain confusing. 
+* Rename Dec.InputContext to Dec.Context, since it will now also apply to things that aren't input. Sorry about this one too - it'll take some renaming.
+* Split CloneWithAssignmentAttribute into CloneStructPiecewiseAttribute and CloneClassAsSharedRef, because the description of CloneWithAssignmentAttribute was just plain confusing.  I don't think anyone's using Clone besides me. If you are, come talk to me on Discord so I can make sure it's doing what you need.
 
 ### Improved
 * Error messages regarding Shared/Unshared conflicts now report the actual location of those conflicts. This is a first revision; please give feedback.
+* Clone performance on Dictionaries with asymmetrical clone-as-valuelike parameters.
+* General Clone performance regarding asymmetrical clone-as-valuelike parameters.
+
+### Made Worse
+* The new Path system is probably a performance and memory hit. For now, I'm just living with it; if it's a problem for you, please report it so I can work on it with actual numbers.
 
 ### Fixed
 * Several Clone pathways that would incorrectly Record objects with a TreatAsValuelike converter.
-
-### Improved
-* Clone performance on Dictionaries with asymmetrical clone-as-valuelike parameters.
-* General Clone performance regarding asymmetrical clone-as-valuelike parameters.
 
 
 ## [v0.7.1]
