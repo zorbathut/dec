@@ -37,7 +37,7 @@ namespace Dec
         public abstract void WriteType(Type value);
         public abstract void WriteDec(Dec value);
         public abstract void WriteExplicitNull();
-        public abstract bool WriteReference(object value);
+        public abstract bool WriteReference(object value, Path path);
         public abstract void WriteArray(Array value);
         public abstract void WriteList(IList value);
         public abstract void WriteDictionary(IDictionary value);

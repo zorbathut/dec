@@ -15,7 +15,7 @@ namespace Dec
         public abstract bool AllowReflection { get; }
         public abstract Recorder.IUserSettings UserSettings { get; }
 
-        public abstract bool RegisterReference(object referenced, XElement element, Recorder.Settings recSettings);
+        public abstract bool RegisterReference(object referenced, XElement element, Recorder.Settings recSettings, Path path);
 
         public void RegisterPendingWrite(Action action)
         {
@@ -174,9 +174,9 @@ namespace Dec
             node.SetAttributeValue("null", "true");
         }
 
-        public override bool WriteReference(object value)
+        public override bool WriteReference(object value, Path path)
         {
-            return writer.RegisterReference(value, node, RecorderSettings);
+            return writer.RegisterReference(value, node, RecorderSettings, path);
         }
 
         private void WriteArrayRank(WriterNodeXml node, Array value, Type referencedType, int rank, int[] indices)

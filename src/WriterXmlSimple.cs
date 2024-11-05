@@ -9,7 +9,7 @@ namespace Dec
         public override bool AllowReflection { get => false; }
         public override Recorder.IUserSettings UserSettings { get; }
 
-        private HashSet<object> seenObjects = new HashSet<object>();
+        private Dictionary<object, Path> seenObjects = new Dictionary<object, Path>();
 
         private XDocument doc;
         private string rootTag;
@@ -22,11 +22,11 @@ namespace Dec
             this.rootTag = rootTag;
         }
 
-        public override bool RegisterReference(object referenced, XElement element, Recorder.Settings recSettings)
+        public override bool RegisterReference(object referenced, XElement element, Recorder.Settings recSettings, Path path)
         {
-            if (!seenObjects.Add(referenced))
+            if (!seenObjects.TryAdd(referenced, path))
             {
-                Dbg.Err($"{recSettings}: Object {referenced} has already been written, and shared objects do not work in simple mode. Skipping to avoid infinite loops.");
+                Dbg.Err($"{recSettings}: Object {referenced} at [{path.Serialize()}] has already been written from [{seenObjects[referenced].Serialize()}], and shared objects do not work in simple mode. Skipping to avoid infinite loops.");
                 return true;
             }
 

@@ -11,7 +11,7 @@ namespace Dec
         public override Recorder.IUserSettings UserSettings { get; }
 
         // Maps between object and the in-place element. This does *not* yet have the ref ID tagged, and will have to be extracted into a new Element later.
-        private Dictionary<object, XElement> refToElement = new Dictionary<object, XElement>();
+        private Dictionary<object, (XElement element, Path path)> refToElement = new Dictionary<object, (XElement, Path)>();
         private Dictionary<XElement, object> elementToRef = new Dictionary<XElement, object>();
 
         // A map from object to the string intended as a reference. This will be filled in only once a second reference to something is created.
@@ -41,22 +41,22 @@ namespace Dec
             record.Add(refs);
         }
 
-        public override bool RegisterReference(object referenced, XElement element, Recorder.Settings recSettings)
+        public override bool RegisterReference(object referenced, XElement element, Recorder.Settings recSettings, Path path)
         {
             bool forceProcess = false;
 
-            if (!refToElement.TryGetValue(referenced, out var xelement))
+            if (!refToElement.TryGetValue(referenced, out var xe_path))
             {
                 if (recSettings.shared != Recorder.Settings.Shared.Deny)
                 {
                     // Insert it into our refToElement mapping
-                    refToElement[referenced] = element;
+                    refToElement[referenced] = (element, path);
                     elementToRef[element] = referenced;
                 }
                 else
                 {
-                    // Cannot be referenced, so we insert a fake null entry
-                    refToElement[referenced] = null;
+                    // Cannot be referenced, so we insert a fake null entry but including the path for tracking
+                    refToElement[referenced] = (null, path);
 
                     // Note: It is important not to add an elementToRef entry because this is later used to split long hierarchies
                     // and if you split a long hierarchy around a non-referencable barrier, everything breaks!
@@ -65,7 +65,7 @@ namespace Dec
                 if (Config.TestRefEverything && recSettings.shared != Recorder.Settings.Shared.Deny)
                 {
                     // Test pathway that should only occur during testing.
-                    xelement = element;
+                    xe_path = (element, path);
                     forceProcess = true;
                 }
                 else
@@ -74,17 +74,17 @@ namespace Dec
                 }
             }
 
-            if (xelement == null)
+            if (xe_path.element == null)
             {
                 // This is an unreferencable object! We are in trouble.
-                Dbg.Err("Attempted to create a new reference to an unshared object. This may result in an invalid serialization. If this is coming from a Recorder setup, perhaps you need a .Shared() decorator.");
+                Dbg.Err($"Attempted to create a new shared reference at [{path.Serialize()}] to an previously-seen unshared object at [{xe_path.path.Serialize()}]. This may result in an invalid serialization. If this is coming from a Recorder setup, it's likely you either need a .Shared() decorator, or you need to ensure that this object is not serialized elsewhere.");
                 return true;
             }
 
             // We have a referenceable target, but do *we* allow a reference?
             if (recSettings.shared == Recorder.Settings.Shared.Deny)
             {
-                Dbg.Err("Attempted to create a new unshared reference to a previously-seen object. This may result in an invalid serialization. If this is coming from a Recorder setup, it's likely you either need a .Shared() decorator, or you need to ensure that this object is not serialized elsewhere.");
+                Dbg.Err($"Attempted to create a new unshared reference at [{path.Serialize()}] to a previously-seen shared object at [{xe_path.path.Serialize()}]. This may result in an invalid serialization. If this is coming from a Recorder setup, it's likely you either need a .Shared() decorator, or you need to ensure that this object is not serialized elsewhere.");
                 return true;
             }
 
@@ -118,7 +118,7 @@ namespace Dec
 
                 // gotta ToArray() because it does not like mutating things while iterating
                 // And yes, you have to .Remove() also, otherwise you get copies in both places.
-                foreach (var attribute in src.Attributes().ToArray())
+                foreach (var attribute in src.element.Attributes().ToArray())
                 {
                     attribute.Remove();
 
@@ -129,14 +129,14 @@ namespace Dec
                     }
                 }
 
-                foreach (var node in src.Nodes().ToArray())
+                foreach (var node in src.element.Nodes().ToArray())
                 {
                     node.Remove();
                     result.Add(node);
                 }
 
                 // Patch in the ref link
-                src.SetAttributeValue("ref", refblock.Value);
+                src.element.SetAttributeValue("ref", refblock.Value);
 
                 // We may not have had a class to begin with, but we sure need one now!
                 result.SetAttributeValue("class", refblock.Key.GetType().ComposeDecFormatted());

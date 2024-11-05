@@ -224,7 +224,7 @@ namespace Dec
             writer.AppendLine($"Assert.IsNull({accessor});");
         }
 
-        public override bool WriteReference(object value)
+        public override bool WriteReference(object value, Path path)
         {
             // We're just going to ignore whether a reference is "allowed" here; this is not the place for metavalidation.
 
@@ -450,7 +450,7 @@ namespace Dec
             throw new NotImplementedException();
         }
 
-        public override bool WriteReference(object value)
+        public override bool WriteReference(object value, Path path)
         {
             throw new NotImplementedException();
         }

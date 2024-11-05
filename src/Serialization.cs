@@ -1774,7 +1774,7 @@ namespace Dec
             // Note that it's important we don't write a reference if we had an unreferenceable; it's unnecessarily slow and some of our writer types don't support it.
             if (Util.CanBeShared(valType) && !asThis)
             {
-                if (node.WriteReference(value))
+                if (node.WriteReference(value, node.Path))
                 {
                     // The ref system has set up the appropriate tagging, so we're done!
                     return;

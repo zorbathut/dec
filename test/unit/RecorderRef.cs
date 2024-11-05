@@ -617,5 +617,72 @@ namespace DecTest
 
             Assert.AreSame(deserialized.a, deserialized.b);
         }
+
+        public class StubHolderShared : Dec.IRecordable
+        {
+            public StubRecordable stub;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Shared().Record(ref stub, "stub");
+            }
+        }
+
+        public class StubHolderUnshared : Dec.IRecordable
+        {
+            public StubRecordable stub;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref stub, "stub");
+            }
+        }
+
+        [Test]
+        public void SharedBeforeUnshared([ValuesExcept(RecorderMode.Simple, RecorderMode.Clone)] RecorderMode mode, [Values] bool firstShared, [Values] bool secondShared)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var root = new List<object>();
+            var stub = new StubRecordable();
+
+            if (firstShared)
+            {
+                root.Add(new StubHolderShared { stub = stub });
+            }
+            else
+            {
+                root.Add(new StubHolderUnshared { stub = stub });
+            }
+
+            if (secondShared)
+            {
+                root.Add(new StubHolderShared { stub = stub });
+            }
+            else
+            {
+                root.Add(new StubHolderUnshared { stub = stub });
+            }
+
+            string expectedError = null;
+
+            if (!firstShared)
+            {
+                expectedError = "Attempted to create a new shared reference at [RECORD[1].stub] to an previously-seen unshared object at [RECORD[0].stub].";
+            }
+            else if (!secondShared)
+            {
+                expectedError = "Attempted to create a new unshared reference at [RECORD[1].stub] to a previously-seen shared object at [RECORD[0].stub].";
+            }
+
+            if (expectedError != null)
+            {
+                ExpectErrors(() => DoRecorderRoundTrip(root, mode), errorValidator: err => err.Contains(expectedError));
+            }
+            else
+            {
+                DoRecorderRoundTrip(root, mode);
+            }
+        }
     }
 }

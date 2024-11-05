@@ -611,7 +611,7 @@ namespace Dec
             SetValuelikeOriginalAndResult(null);
         }
 
-        public override bool WriteReference(object value)
+        public override bool WriteReference(object value, Path path)
         {
             if (writer.cloneReferences.TryGetValue(value, out var clone))
             {
