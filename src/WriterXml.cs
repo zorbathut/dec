@@ -58,7 +58,7 @@ namespace Dec
             return node;
         }
 
-        public static WriterNodeXml StartData(WriterXml writer, XContainer decRoot, string name, Type type, string pathId)
+        public static WriterNodeXml StartRecord(WriterXml writer, XContainer decRoot, string name, Type type, string pathId)
         {
             return new WriterNodeXml(writer, decRoot, name, 0, new Recorder.Settings() { shared = Recorder.Settings.Shared.Flexible }, new PathRoot(pathId));
         }

@@ -174,9 +174,9 @@ namespace Dec
             }
         }
 
-        public WriterNodeXml StartData(Type type)
+        public WriterNodeXml StartRecord(Type type)
         {
-            var node = WriterNodeXml.StartData(this, record, "data", type, "RECORD");
+            var node = WriterNodeXml.StartRecord(this, record, "data", type, "RECORD");
             rootElement = node.GetXElement();
             return node;
         }

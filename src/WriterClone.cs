@@ -30,9 +30,9 @@ namespace Dec
             this.UserSettings = userSettings;
         }
 
-        public WriterNodeClone StartData(Type type)
+        public WriterNodeClone StartClone(Type type)
         {
-            return WriterNodeClone.StartData(this, type);
+            return WriterNodeClone.StartClone(this, type);
         }
     }
 
@@ -538,7 +538,7 @@ namespace Dec
             }
         }
 
-        public static WriterNodeClone StartData(WriterClone writer, Type type)
+        public static WriterNodeClone StartClone(WriterClone writer, Type type)
         {
             return new WriterNodeClone(writer, 0, new Recorder.Settings() { shared = Recorder.Settings.Shared.Flexible }, new PathRoot("RECORD"));
         }

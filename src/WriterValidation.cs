@@ -60,7 +60,7 @@ namespace Dec
         {
         }
 
-        public WriterNode StartData()
+        public WriterNode StartValidation()
         {
             return new WriterNodeValidation(this, $"input", new PathRoot("RECORD"));
         }

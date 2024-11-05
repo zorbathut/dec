@@ -33,9 +33,9 @@ namespace Dec
             return false;
         }
 
-        public WriterNodeXml StartData(Type type, string pathId)
+        public WriterNodeXml StartRecord(Type type, string pathId)
         {
-            var node = WriterNodeXml.StartData(this, doc, rootTag, type, pathId);
+            var node = WriterNodeXml.StartRecord(this, doc, rootTag, type, pathId);
             return node;
         }
 

@@ -16,7 +16,7 @@ namespace Dec
             {
                 var writerContext = new WriterXmlRecord(userSettings);
 
-                Serialization.ComposeElement(writerContext.StartData(typeof(T)), target, typeof(T));
+                Serialization.ComposeElement(writerContext.StartRecord(typeof(T)), target, typeof(T));
 
                 return writerContext.Finish(pretty);
             }
@@ -33,7 +33,7 @@ namespace Dec
             {
                 var writerContext = new WriterXmlSimple(rootTag, userSettings);
 
-                Serialization.ComposeElement(writerContext.StartData(typeof(T), rootTag), target, typeof(T));
+                Serialization.ComposeElement(writerContext.StartRecord(typeof(T), rootTag), target, typeof(T));
 
                 // right now I'm just assuming "always pretty"
                 return writerContext.Finish(true);
@@ -49,7 +49,7 @@ namespace Dec
             {
                 var writerContext = new WriterValidationRecord(userSettings);
 
-                Serialization.ComposeElement(writerContext.StartData(), target, typeof(T));
+                Serialization.ComposeElement(writerContext.StartValidation(), target, typeof(T));
 
                 return writerContext.Finish();
             }
@@ -247,7 +247,7 @@ namespace Dec
             {
                 var writerContext = new WriterClone(userSettings);
 
-                var writerNode = writerContext.StartData(typeof(T));
+                var writerNode = writerContext.StartClone(typeof(T));
 
                 Serialization.ComposeElement(writerNode, obj, typeof(T));
                 var output = writerNode.GetResult(false);
