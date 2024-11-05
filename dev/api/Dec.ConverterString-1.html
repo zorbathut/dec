@@ -139,8 +139,8 @@ Class ConverterString&lt;T&gt;  <a class="header-action link-secondary" title="V
 
   <a id="Dec_ConverterString_1_Read_" data-uid="Dec.ConverterString`1.Read*"></a>
 
-  <h3 id="Dec_ConverterString_1_Read_System_String_Dec_InputContext_" data-uid="Dec.ConverterString`1.Read(System.String,Dec.InputContext)">
-  Read(string, InputContext)
+  <h3 id="Dec_ConverterString_1_Read_System_String_Dec_Context_" data-uid="Dec.ConverterString`1.Read(System.String,Dec.Context)">
+  Read(string, Context)
   <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Converter.cs/#L66"><i class="bi bi-code-slash"></i></a>
   </h3>
 
@@ -149,14 +149,14 @@ Class ConverterString&lt;T&gt;  <a class="header-action link-secondary" title="V
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public abstract T Read(string input, InputContext context)</code></pre>
+    <pre><code class="lang-csharp hljs">public abstract T Read(string input, Context context)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
     <dt><code>input</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
     <dd></dd>
-    <dt><code>context</code> <a class="xref" href="Dec.InputContext.html">InputContext</a></dt>
+    <dt><code>context</code> <a class="xref" href="Dec.Context.html">Context</a></dt>
     <dd></dd>
   </dl>
 
@@ -172,7 +172,7 @@ Class ConverterString&lt;T&gt;  <a class="header-action link-secondary" title="V
 
 
 
-  <h4 class="section" id="Dec_ConverterString_1_Read_System_String_Dec_InputContext__remarks">Remarks</h4>
+  <h4 class="section" id="Dec_ConverterString_1_Read_System_String_Dec_Context__remarks">Remarks</h4>
   <div class="markdown level1 remarks"><p>In case of error, call Dec.Dbg.Err with some appropriately useful message and return default. Message should be formatted as $&quot;{context}: Something went wrong&quot;.</p>
 </div>
 

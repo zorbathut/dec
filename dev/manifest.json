@@ -64,6 +64,16 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Dec.Context.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.Context.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Dec.ConverterFactory-1.yml",
       "output": {
         ".html": {
@@ -238,16 +248,6 @@
       "output": {
         ".html": {
           "relative_path": "api/Dec.IndexAttribute.html"
-        }
-      },
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/Dec.InputContext.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/Dec.InputContext.html"
         }
       },
       "version": ""

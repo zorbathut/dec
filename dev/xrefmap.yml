@@ -197,6 +197,38 @@ references:
   isSpec: "True"
   fullName: Dec.Config.WarningHandler
   nameWithType: Config.WarningHandler
+- uid: Dec.Context
+  name: Context
+  href: api/Dec.Context.html
+  commentId: T:Dec.Context
+  fullName: Dec.Context
+  nameWithType: Context
+- uid: Dec.Context.PathString
+  name: PathString()
+  href: api/Dec.Context.html#Dec_Context_PathString
+  commentId: M:Dec.Context.PathString
+  fullName: Dec.Context.PathString()
+  nameWithType: Context.PathString()
+- uid: Dec.Context.PathString*
+  name: PathString
+  href: api/Dec.Context.html#Dec_Context_PathString_
+  commentId: Overload:Dec.Context.PathString
+  isSpec: "True"
+  fullName: Dec.Context.PathString
+  nameWithType: Context.PathString
+- uid: Dec.Context.ToString
+  name: ToString()
+  href: api/Dec.Context.html#Dec_Context_ToString
+  commentId: M:Dec.Context.ToString
+  fullName: Dec.Context.ToString()
+  nameWithType: Context.ToString()
+- uid: Dec.Context.ToString*
+  name: ToString
+  href: api/Dec.Context.html#Dec_Context_ToString_
+  commentId: Overload:Dec.Context.ToString
+  isSpec: "True"
+  fullName: Dec.Context.ToString
+  nameWithType: Context.ToString
 - uid: Dec.ConverterFactoryDynamic
   name: ConverterFactoryDynamic
   href: api/Dec.ConverterFactoryDynamic.html
@@ -315,15 +347,15 @@ references:
   commentId: T:Dec.ConverterReadException
   fullName: Dec.ConverterReadException
   nameWithType: ConverterReadException
-- uid: Dec.ConverterReadException.#ctor(Dec.InputContext,System.Object,System.Exception)
-  name: ConverterReadException(InputContext, object, Exception)
-  href: api/Dec.ConverterReadException.html#Dec_ConverterReadException__ctor_Dec_InputContext_System_Object_System_Exception_
-  commentId: M:Dec.ConverterReadException.#ctor(Dec.InputContext,System.Object,System.Exception)
-  name.vb: New(InputContext, Object, Exception)
-  fullName: Dec.ConverterReadException.ConverterReadException(Dec.InputContext, object, System.Exception)
-  fullName.vb: Dec.ConverterReadException.New(Dec.InputContext, Object, System.Exception)
-  nameWithType: ConverterReadException.ConverterReadException(InputContext, object, Exception)
-  nameWithType.vb: ConverterReadException.New(InputContext, Object, Exception)
+- uid: Dec.ConverterReadException.#ctor(Dec.Context,System.Object,System.Exception)
+  name: ConverterReadException(Context, object, Exception)
+  href: api/Dec.ConverterReadException.html#Dec_ConverterReadException__ctor_Dec_Context_System_Object_System_Exception_
+  commentId: M:Dec.ConverterReadException.#ctor(Dec.Context,System.Object,System.Exception)
+  name.vb: New(Context, Object, Exception)
+  fullName: Dec.ConverterReadException.ConverterReadException(Dec.Context, object, System.Exception)
+  fullName.vb: Dec.ConverterReadException.New(Dec.Context, Object, System.Exception)
+  nameWithType: ConverterReadException.ConverterReadException(Context, object, Exception)
+  nameWithType.vb: ConverterReadException.New(Context, Object, Exception)
 - uid: Dec.ConverterReadException.#ctor*
   name: ConverterReadException
   href: api/Dec.ConverterReadException.html#Dec_ConverterReadException__ctor_
@@ -389,15 +421,15 @@ references:
   commentId: T:Dec.ConverterStringDynamic
   fullName: Dec.ConverterStringDynamic
   nameWithType: ConverterStringDynamic
-- uid: Dec.ConverterStringDynamic.Read(System.String,Dec.InputContext)
-  name: Read(string, InputContext)
-  href: api/Dec.ConverterStringDynamic.html#Dec_ConverterStringDynamic_Read_System_String_Dec_InputContext_
-  commentId: M:Dec.ConverterStringDynamic.Read(System.String,Dec.InputContext)
-  name.vb: Read(String, InputContext)
-  fullName: Dec.ConverterStringDynamic.Read(string, Dec.InputContext)
-  fullName.vb: Dec.ConverterStringDynamic.Read(String, Dec.InputContext)
-  nameWithType: ConverterStringDynamic.Read(string, InputContext)
-  nameWithType.vb: ConverterStringDynamic.Read(String, InputContext)
+- uid: Dec.ConverterStringDynamic.Read(System.String,Dec.Context)
+  name: Read(string, Context)
+  href: api/Dec.ConverterStringDynamic.html#Dec_ConverterStringDynamic_Read_System_String_Dec_Context_
+  commentId: M:Dec.ConverterStringDynamic.Read(System.String,Dec.Context)
+  name.vb: Read(String, Context)
+  fullName: Dec.ConverterStringDynamic.Read(string, Dec.Context)
+  fullName.vb: Dec.ConverterStringDynamic.Read(String, Dec.Context)
+  nameWithType: ConverterStringDynamic.Read(string, Context)
+  nameWithType.vb: ConverterStringDynamic.Read(String, Context)
 - uid: Dec.ConverterStringDynamic.Read*
   name: Read
   href: api/Dec.ConverterStringDynamic.html#Dec_ConverterStringDynamic_Read_
@@ -430,15 +462,15 @@ references:
   fullName.vb: Dec.ConverterString(Of T)
   nameWithType: ConverterString<T>
   nameWithType.vb: ConverterString(Of T)
-- uid: Dec.ConverterString`1.Read(System.String,Dec.InputContext)
-  name: Read(string, InputContext)
-  href: api/Dec.ConverterString-1.html#Dec_ConverterString_1_Read_System_String_Dec_InputContext_
-  commentId: M:Dec.ConverterString`1.Read(System.String,Dec.InputContext)
-  name.vb: Read(String, InputContext)
-  fullName: Dec.ConverterString<T>.Read(string, Dec.InputContext)
-  fullName.vb: Dec.ConverterString(Of T).Read(String, Dec.InputContext)
-  nameWithType: ConverterString<T>.Read(string, InputContext)
-  nameWithType.vb: ConverterString(Of T).Read(String, InputContext)
+- uid: Dec.ConverterString`1.Read(System.String,Dec.Context)
+  name: Read(string, Context)
+  href: api/Dec.ConverterString-1.html#Dec_ConverterString_1_Read_System_String_Dec_Context_
+  commentId: M:Dec.ConverterString`1.Read(System.String,Dec.Context)
+  name.vb: Read(String, Context)
+  fullName: Dec.ConverterString<T>.Read(string, Dec.Context)
+  fullName.vb: Dec.ConverterString(Of T).Read(String, Dec.Context)
+  nameWithType: ConverterString<T>.Read(string, Context)
+  nameWithType.vb: ConverterString(Of T).Read(String, Context)
 - uid: Dec.ConverterString`1.Read*
   name: Read
   href: api/Dec.ConverterString-1.html#Dec_ConverterString_1_Read_
@@ -900,25 +932,6 @@ references:
   fullName.vb: Dec.Index(Of T).List
   nameWithType: Index<T>.List
   nameWithType.vb: Index(Of T).List
-- uid: Dec.InputContext
-  name: InputContext
-  href: api/Dec.InputContext.html
-  commentId: T:Dec.InputContext
-  fullName: Dec.InputContext
-  nameWithType: InputContext
-- uid: Dec.InputContext.ToString
-  name: ToString()
-  href: api/Dec.InputContext.html#Dec_InputContext_ToString
-  commentId: M:Dec.InputContext.ToString
-  fullName: Dec.InputContext.ToString()
-  nameWithType: InputContext.ToString()
-- uid: Dec.InputContext.ToString*
-  name: ToString
-  href: api/Dec.InputContext.html#Dec_InputContext_ToString_
-  commentId: Overload:Dec.InputContext.ToString
-  isSpec: "True"
-  fullName: Dec.InputContext.ToString
-  nameWithType: InputContext.ToString
 - uid: Dec.Parser
   name: Parser
   href: api/Dec.Parser.html
@@ -1553,6 +1566,19 @@ references:
   fullName.vb: Dec.Recorder.Clone(Of T)(T, Dec.Recorder.IUserSettings)
   nameWithType: Recorder.Clone<T>(T, Recorder.IUserSettings)
   nameWithType.vb: Recorder.Clone(Of T)(T, Recorder.IUserSettings)
+- uid: Dec.Recorder.Context
+  name: Context
+  href: api/Dec.Recorder.html#Dec_Recorder_Context
+  commentId: P:Dec.Recorder.Context
+  fullName: Dec.Recorder.Context
+  nameWithType: Recorder.Context
+- uid: Dec.Recorder.Context*
+  name: Context
+  href: api/Dec.Recorder.html#Dec_Recorder_Context_
+  commentId: Overload:Dec.Recorder.Context
+  isSpec: "True"
+  fullName: Dec.Recorder.Context
+  nameWithType: Recorder.Context
 - uid: Dec.Recorder.Direction
   name: Recorder.Direction
   href: api/Dec.Recorder.Direction.html
