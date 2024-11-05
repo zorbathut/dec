@@ -13,13 +13,13 @@ namespace DecTest
         [Test, TestCaseSource(nameof(GenerateValidationParser))]
         public void Validation(string id, [Values] ParserMode mode)
         {
-            string directory = Path.Combine("data", "golden", "parser", id);
+            string directory = System.IO.Path.Combine("data", "golden", "parser", id);
 
             Assembly assembly;
             if (!AssemblyLookup.TryGetValue(id, out assembly))
             {
                 // gotta load
-                assembly = DecUtilLib.Compilation.Compile(DecUtilLib.Compress.ReadFromFile(Path.Combine(directory, "Harness.cs")), new Assembly[] { this.GetType().Assembly });
+                assembly = DecUtilLib.Compilation.Compile(DecUtilLib.Compress.ReadFromFile(System.IO.Path.Combine(directory, "Harness.cs")), new Assembly[] { this.GetType().Assembly });
                 AssemblyLookup[id] = assembly;
             }
 
@@ -27,7 +27,7 @@ namespace DecTest
             type.GetMethod("Setup").Invoke(null, null);
 
             var parser = new Dec.Parser();
-            parser.AddString(Dec.Parser.FileType.Xml, DecUtilLib.Compress.ReadFromFile(Path.Combine(directory, "data.xml")));
+            parser.AddString(Dec.Parser.FileType.Xml, DecUtilLib.Compress.ReadFromFile(System.IO.Path.Combine(directory, "data.xml")));
             parser.Finish();
 
             DoParserTests(mode, validation_assemblies: new Assembly[] { assembly });
@@ -39,7 +39,7 @@ namespace DecTest
         {
             PrepCwd();
 
-            var targetDir = Path.Combine("data", "golden", "parser");
+            var targetDir = System.IO.Path.Combine("data", "golden", "parser");
 
             if (!Directory.Exists(targetDir))
             {
@@ -48,7 +48,7 @@ namespace DecTest
 
             foreach (var path in Directory.GetDirectories(targetDir))
             {
-                var id = Path.GetFileName(path);
+                var id = System.IO.Path.GetFileName(path);
                 yield return new object[] { id, ParserMode.Bare };
                 yield return new object[] { id, ParserMode.RewrittenBare };
                 yield return new object[] { id, ParserMode.RewrittenPretty };

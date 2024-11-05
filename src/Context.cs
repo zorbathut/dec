@@ -21,6 +21,11 @@ namespace Dec
             this.path = path;
         }
 
+        public string PathString()
+        {
+            return path?.Serialize() ?? "[unknown]";
+        }
+
         public override string ToString()
         {
             if (this.element != null)
@@ -33,7 +38,7 @@ namespace Dec
             }
             else if (path != null)
             {
-                return path.ToString();
+                return path.Serialize();
             }
             else
             {

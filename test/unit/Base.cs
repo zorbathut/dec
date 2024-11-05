@@ -136,7 +136,7 @@ namespace DecTest
             // Find our data directory
             while (!Directory.Exists("data"))
             {
-                Environment.CurrentDirectory = Path.GetDirectoryName(Environment.CurrentDirectory);
+                Environment.CurrentDirectory = System.IO.Path.GetDirectoryName(Environment.CurrentDirectory);
             }
         }
 
