@@ -210,7 +210,7 @@ namespace Dec
                     }
 
                     var keyPath = new PathDictionaryKey(path);
-                    var key = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(keyNode, fileIdentifier, null, UserSettings) }, referencedKeyType, null, readerGlobals, recorderChildContext);
+                    var key = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(keyNode, fileIdentifier, keyPath, UserSettings) }, referencedKeyType, null, readerGlobals, recorderChildContext);
 
                     if (key == null)
                     {
