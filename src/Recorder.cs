@@ -401,8 +401,7 @@ namespace Dec
 
         public override IUserSettings UserSettings { get => node.UserSettings; }
 
-        // currently no sensible implementation
-        public override Context Context { get => new Context(); }
+        public override Context Context { get => new Context(path: node.Path); }
 
         internal override void Record<T>(ref T value, string label, Parameters parameters)
         {

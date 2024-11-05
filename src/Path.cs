@@ -24,6 +24,7 @@ namespace Dec
     {
         // we keep these separate so we don't have to do string manipulation at runtime
         private System.Type decType;
+        private string decTypeName; // this is kind of redundant and should be cleaned up, but right now it's hard to tell what the actual path should be; calculating a "valid dec name" is tricky
         private string decName;
 
         public PathDec(System.Type decType, string decName)
@@ -32,9 +33,15 @@ namespace Dec
             this.decName = decName;
         }
 
+        public PathDec(string decTypeName, string decName)
+        {
+            this.decTypeName = decTypeName;
+            this.decName = decName;
+        }
+
         public override string Serialize()
         {
-            return $"{decType.ComposeDecFormatted()}.{decName}";
+            return $"{decTypeName ?? decType.ComposeDecFormatted()}.{decName}";
         }
     }
 

@@ -6,10 +6,12 @@ namespace Dec
     internal abstract class WriterNode
     {
         private Recorder.Settings settings;
+        private Path path;
 
-        public WriterNode(Recorder.Settings settings)
+        public WriterNode(Recorder.Settings settings, Path path)
         {
             this.settings = settings;
+            this.path = path;
         }
 
         public Recorder.Settings RecorderSettings { get => settings; }
@@ -17,6 +19,8 @@ namespace Dec
         public virtual bool AllowAsThis { get => true; }
         public virtual bool AllowCloning { get => false; }
         public abstract Recorder.IUserSettings UserSettings { get; }
+
+        public Path Path { get => path; }
 
         // I'm not real happy with the existence of this function; it's kind of a hack so that a shared Converter that writes a string or an int can avoid errors
         public void MakeRecorderContextChild()

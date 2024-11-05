@@ -48,7 +48,7 @@ namespace Dec
 
         public WriterNode StartDec(Type type, string decName)
         {
-            return new WriterNodeValidation(this, $"Dec.Database<{type.ComposeCSFormatted()}>.Get(\"{decName}\")");
+            return new WriterNodeValidation(this, $"Dec.Database<{type.ComposeCSFormatted()}>.Get(\"{decName}\")", new PathDec(type, decName));
         }
     }
 
@@ -62,14 +62,14 @@ namespace Dec
 
         public WriterNode StartData()
         {
-            return new WriterNodeValidation(this, $"input");
+            return new WriterNodeValidation(this, $"input", new PathRoot("RECORD"));
         }
     }
 
     // This is used for things that can be expressed as an easy inline string, which is used as part of the Dictionary-handling code.
     internal abstract class WriterNodeCS : WriterNode
     {
-        public WriterNodeCS() : base(new Recorder.Settings())
+        public WriterNodeCS(Path path) : base(new Recorder.Settings(), path)
         {
         }
 
@@ -163,7 +163,7 @@ namespace Dec
         public override bool AllowReflection { get => writer.AllowReflection; }
         public override Recorder.IUserSettings UserSettings { get => writer.UserSettings; }
 
-        public WriterNodeValidation(WriterValidation writer, string accessor)
+        public WriterNodeValidation(WriterValidation writer, string accessor, Path path) : base(path)
         {
             this.writer = writer;
             this.accessor = accessor;
@@ -171,18 +171,18 @@ namespace Dec
 
         public override WriterNode CreateRecorderChild(string label, Recorder.Settings settings)
         {
-            return new WriterNodeValidation(writer, $"{accessor}.{label}");
+            return new WriterNodeValidation(writer, $"{accessor}.{label}", new PathMember(Path, label));
         }
 
         public override WriterNode CreateReflectionChild(System.Reflection.FieldInfo field, Recorder.Settings settings)
         {
             if (field.IsPublic)
             {
-                return new WriterNodeValidation(writer, $"{accessor}.{field.Name}");
+                return new WriterNodeValidation(writer, $"{accessor}.{field.Name}", new PathMember(Path, field.Name));
             }
             else
             {
-                return new WriterNodeValidation(writer, $"(({field.FieldType.ComposeCSFormatted()})typeof({field.DeclaringType.ComposeCSFormatted()}).GetField(\"{field.Name}\", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue({accessor}))");
+                return new WriterNodeValidation(writer, $"(({field.FieldType.ComposeCSFormatted()})typeof({field.DeclaringType.ComposeCSFormatted()}).GetField(\"{field.Name}\", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue({accessor}))", new PathMember(Path, field.Name));
             }
         }
 
@@ -258,7 +258,7 @@ namespace Dec
 
             for (int i = 0; i < value.Length; ++i)
             {
-                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}[{i}]"), value.GetValue(i), referencedType);
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}[{i}]", new PathIndex(Path, i)), value.GetValue(i), referencedType);
             }
 
             writer.AppendLine($"}}");
@@ -274,7 +274,7 @@ namespace Dec
 
             for (int i = 0; i < value.Count; ++i)
             {
-                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}[{i}]"), value[i], referencedType);
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}[{i}]", new PathIndex(Path, i)), value[i], referencedType);
             }
 
             writer.AppendLine($"}}");
@@ -290,11 +290,11 @@ namespace Dec
             IDictionaryEnumerator iterator = value.GetEnumerator();
             while (iterator.MoveNext())
             {
-                var keyNode = new WriterNodeStringize(UserSettings);
+                var keyNode = new WriterNodeStringize(UserSettings, new PathDictionaryKey(Path));
                 Serialization.ComposeElement(keyNode, iterator.Key, keyType);
 
                 writer.AppendLine($"if ({accessor}.ContainsKey({keyNode.SerializedString})) {{");
-                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}[{keyNode.SerializedString}]"), iterator.Value, valueType);
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}[{keyNode.SerializedString}]", new PathDictionaryValue(Path)), iterator.Value, valueType);
                 writer.AppendLine($"}} else {{");
                 writer.AppendLine($"Assert.IsTrue({accessor}.ContainsKey({keyNode.SerializedString}));");   // this is unnecessary - it could just be .Fail() - but this gives you a *much* better error message
                 writer.AppendLine($"}}");
@@ -309,7 +309,7 @@ namespace Dec
             IEnumerator iterator = value.GetEnumerator();
             while (iterator.MoveNext())
             {
-                var keyNode = new WriterNodeStringize(UserSettings);
+                var keyNode = new WriterNodeStringize(UserSettings, new PathHashSetElement(Path));
                 Serialization.ComposeElement(keyNode, iterator.Current, keyType);
 
                 // You might think "Assert.Contains" would do what we want, but it doesn't - it requires an ICollection and HashSet isn't an ICollection.
@@ -340,7 +340,7 @@ namespace Dec
 
             for (int i = 0; i < count; ++i)
             {
-                Serialization.ComposeElement(new WriterNodeValidation(writer, $"tempArray[{i}]"), array.GetValue(i), referencedType);
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"tempArray[{i}]", new PathIndex(Path, i)), array.GetValue(i), referencedType);
             }
 
             writer.AppendLine($"}}");
@@ -365,7 +365,7 @@ namespace Dec
 
             for (int i = 0; i < count; ++i)
             {
-                Serialization.ComposeElement(new WriterNodeValidation(writer, $"tempArray[{i}]"), array.GetValue(i), referencedType);
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"tempArray[{i}]", new PathIndex(Path, i)), array.GetValue(i), referencedType);
             }
 
             writer.AppendLine($"}}");
@@ -381,7 +381,7 @@ namespace Dec
             for (int i = 0; i < length; ++i)
             {
                 var propertyName = nameArray[i];
-                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}.{propertyName}"), value.GetType().GetProperty(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}.{propertyName}", new PathIndex(Path, i)), value.GetType().GetProperty(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
             }
         }
 
@@ -395,7 +395,7 @@ namespace Dec
             for (int i = 0; i < length; ++i)
             {
                 var propertyName = nameArray[i];
-                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}.{propertyName}"), value.GetType().GetField(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}.{propertyName}", new PathIndex(Path, i)), value.GetType().GetField(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
             }
         }
 
@@ -415,7 +415,7 @@ namespace Dec
 
         public string SerializedString { get; private set; }
 
-        public WriterNodeStringize(Recorder.IUserSettings userSettings)
+        public WriterNodeStringize(Recorder.IUserSettings userSettings, Path path) : base(path)
         {
             UserSettings = userSettings;
         }

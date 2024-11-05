@@ -41,7 +41,7 @@ namespace DecTest
         }
 
         [Test]
-        public void MemberPath()
+        public void MemberPath([ValuesExcept(ParserMode.Validation)] ParserMode mode)
         {
             var parser = new Dec.Parser();
             parser.AddString(Dec.Parser.FileType.Xml, @"
@@ -53,10 +53,14 @@ namespace DecTest
             parser.Finish();
 
             Assert.IsTrue(PathTester.validations == 1);
+
+            DoParserTests(mode);
+
+            Assert.IsTrue(PathTester.validations == (mode == ParserMode.Bare ? 1 : 3));
         }
 
         [Test]
-        public void ArrayPath()
+        public void ArrayPath([ValuesExcept(ParserMode.Validation)] ParserMode mode)
         {
             var parser = new Dec.Parser();
             parser.AddString(Dec.Parser.FileType.Xml, @"
@@ -71,10 +75,14 @@ namespace DecTest
             parser.Finish();
 
             Assert.IsTrue(PathTester.validations == 2);
+
+            DoParserTests(mode);
+
+            Assert.IsTrue(PathTester.validations == (mode == ParserMode.Bare ? 2 : 6));
         }
 
         [Test]
-        public void MultiDimensionalArrayPath()
+        public void MultiDimensionalArrayPath([ValuesExcept(ParserMode.Validation)] ParserMode mode)
         {
             var parser = new Dec.Parser();
             parser.AddString(Dec.Parser.FileType.Xml, @"
@@ -95,10 +103,14 @@ namespace DecTest
             parser.Finish();
 
             Assert.IsTrue(PathTester.validations == 4);
+
+            DoParserTests(mode);
+
+            Assert.IsTrue(PathTester.validations == (mode == ParserMode.Bare ? 4 : 12));
         }
 
         [Test]
-        public void ListPath()
+        public void ListPath([ValuesExcept(ParserMode.Validation)] ParserMode mode)
         {
             var parser = new Dec.Parser();
             parser.AddString(Dec.Parser.FileType.Xml, @"
@@ -113,10 +125,14 @@ namespace DecTest
             parser.Finish();
 
             Assert.IsTrue(PathTester.validations == 2);
+
+            DoParserTests(mode);
+
+            Assert.IsTrue(PathTester.validations == (mode == ParserMode.Bare ? 2 : 6));
         }
 
         [Test]
-        public void DictionaryKeyPath()
+        public void DictionaryKeyPath([ValuesExcept(ParserMode.Validation)] ParserMode mode)
         {
             var parser = new Dec.Parser();
             parser.AddString(Dec.Parser.FileType.Xml, @"
@@ -133,10 +149,14 @@ namespace DecTest
             parser.Finish();
 
             Assert.IsTrue(PathTester.validations == 1);
+
+            DoParserTests(mode);
+
+            Assert.IsTrue(PathTester.validations == (mode == ParserMode.Bare ? 1 : 3));
         }
 
         [Test]
-        public void DictionaryValuePath()
+        public void DictionaryValuePath([ValuesExcept(ParserMode.Validation)] ParserMode mode)
         {
             var parser = new Dec.Parser();
             parser.AddString(Dec.Parser.FileType.Xml, @"
@@ -153,10 +173,14 @@ namespace DecTest
             parser.Finish();
 
             Assert.IsTrue(PathTester.validations == 1);
+
+            DoParserTests(mode);
+
+            Assert.IsTrue(PathTester.validations == (mode == ParserMode.Bare ? 1 : 3));
         }
 
         [Test]
-        public void HashSetPath()
+        public void HashSetPath([ValuesExcept(ParserMode.Validation)] ParserMode mode)
         {
             var parser = new Dec.Parser();
             parser.AddString(Dec.Parser.FileType.Xml, @"
@@ -170,6 +194,10 @@ namespace DecTest
             parser.Finish();
 
             Assert.IsTrue(PathTester.validations == 1);
+
+            DoParserTests(mode);
+
+            Assert.IsTrue(PathTester.validations == (mode == ParserMode.Bare ? 1 : 3));
         }
 
         // nyi due to needing a write step

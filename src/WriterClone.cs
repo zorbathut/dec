@@ -73,7 +73,7 @@ namespace Dec
         public override bool AllowCloning { get => true;  }
         public override Recorder.IUserSettings UserSettings { get => writer.UserSettings; }
 
-        private WriterNodeClone(WriterClone writer, int depth, Recorder.Settings settings) : base(settings)
+        private WriterNodeClone(WriterClone writer, int depth, Recorder.Settings settings, Path path) : base(settings, path)
         {
             this.writer = writer;
             this.depth = depth;
@@ -540,7 +540,7 @@ namespace Dec
 
         public static WriterNodeClone StartData(WriterClone writer, Type type)
         {
-            return new WriterNodeClone(writer, 0, new Recorder.Settings() { shared = Recorder.Settings.Shared.Flexible });
+            return new WriterNodeClone(writer, 0, new Recorder.Settings() { shared = Recorder.Settings.Shared.Flexible }, new PathRoot("RECORD"));
         }
 
         public override WriterNode CreateRecorderChild(string label, Recorder.Settings settings)
@@ -550,7 +550,7 @@ namespace Dec
                 recorderChildren = new Dictionary<string, WriterNodeClone>();
             }
 
-            var child = new WriterNodeClone(writer, depth + 1, settings);
+            var child = new WriterNodeClone(writer, depth + 1, settings, new PathMember(Path, label));
             recorderChildren[label] = child;
             return child;
         }
@@ -571,7 +571,7 @@ namespace Dec
             }
             // maybe I should set up more value-type-ish special cases here?
 
-            var child = new WriterNodeClone(writer, resetDepth ? 0 : depth + 1, RecorderSettings.CreateChild());
+            var child = new WriterNodeClone(writer, resetDepth ? 0 : depth + 1, RecorderSettings.CreateChild(), Path);
             Serialization.ComposeElement(child, obj, obj.GetType());
             return child.GetResult(false);
         }
