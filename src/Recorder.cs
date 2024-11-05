@@ -452,6 +452,7 @@ namespace Dec
     internal struct ReaderGlobals
     {
         public Dictionary<string, object> refs;
+        public Dictionary<object, Path> decPathLookup;
         public bool allowRefs;
         public bool allowReflection;
     }

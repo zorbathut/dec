@@ -18,6 +18,8 @@ namespace Dec
         private static readonly Dictionary<Type, Dictionary<string, Dec>> Lookup = new Dictionary<Type, Dictionary<string, Dec>>();
         private static Dec[] CachedList = null;
 
+        internal static Dictionary<object, Path> DecPathLookup = new Dictionary<object, Path>();
+
         /// <summary>
         /// The total number of decs that exist.
         /// </summary>
@@ -181,6 +183,7 @@ namespace Dec
         {
             CachedList = null;
             Lookup.Clear();
+            DecPathLookup.Clear();
 
             foreach (var db in Databases)
             {

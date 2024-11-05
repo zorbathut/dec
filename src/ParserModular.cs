@@ -258,7 +258,7 @@ namespace Dec
                 }
                 s_Status = Status.Processing;
 
-                var readerContext = new ReaderGlobals() { allowReflection = true, allowRefs = false };
+                var readerContext = new ReaderGlobals() { allowReflection = true, allowRefs = false, decPathLookup = Database.DecPathLookup };
 
                 // Collate reader decs
                 var registeredDecs = new Dictionary<(Type, string), List<ReaderFileDec.ReaderDec>>();
@@ -322,7 +322,7 @@ namespace Dec
 
                     foreach (var order in orders.Skip(1))
                     {
-                        // Since we're iterating over this anyway, yank the abstract updates out as go.
+                        // Since we're iterating over this anyway, yank the abstract updates out as we go.
                         if (order.abstrct.HasValue)
                         {
                             abstrct = order.abstrct.Value;

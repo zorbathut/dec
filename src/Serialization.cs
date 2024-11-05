@@ -560,7 +560,37 @@ namespace Dec
             return orders;
         }
 
-        internal static object ParseElement(List<ReaderNodeParseable> nodes, Type type, object original, ReaderGlobals globals, Recorder.Settings recSettings, FieldInfo fieldInfo = null, bool isRootDec = false, bool hasReferenceId = false, bool asThis = false, List<(ParseCommand command, ReaderNodeParseable node)> ordersOverride = null)
+        internal static object ParseElement(List<ReaderNodeParseable> nodes, Type type, object original,
+            ReaderGlobals globals, Recorder.Settings recSettings, FieldInfo fieldInfo = null, bool isRootDec = false,
+            bool hasReferenceId = false, bool asThis = false,
+            List<(ParseCommand command, ReaderNodeParseable node)> ordersOverride = null)
+        {
+            var result = ParseElement_Worker(nodes, type, original, globals, recSettings, fieldInfo, isRootDec, hasReferenceId, asThis, ordersOverride);
+
+            // I just really don't want to put this code at the end of *every single return*, that would be insane
+            // we don't allow dec references, we've already got those!
+            if (globals.decPathLookup != null && result != null)
+            {
+                var resultType = result.GetType();
+
+                // I really feel like whatever I'm expressing here must exist elsewhere in the codebase, but I can't find it
+                if (!resultType.IsValueType && resultType != typeof(string) && resultType != typeof(Type) && !typeof(Dec).IsAssignableFrom(resultType))
+                {
+                    // these paths *should* all match up, so we're just choosing one
+                    var newPath = nodes[0].GetContext().path;
+
+                    // right now we strictly overwrite previous instances of the result
+                    // this is not a great solution because it's very error-prone
+                    // the problem is that the inheritance/patch system has a tendency to spam this function repeatedly with the same object
+                    // I'm currently not sure how to deal with this, so . . . I'm not! I'm just doing it the bad way.
+                    globals.decPathLookup[result] = newPath;
+                }
+            }
+
+            return result;
+        }
+
+        internal static object ParseElement_Worker(List<ReaderNodeParseable> nodes, Type type, object original, ReaderGlobals globals, Recorder.Settings recSettings, FieldInfo fieldInfo = null, bool isRootDec = false, bool hasReferenceId = false, bool asThis = false, List<(ParseCommand command, ReaderNodeParseable node)> ordersOverride = null)
         {
             if (nodes == null || nodes.Count == 0)
             {
