@@ -590,7 +590,7 @@ namespace Dec
                 return result;
             }
 
-            result = type.IsPrimitive || typeof(Dec).IsAssignableFrom(type) || type == typeof(string) || type == typeof(Type) || type.GetCustomAttribute<CloneWithAssignmentAttribute>() != null;
+            result = type.IsPrimitive || typeof(Dec).IsAssignableFrom(type) || type == typeof(string) || type == typeof(Type) || type.GetCustomAttribute<CloneStructPiecewiseAttribute>() != null || type.GetCustomAttribute<CloneClassAsSharedRef>() != null;
 
             if (!result)
             {

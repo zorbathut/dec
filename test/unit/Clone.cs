@@ -23,26 +23,26 @@ namespace DecTest
             }
         }
 
-        [Dec.CloneWithAssignment]
+        [Dec.CloneClassAsSharedRef]
         public class CloneWithAssignmentClass
         {
 
         }
 
-        [Dec.CloneWithAssignment]
+        [Dec.CloneStructPiecewise]
         public struct CloneWithAssignmentStruct
         {
             public List<int> list;
         }
 
 
-        [Dec.CloneWithAssignment]
+        [Dec.CloneClassAsSharedRef]
         public class CloneWithAssignmentResolutionClass : IRecordable
         {
             public void Record(Dec.Recorder recorder) { }
         }
 
-        [Dec.CloneWithAssignment]
+        [Dec.CloneStructPiecewise]
         public struct CloneWithAssignmentResolutionStruct : IRecordable
         {
             public List<int> list;

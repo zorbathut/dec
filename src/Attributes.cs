@@ -42,15 +42,25 @@ namespace Dec
     }
 
     /// <summary>
-    /// Signals that this class or struct should be cloned with standard assignment.
+    /// Signals that this struct should be cloned with standard shallow-copy assignment semantics.
     /// </summary>
     /// <remarks>
-    /// This is most useful for collections of objects, where it can rely on the collection's own cloning behavior to clone a vast swath of objects at once.
-    ///
-    /// For structs, this becomes a shallow copy. For classes, this becomes a reference copy.
+    /// This is potentially much faster than using IRecordable to accomplish the same thing, especially if the struct is in a collection of some kind.
     /// </remarks>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
-    public class CloneWithAssignmentAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Struct)]
+    public class CloneStructPiecewiseAttribute : Attribute
+    {
+
+    }
+
+    /// <summary>
+    /// Signals that this class should be "cloned" by simply duplicating the reference.
+    /// </summary>
+    /// <remarks>
+    /// This is (obviously) much faster than copying the class, though it also (obviously) leaves you with a "clone" that shares state with the original. Great for immutable classes or classes wrapped in copy-on-write structures.
+    /// </remarks>
+    [AttributeUsage(AttributeTargets.Class)]
+    public class CloneClassAsSharedRef : Attribute
     {
 
     }
