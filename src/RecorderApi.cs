@@ -33,7 +33,7 @@ namespace Dec
             {
                 var writerContext = new WriterXmlSimple(rootTag, userSettings);
 
-                Serialization.ComposeElement(writerContext.StartData(typeof(T)), target, typeof(T));
+                Serialization.ComposeElement(writerContext.StartData(typeof(T), rootTag), target, typeof(T));
 
                 // right now I'm just assuming "always pretty"
                 return writerContext.Finish(true);

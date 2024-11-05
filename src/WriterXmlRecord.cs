@@ -176,7 +176,7 @@ namespace Dec
 
         public WriterNodeXml StartData(Type type)
         {
-            var node = WriterNodeXml.StartData(this, record, "data", type);
+            var node = WriterNodeXml.StartData(this, record, "data", type, "RECORD");
             rootElement = node.GetXElement();
             return node;
         }

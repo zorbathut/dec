@@ -10,6 +10,7 @@ namespace DecTest
     {
         private class PathTester : Dec.IRecordable
         {
+            public static bool ignore = false;
             public static int validations = 0;
             public string text;
 
@@ -17,8 +18,11 @@ namespace DecTest
             {
                 recorder.RecordAsThis(ref text);
 
-                Assert.AreEqual(text, recorder.Context.PathString());
-                ++validations;
+                if (!PathTester.ignore)
+                {
+                    Assert.AreEqual(text, recorder.Context.PathString());
+                    ++validations;
+                }
             }
         }
 
@@ -37,6 +41,7 @@ namespace DecTest
         public void Setup()
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(PathDec) } });
+            PathTester.ignore = false;
             PathTester.validations = 0;
         }
 
@@ -200,8 +205,6 @@ namespace DecTest
             Assert.IsTrue(PathTester.validations == (mode == ParserMode.Bare ? 1 : 3));
         }
 
-        // nyi due to needing a write step
-        /*
         [Test]
         public void Record()
         {
@@ -218,14 +221,19 @@ namespace DecTest
         [Test]
         public void RecordRef()
         {
-            var initialData = new PathTester { text = "RECORD" };
+            // this actual string may change someday
+            var initialData = new PathTester { text = "REF.ref00000" };
 
+            // we can't know that it's a Ref until we've written it out
+            PathTester.ignore = true;
             string serialized = Dec.Recorder.Write((initialData, initialData));
+
+            PathTester.ignore = false;
             var deserialized = Dec.Recorder.Read<(PathTester, PathTester)>(serialized);
 
             Assert.IsNotNull(deserialized);
 
-            Assert.AreEqual(2, PathTester.validations); // Once for write, once for read
+            Assert.AreEqual(1, PathTester.validations);
         }
 
         [Test]
@@ -239,6 +247,6 @@ namespace DecTest
             Assert.IsNotNull(deserialized);
 
             Assert.AreEqual(2, PathTester.validations); // Once for write, once for read
-        }*/
+        }
     }
 }
