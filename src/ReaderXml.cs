@@ -135,6 +135,7 @@ namespace Dec
                         break;
                     }
 
+                    indices[rank] = startAt + i++;
                     var newPath = new PathIndexMultidim(path, indices.ToArray());
 
                     if (fieldElement.Name.LocalName != "li")
@@ -143,7 +144,6 @@ namespace Dec
                         Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                     }
 
-                    indices[rank] = startAt + i++;
                     // the pathIndexMultidim is kind of slow and I should solve this at some point
                     ParseArrayRank(new ReaderNodeXml(fieldElement, fileIdentifier, newPath, UserSettings), readerGlobals, recorderChildContext, value, referencedType, rank + 1, indices, 0);
                 }
