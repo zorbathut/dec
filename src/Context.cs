@@ -21,9 +21,36 @@ namespace Dec
             this.path = path;
         }
 
+        /// <summary>
+        /// Returns the best guess at the path of this Record query.
+        /// </summary>
         public string PathString()
         {
             return path?.Serialize() ?? "[unknown]";
+        }
+
+        /// <summary>
+        /// Post a proper Context-decorated message to the info log.
+        /// </summary>
+        public void Inf(string message)
+        {
+            Dbg.Inf($"{this}: {message}");
+        }
+
+        /// <summary>
+        /// Post a proper Context-decorated message to the warning log.
+        /// </summary>
+        public void Wrn(string message)
+        {
+            Dbg.Wrn($"{this}: {message}");
+        }
+
+        /// <summary>
+        /// Post a proper Context-decorated message to the error log.
+        /// </summary>
+        public void Err(string message)
+        {
+            Dbg.Err($"{this}: {message}");
         }
 
         public override string ToString()

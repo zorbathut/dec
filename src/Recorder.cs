@@ -273,6 +273,30 @@ namespace Dec
         public abstract Context Context { get; }
 
         /// <summary>
+        /// Post a proper Context-decorated message to the info log.
+        /// </summary>
+        public void Inf(string message)
+        {
+            Context.Inf(message);
+        }
+
+        /// <summary>
+        /// Post a proper Context-decorated message to the warning log.
+        /// </summary>
+        public void Wrn(string message)
+        {
+            Context.Wrn(message);
+        }
+
+        /// <summary>
+        /// Post a proper Context-decorated message to the error log.
+        /// </summary>
+        public void Err(string message)
+        {
+            Context.Err(message);
+        }
+
+        /// <summary>
         /// Serialize or deserialize a member of a class.
         /// </summary>
         /// <remarks>
