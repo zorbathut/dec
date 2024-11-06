@@ -1,5 +1,6 @@
 namespace Dec
 {
+    [System.Diagnostics.DebuggerDisplay("{Serialize(),nq}")]
     public abstract class Path
     {
         public abstract string Serialize();
