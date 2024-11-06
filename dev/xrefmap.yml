@@ -13,12 +13,18 @@ references:
   commentId: T:Dec.AbstractAttribute
   fullName: Dec.AbstractAttribute
   nameWithType: AbstractAttribute
-- uid: Dec.CloneWithAssignmentAttribute
-  name: CloneWithAssignmentAttribute
-  href: api/Dec.CloneWithAssignmentAttribute.html
-  commentId: T:Dec.CloneWithAssignmentAttribute
-  fullName: Dec.CloneWithAssignmentAttribute
-  nameWithType: CloneWithAssignmentAttribute
+- uid: Dec.CloneClassAsSharedRef
+  name: CloneClassAsSharedRef
+  href: api/Dec.CloneClassAsSharedRef.html
+  commentId: T:Dec.CloneClassAsSharedRef
+  fullName: Dec.CloneClassAsSharedRef
+  nameWithType: CloneClassAsSharedRef
+- uid: Dec.CloneStructPiecewiseAttribute
+  name: CloneStructPiecewiseAttribute
+  href: api/Dec.CloneStructPiecewiseAttribute.html
+  commentId: T:Dec.CloneStructPiecewiseAttribute
+  fullName: Dec.CloneStructPiecewiseAttribute
+  nameWithType: CloneStructPiecewiseAttribute
 - uid: Dec.Composer
   name: Composer
   href: api/Dec.Composer.html
@@ -1176,6 +1182,19 @@ references:
   commentId: T:Dec.Path
   fullName: Dec.Path
   nameWithType: Path
+- uid: Dec.Path.IsValidForWriting
+  name: IsValidForWriting()
+  href: api/Dec.Path.html#Dec_Path_IsValidForWriting
+  commentId: M:Dec.Path.IsValidForWriting
+  fullName: Dec.Path.IsValidForWriting()
+  nameWithType: Path.IsValidForWriting()
+- uid: Dec.Path.IsValidForWriting*
+  name: IsValidForWriting
+  href: api/Dec.Path.html#Dec_Path_IsValidForWriting_
+  commentId: Overload:Dec.Path.IsValidForWriting
+  isSpec: "True"
+  fullName: Dec.Path.IsValidForWriting
+  nameWithType: Path.IsValidForWriting
 - uid: Dec.Path.Serialize
   name: Serialize()
   href: api/Dec.Path.html#Dec_Path_Serialize
@@ -1223,6 +1242,19 @@ references:
   fullName.vb: Dec.PathDec.New
   nameWithType: PathDec.PathDec
   nameWithType.vb: PathDec.New
+- uid: Dec.PathDec.IsValidForWriting
+  name: IsValidForWriting()
+  href: api/Dec.PathDec.html#Dec_PathDec_IsValidForWriting
+  commentId: M:Dec.PathDec.IsValidForWriting
+  fullName: Dec.PathDec.IsValidForWriting()
+  nameWithType: PathDec.IsValidForWriting()
+- uid: Dec.PathDec.IsValidForWriting*
+  name: IsValidForWriting
+  href: api/Dec.PathDec.html#Dec_PathDec_IsValidForWriting_
+  commentId: Overload:Dec.PathDec.IsValidForWriting
+  isSpec: "True"
+  fullName: Dec.PathDec.IsValidForWriting
+  nameWithType: PathDec.IsValidForWriting
 - uid: Dec.PathDec.Serialize
   name: Serialize()
   href: api/Dec.PathDec.html#Dec_PathDec_Serialize
@@ -1261,6 +1293,19 @@ references:
   fullName.vb: Dec.PathDictionaryKey.New
   nameWithType: PathDictionaryKey.PathDictionaryKey
   nameWithType.vb: PathDictionaryKey.New
+- uid: Dec.PathDictionaryKey.IsValidForWriting
+  name: IsValidForWriting()
+  href: api/Dec.PathDictionaryKey.html#Dec_PathDictionaryKey_IsValidForWriting
+  commentId: M:Dec.PathDictionaryKey.IsValidForWriting
+  fullName: Dec.PathDictionaryKey.IsValidForWriting()
+  nameWithType: PathDictionaryKey.IsValidForWriting()
+- uid: Dec.PathDictionaryKey.IsValidForWriting*
+  name: IsValidForWriting
+  href: api/Dec.PathDictionaryKey.html#Dec_PathDictionaryKey_IsValidForWriting_
+  commentId: Overload:Dec.PathDictionaryKey.IsValidForWriting
+  isSpec: "True"
+  fullName: Dec.PathDictionaryKey.IsValidForWriting
+  nameWithType: PathDictionaryKey.IsValidForWriting
 - uid: Dec.PathDictionaryKey.Serialize
   name: Serialize()
   href: api/Dec.PathDictionaryKey.html#Dec_PathDictionaryKey_Serialize
@@ -1299,6 +1344,19 @@ references:
   fullName.vb: Dec.PathDictionaryValue.New
   nameWithType: PathDictionaryValue.PathDictionaryValue
   nameWithType.vb: PathDictionaryValue.New
+- uid: Dec.PathDictionaryValue.IsValidForWriting
+  name: IsValidForWriting()
+  href: api/Dec.PathDictionaryValue.html#Dec_PathDictionaryValue_IsValidForWriting
+  commentId: M:Dec.PathDictionaryValue.IsValidForWriting
+  fullName: Dec.PathDictionaryValue.IsValidForWriting()
+  nameWithType: PathDictionaryValue.IsValidForWriting()
+- uid: Dec.PathDictionaryValue.IsValidForWriting*
+  name: IsValidForWriting
+  href: api/Dec.PathDictionaryValue.html#Dec_PathDictionaryValue_IsValidForWriting_
+  commentId: Overload:Dec.PathDictionaryValue.IsValidForWriting
+  isSpec: "True"
+  fullName: Dec.PathDictionaryValue.IsValidForWriting
+  nameWithType: PathDictionaryValue.IsValidForWriting
 - uid: Dec.PathDictionaryValue.Serialize
   name: Serialize()
   href: api/Dec.PathDictionaryValue.html#Dec_PathDictionaryValue_Serialize
@@ -1337,6 +1395,19 @@ references:
   fullName.vb: Dec.PathHashSetElement.New
   nameWithType: PathHashSetElement.PathHashSetElement
   nameWithType.vb: PathHashSetElement.New
+- uid: Dec.PathHashSetElement.IsValidForWriting
+  name: IsValidForWriting()
+  href: api/Dec.PathHashSetElement.html#Dec_PathHashSetElement_IsValidForWriting
+  commentId: M:Dec.PathHashSetElement.IsValidForWriting
+  fullName: Dec.PathHashSetElement.IsValidForWriting()
+  nameWithType: PathHashSetElement.IsValidForWriting()
+- uid: Dec.PathHashSetElement.IsValidForWriting*
+  name: IsValidForWriting
+  href: api/Dec.PathHashSetElement.html#Dec_PathHashSetElement_IsValidForWriting_
+  commentId: Overload:Dec.PathHashSetElement.IsValidForWriting
+  isSpec: "True"
+  fullName: Dec.PathHashSetElement.IsValidForWriting
+  nameWithType: PathHashSetElement.IsValidForWriting
 - uid: Dec.PathHashSetElement.Serialize
   name: Serialize()
   href: api/Dec.PathHashSetElement.html#Dec_PathHashSetElement_Serialize
@@ -1375,6 +1446,19 @@ references:
   fullName.vb: Dec.PathIndex.New
   nameWithType: PathIndex.PathIndex
   nameWithType.vb: PathIndex.New
+- uid: Dec.PathIndex.IsValidForWriting
+  name: IsValidForWriting()
+  href: api/Dec.PathIndex.html#Dec_PathIndex_IsValidForWriting
+  commentId: M:Dec.PathIndex.IsValidForWriting
+  fullName: Dec.PathIndex.IsValidForWriting()
+  nameWithType: PathIndex.IsValidForWriting()
+- uid: Dec.PathIndex.IsValidForWriting*
+  name: IsValidForWriting
+  href: api/Dec.PathIndex.html#Dec_PathIndex_IsValidForWriting_
+  commentId: Overload:Dec.PathIndex.IsValidForWriting
+  isSpec: "True"
+  fullName: Dec.PathIndex.IsValidForWriting
+  nameWithType: PathIndex.IsValidForWriting
 - uid: Dec.PathIndex.Serialize
   name: Serialize()
   href: api/Dec.PathIndex.html#Dec_PathIndex_Serialize
@@ -1413,6 +1497,19 @@ references:
   fullName.vb: Dec.PathIndexMultidim.New
   nameWithType: PathIndexMultidim.PathIndexMultidim
   nameWithType.vb: PathIndexMultidim.New
+- uid: Dec.PathIndexMultidim.IsValidForWriting
+  name: IsValidForWriting()
+  href: api/Dec.PathIndexMultidim.html#Dec_PathIndexMultidim_IsValidForWriting
+  commentId: M:Dec.PathIndexMultidim.IsValidForWriting
+  fullName: Dec.PathIndexMultidim.IsValidForWriting()
+  nameWithType: PathIndexMultidim.IsValidForWriting()
+- uid: Dec.PathIndexMultidim.IsValidForWriting*
+  name: IsValidForWriting
+  href: api/Dec.PathIndexMultidim.html#Dec_PathIndexMultidim_IsValidForWriting_
+  commentId: Overload:Dec.PathIndexMultidim.IsValidForWriting
+  isSpec: "True"
+  fullName: Dec.PathIndexMultidim.IsValidForWriting
+  nameWithType: PathIndexMultidim.IsValidForWriting
 - uid: Dec.PathIndexMultidim.Serialize
   name: Serialize()
   href: api/Dec.PathIndexMultidim.html#Dec_PathIndexMultidim_Serialize
@@ -1451,6 +1548,19 @@ references:
   fullName.vb: Dec.PathMember.New
   nameWithType: PathMember.PathMember
   nameWithType.vb: PathMember.New
+- uid: Dec.PathMember.IsValidForWriting
+  name: IsValidForWriting()
+  href: api/Dec.PathMember.html#Dec_PathMember_IsValidForWriting
+  commentId: M:Dec.PathMember.IsValidForWriting
+  fullName: Dec.PathMember.IsValidForWriting()
+  nameWithType: PathMember.IsValidForWriting()
+- uid: Dec.PathMember.IsValidForWriting*
+  name: IsValidForWriting
+  href: api/Dec.PathMember.html#Dec_PathMember_IsValidForWriting_
+  commentId: Overload:Dec.PathMember.IsValidForWriting
+  isSpec: "True"
+  fullName: Dec.PathMember.IsValidForWriting
+  nameWithType: PathMember.IsValidForWriting
 - uid: Dec.PathMember.Serialize
   name: Serialize()
   href: api/Dec.PathMember.html#Dec_PathMember_Serialize
@@ -1489,6 +1599,19 @@ references:
   fullName.vb: Dec.PathRef.New
   nameWithType: PathRef.PathRef
   nameWithType.vb: PathRef.New
+- uid: Dec.PathRef.IsValidForWriting
+  name: IsValidForWriting()
+  href: api/Dec.PathRef.html#Dec_PathRef_IsValidForWriting
+  commentId: M:Dec.PathRef.IsValidForWriting
+  fullName: Dec.PathRef.IsValidForWriting()
+  nameWithType: PathRef.IsValidForWriting()
+- uid: Dec.PathRef.IsValidForWriting*
+  name: IsValidForWriting
+  href: api/Dec.PathRef.html#Dec_PathRef_IsValidForWriting_
+  commentId: Overload:Dec.PathRef.IsValidForWriting
+  isSpec: "True"
+  fullName: Dec.PathRef.IsValidForWriting
+  nameWithType: PathRef.IsValidForWriting
 - uid: Dec.PathRef.Serialize
   name: Serialize()
   href: api/Dec.PathRef.html#Dec_PathRef_Serialize
@@ -1527,6 +1650,19 @@ references:
   fullName.vb: Dec.PathRoot.New
   nameWithType: PathRoot.PathRoot
   nameWithType.vb: PathRoot.New
+- uid: Dec.PathRoot.IsValidForWriting
+  name: IsValidForWriting()
+  href: api/Dec.PathRoot.html#Dec_PathRoot_IsValidForWriting
+  commentId: M:Dec.PathRoot.IsValidForWriting
+  fullName: Dec.PathRoot.IsValidForWriting()
+  nameWithType: PathRoot.IsValidForWriting()
+- uid: Dec.PathRoot.IsValidForWriting*
+  name: IsValidForWriting
+  href: api/Dec.PathRoot.html#Dec_PathRoot_IsValidForWriting_
+  commentId: Overload:Dec.PathRoot.IsValidForWriting
+  isSpec: "True"
+  fullName: Dec.PathRoot.IsValidForWriting
+  nameWithType: PathRoot.IsValidForWriting
 - uid: Dec.PathRoot.Serialize
   name: Serialize()
   href: api/Dec.PathRoot.html#Dec_PathRoot_Serialize

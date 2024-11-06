@@ -2,11 +2,11 @@
 <html>
   <head>
     <meta charset="utf-8">
-      <title>Class CloneWithAssignmentAttribute </title>
+      <title>Class CloneStructPiecewiseAttribute </title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="title" content="Class CloneWithAssignmentAttribute ">
+      <meta name="title" content="Class CloneStructPiecewiseAttribute ">
       
-      <meta name="description" content="Signals that this class or struct should be cloned with standard assignment.">
+      <meta name="description" content="Signals that this struct should be cloned with standard shallow-copy assignment semantics.">
       <link rel="icon" href="../favicon.ico">
       <link rel="stylesheet" href="../public/docfx.min.css">
       <link rel="stylesheet" href="../public/main.css">
@@ -16,7 +16,7 @@
       
       
       
-      <meta name="docfx:docurl" content="https://github.com/zorbathut/dec/new/dev/apiSpec/new?filename=Dec_CloneWithAssignmentAttribute.md&amp;value=---%0Auid%3A%20Dec.CloneWithAssignmentAttribute%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/zorbathut/dec/new/dev/apiSpec/new?filename=Dec_CloneStructPiecewiseAttribute.md&amp;value=---%0Auid%3A%20Dec.CloneStructPiecewiseAttribute%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -80,12 +80,12 @@
           <nav id="breadcrumb"></nav>
         </div>
 
-        <article data-uid="Dec.CloneWithAssignmentAttribute">
+        <article data-uid="Dec.CloneStructPiecewiseAttribute">
 
 
 
-  <h1 id="Dec_CloneWithAssignmentAttribute" data-uid="Dec.CloneWithAssignmentAttribute" class="text-break">
-Class CloneWithAssignmentAttribute  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Attributes.cs/#L52"><i class="bi bi-code-slash"></i></a>
+  <h1 id="Dec_CloneStructPiecewiseAttribute" data-uid="Dec.CloneStructPiecewiseAttribute" class="text-break">
+Class CloneStructPiecewiseAttribute  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Attributes.cs/#L50"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -93,13 +93,13 @@ Class CloneWithAssignmentAttribute  <a class="header-action link-secondary" titl
   <dl><dt>Assembly</dt><dd>dec.dll</dd></dl>
   </div>
 
-  <div class="markdown summary"><p>Signals that this class or struct should be cloned with standard assignment.</p>
+  <div class="markdown summary"><p>Signals that this struct should be cloned with standard shallow-copy assignment semantics.</p>
 </div>
   <div class="markdown conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[AttributeUsage(AttributeTargets.Class|AttributeTargets.Struct)]
-public class CloneWithAssignmentAttribute : Attribute</code></pre>
+    <pre><code class="lang-csharp hljs">[AttributeUsage(AttributeTargets.Struct)]
+public class CloneStructPiecewiseAttribute : Attribute</code></pre>
   </div>
 
 
@@ -110,7 +110,7 @@ public class CloneWithAssignmentAttribute : Attribute</code></pre>
     <dd>
       <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
       <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.attribute">Attribute</a></div>
-      <div><span class="xref">CloneWithAssignmentAttribute</span></div>
+      <div><span class="xref">CloneStructPiecewiseAttribute</span></div>
     </dd>
   </dl>
 
@@ -120,9 +120,8 @@ public class CloneWithAssignmentAttribute : Attribute</code></pre>
 
 
 
-  <h2 id="Dec_CloneWithAssignmentAttribute_remarks">Remarks</h2>
-  <div class="markdown level0 remarks"><p>This is most useful for collections of objects, where it can rely on the collection's own cloning behavior to clone a vast swath of objects at once.</p>
-<p>For structs, this becomes a shallow copy. For classes, this becomes a reference copy.</p>
+  <h2 id="Dec_CloneStructPiecewiseAttribute_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>This is potentially much faster than using IRecordable to accomplish the same thing, especially if the struct is in a collection of some kind.</p>
 </div>
 
 
@@ -130,7 +129,7 @@ public class CloneWithAssignmentAttribute : Attribute</code></pre>
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/zorbathut/dec/blob/dev/src/Attributes.cs/#L52" class="edit-link">Edit this page</a>
+          <a href="https://github.com/zorbathut/dec/blob/dev/src/Attributes.cs/#L50" class="edit-link">Edit this page</a>
         </div>
 
 

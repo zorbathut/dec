@@ -14,10 +14,20 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/Dec.CloneWithAssignmentAttribute.yml",
+      "source_relative_path": "api/Dec.CloneClassAsSharedRef.yml",
       "output": {
         ".html": {
-          "relative_path": "api/Dec.CloneWithAssignmentAttribute.html"
+          "relative_path": "api/Dec.CloneClassAsSharedRef.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.CloneStructPiecewiseAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.CloneStructPiecewiseAttribute.html"
         }
       },
       "version": ""
