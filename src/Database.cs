@@ -19,6 +19,9 @@ namespace Dec
         private static Dec[] CachedList = null;
 
         internal static Dictionary<object, Path> DecPathLookup = new Dictionary<object, Path>();
+        internal static Dictionary<string, object> DecPathLookupReverse = new Dictionary<string, object>();
+        internal static HashSet<string> DecPathLookupInvalid = new HashSet<string>();
+        internal static HashSet<string> DecPathLookupConflicts = new HashSet<string>();
 
         /// <summary>
         /// The total number of decs that exist.
@@ -184,6 +187,9 @@ namespace Dec
             CachedList = null;
             Lookup.Clear();
             DecPathLookup.Clear();
+            DecPathLookupReverse.Clear();
+            DecPathLookupInvalid.Clear();
+            DecPathLookupConflicts.Clear();
 
             foreach (var db in Databases)
             {

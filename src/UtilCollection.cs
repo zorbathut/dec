@@ -85,5 +85,19 @@ namespace Dec
 
             return -1;
         }
+
+        internal static IEnumerable<T> FindDuplicates<T>(this IEnumerable<T> source)
+        {
+            var seen = new HashSet<T>();
+            var duplicates = new HashSet<T>();
+
+            foreach (var item in source)
+            {
+                if (!seen.Add(item))
+                    duplicates.Add(item);
+            }
+
+            return duplicates;
+        }
     }
 }

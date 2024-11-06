@@ -206,6 +206,28 @@ namespace DecTest
         }
 
         [Test]
+        public void InheritedPath([ValuesExcept(ParserMode.Validation)] ParserMode mode)
+        {
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <PathDec decName=""AbstractDec"" abstract=""true"">
+                        <member>PathDec.ConcreteDec.member</member>
+                    </PathDec>
+
+                    <PathDec decName=""ConcreteDec"" parent=""AbstractDec"">
+                    </PathDec>
+                </Decs>");
+            parser.Finish();
+
+            Assert.IsTrue(PathTester.validations == 1);
+
+            DoParserTests(mode);
+
+            Assert.IsTrue(PathTester.validations == (mode == ParserMode.Bare ? 1 : 3));
+        }
+
+        [Test]
         public void Record()
         {
             var initialData = new PathTester { text = "RECORD" };

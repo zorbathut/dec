@@ -13,6 +13,7 @@ namespace Dec
         private WriterUtil.PendingWriteCoordinator pendingWriteCoordinator = new WriterUtil.PendingWriteCoordinator();
 
         public abstract bool AllowReflection { get; }
+        public abstract bool AllowDecPath { get; }
         public abstract Recorder.IUserSettings UserSettings { get; }
 
         public abstract bool RegisterReference(object referenced, XElement element, Recorder.Settings recSettings, Path path);
@@ -40,6 +41,7 @@ namespace Dec
         private const int MaxRecursionDepth = 100;
 
         public override bool AllowReflection { get => writer.AllowReflection; }
+        public override bool AllowDecPath { get => writer.AllowDecPath; }
         public override Recorder.IUserSettings UserSettings { get => writer.UserSettings; }
 
         private WriterNodeXml(WriterXml writer, XContainer parent, string label, int depth, Recorder.Settings settings, Path path) : base(settings, path)
@@ -159,6 +161,23 @@ namespace Dec
             {
                 node.Add(new XText(value.DecName));
             }
+        }
+
+        public override void WriteDecPathRef(object value)
+        {
+            var path = Database.DecPathLookup[value];
+
+            var pathSerialized = path.Serialize();
+            if (Database.DecPathLookupInvalid.Contains(pathSerialized))
+            {
+                Dbg.Err($"Attempting to record a dec path [{path.Serialize()}], but this is not currently valid; doing our best though!");
+            }
+            else if (Database.DecPathLookupConflicts.Contains(pathSerialized))
+            {
+                Dbg.Err($"Attempting to record a dec path [{path.Serialize()}], but this is currently ambiguous; doing our best though!");
+            }
+
+            node.Add(new XAttribute("ref", pathSerialized));
         }
 
         public override void TagClass(Type type)

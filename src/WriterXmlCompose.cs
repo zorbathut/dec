@@ -8,6 +8,7 @@ namespace Dec
     internal class WriterXmlCompose : WriterXml
     {
         public override bool AllowReflection { get => true; }
+        public override bool AllowDecPath { get => false; }
         public override Recorder.IUserSettings UserSettings { get; }
 
         private XDocument doc;

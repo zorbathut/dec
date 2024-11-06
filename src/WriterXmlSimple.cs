@@ -7,6 +7,7 @@ namespace Dec
     internal class WriterXmlSimple : WriterXml
     {
         public override bool AllowReflection { get => false; }
+        public override bool AllowDecPath { get => true; }  // . . . sure, I guess?
         public override Recorder.IUserSettings UserSettings { get; }
 
         private Dictionary<object, Path> seenObjects = new Dictionary<object, Path>();

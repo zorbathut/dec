@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Reflection;
 
@@ -580,11 +581,18 @@ namespace Dec
                     // these paths *should* all match up, so we're just choosing one
                     var newPath = nodes[0].GetContext().path;
 
-                    // right now we strictly overwrite previous instances of the result
-                    // this is not a great solution because it's very error-prone
-                    // the problem is that the inheritance/patch system has a tendency to spam this function repeatedly with the same object
-                    // I'm currently not sure how to deal with this, so . . . I'm not! I'm just doing it the bad way.
-                    globals.decPathLookup[result] = newPath;
+                    if (newPath == null)
+                    {
+                        Dbg.Err("Internal error; missing path somehow? Please report this, thanks!");
+                    }
+                    else
+                    {
+                        // right now we strictly overwrite previous instances of the result
+                        // this is not a great solution because it's very error-prone
+                        // the problem is that the inheritance/patch system has a tendency to spam this function repeatedly with the same object
+                        // I'm currently not sure how to deal with this, so . . . I'm not! I'm just doing it the bad way.
+                        globals.decPathLookup[result] = newPath;
+                    }
                 }
             }
 
@@ -771,6 +779,30 @@ namespace Dec
             if (refKey != null)
             {
                 // Ref is the highest priority, largely because I think it's cool
+
+                // First we check if this is a valid Dec path ref; those don't require .Shared()
+                if (Database.DecPathLookupReverse.TryGetValue(refKey, out var defPathRef))
+                {
+                    // check types
+                    if (!type.IsAssignableFrom(defPathRef.GetType()))
+                    {
+                        Dbg.Err($"{refKeyNode.GetContext()}: Dec path reference object [{refKey}] is of type {defPathRef.GetType()}, which cannot be converted to expected type {type}");
+                        return result;
+                    }
+
+                    // if it's a conflict, be unhappy
+                    if (Database.DecPathLookupInvalid.Contains(refKey))
+                    {
+                        Dbg.Err($"{refKeyNode.GetContext()}: Deserializes improper Dec path reference [{refKey}]; this should probably not have been serialized in the first place, doing our best though");
+                    }
+                    else if (Database.DecPathLookupConflicts.Contains(refKey))
+                    {
+                        Dbg.Err($"{refKeyNode.GetContext()}: Multiple objects claiming Dec path reference [{refKey}]; this should probably not have been serialized in the first place, doing our best though");
+                    }
+
+                    // toot
+                    return defPathRef;
+                }
 
                 if (recSettings.shared == Recorder.Settings.Shared.Deny)
                 {
@@ -1758,6 +1790,19 @@ namespace Dec
                 }
 
                 return;
+            }
+
+
+            if (node.AllowDecPath)
+            {
+                // Try to snag a Dec path
+                var decPath = Database.DecPathLookup.TryGetValue(value);
+
+                if (decPath != null)
+                {
+                    node.WriteDecPathRef(value);
+                    return;
+                }
             }
 
             var valType = value.GetType();

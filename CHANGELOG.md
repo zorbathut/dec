@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 * Added SetupDependsOnAttribute, which allows you to define ConfigErrors/PostLoad dependencies between Dec classes. This is a prototype and will probably change in the future.
 * Added a general-purpose stable dag evaluator, which is exposed mostly because it's often convenient.
 * Added Recorder.InputContext, which gives contextual diagnostic information useful for reporting Recorder issues.
+* Added the ability to reference class objects contained within Decs. Right now the path generation works only for members, lists, and arrays; this will probably be improved later.
 
 ### Breaking
 * Dec doesn't guarantee what order Decs are initialized in, and it still doesn't . . . but it was *pretty consistent*, and boy, did the above change seriously scramble the order they tend to get initialized in! If you have load dependencies, even if you don't realize that you do, don't be surprised if stuff breaks. Future versions of Dec might include a Dev Mode that intentionally randomizes load order (within the bounds of dependencies) to help catch these issues.

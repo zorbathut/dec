@@ -69,6 +69,7 @@ namespace Dec
         private Dictionary<string, WriterNodeClone> recorderChildren;
 
         public override bool AllowReflection { get => writer.AllowReflection; }
+        public override bool AllowDecPath { get => true; }
         public override bool AllowAsThis { get => false; }
         public override bool AllowCloning { get => true;  }
         public override Recorder.IUserSettings UserSettings { get => writer.UserSettings; }
@@ -597,6 +598,11 @@ namespace Dec
         }
 
         public override void WriteDec(Dec value)
+        {
+            SetValuelikeOriginalAndResult(value);
+        }
+
+        public override void WriteDecPathRef(object value)
         {
             SetValuelikeOriginalAndResult(value);
         }

@@ -89,7 +89,6 @@ namespace Dec
         {
             var recorderChildContext = recorderSettings.CreateChild();
 
-            int index = 0;
             foreach (var fieldElement in xml.Elements())
             {
                 if (fieldElement.Name.LocalName != "li")
@@ -98,7 +97,7 @@ namespace Dec
                     Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                 }
 
-                list.Add(Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, new PathIndex(path, index++), UserSettings) }, referencedType, null, readerGlobals, recorderChildContext));
+                list.Add(Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, new PathIndex(path, list.Count), UserSettings) }, referencedType, null, readerGlobals, recorderChildContext));
             }
 
             list.GetType().GetField("_version", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(list, Util.CollectionDeserializationVersion);
@@ -160,7 +159,7 @@ namespace Dec
                 int index = 0;
                 foreach (var fieldElement in xml.Elements())
                 {
-                    var newPath = new PathIndex(path, index);
+                    var newPath = new PathIndex(path, startOffset + index);
 
                     if (fieldElement.Name.LocalName != "li")
                     {
@@ -286,7 +285,8 @@ namespace Dec
 
                     writtenFields?.Add(key);
 
-                    dict[key] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, null, UserSettings) }, valueType, originalValue, readerGlobals, recorderChildContext);
+                    var valuePath = new PathDictionaryValue(path);
+                    dict[key] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, valuePath, UserSettings) }, valueType, originalValue, readerGlobals, recorderChildContext);
                 }
             }
         }
@@ -373,7 +373,7 @@ namespace Dec
 
             var recorderChildContext = recorderSettings.CreateChild();
 
-            int index = 0;
+            int index = (int)stack.GetType().GetProperty("Count").GetValue(stack);
             foreach (var fieldElement in xml.Elements())
             {
                 var newPath = new PathIndex(path, index);
@@ -395,7 +395,7 @@ namespace Dec
 
             var recorderChildContext = recorderSettings.CreateChild();
 
-            int index = 0;
+            int index = (int)queue.GetType().GetProperty("Count").GetValue(queue);
             foreach (var fieldElement in xml.Elements())
             {
                 var newPath = new PathIndex(path, index);

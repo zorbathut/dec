@@ -161,6 +161,7 @@ namespace Dec
         private string accessor;
 
         public override bool AllowReflection { get => writer.AllowReflection; }
+        public override bool AllowDecPath { get => false; }
         public override Recorder.IUserSettings UserSettings { get => writer.UserSettings; }
 
         public WriterNodeValidation(WriterValidation writer, string accessor, Path path) : base(path)
@@ -405,12 +406,19 @@ namespace Dec
             // and if we're going through Converter, we don't know what the underlying known values will be
             throw new NotImplementedException();
         }
+
+        public override void WriteDecPathRef(object value)
+        {
+            // not really viable honestly
+            throw new NotImplementedException();
+        }
     }
 
     // This is used solely for dict keys, because we want to get a reasonably-stringized version of this without having to jump through hideous hoops.
     internal sealed class WriterNodeStringize : WriterNodeCS
     {
         public override bool AllowReflection { get => false; }
+        public override bool AllowDecPath { get => false; }
         public override Recorder.IUserSettings UserSettings { get; }
 
         public string SerializedString { get; private set; }
@@ -501,6 +509,11 @@ namespace Dec
         }
 
         public override void WriteConvertible(Converter converter, object value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void WriteDecPathRef(object value)
         {
             throw new NotImplementedException();
         }

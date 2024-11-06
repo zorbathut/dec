@@ -459,6 +459,24 @@ namespace Dec
                     }
                 }
 
+                // Invert the dec path lookup tables
+                foreach (var (decObject, decPath) in Database.DecPathLookup)
+                {
+                    var pathSerialized = decPath.Serialize();
+
+                    if (Database.DecPathLookupReverse.ContainsKey(pathSerialized))
+                    {
+                        Database.DecPathLookupConflicts.Add(pathSerialized);    // this is currently considered OK because our path system is highly incomplete
+                    }
+
+                    if (!decPath.IsValidForWriting())
+                    {
+                        Database.DecPathLookupInvalid.Add(pathSerialized);
+                    }
+
+                    Database.DecPathLookupReverse[pathSerialized] = decObject;
+                }
+
                 if (s_Status != Status.Distributing)
                 {
                     Dbg.Err($"Finalizing while the world is in {s_Status} state; should be {Status.Distributing} state");

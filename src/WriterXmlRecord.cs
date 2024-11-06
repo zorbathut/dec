@@ -8,6 +8,7 @@ namespace Dec
     internal class WriterXmlRecord : WriterXml
     {
         public override bool AllowReflection { get => false; }
+        public override bool AllowDecPath { get => true; }
         public override Recorder.IUserSettings UserSettings { get; }
 
         // Maps between object and the in-place element. This does *not* yet have the ref ID tagged, and will have to be extracted into a new Element later.

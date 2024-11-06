@@ -4,6 +4,8 @@ namespace Dec
     public abstract class Path
     {
         public abstract string Serialize();
+
+        public abstract bool IsValidForWriting();
     }
 
     public class PathRoot : Path
@@ -18,6 +20,11 @@ namespace Dec
         public override string Serialize()
         {
             return rootType;
+        }
+
+        public override bool IsValidForWriting()
+        {
+            return true;
         }
     }
 
@@ -44,6 +51,11 @@ namespace Dec
         {
             return $"{decTypeName ?? decType.ComposeDecFormatted()}.{decName}";
         }
+
+        public override bool IsValidForWriting()
+        {
+            return true;
+        }
     }
 
     public class PathRef : Path
@@ -59,6 +71,12 @@ namespace Dec
         public override string Serialize()
         {
             return $"REF.{refName}";
+        }
+
+        public override bool IsValidForWriting()
+        {
+            // how did this even happen?
+            return false;
         }
     }
 
@@ -77,6 +95,11 @@ namespace Dec
         {
             return $"{parent.Serialize()}.{memberName}";
         }
+
+        public override bool IsValidForWriting()
+        {
+            return parent.IsValidForWriting();
+        }
     }
 
     public class PathIndex : Path
@@ -93,6 +116,11 @@ namespace Dec
         public override string Serialize()
         {
             return $"{parent.Serialize()}[{index}]";
+        }
+
+        public override bool IsValidForWriting()
+        {
+            return parent.IsValidForWriting();
         }
     }
 
@@ -111,6 +139,11 @@ namespace Dec
         {
             return $"{parent.Serialize()}[{string.Join(",", indices)}]";
         }
+
+        public override bool IsValidForWriting()
+        {
+            return parent.IsValidForWriting();
+        }
     }
 
     // the ones after this point are grossly incomplete
@@ -128,6 +161,12 @@ namespace Dec
         {
             return $"{parent.Serialize()}[KEY]";
         }
+
+        public override bool IsValidForWriting()
+        {
+            // not yet identifiable; I'm not sure how this even can work, frankly
+            return false;
+        }
     }
 
     public class PathDictionaryValue : Path
@@ -143,6 +182,12 @@ namespace Dec
         {
             return $"{parent.Serialize()}[nyi]";
         }
+
+        public override bool IsValidForWriting()
+        {
+            // if we have a usable key this can be done! but we're not right now
+            return false;
+        }
     }
 
     public class PathHashSetElement : Path
@@ -157,6 +202,12 @@ namespace Dec
         public override string Serialize()
         {
             return $"{parent.Serialize()}[KEY]";
+        }
+
+        public override bool IsValidForWriting()
+        {
+            // not yet identifiable; I'm not sure how this even can work, frankly
+            return false;
         }
     }
 }

@@ -16,6 +16,7 @@ namespace Dec
 
         public Recorder.Settings RecorderSettings { get => settings; }
         public abstract bool AllowReflection { get; }
+        public abstract bool AllowDecPath { get; }
         public virtual bool AllowAsThis { get => true; }
         public virtual bool AllowCloning { get => false; }
         public abstract Recorder.IUserSettings UserSettings { get; }
@@ -36,6 +37,7 @@ namespace Dec
         public abstract void WriteString(string value);
         public abstract void WriteType(Type value);
         public abstract void WriteDec(Dec value);
+        public abstract void WriteDecPathRef(object value);
         public abstract void WriteExplicitNull();
         public abstract bool WriteReference(object value, Path path);
         public abstract void WriteArray(Array value);
