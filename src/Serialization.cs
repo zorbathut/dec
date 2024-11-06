@@ -469,7 +469,8 @@ namespace Dec
             bool everExisted = false;
             foreach (var item in decs)
             {
-                var s_parseMode = ParseModeFromString(item.context, item.node.GetMetadata(ReaderNodeParseable.Metadata.Mode));
+                // this is also horribly inefficient
+                var s_parseMode = ParseModeFromString(item.context, item.nodeFactory(null).GetMetadata(ReaderNodeParseable.Metadata.Mode));
 
                 switch (s_parseMode)
                 {

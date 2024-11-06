@@ -264,17 +264,16 @@ namespace Dec
                 var registeredDecs = new Dictionary<(Type, string), List<ReaderFileDec.ReaderDec>>();
                 foreach (var module in modules)
                 {
-                    var seenDecs = new Dictionary<(Type, string), ReaderNode>();
+                    var seenDecs = new Dictionary<(Type, string), Context>();
                     foreach (var reader in module.readers)
                     {
                         foreach (var readerDec in reader.ParseDecs())
                         {
                             var id = (readerDec.type.GetDecRootType(), readerDec.name);
 
-                            var collidingDec = seenDecs.TryGetValue(id);
-                            if (collidingDec != null)
+                            if (seenDecs.TryGetValue(id, out var collidingDec))
                             {
-                                Dbg.Err($"{collidingDec.GetContext()} / {readerDec.node.GetContext()}: Dec [{id.Item1}:{id.name}] defined twice");
+                                Dbg.Err($"{collidingDec} / {readerDec.context}: Dec [{id.Item1}:{id.name}] defined twice");
 
                                 // If the already-parsed one is abstract, we throw it away and go with the non-abstract one, because it's arguably more likely to be the one the user wants.
                                 if (!(registeredDecs[id].Select(dec => dec.abstrct).LastOrDefault(abstrct => abstrct.HasValue) ?? false))
@@ -285,7 +284,7 @@ namespace Dec
                                 registeredDecs.Remove(id);
                             }
 
-                            seenDecs[id] = readerDec.node;
+                            seenDecs[id] = readerDec.context;
 
                             if (!registeredDecs.TryGetValue(id, out var list))
                             {
@@ -357,7 +356,8 @@ namespace Dec
                     }
 
                     // Not an abstract dec instance, so create our instance
-                    var decInstance = (Dec)typeDeterminor.type.CreateInstanceSafe("dec", typeDeterminor.node);
+                    // also, this invocation of NodeFactory is unnecessarily slow and should be fixed at some point
+                    var decInstance = (Dec)typeDeterminor.type.CreateInstanceSafe("dec", typeDeterminor.nodeFactory(new PathDec(id.Item1, id.Item2)));
 
                     // Error reporting happens within CreateInstanceSafe; if we get null out, we just need to clean up elegantly
                     if (decInstance != null)
@@ -392,7 +392,7 @@ namespace Dec
                         var parentId = (id.Item1, decWithParent.parent);
                         if (!registeredDecOrders.TryGetValue(parentId, out var parentDec))
                         {
-                            Dbg.Err($"{decWithParent.node.GetContext()}: Dec [{decWithParent.type}:{id.Item2}] is attempting to use parent `[{parentId.Item1}:{parentId.parent}]`, but no such dec exists");
+                            Dbg.Err($"{decWithParent.context}: Dec [{decWithParent.type}:{id.Item2}] is attempting to use parent `[{parentId.Item1}:{parentId.parent}]`, but no such dec exists");
                             // guess we'll just try to build it from nothing
                             break;
                         }
@@ -402,8 +402,10 @@ namespace Dec
                         currentOrder = parentDec;
                     }
 
+                    var generatedOrders = completeOrders.Select(order => order.nodeFactory(new PathDec(id.Item1, id.Item2))).ToList();
+
                     var targetDec = Database.Get(id.Item1, id.Item2);
-                    Serialization.ParseElement(completeOrders.Select(order => order.node).ToList(), targetDec.GetType(), targetDec, readerContext, new Recorder.Settings(), isRootDec: true, ordersOverride: completeOrders.Select(order => (Serialization.ParseCommand.Patch, order.node)).ToList());
+                    Serialization.ParseElement(generatedOrders, targetDec.GetType(), targetDec, readerContext, new Recorder.Settings(), isRootDec: true, ordersOverride: generatedOrders.Select(order => (Serialization.ParseCommand.Patch, node: order)).ToList());
                 }
 
                 if (s_Status != Status.Processing)

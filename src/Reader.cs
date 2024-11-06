@@ -11,7 +11,10 @@ namespace Dec
             public Type type;
             public string name;
 
-            public ReaderNodeParseable node;
+            // this is a factory because we need to be able to generate lots of it with different paths
+            // this is not a good solution
+            // this needs to go away along with the whole polymorphic ReaderNode system
+            public Func<Path, ReaderNodeParseable> nodeFactory;
             public Context context;
 
             public bool? abstrct;
