@@ -209,6 +209,38 @@ references:
   commentId: T:Dec.Context
   fullName: Dec.Context
   nameWithType: Context
+- uid: Dec.Context.Err(System.String)
+  name: Err(string)
+  href: api/Dec.Context.html#Dec_Context_Err_System_String_
+  commentId: M:Dec.Context.Err(System.String)
+  name.vb: Err(String)
+  fullName: Dec.Context.Err(string)
+  fullName.vb: Dec.Context.Err(String)
+  nameWithType: Context.Err(string)
+  nameWithType.vb: Context.Err(String)
+- uid: Dec.Context.Err*
+  name: Err
+  href: api/Dec.Context.html#Dec_Context_Err_
+  commentId: Overload:Dec.Context.Err
+  isSpec: "True"
+  fullName: Dec.Context.Err
+  nameWithType: Context.Err
+- uid: Dec.Context.Inf(System.String)
+  name: Inf(string)
+  href: api/Dec.Context.html#Dec_Context_Inf_System_String_
+  commentId: M:Dec.Context.Inf(System.String)
+  name.vb: Inf(String)
+  fullName: Dec.Context.Inf(string)
+  fullName.vb: Dec.Context.Inf(String)
+  nameWithType: Context.Inf(string)
+  nameWithType.vb: Context.Inf(String)
+- uid: Dec.Context.Inf*
+  name: Inf
+  href: api/Dec.Context.html#Dec_Context_Inf_
+  commentId: Overload:Dec.Context.Inf
+  isSpec: "True"
+  fullName: Dec.Context.Inf
+  nameWithType: Context.Inf
 - uid: Dec.Context.PathString
   name: PathString()
   href: api/Dec.Context.html#Dec_Context_PathString
@@ -235,6 +267,22 @@ references:
   isSpec: "True"
   fullName: Dec.Context.ToString
   nameWithType: Context.ToString
+- uid: Dec.Context.Wrn(System.String)
+  name: Wrn(string)
+  href: api/Dec.Context.html#Dec_Context_Wrn_System_String_
+  commentId: M:Dec.Context.Wrn(System.String)
+  name.vb: Wrn(String)
+  fullName: Dec.Context.Wrn(string)
+  fullName.vb: Dec.Context.Wrn(String)
+  nameWithType: Context.Wrn(string)
+  nameWithType.vb: Context.Wrn(String)
+- uid: Dec.Context.Wrn*
+  name: Wrn
+  href: api/Dec.Context.html#Dec_Context_Wrn_
+  commentId: Overload:Dec.Context.Wrn
+  isSpec: "True"
+  fullName: Dec.Context.Wrn
+  nameWithType: Context.Wrn
 - uid: Dec.ConverterFactoryDynamic
   name: ConverterFactoryDynamic
   href: api/Dec.ConverterFactoryDynamic.html
@@ -1742,6 +1790,22 @@ references:
   commentId: F:Dec.Recorder.Direction.Write
   fullName: Dec.Recorder.Direction.Write
   nameWithType: Recorder.Direction.Write
+- uid: Dec.Recorder.Err(System.String)
+  name: Err(string)
+  href: api/Dec.Recorder.html#Dec_Recorder_Err_System_String_
+  commentId: M:Dec.Recorder.Err(System.String)
+  name.vb: Err(String)
+  fullName: Dec.Recorder.Err(string)
+  fullName.vb: Dec.Recorder.Err(String)
+  nameWithType: Recorder.Err(string)
+  nameWithType.vb: Recorder.Err(String)
+- uid: Dec.Recorder.Err*
+  name: Err
+  href: api/Dec.Recorder.html#Dec_Recorder_Err_
+  commentId: Overload:Dec.Recorder.Err
+  isSpec: "True"
+  fullName: Dec.Recorder.Err
+  nameWithType: Recorder.Err
 - uid: Dec.Recorder.IUserSettings
   name: Recorder.IUserSettings
   href: api/Dec.Recorder.IUserSettings.html
@@ -1764,6 +1828,22 @@ references:
   isSpec: "True"
   fullName: Dec.Recorder.Ignore
   nameWithType: Recorder.Ignore
+- uid: Dec.Recorder.Inf(System.String)
+  name: Inf(string)
+  href: api/Dec.Recorder.html#Dec_Recorder_Inf_System_String_
+  commentId: M:Dec.Recorder.Inf(System.String)
+  name.vb: Inf(String)
+  fullName: Dec.Recorder.Inf(string)
+  fullName.vb: Dec.Recorder.Inf(String)
+  nameWithType: Recorder.Inf(string)
+  nameWithType.vb: Recorder.Inf(String)
+- uid: Dec.Recorder.Inf*
+  name: Inf
+  href: api/Dec.Recorder.html#Dec_Recorder_Inf_
+  commentId: Overload:Dec.Recorder.Inf
+  isSpec: "True"
+  fullName: Dec.Recorder.Inf
+  nameWithType: Recorder.Inf
 - uid: Dec.Recorder.Mode
   name: Mode
   href: api/Dec.Recorder.html#Dec_Recorder_Mode
@@ -2024,6 +2104,22 @@ references:
   fullName.vb: Dec.Recorder.Write(Of T)(T, Boolean, Dec.Recorder.IUserSettings)
   nameWithType: Recorder.Write<T>(T, bool, Recorder.IUserSettings)
   nameWithType.vb: Recorder.Write(Of T)(T, Boolean, Recorder.IUserSettings)
+- uid: Dec.Recorder.Wrn(System.String)
+  name: Wrn(string)
+  href: api/Dec.Recorder.html#Dec_Recorder_Wrn_System_String_
+  commentId: M:Dec.Recorder.Wrn(System.String)
+  name.vb: Wrn(String)
+  fullName: Dec.Recorder.Wrn(string)
+  fullName.vb: Dec.Recorder.Wrn(String)
+  nameWithType: Recorder.Wrn(string)
+  nameWithType.vb: Recorder.Wrn(String)
+- uid: Dec.Recorder.Wrn*
+  name: Wrn
+  href: api/Dec.Recorder.html#Dec_Recorder_Wrn_
+  commentId: Overload:Dec.Recorder.Wrn
+  isSpec: "True"
+  fullName: Dec.Recorder.Wrn
+  nameWithType: Recorder.Wrn
 - uid: Dec.SetupDependsOnAttribute
   name: SetupDependsOnAttribute
   href: api/Dec.SetupDependsOnAttribute.html
