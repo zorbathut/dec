@@ -1373,15 +1373,15 @@ references:
   commentId: T:Dec.PathDictionaryValue
   fullName: Dec.PathDictionaryValue
   nameWithType: PathDictionaryValue
-- uid: Dec.PathDictionaryValue.#ctor(Dec.Path)
-  name: PathDictionaryValue(Path)
-  href: api/Dec.PathDictionaryValue.html#Dec_PathDictionaryValue__ctor_Dec_Path_
-  commentId: M:Dec.PathDictionaryValue.#ctor(Dec.Path)
-  name.vb: New(Path)
-  fullName: Dec.PathDictionaryValue.PathDictionaryValue(Dec.Path)
-  fullName.vb: Dec.PathDictionaryValue.New(Dec.Path)
-  nameWithType: PathDictionaryValue.PathDictionaryValue(Path)
-  nameWithType.vb: PathDictionaryValue.New(Path)
+- uid: Dec.PathDictionaryValue.#ctor(Dec.Path,System.String)
+  name: PathDictionaryValue(Path, string)
+  href: api/Dec.PathDictionaryValue.html#Dec_PathDictionaryValue__ctor_Dec_Path_System_String_
+  commentId: M:Dec.PathDictionaryValue.#ctor(Dec.Path,System.String)
+  name.vb: New(Path, String)
+  fullName: Dec.PathDictionaryValue.PathDictionaryValue(Dec.Path, string)
+  fullName.vb: Dec.PathDictionaryValue.New(Dec.Path, String)
+  nameWithType: PathDictionaryValue.PathDictionaryValue(Path, string)
+  nameWithType.vb: PathDictionaryValue.New(Path, String)
 - uid: Dec.PathDictionaryValue.#ctor*
   name: PathDictionaryValue
   href: api/Dec.PathDictionaryValue.html#Dec_PathDictionaryValue__ctor_
@@ -1418,6 +1418,57 @@ references:
   isSpec: "True"
   fullName: Dec.PathDictionaryValue.Serialize
   nameWithType: PathDictionaryValue.Serialize
+- uid: Dec.PathDictionaryValueUnpathable
+  name: PathDictionaryValueUnpathable
+  href: api/Dec.PathDictionaryValueUnpathable.html
+  commentId: T:Dec.PathDictionaryValueUnpathable
+  fullName: Dec.PathDictionaryValueUnpathable
+  nameWithType: PathDictionaryValueUnpathable
+- uid: Dec.PathDictionaryValueUnpathable.#ctor(Dec.Path)
+  name: PathDictionaryValueUnpathable(Path)
+  href: api/Dec.PathDictionaryValueUnpathable.html#Dec_PathDictionaryValueUnpathable__ctor_Dec_Path_
+  commentId: M:Dec.PathDictionaryValueUnpathable.#ctor(Dec.Path)
+  name.vb: New(Path)
+  fullName: Dec.PathDictionaryValueUnpathable.PathDictionaryValueUnpathable(Dec.Path)
+  fullName.vb: Dec.PathDictionaryValueUnpathable.New(Dec.Path)
+  nameWithType: PathDictionaryValueUnpathable.PathDictionaryValueUnpathable(Path)
+  nameWithType.vb: PathDictionaryValueUnpathable.New(Path)
+- uid: Dec.PathDictionaryValueUnpathable.#ctor*
+  name: PathDictionaryValueUnpathable
+  href: api/Dec.PathDictionaryValueUnpathable.html#Dec_PathDictionaryValueUnpathable__ctor_
+  commentId: Overload:Dec.PathDictionaryValueUnpathable.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: Dec.PathDictionaryValueUnpathable.PathDictionaryValueUnpathable
+  fullName.vb: Dec.PathDictionaryValueUnpathable.New
+  nameWithType: PathDictionaryValueUnpathable.PathDictionaryValueUnpathable
+  nameWithType.vb: PathDictionaryValueUnpathable.New
+- uid: Dec.PathDictionaryValueUnpathable.IsValidForWriting
+  name: IsValidForWriting()
+  href: api/Dec.PathDictionaryValueUnpathable.html#Dec_PathDictionaryValueUnpathable_IsValidForWriting
+  commentId: M:Dec.PathDictionaryValueUnpathable.IsValidForWriting
+  fullName: Dec.PathDictionaryValueUnpathable.IsValidForWriting()
+  nameWithType: PathDictionaryValueUnpathable.IsValidForWriting()
+- uid: Dec.PathDictionaryValueUnpathable.IsValidForWriting*
+  name: IsValidForWriting
+  href: api/Dec.PathDictionaryValueUnpathable.html#Dec_PathDictionaryValueUnpathable_IsValidForWriting_
+  commentId: Overload:Dec.PathDictionaryValueUnpathable.IsValidForWriting
+  isSpec: "True"
+  fullName: Dec.PathDictionaryValueUnpathable.IsValidForWriting
+  nameWithType: PathDictionaryValueUnpathable.IsValidForWriting
+- uid: Dec.PathDictionaryValueUnpathable.Serialize
+  name: Serialize()
+  href: api/Dec.PathDictionaryValueUnpathable.html#Dec_PathDictionaryValueUnpathable_Serialize
+  commentId: M:Dec.PathDictionaryValueUnpathable.Serialize
+  fullName: Dec.PathDictionaryValueUnpathable.Serialize()
+  nameWithType: PathDictionaryValueUnpathable.Serialize()
+- uid: Dec.PathDictionaryValueUnpathable.Serialize*
+  name: Serialize
+  href: api/Dec.PathDictionaryValueUnpathable.html#Dec_PathDictionaryValueUnpathable_Serialize_
+  commentId: Overload:Dec.PathDictionaryValueUnpathable.Serialize
+  isSpec: "True"
+  fullName: Dec.PathDictionaryValueUnpathable.Serialize
+  nameWithType: PathDictionaryValueUnpathable.Serialize
 - uid: Dec.PathHashSetElement
   name: PathHashSetElement
   href: api/Dec.PathHashSetElement.html
