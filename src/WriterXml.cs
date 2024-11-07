@@ -263,7 +263,9 @@ namespace Dec
                 var li = CreateNamedChild("li", RecorderSettings, Path);
 
                 Serialization.ComposeElement(li.CreateNamedChild("key", RecorderSettings.CreateChild(), new PathDictionaryKey(Path)), iterator.Key, keyType);
-                Serialization.ComposeElement(li.CreateNamedChild("value", RecorderSettings.CreateChild(), new PathDictionaryValue(Path)), iterator.Value, valueType);
+
+                // unfortunate consequence: we can't generate sensible Paths when doing this
+                Serialization.ComposeElement(li.CreateNamedChild("value", RecorderSettings.CreateChild(), new PathDictionaryValueUnpathable(Path)), iterator.Value, valueType);
             }
         }
 

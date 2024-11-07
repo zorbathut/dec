@@ -146,6 +146,28 @@ namespace Dec
         }
     }
 
+    public class PathDictionaryValue : Path
+    {
+        private Path parent;
+        private string key;
+
+        public PathDictionaryValue(Path parent, string key)
+        {
+            this.parent = parent;
+            this.key = key;
+        }
+
+        public override string Serialize()
+        {
+            return $"{parent.Serialize()}[{key}]";
+        }
+
+        public override bool IsValidForWriting()
+        {
+            return parent.IsValidForWriting();
+        }
+    }
+
     // the ones after this point are grossly incomplete
 
     public class PathDictionaryKey : Path
@@ -169,18 +191,18 @@ namespace Dec
         }
     }
 
-    public class PathDictionaryValue : Path
+    public class PathDictionaryValueUnpathable : Path
     {
         private Path parent;
 
-        public PathDictionaryValue(Path parent)
+        public PathDictionaryValueUnpathable(Path parent)
         {
             this.parent = parent;
         }
 
         public override string Serialize()
         {
-            return $"{parent.Serialize()}[nyi]";
+            return $"{parent.Serialize()}[UNSERIALIZABLE]";
         }
 
         public override bool IsValidForWriting()

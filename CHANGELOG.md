@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 * SetupDependsOnAttribute, which allows you to define ConfigErrors/PostLoad dependencies between Dec classes. This is a prototype and will probably change in the future.
 * A general-purpose stable dag evaluator, which is exposed mostly because it's often convenient.
 * Recorder.InputContext, which gives contextual diagnostic information useful for reporting Recorder issues.
-* The ability to reference class objects contained within Decs. Right now the path generation works only for members, lists, and arrays; this will probably be improved later.
+* The ability to reference class objects contained within Decs. Right now the path generation works only for members, lists, arrays, and values of dictionaries that are input with non-`li` keys; this will probably be improved later.
 * Debug-log functions to Context and Recorder, making it easier to report issues.
 
 ### Breaking

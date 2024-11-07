@@ -295,7 +295,7 @@ namespace Dec
                 Serialization.ComposeElement(keyNode, iterator.Key, keyType);
 
                 writer.AppendLine($"if ({accessor}.ContainsKey({keyNode.SerializedString})) {{");
-                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}[{keyNode.SerializedString}]", new PathDictionaryValue(Path)), iterator.Value, valueType);
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}[{keyNode.SerializedString}]", new PathDictionaryValueUnpathable(Path)), iterator.Value, valueType);
                 writer.AppendLine($"}} else {{");
                 writer.AppendLine($"Assert.IsTrue({accessor}.ContainsKey({keyNode.SerializedString}));");   // this is unnecessary - it could just be .Fail() - but this gives you a *much* better error message
                 writer.AppendLine($"}}");

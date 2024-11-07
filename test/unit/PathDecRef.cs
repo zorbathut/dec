@@ -14,6 +14,7 @@ namespace DecTest
             public StubRecordable[] array;
             public StubRecordable[,] arrayMulti;
             public List<StubRecordable> list;
+            public Dictionary<string, StubRecordable> dictionary;
         }
 
         [SetUp]
@@ -44,6 +45,10 @@ namespace DecTest
                             <li />
                             <li />
                         </list>
+                        <dictionary>
+                          <horse />
+                          <dog />
+                        </dictionary>
                     </PathDec>
                 </Decs>");
             parser.Finish();
@@ -91,6 +96,18 @@ namespace DecTest
             var dec = Dec.Database<PathDec>.Get("TestDec");
 
             var item = dec.list[index];
+
+            var newItem = DoRecorderRoundTrip(item, mode);
+
+            Assert.AreSame(item, newItem);
+        }
+
+        [Test]
+        public void Dictionary([ValuesExcept(RecorderMode.Simple)] RecorderMode mode, [Values("horse", "dog")] string key)
+        {
+            var dec = Dec.Database<PathDec>.Get("TestDec");
+
+            var item = dec.dictionary[key];
 
             var newItem = DoRecorderRoundTrip(item, mode);
 

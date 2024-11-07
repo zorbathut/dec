@@ -232,7 +232,7 @@ namespace Dec
 
                     writtenFields?.Add(key);
 
-                    var valuePath = new PathDictionaryValue(path);
+                    var valuePath = new PathDictionaryValueUnpathable(path);
                     dict[key] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(valueNode, fileIdentifier,valuePath, UserSettings) }, referencedValueType, originalValue, readerGlobals, recorderChildContext);
                 }
                 else
@@ -285,7 +285,17 @@ namespace Dec
 
                     writtenFields?.Add(key);
 
-                    var valuePath = new PathDictionaryValue(path);
+                    Path valuePath;
+                    if (fieldElement.Name.LocalName.Contains('[') || fieldElement.Name.LocalName.Contains(']'))
+                    {
+                        // I'm not actually sure this is possible
+                        valuePath = new PathDictionaryValueUnpathable(path);
+                    }
+                    else
+                    {
+                        valuePath = new PathDictionaryValue(path, fieldElement.Name.LocalName);
+                    }
+
                     dict[key] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, valuePath, UserSettings) }, valueType, originalValue, readerGlobals, recorderChildContext);
                 }
             }

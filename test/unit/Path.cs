@@ -170,18 +170,23 @@ namespace DecTest
                         <dictValue>
                             <li>
                                 <key>first</key>
-                                <value>PathDec.TestDec.dictValue[nyi]</value>
+                                <value>PathDec.TestDec.dictValue[UNSERIALIZABLE]</value>
                             </li>
+                            <second>PathDec.TestDec.dictValue[second]</second>
                         </dictValue>
                     </PathDec>
                 </Decs>");
             parser.Finish();
 
-            Assert.IsTrue(PathTester.validations == 1);
+            Assert.IsTrue(PathTester.validations == 2);
+
+            // the `second` currently does not serialize properly, so we replace the value there for now
+            // fix this when we add support!
+            Dec.Database<PathDec>.Get("TestDec").dictValue["second"] = new PathTester { text = "PathDec.TestDec.dictValue[UNSERIALIZABLE]" };
 
             DoParserTests(mode);
 
-            Assert.IsTrue(PathTester.validations == (mode == ParserMode.Bare ? 1 : 3));
+            Assert.IsTrue(PathTester.validations == (mode == ParserMode.Bare ? 2 : 6));
         }
 
         [Test]
