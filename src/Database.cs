@@ -24,6 +24,32 @@ namespace Dec
         internal static HashSet<string> DecPathLookupConflicts = new HashSet<string>();
 
         /// <summary>
+        /// Registers a path lookup with the database.
+        /// </summary>
+        /// <remarks>
+        /// This is a hack job put in because I need the functionality on my own project. Don't be surprised if this behavior changes dramatically at some point.
+        /// </remarks>
+        public static void RegisterLookup(object obj, Path path)
+        {
+            var serialized = path.Serialize();
+
+            if (DecPathLookup.ContainsKey(obj))
+            {
+                Dbg.Err($"Attempting to register {obj} with path [{serialized}], but it's already registered with path {DecPathLookup[obj]}");
+                return;
+            }
+
+            if (DecPathLookupReverse.ContainsKey(serialized))
+            {
+                Dbg.Err($"Attempting to register {obj} with path [{serialized}], but that path is already registered to {DecPathLookupReverse[serialized]}");
+                return;
+            }
+
+            DecPathLookup[obj] = path;
+            DecPathLookupReverse[serialized] = obj;
+        }
+
+        /// <summary>
         /// The total number of decs that exist.
         /// </summary>
         public static int Count

@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using Dec;
 
 namespace DecTest
 {
@@ -112,6 +113,18 @@ namespace DecTest
             var newItem = DoRecorderRoundTrip(item, mode);
 
             Assert.AreSame(item, newItem);
+        }
+
+        [Test]
+        public void Register()
+        {
+            // This maybe shouldn't work.
+            var stub = new StubRecordable();
+            Dec.Database.RegisterLookup(stub, new PathRoot("stub"));
+
+            var newItem = DoRecorderRoundTrip(stub, RecorderMode.Pretty);
+
+            Assert.AreSame(stub, newItem);
         }
     }
 }
