@@ -35,7 +35,7 @@ namespace Dec
 
             if (DecPathLookup.ContainsKey(obj))
             {
-                Dbg.Err($"Attempting to register {obj} with path [{serialized}], but it's already registered with path {DecPathLookup[obj]}");
+                Dbg.Err($"Attempting to register {obj} with path [{serialized}], but it's already registered with path {DecPathLookup[obj].Serialize()}");
                 return;
             }
 
