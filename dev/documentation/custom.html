@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
@@ -83,7 +83,7 @@
         <article data-uid="">
 <h1 id="custom-deserialization">Custom deserialization</h1>
 
-<p>Providing custom deserializers for your own classes, or third-party classes, requires defining classes that derive from <a class="xref" href="Dec.Converter.html"><code>Dec.Converter</code></a>. <a class="xref" href="../api/Dec.Parser.html"><code>Dec.Parser</code></a> will automatically find them during startup and register them. (Note: At this time, it is <em>required</em> to run Parser first. If you want to use Converters in a pre-parser Recorder, come pester me on Discord and I'll get it working for you.)</p>
+<p>Providing custom deserializers for your own classes, or third-party classes, requires defining classes that derive from <a href="xref:Dec.Converter"><code>Dec.Converter</code></a>. <a class="xref" href="../api/Dec.Parser.html"><code>Dec.Parser</code></a> will automatically find them during startup and register them. (Note: At this time, it is <em>required</em> to run Parser first. If you want to use Converters in a pre-parser Recorder, come pester me on Discord and I'll get it working for you.)</p>
 <p>There are three converter types available. In increasing order of complexity, <a class="xref" href="../api/Dec.ConverterString-1.html"><code>Dec.ConverterString</code></a> is most useful for simple objects that fit inside a string, <a class="xref" href="../api/Dec.ConverterRecord-1.html"><code>Dec.ConverterRecord</code></a> is suitable for larger hierarchies that have a default constructor, <a class="xref" href="../api/Dec.ConverterFactory-1.html"><code>Dec.ConverterFactory</code></a> is best for anything that needs to insert complicated objects created outside the Dec system. It is recommended that you consider them in that order.</p>
 <h2 id="converterstring">ConverterString</h2>
 <p><a class="xref" href="../api/Dec.ConverterString-1.html"><code>Dec.ConverterString</code></a> is designed for converting to and from simple string objects. It's not suitable for objects that reference other objects, nor does it allow you to do per-field default overrides. If your data plausibly fits in a single short human-readable string, ConverterString is a great choice.</p>

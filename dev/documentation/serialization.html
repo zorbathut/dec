@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
@@ -92,7 +92,7 @@ var deserializedObject = Recorder.Read&lt;ObjectType&gt;(serializedString);
 <p>Child objects will be serialized recursively. In addition, Recorder supports non-tree structures and circular references. Recorder doesn't require any explicit ownership semantics; multiply referenced objects will be handled automatically, without any extra effort required by the programmer.</p>
 <h2 id="custom-serialization">Custom serialization</h2>
 <p>Recorder does not support the automatic reflection-based parsing that Dec.Parser does. This is partly for security reasons and partly for practicality reasons; the author's experience is that fully automatic reflection-based game saves rarely work well.</p>
-<p>Recorder does support <a class="xref" href="Dec.Converter.html"><code>Dec.Converter</code></a>, but this isn't the intended way to handle serialization of classes that you authored. Most custom serialization should be taken care of by inheriting from <a class="xref" href="../api/Dec.IRecordable.html"><code>Dec.IRecordable</code></a>, then overriding <a class="xref" href="../api/Dec.IRecordable.html#Dec_IRecordable_Record_Dec_Recorder_"><code>Dec.IRecordable.Record</code></a>. This function provides you with a <a class="xref" href="../api/Dec.Recorder.html"><code>Dec.Recorder</code></a>, whose most important function is Dec.Recorder.Record. This function can be used to easily serialize any type that Recorder supports.</p>
+<p>Recorder does support <a href="xref:Dec.Converter"><code>Dec.Converter</code></a>, but this isn't the intended way to handle serialization of classes that you authored. Most custom serialization should be taken care of by inheriting from <a class="xref" href="../api/Dec.IRecordable.html"><code>Dec.IRecordable</code></a>, then overriding <a class="xref" href="../api/Dec.IRecordable.html#Dec_IRecordable_Record_Dec_Recorder_"><code>Dec.IRecordable.Record</code></a>. This function provides you with a <a class="xref" href="../api/Dec.Recorder.html"><code>Dec.Recorder</code></a>, whose most important function is Dec.Recorder.Record. This function can be used to easily serialize any type that Recorder supports.</p>
 <pre><code class="lang-cs">public class RecordableExample : Dec.IRecorder
 {
     int intMember;
