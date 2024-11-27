@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 
 
+## [Unreleased]
+### Improved
+* Exception messages for ConfigErrors() and PostLoad() now include the Dec name. 
+
+
 ## [v0.8.0]
 ### Added
 * SetupDependsOnAttribute, which allows you to define ConfigErrors/PostLoad dependencies between Dec classes. This is a prototype and will probably change in the future.

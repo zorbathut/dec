@@ -533,7 +533,7 @@ namespace Dec
                         }
                         catch (Exception e)
                         {
-                            Dbg.Ex(e);
+                            Dbg.Ex(new Exception($"Exception thrown during ConfigErrors on {dec}", e));
                         }
 
                         try
@@ -542,7 +542,7 @@ namespace Dec
                         }
                         catch (Exception e)
                         {
-                            Dbg.Ex(e);
+                            Dbg.Ex(new Exception($"Exception thrown during PostLoad on {dec}", e));
                         }
                     }
                 }
