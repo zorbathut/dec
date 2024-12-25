@@ -202,7 +202,7 @@ namespace Dec
 
                 // And now, we can finally parse our actual root element!
                 // (which accounts for a tiny percentage of things that need to be parsed)
-                return (T)Serialization.ParseElement(new List<ReaderNodeParseable>() { parseNode }, typeof(T), null, readerGlobals, new Recorder.Settings() { shared = Settings.Shared.Flexible });
+                return Serialization.ParseElementTyped<T>(new List<ReaderNodeParseable>() { parseNode }, typeof(T), null, readerGlobals, new Recorder.Settings() { shared = Settings.Shared.Flexible });
             }
         }
 
@@ -225,7 +225,7 @@ namespace Dec
 
                 // And now, we can finally parse our actual root element!
                 // (which accounts for a tiny percentage of things that need to be parsed)
-                return (T)Serialization.ParseElement(new List<ReaderNodeParseable>() { reader }, typeof(T), null, readerContext, new Recorder.Settings() { shared = Settings.Shared.Flexible });
+                return Serialization.ParseElementTyped<T>(new List<ReaderNodeParseable>() { reader }, typeof(T), null, readerContext, new Recorder.Settings() { shared = Settings.Shared.Flexible });
             }
         }
 

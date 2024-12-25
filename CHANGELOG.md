@@ -4,7 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Improved
-* Exception messages for ConfigErrors() and PostLoad() now include the Dec name. 
+* Exception messages for ConfigErrors() and PostLoad() now include the Dec name.
+
+### Fixed
+* Reading recorder files with objects with a missing Converter could result in an unhandled exception.
 
 
 ## [v0.8.0]

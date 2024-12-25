@@ -599,6 +599,19 @@ namespace Dec
             return result;
         }
 
+        internal static T ParseElementTyped<T>(List<ReaderNodeParseable> nodes, Type type, object original, ReaderGlobals globals, Recorder.Settings recSettings, FieldInfo fieldInfo = null, bool isRootDec = false, bool hasReferenceId = false, bool asThis = false, List<(ParseCommand command, ReaderNodeParseable node)> ordersOverride = null)
+        {
+            var result = ParseElement(nodes, type, original, globals, recSettings, fieldInfo, isRootDec, hasReferenceId, asThis, ordersOverride);
+            if (result != null)
+            {
+                return (T)result;
+            }
+            else
+            {
+                return default;
+            }
+        }
+
         internal static object ParseElement_Worker(List<ReaderNodeParseable> nodes, Type type, object original, ReaderGlobals globals, Recorder.Settings recSettings, FieldInfo fieldInfo = null, bool isRootDec = false, bool hasReferenceId = false, bool asThis = false, List<(ParseCommand command, ReaderNodeParseable node)> ordersOverride = null)
         {
             if (nodes == null || nodes.Count == 0)

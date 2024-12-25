@@ -530,6 +530,7 @@ namespace Dec
                 if (node.AllowAsThis && (node is ReaderNodeParseable nodeParseable))
                 {
                     // Explicit cast here because we want an error if we have the wrong type!
+                    // This shouldn't need ParseElementTypd because it's guaranteed to have a valid input.
                     value = (T)Serialization.ParseElement(new List<ReaderNodeParseable>() { nodeParseable }, typeof(T), value, readerGlobals, parameters.CreateSettings(), asThis: true);
 
                     return;
