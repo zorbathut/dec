@@ -23,6 +23,16 @@ namespace DecTest
             }
         }
 
+        struct TestStructMember : Dec.IRecordable
+        {
+            public TestStruct value;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref value, nameof(value));
+            }
+        }
+
         [Test]
         public void UnavailableStructRecorderNormal()
         {
@@ -51,6 +61,14 @@ namespace DecTest
             string recorded = "<Record><recordFormatVersion>1</recordFormatVersion><data /></Record>";
 
             ExpectErrors(() => Dec.Recorder.Read<TestStructAsThis>(recorded));
+        }
+
+        [Test]
+        public void UnavailableStructRecorderClone()
+        {
+            var initial = new TestStructMember();
+
+            ExpectErrors(() => Dec.Recorder.Clone(initial));
         }
     }
 }

@@ -550,8 +550,16 @@ namespace Dec
 
             seen?.Add(label);
 
-            // Explicit cast here because we want an error if we have the wrong type!
-            value = (T)recorded.ParseElement(typeof(T), value, readerGlobals, parameters.CreateSettings());
+            // Avoid an explicit cast because that can cause null reference errors
+            var result = recorded.ParseElement(typeof(T), value, readerGlobals, parameters.CreateSettings());
+            if (result != null)
+            {
+                value = (T)result;
+            }
+            else
+            {
+                value = default;
+            }
         }
 
         public override void Ignore(string label)

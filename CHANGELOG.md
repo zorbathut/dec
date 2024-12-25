@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 * Reading recorder files with objects with a missing Converter could result in an unhandled exception.
+* Cloning objects with children with missing Converters could result in an unhandled exception.
 
 
 ## [v0.8.0]
