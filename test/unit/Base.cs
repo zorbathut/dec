@@ -23,6 +23,7 @@ namespace DecTest
 
             // stop verifying things
             errorValidator = null;
+            warningValidator = null;
 
             // we turn on error handling so that Clear can work even if we're in the wrong mode
             handlingErrors = true;
@@ -34,6 +35,8 @@ namespace DecTest
 
             handlingErrors = false;
             handledError = false;
+
+            withinExpect = false;
 
             Dec.Config.UsingNamespaces = new string[0];
 
@@ -140,64 +143,85 @@ namespace DecTest
             }
         }
 
-        protected void ExpectWarnings(Action action, string context = "unlabeled context", Func<string, bool> warningValidator = null)
+        protected enum ExpectationType
         {
-            Assert.IsFalse(handlingWarnings);
-            handlingWarnings = true;
-            handledWarning = false;
-            this.warningValidator = warningValidator;
+            Disallow,
+            Tolerate,
+            Expect,
+        }
+        private bool withinExpect = false;
+        protected void ExpectGeneral(Action action, string context = "unlabeled context", ExpectationType warning = ExpectationType.Disallow, Func<string, bool> warningValidator = null, ExpectationType error = ExpectationType.Disallow, Func<string, bool> errorValidator = null)
+        {
+            Assert.IsFalse(withinExpect);
+            withinExpect = true;
 
+            // Check initial states based on expectations
+            if (warning != ExpectationType.Disallow)
+            {
+                Assert.IsFalse(handlingWarnings, "Already handling warnings");
+                handlingWarnings = true;
+                handledWarning = false;
+                this.warningValidator = warningValidator;
+            }
+
+            if (error != ExpectationType.Disallow)
+            {
+                Assert.IsFalse(handlingErrors, "Already handling errors");
+                handlingErrors = true;
+                handledError = false;
+                this.errorValidator = errorValidator;
+            }
+
+            // Execute the action
             action();
 
-            Assert.IsTrue(handlingWarnings);
-            Assert.IsTrue(handledWarning, $"Expected warning in {context} but did not generate one");
-            handlingWarnings = false;
-            handledWarning = false;
-            this.warningValidator = null;
+            // Check for expected warnings
+            if (warning == ExpectationType.Expect)
+            {
+                Assert.IsTrue(handlingWarnings);
+                Assert.IsTrue(handledWarning, $"Expected warning in {context} but did not generate one");
+            }
+
+            // Check for expected errors
+            if (error == ExpectationType.Expect)
+            {
+                Assert.IsTrue(handlingErrors);
+                Assert.IsTrue(handledError, $"Expected error in {context} but did not generate one");
+            }
+
+            // Reset state for warnings
+            if (warning != ExpectationType.Disallow)
+            {
+                handlingWarnings = false;
+                handledWarning = false;
+                this.warningValidator = null;
+            }
+
+            // Reset state for errors
+            if (error != ExpectationType.Disallow)
+            {
+                handlingErrors = false;
+                handledError = false;
+                this.errorValidator = null;
+            }
+
+            withinExpect = false;
+        }
+
+        protected void ExpectWarnings(Action action, string context = "unlabeled context", Func<string, bool> warningValidator = null)
+        {
+            ExpectGeneral(action, context, ExpectationType.Expect, warningValidator, ExpectationType.Disallow, null);
         }
 
         // Return "true" if this is the expected error, "false" if this is a bad error
         protected void ExpectErrors(Action action, string context = "unlabeled context", Func<string, bool> errorValidator = null)
         {
-            Assert.IsFalse(handlingErrors);
-            handlingErrors = true;
-            handledError = false;
-            this.errorValidator = errorValidator;
-
-            action();
-
-            Assert.IsTrue(handlingErrors);
-            Assert.IsTrue(handledError, $"Expected error in {context} but did not generate one");
-            handlingErrors = false;
-            handledError = false;
-            this.errorValidator = null;
+            ExpectGeneral(action, context, ExpectationType.Disallow, null, ExpectationType.Expect, errorValidator);
         }
 
         protected void ExpectWarningsAndErrors(Action action, string context = "unlabeled context", Func<string, bool> errorValidator = null, Func<string, bool> warningValidator = null)
         {
-            Assert.IsFalse(handlingWarnings);
-            Assert.IsFalse(handlingErrors);
-            handlingWarnings = true;
-            handledWarning = false;
-            this.warningValidator = warningValidator;
-
-            handlingErrors = true;
-            handledError = false;
-            this.errorValidator = errorValidator;
-
-            action();
-
-            Assert.IsTrue(handlingWarnings);
-            Assert.IsTrue(handledWarning, $"Expected warning in {context} but did not generate one");
-            handlingWarnings = false;
-            handledWarning = false;
-            this.warningValidator = null;
-
-            Assert.IsTrue(handlingErrors);
-            Assert.IsTrue(handledError, $"Expected error in {context} but did not generate one");
-            handlingErrors = false;
-            handledError = false;
-            this.errorValidator = null;
+            ExpectGeneral(action, context, ExpectationType.Expect, warningValidator, ExpectationType.Expect, errorValidator);
         }
 
         // Some stubs and universally-useful tools
