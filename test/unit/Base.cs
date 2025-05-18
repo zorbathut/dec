@@ -219,7 +219,8 @@ namespace DecTest
             ExpectGeneral(action, context, ExpectationType.Disallow, null, ExpectationType.Expect, errorValidator);
         }
 
-        protected void ExpectWarningsAndErrors(Action action, string context = "unlabeled context", Func<string, bool> errorValidator = null, Func<string, bool> warningValidator = null)
+        protected void ExpectWarningsAndErrors(Action action, string context = "unlabeled context",
+            Func<string, bool> warningValidator = null, Func<string, bool> errorValidator = null)
         {
             ExpectGeneral(action, context, ExpectationType.Expect, warningValidator, ExpectationType.Expect, errorValidator);
         }
