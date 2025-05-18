@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 
@@ -11,15 +12,9 @@ namespace DecTest
     {
         List<Enum> excepts = new List<Enum>();
 
-        public ValuesExceptAttribute(object arg1)
+        public ValuesExceptAttribute(params object[] arg1)
         {
-            excepts.Add((Enum)arg1);
-        }
-
-        public ValuesExceptAttribute(object arg1, object arg2)
-        {
-            excepts.Add((Enum)arg1);
-            excepts.Add((Enum)arg2);
+            excepts.AddRange(arg1.Cast<Enum>());
         }
 
         public IEnumerable GetData(IParameterInfo parameter)
