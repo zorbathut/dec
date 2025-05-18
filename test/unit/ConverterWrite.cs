@@ -97,7 +97,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ConverterStringRef([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode mode)
+        public void ConverterStringRef([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterString) } });
 
@@ -125,7 +125,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ConverterReplacementWorking([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode mode)
+        public void ConverterReplacementWorking([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverterRecord) } });
 

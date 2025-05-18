@@ -181,7 +181,7 @@ namespace DecTest
         }
 
         [Test]
-        public void InheritanceOptions([Values] RecorderMode mode, [Values] InheritanceTestFactoryProvided provided, [Values] InheritanceTestResult result)
+        public void InheritanceOptions([ValuesExcept(RecorderMode.Checksum)] RecorderMode mode, [Values] InheritanceTestFactoryProvided provided, [Values] InheritanceTestResult result)
         {
             if (provided == InheritanceTestFactoryProvided.Exact)
             {
@@ -427,7 +427,7 @@ namespace DecTest
         }
 
         [Test]
-        public void SharedWrite([Values] RecorderMode mode)
+        public void SharedWrite([ValuesExcept(RecorderMode.Checksum)] RecorderMode mode)
         {
             var element = new SharedWriteCode();
 
@@ -437,7 +437,7 @@ namespace DecTest
             element.one.nonrecorded = 11;
             element.one.recorded = 12;
 
-            var deserialized = DoRecorderRoundTrip(element, mode, expectWriteErrors: mode != RecorderMode.Clone);
+            var deserialized = DoRecorderRoundTrip(element, mode, expectWriteErrors: mode != RecorderMode.Clone && mode != RecorderMode.Checksum);
 
             if (mode != RecorderMode.Clone)
             {

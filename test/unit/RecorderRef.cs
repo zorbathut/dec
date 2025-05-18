@@ -32,7 +32,7 @@ namespace DecTest
         }
 
         [Test]
-        public void Refs([ValuesExcept(RecorderMode.Simple)] RecorderMode mode)
+        public void Refs([ValuesExcept(RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
@@ -76,7 +76,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ContainerRecursive([ValuesExcept(RecorderMode.Simple)] RecorderMode mode)
+        public void ContainerRecursive([ValuesExcept(RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
@@ -121,7 +121,7 @@ namespace DecTest
         }
 
         [Test]
-        public void DepthDoubleLinked([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode mode)
+        public void DepthDoubleLinked([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode mode)
         {
             // This test verifies that we can write an extremely deep structure without blowing the stack.
             // We use double links so we don't have to worry about generating an absurd xml file in the process.
@@ -162,7 +162,7 @@ namespace DecTest
         }
 
         [Test]
-        public void DepthSingleLinked([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode mode)
+        public void DepthSingleLinked([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode mode)
         {
             // This test verifies that we can serialize and/or read an extremely deep structure without blowing the stack.
             // We use single links so we don't generate refs, we actually embed objects.
@@ -214,7 +214,7 @@ namespace DecTest
         }
 
         [Test]
-        public void DepthUnsharedWarning([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
+        public void DepthUnsharedWarning([ValuesExcept(RecorderMode.Validation, RecorderMode.Checksum)] RecorderMode mode)
         {
             // This test is all about yelling at you if your stack depth gets too high
 
@@ -270,7 +270,7 @@ namespace DecTest
         }
 
         [Test]
-        public void DepthTrueUnshared([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
+        public void DepthTrueUnshared([ValuesExcept(RecorderMode.Validation, RecorderMode.Checksum)] RecorderMode mode)
         {
             const int maxDepth = 80;
             OptionalChain[] chains = new OptionalChain[maxDepth];
@@ -534,7 +534,7 @@ namespace DecTest
         }
 
         [Test]
-        public void DictionaryKeyRef([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode mode)
+        public void DictionaryKeyRef([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode mode)
         {
             var dict = new DictionaryKeyRefDec();
             dict.referenceA = new StubRecordable();
@@ -602,7 +602,7 @@ namespace DecTest
         }
 
         [Test]
-        public void DerivedRefRecordables([ValuesExcept(RecorderMode.Simple)] RecorderMode mode)
+        public void DerivedRefRecordables([ValuesExcept(RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
@@ -639,7 +639,7 @@ namespace DecTest
         }
 
         [Test]
-        public void SharedBeforeUnshared([ValuesExcept(RecorderMode.Simple, RecorderMode.Clone)] RecorderMode mode, [Values] bool firstShared, [Values] bool secondShared)
+        public void SharedBeforeUnshared([ValuesExcept(RecorderMode.Simple, RecorderMode.Clone, RecorderMode.Checksum)] RecorderMode mode, [Values] bool firstShared, [Values] bool secondShared)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 

@@ -80,7 +80,7 @@ namespace DecTest
             Assert.AreEqual(8, deserialized.cargo.recorded);
             Assert.AreEqual(5, deserialized.cargo.unrecorded);
 
-            if (mode != RecorderMode.Clone)
+            if (mode != RecorderMode.Clone && mode != RecorderMode.Checksum)
             {
                 Assert.AreEqual(0, deserialized.cargoLink.recorded);
                 Assert.AreEqual(0, deserialized.cargoLink.unrecorded);
@@ -111,7 +111,7 @@ namespace DecTest
             rec.cargo = new List<int> { 100 };
 
             // clone probably *should* error on this, but right now it doesn't, it has unspecified behavior with the interaction of shared and non-null
-            var deserialized = DoRecorderRoundTrip(rec, mode, expectReadErrors: mode != RecorderMode.Clone);
+            var deserialized = DoRecorderRoundTrip(rec, mode, expectReadErrors: mode != RecorderMode.Clone && mode != RecorderMode.Checksum);
 
             Assert.AreEqual(deserialized.cargo, rec.cargo);
         }
@@ -243,7 +243,7 @@ namespace DecTest
             }
         }
         [Test]
-        public void SharedRootClass([ValuesExcept(RecorderMode.Simple)] RecorderMode mode)
+        public void SharedRootClass([ValuesExcept(RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode mode)
         {
             var rec = new SharedRoot();
             rec.root = rec;

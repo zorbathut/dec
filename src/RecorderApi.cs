@@ -257,5 +257,31 @@ namespace Dec
                 return (T)output;
             }
         }
+
+        /// <summary>
+        /// Returns a checksum of the object. This is a non-cryptographic hash of the serialized data, and is not guaranteed to be unique or safe against malicious tampering.
+        /// </summary>
+        /// <remarks>
+        /// This returns a checksum of input data. Traversing the data is done through the Record system and it will pick up all data that Write() or Clone() will see.
+        ///
+        /// This does not rely on GetHashCode() and is guaranteed to return the same number across runs, even if object hashes have changed or non-ordered containers like HashSet<> or Dictionary<> have chosen to store things in a different "order". This also guarantees the same result on different platforms.
+        ///
+        /// This does not guarantee immutability between versions of Dec; the result may change on library update. Also, unlike normal Dec serialization, Checksum is very sensitive to underlying types. As an example, it will generate different results for SomeEnum.SomeValue and "SomeValue". In general, permanent storage of Checksums is not recommended; this is designed for runtime comparisons only.
+        ///
+        /// The Checksum system does not currently have a working solution for shared objects or stack-overflow prevention. If you need this in your project, please ask on Discord.
+        /// </remarks>
+        public static ulong Checksum<T>(T target, IUserSettings userSettings = null)
+        {
+            Serialization.Initialize();
+
+            using (var _ = new CultureInfoScope(Config.CultureInfo))
+            {
+                var writerChecksum = new WriterChecksum(userSettings);
+
+                Serialization.ComposeElement(writerChecksum.Start(), target, typeof(T));
+
+                return writerChecksum.FinishChecksum();
+            }
+        }
     }
 }

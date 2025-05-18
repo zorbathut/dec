@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 
 
 ## [Unreleased]
+### Added
+* Initial implementation of Record.Checksum(), intended for easy and fast comparison of recordable objects.
+
 ### Improved
 * Exception messages for ConfigErrors() and PostLoad() now include the Dec name.
 

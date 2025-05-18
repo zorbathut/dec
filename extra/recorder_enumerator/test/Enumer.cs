@@ -29,7 +29,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void EnumerableMember([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
+        public void EnumerableMember([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
         {
             var dataReporter = new DataReporter();
             dataReporter.reporter = dataReporter.PrintTheNumber().GetEnumerator();

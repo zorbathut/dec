@@ -184,9 +184,9 @@ namespace DecTest
 
             Dec.Database.Delete(StaticReferenceDecs.TestDecA);
 
-            var deserialized = DoRecorderRoundTrip(decs, mode, expectWriteErrors: mode != RecorderMode.Clone, expectReadErrors: mode != RecorderMode.Clone);
+            var deserialized = DoRecorderRoundTrip(decs, mode, expectWriteErrors: mode != RecorderMode.Clone && mode != RecorderMode.Checksum, expectReadErrors: mode != RecorderMode.Clone && mode != RecorderMode.Checksum);
 
-            if (mode != RecorderMode.Clone)
+            if (mode != RecorderMode.Clone && mode != RecorderMode.Checksum)
             {
                 Assert.IsNull(deserialized.a);
             }
@@ -276,7 +276,7 @@ namespace DecTest
         }
 
         [Test]
-        public void Misparse([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
+        public void Misparse([ValuesExcept(RecorderMode.Validation, RecorderMode.Checksum)] RecorderMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
@@ -309,7 +309,7 @@ namespace DecTest
         }
 
         [Test]
-        public void RecursiveSquared([ValuesExcept(RecorderMode.Simple)] RecorderMode mode)
+        public void RecursiveSquared([ValuesExcept(RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
@@ -353,7 +353,7 @@ namespace DecTest
         }
 
         [Test]
-        public void RecursiveSquaredRoot([ValuesExcept(RecorderMode.Simple)] RecorderMode mode)
+        public void RecursiveSquaredRoot([ValuesExcept(RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
@@ -568,7 +568,7 @@ namespace DecTest
         }
 
         [Test]
-        public void Parameter([Values] RecorderMode mode)
+        public void Parameter([ValuesExcept(RecorderMode.Checksum)] RecorderMode mode)
         {
             var item = new RecordableParameter(3);
 
@@ -754,7 +754,7 @@ namespace DecTest
 
         // This is specifically hard because arrays require a constructor parameter.
         [Test]
-        public void SharedArray([ValuesExcept(RecorderMode.Simple)] RecorderMode mode)
+        public void SharedArray([ValuesExcept(RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode mode)
         {
             var root = new SharedArrayDec();
             root.data_b = root.data_a = new StubRecordable[10];

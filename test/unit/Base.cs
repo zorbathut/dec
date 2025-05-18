@@ -388,13 +388,17 @@ namespace DecTest
             // Use the Clone function instead of a write/read pair.
             Clone,
 
+            // Do the checksum, clone it, do the checksum again, verify they match.
+            // this is not a great test honestly
+            Checksum,
+
             // Generate validation code beforehand, then run that code.
             Validation,
         }
 
         public T DoRecorderRoundTrip<T>(T input, RecorderMode mode, Action<string> testSerializedResult = null, bool expectWriteErrors = false, bool expectWriteWarnings = false, bool expectReadErrors = false, bool expectReadWarnings = false, Func<string, bool> readErrorValidator = null)
         {
-            if (mode == RecorderMode.Clone)
+            if (mode == RecorderMode.Clone || mode == RecorderMode.Checksum)
             {
                 // this is all its own special thing
                 bool expectErrors = expectWriteErrors || expectReadErrors;
@@ -421,6 +425,18 @@ namespace DecTest
                 else
                 {
                     DoClone();
+                }
+
+                if (mode == RecorderMode.Checksum)
+                {
+                    // this is a pain because of all the expectations
+                    ulong inputChecksum = 0;
+                    ulong resultChecksum = 0;
+
+                    ExpectGeneral(() => inputChecksum = Dec.Recorder.Checksum(input), "DoRecorder.Checksum", expectWarnings ? ExpectationType.Tolerate : ExpectationType.Disallow, null, expectErrors ? ExpectationType.Tolerate : ExpectationType.Disallow, null);
+                    ExpectGeneral(() => resultChecksum = Dec.Recorder.Checksum(result), "DoRecorder.Checksum", expectWarnings ? ExpectationType.Tolerate : ExpectationType.Disallow, null, expectErrors ? ExpectationType.Tolerate : ExpectationType.Disallow, null);
+
+                    Assert.AreEqual(inputChecksum, resultChecksum);
                 }
 
                 return result;

@@ -531,7 +531,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ExceptionStringRead([ValuesExcept(RecorderMode.Clone, RecorderMode.Validation)] RecorderMode mode, [Values] bool asRef)
+        public void ExceptionStringRead([ValuesExcept(RecorderMode.Clone, RecorderMode.Validation, RecorderMode.Checksum)] RecorderMode mode, [Values] bool asRef)
         {
             if (mode == RecorderMode.Simple && asRef)
             {
@@ -560,7 +560,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ExceptionStringReadAsKey([ValuesExcept(RecorderMode.Clone, RecorderMode.Validation)] RecorderMode mode)
+        public void ExceptionStringReadAsKey([ValuesExcept(RecorderMode.Clone, RecorderMode.Validation, RecorderMode.Checksum)] RecorderMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ExceptionStringConverter) } });
             new Dec.Parser().Finish(); // we're only doing this to kick off the converter init; this is bad and I should fix it
@@ -584,7 +584,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ExceptionRecordRead([ValuesExcept(RecorderMode.Clone, RecorderMode.Validation)] RecorderMode mode, [Values] bool asRef)
+        public void ExceptionRecordRead([ValuesExcept(RecorderMode.Clone, RecorderMode.Validation, RecorderMode.Checksum)] RecorderMode mode, [Values] bool asRef)
         {
             if (mode == RecorderMode.Simple && asRef)
             {
@@ -620,7 +620,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ExceptionFactoryCreate([ValuesExcept(RecorderMode.Clone, RecorderMode.Validation)] RecorderMode mode, [Values] bool asRef)
+        public void ExceptionFactoryCreate([ValuesExcept(RecorderMode.Clone, RecorderMode.Validation, RecorderMode.Checksum)] RecorderMode mode, [Values] bool asRef)
         {
             if (mode == RecorderMode.Simple && asRef)
             {
@@ -649,7 +649,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ExceptionFactoryRead([ValuesExcept(RecorderMode.Clone, RecorderMode.Validation)] RecorderMode mode, [Values] bool asRef)
+        public void ExceptionFactoryRead([ValuesExcept(RecorderMode.Clone, RecorderMode.Validation, RecorderMode.Checksum)] RecorderMode mode, [Values] bool asRef)
         {
             if (mode == RecorderMode.Simple && asRef)
             {
@@ -749,7 +749,7 @@ namespace DecTest
         }
 
         [Test]
-        public void RefsInWrongPlaces([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode mode)
+        public void RefsInWrongPlaces([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(RefsInWrongPlacesConverter) } });
             new Dec.Parser().Finish(); // we're only doing this to kick off the converter init; this is bad and I should fix it
@@ -781,14 +781,14 @@ namespace DecTest
             var dat = new RefsForThings();
             // these are null, so we'll get the right result, but we want to make sure the errors happen as well
 
-            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: mode != RecorderMode.Clone);
+            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: mode != RecorderMode.Clone && mode != RecorderMode.Checksum);
 
             Assert.IsNull(deserialized.listA);
             Assert.IsNull(deserialized.listB);
         }
 
         [Test]
-        public void RefsInWrongPlacesBroken([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode mode)
+        public void RefsInWrongPlacesBroken([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(RefsInWrongPlacesConverter) } });
             new Dec.Parser().Finish(); // we're only doing this to kick off the converter init; this is bad and I should fix it
@@ -810,7 +810,7 @@ namespace DecTest
         }
 
         [Test]
-        public void RefsInRightPlaces([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode mode)
+        public void RefsInRightPlaces([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(RefsInRightPlacesConverter) } });
             new Dec.Parser().Finish(); // we're only doing this to kick off the converter init; this is bad and I should fix it
