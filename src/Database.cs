@@ -23,6 +23,23 @@ namespace Dec
         internal static HashSet<string> DecPathLookupInvalid = new HashSet<string>();
         internal static HashSet<string> DecPathLookupConflicts = new HashSet<string>();
 
+        internal static string GetDecPath(object obj)
+        {
+            var path = Database.DecPathLookup[obj];
+            var pathStr = path.Serialize();
+
+            if (Database.DecPathLookupInvalid.Contains(pathStr))
+            {
+                Dbg.Err($"Attempting to record a dec path [{pathStr}], but this is not currently valid; doing our best though!");
+            }
+            else if (Database.DecPathLookupConflicts.Contains(pathStr))
+            {
+                Dbg.Err($"Attempting to record a dec path [{pathStr}], but this is currently ambiguous; doing our best though!");
+            }
+
+            return pathStr;
+        }
+
         /// <summary>
         /// Registers a path lookup with the database.
         /// </summary>

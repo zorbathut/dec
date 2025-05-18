@@ -165,19 +165,7 @@ namespace Dec
 
         public override void WriteDecPathRef(object value)
         {
-            var path = Database.DecPathLookup[value];
-
-            var pathSerialized = path.Serialize();
-            if (Database.DecPathLookupInvalid.Contains(pathSerialized))
-            {
-                Dbg.Err($"Attempting to record a dec path [{path.Serialize()}], but this is not currently valid; doing our best though!");
-            }
-            else if (Database.DecPathLookupConflicts.Contains(pathSerialized))
-            {
-                Dbg.Err($"Attempting to record a dec path [{path.Serialize()}], but this is currently ambiguous; doing our best though!");
-            }
-
-            node.Add(new XAttribute("ref", pathSerialized));
+            node.Add(new XAttribute("ref", Database.GetDecPath(value)));
         }
 
         public override void TagClass(Type type)
