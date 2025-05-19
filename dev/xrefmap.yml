@@ -1810,6 +1810,22 @@ references:
   isSpec: "True"
   fullName: Dec.Recorder.Bespoke_KeyTypeDict
   nameWithType: Recorder.Bespoke_KeyTypeDict
+- uid: Dec.Recorder.Checksum*
+  name: Checksum
+  href: api/Dec.Recorder.html#Dec_Recorder_Checksum_
+  commentId: Overload:Dec.Recorder.Checksum
+  isSpec: "True"
+  fullName: Dec.Recorder.Checksum
+  nameWithType: Recorder.Checksum
+- uid: Dec.Recorder.Checksum``1(``0,Dec.Recorder.IUserSettings)
+  name: Checksum<T>(T, IUserSettings)
+  href: api/Dec.Recorder.html#Dec_Recorder_Checksum__1___0_Dec_Recorder_IUserSettings_
+  commentId: M:Dec.Recorder.Checksum``1(``0,Dec.Recorder.IUserSettings)
+  name.vb: Checksum(Of T)(T, IUserSettings)
+  fullName: Dec.Recorder.Checksum<T>(T, Dec.Recorder.IUserSettings)
+  fullName.vb: Dec.Recorder.Checksum(Of T)(T, Dec.Recorder.IUserSettings)
+  nameWithType: Recorder.Checksum<T>(T, Recorder.IUserSettings)
+  nameWithType.vb: Recorder.Checksum(Of T)(T, Recorder.IUserSettings)
 - uid: Dec.Recorder.Clone*
   name: Clone
   href: api/Dec.Recorder.html#Dec_Recorder_Clone_
