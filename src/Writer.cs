@@ -19,6 +19,7 @@ namespace Dec
         public abstract bool AllowDecPath { get; }
         public virtual bool AllowAsThis { get => true; }
         public virtual bool AllowCloning { get => false; }
+        public abstract Recorder.Purpose Intent { get; }
         public abstract Recorder.IUserSettings UserSettings { get; }
 
         public Path Path { get => path; }

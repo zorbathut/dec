@@ -58,6 +58,7 @@ namespace Dec
         public override bool AllowDecPath { get => true; }
         public override bool AllowAsThis { get => false; }
         public override bool AllowCloning { get => false;  }
+        public override Recorder.Purpose Intent { get => Recorder.Purpose.Checksum; }
         public override Recorder.IUserSettings UserSettings { get => writer.UserSettings; }
 
         internal bool unordered;

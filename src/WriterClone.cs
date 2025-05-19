@@ -72,6 +72,7 @@ namespace Dec
         public override bool AllowDecPath { get => true; }
         public override bool AllowAsThis { get => false; }
         public override bool AllowCloning { get => true;  }
+        public override Recorder.Purpose Intent { get => Recorder.Purpose.Cloning; }
         public override Recorder.IUserSettings UserSettings { get => writer.UserSettings; }
 
         private WriterNodeClone(WriterClone writer, int depth, Recorder.Settings settings, Path path) : base(settings, path)
@@ -693,6 +694,7 @@ namespace Dec
     internal class ReaderNodeCloneRecorder : ReaderNode
     {
         public override bool AllowAsThis { get => false; }
+        public override Recorder.Purpose Intent { get => Recorder.Purpose.Cloning; }
         public override Recorder.IUserSettings UserSettings { get; }
 
         private Dictionary<string, WriterNodeClone> recorderChildren;
@@ -747,6 +749,7 @@ namespace Dec
     internal class ReaderNodeCloneRecorderItem : ReaderNode
     {
         public override bool AllowAsThis { get => false; }
+        public override Recorder.Purpose Intent { get => Recorder.Purpose.Cloning; }
         public override Recorder.IUserSettings UserSettings { get; }
 
         private WriterNodeClone item;
@@ -789,6 +792,7 @@ namespace Dec
     internal class ReaderNodeCloneCreator : ReaderNode
     {
         public override Recorder.IUserSettings UserSettings { get; }
+        public override Recorder.Purpose Intent { get => Recorder.Purpose.Cloning; }
 
         private object original;
         public ReaderNodeCloneCreator(object original, Recorder.IUserSettings userSettings)

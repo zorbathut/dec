@@ -10,6 +10,7 @@ namespace Dec
     internal class ReaderNodeXml : ReaderNodeParseable
     {
         public override Recorder.IUserSettings UserSettings { get; }
+        public override Recorder.Purpose Intent { get => Recorder.Purpose.Serialization; }
 
         private XElement xml;
         private string fileIdentifier;

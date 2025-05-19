@@ -42,6 +42,7 @@ namespace Dec
 
         public override bool AllowReflection { get => writer.AllowReflection; }
         public override bool AllowDecPath { get => writer.AllowDecPath; }
+        public override Recorder.Purpose Intent { get => Recorder.Purpose.Serialization; }
         public override Recorder.IUserSettings UserSettings { get => writer.UserSettings; }
 
         private WriterNodeXml(WriterXml writer, XContainer parent, string label, int depth, Recorder.Settings settings, Path path) : base(settings, path)

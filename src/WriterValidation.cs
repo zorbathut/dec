@@ -162,6 +162,7 @@ namespace Dec
 
         public override bool AllowReflection { get => writer.AllowReflection; }
         public override bool AllowDecPath { get => false; }
+        public override Recorder.Purpose Intent { get => Recorder.Purpose.Serialization; }  // I mean, sorta
         public override Recorder.IUserSettings UserSettings { get => writer.UserSettings; }
 
         public WriterNodeValidation(WriterValidation writer, string accessor, Path path) : base(path)
@@ -419,6 +420,7 @@ namespace Dec
     {
         public override bool AllowReflection { get => false; }
         public override bool AllowDecPath { get => false; }
+        public override Recorder.Purpose Intent { get => Recorder.Purpose.Serialization; }
         public override Recorder.IUserSettings UserSettings { get; }
 
         public string SerializedString { get; private set; }

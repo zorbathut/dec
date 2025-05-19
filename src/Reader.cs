@@ -43,6 +43,7 @@ namespace Dec
     internal abstract class ReaderNode
     {
         public virtual bool AllowAsThis { get => true; }
+        public abstract Recorder.Purpose Intent { get; }
         public abstract Recorder.IUserSettings UserSettings { get; }
 
         public abstract Context GetContext(); // note: this function must be really fast!

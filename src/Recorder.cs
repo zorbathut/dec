@@ -410,6 +410,20 @@ namespace Dec
         /// Indicates whether this Recorder is being used for reading or writing.
         /// </summary>
         public abstract Direction Mode { get; }
+
+        /// <summary>
+        /// Indicates what this Recorder is being used for.
+        /// </summary>
+        public enum Purpose
+        {
+            Serialization,
+            Cloning,
+            Checksum,
+        }
+        /// <summary>
+        /// Indicates whether this Recorder is being used for serialization, cloning, or checksumming.
+        /// </summary>
+        public abstract Purpose Intent { get; }
     }
 
     internal class RecorderWriter : Recorder
@@ -471,6 +485,7 @@ namespace Dec
         }
 
         public override Direction Mode { get => Direction.Write; }
+        public override Recorder.Purpose Intent { get => node.Intent; }
     }
 
     internal struct ReaderGlobals
@@ -568,6 +583,7 @@ namespace Dec
         }
 
         public override Direction Mode { get => Direction.Read; }
+        public override Purpose Intent { get => node.Intent; }
 
         internal void ReportUnusedFields()
         {
