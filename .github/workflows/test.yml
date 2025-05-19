@@ -55,7 +55,7 @@ jobs:
     - name: Setup environment
       run: dotnet restore
     - name: Download all coverage files
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
     - name: Combine and submit coverage data
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
