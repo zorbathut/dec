@@ -1927,6 +1927,19 @@ references:
   isSpec: "True"
   fullName: Dec.Recorder.Inf
   nameWithType: Recorder.Inf
+- uid: Dec.Recorder.Intent
+  name: Intent
+  href: api/Dec.Recorder.html#Dec_Recorder_Intent
+  commentId: P:Dec.Recorder.Intent
+  fullName: Dec.Recorder.Intent
+  nameWithType: Recorder.Intent
+- uid: Dec.Recorder.Intent*
+  name: Intent
+  href: api/Dec.Recorder.html#Dec_Recorder_Intent_
+  commentId: Overload:Dec.Recorder.Intent
+  isSpec: "True"
+  fullName: Dec.Recorder.Intent
+  nameWithType: Recorder.Intent
 - uid: Dec.Recorder.Mode
   name: Mode
   href: api/Dec.Recorder.html#Dec_Recorder_Mode
@@ -2033,6 +2046,30 @@ references:
   isSpec: "True"
   fullName: Dec.Recorder.Parameters.WithFactory
   nameWithType: Recorder.Parameters.WithFactory
+- uid: Dec.Recorder.Purpose
+  name: Recorder.Purpose
+  href: api/Dec.Recorder.Purpose.html
+  commentId: T:Dec.Recorder.Purpose
+  fullName: Dec.Recorder.Purpose
+  nameWithType: Recorder.Purpose
+- uid: Dec.Recorder.Purpose.Checksum
+  name: Checksum
+  href: api/Dec.Recorder.Purpose.html#Dec_Recorder_Purpose_Checksum
+  commentId: F:Dec.Recorder.Purpose.Checksum
+  fullName: Dec.Recorder.Purpose.Checksum
+  nameWithType: Recorder.Purpose.Checksum
+- uid: Dec.Recorder.Purpose.Cloning
+  name: Cloning
+  href: api/Dec.Recorder.Purpose.html#Dec_Recorder_Purpose_Cloning
+  commentId: F:Dec.Recorder.Purpose.Cloning
+  fullName: Dec.Recorder.Purpose.Cloning
+  nameWithType: Recorder.Purpose.Cloning
+- uid: Dec.Recorder.Purpose.Serialization
+  name: Serialization
+  href: api/Dec.Recorder.Purpose.html#Dec_Recorder_Purpose_Serialization
+  commentId: F:Dec.Recorder.Purpose.Serialization
+  fullName: Dec.Recorder.Purpose.Serialization
+  nameWithType: Recorder.Purpose.Serialization
 - uid: Dec.Recorder.Read*
   name: Read
   href: api/Dec.Recorder.html#Dec_Recorder_Read_

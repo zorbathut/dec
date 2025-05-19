@@ -620,6 +620,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Dec.Recorder.Purpose.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.Recorder.Purpose.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.Recorder.Purpose",
+      "Summary": "<p sourcefile=\"api/Dec.Recorder.Purpose.yml\" sourcestartlinenumber=\"1\">Indicates what this Recorder is being used for.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Dec.Recorder.yml",
       "output": {
         ".html": {
