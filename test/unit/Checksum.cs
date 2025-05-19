@@ -19,7 +19,7 @@ namespace DecTest
             ulong checksum2 = Dec.Recorder.Checksum(value2);
 
             Assert.AreNotEqual(checksum1, checksum2, "Different integers should produce different checksums");
-            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical integers should produce the same checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical integers should produce the same checksums");
         }
 
         [Test]
@@ -32,7 +32,7 @@ namespace DecTest
             ulong checksum2 = Dec.Recorder.Checksum(value2);
 
             Assert.AreNotEqual(checksum1, checksum2, "Different longs should produce different checksums");
-            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical longs should produce the same checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical longs should produce the same checksums");
         }
 
         [Test]
@@ -45,7 +45,7 @@ namespace DecTest
             ulong checksum2 = Dec.Recorder.Checksum(value2);
 
             Assert.AreNotEqual(checksum1, checksum2, "Different ulongs should produce different checksums");
-            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical ulongs should produce the same checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical ulongs should produce the same checksums");
         }
 
         [Test]
@@ -58,7 +58,7 @@ namespace DecTest
             ulong checksum2 = Dec.Recorder.Checksum(value2);
 
             Assert.AreNotEqual(checksum1, checksum2, "Different uints should produce different checksums");
-            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical uints should produce the same checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical uints should produce the same checksums");
         }
 
         [Test]
@@ -71,7 +71,7 @@ namespace DecTest
             ulong checksum2 = Dec.Recorder.Checksum(value2);
 
             Assert.AreNotEqual(checksum1, checksum2, "Different shorts should produce different checksums");
-            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical shorts should produce the same checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical shorts should produce the same checksums");
         }
 
         [Test]
@@ -84,7 +84,7 @@ namespace DecTest
             ulong checksum2 = Dec.Recorder.Checksum(value2);
 
             Assert.AreNotEqual(checksum1, checksum2, "Different ushorts should produce different checksums");
-            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical ushorts should produce the same checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical ushorts should produce the same checksums");
         }
 
         [Test]
@@ -97,7 +97,7 @@ namespace DecTest
             ulong checksum2 = Dec.Recorder.Checksum(value2);
 
             Assert.AreNotEqual(checksum1, checksum2, "Different sbytes should produce different checksums");
-            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical sbytes should produce the same checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical sbytes should produce the same checksums");
         }
 
         [Test]
@@ -110,7 +110,7 @@ namespace DecTest
             ulong checksum2 = Dec.Recorder.Checksum(value2);
 
             Assert.AreNotEqual(checksum1, checksum2, "Different bytes should produce different checksums");
-            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical bytes should produce the same checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical bytes should produce the same checksums");
         }
 
         [Test]
@@ -123,7 +123,7 @@ namespace DecTest
             ulong checksum2 = Dec.Recorder.Checksum(value2);
 
             Assert.AreNotEqual(checksum1, checksum2, "Different floats should produce different checksums");
-            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical floats should produce the same checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical floats should produce the same checksums");
         }
 
         [Test]
@@ -136,7 +136,7 @@ namespace DecTest
             ulong checksum2 = Dec.Recorder.Checksum(value2);
 
             Assert.AreNotEqual(checksum1, checksum2, "Different doubles should produce different checksums");
-            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical doubles should produce the same checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical doubles should produce the same checksums");
         }
 
         [Test]
@@ -149,7 +149,7 @@ namespace DecTest
             ulong checksum2 = Dec.Recorder.Checksum(value2);
 
             Assert.AreNotEqual(checksum1, checksum2, "Different booleans should produce different checksums");
-            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical booleans should produce the same checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical booleans should produce the same checksums");
         }
 
         [Test]
@@ -162,7 +162,7 @@ namespace DecTest
             ulong checksum2 = Dec.Recorder.Checksum(value2);
 
             Assert.AreNotEqual(checksum1, checksum2, "Different strings should produce different checksums");
-            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical strings should produce the same checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical strings should produce the same checksums");
         }
 
         [Test]
@@ -175,7 +175,7 @@ namespace DecTest
             ulong checksum2 = Dec.Recorder.Checksum(value2);
 
             Assert.AreNotEqual(checksum1, checksum2, "Different enums should produce different checksums");
-            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical enums should produce the same checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical enums should produce the same checksums");
         }
 
         [Test]
@@ -188,7 +188,7 @@ namespace DecTest
             ulong checksum2 = Dec.Recorder.Checksum(value2);
 
             Assert.AreNotEqual(checksum1, checksum2, "Different types should produce different checksums");
-            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical types should produce the same checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical types should produce the same checksums");
         }
 
         [Test]
@@ -211,7 +211,7 @@ namespace DecTest
             ulong checksum2 = Dec.Recorder.Checksum(value2);
 
             Assert.AreNotEqual(checksum1, checksum2, "Different decs should produce different checksums");
-            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical decs should produce the same checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical decs should produce the same checksums");
         }
 
         class RefHolder : IRecordable
@@ -237,7 +237,7 @@ namespace DecTest
             ulong checksum2 = Dec.Recorder.Checksum(value2);
 
             Assert.AreNotEqual(checksum1, checksum2, "Different decs should produce different checksums");
-            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical decs should produce the same checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical decs should produce the same checksums");
         }
 
         [Test]
@@ -258,7 +258,7 @@ namespace DecTest
             ulong checksum2 = Dec.Recorder.Checksum(value2);
 
             Assert.AreNotEqual(checksum1, checksum2, "Different decs should produce different checksums");
-            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical decs should produce the same checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical decs should produce the same checksums");
         }
 
         [Test]
@@ -271,7 +271,7 @@ namespace DecTest
             ulong checksum2 = Dec.Recorder.Checksum(value2);
 
             Assert.AreNotEqual(checksum1, checksum2, "Different decs should produce different checksums");
-            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical decs should produce the same checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical decs should produce the same checksums");
         }
 
         private class ReferencedChecksumTester : IRecordable
@@ -310,7 +310,7 @@ namespace DecTest
             ulong checksum2 = Dec.Recorder.Checksum(value2);
 
             Assert.AreNotEqual(checksum1, checksum2, "Different decs should produce different checksums");
-            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical decs should produce the same checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical decs should produce the same checksums");
         }
 
         [Test]
@@ -334,7 +334,7 @@ namespace DecTest
             ulong checksum1 = 0;
             ulong checksum2 = 0;
 
-            ExpectErrors(() => checksum1 = Dec.Recorder.Checksum(value1));
+            ExpectErrors(() => checksum1 = Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)));
             ExpectErrors(() => checksum2 = Dec.Recorder.Checksum(value2));
 
             ulong checksum3 = 0;
@@ -355,7 +355,7 @@ namespace DecTest
             ulong checksum2 = Dec.Recorder.Checksum(value2);
 
             Assert.AreNotEqual(checksum1, checksum2, "Different arrays should produce different checksums");
-            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical arrays should produce the same checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical arrays should produce the same checksums");
         }
 
         [Test]
@@ -368,7 +368,7 @@ namespace DecTest
             ulong checksum2 = Dec.Recorder.Checksum(value2);
 
             Assert.AreNotEqual(checksum1, checksum2, "Different lists should produce different checksums");
-            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical lists should produce the same checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical lists should produce the same checksums");
         }
 
         [Test]
@@ -381,7 +381,7 @@ namespace DecTest
             ulong checksum2 = Dec.Recorder.Checksum(value2);
 
             Assert.AreNotEqual(checksum1, checksum2, "Different dictionaries should produce different checksums");
-            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical dictionaries should produce the same checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical dictionaries should produce the same checksums");
         }
 
         [Test]
@@ -394,7 +394,7 @@ namespace DecTest
             ulong checksum2 = Dec.Recorder.Checksum(value2);
 
             Assert.AreNotEqual(checksum1, checksum2, "Different hashsets should produce different checksums");
-            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical hashsets should produce the same checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical hashsets should produce the same checksums");
         }
 
         [Test]
@@ -407,7 +407,7 @@ namespace DecTest
             ulong checksum2 = Dec.Recorder.Checksum(value2);
 
             Assert.AreNotEqual(checksum1, checksum2, "Different queues should produce different checksums");
-            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical queues should produce the same checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical queues should produce the same checksums");
         }
 
         [Test]
@@ -420,7 +420,7 @@ namespace DecTest
             ulong checksum2 = Dec.Recorder.Checksum(value2);
 
             Assert.AreNotEqual(checksum1, checksum2, "Different stacks should produce different checksums");
-            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical stacks should produce the same checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical stacks should produce the same checksums");
         }
 
         [Test]
@@ -433,7 +433,7 @@ namespace DecTest
             ulong checksum2 = Dec.Recorder.Checksum(value2);
 
             Assert.AreNotEqual(checksum1, checksum2, "Different tuples should produce different checksums");
-            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical tuples should produce the same checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical tuples should produce the same checksums");
         }
 
         [Test]
@@ -446,7 +446,7 @@ namespace DecTest
             ulong checksum2 = Dec.Recorder.Checksum(value2);
 
             Assert.AreNotEqual(checksum1, checksum2, "Different value tuples should produce different checksums");
-            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical value tuples should produce the same checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical value tuples should produce the same checksums");
         }
 
         [Test]
@@ -459,7 +459,7 @@ namespace DecTest
             ulong checksum2 = Dec.Recorder.Checksum(value2);
 
             Assert.AreEqual(checksum1, checksum2, "Empty recordables should produce the same checksums");
-            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical recordables should produce the same checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical recordables should produce the same checksums");
         }
     }
 }
