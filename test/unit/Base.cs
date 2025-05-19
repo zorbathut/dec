@@ -236,6 +236,15 @@ namespace DecTest
                 // lol
             }
         }
+        public class StubRecordableInt : Dec.IRecordable
+        {
+            public int data;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref data, "data");
+            }
+        }
 
         public enum GenericEnum
         {

@@ -262,6 +262,90 @@ namespace DecTest
         }
 
         [Test]
+        public void UnreferencedObjectUnordered()
+        {
+            HashSet<StubRecordableInt> value1 = new HashSet<StubRecordableInt> { new StubRecordableInt() { data = 1 }, new StubRecordableInt() { data = 2 }, new StubRecordableInt() { data = 3 } };
+            HashSet<StubRecordableInt> value2 = new HashSet<StubRecordableInt> { new StubRecordableInt() { data = 1 }, new StubRecordableInt() { data = 3 }, new StubRecordableInt() { data = 3 } };
+
+            ulong checksum1 = Dec.Recorder.Checksum(value1);
+            ulong checksum2 = Dec.Recorder.Checksum(value2);
+
+            Assert.AreNotEqual(checksum1, checksum2, "Different decs should produce different checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical decs should produce the same checksums");
+        }
+
+        private class ReferencedChecksumTester : IRecordable
+        {
+            public HashSet<StubRecordable> prefix;
+            public List<StubRecordable> ordered;
+            public HashSet<StubRecordable> suffix;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref prefix, nameof(prefix));
+                recorder.Record(ref ordered, nameof(ordered));
+                recorder.Record(ref suffix, nameof(suffix));
+            }
+        }
+
+        [Test]
+        public void ReferencedObjectUnorderedFromOrdered()
+        {
+            ReferencedChecksumTester value1 = new ReferencedChecksumTester()
+            {
+                prefix = new HashSet<StubRecordable>(),
+                ordered = new List<StubRecordable> { new StubRecordable() },
+                suffix = new HashSet<StubRecordable>(),
+            };
+            value1.suffix.Add(value1.ordered[0]);
+            ReferencedChecksumTester value2 = new ReferencedChecksumTester()
+            {
+                prefix = new HashSet<StubRecordable>(),
+                ordered = new List<StubRecordable> { new StubRecordable(), new StubRecordable() },
+                suffix = new HashSet<StubRecordable>(),
+            };
+            value2.suffix.Add(value1.ordered[0]);
+
+            ulong checksum1 = Dec.Recorder.Checksum(value1);
+            ulong checksum2 = Dec.Recorder.Checksum(value2);
+
+            Assert.AreNotEqual(checksum1, checksum2, "Different decs should produce different checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical decs should produce the same checksums");
+        }
+
+        [Test]
+        public void ReferencedObjectOrderedFromUnordered()
+        {
+            ReferencedChecksumTester value1 = new ReferencedChecksumTester()
+            {
+                prefix = new HashSet<StubRecordable>(),
+                ordered = new List<StubRecordable> { new StubRecordable() },
+                suffix = new HashSet<StubRecordable>(),
+            };
+            value1.prefix.Add(value1.ordered[0]);
+            ReferencedChecksumTester value2 = new ReferencedChecksumTester()
+            {
+                prefix = new HashSet<StubRecordable>(),
+                ordered = new List<StubRecordable> { new StubRecordable(), new StubRecordable() },
+                suffix = new HashSet<StubRecordable>(),
+            };
+            value2.prefix.Add(value2.ordered[0]);
+
+            ulong checksum1 = 0;
+            ulong checksum2 = 0;
+
+            ExpectErrors(() => checksum1 = Dec.Recorder.Checksum(value1));
+            ExpectErrors(() => checksum2 = Dec.Recorder.Checksum(value2));
+
+            ulong checksum3 = 0;
+
+            ExpectErrors(() => checksum3 = Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)));
+
+            Assert.AreNotEqual(checksum1, checksum2, "Different decs should produce different checksums");
+            Assert.AreEqual(checksum1, checksum3, "Identical decs should produce the same checksums");
+        }
+
+        [Test]
         public void Array()
         {
             int[] value1 = new int[] { 1, 2, 3 };
