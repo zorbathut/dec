@@ -9,18 +9,6 @@ namespace Dec
 {
     internal class WriterChecksum
     {
-        private WriterUtil.PendingWriteCoordinator pendingWriteCoordinator = new WriterUtil.PendingWriteCoordinator();
-
-        public void RegisterPendingWrite(Action action)
-        {
-            pendingWriteCoordinator.RegisterPendingWrite(action);
-        }
-
-        public void FinalizePendingWrites()
-        {
-            pendingWriteCoordinator.DequeuePendingWrites();
-        }
-
         public bool AllowReflection { get => false; }
         public Recorder.IUserSettings UserSettings { get; }
 
