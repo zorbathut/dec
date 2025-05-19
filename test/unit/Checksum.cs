@@ -452,13 +452,13 @@ namespace DecTest
         [Test]
         public void IRecordable()
         {
-            var value1 = new StubRecordable();
-            var value2 = new StubRecordable();
+            var value1 = new StubRecordableInt() { data = 1 };
+            var value2 = new StubRecordableInt() { data = 2 };
 
             ulong checksum1 = Dec.Recorder.Checksum(value1);
             ulong checksum2 = Dec.Recorder.Checksum(value2);
 
-            Assert.AreEqual(checksum1, checksum2, "Empty recordables should produce the same checksums");
+            Assert.AreNotEqual(checksum1, checksum2, "Different recordables should produce different checksums");
             Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical recordables should produce the same checksums");
         }
     }
