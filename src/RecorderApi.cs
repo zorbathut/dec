@@ -264,7 +264,7 @@ namespace Dec
         /// <remarks>
         /// This returns a checksum of input data. Traversing the data is done through the Record system and it will pick up all data that Write() or Clone() will see.
         ///
-        /// This does not rely on GetHashCode() and is guaranteed to return the same number across runs, even if object hashes have changed or non-ordered containers like HashSet<> or Dictionary<> have chosen to store things in a different "order". This also guarantees the same result on different platforms.
+        /// This does not rely on GetHashCode() and is guaranteed to return the same number across runs, even if object hashes have changed or non-ordered containers like HashSet or Dictionary have chosen to store things in a different "order". This also guarantees the same result on different platforms.
         ///
         /// This does not guarantee immutability between versions of Dec; the result may change on library update. Also, unlike normal Dec serialization, Checksum is very sensitive to underlying types. As an example, it will generate different results for SomeEnum.SomeValue and "SomeValue". In general, permanent storage of Checksums is not recommended; this is designed for runtime comparisons only.
         ///
