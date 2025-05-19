@@ -269,7 +269,8 @@ Class Recorder  <a class="header-action link-secondary" title="View source" href
   <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/RecorderApi.cs/#L273"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Returns a checksum of the object. This is a non-cryptographic hash of the serialized data, and is not guaranteed to be unique or safe against malicious tampering.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
@@ -301,6 +302,12 @@ Class Recorder  <a class="header-action link-secondary" title="View source" href
 
 
 
+  <h4 class="section" id="Dec_Recorder_Checksum__1___0_Dec_Recorder_IUserSettings__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>This returns a checksum of input data. Traversing the data is done through the Record system and it will pick up all data that Write() or Clone() will see.</p>
+<p>This does not rely on GetHashCode() and is guaranteed to return the same number across runs, even if object hashes have changed or non-ordered containers like HashSet or Dictionary have chosen to store things in a different &quot;order&quot;. This also guarantees the same result on different platforms.</p>
+<p>This does not guarantee immutability between versions of Dec; the result may change on library update. Also, unlike normal Dec serialization, Checksum is very sensitive to underlying types. As an example, it will generate different results for SomeEnum.SomeValue and &quot;SomeValue&quot;. In general, permanent storage of Checksums is not recommended; this is designed for runtime comparisons only.</p>
+<p>The Checksum system does not currently have a working solution for shared objects or stack-overflow prevention. If you need this in your project, please ask on Discord.</p>
+</div>
 
 
 
