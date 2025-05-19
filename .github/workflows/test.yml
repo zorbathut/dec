@@ -34,7 +34,7 @@ jobs:
 
         dotnet test -f $framework --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
     - name: Upload coverage files
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: coverage-${{ matrix.dotnet-version }}
         path: test/*/TestResults
