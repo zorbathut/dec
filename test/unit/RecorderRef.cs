@@ -32,7 +32,7 @@ namespace DecTest
         }
 
         [Test]
-        public void Refs([ValuesExcept(RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode mode)
+        public void Refs([ValuesExcept(RecorderMode.Simple)] RecorderMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
@@ -76,7 +76,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ContainerRecursive([ValuesExcept(RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode mode)
+        public void ContainerRecursive([ValuesExcept(RecorderMode.Simple)] RecorderMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
@@ -602,7 +602,7 @@ namespace DecTest
         }
 
         [Test]
-        public void DerivedRefRecordables([ValuesExcept(RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode mode)
+        public void DerivedRefRecordables([ValuesExcept(RecorderMode.Simple)] RecorderMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
@@ -639,7 +639,7 @@ namespace DecTest
         }
 
         [Test]
-        public void SharedBeforeUnshared([ValuesExcept(RecorderMode.Simple, RecorderMode.Clone, RecorderMode.Checksum)] RecorderMode mode, [Values] bool firstShared, [Values] bool secondShared)
+        public void SharedBeforeUnshared([ValuesExcept(RecorderMode.Simple)] RecorderMode mode, [Values] bool firstShared, [Values] bool secondShared)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
@@ -666,7 +666,11 @@ namespace DecTest
 
             string expectedError = null;
 
-            if (!firstShared)
+            if (mode == RecorderMode.Clone || mode == RecorderMode.Checksum)
+            {
+                // no errors expected
+            }
+            else if (!firstShared)
             {
                 expectedError = "Attempted to create a new shared reference at [RECORD[1].stub] to an previously-seen unshared object at [RECORD[0].stub].";
             }
@@ -677,7 +681,7 @@ namespace DecTest
 
             if (expectedError != null)
             {
-                ExpectErrors(() => DoRecorderRoundTrip(root, mode), errorValidator: err => err.Contains(expectedError));
+                DoRecorderRoundTrip(root, mode, expectWriteErrors: true, errorValidator: err => err.Contains(expectedError));
             }
             else
             {

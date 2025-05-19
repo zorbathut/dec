@@ -552,7 +552,7 @@ namespace DecTest
                 dat.b = dat.a;
             }
 
-            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: true, readErrorValidator: err => err.Contains("EasilyDetectableMessage") && err.Contains("recorderTestInput"));
+            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: true, errorValidator: err => err.Contains("EasilyDetectableMessage") && err.Contains("recorderTestInput"));
 
             // not readable gets the firehose
             Assert.IsNull(deserialized.a);
@@ -569,7 +569,7 @@ namespace DecTest
             dat.data = new Dictionary<ExceptionConverterClass, int>();
             dat.data[new ExceptionConverterClass() { payload = "hello" }] = 42;
 
-            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: true, readErrorValidator: err =>
+            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: true, errorValidator: err =>
             {
                 if (err.Contains("EasilyDetectableMessage") && err.Contains("recorderTestInput"))
                 {
@@ -605,7 +605,7 @@ namespace DecTest
                 dat.b = dat.a;
             }
 
-            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: true, readErrorValidator: err => err.Contains("EasilyDetectableMessage") && err.Contains("recorderTestInput"));
+            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: true, errorValidator: err => err.Contains("EasilyDetectableMessage") && err.Contains("recorderTestInput"));
 
             // should I clear this? I don't know
             Assert.IsNotNull(deserialized.a);
@@ -641,7 +641,7 @@ namespace DecTest
                 dat.b = dat.a;
             }
 
-            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: true, readErrorValidator: err => err.Contains("EasilyDetectableMessage") && err.Contains("recorderTestInput"));
+            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: true, errorValidator: err => err.Contains("EasilyDetectableMessage") && err.Contains("recorderTestInput"));
 
             // not readable gets the firehose
             Assert.IsNull(deserialized.a);
@@ -670,7 +670,7 @@ namespace DecTest
                 dat.b = dat.a;
             }
 
-            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: true, readErrorValidator: err => err.Contains("EasilyDetectableMessage") && err.Contains("recorderTestInput"));
+            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: true, errorValidator: err => err.Contains("EasilyDetectableMessage") && err.Contains("recorderTestInput"));
 
             // should I clear this? I don't know
             Assert.IsNotNull(deserialized.a);

@@ -396,7 +396,7 @@ namespace DecTest
             Validation,
         }
 
-        public T DoRecorderRoundTrip<T>(T input, RecorderMode mode, Action<string> testSerializedResult = null, bool expectWriteErrors = false, bool expectWriteWarnings = false, bool expectReadErrors = false, bool expectReadWarnings = false, Func<string, bool> readErrorValidator = null)
+        public T DoRecorderRoundTrip<T>(T input, RecorderMode mode, Action<string> testSerializedResult = null, bool expectWriteErrors = false, bool expectWriteWarnings = false, bool expectReadErrors = false, bool expectReadWarnings = false, Func<string, bool> errorValidator = null)
         {
             if (mode == RecorderMode.Clone || mode == RecorderMode.Checksum)
             {
@@ -412,11 +412,11 @@ namespace DecTest
 
                 if (expectErrors && expectWarnings)
                 {
-                    ExpectWarningsAndErrors(DoClone, "DoRecorder.Clone", errorValidator: readErrorValidator);
+                    ExpectWarningsAndErrors(DoClone, "DoRecorder.Clone", errorValidator: errorValidator);
                 }
                 else if (expectErrors)
                 {
-                    ExpectErrors(DoClone, "DoRecorder.Clone", errorValidator: readErrorValidator);
+                    ExpectErrors(DoClone, "DoRecorder.Clone", errorValidator: errorValidator);
                 }
                 else if (expectWarnings)
                 {
@@ -455,7 +455,7 @@ namespace DecTest
                     {
                         code = Dec.Recorder.WriteValidation(input);
                         handledError = true; // good enough, just continue
-                    }, "DoRecorder.Validation.Write");
+                    }, "DoRecorder.Validation.Write", errorValidator: errorValidator);
                 }
                 else
                 {
@@ -482,7 +482,7 @@ namespace DecTest
             Assert.IsFalse(expectWriteErrors && expectWriteWarnings); // nyi
             if (expectWriteErrors)
             {
-                ExpectErrors(DoSerialize, "DoRecorder.Write");
+                ExpectErrors(DoSerialize, "DoRecorder.Write", errorValidator: errorValidator);
             }
             else if (expectWriteWarnings)
             {
@@ -514,7 +514,7 @@ namespace DecTest
             Assert.IsFalse(expectReadErrors && expectReadWarnings); // nyi
             if (expectReadErrors)
             {
-                ExpectErrors(DoDeserialize, "DoRecorder.Read", errorValidator: readErrorValidator);
+                ExpectErrors(DoDeserialize, "DoRecorder.Read", errorValidator: errorValidator);
             }
             else if (expectReadWarnings)
             {

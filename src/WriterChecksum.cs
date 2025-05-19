@@ -24,7 +24,8 @@ namespace Dec
         public bool AllowReflection { get => false; }
         public Recorder.IUserSettings UserSettings { get; }
 
-        internal HashSet<object> seenReferences = new HashSet<object>();
+        internal Dictionary<object, int> seenReferences = new Dictionary<object, int>();
+        internal HashSet<object> seenReferencesUnordered = new HashSet<object>();
 
         // FNV1a, 64-bit
         private ulong checksum = 14695981039346656037UL;
@@ -71,14 +72,17 @@ namespace Dec
         public override bool AllowCloning { get => false;  }
         public override Recorder.IUserSettings UserSettings { get => writer.UserSettings; }
 
+        internal bool unordered;
+
         public static WriterNodeChecksum Start(WriterChecksum writer)
         {
-            return new WriterNodeChecksum(writer, new Recorder.Settings(), new PathRoot("CHECKSUM"));
+            return new WriterNodeChecksum(writer, false, new Recorder.Settings(), new PathRoot("CHECKSUM"));
         }
 
-        private WriterNodeChecksum(WriterChecksum writer, Recorder.Settings settings, Path path) : base(settings, path)
+        private WriterNodeChecksum(WriterChecksum writer, bool unordered, Recorder.Settings settings, Path path) : base(settings, path)
         {
             this.writer = writer;
+            this.unordered = unordered;
         }
 
         private enum NodeTag
@@ -91,6 +95,8 @@ namespace Dec
             Dec,
             PathRef,
             Null,
+            Reference,
+            NotReference,
             Array,
             List,
             Dictionary,
@@ -107,20 +113,20 @@ namespace Dec
         public override WriterNode CreateRecorderChild(string label, Recorder.Settings settings)
         {
             writer.AddChecksum((int)NodeTag.Child);
-            return new WriterNodeChecksum(writer, settings, new PathMember(Path, label));
+            return new WriterNodeChecksum(writer, unordered, settings, new PathMember(Path, label));
         }
 
         // this should be WriterNodeXml but this C# doesn't support that
         public override WriterNode CreateReflectionChild(System.Reflection.FieldInfo field, Recorder.Settings settings)
         {
             writer.AddChecksum((int)NodeTag.Child);
-            return new WriterNodeChecksum(writer, settings, new PathMember(Path, field.Name));
+            return new WriterNodeChecksum(writer, unordered, settings, new PathMember(Path, field.Name));
         }
 
-        private WriterNode CreateNamedChild(string label, Recorder.Settings settings, Path path)
+        private WriterNode CreateNamedChild(string label, bool unordered, Recorder.Settings settings, Path path)
         {
             writer.AddChecksum((int)NodeTag.Child);
-            return new WriterNodeChecksum(writer, settings, new PathMember(path, label));
+            return new WriterNodeChecksum(writer, this.unordered || unordered, settings, new PathMember(path, label));
         }
 
         public override void WritePrimitive(object value)
@@ -215,13 +221,31 @@ namespace Dec
 
         public override bool WriteReference(object value, Path path)
         {
-            if (writer.seenReferences.Contains(value))
+            if (writer.seenReferencesUnordered.Contains(value))
             {
-                Dbg.Err("Seen shared object reference encountered in Checksum, this may result in inconsistent output, sorry :(");
+                Dbg.Err("Attempting to reference object first seen in an unordered context; this will cause problems. Come to Discord and pester me if you need this fixed.");
+                writer.AddChecksum((int)NodeTag.Reference);
+                writer.AddChecksum(~0UL); // welp
                 return true;
             }
 
-            writer.seenReferences.Add(value);
+            if (writer.seenReferences.ContainsKey(value))
+            {
+                writer.AddChecksum((int)NodeTag.Reference);
+                writer.AddChecksum((ulong)writer.seenReferences[value]);
+                return true;
+            }
+
+            // not previously seen
+            writer.AddChecksum((int)NodeTag.NotReference);
+            if (unordered)
+            {
+                writer.seenReferencesUnordered.Add(value);
+            }
+            else
+            {
+                writer.seenReferences[value] = writer.seenReferences.Count;
+            }
 
             return false;
         }
@@ -282,7 +306,7 @@ namespace Dec
 
             for (int i = 0; i < value.Count; ++i)
             {
-                Serialization.ComposeElement(CreateNamedChild("li", RecorderSettings.CreateChild(), new PathIndex(Path, i)), value[i], referencedType);
+                Serialization.ComposeElement(CreateNamedChild("li", false, RecorderSettings.CreateChild(), new PathIndex(Path, i)), value[i], referencedType);
             }
         }
 
@@ -301,8 +325,8 @@ namespace Dec
             foreach (DictionaryEntry entry in value)
             {
                 ulong push = writer.PushChecksum();
-                Serialization.ComposeElement(CreateNamedChild("key", RecorderSettings.CreateChild(), new PathMember(Path, "key")), entry.Key, typeof(object));
-                Serialization.ComposeElement(CreateNamedChild("val", RecorderSettings.CreateChild(), new PathMember(Path, "val")), entry.Value, referencedType);
+                Serialization.ComposeElement(CreateNamedChild("key", true, RecorderSettings.CreateChild(), new PathMember(Path, "key")), entry.Key, typeof(object));
+                Serialization.ComposeElement(CreateNamedChild("val", true, RecorderSettings.CreateChild(), new PathMember(Path, "val")), entry.Value, referencedType);
                 ulong result = writer.PopChecksum(push);
 
                 accumulator ^= result;
@@ -326,7 +350,7 @@ namespace Dec
             foreach (var entry in value)
             {
                 ulong push = writer.PushChecksum();
-                Serialization.ComposeElement(CreateNamedChild("val", RecorderSettings.CreateChild(), new PathMember(Path, "val")), entry, referencedType);
+                Serialization.ComposeElement(CreateNamedChild("val", true, RecorderSettings.CreateChild(), new PathMember(Path, "val")), entry, referencedType);
                 ulong result = writer.PopChecksum(push);
 
                 accumulator ^= result;
@@ -366,7 +390,7 @@ namespace Dec
 
             for (int i = 0; i < length; ++i)
             {
-                Serialization.ComposeElement(CreateNamedChild("li", RecorderSettings.CreateChild(), new PathIndex(Path, i)), value.GetType().GetProperty(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
+                Serialization.ComposeElement(CreateNamedChild("li", false, RecorderSettings.CreateChild(), new PathIndex(Path, i)), value.GetType().GetProperty(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
             }
         }
 
@@ -381,7 +405,7 @@ namespace Dec
 
             for (int i = 0; i < length; ++i)
             {
-                Serialization.ComposeElement(CreateNamedChild("li", RecorderSettings.CreateChild(), new PathIndex(Path, i)), value.GetType().GetField(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
+                Serialization.ComposeElement(CreateNamedChild("li", false, RecorderSettings.CreateChild(), new PathIndex(Path, i)), value.GetType().GetField(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
             }
         }
 
