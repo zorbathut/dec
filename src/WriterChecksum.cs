@@ -319,7 +319,8 @@ namespace Dec
                 Serialization.ComposeElement(CreateNamedChild("val", true, RecorderSettings.CreateChild(), new PathMember(Path, "val")), entry.Value, referencedType);
                 ulong result = writer.PopChecksum(push);
 
-                accumulator ^= result;
+                // this is a weird way to combine, but this avoids issues where pairs of identical items cancel out, and I haven't found a good case where this doesn't work
+                accumulator += result;
             }
 
             writer.AddChecksum(accumulator);
@@ -343,7 +344,8 @@ namespace Dec
                 Serialization.ComposeElement(CreateNamedChild("val", true, RecorderSettings.CreateChild(), new PathMember(Path, "val")), entry, referencedType);
                 ulong result = writer.PopChecksum(push);
 
-                accumulator ^= result;
+                // this is a weird way to combine, but this avoids issues where pairs of identical items cancel out, and I haven't found a good case where this doesn't work
+                accumulator += result;
             }
 
             writer.AddChecksum(accumulator);

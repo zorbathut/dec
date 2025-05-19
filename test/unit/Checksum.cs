@@ -461,5 +461,22 @@ namespace DecTest
             Assert.AreNotEqual(checksum1, checksum2, "Different recordables should produce different checksums");
             Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical recordables should produce the same checksums");
         }
+
+        class StubRecordableChildA : StubRecordable { }
+        class StubRecordableChildB : StubRecordable { }
+
+        [Test]
+        public void RecordableHashset42()
+        {
+            // this tests for a problem that existed in initial implementations of HashSet's checksum
+            var value1 = new HashSet<StubRecordable>() { new StubRecordableChildA(), new StubRecordableChildA(), new StubRecordableChildA(), new StubRecordableChildA(), new StubRecordableChildB(), new StubRecordableChildB() };
+            var value2 = new HashSet<StubRecordable>() { new StubRecordableChildA(), new StubRecordableChildA(), new StubRecordableChildB(), new StubRecordableChildB(), new StubRecordableChildB(), new StubRecordableChildB() };
+
+            ulong checksum1 = Dec.Recorder.Checksum(value1);
+            ulong checksum2 = Dec.Recorder.Checksum(value2);
+
+            Assert.AreNotEqual(checksum1, checksum2, "Different Hashset42's should produce different checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Identical Hashset42's should produce the same checksums");
+        }
     }
 }
