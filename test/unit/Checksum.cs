@@ -1,3 +1,5 @@
+
+using Dec;
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
@@ -204,6 +206,53 @@ namespace DecTest
 
             StubDec value1 = Dec.Database<StubDec>.Get("TestDecA");
             StubDec value2 = Dec.Database<StubDec>.Get("TestDecB");
+
+            ulong checksum1 = Dec.Recorder.Checksum(value1);
+            ulong checksum2 = Dec.Recorder.Checksum(value2);
+
+            Assert.AreNotEqual(checksum1, checksum2, "Different decs should produce different checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical decs should produce the same checksums");
+        }
+
+        class RefHolder : IRecordable
+        {
+            public RefHolder obj;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref obj, nameof(obj));
+            }
+        }
+
+        [Test]
+        public void ReferencedObject()
+        {
+            RefHolder[] value1 = new RefHolder[3] { new RefHolder(), new RefHolder(), new RefHolder() };
+            RefHolder[] value2 = new RefHolder[3] { new RefHolder(), new RefHolder(), new RefHolder() };
+
+            value1[0].obj = value1[1];
+            value2[0].obj = value2[2];
+
+            ulong checksum1 = Dec.Recorder.Checksum(value1);
+            ulong checksum2 = Dec.Recorder.Checksum(value2);
+
+            Assert.AreNotEqual(checksum1, checksum2, "Different decs should produce different checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(value1), "Identical decs should produce the same checksums");
+        }
+
+        [Test]
+        public void ReferencedObjectCycle()
+        {
+            RefHolder[] value1 = new RefHolder[3] { new RefHolder(), new RefHolder(), new RefHolder() };
+            RefHolder[] value2 = new RefHolder[3] { new RefHolder(), new RefHolder(), new RefHolder() };
+
+            value1[0].obj = value1[1];
+            value1[1].obj = value1[2];
+            value1[2].obj = value1[0];
+
+            value2[0].obj = value2[2];
+            value2[1].obj = value2[0];
+            value2[2].obj = value2[1];
 
             ulong checksum1 = Dec.Recorder.Checksum(value1);
             ulong checksum2 = Dec.Recorder.Checksum(value2);
