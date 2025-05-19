@@ -243,7 +243,7 @@ namespace DecTest
             }
         }
         [Test]
-        public void SharedRootClass([ValuesExcept(RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode mode)
+        public void SharedRootClass([ValuesExcept(RecorderMode.Simple)] RecorderMode mode)
         {
             var rec = new SharedRoot();
             rec.root = rec;

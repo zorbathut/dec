@@ -92,7 +92,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void WhereEnumerable([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void WhereEnumerable([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             int k = 3;
             var range = Enumerable.Range(0, 20).Where(i => i % k == 0).GetEnumerator();
@@ -106,7 +106,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void WhereArray([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void WhereArray([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             int k = 3;
             var array = Enumerable.Range(0, 20).ToArray();
@@ -121,7 +121,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void WhereList([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void WhereList([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             int k = 3;
             var list = Enumerable.Range(0, 20).ToList();
@@ -136,7 +136,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void WhereListOutOfDate([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void WhereListOutOfDate([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             var list = Enumerable.Range(0, 5).ToList();
             var range = list.GetEnumerator();
@@ -157,7 +157,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void WhereSelectEnumerable([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void WhereSelectEnumerable([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             int k = 3;
             int m = 2;
@@ -172,7 +172,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void WhereSelectArray([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void WhereSelectArray([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             int k = 3;
             int m = 2;
@@ -188,7 +188,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void WhereSelectList([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void WhereSelectList([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             int k = 3;
             int m = 2;
@@ -204,7 +204,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void ObjectEnumerable([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void ObjectEnumerable([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             var list = new List<StubRecordable>();
             list.Add(new StubRecordable());
@@ -218,7 +218,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void SelectEnumerable([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void SelectEnumerable([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             var range = FakeRange().Select(i => i.ToString()).GetEnumerator();
             range.MoveNext();
@@ -244,7 +244,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void SelectArray([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void SelectArray([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             var array = Enumerable.Range(0, 20).ToArray();
             var range = array.Select(i => i.ToString()).GetEnumerator();
@@ -258,7 +258,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void SelectList([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void SelectList([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             var list = Enumerable.Range(0, 20).ToList();
             var range = list.Select(i => i.ToString()).GetEnumerator();
@@ -272,7 +272,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void SelectMany([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void SelectMany([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             var range = Enumerable.Range(0, 5).SelectMany(i => Enumerable.Range(0, i)).GetEnumerator();
             range.MoveNext();
@@ -325,7 +325,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void DistinctEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void DistinctEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             var source = Enumerable.Range(0, 40).Select(i => i % 5).Distinct().GetEnumerator();
             source.MoveNext();
@@ -336,7 +336,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void DistinctByEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void DistinctByEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             var source = Enumerable.Range(0, 40).Select(i => i % 5).DistinctBy(x => x % 4).GetEnumerator();
             source.MoveNext();
@@ -347,7 +347,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void UnionEnumerator2Test([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void UnionEnumerator2Test([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             var first = Enumerable.Range(0, 20).Select(x => x * 2);
             var second = Enumerable.Range(0, 20).Select(x => x * 3);
@@ -360,7 +360,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void UnionEnumerator3Test([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void UnionEnumerator3Test([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             var first = Enumerable.Range(0, 20).Select(x => x * 2);
             var second = Enumerable.Range(0, 20).Select(x => x * 3);
@@ -374,7 +374,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void IntersectEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void IntersectEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             var first = Enumerable.Range(0, 20);
             var second = Enumerable.Range(15, 20);
@@ -387,7 +387,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void IntersectByEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void IntersectByEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             var first = Enumerable.Range(0, 20);
             var second = Enumerable.Range(15, 20);
@@ -400,7 +400,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void ExceptEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void ExceptEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             var first = Enumerable.Range(0, 20);
             var second = Enumerable.Range(15, 20);
@@ -413,7 +413,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void ExceptByEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void ExceptByEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             var first = Enumerable.Range(0, 20);
             var second = Enumerable.Range(15, 20);
@@ -426,7 +426,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void OrderByEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void OrderByEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             var source = Enumerable.Range(0, 20).OrderBy(i => i % 3).GetEnumerator();
             source.MoveNext();
@@ -437,7 +437,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void OrderByDescendingEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void OrderByDescendingEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             var source = Enumerable.Range(0, 20).OrderByDescending(i => i % 3).GetEnumerator();
             source.MoveNext();
@@ -448,7 +448,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void ThenByEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void ThenByEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             var source = Enumerable.Range(0, 20).OrderBy(i => i % 3).ThenBy(i => i).GetEnumerator();
             source.MoveNext();
@@ -459,7 +459,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void ThenByDescendingEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void ThenByDescendingEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             var source = Enumerable.Range(0, 20).OrderBy(i => i % 3).ThenByDescending(i => i).GetEnumerator();
             source.MoveNext();
@@ -470,7 +470,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void ReverseEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void ReverseEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             var source = Enumerable.Range(0, 20).Reverse().GetEnumerator();
             source.MoveNext();
@@ -493,7 +493,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void OfTypeEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void OfTypeEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             var mixedSource = new List<object> { 0, 1, "two", 3, "four", 5 };
             var source = mixedSource.OfType<int>().GetEnumerator();
@@ -505,7 +505,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void CastEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void CastEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             var objectSource = new List<object> { 0, 1, 2, 3, 4, 5 };
             var source = objectSource.Cast<int>().GetEnumerator();
@@ -539,7 +539,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void TakeWhileEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void TakeWhileEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             var source = Enumerable.Range(0, 20).TakeWhile(i => i < 10).GetEnumerator();
             source.MoveNext();
@@ -550,7 +550,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void SkipWhileEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void SkipWhileEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             var source = Enumerable.Range(0, 20).SkipWhile(i => i < 10).GetEnumerator();
             source.MoveNext();
@@ -561,7 +561,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void ConcatEnumerator2Test([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void ConcatEnumerator2Test([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             var first = Enumerable.Range(0, 20);
             var second = Enumerable.Range(20, 20);
@@ -574,7 +574,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void ConcatEnumeratorNTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode recorderMode)
+        public void ConcatEnumeratorNTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             var first = Enumerable.Range(0, 20);
             var second = Enumerable.Range(20, 20);

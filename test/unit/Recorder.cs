@@ -309,7 +309,7 @@ namespace DecTest
         }
 
         [Test]
-        public void RecursiveSquared([ValuesExcept(RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode mode)
+        public void RecursiveSquared([ValuesExcept(RecorderMode.Simple)] RecorderMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
@@ -353,7 +353,7 @@ namespace DecTest
         }
 
         [Test]
-        public void RecursiveSquaredRoot([ValuesExcept(RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode mode)
+        public void RecursiveSquaredRoot([ValuesExcept(RecorderMode.Simple)] RecorderMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
@@ -754,7 +754,7 @@ namespace DecTest
 
         // This is specifically hard because arrays require a constructor parameter.
         [Test]
-        public void SharedArray([ValuesExcept(RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode mode)
+        public void SharedArray([ValuesExcept(RecorderMode.Simple)] RecorderMode mode)
         {
             var root = new SharedArrayDec();
             root.data_b = root.data_a = new StubRecordable[10];

@@ -810,7 +810,7 @@ namespace DecTest
         }
 
         [Test]
-        public void RefsInRightPlaces([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode mode)
+        public void RefsInRightPlaces([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(RefsInRightPlacesConverter) } });
             new Dec.Parser().Finish(); // we're only doing this to kick off the converter init; this is bad and I should fix it
