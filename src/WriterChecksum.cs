@@ -262,6 +262,7 @@ namespace Dec
                 {
                     indices[rank] = i;
 
+                    var child = CreateNamedChild("li", false, RecorderSettings.CreateChild(), new PathIndexMultidim(Path, indices.ToArray()));
                     WriteArrayRank(value, referencedType, rank + 1, indices);
                 }
             }
@@ -281,7 +282,8 @@ namespace Dec
                 // fast path
                 for (int i = 0; i < value.Length; ++i)
                 {
-                    Serialization.ComposeElement(this, value.GetValue(i), referencedType);
+                    var child = CreateNamedChild("li", false, RecorderSettings.CreateChild(), new PathIndex(Path, i));
+                    Serialization.ComposeElement(child, value.GetValue(i), referencedType);
                 }
             }
             else
