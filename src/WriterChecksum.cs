@@ -107,8 +107,8 @@ namespace Dec
         // this should be WriterNodeChecksum but this C# doesn't support that
         public override WriterNode CreateReflectionChild(System.Reflection.FieldInfo field, Recorder.Settings settings)
         {
-            writer.AddChecksum((int)NodeTag.Child);
-            return new WriterNodeChecksum(writer, unordered, settings, new PathMember(Path, field.Name));
+            // This currently doesn't happen ever.
+            throw new NotImplementedException("Reflection child creation is not implemented in WriterNodeChecksum.");
         }
 
         private WriterNode CreateNamedChild(string label, bool unordered, Recorder.Settings settings, Path path)
