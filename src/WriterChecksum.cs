@@ -97,14 +97,14 @@ namespace Dec
             TagClass,
         }
 
-        // this should be WriterNodeXml but this C# doesn't support that
+        // this should be WriterNodeChecksum but this C# doesn't support that
         public override WriterNode CreateRecorderChild(string label, Recorder.Settings settings)
         {
             writer.AddChecksum((int)NodeTag.Child);
             return new WriterNodeChecksum(writer, unordered, settings, new PathMember(Path, label));
         }
 
-        // this should be WriterNodeXml but this C# doesn't support that
+        // this should be WriterNodeChecksum but this C# doesn't support that
         public override WriterNode CreateReflectionChild(System.Reflection.FieldInfo field, Recorder.Settings settings)
         {
             writer.AddChecksum((int)NodeTag.Child);
