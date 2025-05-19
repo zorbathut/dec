@@ -13,6 +13,11 @@ The Dec library does not tie itself to any particular engine and works within Go
 
 Dual-licensed under MIT or the [Unlicense](http://unlicense.org).
 
+### Status
+
+Dec development is heavily driven by demand, and the repo doesn't get commits unless there are active requests for new features. As such, it tends to be idle for sometimes months at a time. It's not dead; it's just reasonably mature.
+
+If you run into a bug, please report it; bugfixes are high priority. If you have a feature request, let me know!
 
 ### Releases
 
