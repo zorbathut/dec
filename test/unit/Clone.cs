@@ -205,5 +205,36 @@ namespace DecTest
             Assert.AreNotSame(dict.First().Key, dictClone.First().Key);
             Assert.AreSame(dict.First().Value, dictClone.First().Value);
         }
+
+        class ListToArrayRecordable : IRecordable
+        {
+            public List<int> list;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                if (recorder.Mode == Dec.Recorder.Direction.Read)
+                {
+                    recorder.Record(ref list, "list");
+                }
+                else
+                {
+                    var array = list.ToArray();
+                    recorder.Record(ref array, "list");
+                    list = new List<int>(array);
+                }
+            }
+        }
+
+        [Test]
+        public void ListToArray()
+        {
+            var listToArray = new ListToArrayRecordable();
+            listToArray.list = new List<int> { 1, 2, 3 };
+
+            ListToArrayRecordable listToArrayClone = null;
+            ExpectErrors(() => listToArrayClone = Dec.Recorder.Clone(listToArray), errorValidator: err => err.Contains("Attempting to clone type"));
+
+            Assert.IsNull(listToArrayClone.list);
+        }
     }
 }

@@ -135,7 +135,7 @@ namespace Dec
             resultIsValuelike = true;
         }
 
-        public object GetResult(bool sharable)
+        public object GetResult(bool sharable, Type intendedType)
         {
             if (!resultReady)
             {
@@ -145,7 +145,7 @@ namespace Dec
                     // we'll just "clone" null, I guess
                 }
 
-                CreateResult(sharable);
+                CreateResult(sharable, intendedType);
 
                 resultReady = true;
             }
@@ -153,7 +153,7 @@ namespace Dec
             return result;
         }
 
-        private void CreateResult(bool sharable)
+        private void CreateResult(bool sharable, Type intendedType)
         {
             // this is kind of copied from serialization
             if (original == null)
@@ -174,6 +174,15 @@ namespace Dec
             // tuples are sort of busted and we're going to punt on them for now
             // this needs to deal with anything that has complicated constructor behavior
             var originalType = original.GetType();
+
+            // make sure originalType can be converted to intendedType
+            if (!intendedType.IsAssignableFrom(originalType))
+            {
+                Dbg.Err($"Attempting to clone type {originalType} into {intendedType}; this is currently not supported (ask me on Discord if you need it)");
+                result = null;
+                return;
+            }
+
             bool done = false;
             if (UtilType.CanBeCloneCopied(originalType))
             {
@@ -573,9 +582,10 @@ namespace Dec
             }
             // maybe I should set up more value-type-ish special cases here?
 
+            var objType = obj.GetType();
             var child = new WriterNodeClone(writer, resetDepth ? 0 : depth + 1, RecorderSettings.CreateChild(), Path);
-            Serialization.ComposeElement(child, obj, obj.GetType());
-            return child.GetResult(false);
+            Serialization.ComposeElement(child, obj, objType);
+            return child.GetResult(false, objType);
         }
 
         public override void WritePrimitive(object value)
@@ -785,7 +795,7 @@ namespace Dec
             // we actually just ignore the type right now, we copy off the original
 
             item.SetModel(model);
-            return item.GetResult(recorderSettings.shared != Recorder.Settings.Shared.Deny);
+            return item.GetResult(recorderSettings.shared != Recorder.Settings.Shared.Deny, type);
         }
     }
 

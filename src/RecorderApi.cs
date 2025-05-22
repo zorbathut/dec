@@ -250,7 +250,7 @@ namespace Dec
                 var writerNode = writerContext.StartClone(typeof(T));
 
                 Serialization.ComposeElement(writerNode, obj, typeof(T));
-                var output = writerNode.GetResult(false);
+                var output = writerNode.GetResult(false, typeof(T));
 
                 writerContext.FinalizePendingWrites();
 
