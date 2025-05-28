@@ -283,5 +283,99 @@ namespace Dec
                 return writerChecksum.FinishChecksum();
             }
         }
+
+        /// <summary>
+        /// Compares two objects and reports the first point where they differ in their serialized structure.
+        /// </summary>
+        /// <remarks>
+        /// This method identifies the location of the first difference between two objects.
+        ///
+        /// If the objects are identical according to their serialized representation, no report is made. Otherwise, the report callback will be invoked with a human-readable message indicating the path where the difference was found.
+        ///
+        /// This uses <see cref="Checksum{T}"/> to compute checksums, and therefore includes all of its notes and remarks.
+        ///
+        /// This interface is not very good and might be changed without warning.
+        /// </remarks>
+        public static void ChecksumDiff<T>(T lhs, T rhs, Action<string> report, IUserSettings userSettings = null)
+        {
+            Serialization.Initialize();
+
+            using (var _ = new CultureInfoScope(Config.CultureInfo))
+            {
+                long maxLength;
+
+                {
+                    // get a length and bases
+                    var writerChecksumA = new WriterChecksum(userSettings);
+                    Serialization.ComposeElement(writerChecksumA.Start(), lhs, typeof(T));
+
+                    var writerChecksumB = new WriterChecksum(userSettings);
+                    Serialization.ComposeElement(writerChecksumB.Start(), rhs, typeof(T));
+
+                    if (writerChecksumA.FinishChecksum() == writerChecksumB.FinishChecksum())
+                    {
+                        // yes! this is stupid!
+                        return;
+                    }
+
+                    // max, just in case one of them is a strict append of the other
+                    maxLength = Math.Max(writerChecksumA.GetTokensIfNotStopped(), writerChecksumB.GetTokensIfNotStopped());
+                }
+
+                // binsearch time
+                long low = 0;
+                long high = maxLength;
+
+                while (low < high)
+                {
+                    long mid = (low + high) / 2;
+
+                    var writerChecksumA = new WriterChecksum(userSettings);
+                    var writerChecksumB = new WriterChecksum(userSettings);
+
+                    writerChecksumA.SetStopAt(mid);
+                    writerChecksumB.SetStopAt(mid);
+
+                    Serialization.ComposeElement(writerChecksumA.Start(), lhs, typeof(T));
+                    Serialization.ComposeElement(writerChecksumB.Start(), rhs, typeof(T));
+
+                    if (writerChecksumA.FinishChecksum() == writerChecksumB.FinishChecksum())
+                    {
+                        // they match, so we need to go higher
+                        low = mid + 1;
+                    }
+                    else
+                    {
+                        // they don't match, so we need to go lower
+                        high = mid;
+                    }
+                }
+
+                // this can probably be better, but for now, do one last scan so we can get the paths
+                var writerChecksumFinalA = new WriterChecksum(userSettings);
+                var writerChecksumFinalB = new WriterChecksum(userSettings);
+
+                writerChecksumFinalA.SetStopAt(low);
+                writerChecksumFinalB.SetStopAt(low);
+
+                Serialization.ComposeElement(writerChecksumFinalA.Start(), lhs, typeof(T));
+                Serialization.ComposeElement(writerChecksumFinalB.Start(), rhs, typeof(T));
+
+                var pathA = writerChecksumFinalA.GetStopPath();
+                var pathB = writerChecksumFinalB.GetStopPath();
+
+                var pathAString = pathA.Serialize();
+                var pathBString = pathB.Serialize();
+
+                if (pathAString == pathBString)
+                {
+                    report($"Difference found at path `{pathAString}`");
+                }
+                else
+                {
+                    report($"Difference found at conflicting paths; `{pathAString}` vs `{pathBString}`");
+                }
+            }
+        }
     }
 }

@@ -17,8 +17,18 @@ namespace Dec
 
         // FNV1a, 64-bit
         private ulong checksum = 14695981039346656037UL;
-        internal void AddChecksum(ulong value)
+        private Path path;
+        internal void AddChecksum(ulong value, Path path)
         {
+            if (stopAt == 0)
+            {
+                // this currently behaves badly with PushChecksum/PopChecksum, but that's not a problem for now
+                return;
+            }
+
+            --stopAt;
+            this.path = path;
+
             checksum ^= value;
             checksum *= 1099511628211UL;
         }
@@ -37,6 +47,22 @@ namespace Dec
         internal ulong FinishChecksum()
         {
             return checksum;
+        }
+
+        // checksum-diff code
+        private long stopAt = -1;
+        internal void SetStopAt(long stopAt)
+        {
+            this.stopAt = stopAt;
+        }
+        internal long GetTokensIfNotStopped()
+        {
+            // yes this is a gnarly way of doing this
+            return -stopAt - 1;
+        }
+        internal Path GetStopPath()
+        {
+            return path;
         }
 
         public WriterChecksum(Recorder.IUserSettings userSettings)
@@ -65,7 +91,7 @@ namespace Dec
 
         public static WriterNodeChecksum Start(WriterChecksum writer)
         {
-            return new WriterNodeChecksum(writer, false, new Recorder.Settings(), new PathRoot("CHECKSUM"));
+            return new WriterNodeChecksum(writer, false, new Recorder.Settings(), new PathRoot("ROOT"));
         }
 
         private WriterNodeChecksum(WriterChecksum writer, bool unordered, Recorder.Settings settings, Path path) : base(settings, path)
@@ -101,7 +127,7 @@ namespace Dec
         // this should be WriterNodeChecksum but this C# doesn't support that
         public override WriterNode CreateRecorderChild(string label, Recorder.Settings settings)
         {
-            writer.AddChecksum((int)NodeTag.Child);
+            writer.AddChecksum((int)NodeTag.Child, Path);
             return new WriterNodeChecksum(writer, unordered, settings, new PathMember(Path, label));
         }
 
@@ -114,53 +140,53 @@ namespace Dec
 
         private WriterNode CreateNamedChild(string label, bool unordered, Recorder.Settings settings, Path path)
         {
-            writer.AddChecksum((int)NodeTag.Child);
+            writer.AddChecksum((int)NodeTag.Child, Path);
             return new WriterNodeChecksum(writer, this.unordered || unordered, settings, new PathMember(path, label));
         }
 
         public override void WritePrimitive(object value)
         {
-            writer.AddChecksum((int)NodeTag.Primitive);
+            writer.AddChecksum((int)NodeTag.Primitive, Path);
 
             if (value is double)
             {
-                writer.AddChecksum((ulong)BitConverter.DoubleToInt64Bits((double)value));
+                writer.AddChecksum((ulong)BitConverter.DoubleToInt64Bits((double)value), Path);
             }
             else if (value is float)
             {
-                writer.AddChecksum((ulong)BitConverter.SingleToInt32Bits((float)value));
+                writer.AddChecksum((ulong)BitConverter.SingleToInt32Bits((float)value), Path);
             }
             else if (value is long)
             {
-                writer.AddChecksum((ulong)(long)value);
+                writer.AddChecksum((ulong)(long)value, Path);
             }
             else if (value is ulong)
             {
-                writer.AddChecksum((ulong)value);
+                writer.AddChecksum((ulong)value, Path);
             }
             else if (value is int)
             {
-                writer.AddChecksum((ulong)(int)value);
+                writer.AddChecksum((ulong)(int)value, Path);
             }
             else if (value is uint)
             {
-                writer.AddChecksum((uint)value);
+                writer.AddChecksum((uint)value, Path);
             }
             else if (value is short)
             {
-                writer.AddChecksum((ulong)(short)value);
+                writer.AddChecksum((ulong)(short)value, Path);
             }
             else if (value is ushort)
             {
-                writer.AddChecksum((ushort)value);
+                writer.AddChecksum((ushort)value, Path);
             }
             else if (value is sbyte)
             {
-                writer.AddChecksum((ulong)(sbyte)value);
+                writer.AddChecksum((ulong)(sbyte)value, Path);
             }
             else if (value is byte)
             {
-                writer.AddChecksum((ulong)(byte)value);
+                writer.AddChecksum((ulong)(byte)value, Path);
             }
             else
             {
@@ -171,41 +197,41 @@ namespace Dec
 
         public override void WriteEnum(object value)
         {
-            writer.AddChecksum((int)NodeTag.Enum);
-            writer.AddChecksum((ulong)(int)value);
+            writer.AddChecksum((int)NodeTag.Enum, Path);
+            writer.AddChecksum((ulong)(int)value, Path);
         }
 
         public override void WriteString(string value)
         {
-            writer.AddChecksum((int)NodeTag.String);
-            writer.AddChecksum((ulong)value.Length);
+            writer.AddChecksum((int)NodeTag.String, Path);
+            writer.AddChecksum((ulong)value.Length, Path);
             foreach (char c in value)
             {
-                writer.AddChecksum((ulong)c);
+                writer.AddChecksum((ulong)c, Path);
             }
         }
 
         public override void WriteType(Type value)
         {
-            writer.AddChecksum((int)NodeTag.Type);
+            writer.AddChecksum((int)NodeTag.Type, Path);
             WriteString(value.ComposeDecFormatted());   // cache this for less string manipulation?
         }
 
         public override void WriteDec(Dec value)
         {
-            writer.AddChecksum((int)NodeTag.Dec);
+            writer.AddChecksum((int)NodeTag.Dec, Path);
             WriteString(value?.DecName ?? "");
         }
 
         public override void WriteDecPathRef(object value)
         {
-            writer.AddChecksum((int)NodeTag.PathRef);
+            writer.AddChecksum((int)NodeTag.PathRef, Path);
             WriteString(Database.GetDecPath(value));
         }
 
         public override void WriteExplicitNull()
         {
-            writer.AddChecksum((int)NodeTag.Null);
+            writer.AddChecksum((int)NodeTag.Null, Path);
         }
 
         public override bool WriteReference(object value, Path path)
@@ -213,20 +239,20 @@ namespace Dec
             if (writer.seenReferencesUnordered.Contains(value))
             {
                 Dbg.Err("Attempting to reference object first seen in an unordered context; this will cause problems. Come to Discord and pester me if you need this fixed.");
-                writer.AddChecksum((int)NodeTag.Reference);
-                writer.AddChecksum(~0UL); // welp
+                writer.AddChecksum((int)NodeTag.Reference, Path);
+                writer.AddChecksum(~0UL, Path); // welp
                 return true;
             }
 
             if (writer.seenReferences.ContainsKey(value))
             {
-                writer.AddChecksum((int)NodeTag.Reference);
-                writer.AddChecksum((ulong)writer.seenReferences[value]);
+                writer.AddChecksum((int)NodeTag.Reference, Path);
+                writer.AddChecksum((ulong)writer.seenReferences[value], Path);
                 return true;
             }
 
             // not previously seen
-            writer.AddChecksum((int)NodeTag.NotReference);
+            writer.AddChecksum((int)NodeTag.NotReference, Path);
             if (unordered)
             {
                 writer.seenReferencesUnordered.Add(value);
@@ -261,12 +287,12 @@ namespace Dec
         {
             Type referencedType = value.GetType().GetElementType();
 
-            writer.AddChecksum((int)NodeTag.Array);
-            writer.AddChecksum((ulong)value.Rank);
+            writer.AddChecksum((int)NodeTag.Array, Path);
+            writer.AddChecksum((ulong)value.Rank, Path);
 
             if (value.Rank == 1)
             {
-                writer.AddChecksum((ulong)value.Length);
+                writer.AddChecksum((ulong)value.Length, Path);
 
                 // fast path
                 for (int i = 0; i < value.Length; ++i)
@@ -279,7 +305,7 @@ namespace Dec
             {
                 for (int i = 0; i < value.Rank; ++i)
                 {
-                    writer.AddChecksum((ulong)value.GetLength(i));
+                    writer.AddChecksum((ulong)value.GetLength(i), Path);
                 }
 
                 // slow path
@@ -292,8 +318,8 @@ namespace Dec
         {
             Type referencedType = value.GetType().GetGenericArguments()[0];
 
-            writer.AddChecksum((int)NodeTag.List);
-            writer.AddChecksum((ulong)value.Count);
+            writer.AddChecksum((int)NodeTag.List, Path);
+            writer.AddChecksum((ulong)value.Count, Path);
 
             for (int i = 0; i < value.Count; ++i)
             {
@@ -305,8 +331,8 @@ namespace Dec
         {
             Type referencedType = value.GetType().GetGenericArguments()[1];
 
-            writer.AddChecksum((int)NodeTag.Dictionary);
-            writer.AddChecksum((ulong)value.Count);
+            writer.AddChecksum((int)NodeTag.Dictionary, Path);
+            writer.AddChecksum((ulong)value.Count, Path);
 
             // This is a weird setup.
             // We want to be order-independent here, but we don't know what order dictionary keys are in.
@@ -324,15 +350,15 @@ namespace Dec
                 accumulator += result;
             }
 
-            writer.AddChecksum(accumulator);
+            writer.AddChecksum(accumulator, Path);
         }
 
         public override void WriteHashSet(IEnumerable value)
         {
             Type referencedType = value.GetType().GetGenericArguments()[0];
 
-            writer.AddChecksum((int)NodeTag.HashSet);
-            writer.AddChecksum((ulong)value.Cast<object>().Count());
+            writer.AddChecksum((int)NodeTag.HashSet, Path);
+            writer.AddChecksum((ulong)value.Cast<object>().Count(), Path);
 
             // This is a weird setup.
             // We want to be order-independent here, but we don't know what order hashSet keys are in.
@@ -349,12 +375,12 @@ namespace Dec
                 accumulator += result;
             }
 
-            writer.AddChecksum(accumulator);
+            writer.AddChecksum(accumulator, Path);
         }
 
         public override void WriteQueue(IEnumerable value)
         {
-            writer.AddChecksum((int)NodeTag.Queue);
+            writer.AddChecksum((int)NodeTag.Queue, Path);
 
             Type keyType = value.GetType().GetGenericArguments()[0];
             var array = value.GetType().GetMethod("ToArray").Invoke(value, new object[] { }) as Array;
@@ -364,7 +390,7 @@ namespace Dec
 
         public override void WriteStack(IEnumerable value)
         {
-            writer.AddChecksum((int)NodeTag.Stack);
+            writer.AddChecksum((int)NodeTag.Stack, Path);
 
             Type keyType = value.GetType().GetGenericArguments()[0];
             var array = value.GetType().GetMethod("ToArray").Invoke(value, new object[] { }) as Array;
@@ -374,7 +400,7 @@ namespace Dec
 
         public override void WriteTuple(object value, TupleElementNamesAttribute names)
         {
-            writer.AddChecksum((int)NodeTag.Tuple);
+            writer.AddChecksum((int)NodeTag.Tuple, Path);
 
             var args = value.GetType().GenericTypeArguments;
             var length = args.Length;
@@ -389,7 +415,7 @@ namespace Dec
 
         public override void WriteValueTuple(object value, TupleElementNamesAttribute names)
         {
-            writer.AddChecksum((int)NodeTag.Tuple);
+            writer.AddChecksum((int)NodeTag.Tuple, Path);
 
             var args = value.GetType().GenericTypeArguments;
             var length = args.Length;
@@ -404,7 +430,7 @@ namespace Dec
 
         public override void WriteRecord(IRecordable value)
         {
-            writer.AddChecksum((int)NodeTag.Record);
+            writer.AddChecksum((int)NodeTag.Record, Path);
 
             value.Record(new RecorderWriter(this));
         }
@@ -413,7 +439,7 @@ namespace Dec
         {
             try
             {
-                writer.AddChecksum((int)NodeTag.Convertible);
+                writer.AddChecksum((int)NodeTag.Convertible, Path);
 
                 if (converter is ConverterString converterString)
                 {
@@ -440,7 +466,7 @@ namespace Dec
 
         public override void TagClass(Type type)
         {
-            writer.AddChecksum((int)NodeTag.TagClass);
+            writer.AddChecksum((int)NodeTag.TagClass, Path);
 
             WriteType(type);
         }

@@ -445,6 +445,8 @@ namespace DecTest
                     ExpectGeneral(() => inputChecksum = Dec.Recorder.Checksum(input), "DoRecorder.Checksum", expectWarnings ? ExpectationType.Tolerate : ExpectationType.Disallow, null, expectErrors ? ExpectationType.Tolerate : ExpectationType.Disallow, null);
                     ExpectGeneral(() => resultChecksum = Dec.Recorder.Checksum(result), "DoRecorder.Checksum", expectWarnings ? ExpectationType.Tolerate : ExpectationType.Disallow, null, expectErrors ? ExpectationType.Tolerate : ExpectationType.Disallow, null);
 
+                    ExpectGeneral(() => Dec.Recorder.ChecksumDiff(input, result, Assert.Fail), "DoRecorder.ChecksumDiff", expectWarnings ? ExpectationType.Tolerate : ExpectationType.Disallow, null, expectErrors ? ExpectationType.Tolerate : ExpectationType.Disallow, null);
+
                     Assert.AreEqual(inputChecksum, resultChecksum);
                 }
 

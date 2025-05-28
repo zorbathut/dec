@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 * Initial implementation of Record.Checksum(), intended for easy and fast comparison of recordable objects.
+* Initial implementation of Record.ChecksumDiff(), intended for easy and fast detection of how recordable objects differ.
 * Added Intent property to Recorder to indicate Serialization/Cloning/Checksum purpose.
 
 ### Improved
