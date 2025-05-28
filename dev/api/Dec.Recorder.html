@@ -294,6 +294,55 @@ Class Recorder  <a class="header-action link-secondary" title="View source" href
 
 
 
+  <a id="Dec_Recorder_ChecksumDiff_" data-uid="Dec.Recorder.ChecksumDiff*"></a>
+
+  <h3 id="Dec_Recorder_ChecksumDiff__1___0___0_System_Action_System_String__Dec_Recorder_IUserSettings_" data-uid="Dec.Recorder.ChecksumDiff``1(``0,``0,System.Action{System.String},Dec.Recorder.IUserSettings)">
+  ChecksumDiff&lt;T&gt;(T, T, Action&lt;string&gt;, IUserSettings)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/RecorderApi.cs/#L299"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Compares two objects and reports the first point where they differ in their serialized structure.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void ChecksumDiff&lt;T&gt;(T lhs, T rhs, Action&lt;string&gt; report, Recorder.IUserSettings userSettings = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>lhs</code> <span class="xref">T</span></dt>
+    <dd></dd>
+    <dt><code>rhs</code> <span class="xref">T</span></dt>
+    <dd></dd>
+    <dt><code>report</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>userSettings</code> <a class="xref" href="Dec.Recorder.html">Recorder</a>.<a class="xref" href="Dec.Recorder.IUserSettings.html">IUserSettings</a></dt>
+    <dd></dd>
+  </dl>
+
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+  <h4 class="section" id="Dec_Recorder_ChecksumDiff__1___0___0_System_Action_System_String__Dec_Recorder_IUserSettings__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>This method identifies the location of the first difference between two objects.</p>
+<p>If the objects are identical according to their serialized representation, no report is made. Otherwise, the report callback will be invoked with a human-readable message indicating the path where the difference was found.</p>
+<p>This uses <a class="xref" href="Dec.Recorder.html#Dec_Recorder_Checksum__1___0_Dec_Recorder_IUserSettings_">Checksum&lt;T&gt;(T, IUserSettings)</a> to compute checksums, and therefore includes all of its notes and remarks.</p>
+<p>This interface is not very good and might be changed without warning.</p>
+</div>
+
+
+
+
   <a id="Dec_Recorder_Checksum_" data-uid="Dec.Recorder.Checksum*"></a>
 
   <h3 id="Dec_Recorder_Checksum__1___0_Dec_Recorder_IUserSettings_" data-uid="Dec.Recorder.Checksum``1(``0,Dec.Recorder.IUserSettings)">

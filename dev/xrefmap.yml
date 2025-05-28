@@ -1817,6 +1817,22 @@ references:
   isSpec: "True"
   fullName: Dec.Recorder.Checksum
   nameWithType: Recorder.Checksum
+- uid: Dec.Recorder.ChecksumDiff*
+  name: ChecksumDiff
+  href: api/Dec.Recorder.html#Dec_Recorder_ChecksumDiff_
+  commentId: Overload:Dec.Recorder.ChecksumDiff
+  isSpec: "True"
+  fullName: Dec.Recorder.ChecksumDiff
+  nameWithType: Recorder.ChecksumDiff
+- uid: Dec.Recorder.ChecksumDiff``1(``0,``0,System.Action{System.String},Dec.Recorder.IUserSettings)
+  name: ChecksumDiff<T>(T, T, Action<string>, IUserSettings)
+  href: api/Dec.Recorder.html#Dec_Recorder_ChecksumDiff__1___0___0_System_Action_System_String__Dec_Recorder_IUserSettings_
+  commentId: M:Dec.Recorder.ChecksumDiff``1(``0,``0,System.Action{System.String},Dec.Recorder.IUserSettings)
+  name.vb: ChecksumDiff(Of T)(T, T, Action(Of String), IUserSettings)
+  fullName: Dec.Recorder.ChecksumDiff<T>(T, T, System.Action<string>, Dec.Recorder.IUserSettings)
+  fullName.vb: Dec.Recorder.ChecksumDiff(Of T)(T, T, System.Action(Of String), Dec.Recorder.IUserSettings)
+  nameWithType: Recorder.ChecksumDiff<T>(T, T, Action<string>, Recorder.IUserSettings)
+  nameWithType.vb: Recorder.ChecksumDiff(Of T)(T, T, Action(Of String), Recorder.IUserSettings)
 - uid: Dec.Recorder.Checksum``1(``0,Dec.Recorder.IUserSettings)
   name: Checksum<T>(T, IUserSettings)
   href: api/Dec.Recorder.html#Dec_Recorder_Checksum__1___0_Dec_Recorder_IUserSettings_
