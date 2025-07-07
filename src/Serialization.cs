@@ -1499,6 +1499,15 @@ namespace Dec
                 return result;
             }
 
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+            {
+                // Intercept and handle appropriately
+                // We've already handled the `null` attribute, so we know it isn't null - just go ahead and deal with it by passing it up to a parent
+                // I'm not sure if this is the right approach?
+                result = ParseElement(nodes, type.GetGenericArguments()[0], original, globals, recSettings);
+                return result;
+            }
+
             // At this point, we're either a class or a struct, and we need to do the reflection thing
 
             // If we have refs, something has gone wrong; we should never be doing reflection inside a Record system.

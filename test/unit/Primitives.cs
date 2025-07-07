@@ -970,10 +970,13 @@ namespace DecTest
             public string nullableString;
             public StubStruct? nullableStruct;
             public StubStructRecordable? nullableStructRecordable;
+
+            public StubStruct? nullableStructDefaulted = new StubStruct { data = 42 };
+            public StubStructRecordable? nullableStructRecordableDefaulted = new StubStructRecordable { data = 42 };
         }
 
         [Test]
-        public void NullableReflection([Values] ParserMode mode)
+        public void NullableReflection([ValuesExcept(ParserMode.Validation)] ParserMode mode)
         {
             UpdateTestParameters(
                 new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(NullableDec) } });
@@ -986,11 +989,17 @@ namespace DecTest
                         <nullableFloat>3.14</nullableFloat>
                         <nullableString>hello</nullableString>
                         <nullableStruct>
-                            <value>99</value>
+                            <data>99</data>
                         </nullableStruct>
                         <nullableStructRecordable>
-                            <value>100</value>
+                            <dataRecorded>100</dataRecorded>
                         </nullableStructRecordable>
+                        <nullableStructDefaulted>
+                            <data>101</data>
+                        </nullableStructDefaulted>
+                        <nullableStructRecordableDefaulted>
+                            <dataRecorded>102</dataRecorded>
+                        </nullableStructRecordableDefaulted>
                     </NullableDec>
                 </Decs>");
             parser.Finish();
@@ -1004,9 +1013,13 @@ namespace DecTest
             Assert.AreEqual(3.14f, result.nullableFloat);
             Assert.AreEqual("hello", result.nullableString);
             Assert.IsNotNull(result.nullableStruct);
-            Assert.AreEqual(99, result.nullableStruct.Value.value);
+            Assert.AreEqual(99, result.nullableStruct.Value.data);
             Assert.IsNotNull(result.nullableStructRecordable);
-            Assert.AreEqual(100, result.nullableStructRecordable.Value.value);
+            Assert.AreEqual(100, result.nullableStructRecordable.Value.data);
+            Assert.IsNotNull(result.nullableStructDefaulted);
+            Assert.AreEqual(101, result.nullableStructDefaulted.Value.data);
+            Assert.IsNotNull(result.nullableStructRecordableDefaulted);
+            Assert.AreEqual(102, result.nullableStructRecordableDefaulted.Value.data);
         }
 
         [Test]
@@ -1024,6 +1037,8 @@ namespace DecTest
                         <nullableString null=""true"" />
                         <nullableStruct null=""true"" />
                         <nullableStructRecordable null=""true"" />
+                        <nullableStructDefaulted null=""true"" />
+                        <nullableStructRecordableDefaulted null=""true"" />
                     </NullableDec>
                 </Decs>");
             parser.Finish();
@@ -1038,6 +1053,8 @@ namespace DecTest
             Assert.IsNull(result.nullableString);
             Assert.IsNull(result.nullableStruct);
             Assert.IsNull(result.nullableStructRecordable);
+            Assert.IsNull(result.nullableStructDefaulted);
+            Assert.IsNull(result.nullableStructRecordableDefaulted);
         }
     }
 }

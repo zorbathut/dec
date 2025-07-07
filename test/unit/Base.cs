@@ -242,20 +242,22 @@ namespace DecTest
 
             public void Record(Dec.Recorder record)
             {
-                record.Record(ref data, "data");
+                // different label to verify that it's going through the record system
+                record.Record(ref data, "dataRecorded");
             }
         }
         public struct StubStruct
         {
-            public int value;
+            public int data;
         }
         public struct StubStructRecordable : Dec.IRecordable
         {
-            public int value;
+            public int data;
 
             public void Record(Dec.Recorder record)
             {
-                record.Record(ref value, nameof(value));
+                // different label to verify that it's going through the record system
+                record.Record(ref data, "dataRecorded");
             }
         }
 
