@@ -962,5 +962,82 @@ namespace DecTest
             Assert.AreEqual(original.struct_opt_nul, deserialized.struct_opt_nul);
             Assert.AreEqual(original.struct_opt_val?.a, deserialized.struct_opt_val?.a);
         }
+
+        public class NullableDec : Dec.Dec
+        {
+            public int? nullableInt;
+            public float? nullableFloat;
+            public string nullableString;
+            public StubStruct? nullableStruct;
+            public StubStructRecordable? nullableStructRecordable;
+        }
+
+        [Test]
+        public void NullableReflection([Values] ParserMode mode)
+        {
+            UpdateTestParameters(
+                new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(NullableDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <NullableDec decName=""TestDec"">
+                        <nullableInt>42</nullableInt>
+                        <nullableFloat>3.14</nullableFloat>
+                        <nullableString>hello</nullableString>
+                        <nullableStruct>
+                            <value>99</value>
+                        </nullableStruct>
+                        <nullableStructRecordable>
+                            <value>100</value>
+                        </nullableStructRecordable>
+                    </NullableDec>
+                </Decs>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            var result = Dec.Database<NullableDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(42, result.nullableInt);
+            Assert.AreEqual(3.14f, result.nullableFloat);
+            Assert.AreEqual("hello", result.nullableString);
+            Assert.IsNotNull(result.nullableStruct);
+            Assert.AreEqual(99, result.nullableStruct.Value.value);
+            Assert.IsNotNull(result.nullableStructRecordable);
+            Assert.AreEqual(100, result.nullableStructRecordable.Value.value);
+        }
+
+        [Test]
+        public void NullableReflectionNull([Values] ParserMode mode)
+        {
+            UpdateTestParameters(
+                new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(NullableDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <NullableDec decName=""TestDec"">
+                        <nullableInt null=""true"" />
+                        <nullableFloat null=""true"" />
+                        <nullableString null=""true"" />
+                        <nullableStruct null=""true"" />
+                        <nullableStructRecordable null=""true"" />
+                    </NullableDec>
+                </Decs>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            var result = Dec.Database<NullableDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.IsNull(result.nullableInt);
+            Assert.IsNull(result.nullableFloat);
+            Assert.IsNull(result.nullableString);
+            Assert.IsNull(result.nullableStruct);
+            Assert.IsNull(result.nullableStructRecordable);
+        }
     }
 }

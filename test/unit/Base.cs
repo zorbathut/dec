@@ -245,6 +245,19 @@ namespace DecTest
                 record.Record(ref data, "data");
             }
         }
+        public struct StubStruct
+        {
+            public int value;
+        }
+        public struct StubStructRecordable : Dec.IRecordable
+        {
+            public int value;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref value, nameof(value));
+            }
+        }
 
         public enum GenericEnum
         {

@@ -221,6 +221,11 @@ namespace Dec
                 Dbg.Err($"{BuiltContext()}: Attempting to create {errorType} of type {type} without a no-argument constructor");
                 return null;    // similarly, anything that is capable of not having a no-argument constructor can accept being null
             }
+            else if (type.IsConstructedGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+            {
+                // we actually just treat this like the object itself, C# will handle the details
+                return CreateInstanceSafe(type.GenericTypeArguments[0], errorType, node);
+            }
             else
             {
                 try
@@ -228,9 +233,8 @@ namespace Dec
                     var result = Activator.CreateInstance(type, true);
                     if (result == null)
                     {
-                        // This is difficult to test; there are very few things that can get CreateInstance to return null, and right now the Dec type system doesn't support them (int? for example)
-                        // Right now we're just hardcode testing this for laughs.
-                        // *need more coverage*
+                        // This is difficult to test; there are very few things that can get CreateInstance to return null, and we supposedly handle all of them in the above tests.
+                        // In theory a malformed COM object might do it.
                         Dbg.Err($"{BuiltContext()}: {errorType} of type {type} was not properly created; this will cause issues");
                     }
                     return result;

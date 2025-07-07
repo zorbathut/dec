@@ -170,17 +170,5 @@ namespace DecTest
                 "loaf, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null",
             }, ApplyUserAssemblyFilter(input));
         }
-
-        [Test]
-        public void CreatedNull()
-        {
-            var CreateInstanceSafeHandle = Assembly.GetAssembly(typeof(Dec.Dec)).GetType("Dec.UtilReflection").GetMethod("CreateInstanceSafe", BindingFlags.Static | BindingFlags.NonPublic);
-            object CreateInstanceSafe(Type type, string errorType, object readerNode)
-            {
-                return CreateInstanceSafeHandle.Invoke(null, new object[] { type, errorType, readerNode });
-            }
-
-            ExpectErrors(() => Assert.AreEqual(null, CreateInstanceSafe(typeof(int?), "object", null)));
-        }
     }
 }

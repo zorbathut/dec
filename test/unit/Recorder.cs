@@ -783,8 +783,8 @@ namespace DecTest
             public float? nullableFloatB;
             public bool? nullableBoolA;
             public bool? nullableBoolB;
-            public NullableStruct nullableStructA;
-            public NullableStruct nullableStructB;
+            public NullableStruct? nullableStructA;
+            public NullableStruct? nullableStructB;
 
             public void Record(Dec.Recorder recorder)
             {
