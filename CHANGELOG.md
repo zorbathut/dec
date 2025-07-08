@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 ### Improved
 * Exception messages for ConfigErrors() and PostLoad() now include the Dec name.
 * Error messages for trying to clone an object into a different object type.
+* Remove unnecessary class tag on Recorder nullable fields.
 
 ### Fixed
 * Reading recorder files with objects with a missing Converter could result in an unhandled exception.

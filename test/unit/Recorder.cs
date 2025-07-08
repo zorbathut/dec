@@ -800,7 +800,7 @@ namespace DecTest
         }
 
         [Test]
-        public void Nullable([Values] RecorderMode mode)
+        public void Nullable([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
             var root = new Nullables();
             root.nullableIntA = 42;

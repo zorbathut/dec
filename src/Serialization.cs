@@ -1883,18 +1883,28 @@ namespace Dec
             }
 
             // If we have a type that isn't the expected type, tag it. We may need this even for unreferencable value types because everything fits in an `object`.
-            if (valType != fieldType)
             {
-                if (asThis)
+                bool tagClass = valType != fieldType;
+                if (fieldType.IsConstructedGenericType && fieldType.GetGenericTypeDefinition() == typeof(Nullable<>))
                 {
-                    Dbg.Err($"RecordAsThis() call attempted to add a class tag, which is currently not allowed; AsThis() calls must not be polymorphic (ask the devs for chained class tags if this is a thing you need)");
-                    // . . . I guess we just keep going?
+                    // If we're a Nullable<> then we know the type, so we unwrap it a layer
+                    tagClass = valType != fieldType.GetGenericArguments()[0];
                 }
-                else
+
+                if (tagClass)
                 {
-                    node.TagClass(valType);
+                    if (asThis)
+                    {
+                        Dbg.Err($"RecordAsThis() call attempted to add a class tag, which is currently not allowed; AsThis() calls must not be polymorphic (ask the devs for chained class tags if this is a thing you need)");
+                        // . . . I guess we just keep going?
+                    }
+                    else
+                    {
+                        node.TagClass(valType);
+                    }
                 }
             }
+
 
             // Did we actually write our node type? Alright, we're done.
             if (unreferenceableComplete)

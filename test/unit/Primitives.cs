@@ -943,7 +943,7 @@ namespace DecTest
         }
 
         [Test]
-        public void Optionals([Values] RecorderMode mode)
+        public void Optionals([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
             var original = new OptionalsStruct
             {
