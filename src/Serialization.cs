@@ -576,7 +576,7 @@ namespace Dec
                 var resultType = result.GetType();
 
                 // I really feel like whatever I'm expressing here must exist elsewhere in the codebase, but I can't find it
-                if (!resultType.IsValueType && resultType != typeof(string) && resultType != typeof(Type) && !typeof(Dec).IsAssignableFrom(resultType))
+                if (!resultType.IsValueType && resultType != typeof(string) && resultType != typeof(Type) && resultType != TypeSystemRuntimeType && !typeof(Dec).IsAssignableFrom(resultType))
                 {
                     // these paths *should* all match up, so we're just choosing one
                     var newPath = nodes[0].GetContext().path;

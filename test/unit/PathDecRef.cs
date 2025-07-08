@@ -7,7 +7,7 @@ using Dec;
 namespace DecTest
 {
     [TestFixture]
-    public class PathDecRef : Base
+    public class PathDecRefStd : Base
     {
         private class PathDec : Dec.Dec
         {
@@ -80,7 +80,8 @@ namespace DecTest
         }
 
         [Test]
-        public void MultiDimensionalArray([ValuesExcept(RecorderMode.Simple)] RecorderMode mode, [Values(0, 1)] int index1, [Values(0, 1)] int index2)
+        public void MultiDimensionalArray([ValuesExcept(RecorderMode.Simple)] RecorderMode mode,
+            [Values(0, 1)] int index1, [Values(0, 1)] int index2)
         {
             var dec = Dec.Database<PathDec>.Get("TestDec");
 
@@ -104,7 +105,8 @@ namespace DecTest
         }
 
         [Test]
-        public void Dictionary([ValuesExcept(RecorderMode.Simple)] RecorderMode mode, [Values("horse", "dog")] string key)
+        public void Dictionary([ValuesExcept(RecorderMode.Simple)] RecorderMode mode,
+            [Values("horse", "dog")] string key)
         {
             var dec = Dec.Database<PathDec>.Get("TestDec");
 
@@ -125,6 +127,41 @@ namespace DecTest
             var newItem = DoRecorderRoundTrip(stub, RecorderMode.Pretty);
 
             Assert.AreSame(stub, newItem);
+        }
+    }
+
+    [TestFixture]
+    public class PathDecRef : Base
+    {
+        public class TypeHolderDec : Dec.Dec
+        {
+            public Type type;
+        }
+
+        [Test]
+        public void TypeNotReffed([Values] RecorderMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(TypeHolderDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <TypeHolderDec decName=""Test"">
+                        <type>int</type>
+                    </TypeHolderDec>
+                </Decs>");
+            parser.Finish();
+
+            var type = typeof(int);
+
+            string serialized = Dec.Recorder.Write(type);
+
+            // nuke the entire environment
+            Clean();
+
+            var deserialized = Dec.Recorder.Read<Type>(serialized);
+
+            Assert.AreEqual(type, deserialized);
         }
     }
 }
