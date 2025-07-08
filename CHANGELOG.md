@@ -9,6 +9,9 @@ All notable changes to this project will be documented in this file.
 * Added Intent property to Recorder to indicate Serialization/Cloning/Checksum purpose.
 * Official support for nullable value types.
 
+### Breaking
+* Fixing "Recorded Types could be stored as Dec Refs if the right type showed up in the Dec system" may result in savegames being broken, sometimes unexpected. If this is a problem for you, let me know and I'll come up with a fix. I admit I'm kinda hoping nobody cares.
+
 ### Improved
 * Exception messages for ConfigErrors() and PostLoad() now include the Dec name.
 * Error messages for trying to clone an object into a different object type.
