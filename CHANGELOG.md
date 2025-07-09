@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 
-## [Unreleased]
+## [v0.9.0]
 ### Added
 * Initial implementation of Record.Checksum(), intended for easy and fast comparison of recordable objects.
 * Initial implementation of Record.ChecksumDiff(), intended for easy and fast detection of how recordable objects differ.
