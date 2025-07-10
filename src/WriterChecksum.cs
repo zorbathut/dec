@@ -231,6 +231,8 @@ namespace Dec
 
         public override void WriteExplicitNull()
         {
+            FlagAsNull();
+
             writer.AddChecksum((int)NodeTag.Null, Path);
         }
 

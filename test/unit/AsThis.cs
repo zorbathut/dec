@@ -132,7 +132,7 @@ namespace DecTest
 
         public class ClassThenThisOuterBase : Dec.IRecordable
         {
-            public Stub data;
+            public StubRecordable data;
 
             public void Record(Dec.Recorder recorder)
             {
@@ -144,10 +144,19 @@ namespace DecTest
         [Test]
         public void InheritedMember([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
+            var item = new ClassThenThisOuterDerived() { data = new StubRecordable() };
+            ClassThenThisOuterBase itemBase = item;
+
+            var deserialized = DoRecorderRoundTrip(itemBase, mode);
+        }
+
+        [Test]
+        public void InheritedMemberNull([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
+        {
             var item = new ClassThenThisOuterDerived();
             ClassThenThisOuterBase itemBase = item;
 
-            var deserialized = DoRecorderRoundTrip(itemBase, mode, expectReadErrors: mode != RecorderMode.Clone && mode != RecorderMode.Checksum, expectWriteErrors: mode != RecorderMode.Clone && mode != RecorderMode.Checksum);
+            var deserialized = DoRecorderRoundTrip(itemBase, mode, expectWriteErrors: mode != RecorderMode.Clone && mode != RecorderMode.Checksum);
         }
 
         public class Inner : Dec.IRecordable

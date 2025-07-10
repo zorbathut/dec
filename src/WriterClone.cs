@@ -625,6 +625,8 @@ namespace Dec
 
         public override void WriteExplicitNull()
         {
+            FlagAsNull();
+
             SetValuelikeOriginalAndResult(null);
         }
 

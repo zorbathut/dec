@@ -223,6 +223,8 @@ namespace Dec
 
         public override void WriteExplicitNull()
         {
+            FlagAsNull();
+
             writer.AppendLine($"Assert.IsNull({accessor});");
         }
 

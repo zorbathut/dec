@@ -179,6 +179,12 @@ namespace Dec
 
         public override void WriteExplicitNull()
         {
+            if (!FlagAsNull())
+            {
+                // this can result in some weirdly broken XML so let's just not do that
+                return;
+            }
+
             node.SetAttributeValue("null", "true");
         }
 

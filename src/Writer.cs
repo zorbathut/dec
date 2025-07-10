@@ -63,12 +63,6 @@ namespace Dec
         // attempts to flag as self, posts error if it can't
         public bool FlagAsThis()
         {
-            if (flaggedAsClass)
-            {
-                Dbg.Err("RecordAsThis() called on a node that was already polymorphic; this does not work, RecordAsThis() can be used only if every class involved in the This() chain is of expected type");
-                return false;
-            }
-
             flaggedAsThis = true;
             return true;
         }
@@ -76,11 +70,22 @@ namespace Dec
         {
             if (flaggedAsThis)
             {
-                Dbg.Err("Polymorphic Record() detected after a RecordAsThis(); this does not work, RecordAsThis() can be used only if every class involved in the This() chain is of expected type");
+                Dbg.Err("Polymorphic Record() detected after a RecordAsThis(); this does not work, polymorphic Record() must be the first item in a This() chain");
                 return false;
             }
 
             flaggedAsClass = true;
+            return true;
+        }
+
+        protected bool FlagAsNull()
+        {
+            if (flaggedAsClass || flaggedAsThis)
+            {
+                Dbg.Err("Null tag detected after a class tag or a RecordAsThis(); this currently does not work, RecordAsThis() must not be used on a null value");
+                return false;
+            }
+
             return true;
         }
     }

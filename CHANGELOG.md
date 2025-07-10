@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 
 
+## [Unreleased]
+### Improved
+* Added support for RecordAsThis() after a class tag.
+
+
 ## [v0.9.0]
 ### Added
 * Initial implementation of Record.Checksum(), intended for easy and fast comparison of recordable objects.
