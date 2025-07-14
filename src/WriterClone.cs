@@ -646,6 +646,11 @@ namespace Dec
             SetOriginal(value);
         }
 
+        public override void WriteByteArray(byte[] value)
+        {
+            SetOriginal(value);
+        }
+
         public override void WriteList(IList value)
         {
             SetOriginal(value);

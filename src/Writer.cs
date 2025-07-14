@@ -42,6 +42,7 @@ namespace Dec
         public abstract void WriteExplicitNull();
         public abstract bool WriteReference(object value, Path path);
         public abstract void WriteArray(Array value);
+        public abstract void WriteByteArray(byte[] value);
         public abstract void WriteList(IList value);
         public abstract void WriteDictionary(IDictionary value);
         public abstract void WriteHashSet(IEnumerable value);

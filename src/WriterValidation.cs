@@ -268,6 +268,11 @@ namespace Dec
             writer.AppendLine($"}}");
         }
 
+        public override void WriteByteArray(byte[] value)
+        {
+            writer.AppendLine($"Assert.AreEqual(new byte[] {{ {string.Join(", ", value)} }}, {accessor});");
+        }
+
         public override void WriteList(IList value)
         {
             Type referencedType = value.GetType().GetGenericArguments()[0];
@@ -473,6 +478,11 @@ namespace Dec
         }
 
         public override void WriteArray(Array value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void WriteByteArray(byte[] value)
         {
             throw new NotImplementedException();
         }

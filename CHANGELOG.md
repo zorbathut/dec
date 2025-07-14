@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Improved
 * Added support for RecordAsThis() after a class tag.
+* Special-case behavior to convert byte[] input into a Base64-encoded string in XML.
 
 
 ## [v0.9.0]

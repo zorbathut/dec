@@ -233,6 +233,12 @@ namespace Dec
             }
         }
 
+        public override void WriteByteArray(byte[] value)
+        {
+            // about as good as we're gonna get
+            WriteString(Convert.ToBase64String(value));
+        }
+
         public override void WriteList(IList value)
         {
             Type referencedType = value.GetType().GetGenericArguments()[0];

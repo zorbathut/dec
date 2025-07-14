@@ -68,6 +68,23 @@ namespace Dec
 
         public override int[] GetArrayDimensions(int rank)
         {
+            // Special case: if this is a 1D array with text content and no children,
+            // it's likely a base64-encoded byte array
+            if (rank == 1 && xml.GetText() != null && !xml.Elements().Any())
+            {
+                string base64Text = xml.GetText();
+
+                // Calculate byte array length from base64 string length without full parsing
+                // Base64 length formula: (base64Length / 4) * 3, minus padding
+                int base64Length = base64Text.Length;
+                int padding = 0;
+                if (base64Text.EndsWith("==")) padding = 2;
+                else if (base64Text.EndsWith("=")) padding = 1;
+
+                int estimatedByteLength = (base64Length / 4) * 3 - padding;
+                return new int[] { estimatedByteLength };
+            }
+
             // The actual processing will be handled by ParseArray, so we're not doing much validation here right now
             int[] results = new int[rank];
             var tier = xml;

@@ -122,6 +122,7 @@ namespace Dec
             Record,
             Convertible,
             TagClass,
+            ByteArray,
         }
 
         // this should be WriterNodeChecksum but this C# doesn't support that
@@ -313,6 +314,18 @@ namespace Dec
                 // slow path
                 int[] indices = new int[value.Rank];
                 WriteArrayRank(value, referencedType, 0, indices);
+            }
+        }
+
+        public override void WriteByteArray(byte[] value)
+        {
+            writer.AddChecksum((int)NodeTag.ByteArray, Path);
+            writer.AddChecksum((ulong)value.Length, Path);
+
+            // a reinterpret might make this faster
+            foreach (byte b in value)
+            {
+                writer.AddChecksum((ulong)b, Path);
             }
         }
 

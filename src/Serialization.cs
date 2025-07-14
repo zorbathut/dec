@@ -1115,6 +1115,53 @@ namespace Dec
                 // otherwise we just fall through
             }
 
+            // Special case: byte[] arrays with base64 encoding
+            if (type == typeof(byte[]) && hasText && !hasChildren)
+            {
+                // This is a byte array encoded as base64 text
+                foreach (var (parseCommand, node) in orders)
+                {
+                    switch (parseCommand)
+                    {
+                        case ParseCommand.Replace:
+                            // easy, done
+                            break;
+
+                        default:
+                            Dbg.Err($"{node.GetContext()}: Internal error, got invalid mode {parseCommand}");
+                            break;
+                    }
+
+                    try
+                    {
+                        byte[] decodedArray = Convert.FromBase64String(node.GetText());
+
+                        // Check if we can reuse the existing array
+                        if (result != null && result.GetType() == type && ((byte[])result).Length == decodedArray.Length)
+                        {
+                            // Copy into existing array for reference preservation
+                            Array.Copy(decodedArray, (byte[])result, decodedArray.Length);
+                        }
+                        else
+                        {
+                            // Use this as the new array
+                            result = decodedArray;
+                        }
+                    }
+                    catch (FormatException)
+                    {
+                        Dbg.Err($"{node.GetContext()}: Invalid base64 string for byte array");
+
+                        if (result == null)
+                        {
+                            result = new byte[0];   // kind of an ugly fallback
+                        }
+                    }
+                }
+
+                return result;
+            }
+
             // Nothing past this point even supports text, so let's just get angry and break stuff.
             if (hasText)
             {
@@ -1917,6 +1964,13 @@ namespace Dec
             if (node.AllowCloning && UtilType.CanBeCloneCopied(valType))
             {
                 node.WriteCloneCopy(value);
+
+                return;
+            }
+
+            if (valType == typeof(byte[]))
+            {
+                node.WriteByteArray(value as byte[]);
 
                 return;
             }
