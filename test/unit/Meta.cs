@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Reflection;
 using NUnit.Framework;
 
@@ -130,13 +130,13 @@ namespace DecTest
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
-            var parseCache = (Dictionary<string, Type>)Assembly.GetAssembly(typeof(Dec.Dec)).GetType("Dec.UtilType").GetField("ParseCache", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
+            var parseCache = (ConcurrentDictionary<string, Type>)Assembly.GetAssembly(typeof(Dec.Dec)).GetType("Dec.UtilType").GetField("ParseCache", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
 
             // This will be equal to our seeded intro values.
             int baseSize = parseCache.Count;
             Assert.AreEqual(baseSize, parseCache.Count);
 
-            parseCache.Add("Meta", typeof(Meta));
+            parseCache["Meta"] = typeof(Meta);
             Assert.AreEqual(baseSize + 1, parseCache.Count);
 
             ExpectWarnings(() => DoParserTests(ParserMode.RewrittenBare));

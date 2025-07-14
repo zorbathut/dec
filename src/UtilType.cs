@@ -291,7 +291,7 @@ namespace Dec
         }
 
         private static Regex ArrayRankParser = new Regex(@"\[([,]*)\]$", RegexOptions.Compiled);
-        private static Dictionary<string, Type> ParseCache = new Dictionary<string, Type>();
+        private static ConcurrentDictionary<string, Type> ParseCache = new ConcurrentDictionary<string, Type>();
         internal static Type ParseDecFormatted(string text, Context context)
         {
             if (text == "")
