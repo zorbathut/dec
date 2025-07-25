@@ -199,6 +199,12 @@ namespace Dec
                 var readerClone = new ReaderNodeCloneRecorder(recorderChildren, UserSettings);
                 result = converterFactory.CreateObj(new RecorderReader(readerClone, new ReaderGlobals()));
             }
+            else if (originalConverter is ConverterString converterString)
+            {
+                var str = converterString.WriteObj(original);
+                result = converterString.ReadObj(str, new Context(filename: "clone"));
+                done = true;
+            }
             else if (RecorderSettings.factories != null && original is IRecordable)
             {
                 result = RecorderSettings.CreateRecordableFromFactory(originalType, "clone", new ReaderNodeCloneCreator(original, UserSettings));

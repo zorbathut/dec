@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 * Thread contention error when running Dec on multiple threads simultaneously.
+* Error when cloning a ConverterString-driven class without a parameterless constructor.
 
 
 ## [v0.9.0]
