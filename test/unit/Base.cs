@@ -474,19 +474,8 @@ namespace DecTest
             {
                 string code = "";
 
-                if (expectWriteErrors)
-                {
-                    // We don't really insist on an error, but we tolerate one.
-                    ExpectErrors(() =>
-                    {
-                        code = Dec.Recorder.WriteValidation(input);
-                        handledError = true; // good enough, just continue
-                    }, "DoRecorder.Validation.Write", errorValidator: errorValidator);
-                }
-                else
-                {
-                    code = Dec.Recorder.WriteValidation(input);
-                }
+                // validation has weird behavior so, if allowed, we tolerate all errors/warnings instead of disallowing them
+                ExpectGeneral(() => code = Dec.Recorder.WriteValidation(input), "validationWrite", expectWriteWarnings ? ExpectationType.Tolerate : ExpectationType.Disallow, warningValidator, expectWriteErrors ? ExpectationType.Tolerate : ExpectationType.Disallow, errorValidator);
 
                 var ComposeCSFormatted = Assembly.GetAssembly(typeof(Dec.Dec)).GetType("Dec.UtilType").GetMethod("ComposeCSFormatted", BindingFlags.NonPublic | BindingFlags.Static);
 
