@@ -420,7 +420,7 @@ namespace DecTest
             Validation,
         }
 
-        public T DoRecorderRoundTrip<T>(T input, RecorderMode mode, Action<string> testSerializedResult = null, bool expectWriteErrors = false, bool expectWriteWarnings = false, bool expectReadErrors = false, bool expectReadWarnings = false, Func<string, bool> errorValidator = null)
+        public T DoRecorderRoundTrip<T>(T input, RecorderMode mode, Action<string> testSerializedResult = null, bool expectWriteErrors = false, bool expectWriteWarnings = false, bool expectReadErrors = false, bool expectReadWarnings = false, Func<string, bool> errorValidator = null, Func<string, bool> warningValidator = null)
         {
             if (mode == RecorderMode.Clone || mode == RecorderMode.Checksum)
             {
@@ -436,7 +436,7 @@ namespace DecTest
 
                 if (expectErrors && expectWarnings)
                 {
-                    ExpectWarningsAndErrors(DoClone, "DoRecorder.Clone", errorValidator: errorValidator);
+                    ExpectWarningsAndErrors(DoClone, "DoRecorder.Clone", warningValidator: warningValidator, errorValidator: errorValidator);
                 }
                 else if (expectErrors)
                 {
@@ -444,7 +444,7 @@ namespace DecTest
                 }
                 else if (expectWarnings)
                 {
-                    ExpectWarnings(DoClone, "DoRecorder.Clone");
+                    ExpectWarnings(DoClone, "DoRecorder.Clone", warningValidator: warningValidator);
                 }
                 else
                 {
@@ -457,10 +457,10 @@ namespace DecTest
                     ulong inputChecksum = 0;
                     ulong resultChecksum = 0;
 
-                    ExpectGeneral(() => inputChecksum = Dec.Recorder.Checksum(input), "DoRecorder.Checksum", expectWarnings ? ExpectationType.Tolerate : ExpectationType.Disallow, null, expectErrors ? ExpectationType.Tolerate : ExpectationType.Disallow, null);
-                    ExpectGeneral(() => resultChecksum = Dec.Recorder.Checksum(result), "DoRecorder.Checksum", expectWarnings ? ExpectationType.Tolerate : ExpectationType.Disallow, null, expectErrors ? ExpectationType.Tolerate : ExpectationType.Disallow, null);
+                    ExpectGeneral(() => inputChecksum = Dec.Recorder.Checksum(input), "DoRecorder.Checksum", expectWarnings ? ExpectationType.Tolerate : ExpectationType.Disallow, warningValidator, expectErrors ? ExpectationType.Tolerate : ExpectationType.Disallow, errorValidator);
+                    ExpectGeneral(() => resultChecksum = Dec.Recorder.Checksum(result), "DoRecorder.Checksum", expectWarnings ? ExpectationType.Tolerate : ExpectationType.Disallow, warningValidator, expectErrors ? ExpectationType.Tolerate : ExpectationType.Disallow, errorValidator);
 
-                    ExpectGeneral(() => Dec.Recorder.ChecksumDiff(input, result, Assert.Fail), "DoRecorder.ChecksumDiff", expectWarnings ? ExpectationType.Tolerate : ExpectationType.Disallow, null, expectErrors ? ExpectationType.Tolerate : ExpectationType.Disallow, null);
+                    ExpectGeneral(() => Dec.Recorder.ChecksumDiff(input, result, Assert.Fail), "DoRecorder.ChecksumDiff", expectWarnings ? ExpectationType.Tolerate : ExpectationType.Disallow, warningValidator, expectErrors ? ExpectationType.Tolerate : ExpectationType.Disallow, errorValidator);
 
                     Assert.AreEqual(inputChecksum, resultChecksum);
                 }
@@ -512,7 +512,7 @@ namespace DecTest
             }
             else if (expectWriteWarnings)
             {
-                ExpectWarnings(DoSerialize, "DoRecorder.Write");
+                ExpectWarnings(DoSerialize, "DoRecorder.Write", warningValidator: warningValidator);
             }
             else
             {
@@ -544,7 +544,7 @@ namespace DecTest
             }
             else if (expectReadWarnings)
             {
-                ExpectWarnings(DoDeserialize, "DoRecorder.Read");
+                ExpectWarnings(DoDeserialize, "DoRecorder.Read", warningValidator: warningValidator);
             }
             else
             {
