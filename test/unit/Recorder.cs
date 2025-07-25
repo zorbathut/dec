@@ -572,7 +572,7 @@ namespace DecTest
         {
             var item = new RecordableParameter(3);
 
-            var output = DoRecorderRoundTrip(item, mode, expectReadErrors: true);
+            var output = DoRecorderRoundTrip(item, mode, expectWriteWarnings: true, expectReadErrors: true);
 
             Assert.IsNull(output);
         }
@@ -818,6 +818,107 @@ namespace DecTest
             Assert.AreEqual(root.nullableBoolB, deserialized.nullableBoolB);
             Assert.AreEqual(root.nullableStructA, deserialized.nullableStructA);
             Assert.AreEqual(root.nullableStructB, deserialized.nullableStructB);
+        }
+
+        class NonConstructableRecorderClass : Dec.IRecordable
+        {
+            public NonConstructableRecorderClass(int x) { }
+
+            public void Record(Dec.Recorder recorder) { }
+        }
+
+        [Test]
+        public void NonConstructableRecorder([ValuesExcept(RecorderMode.Checksum, RecorderMode.Validation)] RecorderMode mode)
+        {
+            var item = new NonConstructableRecorderClass(42);
+
+            var output = DoRecorderRoundTrip(item, mode, expectWriteWarnings: true, expectReadErrors: true, warningValidator: wrn => wrn.Contains("cannot be constructed"));
+
+            Assert.IsNull(output);
+        }
+
+        class NonConstructableConverterStringClass
+        {
+            public NonConstructableConverterStringClass(int x) { }
+        }
+
+        class NonConstructableConverterStringConverter : Dec.ConverterString<NonConstructableConverterStringClass>
+        {
+            public override string Write(NonConstructableConverterStringClass input)
+            {
+                return "yup";
+            }
+
+            public override NonConstructableConverterStringClass Read(string input, Dec.Context context)
+            {
+                return new NonConstructableConverterStringClass(42);
+            }
+        }
+
+        [Test]
+        public void NonConstructableConverterString([ValuesExcept(RecorderMode.Checksum, RecorderMode.Validation)] RecorderMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(NonConstructableConverterStringConverter) } });
+
+            var item = new NonConstructableConverterStringClass(42);
+
+            var output = DoRecorderRoundTrip(item, mode);
+
+            Assert.IsNotNull(output);
+        }
+
+        class NonConstructableConverterRecordClass
+        {
+            public NonConstructableConverterRecordClass(int x) { }
+        }
+
+        class NonConstructableConverterRecordConverter : Dec.ConverterRecord<NonConstructableConverterRecordClass>
+        {
+            public override void Record(ref NonConstructableConverterRecordClass input, Dec.Recorder recorder)
+            {
+                // huehuehue
+            }
+        }
+
+        [Test]
+        public void NonConstructableConverterRecord([ValuesExcept(RecorderMode.Checksum, RecorderMode.Validation)] RecorderMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(NonConstructableConverterRecordConverter) } });
+
+            var item = new NonConstructableConverterRecordClass(42);
+
+            var output = DoRecorderRoundTrip(item, mode, expectWriteWarnings: true, expectReadErrors: true, warningValidator: wrn => wrn.Contains("cannot be constructed"));
+
+            Assert.IsNull(output);
+        }
+
+        class NonConstructableConverterFactoryClass
+        {
+            public NonConstructableConverterFactoryClass(int x) { }
+        }
+
+        class NonConstructableConverterFactoryConverter : Dec.ConverterFactory<NonConstructableConverterFactoryClass>
+        {
+            public override void Write(NonConstructableConverterFactoryClass input, Dec.Recorder recorder) { }
+
+            public override NonConstructableConverterFactoryClass Create(Dec.Recorder recorder)
+            {
+                return new NonConstructableConverterFactoryClass(42);
+            }
+
+            public override void Read(ref NonConstructableConverterFactoryClass input, Dec.Recorder recorder) { }
+        }
+
+        [Test]
+        public void NonConstructableConverterFactory([ValuesExcept(RecorderMode.Checksum, RecorderMode.Validation)] RecorderMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(NonConstructableConverterFactoryConverter) } });
+
+            var item = new NonConstructableConverterFactoryClass(42);
+
+            var output = DoRecorderRoundTrip(item, mode);
+
+            Assert.IsNotNull(output);
         }
     }
 }

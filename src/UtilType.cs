@@ -607,6 +607,60 @@ namespace Dec
             return result;
         }
 
+        private static ConcurrentDictionary<Type, bool> CanBeConstructedCache = new ConcurrentDictionary<Type, bool>();
+        internal static bool CanBeConstructed(this Type type)
+        {
+            if (CanBeConstructedCache.TryGetValue(type, out var result))
+            {
+                return result;
+            }
+
+            // Check if the type implements IRecordable
+            if (typeof(IRecordable).IsAssignableFrom(type))
+            {
+                // For IRecordable types, check if they can be constructed
+                result = type.IsValueType || type.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { }, null) != null;
+            }
+            else
+            {
+                // Check if there's a converter for this type
+                var converter = Serialization.ConverterFor(type);
+                if (converter != null)
+                {
+                    if (converter is ConverterString)
+                    {
+                        // ConverterString types can always be recorded as they handle their own construction
+                        result = true;
+                    }
+                    else if (converter is ConverterFactory)
+                    {
+                        // ConverterFactory types can always be recorded as they have their own Create method
+                        result = true;
+                    }
+                    else if (converter is ConverterRecord)
+                    {
+                        // ConverterRecord types need a default constructor
+                        result = type.IsValueType || type.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { }, null) != null;
+                    }
+                    else
+                    {
+                        // Unknown converter type, assume it can't be recorded
+                        result = false;
+                        Dbg.Err($"Unknown converter type, internal error, please report");
+                    }
+                }
+                else
+                {
+                    // No converter and not IRecordable, cannot be recorded (also how did we get here)
+                    result = false;
+                }
+            }
+
+            CanBeConstructedCache[type] = result;
+
+            return result;
+        }
+
         internal enum ParseModeCategory
         {
             Dec,
