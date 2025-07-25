@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 ### Improved
 * Added support for RecordAsThis() after a class tag.
 * Special-case behavior to convert byte[] input into a Base64-encoded string in XML.
+* Special-case error when hitting a shared-object error while recording an empty Array.
 
 ### Fixed
 * Thread contention error when running Dec on multiple threads simultaneously.

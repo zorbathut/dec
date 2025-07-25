@@ -78,14 +78,24 @@ namespace Dec
             if (xe_path.element == null)
             {
                 // This is an unreferencable object! We are in trouble.
-                Dbg.Err($"Attempted to create a new shared reference at [{path.Serialize()}] to an previously-seen unshared object at [{xe_path.path.Serialize()}]. This may result in an invalid serialization. If this is coming from a Recorder setup, it's likely you either need a .Shared() decorator, or you need to ensure that this object is not serialized elsewhere.");
+                string additionalNote = "";
+                if (referenced is Array array && array.Length == 0)
+                {
+                    additionalNote = " (Note: C# empty arrays often refer to a single shared instance, and it's unclear what Dec should do about this. Come talk to us in Discord if you think you have a good solution. Lists do not have this behvaior.)";
+                }
+                Dbg.Err($"Attempted to create a new shared reference at [{path.Serialize()}] to an previously-seen unshared object at [{xe_path.path.Serialize()}]. This may result in an invalid serialization. If this is coming from a Recorder setup, it's likely you either need a .Shared() decorator, or you need to ensure that this object is not serialized elsewhere.{additionalNote}");
                 return true;
             }
 
             // We have a referenceable target, but do *we* allow a reference?
             if (recSettings.shared == Recorder.Settings.Shared.Deny)
             {
-                Dbg.Err($"Attempted to create a new unshared reference at [{path.Serialize()}] to a previously-seen shared object at [{xe_path.path.Serialize()}]. This may result in an invalid serialization. If this is coming from a Recorder setup, it's likely you either need a .Shared() decorator, or you need to ensure that this object is not serialized elsewhere.");
+                string additionalNote = "";
+                if (referenced is Array array && array.Length == 0)
+                {
+                    additionalNote = " (Note: C# empty arrays often refer to a single shared instance, and it's unclear what Dec should do about this. Come talk to us in Discord if you think you have a good solution. Lists do not have this behvaior.)";
+                }
+                Dbg.Err($"Attempted to create a new unshared reference at [{path.Serialize()}] to a previously-seen shared object at [{xe_path.path.Serialize()}]. This may result in an invalid serialization. If this is coming from a Recorder setup, it's likely you either need a .Shared() decorator, or you need to ensure that this object is not serialized elsewhere.{additionalNote}");
                 return true;
             }
 
