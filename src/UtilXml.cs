@@ -61,7 +61,7 @@ namespace Dec
             return element.Nodes().OfType<XText>().FirstOrDefault()?.Value;
         }
 
-        internal static XDocument ParseSafely(System.IO.TextReader input)
+        internal static XDocument ParseSafely(System.IO.TextReader input, string identifier)
         {
             var settings = new XmlReaderSettings
             {
@@ -81,7 +81,9 @@ namespace Dec
                     }
                     catch (System.Xml.XmlException e)
                     {
-                        Dbg.Ex(e);
+                        // Wrap the exception with file context while preserving the original as InnerException
+                        var contextException = new System.Xml.XmlException($"{identifier}: {e.Message}", e);
+                        Dbg.Ex(contextException);
                         return null;
                     }
                 }

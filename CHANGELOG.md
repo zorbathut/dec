@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 * Special-case behavior to convert byte[] input into a Base64-encoded string in XML.
 * Special-case error when hitting a shared-object error while recording an empty Array.
 * Preemptive warning messages when recording an object that cannot be instantiated.
+* Error messages on fatally malformed XML.
 
 ### Fixed
 * Thread contention error when running Dec on multiple threads simultaneously.

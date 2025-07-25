@@ -116,7 +116,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
             var parser = new Dec.Parser();
-            ExpectErrors(() => parser.AddString(Dec.Parser.FileType.Xml, @"�SimpleDec decName=""Hello""><value>3</value></SimpleDec>"));
+            ExpectErrors(() => parser.AddString(Dec.Parser.FileType.Xml, @"�SimpleDec decName=""Hello""><value>3</value></SimpleDec>", "GarbageTest"), errorValidator: err => err.Contains("GarbageTest"));
             parser.Finish();
 
             DoParserTests(mode);

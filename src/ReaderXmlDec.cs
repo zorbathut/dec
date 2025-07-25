@@ -14,7 +14,7 @@ namespace Dec
 
         public static ReaderFileDecXml Create(TextReader input, string identifier, Recorder.IUserSettings userSettings)
         {
-            XDocument doc = UtilXml.ParseSafely(input);
+            XDocument doc = UtilXml.ParseSafely(input, identifier);
             if (doc == null)
             {
                 return null;
