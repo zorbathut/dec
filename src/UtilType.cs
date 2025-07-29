@@ -377,7 +377,7 @@ namespace Dec
         }
 
         private static readonly Regex GenericParameterReplacementRegex = new Regex(@"`\d+", RegexOptions.Compiled);
-        private static Dictionary<Type, string> ComposeDecCache = new Dictionary<Type, string>();
+        private static ConcurrentDictionary<Type, string> ComposeDecCache = new ConcurrentDictionary<Type, string>();
         internal static string ComposeDecFormatted(this Type type)
         {
             if (ComposeDecCache.TryGetValue(type, out string cacheVal))
