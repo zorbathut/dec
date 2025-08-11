@@ -334,7 +334,7 @@ namespace Dec
                 }
                 else
                 {
-                    int[] dimensions = Enumerable.Range(0, originalArray.Rank).Select(i => originalArray.GetLength(i)).ToArray();
+                    int[] dimensions = UtilType.GetArrayDimensions(originalArray);
                     int[] index = new int[originalArray.Rank];
 
                     DoArrayRecursive(originalArray, resultArray, dimensions, index, 0, resetDepth);
@@ -853,7 +853,7 @@ namespace Dec
                 return null;
             }
 
-            return Enumerable.Range(0, rank).Select(i => arr.GetLength(i)).ToArray();
+            return UtilType.GetArrayDimensions(arr);
         }
 
         public override object ParseElement(Type type, object model, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings)

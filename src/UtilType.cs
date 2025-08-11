@@ -729,5 +729,15 @@ namespace Dec
                 return ParseModeCategory.Object;
             }
         }
+
+        internal static int[] GetArrayDimensions(Array array)
+        {
+            int[] dimensions = new int[array.Rank];
+            for (int i = 0; i < dimensions.Length; i++)
+            {
+                dimensions[i] = array.GetLength(i);
+            }
+            return dimensions;
+        }
     }
 }
