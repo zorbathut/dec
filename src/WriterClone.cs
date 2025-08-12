@@ -549,6 +549,13 @@ namespace Dec
                     var valueTupleItems = original.GetType().GetFields().Select(field => field.GetValue(original)).Select(item => CloneChild(item, resetDepth)).ToArray();
                     result = Activator.CreateInstance(original.GetType(), valueTupleItems);
                 }
+                else
+                {
+                    // something went wrong
+                    Dbg.Err($"Internal error: Failed to clone object of type {valType}");
+                }
+
+                // remember this doesn't fallthrough!
             }
             else
             {
