@@ -340,6 +340,22 @@ namespace Dec
                     DoArrayRecursive(originalArray, resultArray, dimensions, index, 0, resetDepth);
                 }
             }
+            else if (original is IRecordable originalRecordable)
+            {
+                if (result == null)
+                {
+                    // we have presumably already printed an error explaining why we can't create this class, so just give up
+                    return;
+                }
+
+                // this calls CreateRecorderChild a bunch and fills it out
+                originalRecordable.Record(new RecorderWriter(this));
+
+                var readerClone = new ReaderNodeCloneRecorder(recorderChildren, UserSettings);
+
+                // do the dupe
+                (result as IRecordable).Record(new RecorderReader(readerClone, new ReaderGlobals()));
+            }
             else if (valType.IsGenericType)
             {
                 var genericTypeDefinition = valType.GetGenericTypeDefinition();
@@ -533,22 +549,6 @@ namespace Dec
                     var valueTupleItems = original.GetType().GetFields().Select(field => field.GetValue(original)).Select(item => CloneChild(item, resetDepth)).ToArray();
                     result = Activator.CreateInstance(original.GetType(), valueTupleItems);
                 }
-            }
-            else if (original is IRecordable originalRecordable)
-            {
-                if (result == null)
-                {
-                    // we have presumably already printed an error explaining why we can't create this class, so just give up
-                    return;
-                }
-
-                // this calls CreateRecorderChild a bunch and fills it out
-                originalRecordable.Record(new RecorderWriter(this));
-
-                var readerClone = new ReaderNodeCloneRecorder(recorderChildren, UserSettings);
-
-                // do the dupe
-                (result as IRecordable).Record(new RecorderReader(readerClone, new ReaderGlobals()));
             }
             else
             {

@@ -920,5 +920,25 @@ namespace DecTest
 
             Assert.IsNotNull(output);
         }
+
+        public class Generic<T> : Dec.IRecordable
+        {
+            public T value;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref value, "value");
+            }
+        }
+
+        [Test]
+        public void GenericRecordable([Values] RecorderMode mode)
+        {
+            var item = new Generic<int> { value = 42 };
+
+            var deserialized = DoRecorderRoundTrip(item, mode);
+
+            Assert.AreEqual(item.value, deserialized.value);
+        }
     }
 }
