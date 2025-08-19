@@ -147,7 +147,7 @@ namespace Dec
             {
                 if (DefaultHandlerShowConfigOnException)
                 {
-                    return "\nThis error-handling behavior (as well as this message) can be modified in Dec.Config.";
+                    return "\nIf you don't want errors to be critical exceptions, this can be modified in Dec.Config; change DefaultHandlerThrowExceptions to avoid exceptions, or replace WarningHandler, ErrorHandler, and ExceptionHandler with your own handlers. Doing this is STRONGLY RECOMMENDED. Dec can recover smoothly from most error cases, but it's still important that you see the error.\nIf you want the current behavior but don't want to see this message, set DefaultHandlerShowConfigOnException to false.";
                 }
                 else
                 {
