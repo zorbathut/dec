@@ -2,10 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-#if UNITY_5_3_OR_NEWER
-        using UnityEngine;
-#endif
-
 namespace Dec
 {
     /// <summary>
@@ -158,12 +154,12 @@ namespace Dec
             #if UNITY_5_3_OR_NEWER
                 InfoHandler = (str) =>
                 {
-                    Debug.Log(str);
+                    UnityEngine.Debug.Log(str);
                 };
 
                 WarningHandler = (str) =>
                 {
-                    Debug.LogWarning(str);
+                    UnityEngine.Debug.LogWarning(str);
                     if (DefaultHandlerThrowExceptions >= DefaultExceptionBehavior.ErrorAndWarning)
                     {
                         throw new ArgumentException(str + ExceptionSuffix());
@@ -172,7 +168,7 @@ namespace Dec
 
                 ErrorHandler = (str) =>
                 {
-                    Debug.LogError(str);
+                    UnityEngine.Debug.LogError(str);
                     if (DefaultHandlerThrowExceptions >= DefaultExceptionBehavior.ErrorOnly)
                     {
                         throw new ArgumentException(str + ExceptionSuffix());
@@ -181,8 +177,40 @@ namespace Dec
 
                 ExceptionHandler = (e) =>
                 {
-                    Debug.LogException(e);
+                    UnityEngine.Debug.LogException(e);
                     throw e;
+                };
+            #elif GODOT
+                InfoHandler = (str) =>
+                {
+                    Godot.GD.Print(str);
+                };
+
+                WarningHandler = (str) =>
+                {
+                    Godot.GD.PushWarning(str);
+                    if (DefaultHandlerThrowExceptions >= DefaultExceptionBehavior.ErrorAndWarning)
+                    {
+                        throw new ArgumentException(str + ExceptionSuffix());
+                    }
+                };
+
+                ErrorHandler = (str) =>
+                {
+                    Godot.GD.PushError(str);
+                    if (DefaultHandlerThrowExceptions >= DefaultExceptionBehavior.ErrorOnly)
+                    {
+                        throw new ArgumentException(str + ExceptionSuffix());
+                    }
+                };
+
+                ExceptionHandler = (e) =>
+                {
+                    Godot.GD.PushError(e.ToString());
+                    if (DefaultHandlerThrowExceptions >= DefaultExceptionBehavior.ErrorOnly)
+                    {
+                        throw e;
+                    }
                 };
             #else
                 InfoHandler = (str) =>
