@@ -660,6 +660,38 @@ references:
   fullName.vb: Dec.Database.Create(Of T)(String)
   nameWithType: Database.Create<T>(string)
   nameWithType.vb: Database.Create(Of T)(String)
+- uid: Dec.Database.DecLookupEnable(System.Object)
+  name: DecLookupEnable(object)
+  href: api/Dec.Database.html#Dec_Database_DecLookupEnable_System_Object_
+  commentId: M:Dec.Database.DecLookupEnable(System.Object)
+  name.vb: DecLookupEnable(Object)
+  fullName: Dec.Database.DecLookupEnable(object)
+  fullName.vb: Dec.Database.DecLookupEnable(Object)
+  nameWithType: Database.DecLookupEnable(object)
+  nameWithType.vb: Database.DecLookupEnable(Object)
+- uid: Dec.Database.DecLookupEnable*
+  name: DecLookupEnable
+  href: api/Dec.Database.html#Dec_Database_DecLookupEnable_
+  commentId: Overload:Dec.Database.DecLookupEnable
+  isSpec: "True"
+  fullName: Dec.Database.DecLookupEnable
+  nameWithType: Database.DecLookupEnable
+- uid: Dec.Database.DecLookupRegisterCustom(System.Object,Dec.Path)
+  name: DecLookupRegisterCustom(object, Path)
+  href: api/Dec.Database.html#Dec_Database_DecLookupRegisterCustom_System_Object_Dec_Path_
+  commentId: M:Dec.Database.DecLookupRegisterCustom(System.Object,Dec.Path)
+  name.vb: DecLookupRegisterCustom(Object, Path)
+  fullName: Dec.Database.DecLookupRegisterCustom(object, Dec.Path)
+  fullName.vb: Dec.Database.DecLookupRegisterCustom(Object, Dec.Path)
+  nameWithType: Database.DecLookupRegisterCustom(object, Path)
+  nameWithType.vb: Database.DecLookupRegisterCustom(Object, Path)
+- uid: Dec.Database.DecLookupRegisterCustom*
+  name: DecLookupRegisterCustom
+  href: api/Dec.Database.html#Dec_Database_DecLookupRegisterCustom_
+  commentId: Overload:Dec.Database.DecLookupRegisterCustom
+  isSpec: "True"
+  fullName: Dec.Database.DecLookupRegisterCustom
+  nameWithType: Database.DecLookupRegisterCustom
 - uid: Dec.Database.Delete(Dec.Dec)
   name: Delete(Dec)
   href: api/Dec.Database.html#Dec_Database_Delete_Dec_Dec_
@@ -702,22 +734,6 @@ references:
   isSpec: "True"
   fullName: Dec.Database.List
   nameWithType: Database.List
-- uid: Dec.Database.RegisterLookup(System.Object,Dec.Path)
-  name: RegisterLookup(object, Path)
-  href: api/Dec.Database.html#Dec_Database_RegisterLookup_System_Object_Dec_Path_
-  commentId: M:Dec.Database.RegisterLookup(System.Object,Dec.Path)
-  name.vb: RegisterLookup(Object, Path)
-  fullName: Dec.Database.RegisterLookup(object, Dec.Path)
-  fullName.vb: Dec.Database.RegisterLookup(Object, Dec.Path)
-  nameWithType: Database.RegisterLookup(object, Path)
-  nameWithType.vb: Database.RegisterLookup(Object, Path)
-- uid: Dec.Database.RegisterLookup*
-  name: RegisterLookup
-  href: api/Dec.Database.html#Dec_Database_RegisterLookup_
-  commentId: Overload:Dec.Database.RegisterLookup
-  isSpec: "True"
-  fullName: Dec.Database.RegisterLookup
-  nameWithType: Database.RegisterLookup
 - uid: Dec.Database.Rename(Dec.Dec,System.String)
   name: Rename(Dec, string)
   href: api/Dec.Database.html#Dec_Database_Rename_Dec_Dec_System_String_
