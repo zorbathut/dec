@@ -571,7 +571,7 @@ namespace Dec
 
             // I just really don't want to put this code at the end of *every single return*, that would be insane
             // we don't allow dec references, we've already got those!
-            if (globals.decPathLookup != null && result != null)
+            if (globals.writeDecPaths && result != null)
             {
                 var resultType = result.GetType();
 
@@ -591,7 +591,7 @@ namespace Dec
                         // this is not a great solution because it's very error-prone
                         // the problem is that the inheritance/patch system has a tendency to spam this function repeatedly with the same object
                         // I'm currently not sure how to deal with this, so . . . I'm not! I'm just doing it the bad way.
-                        globals.decPathLookup[result] = newPath;
+                        Database.DecPathLookup[result] = newPath;
                     }
                 }
             }
