@@ -27,7 +27,7 @@ Read on for more explanation.
 
 Dec will generate warning and error messages. <i>It is strongly recommended that you make these unignorable to developers.</i> Popup windows and modal dialogs may be appropriate here; Dec does its best to recover from errors, which is great for mod compatibility but can be frustrating for developers if the error message is easily missable.
 
-By default, Dec will output to your normal system error log (Unity log for Unity programs, C# console otherwise). If you have your own logging framework, or want to decorate Dec messages with a recognizable tag, this is the place to do it. [Dec.Config.InfoHandler](xref:Dec.Config.InfoHandler), [Dec.Config.WarningHandler](xref:Dec.Config.WarningHandler), [Dec.Config.ErrorHandler](xref:Dec.Config.ErrorHandler), and [Dec.Config.ExceptionHandler](xref:Dec.Config.ExceptionHandler) can all be assigned separately for their respective type of log message.
+By default, Dec will output to your normal system error log (Unity log for Unity programs, C# console otherwise) <i>and also throw exceptions</i>. If you have your own logging framework, or want to decorate Dec messages with a recognizable tag, this is the place to do it. [Dec.Config.InfoHandler](xref:Dec.Config.InfoHandler), [Dec.Config.WarningHandler](xref:Dec.Config.WarningHandler), [Dec.Config.ErrorHandler](xref:Dec.Config.ErrorHandler), and [Dec.Config.ExceptionHandler](xref:Dec.Config.ExceptionHandler) can all be assigned separately for their respective type of log message.
 
 ```cs
 Dec.Config.InfoHandler = str => YourGame.Logging.LogInfoMessage(str);
@@ -35,6 +35,14 @@ Dec.Config.WarningHandler = str => YourGame.Logging.LogWarningMessage(str);
 Dec.Config.ErrorHandler = str => YourGame.Logging.LogErrorMessage(str);
 Dec.Config.ExceptionHandler = e => YourGame.Logging.LogException(e);
 ```
+
+If you're fine with warnings and errors reaching your standard error log, <i>and expect to see them</i>, then it is strongly recommended that you disable error exceptions. Dec will automatically recover from a wide variety of issues, usually guessing reasonably regarding the intent and the safest fallback. This is not recommended if you're unlikely to see errors; errors are there to be fixed!
+
+```cs
+Dec.Config.DefaultHandlerThrowExceptions = Dec.Config.DefaultExceptionBehavior.None;
+```
+
+This is not necessary if you're overridden the handlers yourself; it applies only to the default handlers.
 
 ## Exceptions
 

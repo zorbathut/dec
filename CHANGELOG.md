@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 * Performance for cloning small arrays improved significantly (~20% in a semi-realistic test case).
 * Performance for cloning generic objects improved somewhat (~10% in a semi-realistic test case).
 * Warning message attached to the default Error exception-throw behavior.
+* More documentation regarding error log exception behavior.
 
 ### Fixed
 * Thread contention error when running Dec on multiple threads simultaneously.
