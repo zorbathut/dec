@@ -6,6 +6,11 @@ All notable changes to this project will be documented in this file.
 ### Added
 * Default Godot support for error reporting, though right now it works only if the source is embedded in the project.
 
+### Breaking
+* Okay I kinda screwed up the Dec Ref thing. Sorry about that. The system should not have been enabled by default; it turns out this causes a bunch of weird unexpected issues. Dec Refs are now disabled by default, and need to be opted-in per-object in PostLoad(). This is a breaking change, although I suspect if you notice any change in your own project, it's likely to be "oh, that was broken before, and now it isn't".
+* Also the interface to opt-in to Dec Refs has changed; look at Database.DecLookupEnable() and Database.DecLookupRegisterCustom().
+* This is probably not the final form of this feature. I do promise to include this basic functionality in the future, but the actual shape of it might differ considerably.
+
 ### Improved
 * Added support for RecordAsThis() after a class tag.
 * Special-case behavior to convert byte[] input into a Base64-encoded string in XML.

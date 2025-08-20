@@ -18,35 +18,84 @@ namespace Dec
         private static readonly Dictionary<Type, Dictionary<string, Dec>> Lookup = new Dictionary<Type, Dictionary<string, Dec>>();
         private static Dec[] CachedList = null;
 
-        internal static Dictionary<object, Path> DecPathLookup = new Dictionary<object, Path>();
-        internal static Dictionary<string, object> DecPathLookupReverse = new Dictionary<string, object>();
-        internal static HashSet<string> DecPathLookupInvalid = new HashSet<string>();
-        internal static HashSet<string> DecPathLookupConflicts = new HashSet<string>();
+        // this is for actual valid lookups
+        private static Dictionary<object, Path> DecPathLookup = new Dictionary<object, Path>();
 
-        internal static string GetDecPath(object obj)
+        // this is for all lookups, valid or not
+        // note: this gets filled from the outside right now
+        private static Dictionary<object, Path> DecPathLookupComplete = new Dictionary<object, Path>();
+
+        // these are for all possible reverses
+        private static Dictionary<string, object> DecPathLookupReverse = new Dictionary<string, object>();
+        private static HashSet<string> DecPathLookupUnusable = new HashSet<string>();
+        private static HashSet<string> DecPathLookupConflicts = new HashSet<string>();
+
+        // A lot of this really needs work for validation and error reporting.
+        internal static string GetDecPathFromObj(object obj)
         {
-            var path = Database.DecPathLookup[obj];
-            var pathStr = path.Serialize();
+            var path = Database.DecPathLookup.TryGetValue(obj);
 
-            if (Database.DecPathLookupInvalid.Contains(pathStr))
+            if (path == null)
             {
-                Dbg.Err($"Attempting to record a dec path [{pathStr}], but this is not currently valid; doing our best though!");
+                return null;
             }
-            else if (Database.DecPathLookupConflicts.Contains(pathStr))
+            else
             {
-                Dbg.Err($"Attempting to record a dec path [{pathStr}], but this is currently ambiguous; doing our best though!");
+                return path.Serialize();
             }
+        }
 
-            return pathStr;
+        internal static void DecPathRegister(object obj, Path path)
+        {
+            DecPathLookupComplete[obj] = path;
+        }
+
+        internal static object GetFromDecPath(string path)
+        {
+            return DecPathLookupReverse.TryGetValue(path);
+        }
+
+        internal static void DecPathResolveDatabase()
+        {
+            foreach (var (decObject, decPath) in Database.DecPathLookup)
+            {
+                var pathSerialized = decPath.Serialize();
+
+                if (Database.DecPathLookupReverse.ContainsKey(pathSerialized))
+                {
+                    Database.DecPathLookupConflicts.Add(pathSerialized);    // this is currently considered OK because our path system is highly incomplete
+                }
+
+                if (!decPath.IsValidForWriting())
+                {
+                    DecPathLookupUnusable.Add(pathSerialized);
+                }
+
+                DecPathLookupReverse[pathSerialized] = decObject;
+            }
         }
 
         /// <summary>
-        /// Registers a path lookup with the database.
+        /// Enables a path lookup with the database.
         /// </summary>
         /// <remarks>
         /// This is a hack job put in because I need the functionality on my own project. Don't be surprised if this behavior changes dramatically at some point.
         /// </remarks>
-        public static void RegisterLookup(object obj, Path path)
+        public static void DecLookupEnable(object obj)
+        {
+            DecPathLookup[obj] = DecPathLookupComplete[obj];
+            DecPathLookupReverse[DecPathLookupComplete[obj].Serialize()] = obj;
+
+            // needs more validation
+        }
+
+        /// <summary>
+        /// Registers a custom path lookup with the database.
+        /// </summary>
+        /// <remarks>
+        /// This is a hack job put in because I need the functionality on my own project. Don't be surprised if this behavior changes dramatically at some point.
+        /// </remarks>
+        public static void DecLookupRegisterCustom(object obj, Path path)
         {
             var serialized = path.Serialize();
 
@@ -62,7 +111,10 @@ namespace Dec
                 return;
             }
 
+            // needs more validation
+
             DecPathLookup[obj] = path;
+            DecPathLookupComplete[obj] = path;
             DecPathLookupReverse[serialized] = obj;
         }
 
@@ -230,8 +282,9 @@ namespace Dec
             CachedList = null;
             Lookup.Clear();
             DecPathLookup.Clear();
+            DecPathLookupComplete.Clear();
             DecPathLookupReverse.Clear();
-            DecPathLookupInvalid.Clear();
+            DecPathLookupUnusable.Clear();
             DecPathLookupConflicts.Clear();
 
             foreach (var db in Databases)

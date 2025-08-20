@@ -166,7 +166,7 @@ namespace Dec
 
         public override void WriteDecPathRef(object value)
         {
-            node.Add(new XAttribute("ref", Database.GetDecPath(value)));
+            node.Add(new XAttribute("ref", Database.GetDecPathFromObj(value)));
         }
 
         public override void TagClass(Type type)

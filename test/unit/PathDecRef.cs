@@ -16,6 +16,33 @@ namespace DecTest
             public StubRecordable[,] arrayMulti;
             public List<StubRecordable> list;
             public Dictionary<string, StubRecordable> dictionary;
+
+            public override void PostLoad(Action<string> reporter)
+            {
+                base.PostLoad(reporter);
+
+                Dec.Database.DecLookupEnable(member);
+                Dec.Database.DecLookupEnable(array);
+                foreach (var item in array)
+                {
+                    Dec.Database.DecLookupEnable(item);
+                }
+                Dec.Database.DecLookupEnable(arrayMulti);
+                foreach (var item in arrayMulti)
+                {
+                    Dec.Database.DecLookupEnable(item);
+                }
+                Dec.Database.DecLookupEnable(list);
+                foreach (var item in list)
+                {
+                    Dec.Database.DecLookupEnable(item);
+                }
+                Dec.Database.DecLookupEnable(dictionary);
+                foreach (var item in dictionary.Values)
+                {
+                    Dec.Database.DecLookupEnable(item);
+                }
+            }
         }
 
         [SetUp]
@@ -122,7 +149,7 @@ namespace DecTest
         {
             // This maybe shouldn't work.
             var stub = new StubRecordable();
-            Dec.Database.RegisterLookup(stub, new PathRoot("stub"));
+            Dec.Database.DecLookupRegisterCustom(stub, new PathRoot("stub"));
 
             var newItem = DoRecorderRoundTrip(stub, RecorderMode.Pretty);
 
@@ -162,6 +189,36 @@ namespace DecTest
             var deserialized = Dec.Recorder.Read<Type>(serialized);
 
             Assert.AreEqual(type, deserialized);
+        }
+
+        public class ArrayHolderDec : Dec.Dec
+        {
+            public int[] data;
+        }
+
+        [Test]
+        public void NoAutoRef([Values] ParserMode parserMode, [Values] RecorderMode recorderMode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayHolderDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <ArrayHolderDec decName=""Test"">
+                        <data><li>3</li></data>
+                    </ArrayHolderDec>
+                </Decs>");
+            parser.Finish();
+
+            DoParserTests(parserMode);
+
+            var theArray = Dec.Database<ArrayHolderDec>.Get("Test").data;
+            Assert.IsNotNull(theArray);
+
+            var result = DoRecorderRoundTrip(theArray, recorderMode);
+
+            Assert.AreNotSame(theArray, result);
+            Assert.AreEqual(theArray, result);
         }
     }
 }

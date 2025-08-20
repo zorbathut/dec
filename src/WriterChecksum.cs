@@ -227,7 +227,7 @@ namespace Dec
         public override void WriteDecPathRef(object value)
         {
             writer.AddChecksum((int)NodeTag.PathRef, Path);
-            WriteString(Database.GetDecPath(value));
+            WriteString(Database.GetDecPathFromObj(value));
         }
 
         public override void WriteExplicitNull()
