@@ -348,5 +348,35 @@ namespace DecTest
                 { { 1000 } }
             }, result.data);
         }
+
+        public class ObjectArrayDec : Dec.Dec
+        {
+            public object[] data = null;
+        }
+
+        [Test]
+        public void ObjectArrayNonExistentClassTag([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ObjectArrayDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <ObjectArrayDec decName=""TestDec"">
+                        <data class=""NonExistentClass[]"">
+                            <li>42</li>
+                            <li>100</li>
+                        </data>
+                    </ObjectArrayDec>
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoParserTests(mode);
+
+            var result = Dec.Database<ObjectArrayDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(result.data.GetType(), typeof(object[]));
+        }
     }
 }

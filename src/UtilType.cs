@@ -362,15 +362,19 @@ namespace Dec
                 result = possibleTypes[0];
             }
 
-            if (arrayRanks == 1)
+            if (result != null)
             {
-                // I'm not totally sure why MakeArrayType(1) does the wrong thing here
-                result = result.MakeArrayType();
+                if (arrayRanks == 1)
+                {
+                    // I'm not totally sure why MakeArrayType(1) does the wrong thing here
+                    result = result.MakeArrayType();
+                }
+                else if (arrayRanks > 1)
+                {
+                    result = result.MakeArrayType(arrayRanks);
+                }
             }
-            else if (arrayRanks > 1)
-            {
-                result = result.MakeArrayType(arrayRanks);
-            }
+            // Result being null is an error, and we might have a double-error here if we're trying to build an array out of it. But that's kinda okay because we already logged a relevant error.
 
             ParseCache[originalText] = result;
             return result;
