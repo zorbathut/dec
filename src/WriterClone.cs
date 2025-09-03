@@ -770,6 +770,11 @@ namespace Dec
         {
             return recorderChildren.Keys.ToArray();
         }
+        public override bool HasText()
+        {
+            // not valid, this is used only for recorders
+            throw new NotImplementedException();
+        }
 
         public override object ParseElement(Type type, object model, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings)
         {
@@ -811,6 +816,11 @@ namespace Dec
             // not valid, this is used only for recorders
             throw new NotImplementedException();
         }
+        public override bool HasText()
+        {
+            // not valid, this is used only for recorders
+            throw new NotImplementedException();
+        }
 
         public override object ParseElement(Type type, object model, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings)
         {
@@ -843,6 +853,10 @@ namespace Dec
             throw new NotImplementedException();
         }
         public override string[] GetAllChildren()
+        {
+            throw new NotImplementedException();
+        }
+        public override bool HasText()
         {
             throw new NotImplementedException();
         }

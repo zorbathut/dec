@@ -865,5 +865,44 @@ namespace DecTest
             Assert.AreEqual(42, dec.genericInt.item);
             Assert.AreEqual("hello", dec.genericString.item);
         }
+
+        public class SomeChunkOfData
+        {
+            public int data = 19;
+        }
+
+        public class ConverterSomeChunkOfData : Dec.ConverterRecord<SomeChunkOfData>
+        {
+            public override void Record(ref SomeChunkOfData data, Dec.Recorder recorder)
+            {
+                recorder.Record(ref data.data, "data");
+            }
+        }
+
+        public class SomeChunkOfDataDec : Dec.Dec
+        {
+            public SomeChunkOfData data;
+        }
+
+        [Test]
+        public void ContainsText([ValuesExcept(ParserMode.Validation)] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SomeChunkOfDataDec) }, explicitConverters = new Type[] { typeof(ConverterSomeChunkOfData) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <SomeChunkOfDataDec decName=""TestDec"">
+                        <data>42</data>
+                    </SomeChunkOfDataDec>
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoParserTests(mode);
+
+            var dec = Dec.Database<SomeChunkOfDataDec>.Get("TestDec");
+            Assert.IsNotNull(dec);
+            Assert.AreEqual(19, dec.data.data);
+        }
     }
 }

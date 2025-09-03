@@ -599,6 +599,12 @@ namespace Dec
                 return;
             }
 
+            // Check for unused text content when no fields were accessed
+            if (seen.Count == 0 && node.HasText())
+            {
+                Dbg.Err($"{node.GetContext()}: XML contains text content which was ignored. This is probably not meant to be a text node and will be treated as default values.");
+            }
+
             var allChildren = node.GetAllChildren();
             if (seen.Count == allChildren.Length)
             {

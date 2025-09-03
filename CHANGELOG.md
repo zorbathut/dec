@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this file.
 * Performance for cloning generic objects improved somewhat (~10% in a semi-realistic test case).
 * Warning message attached to the default Error exception-throw behavior.
 * More documentation regarding error log exception behavior.
+* Error message for unused text content in XML nodes handled by Recorders.
 
 ### Fixed
 * Thread contention error when running Dec on multiple threads simultaneously.

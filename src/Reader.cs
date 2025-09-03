@@ -50,6 +50,7 @@ namespace Dec
 
         public abstract ReaderNode GetChildNamed(string name);
         public abstract string[] GetAllChildren();
+        public abstract bool HasText();
 
         public abstract int[] GetArrayDimensions(int rank);
 
@@ -74,6 +75,11 @@ namespace Dec
         public abstract string GetMetadata(Metadata metadata);
         public abstract string GetMetadataUnrecognized();
         public abstract string GetText();
+
+        public override bool HasText()
+        {
+            return !string.IsNullOrEmpty(GetText());
+        }
 
         public abstract bool HasChildren();
 
