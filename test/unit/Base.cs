@@ -15,8 +15,9 @@ namespace DecTest
             // Turns out Hebrew is basically the worst-case scenario for parsing of this sort.
             System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("he-IL");
 
-            // But reset this just in case.
+            // But reset stuff just in case.
             Dec.Config.CultureInfo = new System.Globalization.CultureInfo("en-US");
+            Dec.Config.CompatTypeLookup = null;
 
             // flatten these entirely for the sake of tests that don't list anything
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] {}, explicitConverters = new Type[] {}, explicitStaticRefs = new Type[] {}});

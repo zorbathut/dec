@@ -267,7 +267,18 @@ namespace Dec
                 }
 
                 // This is the thing we're going to test to see if is a class.
-                var parsedType = GetTypeFromAnyAssembly(currentPrefix, genericParameters?.Count ?? 0, context);
+                Type parsedType = null;
+
+                // Another compat test!
+                if (Config.CompatTypeLookup?.ContainsKey(currentPrefix) ?? false)
+                {
+                    parsedType = Config.CompatTypeLookup[currentPrefix];
+                }
+
+                if (parsedType == null)
+                {
+                    parsedType = GetTypeFromAnyAssembly(currentPrefix, genericParameters?.Count ?? 0, context);
+                }
 
                 if (parsedType != null)
                 {
@@ -333,6 +344,13 @@ namespace Dec
                 }
             }
 
+            // Check our compat lookup for everything
+            if (Config.CompatTypeLookup?.ContainsKey(text) ?? false)
+            {
+                ParseCache[text] = Config.CompatTypeLookup[text];
+                return Config.CompatTypeLookup[text];
+            }
+
             int arrayRanks = 0;
             string originalText = text;
             if (ArrayRankParser.Match(text) is Match match && match.Success)
@@ -342,6 +360,12 @@ namespace Dec
             }
 
             Type result = null;
+
+            // Check again, now that we've stripped the array tags off
+            if (Config.CompatTypeLookup?.ContainsKey(text) ?? false)
+            {
+                result = Config.CompatTypeLookup[text];
+            }
 
             if (result == null)
             {

@@ -118,6 +118,29 @@ namespace Dec
         private static string[] UsingNamespaceBacking = new string[0];
 
         /// <summary>
+        /// A remapping of old type names to actual types, for compatibility with older files.
+        /// </summary>
+        /// <remarks>
+        /// This will do reasonable things with generic parameters and arrays and the like. As of this writing, it's whitespace-sensitive, but this is not guaranteed to remain the case, although if it changes it will print warnings on whitespace-related ambiguity.
+        ///
+        /// This should not be changed while a Parser or Composer object exists, or while Recorder is active.
+        /// </remarks>
+        /// <example>
+        /// Config.CompatTypeLookup = new Dictionary<string, Type>() { { "OldNamespace.OldTypeName", typeof(NewNamespace.NewTypeName) } };
+        /// </example>
+        public static Dictionary<string, Type> CompatTypeLookup
+        {
+            get => CompatTypeLookupBacking ?? new Dictionary<string, Type>();
+            set
+            {
+                CompatTypeLookupBacking = value;
+                UtilType.ClearCache();
+            }
+        }
+
+        private static Dictionary<string, Type> CompatTypeLookupBacking;
+
+        /// <summary>
         /// A factory function that can be used to provide custom converters.
         /// </summary>
         /// <remarks>

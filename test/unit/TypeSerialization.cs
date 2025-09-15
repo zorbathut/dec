@@ -385,6 +385,278 @@ namespace DecTest
             TypeConversionBidirectional(typeof(Base.Stub[]), "DecTest.Base.Stub[]");
             TypeConversionBidirectional(typeof(Base.Stub), "DecTest.Base.Stub");
         }
+
+        [Test]
+        public void CompatTypeLookupBasic()
+        {
+            Dec.Config.CompatTypeLookup = new System.Collections.Generic.Dictionary<string, System.Type>
+            {
+                { "OldTypeName", typeof(int) },
+                { "AnotherOldName", typeof(string) }
+            };
+
+            Assert.AreEqual(typeof(int), parseType("OldTypeName"));
+            Assert.AreEqual(typeof(string), parseType("AnotherOldName"));
+
+            // Should still work for non-mapped types
+            Assert.AreEqual(typeof(float), parseType("float"));
+        }
+
+        [Test]
+        public void CompatTypeLookupArray()
+        {
+            Dec.Config.CompatTypeLookup = new System.Collections.Generic.Dictionary<string, System.Type>
+            {
+                { "OldArrayType", typeof(int) }
+            };
+
+            // Test that array notation works with compat lookup
+            Assert.AreEqual(typeof(int[]), parseType("OldArrayType[]"));
+            Assert.AreEqual(typeof(int[,]), parseType("OldArrayType[,]"));
+            Assert.AreEqual(typeof(int[,,]), parseType("OldArrayType[,,]"));
+        }
+
+        [Test]
+        public void CompatTypeLookupGeneric()
+        {
+            Dec.Config.CompatTypeLookup = new System.Collections.Generic.Dictionary<string, System.Type>
+            {
+                { "OldListType", typeof(System.Collections.Generic.List<>) }
+            };
+
+            // Test that generic parameters work with compat lookup
+            Assert.AreEqual(typeof(System.Collections.Generic.List<int>), parseType("OldListType<int>"));
+            Assert.AreEqual(typeof(System.Collections.Generic.List<string>), parseType("OldListType<string>"));
+        }
+
+        [Test]
+        public void CompatTypeLookupPriority()
+        {
+            // Create a scenario where compat lookup should override normal resolution
+            Dec.Config.UsingNamespaces = new string[] { "System" };
+            Dec.Config.CompatTypeLookup = new System.Collections.Generic.Dictionary<string, System.Type>
+            {
+                { "String", typeof(int) } // Map "String" to int instead of string
+            };
+
+            // CompatTypeLookup should take priority over normal type resolution
+            Assert.AreEqual(typeof(int), parseType("String"));
+
+            // But full qualification should still work normally
+            Assert.AreEqual(typeof(string), parseType("System.String"));
+        }
+
+        [Test]
+        public void CompatTypeLookupCacheClearing()
+        {
+            Dec.Config.UsingNamespaces = new string[] { "DecTest" };
+
+            // First, parse a type normally to get it in cache
+            Assert.AreEqual(typeof(Meta), parseType("Meta"));
+
+            // Now set up compat lookup that would change the result
+            Dec.Config.CompatTypeLookup = new System.Collections.Generic.Dictionary<string, System.Type>
+            {
+                { "Meta", typeof(string) }
+            };
+
+            // The cache should have been cleared when we set CompatTypeLookup,
+            // so this should return string (from compat lookup) not Meta (from cache)
+            Assert.AreEqual(typeof(string), parseType("Meta"));
+        }
+
+        [Test]
+        public void CompatTypeLookupNull()
+        {
+            // Test that setting CompatTypeLookup to null works properly
+            Dec.Config.CompatTypeLookup = new System.Collections.Generic.Dictionary<string, System.Type>
+            {
+                { "TestType", typeof(int) }
+            };
+
+            Assert.AreEqual(typeof(int), parseType("TestType"));
+
+            // Clear the lookup
+            Dec.Config.CompatTypeLookup = null;
+
+            // Should now fail to find the type
+            ExpectErrors(() => Assert.IsNull(parseType("TestType")));
+        }
+
+        [Test]
+        public void CompatTypeLookupWithArraysInDict()
+        {
+            Dec.Config.CompatTypeLookup = new System.Collections.Generic.Dictionary<string, System.Type>
+            {
+                { "OldType[]", typeof(string[]) }, // Direct mapping of array type name
+                { "OldBaseType", typeof(float) }   // Base type that can have arrays applied
+            };
+
+            // Direct array mapping should work
+            Assert.AreEqual(typeof(string[]), parseType("OldType[]"));
+
+            // Base type with applied array should work
+            Assert.AreEqual(typeof(float[]), parseType("OldBaseType[]"));
+        }
+
+        [Test]
+        public void CompatTypeLookupGenericComplex()
+        {
+            Dec.Config.UsingNamespaces = new string[] { "System.Collections.Generic" };
+            Dec.Config.CompatTypeLookup = new System.Collections.Generic.Dictionary<string, System.Type>
+            {
+                { "OldDictionary", typeof(System.Collections.Generic.Dictionary<,>) },
+                { "OldList", typeof(System.Collections.Generic.List<>) }
+            };
+
+            // Test complex generic combinations
+            Assert.AreEqual(typeof(Dictionary<int, string>), parseType("OldDictionary<int, string>"));
+            Assert.AreEqual(typeof(Dictionary<List<int>, string>), parseType("OldDictionary<OldList<int>, string>"));
+            Assert.AreEqual(typeof(List<Dictionary<string, int>>), parseType("OldList<OldDictionary<string, int>>"));
+        }
+
+        [Test]
+        public void CompatTypeLookupGenericNested()
+        {
+            Dec.Config.UsingNamespaces = new string[] { "DecTest.TypeSerialization" };
+            Dec.Config.CompatTypeLookup = new System.Collections.Generic.Dictionary<string, System.Type>
+            {
+                { "OldGeneric", typeof(Generic<>) },
+                { "OldGeneric2", typeof(Generic2Param<,>) }
+            };
+
+            // Test nested generics with compat lookup
+            Assert.AreEqual(typeof(Generic<int>), parseType("OldGeneric<int>"));
+            Assert.AreEqual(typeof(Generic2Param<string, double>), parseType("OldGeneric2<string, double>"));
+            Assert.AreEqual(typeof(Generic<Generic<int>>), parseType("OldGeneric<OldGeneric<int>>"));
+
+            // Test mixing old and new names
+            Assert.AreEqual(typeof(Generic<Generic2Param<int, string>>), parseType("OldGeneric<OldGeneric2<int, string>>"));
+        }
+
+        [Test]
+        public void CompatTypeLookupGenericWithArrays()
+        {
+            Dec.Config.CompatTypeLookup = new System.Collections.Generic.Dictionary<string, System.Type>
+            {
+                { "OldList", typeof(System.Collections.Generic.List<>) }
+            };
+
+            // Test generic types with arrays
+            Assert.AreEqual(typeof(System.Collections.Generic.List<int>[]), parseType("OldList<int>[]"));
+            Assert.AreEqual(typeof(System.Collections.Generic.List<int[]>), parseType("OldList<int[]>"));
+            Assert.AreEqual(typeof(System.Collections.Generic.List<string>[,]), parseType("OldList<string>[,]"));
+        }
+
+        [Test]
+        public void CompatTypeLookupGenericPartialMatch()
+        {
+            Dec.Config.UsingNamespaces = new string[] { "System.Collections.Generic" };
+            Dec.Config.CompatTypeLookup = new System.Collections.Generic.Dictionary<string, System.Type>
+            {
+                { "System.Collections.Generic.List", typeof(System.Collections.Generic.Queue<>) }
+            };
+
+            // The compat lookup should override even when using full qualified names
+            Assert.AreEqual(typeof(System.Collections.Generic.Queue<int>), parseType("System.Collections.Generic.List<int>"));
+
+            // And when using namespaces
+            Assert.AreEqual(typeof(System.Collections.Generic.Queue<string>), parseType("List<string>"));
+        }
+
+        [Test]
+        public void CompatTypeLookupGenericWhitespace()
+        {
+            Dec.Config.CompatTypeLookup = new System.Collections.Generic.Dictionary<string, System.Type>
+            {
+                { "OldList", typeof(System.Collections.Generic.List<>) }
+            };
+
+            // Test that whitespace handling still works with compat lookup
+            Assert.AreEqual(typeof(System.Collections.Generic.List<int>), parseType("OldList< int>"));
+            Assert.AreEqual(typeof(System.Collections.Generic.List<int>), parseType("OldList<int >"));
+            Assert.AreEqual(typeof(System.Collections.Generic.List<int>), parseType("OldList< int >"));
+        }
+
+        [Test]
+        public void CompatTypeLookupGenericParameters()
+        {
+            Dec.Config.CompatTypeLookup = new System.Collections.Generic.Dictionary<string, System.Type>
+            {
+                { "OldList", typeof(System.Collections.Generic.List<>) },
+                { "OldString", typeof(string) },
+                { "OldInt", typeof(int) },
+                { "OldFloat", typeof(float) }
+            };
+
+            // Test that compat lookup works for generic parameters
+            Assert.AreEqual(typeof(System.Collections.Generic.List<string>), parseType("OldList<OldString>"));
+            Assert.AreEqual(typeof(System.Collections.Generic.List<int>), parseType("OldList<OldInt>"));
+            Assert.AreEqual(typeof(System.Collections.Generic.List<float>), parseType("OldList<OldFloat>"));
+
+            // Test mixing compat and normal types in parameters
+            Assert.AreEqual(typeof(System.Collections.Generic.List<string>), parseType("OldList<string>"));
+            Assert.AreEqual(typeof(System.Collections.Generic.List<string>), parseType("System.Collections.Generic.List<OldString>"));
+        }
+
+        [Test]
+        public void CompatTypeLookupGenericParametersNested()
+        {
+            Dec.Config.CompatTypeLookup = new System.Collections.Generic.Dictionary<string, System.Type>
+            {
+                { "OldList", typeof(System.Collections.Generic.List<>) },
+                { "OldDict", typeof(System.Collections.Generic.Dictionary<,>) },
+                { "OldString", typeof(string) },
+                { "OldInt", typeof(int) }
+            };
+
+            // Test deeply nested compat lookups in generic parameters
+            Assert.AreEqual(
+                typeof(System.Collections.Generic.List<System.Collections.Generic.Dictionary<string, int>>),
+                parseType("OldList<OldDict<OldString, OldInt>>")
+            );
+
+            Assert.AreEqual(
+                typeof(System.Collections.Generic.Dictionary<System.Collections.Generic.List<string>, int>),
+                parseType("OldDict<OldList<OldString>, OldInt>")
+            );
+        }
+
+        [Test]
+        public void CompatTypeLookupGenericParametersWithArrays()
+        {
+            Dec.Config.CompatTypeLookup = new System.Collections.Generic.Dictionary<string, System.Type>
+            {
+                { "OldList", typeof(System.Collections.Generic.List<>) },
+                { "OldString", typeof(string) },
+                { "OldInt", typeof(int) }
+            };
+
+            // Test compat lookup in generic parameters with arrays
+            Assert.AreEqual(typeof(System.Collections.Generic.List<string[]>), parseType("OldList<OldString[]>"));
+            Assert.AreEqual(typeof(System.Collections.Generic.List<int[,]>), parseType("OldList<OldInt[,]>"));
+            Assert.AreEqual(typeof(System.Collections.Generic.List<string>[]), parseType("OldList<OldString>[]"));
+        }
+
+        [Test]
+        public void CompatTypeLookupGenericParametersCustomTypes()
+        {
+            Dec.Config.UsingNamespaces = new string[] { "DecTest" };
+            Dec.Config.CompatTypeLookup = new System.Collections.Generic.Dictionary<string, System.Type>
+            {
+                { "OldList", typeof(System.Collections.Generic.List<>) },
+                { "OldMeta", typeof(Meta) },
+                { "OldBase", typeof(Base) }
+            };
+
+            // Test compat lookup with custom types as generic parameters
+            Assert.AreEqual(typeof(System.Collections.Generic.List<Meta>), parseType("OldList<OldMeta>"));
+            Assert.AreEqual(typeof(System.Collections.Generic.List<Base>), parseType("OldList<OldBase>"));
+
+            // Mix of compat and normal custom types
+            Assert.AreEqual(typeof(System.Collections.Generic.List<Meta>), parseType("OldList<Meta>"));
+            Assert.AreEqual(typeof(System.Collections.Generic.List<Meta>), parseType("System.Collections.Generic.List<OldMeta>"));
+        }
     }
 
     namespace OverloadedNames

@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Added
+* Initial support for Recorder backwards-compatibility type replacement.
 * Default Godot support for error reporting, though right now it works only if the source is embedded in the project.
 
 ### Breaking
