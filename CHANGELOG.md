@@ -27,6 +27,7 @@ All notable changes to this project will be documented in this file.
 * Thread contention error when running Dec on multiple threads simultaneously.
 * Error when cloning a ConverterString-driven class without a parameterless constructor.
 * Parsing a class tag of UnknownClass[] results in an unhandled exception.
+* Parsing generics with multirank arrays as parameters.
 
 
 ## [v0.9.0]

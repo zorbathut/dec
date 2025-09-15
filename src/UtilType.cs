@@ -179,10 +179,12 @@ namespace Dec
                 switch (c)
                 {
                     case '<':
+                    case '[':
                         depth++;
                         break;
 
                     case '>':
+                    case ']':
                         depth--;
                         break;
 

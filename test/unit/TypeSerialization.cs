@@ -315,6 +315,14 @@ namespace DecTest
         }
 
         [Test]
+        public void GenericWithMultirankArray()
+        {
+            Dec.Config.UsingNamespaces = new string[] { "DecTest.TypeSerialization" };
+
+            TypeConversionBidirectional(typeof(Generic<System.Type[,]>), "Generic<System.Type[,]>");
+        }
+
+        [Test]
         public void ErrorCache()
         {
             Dec.Config.UsingNamespaces = new string[] { "DecTest.TypeSerialization" };
