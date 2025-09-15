@@ -341,27 +341,37 @@ namespace Dec
                 text = text.Substring(0, text.Length - match.Length);
             }
 
-            // We need to find a class that matches the least number of tokens. Namespaces can't be generics so at most this continues until we hit a namespace.
-            var possibleTypes = Config.UsingNamespaces
-                .Select(ns => ParseIndependentType($"{ns}.{text}", context))
-                .Concat(ParseIndependentType(text, context))
-                .Where(t => t != null)
-                .ToArray();
+            Type result = null;
 
-            Type result;
-            if (possibleTypes.Length == 0)
+            if (result == null)
             {
-                Dbg.Err($"{context}: Couldn't find type named `{text}`");
-                result = null;
+                // This might pick up primitives.
+                ParseCache.TryGetValue(text, out result);
             }
-            else if (possibleTypes.Length > 1)
+
+            if (result == null)
             {
-                Dbg.Err($"{context}: Found too many types named `{text}` ({possibleTypes.Select(t => t.FullName).ToCommaString()})");
-                result = possibleTypes[0];
-            }
-            else
-            {
-                result = possibleTypes[0];
+                // We need to find a class that matches the least number of tokens. Namespaces can't be generics so at most this continues until we hit a namespace.
+                var possibleTypes = Config.UsingNamespaces
+                    .Select(ns => ParseIndependentType($"{ns}.{text}", context))
+                    .Concat(ParseIndependentType(text, context))
+                    .Where(t => t != null)
+                    .ToArray();
+
+                if (possibleTypes.Length == 0)
+                {
+                    Dbg.Err($"{context}: Couldn't find type named `{text}`");
+                    result = null;
+                }
+                else if (possibleTypes.Length > 1)
+                {
+                    Dbg.Err($"{context}: Found too many types named `{text}` ({possibleTypes.Select(t => t.FullName).ToCommaString()})");
+                    result = possibleTypes[0];
+                }
+                else
+                {
+                    result = possibleTypes[0];
+                }
             }
 
             if (result != null)
@@ -403,6 +413,14 @@ namespace Dec
                         return result;
                     }
                 }
+            }
+
+            // If we're an array, chop off an array and recurse
+            if (type.IsArray)
+            {
+                string result = type.GetElementType().ComposeDecFormatted() + "[" + new string(',', type.GetArrayRank() - 1) + "]";
+                ComposeDecCache[type] = result;
+                return result;
             }
 
             {

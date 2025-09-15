@@ -86,6 +86,13 @@ namespace DecTest
         }
 
         [Test]
+        public void PrimitiveArray()
+        {
+            TypeConversionBidirectional(typeof(int[]), "int[]");
+            TypeConversionBidirectional(typeof(int[,]), "int[,]");
+        }
+
+        [Test]
         public void DecName()
         {
             TypeConversionBidirectional(typeof(Dec.Dec), "Dec.Dec");
@@ -320,6 +327,14 @@ namespace DecTest
             Dec.Config.UsingNamespaces = new string[] { "DecTest.TypeSerialization" };
 
             TypeConversionBidirectional(typeof(Generic<System.Type[,]>), "Generic<System.Type[,]>");
+        }
+
+        [Test]
+        public void GenericWithPrimitiveArray()
+        {
+            Dec.Config.UsingNamespaces = new string[] { "DecTest.TypeSerialization" };
+
+            TypeConversionBidirectional(typeof(Generic<int[]>), "Generic<int[]>");
         }
 
         [Test]

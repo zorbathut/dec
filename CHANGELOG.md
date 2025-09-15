@@ -28,6 +28,7 @@ All notable changes to this project will be documented in this file.
 * Error when cloning a ConverterString-driven class without a parameterless constructor.
 * Parsing a class tag of UnknownClass[] results in an unhandled exception.
 * Parsing generics with multirank arrays as parameters.
+* Overly verbose output when serializing primitive array types.
 
 
 ## [v0.9.0]
