@@ -93,7 +93,7 @@ namespace Dec
                     // oops, all nan boxing!
                     node.Add(new XText("NaNbox" + BitConverter.DoubleToInt64Bits(val).ToString("X16")));
                 }
-                else if (Compat.FloatRoundtripBroken)
+                else if (CsCompat.FloatRoundtripBroken)
                 {
                     node.Add(new XText(val.ToString("G17")));
                 }
@@ -110,7 +110,7 @@ namespace Dec
                     // oops, all nan boxing!
                     node.Add(new XText("NaNbox" + BitConverter.SingleToInt32Bits(val).ToString("X8")));
                 }
-                else if (Compat.FloatRoundtripBroken)
+                else if (CsCompat.FloatRoundtripBroken)
                 {
                     node.Add(new XText(val.ToString("G9")));
                 }

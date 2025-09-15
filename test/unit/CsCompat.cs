@@ -4,7 +4,7 @@ using NUnit.Framework;
 namespace DecTest
 {
     [TestFixture]
-    public class Compat : Base
+    public class CsCompat : Base
     {
         public class DoubleRec : Dec.IRecordable
         {
