@@ -284,7 +284,7 @@ namespace Dec
                 {
                     // We found the root! Keep on digging.
                     Type primitiveType = ParseSubtype(parsedType, text.SubstringSafe(nextTokenEnd), ref genericParameters, context);
-                    if (primitiveType != null && genericParameters != null)
+                    if (primitiveType != null && genericParameters != null && genericParameters.All(p => p != null))
                     {
                         primitiveType = primitiveType.MakeGenericType(genericParameters.ToArray());
                     }

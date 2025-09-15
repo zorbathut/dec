@@ -30,6 +30,7 @@ All notable changes to this project will be documented in this file.
 * Parsing a class tag of UnknownClass[] results in an unhandled exception.
 * Parsing generics with multirank arrays as parameters.
 * Overly verbose output when serializing primitive array types.
+* Thrown exception when parsing a generic with an invalid parameter.
 
 
 ## [v0.9.0]

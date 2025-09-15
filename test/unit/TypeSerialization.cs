@@ -338,6 +338,14 @@ namespace DecTest
         }
 
         [Test]
+        public void GenericWithInvalid()
+        {
+            Dec.Config.UsingNamespaces = new string[] { "DecTest.TypeSerialization" };
+
+            ExpectErrors(() => parseType("Generic<Alakazam>"));
+        }
+
+        [Test]
         public void ErrorCache()
         {
             Dec.Config.UsingNamespaces = new string[] { "DecTest.TypeSerialization" };
