@@ -66,6 +66,19 @@ references:
   commentId: T:Dec.Config
   fullName: Dec.Config
   nameWithType: Config
+- uid: Dec.Config.CompatTypeLookup
+  name: CompatTypeLookup
+  href: api/Dec.Config.html#Dec_Config_CompatTypeLookup
+  commentId: P:Dec.Config.CompatTypeLookup
+  fullName: Dec.Config.CompatTypeLookup
+  nameWithType: Config.CompatTypeLookup
+- uid: Dec.Config.CompatTypeLookup*
+  name: CompatTypeLookup
+  href: api/Dec.Config.html#Dec_Config_CompatTypeLookup_
+  commentId: Overload:Dec.Config.CompatTypeLookup
+  isSpec: "True"
+  fullName: Dec.Config.CompatTypeLookup
+  nameWithType: Config.CompatTypeLookup
 - uid: Dec.Config.ConverterFactory
   name: ConverterFactory
   href: api/Dec.Config.html#Dec_Config_ConverterFactory
