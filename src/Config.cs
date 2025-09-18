@@ -126,7 +126,7 @@ namespace Dec
         /// This should not be changed while a Parser or Composer object exists, or while Recorder is active.
         /// </remarks>
         /// <example>
-        /// Config.CompatTypeLookup = new Dictionary<string, Type>() { { "OldNamespace.OldTypeName", typeof(NewNamespace.NewTypeName) } };
+        /// Config.CompatTypeLookup = new Dictionary&lt;string, Type&gt;() { { "OldNamespace.OldTypeName", typeof(NewNamespace.NewTypeName) } };
         /// </example>
         public static Dictionary<string, Type> CompatTypeLookup
         {
