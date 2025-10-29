@@ -67,7 +67,7 @@ namespace Dec
             {
                 DtdProcessing = DtdProcessing.Prohibit,
                 XmlResolver = null,
-                IgnoreWhitespace = true,
+                IgnoreWhitespace = false,
             };
 
             using (var reader = XmlReader.Create(input, settings))

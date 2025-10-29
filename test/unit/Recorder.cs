@@ -940,5 +940,17 @@ namespace DecTest
 
             Assert.AreEqual(item.value, deserialized.value);
         }
+
+        [Test]
+        public void StringWhitespace(
+            [Values("  leading", "trailing  ", "  both  ", "   ", "\t\ttabs\t\t", "\n\nnewlines\n\n", " \t\n mixed \n\t ", "", "no-whitespace")] string testValue,
+            [ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var deserialized = DoRecorderRoundTrip(testValue, mode);
+
+            Assert.AreEqual(testValue, deserialized);
+        }
     }
 }

@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 
 
+## [Unreleased]
+### Breaking
+* Stop ignoring whitespace. I . . . actually don't remember why I did this. It's not necessary for numbers, and it just makes it impossible to store strings with prefix/suffix whitespace, which breaks the guaranteed roundtrip requirements. If you're reading this in to-be-released notes then let me know if it breaks your workflow, otherwise this is probably going live.
+
+### Fixed
+* String roundtripping with leading/trailing whitespace.
+
 ## [v0.10.0]
 ### Added
 * Initial support for Recorder backwards-compatibility type replacement.

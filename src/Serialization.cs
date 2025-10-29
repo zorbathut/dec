@@ -759,7 +759,7 @@ namespace Dec
             // Gather info
             bool hasChildren = false;
             ReaderNode hasChildrenNode = null;
-            bool hasText = false;
+            bool hasImportantText = false;
             ReaderNode hasTextNode = null;
             foreach (var (_, node) in orders)
             {
@@ -768,10 +768,15 @@ namespace Dec
                     hasChildren = true;
                     hasChildrenNode = node;
                 }
-                if (!hasText && node.GetText() != null)
+
+                // We trim this to get info on whether there's text that must not be ignored. If we turn out to be a string, we'll grudingly accept pure whitespace anyway.
+                if (!hasImportantText && node.GetText() != null)
                 {
-                    hasText = true;
-                    hasTextNode = node;
+                    if (!node.GetText().Trim().IsNullOrEmpty())
+                    {
+                        hasImportantText = true;
+                        hasTextNode = node;
+                    }
                 }
             }
 
@@ -838,7 +843,7 @@ namespace Dec
 
             // Basic early validation
 
-            if (hasChildren && hasText)
+            if (hasChildren && hasImportantText)
             {
                 Dbg.Err($"{hasChildrenNode.GetContext()} / {hasTextNode.GetContext()}: Cannot have both text and child nodes in XML - this is probably a typo, maybe you have the wrong number of close tags or added text somewhere you didn't mean to?");
 
@@ -1094,7 +1099,7 @@ namespace Dec
             }
 
             // Special case: byte[] arrays with base64 encoding
-            if (type == typeof(byte[]) && hasText && !hasChildren)
+            if (type == typeof(byte[]) && hasImportantText && !hasChildren)
             {
                 // This is a byte array encoded as base64 text
                 foreach (var (parseCommand, node) in orders)
@@ -1141,7 +1146,7 @@ namespace Dec
             }
 
             // Nothing past this point even supports text, so let's just get angry and break stuff.
-            if (hasText)
+            if (hasImportantText)
             {
                 Dbg.Err($"{hasTextNode.GetContext()}: Text detected in a situation where it is invalid; will be ignored");
                 return result;
