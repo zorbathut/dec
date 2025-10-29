@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 * String roundtripping with leading/trailing whitespace.
+* Exceptions thrown in Recorder could propagate outside Dec.
 
 ## [v0.10.0]
 ### Added

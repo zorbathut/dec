@@ -1084,7 +1084,14 @@ namespace Dec
                         if (recordable != null)
                         {
                             var recorderReader = new RecorderReader(node, globals, trackUsage: true);
-                            recordable.Record(recorderReader);
+                            try
+                            {
+                                recordable.Record(recorderReader);
+                            }
+                            catch (Exception e)
+                            {
+                                Dbg.Ex(e);
+                            }
                             recorderReader.ReportUnusedFields();
 
                             // TODO: support indices if this is within the Dec system?

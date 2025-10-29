@@ -952,5 +952,44 @@ namespace DecTest
 
             Assert.AreEqual(testValue, deserialized);
         }
+
+        public struct ThrowingStruct : Dec.IRecordable
+        {
+            public int value;
+
+            public void Record(Dec.Recorder record)
+            {
+                // doing this first so I don't have to deal with an unused-field error :V
+                record.Record(ref value, "value");
+
+                if (record.Mode == Dec.Recorder.Direction.Read)
+                {
+                    throw new InvalidOperationException("Test exception during deserialization");
+                }
+            }
+        }
+
+        public class ThrowingStructContainer : Dec.IRecordable
+        {
+            public ThrowingStruct throwing;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref throwing, "throwing");
+            }
+        }
+
+        [Test]
+        public void StructRecordableThrows([ValuesExcept(RecorderMode.Validation, RecorderMode.Checksum)] RecorderMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var container = new ThrowingStructContainer();
+            container.throwing = new ThrowingStruct { value = 42 };
+
+            var deserialized = DoRecorderRoundTrip(container, mode, expectReadErrors: true, errorValidator: err => err.Contains("Test exception during deserialization"));
+
+            Assert.IsNotNull(deserialized);
+        }
     }
 }

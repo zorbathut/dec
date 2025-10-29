@@ -354,7 +354,16 @@ namespace Dec
                 var readerClone = new ReaderNodeCloneRecorder(recorderChildren, UserSettings);
 
                 // do the dupe
-                (result as IRecordable).Record(new RecorderReader(readerClone, new ReaderGlobals()));
+                var resultAsIRecordable = result as IRecordable;
+                var recorderReader = new RecorderReader(readerClone, new ReaderGlobals());
+                try
+                {
+                    resultAsIRecordable.Record(recorderReader);
+                }
+                catch (Exception e)
+                {
+                    Dbg.Ex(e);
+                }
             }
             else if (valType.IsGenericType)
             {
