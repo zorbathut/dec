@@ -98,6 +98,12 @@ namespace Dec
                 return false;
             }
 
+            // Filter out Microsoft test platform to avoid weird .NET 9 compatibility issues
+            if (name.StartsWith("Microsoft.TestPlatform") || name.StartsWith("Microsoft.VisualStudio.TestPlatform"))
+            {
+                return false;
+            }
+
             // Filter out Unity
             if (name.StartsWith("Unity.") || name.StartsWith("UnityEngine,") || name.StartsWith("UnityEngine.") || name.StartsWith("UnityEditor,") || name.StartsWith("UnityEditor.") || name.StartsWith("ExCSS.Unity,"))
             {
