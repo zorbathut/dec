@@ -31,7 +31,7 @@ namespace Dec
                 Dbg.Wrn($"{new Context(identifier, record)}: Found root element with name `{record.Name.LocalName}` when it should be `Record`");
             }
 
-            var recordFormatVersion = record.ElementNamed("recordFormatVersion");
+            var recordFormatVersion = record.ElementNamed("recordFormatVersion", new Context(identifier, record));
             if (recordFormatVersion == null)
             {
                 Dbg.Err($"{new Context(identifier, record)}: Missing record format version, assuming the data is up-to-date");
@@ -56,7 +56,7 @@ namespace Dec
         {
             var result = new List<ReaderRef>();
 
-            var refs = record.ElementNamed("refs");
+            var refs = record.ElementNamed("refs", new Context(fileIdentifier, record));
             if (refs != null)
             {
                 foreach (var reference in refs.Elements())
@@ -104,7 +104,7 @@ namespace Dec
 
         public override ReaderNodeParseable ParseNode()
         {
-            var data = record.ElementNamed("data");
+            var data = record.ElementNamed("data", new Context(fileIdentifier, record));
             if (data == null)
             {
                 Dbg.Err($"{new Context(fileIdentifier, record)}: No data element provided. This is not very recoverable.");

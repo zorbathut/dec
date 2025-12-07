@@ -18,14 +18,34 @@ namespace Dec
             }
         }
 
-        internal static XElement ElementNamed(this XElement root, string name)
+        internal static XElement ElementNamed(this XElement root, string name, Context context)
         {
-            return root.Elements().Where(child => child.Name.LocalName == name).SingleOrDefaultChecked();
+            // this is basically SingleOrDefaultChecked with an inline error message, which proved difficult to get the right way
+            XElement result = null;
+            bool first = true;
+
+            foreach (var element in root.Elements().Where(child => child.Name.LocalName == name))
+            {
+                if (first)
+                {
+                    result = element;
+                    first = false;
+                }
+                else
+                {
+                    Dbg.Err($"{context}: Multiple items named {name} found when only one is expected");
+
+                    // no point in continuing
+                    break;
+                }
+            }
+
+            return result;
         }
 
         internal static XElement ElementNamedWithFallback(this XElement root, string name, Context context, string errorPrefix)
         {
-            var result = ElementNamed(root, name);
+            var result = ElementNamed(root, name, context);
             if (result != null)
             {
                 // yay

@@ -31,7 +31,7 @@ namespace Dec
 
         public override ReaderNode GetChildNamed(string name)
         {
-            var child = xml.ElementNamed(name);
+            var child = xml.ElementNamed(name, GetContext());
             return child == null ? null : new ReaderNodeXml(child, fileIdentifier, new PathMember(path, name), UserSettings);
         }
         public override string[] GetAllChildren()

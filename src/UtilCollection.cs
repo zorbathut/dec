@@ -33,31 +33,6 @@ namespace Dec
             return result;
         }
 
-        internal static T SingleOrDefaultChecked<T>(this IEnumerable<T> elements)
-        {
-            T result = default(T);
-            bool first = true;
-
-            foreach (var element in elements)
-            {
-                if (first)
-                {
-                    result = element;
-                    first = false;
-                }
-                else
-                {
-                    // maybe we need a better error message here.
-                    Dbg.Err("Multiple items found when only one is expected");
-
-                    // no point in continuing
-                    break;
-                }
-            }
-
-            return result;
-        }
-
         internal static IEnumerable<T> Concat<T>(this IEnumerable<T> enumerable, T element)
         {
             foreach (var e in enumerable)
