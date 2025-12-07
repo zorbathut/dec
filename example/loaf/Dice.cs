@@ -31,9 +31,9 @@ namespace Loaf
             public override Dice Read(string input, Dec.Context context)
             {
                 var result = Parser.Match(input);
-                if (result == null)
+                if (result == null || !result.Success)
                 {
-                    Dbg.Err("{context}: Failed to parse dice; {input}");
+                    Dbg.Err($"{context}: Failed to parse dice; {input}");
                     return null;
                 }
 

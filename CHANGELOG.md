@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 * String roundtripping with leading/trailing whitespace.
 * Exceptions thrown in Recorder could propagate outside Dec.
 * Issues with running in test environments on .NET 9.
+* Parse error in Loaf example.
 
 
 ## [v0.10.0]
