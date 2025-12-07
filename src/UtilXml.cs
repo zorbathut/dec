@@ -33,7 +33,7 @@ namespace Dec
                 }
                 else
                 {
-                    Dbg.Err($"{context}: Multiple items named {name} found when only one is expected");
+                    Dbg.Err($"{context}: Multiple items named `{name}` found when only one is expected");
 
                     // no point in continuing
                     break;
