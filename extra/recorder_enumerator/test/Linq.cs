@@ -470,6 +470,17 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
+        public void OrderByDescendingSelectEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
+        {
+            var array = new[] { (item: "a", key: 3), (item: "b", key: 1), (item: "c", key: 2) };
+            var source = array.OrderByDescending(kvp => kvp.key).Select(kvp => kvp.item).GetEnumerator();
+            source.MoveNext();
+            source.MoveNext();
+            var result = DoRecorderRoundTrip(source, recorderMode);
+            Assert.IsTrue(Util.AreEquivalentEnumerators(source, result));
+        }
+
+        [Test]
         public void ReverseEnumeratorTest([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             var source = Enumerable.Range(0, 20).Reverse().GetEnumerator();

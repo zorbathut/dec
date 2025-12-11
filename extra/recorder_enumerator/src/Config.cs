@@ -107,6 +107,11 @@ namespace Dec.RecorderEnumerator
                     return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_SelectMany_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[1]));
                 }
 
+                if (genericTypeDefinition == SystemLinqEnumerable_SelectIPartition_Converter.RelevantType)
+                {
+                    return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_SelectIPartition_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[1]));
+                }
+
                 // Set-related
 
                 if (genericTypeDefinition == SystemLinqEnumerable_DistinctIterator_Converter.RelevantType)

@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 
 ### Improved
 * Error message with multiple nodes of a single name.
+* RecorderEnumerator: Support for SelectIPartitionIterator, enabling OrderByDescending().Select() chains.
 
 ### Fixed
 * String roundtripping with leading/trailing whitespace.
