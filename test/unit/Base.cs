@@ -18,6 +18,7 @@ namespace DecTest
             // But reset stuff just in case.
             Dec.Config.CultureInfo = new System.Globalization.CultureInfo("en-US");
             Dec.Config.CompatTypeLookup = null;
+            Dec.Config.CompatDecLookup = null;
 
             // flatten these entirely for the sake of tests that don't list anything
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] {}, explicitConverters = new Type[] {}, explicitStaticRefs = new Type[] {}});

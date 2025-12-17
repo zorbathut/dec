@@ -160,7 +160,18 @@ namespace Dec
                 return null;
             }
 
-            return typedict.TryGetValue(name);
+            var result = typedict.TryGetValue(name);
+            if (result == null)
+            {
+                var remappedName = LookupCompatDecName(type, name);
+
+                if (remappedName != null)
+                {
+                    result = typedict.TryGetValue(remappedName);
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -320,6 +331,98 @@ namespace Dec
             }
         }
 
+        internal static string LookupCompatDecName(Type type, string originalName)
+        {
+            var lookup = Config.CompatDecLookup;
+            if (lookup.Count == 0)
+            {
+                return null;
+            }
+
+            // Walk up type hierarchy checking each type for a remapping
+            Type currentType = type;
+            while (currentType != typeof(object))
+            {
+                if (lookup.TryGetValue(currentType, out var typeRemappings) &&
+                    typeRemappings.TryGetValue(originalName, out string remappedName))
+                {
+                    return remappedName;
+                }
+                currentType = currentType.BaseType;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Validates CompatDecLookup configuration and warns about issues.
+        /// </summary>
+        /// <remarks>
+        /// Called after parsing is complete to validate that compat mappings are sensible.
+        /// </remarks>
+        internal static void ValidateCompatDecLookup()
+        {
+            // Group mappings by root type to detect conflicts within hierarchies
+            var mappingsByRoot = new Dictionary<Type, Dictionary<string, (string newName, Type sourceType)>>();
+
+            foreach (var typeKvp in Config.CompatDecLookup)
+            {
+                var type = typeKvp.Key;
+
+                // Check if type is a Dec type
+                if (!typeof(Dec).IsAssignableFrom(type))
+                {
+                    Dbg.Wrn($"CompatDecLookup contains type {type}, which is not a Dec type; these entries will be ignored");
+                    continue;
+                }
+
+                var rootType = type.GetDecRootType();
+                if (rootType == null)
+                {
+                    // Maybe start validating these at some point also?
+                    continue;
+                }
+
+                // Track mappings for hierarchy conflict detection
+                if (!mappingsByRoot.TryGetValue(rootType, out var rootMappings))
+                {
+                    rootMappings = new Dictionary<string, (string newName, Type sourceType)>();
+                    mappingsByRoot[rootType] = rootMappings;
+                }
+
+                var typedict = Lookup.TryGetValue(rootType);
+                foreach (var nameKvp in typeKvp.Value)
+                {
+                    var oldName = nameKvp.Key;
+                    var newName = nameKvp.Value;
+
+                    // Check if old name already exists (mapping will be ignored)
+                    if (typedict.ContainsKey(oldName))
+                    {
+                        Dbg.Wrn($"CompatDecLookup maps `{type}.{oldName}` to `{type}.{newName}`, but `{type}.{oldName}` already exists; mapping will be ignored");
+                    }
+                    // Check if new name exists (mapping target is valid)
+                    else if (!typedict.ContainsKey(newName))
+                    {
+                        Dbg.Wrn($"CompatDecLookup maps `{type}.{oldName}` to `{type}.{newName}`, but `{newName}` does not exist (if you want transitive renaming, please come ask on Discord, thanks)");
+                    }
+
+                    // Check for conflicting mappings within the same hierarchy
+                    if (rootMappings.TryGetValue(oldName, out var existing))
+                    {
+                        if (existing.newName != newName)
+                        {
+                            Dbg.Wrn($"CompatDecLookup has conflicting mappings for `{oldName}` within the {rootType} hierarchy: {existing.sourceType} maps to `{existing.newName}`, but {type} maps to `{newName}`");
+                        }
+                    }
+                    else
+                    {
+                        rootMappings[oldName] = (newName, type);
+                    }
+                }
+            }
+        }
+
         private static Dictionary<string, Dec> GetLookupFor(Type type)
         {
             var typedict = Lookup.TryGetValue(type);
@@ -471,6 +574,15 @@ namespace Dec
         public static T Get(string name)
         {
             var result = DecLookup.TryGetValue(name);
+            if (result == null)
+            {
+                string remappedName = Database.LookupCompatDecName(typeof(T), name);
+                if (remappedName != null)
+                {
+                    result = DecLookup.TryGetValue(remappedName);
+                }
+            }
+
             if (result == null)
             {
                 Database.WarnOnEmpty();

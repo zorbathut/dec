@@ -141,6 +141,31 @@ namespace Dec
         private static Dictionary<string, Type> CompatTypeLookupBacking;
 
         /// <summary>
+        /// A remapping of old Dec names to new Dec names, scoped per Dec type, for compatibility with older files.
+        /// </summary>
+        /// <remarks>
+        /// The outer dictionary key is the Dec type. The inner dictionary maps old DecName strings to new DecName strings.
+        ///
+        /// When looking up a Dec by name, if the name is not found, this lookup is checked.
+        /// The lookup walks up the type hierarchy to find applicable remappings.
+        ///
+        /// This should not be changed while a Parser or Composer object exists, or while Recorder is active. You may get weird results by changing it after Parser has finished; you should probably just be setting it early, then not touching it.
+        /// </remarks>
+        /// <example>
+        /// Config.CompatDecLookup = new Dictionary&lt;Type, Dictionary&lt;string, string&gt;&gt;()
+        /// {
+        ///     { typeof(WeaponDec), new Dictionary&lt;string, string&gt;() { { "OldSword", "NewSword" } } },
+        /// };
+        /// </example>
+        public static Dictionary<Type, Dictionary<string, string>> CompatDecLookup
+        {
+            get => CompatDecLookupBacking ?? new Dictionary<Type, Dictionary<string, string>>();
+            set => CompatDecLookupBacking = value;
+        }
+
+        private static Dictionary<Type, Dictionary<string, string>> CompatDecLookupBacking;
+
+        /// <summary>
         /// A factory function that can be used to provide custom converters.
         /// </summary>
         /// <remarks>

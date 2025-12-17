@@ -408,6 +408,9 @@ namespace Dec
                     Serialization.ParseElement(generatedOrders, targetDec.GetType(), targetDec, readerContext, new Recorder.Settings(), isRootDec: true, ordersOverride: generatedOrders.Select(order => (Serialization.ParseCommand.Patch, node: order)).ToList());
                 }
 
+                // Validate CompatDecLookup now that all decs are registered
+                Database.ValidateCompatDecLookup();
+
                 if (s_Status != Status.Processing)
                 {
                     Dbg.Err($"Distributing while the world is in {s_Status} state; should be {Status.Processing} state");
