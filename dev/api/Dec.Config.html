@@ -128,7 +128,7 @@ Initialize as soon as possible.</p>
 
   <h3 id="Dec_Config_ConverterFactory" data-uid="Dec.Config.ConverterFactory">
   ConverterFactory
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Config.cs/#L149"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Config.cs/#L174"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>A factory function that can be used to provide custom converters.</p>
@@ -268,6 +268,50 @@ Initialize as soon as possible.</p>
 
   <h2 class="section" id="properties">Properties
 </h2>
+
+
+  <a id="Dec_Config_CompatDecLookup_" data-uid="Dec.Config.CompatDecLookup*"></a>
+
+  <h3 id="Dec_Config_CompatDecLookup" data-uid="Dec.Config.CompatDecLookup">
+  CompatDecLookup
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Config.cs/#L160"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>A remapping of old Dec names to new Dec names, scoped per Dec type, for compatibility with older files.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Dictionary&lt;Type, Dictionary&lt;string, string&gt;&gt; CompatDecLookup { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Type</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+  <h4 class="section" id="Dec_Config_CompatDecLookup_examples">Examples</h4>
+  <p>Config.CompatDecLookup = new Dictionary&lt;Type, Dictionary&lt;string, string&gt;&gt;()
+{
+{ typeof(WeaponDec), new Dictionary&lt;string, string&gt;() { { &quot;OldSword&quot;, &quot;NewSword&quot; } } },
+};</p>
+
+
+  <h4 class="section" id="Dec_Config_CompatDecLookup_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>The outer dictionary key is the Dec type. The inner dictionary maps old DecName strings to new DecName strings.</p>
+<p>When looking up a Dec by name, if the name is not found, this lookup is checked.
+The lookup walks up the type hierarchy to find applicable remappings.</p>
+<p>This should not be changed while a Parser or Composer object exists, or while Recorder is active. You may get weird results by changing it after Parser has finished; you should probably just be setting it early, then not touching it.</p>
+</div>
+
+
 
 
   <a id="Dec_Config_CompatTypeLookup_" data-uid="Dec.Config.CompatTypeLookup*"></a>
