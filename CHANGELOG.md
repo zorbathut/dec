@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 * Config.CompatDecLookup for remapping old Dec names to new Dec names during lookup, useful for backwards compatibility when renaming Decs.
-* recorder_enumerator: net7.0 support.
+* recorder_enumerator: net7.0 and net8.0 support.
 
 ### Breaking
 * Stop ignoring whitespace. I . . . actually don't remember why I did this. It's not necessary for numbers, and it just makes it impossible to store strings with prefix/suffix whitespace, which breaks the guaranteed roundtrip requirements. If you're reading this in to-be-released notes then let me know if it breaks your workflow, otherwise this is probably going live.

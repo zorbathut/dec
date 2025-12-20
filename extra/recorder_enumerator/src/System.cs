@@ -48,18 +48,36 @@ namespace Dec.RecorderEnumerator
     {
         internal FieldInfo field_Array = typeof(Iterator).GetPrivateFieldInHierarchy("_array");
         internal FieldInfo field_Index = typeof(Iterator).GetPrivateFieldInHierarchy("_index");
+        // .NET 8+ has _endIndex field
+        internal FieldInfo field_EndIndex = typeof(Iterator).GetPrivateFieldInHierarchy("_endIndex");
 
         public override void Write(object input, Recorder recorder)
         {
             recorder.Shared().RecordPrivate(input, field_Array, "array");
             recorder.RecordPrivate(input, field_Index, "index");
+            if (field_EndIndex != null)
+            {
+                recorder.RecordPrivate(input, field_EndIndex, "endIndex");
+            }
         }
 
         public override object Create(Recorder recorder)
         {
             // I am frankly bewildered as to why Activator.CreateInstance() doesn't work here.
             var cs = typeof(Iterator).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic);
-            return cs[0].Invoke(new object[] { null });
+            var ctor = cs[0];
+            var paramCount = ctor.GetParameters().Length;
+
+            // .NET 6-7: ctor(array)
+            // .NET 8+: ctor(array, endIndex)
+            if (paramCount == 1)
+            {
+                return ctor.Invoke(new object[] { null });
+            }
+            else
+            {
+                return ctor.Invoke(new object[] { null, 0 });
+            }
         }
 
         public override void Read(ref object input, Recorder recorder)
