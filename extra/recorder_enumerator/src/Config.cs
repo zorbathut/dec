@@ -36,19 +36,21 @@ namespace Dec.RecorderEnumerator
         /// </remarks>
         public static void Setup()
         {
-            if (Environment.Version.Major >= 6 && Environment.Version.Major <= 9)
+            if (Environment.Version.Major >= 6 && Environment.Version.Major <= 10)
             {
                 global::Dec.Config.ConverterFactory = ConverterFactory;
             }
             else
             {
-                Dbg.Err($"RecorderEnumerator is only supported on .NET 6 through 9; currently running on .NET {Environment.Version.Major}.{Environment.Version.Minor}");
+                Dbg.Err($"RecorderEnumerator is only supported on .NET 6 through 10; currently running on .NET {Environment.Version.Major}.{Environment.Version.Minor}");
             }
         }
 
         private static Converter ConverterFactory(Type type)
         {
-            if (type == SystemLinqEnumerable_RangeIterator_Converter.RelevantType)
+            // .NET 6-9: Non-generic RangeIterator, direct comparison
+            // .NET 10+: Generic RangeIterator`1, comparison handled in generic section below
+            if (!SystemLinqEnumerable_RangeIterator_Converter.IsGeneric && type == SystemLinqEnumerable_RangeIterator_Converter.RelevantType)
             {
                 return new SystemLinqEnumerable_RangeIterator_Converter();
             }
@@ -66,6 +68,12 @@ namespace Dec.RecorderEnumerator
             if (type.IsGenericType)
             {
                 var genericTypeDefinition = type.GetGenericTypeDefinition();
+
+                // .NET 10+ Generic RangeIterator`1
+                if (SystemLinqEnumerable_RangeIterator_Converter.IsGeneric && genericTypeDefinition == SystemLinqEnumerable_RangeIterator_Converter.RelevantType)
+                {
+                    return new SystemLinqEnumerable_RangeIterator_Converter();
+                }
 
                 // Where
 
@@ -118,7 +126,10 @@ namespace Dec.RecorderEnumerator
 
                 if (genericTypeDefinition == SystemLinqEnumerable_SelectRange_Converter.RelevantType)
                 {
-                    return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_SelectRange_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
+                    // .NET 6-9: SelectRangeIterator`1[TResult] - 1 type arg
+                    // .NET 10+: RangeSelectIterator`2[TSource, TResult] - 2 type args, result is last
+                    var resultType = type.GenericTypeArguments[type.GenericTypeArguments.Length - 1];
+                    return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_SelectRange_Converter<,>).MakeGenericType(type, resultType));
                 }
 
                 if (genericTypeDefinition == SystemLinqEnumerable_SelectMany_Converter.RelevantType)

@@ -108,17 +108,19 @@ namespace Dec.RecorderEnumerator
 
     public static class SystemLinqEnumerable_SelectRange_Converter
     {
-        // .NET 9 renamed SelectRangeIterator to RangeSelectIterator
-        internal static Type RelevantType = Util.GetLinqIteratorType("SelectRangeIterator`1", "RangeSelectIterator`1");
+        // .NET 6-8: SelectRangeIterator`1
+        // .NET 9: RangeSelectIterator`1
+        // .NET 10+: RangeSelectIterator`2 (now has 2 type params)
+        internal static Type RelevantType = Util.GetLinqIteratorType("SelectRangeIterator`1", "RangeSelectIterator`1", "RangeSelectIterator`2");
     }
 
     public class SystemLinqEnumerable_SelectRange_Converter<Iterator, T> : ConverterFactoryDynamic
     {
-        internal FieldInfo field_Start = typeof(Iterator).GetField("_start", BindingFlags.NonPublic | BindingFlags.Instance);
-        internal FieldInfo field_End = typeof(Iterator).GetField("_end", BindingFlags.NonPublic | BindingFlags.Instance);
-        internal FieldInfo field_Selector = typeof(Iterator).GetField("_selector", BindingFlags.NonPublic | BindingFlags.Instance);
-        internal FieldInfo field_State = typeof(Iterator).GetField("_state", BindingFlags.NonPublic | BindingFlags.Instance);
-        internal FieldInfo field_Current = typeof(Iterator).GetField("_current", BindingFlags.NonPublic | BindingFlags.Instance);
+        internal FieldInfo field_Start = typeof(Iterator).GetPrivateFieldInHierarchy("_start");
+        internal FieldInfo field_End = typeof(Iterator).GetPrivateFieldInHierarchy("_end");
+        internal FieldInfo field_Selector = typeof(Iterator).GetPrivateFieldInHierarchy("_selector");
+        internal FieldInfo field_State = typeof(Iterator).GetPrivateFieldInHierarchy("_state");
+        internal FieldInfo field_Current = typeof(Iterator).GetPrivateFieldInHierarchy("_current");
 
         public override void Write(object input, Recorder recorder)
         {

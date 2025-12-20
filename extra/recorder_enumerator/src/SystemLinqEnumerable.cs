@@ -70,12 +70,21 @@ namespace Dec.RecorderEnumerator
 
     public class SystemLinqEnumerable_RangeIterator_Converter : ConverterFactoryDynamic
     {
-        internal static Type RelevantType = typeof(System.Linq.Enumerable).GetNestedType("RangeIterator", System.Reflection.BindingFlags.NonPublic);
+        // .NET 6-9: Non-generic RangeIterator
+        // .NET 10+: Generic RangeIterator`1[TResult]
+        internal static Type RelevantType = Util.GetLinqIteratorType("RangeIterator", "RangeIterator`1");
 
-        internal static FieldInfo Field_Current = RelevantType.GetField("_current", BindingFlags.NonPublic | BindingFlags.Instance);
-        internal static FieldInfo Field_State = RelevantType.GetField("_state", BindingFlags.NonPublic | BindingFlags.Instance);
-        internal static FieldInfo Field_Start = RelevantType.GetField("_start", BindingFlags.NonPublic | BindingFlags.Instance);
-        internal static FieldInfo Field_End = RelevantType.GetField("_end", BindingFlags.NonPublic | BindingFlags.Instance);
+        // .NET 10+: RangeIterator`1 is generic, need to check if we need to instantiate generic type
+        internal static bool IsGeneric = RelevantType?.IsGenericTypeDefinition ?? false;
+
+        // For .NET 10, we need the concrete type to get fields. Fields are looked up at runtime.
+        private static Type ConcreteType = IsGeneric ? RelevantType.MakeGenericType(typeof(int)) : RelevantType;
+
+        internal static FieldInfo Field_Start = ConcreteType?.GetPrivateFieldInHierarchy("_start");
+        // .NET 6-9: _end, .NET 10+: _endExclusive
+        internal static FieldInfo Field_End = ConcreteType?.GetPrivateFieldInHierarchy("_end") ?? ConcreteType?.GetPrivateFieldInHierarchy("_endExclusive");
+        internal static FieldInfo Field_State = ConcreteType?.GetPrivateFieldInHierarchy("_state");
+        internal static FieldInfo Field_Current = ConcreteType?.GetPrivateFieldInHierarchy("_current");
 
         public override void Write(object input, Recorder recorder)
         {
@@ -92,8 +101,16 @@ namespace Dec.RecorderEnumerator
             recorder.Record(ref start, "start");
             recorder.Record(ref end, "end");
 
-            // it stores "start" and "end", but takes "start" and "range" as parameters, so, okay, fine, sure
-            return Activator.CreateInstance(RelevantType, start, end - start);
+            if (IsGeneric)
+            {
+                // .NET 10+: constructor takes (start, endExclusive) directly
+                return Activator.CreateInstance(ConcreteType, start, end);
+            }
+            else
+            {
+                // .NET 6-9: constructor takes (start, count), but stores start and end
+                return Activator.CreateInstance(ConcreteType, start, end - start);
+            }
         }
 
         public override void Read(ref object input, Recorder recorder)
