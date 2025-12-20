@@ -16,10 +16,7 @@ namespace Dec.RecorderEnumerator
             return type == typeof(Action);
         }
 
-        public override bool TreatAsValuelike()
-        {
-            return true;
-        }
+        // Can't be valuelike if it has a _Target; technically could be if it doesn't!
 
         private Type localType;
         private MethodInfo localReturnDefault;

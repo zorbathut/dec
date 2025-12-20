@@ -1,4 +1,4 @@
-#if NET7_0_OR_GREATER
+#if NET6_0_OR_GREATER
 
 using DecTest;
 using NUnit.Framework;
@@ -10,6 +10,7 @@ using System.Reflection;
 namespace RecorderEnumeratorTest
 {
     [TestFixture]
+    [Dec.RecorderEnumerator.RecordableClosures]
     public class DelegateTest : Base
     {
         static int ReturnNumber() { return 42; }
@@ -28,14 +29,10 @@ namespace RecorderEnumeratorTest
 
             Assert.AreEqual(42, result.fa());
             Assert.AreEqual(100, result.fb());
-
-            Assert.AreNotSame(pair.fa, result.fa);
-            Assert.AreNotSame(pair.fb, result.fb);
         }
 
         [Test]
-        [Dec.RecorderEnumerator.RecordableClosures]
-        public void FuncMultipleInternal([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        public void FuncMultipleInternal([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             // I'm slightly worried that the way I'm generating functions could create *one* function, then overwrite it, so here's a test for that.
             Func<int> fa = () => 42;
@@ -47,11 +44,9 @@ namespace RecorderEnumeratorTest
 
             Assert.AreEqual(42, result.fa());
             Assert.AreEqual(100, result.fb());
-
-            Assert.AreNotSame(pair.fa, result.fa);
-            Assert.AreNotSame(pair.fb, result.fb);
         }
 
+        [Dec.RecorderEnumerator.RecordableClosures]
         class ActionSideEffectModule : Dec.IRecordable
         {
             public int value = 0;
@@ -70,7 +65,7 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        public void ActionWithClosureSideEffects([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        public void ActionWithClosureSideEffects([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
             var asem = new ActionSideEffectModule();
 
