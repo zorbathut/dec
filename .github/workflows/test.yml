@@ -24,9 +24,9 @@ jobs:
     - name: Test
       run: |
         dotnet_version=${{ matrix.dotnet-version }}
-        first_digit=${dotnet_version:0:1}
+        major_version=${dotnet_version%%.*}
 
-        if [[ $first_digit -lt 5 ]]; then
+        if [[ $major_version -lt 5 ]]; then
             framework="netcoreapp${dotnet_version}"
         else
             framework="net${dotnet_version}"
