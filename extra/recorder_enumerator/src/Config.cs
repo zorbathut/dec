@@ -36,13 +36,14 @@ namespace Dec.RecorderEnumerator
         /// </remarks>
         public static void Setup()
         {
-            if (Environment.Version.Major != 6)
+            if (Environment.Version.Major == 6 || Environment.Version.Major == 7)
             {
-                Dbg.Err($"RecorderEnumerator is only supported on .NET 6.0; currently running on .NET {Environment.Version.Major}.{Environment.Version.Minor}");
+                global::Dec.Config.ConverterFactory = ConverterFactory;
             }
-
-            // Assign the converter factory
-            global::Dec.Config.ConverterFactory = ConverterFactory;
+            else
+            {
+                Dbg.Err($"RecorderEnumerator is only supported on .NET 6 through 7; currently running on .NET {Environment.Version.Major}.{Environment.Version.Minor}");
+            }
         }
 
         private static Converter ConverterFactory(Type type)
