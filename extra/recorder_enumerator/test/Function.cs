@@ -105,17 +105,17 @@ namespace RecorderEnumeratorTest
 
             public void Record(Dec.Recorder recorder)
             {
-                recorder.Record(ref one, nameof(one));
-                recorder.Record(ref two, nameof(two));
+                // Delegates are reference types and need .Shared() when they might be reused.
+                // This is especially important for closures where the Target is a shared object.
+                recorder.Shared().Record(ref one, nameof(one));
+                recorder.Shared().Record(ref two, nameof(two));
             }
         }
 
         [Test]
-        public void DoubleFunction([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
+        public void DoubleFunction([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
         {
-            // this is mostly to ensure that delegates are handled as value types; they're doing GetHashCode()/Equals() magic to make them seem like it, even if they're not
-            // and I'm just gonna play along and pretend they're value types
-            // hopefully I don't regret this but seriously if you're using `unsafe` pointers to test equality then I don't know what you were expecting
+            // Delegates are reference types; the same delegate referenced twice needs .Shared()
             var val = new DoubleFunctionStruct();
             val.one = ReturnFalse;
             val.two = ReturnFalse;

@@ -21,10 +21,11 @@ namespace Dec.RecorderEnumerator
         private Type localType;
         private MethodInfo localReturnDefault;
 
-        private static MethodInfo bindToMethodInfo = typeof(Delegate).GetMethod("BindToMethodInfo", BindingFlags.NonPublic | BindingFlags.Instance);
-        private static MethodInfo runtimeMethodHandle_getDeclaringType;
-
-        private static int delegateBindingFlags = 0; //CalculateDelegateBindingFlags();
+        // Internal Delegate fields for in-place modification
+        private static readonly FieldInfo delegateTargetField = typeof(Delegate).GetField("_target", BindingFlags.NonPublic | BindingFlags.Instance);
+        private static readonly FieldInfo delegateMethodPtrField = typeof(Delegate).GetField("_methodPtr", BindingFlags.NonPublic | BindingFlags.Instance);
+        private static readonly FieldInfo delegateMethodPtrAuxField = typeof(Delegate).GetField("_methodPtrAux", BindingFlags.NonPublic | BindingFlags.Instance);
+        private static readonly FieldInfo delegateMethodBaseField = typeof(Delegate).GetField("_methodBase", BindingFlags.NonPublic | BindingFlags.Instance);
 
         private static MethodInfo[] ReturnDefaultLookup = typeof(System_Delegate_Converter)
             .GetMethods(BindingFlags.NonPublic | BindingFlags.Static)
@@ -37,22 +38,6 @@ namespace Dec.RecorderEnumerator
             .Where(m => m.Name == "DoNothing")
             .OrderBy(m => m.IsGenericMethod ? m.GetGenericArguments().Length : 0)
             .ToArray();
-
-        static System_Delegate_Converter()
-        {
-            runtimeMethodHandle_getDeclaringType = typeof(RuntimeMethodHandle).GetMethod("GetDeclaringType", BindingFlags.NonPublic | BindingFlags.Static, null, new[] { typeof(System.Runtime.CompilerServices.RuntimeHelpers).Assembly.GetType("System.IRuntimeMethodInfo") }, null);
-
-            // Get the DelegateBindingFlags enum type directly.
-            Type bindingFlagsType = typeof(Delegate).Assembly.GetType("System.DelegateBindingFlags", false, true);
-
-            // Fetch individual enum values
-            // These might be needed for more modern runtimes.
-            object relaxedSignature = Enum.Parse(bindingFlagsType, "RelaxedSignature");
-            //object skipSecurityChecks = Enum.Parse(bindingFlagsType, "SkipSecurityChecks");
-
-            // Combine the enum values using bitwise OR
-            delegateBindingFlags = (int)relaxedSignature; // | (int)skipSecurityChecks;
-        }
 
         public System_Delegate_Converter(Type type)
         {
@@ -121,10 +106,15 @@ namespace Dec.RecorderEnumerator
             recorder.Record(ref method, "method");
             recorder.Shared().Record(ref target, "target");
 
-            // BEHOLD
-            // This is an order of magnitude easier than trying to do cutesy things with reflection to replace the guts.
-            // However, this is viable *only* because of TreatAsValuelike(), which ensures that it isn't shared.
-            input = method.CreateDelegate(localType, target);
+            // Create a correctly-configured delegate, then copy its internals to input.
+            // This preserves the identity of `input` (important for shared references)
+            // while updating its behavior to point to the correct method and target.
+            var correctDelegate = method.CreateDelegate(localType, target);
+
+            delegateTargetField.SetValue(input, delegateTargetField.GetValue(correctDelegate));
+            delegateMethodPtrField.SetValue(input, delegateMethodPtrField.GetValue(correctDelegate));
+            delegateMethodPtrAuxField.SetValue(input, delegateMethodPtrAuxField.GetValue(correctDelegate));
+            delegateMethodBaseField.SetValue(input, delegateMethodBaseField.GetValue(correctDelegate));
         }
     }
 }
