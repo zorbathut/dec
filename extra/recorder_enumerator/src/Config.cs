@@ -27,7 +27,25 @@ namespace Dec.RecorderEnumerator
             ("System.Linq.OrderedEnumerable`1", "GetEnumerator"),
         };
 
-        public static Converter ConverterFactory(Type type)
+        /// <summary>
+        /// Sets up RecorderEnumerator by assigning the ConverterFactory and verifying the runtime version.
+        /// </summary>
+        /// <remarks>
+        /// Call this once at application startup before using Recorder with enumerables.
+        /// Logs an error if not running on .NET 6.0 but continues anyway; good luck.
+        /// </remarks>
+        public static void Setup()
+        {
+            if (Environment.Version.Major != 6)
+            {
+                Dbg.Err($"RecorderEnumerator is only supported on .NET 6.0; currently running on .NET {Environment.Version.Major}.{Environment.Version.Minor}");
+            }
+
+            // Assign the converter factory
+            global::Dec.Config.ConverterFactory = ConverterFactory;
+        }
+
+        private static Converter ConverterFactory(Type type)
         {
             if (type == SystemLinqEnumerable_RangeIterator_Converter.RelevantType)
             {

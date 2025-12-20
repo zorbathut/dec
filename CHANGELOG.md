@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 
 ### Breaking
 * Stop ignoring whitespace. I . . . actually don't remember why I did this. It's not necessary for numbers, and it just makes it impossible to store strings with prefix/suffix whitespace, which breaks the guaranteed roundtrip requirements. If you're reading this in to-be-released notes then let me know if it breaks your workflow, otherwise this is probably going live.
+* recorder_enumerator: Changed setup system to validate .net version.
 
 ### Improved
 * Error message with multiple nodes of a single name.
@@ -18,7 +19,7 @@ All notable changes to this project will be documented in this file.
 * Exceptions thrown in Recorder could propagate outside Dec.
 * Issues with running in test environments on .NET 9.
 * Parse error in Loaf example.
-* Recorder_enumerator: Incorrecet cloning of Delegates with a target.
+* recorder_enumerator: Incorrect cloning of Delegates with a target.
 
 
 ## [v0.10.0]
