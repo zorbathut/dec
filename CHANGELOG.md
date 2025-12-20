@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Added
+* Official net10.0 support (nothing changed aside from adding a build target.)
 * Config.CompatDecLookup for remapping old Dec names to new Dec names during lookup, useful for backwards compatibility when renaming Decs.
 * recorder_enumerator: net7.0, net8.0, and net9.0 support.
 

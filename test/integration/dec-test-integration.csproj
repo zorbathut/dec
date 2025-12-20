@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <Configurations>Release;Debug</Configurations>
-    <TargetFrameworks>netcoreapp2.1;netcoreapp3.1;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;netcoreapp3.1;net6.0;net7.0;net8.0;net9.0;net10.0</TargetFrameworks>
 
     <!-- 0649: "is never assigned to, and will always have its default value null". This is obviously pointless with such a reflection-heavy library. -->
     <NoWarn>0649</NoWarn>
