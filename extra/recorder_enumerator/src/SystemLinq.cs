@@ -64,7 +64,8 @@ namespace Dec.RecorderEnumerator
 
     public static class SystemLinq_OrderedEnumerable_Converter
     {
-        internal static Type RelevantType = typeof(System.Linq.Enumerable).Assembly.GetType("System.Linq.OrderedEnumerable`2");
+        // .NET 9 renamed OrderedEnumerable to Enumerable.OrderedIterator
+        internal static Type RelevantType = Util.GetLinqType("System.Linq.OrderedEnumerable`2", "System.Linq.Enumerable+OrderedIterator`2");
     }
 
     public class SystemLinq_OrderedEnumerable_Converter<Iterator, T, K> : ConverterFactoryDynamic
@@ -74,6 +75,12 @@ namespace Dec.RecorderEnumerator
         internal FieldInfo field_Comparer = typeof(Iterator).GetPrivateFieldInHierarchy("_comparer");
         internal FieldInfo field_Descending = typeof(Iterator).GetPrivateFieldInHierarchy("_descending");
         internal FieldInfo field_Source = typeof(Iterator).GetPrivateFieldInHierarchy("_source");
+        // .NET 9 added these fields to OrderedIterator
+        internal FieldInfo field_Buffer = typeof(Iterator).GetPrivateFieldInHierarchy("_buffer");
+        internal FieldInfo field_Map = typeof(Iterator).GetPrivateFieldInHierarchy("_map");
+        // .NET 9 Iterator`1 base class fields (for enumerator state)
+        internal FieldInfo field_State = typeof(Iterator).GetPrivateFieldInHierarchy("_state");
+        internal FieldInfo field_Current = typeof(Iterator).GetPrivateFieldInHierarchy("_current");
 
         internal ConstructorInfo constructor = typeof(Iterator).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic)[0];
 
@@ -84,6 +91,24 @@ namespace Dec.RecorderEnumerator
             recorder.Shared().RecordPrivate(input, field_Comparer, "_comparer");
             recorder.RecordPrivate(input, field_Descending, "_descending");
             recorder.Shared().RecordPrivate(input, field_Source, "_source");
+            // .NET 9 fields (null on earlier versions)
+            if (field_Buffer != null)
+            {
+                recorder.Shared().RecordPrivate(input, field_Buffer, "_buffer");
+            }
+            if (field_Map != null)
+            {
+                recorder.Shared().RecordPrivate(input, field_Map, "_map");
+            }
+            // .NET 9 enumerator state fields in Iterator`1 base
+            if (field_State != null)
+            {
+                recorder.RecordPrivate(input, field_State, "_state");
+            }
+            if (field_Current != null)
+            {
+                recorder.SharedIfPossible<T>().RecordPrivate(input, field_Current, "_current");
+            }
         }
 
         private static K DefaultKeySelector(T t) => default;

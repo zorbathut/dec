@@ -1,8 +1,73 @@
 using System;
+using System.Collections;
 using System.Reflection;
 
 namespace Dec.RecorderEnumerator
 {
+    // .NET 9 CastICollectionIterator - replaces the compiler-generated <CastIterator>d__ iterator
+    public static class SystemLinqEnumerable_CastICollectionIterator_Converter
+    {
+        internal static Type RelevantType = typeof(System.Linq.Enumerable).GetNestedType("CastICollectionIterator`1", BindingFlags.NonPublic);
+    }
+
+    public class SystemLinqEnumerable_CastICollectionIterator_Converter<Iterator, T> : ConverterFactoryDynamic
+    {
+        internal FieldInfo field_Source = typeof(Iterator).GetPrivateFieldInHierarchy("_source");
+        internal FieldInfo field_Enumerator = typeof(Iterator).GetPrivateFieldInHierarchy("_enumerator");
+        internal FieldInfo field_State = typeof(Iterator).GetPrivateFieldInHierarchy("_state");
+        internal FieldInfo field_Current = typeof(Iterator).GetPrivateFieldInHierarchy("_current");
+
+        public override void Write(object input, Recorder recorder)
+        {
+            recorder.Shared().RecordPrivate(input, field_Source, "source");
+            recorder.Shared().RecordPrivate(input, field_Enumerator, "enumerator");
+            recorder.RecordPrivate(input, field_State, "state");
+            recorder.SharedIfPossible<T>().RecordPrivate(input, field_Current, "current");
+        }
+
+        public override object Create(Recorder recorder)
+        {
+            return Activator.CreateInstance(typeof(Iterator), new object[] { null });
+        }
+
+        public override void Read(ref object input, Recorder recorder)
+        {
+            Write(input, recorder);
+        }
+    }
+
+    // .NET 9 OfTypeIterator - replaces the compiler-generated <OfTypeIterator>d__ iterator
+    public static class SystemLinqEnumerable_OfTypeIterator_Converter
+    {
+        internal static Type RelevantType = typeof(System.Linq.Enumerable).GetNestedType("OfTypeIterator`1", BindingFlags.NonPublic);
+    }
+
+    public class SystemLinqEnumerable_OfTypeIterator_Converter<Iterator, T> : ConverterFactoryDynamic
+    {
+        internal FieldInfo field_Source = typeof(Iterator).GetPrivateFieldInHierarchy("_source");
+        internal FieldInfo field_Enumerator = typeof(Iterator).GetPrivateFieldInHierarchy("_enumerator");
+        internal FieldInfo field_State = typeof(Iterator).GetPrivateFieldInHierarchy("_state");
+        internal FieldInfo field_Current = typeof(Iterator).GetPrivateFieldInHierarchy("_current");
+
+        public override void Write(object input, Recorder recorder)
+        {
+            recorder.Shared().RecordPrivate(input, field_Source, "source");
+            recorder.Shared().RecordPrivate(input, field_Enumerator, "enumerator");
+            recorder.RecordPrivate(input, field_State, "state");
+            recorder.SharedIfPossible<T>().RecordPrivate(input, field_Current, "current");
+        }
+
+        public override object Create(Recorder recorder)
+        {
+            return Activator.CreateInstance(typeof(Iterator), new object[] { null });
+        }
+
+        public override void Read(ref object input, Recorder recorder)
+        {
+            Write(input, recorder);
+        }
+    }
+
     public class SystemLinqEnumerable_RangeIterator_Converter : ConverterFactoryDynamic
     {
         internal static Type RelevantType = typeof(System.Linq.Enumerable).GetNestedType("RangeIterator", System.Reflection.BindingFlags.NonPublic);

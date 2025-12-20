@@ -36,13 +36,13 @@ namespace Dec.RecorderEnumerator
         /// </remarks>
         public static void Setup()
         {
-            if (Environment.Version.Major == 6 || Environment.Version.Major == 7 || Environment.Version.Major == 8)
+            if (Environment.Version.Major >= 6 && Environment.Version.Major <= 9)
             {
                 global::Dec.Config.ConverterFactory = ConverterFactory;
             }
             else
             {
-                Dbg.Err($"RecorderEnumerator is only supported on .NET 6 through 8; currently running on .NET {Environment.Version.Major}.{Environment.Version.Minor}");
+                Dbg.Err($"RecorderEnumerator is only supported on .NET 6 through 9; currently running on .NET {Environment.Version.Major}.{Environment.Version.Minor}");
             }
         }
 
@@ -168,6 +168,23 @@ namespace Dec.RecorderEnumerator
                 if (genericTypeDefinition == SystemLinqEnumerable_ConcatNIterator_Converter.RelevantType)
                 {
                     return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_ConcatNIterator_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
+                }
+
+                // .NET 9 Cast/OfType iterators (these types don't exist on earlier versions)
+                if (SystemLinqEnumerable_CastICollectionIterator_Converter.RelevantType != null && genericTypeDefinition == SystemLinqEnumerable_CastICollectionIterator_Converter.RelevantType)
+                {
+                    return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_CastICollectionIterator_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
+                }
+
+                if (SystemLinqEnumerable_OfTypeIterator_Converter.RelevantType != null && genericTypeDefinition == SystemLinqEnumerable_OfTypeIterator_Converter.RelevantType)
+                {
+                    return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_OfTypeIterator_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[0]));
+                }
+
+                // .NET 9 IteratorSelectIterator (e.g., OrderBy().Select())
+                if (SystemLinqEnumerable_IteratorSelectIterator_Converter.RelevantType != null && genericTypeDefinition == SystemLinqEnumerable_IteratorSelectIterator_Converter.RelevantType)
+                {
+                    return (Converter)Activator.CreateInstance(typeof(SystemLinqEnumerable_IteratorSelectIterator_Converter<,>).MakeGenericType(type, type.GenericTypeArguments[1]));
                 }
 
                 // SystemCollections

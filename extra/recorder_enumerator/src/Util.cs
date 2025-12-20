@@ -81,5 +81,40 @@ namespace Dec.RecorderEnumerator
 
             return null;
         }
+
+        /// <summary>
+        /// Gets a nested type from System.Linq.Enumerable, trying multiple names for cross-version compatibility.
+        /// .NET 9 renamed many iterator types (e.g., WhereArrayIterator -> ArrayWhereIterator).
+        /// </summary>
+        internal static Type GetLinqIteratorType(params string[] names)
+        {
+            var enumType = typeof(System.Linq.Enumerable);
+            foreach (var name in names)
+            {
+                var type = enumType.GetNestedType(name, BindingFlags.NonPublic);
+                if (type != null)
+                {
+                    return type;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Gets a type from the System.Linq assembly, trying multiple names for cross-version compatibility.
+        /// </summary>
+        internal static Type GetLinqType(params string[] names)
+        {
+            var asm = typeof(System.Linq.Enumerable).Assembly;
+            foreach (var name in names)
+            {
+                var type = asm.GetType(name);
+                if (type != null)
+                {
+                    return type;
+                }
+            }
+            return null;
+        }
     }
 }

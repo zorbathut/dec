@@ -5,7 +5,8 @@ namespace Dec.RecorderEnumerator
 {
     public static class SystemLinqEnumerable_WhereEnumerable_Converter
     {
-        internal static Type RelevantType = typeof(System.Linq.Enumerable).GetNestedType("WhereEnumerableIterator`1", System.Reflection.BindingFlags.NonPublic);
+        // .NET 9 renamed WhereEnumerableIterator to IEnumerableWhereIterator
+        internal static Type RelevantType = Util.GetLinqIteratorType("WhereEnumerableIterator`1", "IEnumerableWhereIterator`1");
     }
 
     public class SystemLinqEnumerable_WhereEnumerable_Converter<Iterator, T> : ConverterFactoryDynamic
@@ -39,7 +40,8 @@ namespace Dec.RecorderEnumerator
 
     public static class SystemLinqEnumerable_WhereArray_Converter
     {
-        internal static Type RelevantType = typeof(System.Linq.Enumerable).GetNestedType("WhereArrayIterator`1", System.Reflection.BindingFlags.NonPublic);
+        // .NET 9 renamed WhereArrayIterator to ArrayWhereIterator
+        internal static Type RelevantType = Util.GetLinqIteratorType("WhereArrayIterator`1", "ArrayWhereIterator`1");
     }
 
     public class SystemLinqEnumerable_WhereArray_Converter<Iterator, T> : ConverterFactoryDynamic
@@ -71,7 +73,8 @@ namespace Dec.RecorderEnumerator
 
     public static class SystemLinqEnumerable_WhereList_Converter
     {
-        internal static Type RelevantType = typeof(System.Linq.Enumerable).GetNestedType("WhereListIterator`1", System.Reflection.BindingFlags.NonPublic);
+        // .NET 9 renamed WhereListIterator to ListWhereIterator
+        internal static Type RelevantType = Util.GetLinqIteratorType("WhereListIterator`1", "ListWhereIterator`1");
     }
 
     public class SystemLinqEnumerable_WhereList_Converter<Iterator, T> : ConverterFactoryDynamic
@@ -105,7 +108,8 @@ namespace Dec.RecorderEnumerator
 
     public static class SystemLinqEnumerable_WhereSelectIterator_Converter
     {
-        internal static Type RelevantType = typeof(System.Linq.Enumerable).GetNestedType("WhereSelectEnumerableIterator`2", System.Reflection.BindingFlags.NonPublic);
+        // .NET 9 renamed WhereSelectEnumerableIterator to IEnumerableWhereSelectIterator
+        internal static Type RelevantType = Util.GetLinqIteratorType("WhereSelectEnumerableIterator`2", "IEnumerableWhereSelectIterator`2");
     }
 
     public class SystemLinqEnumerable_WhereSelectIterator_Converter<Iterator, T> : ConverterFactoryDynamic
@@ -141,7 +145,8 @@ namespace Dec.RecorderEnumerator
 
     public static class SystemLinqEnumerable_WhereSelectArray_Converter
     {
-        internal static Type RelevantType = typeof(System.Linq.Enumerable).GetNestedType("WhereSelectArrayIterator`2", System.Reflection.BindingFlags.NonPublic);
+        // .NET 9 renamed WhereSelectArrayIterator to ArrayWhereSelectIterator
+        internal static Type RelevantType = Util.GetLinqIteratorType("WhereSelectArrayIterator`2", "ArrayWhereSelectIterator`2");
     }
 
     public class SystemLinqEnumerable_WhereSelectArray_Converter<Iterator, T> : ConverterFactoryDynamic
@@ -175,7 +180,8 @@ namespace Dec.RecorderEnumerator
 
     public static class SystemLinqEnumerable_WhereSelectList_Converter
     {
-        internal static Type RelevantType = typeof(System.Linq.Enumerable).GetNestedType("WhereSelectListIterator`2", System.Reflection.BindingFlags.NonPublic);
+        // .NET 9 renamed WhereSelectListIterator to ListWhereSelectIterator
+        internal static Type RelevantType = Util.GetLinqIteratorType("WhereSelectListIterator`2", "ListWhereSelectIterator`2");
     }
 
     public class SystemLinqEnumerable_WhereSelectList_Converter<Iterator, T> : ConverterFactoryDynamic
