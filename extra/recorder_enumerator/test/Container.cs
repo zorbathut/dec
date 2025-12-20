@@ -1,4 +1,4 @@
-#if NET7_0_OR_GREATER
+#if NET6_0_OR_GREATER
 
 using DecTest;
 using NUnit.Framework;
@@ -12,7 +12,6 @@ namespace RecorderEnumeratorTest
     public class Container : Base
     {
         [Test]
-        [Dec.RecorderEnumerator.RecordableClosures]
         public void Array([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
         {
             var data = new int[] { 1, 2, 3, 4, 5 };
@@ -23,7 +22,6 @@ namespace RecorderEnumeratorTest
         }
 
         [Test]
-        [Dec.RecorderEnumerator.RecordableClosures]
         public void List([ValuesExcept(RecorderMode.Validation)] RecorderMode recorderMode)
         {
             var data = new List<int> { 1, 2, 3, 4, 5 };
