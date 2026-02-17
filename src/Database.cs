@@ -159,7 +159,7 @@ namespace Dec
 
             if (DecForbidden.Contains(obj))
             {
-                Dbg.Err($"Attempting to forbid {obj} which has already been forbidden");
+                // double-forbidding is fine, sure
                 return;
             }
 
