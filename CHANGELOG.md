@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 * Official net10.0 support (nothing changed aside from adding a build target.)
 * Config.CompatDecLookup for remapping old Dec names to new Dec names during lookup, useful for backwards compatibility when renaming Decs.
 * recorder_enumerator: net7.0, net8.0, net9.0, and net10.0 support.
+* Added Database.DecRegisterForbid() to forbid certain objects from being serialized. This also might end up changing at some point in the future, though the basic functionality will remain in some form.
 
 ### Breaking
 * Stop ignoring whitespace. I . . . actually don't remember why I did this. It's not necessary for numbers, and it just makes it impossible to store strings with prefix/suffix whitespace, which breaks the guaranteed roundtrip requirements. If you're reading this in to-be-released notes then let me know if it breaks your workflow, otherwise this is probably going live.

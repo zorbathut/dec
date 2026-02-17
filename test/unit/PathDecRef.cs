@@ -220,5 +220,91 @@ namespace DecTest
             Assert.AreNotSame(theArray, result);
             Assert.AreEqual(theArray, result);
         }
+
+        public class ForbidDec : Dec.Dec
+        {
+            public StubRecordable member;
+        }
+
+        [Test]
+        public void ForbidRecord([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var stub = new StubRecordable();
+            Dec.Database.DecRegisterForbid(stub);
+
+            var result = DoRecorderRoundTrip(stub, mode, expectWriteErrors: true);
+
+            Assert.IsNull(result);
+        }
+
+        [Test]
+        public void ForbidThenRegister()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var stub = new StubRecordable();
+            Dec.Database.DecRegisterForbid(stub);
+
+            ExpectErrors(() => Dec.Database.DecLookupRegisterCustom(stub, new PathRoot("stub")));
+        }
+
+        [Test]
+        public void RegisterThenForbid()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var stub = new StubRecordable();
+            Dec.Database.DecLookupRegisterCustom(stub, new PathRoot("stub"));
+
+            ExpectErrors(() => Dec.Database.DecRegisterForbid(stub));
+        }
+
+        [Test]
+        public void ForbidThenEnable()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ForbidDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <ForbidDec decName=""TestDec"">
+                        <member />
+                    </ForbidDec>
+                </Decs>");
+            parser.Finish();
+
+            var dec = Dec.Database<ForbidDec>.Get("TestDec");
+            Dec.Database.DecRegisterForbid(dec.member);
+
+            ExpectErrors(() => Dec.Database.DecLookupEnable(dec.member));
+        }
+
+        [Test]
+        public void ForbidValueType()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            ExpectErrors(() => Dec.Database.DecRegisterForbid(42));
+        }
+
+        [Test]
+        public void ForbidDecInstance()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ForbidDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <ForbidDec decName=""TestDec"">
+                        <member />
+                    </ForbidDec>
+                </Decs>");
+            parser.Finish();
+
+            var dec = Dec.Database<ForbidDec>.Get("TestDec");
+            ExpectErrors(() => Dec.Database.DecRegisterForbid(dec));
+        }
     }
 }

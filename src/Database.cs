@@ -30,6 +30,8 @@ namespace Dec
         private static HashSet<string> DecPathLookupUnusable = new HashSet<string>();
         private static HashSet<string> DecPathLookupConflicts = new HashSet<string>();
 
+        private static HashSet<object> DecForbidden = new HashSet<object>();
+
         // A lot of this really needs work for validation and error reporting.
         internal static string GetDecPathFromObj(object obj)
         {
@@ -43,6 +45,11 @@ namespace Dec
             {
                 return path.Serialize();
             }
+        }
+
+        internal static bool IsForbidden(object obj)
+        {
+            return DecForbidden.Contains(obj);
         }
 
         internal static void DecPathRegister(object obj, Path path)
@@ -83,6 +90,12 @@ namespace Dec
         /// </remarks>
         public static void DecLookupEnable(object obj)
         {
+            if (DecForbidden.Contains(obj))
+            {
+                Dbg.Err($"Attempting to enable lookup for {obj} which has been explicitly forbidden from recording");
+                return;
+            }
+
             DecPathLookup[obj] = DecPathLookupComplete[obj];
             DecPathLookupReverse[DecPathLookupComplete[obj].Serialize()] = obj;
 
@@ -98,6 +111,12 @@ namespace Dec
         public static void DecLookupRegisterCustom(object obj, Path path)
         {
             var serialized = path.Serialize();
+
+            if (DecForbidden.Contains(obj))
+            {
+                Dbg.Err($"Attempting to register {obj} with path [{serialized}], but it has been explicitly forbidden from recording");
+                return;
+            }
 
             if (DecPathLookup.ContainsKey(obj))
             {
@@ -116,6 +135,41 @@ namespace Dec
             DecPathLookup[obj] = path;
             DecPathLookupComplete[obj] = path;
             DecPathLookupReverse[serialized] = obj;
+        }
+
+        /// <summary>
+        /// Registers an object as forbidden from being Recorded.
+        /// </summary>
+        /// <remarks>
+        /// This is a hack job put in because I need the functionality on my own project. Don't be surprised if this behavior changes dramatically at some point.
+        /// </remarks>
+        public static void DecRegisterForbid(object obj)
+        {
+            if (obj.GetType().IsValueType)
+            {
+                Dbg.Err($"Attempting to forbid {obj} which is a value type; forbidding value types is not supported");
+                return;
+            }
+
+            if (obj is Dec)
+            {
+                Dbg.Err($"Attempting to forbid {obj} which is a Dec; forbidding Decs is not currently supported");
+                return;
+            }
+
+            if (DecForbidden.Contains(obj))
+            {
+                Dbg.Err($"Attempting to forbid {obj} which has already been forbidden");
+                return;
+            }
+
+            if (DecPathLookup.ContainsKey(obj))
+            {
+                Dbg.Err($"Attempting to forbid {obj} which is already registered with path {DecPathLookup[obj].Serialize()}");
+                return;
+            }
+
+            DecForbidden.Add(obj);
         }
 
         /// <summary>
@@ -297,6 +351,7 @@ namespace Dec
             DecPathLookupReverse.Clear();
             DecPathLookupUnusable.Clear();
             DecPathLookupConflicts.Clear();
+            DecForbidden.Clear();
 
             foreach (var db in Databases)
             {

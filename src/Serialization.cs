@@ -1851,6 +1851,12 @@ namespace Dec
                 return;
             }
 
+            if (Database.IsForbidden(value))
+            {
+                Dbg.Err($"Attempting to record {value} which has been explicitly forbidden from recording");
+                node.WriteExplicitNull();
+                return;
+            }
 
             if (node.AllowDecPath)
             {
