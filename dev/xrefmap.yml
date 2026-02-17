@@ -718,6 +718,22 @@ references:
   isSpec: "True"
   fullName: Dec.Database.DecLookupRegisterCustom
   nameWithType: Database.DecLookupRegisterCustom
+- uid: Dec.Database.DecRegisterForbid(System.Object)
+  name: DecRegisterForbid(object)
+  href: api/Dec.Database.html#Dec_Database_DecRegisterForbid_System_Object_
+  commentId: M:Dec.Database.DecRegisterForbid(System.Object)
+  name.vb: DecRegisterForbid(Object)
+  fullName: Dec.Database.DecRegisterForbid(object)
+  fullName.vb: Dec.Database.DecRegisterForbid(Object)
+  nameWithType: Database.DecRegisterForbid(object)
+  nameWithType.vb: Database.DecRegisterForbid(Object)
+- uid: Dec.Database.DecRegisterForbid*
+  name: DecRegisterForbid
+  href: api/Dec.Database.html#Dec_Database_DecRegisterForbid_
+  commentId: Overload:Dec.Database.DecRegisterForbid
+  isSpec: "True"
+  fullName: Dec.Database.DecRegisterForbid
+  nameWithType: Database.DecRegisterForbid
 - uid: Dec.Database.Delete(Dec.Dec)
   name: Delete(Dec)
   href: api/Dec.Database.html#Dec_Database_Delete_Dec_Dec_
