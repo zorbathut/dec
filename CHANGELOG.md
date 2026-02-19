@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
 * Issues with running in test environments on .NET 9.
 * Parse error in Loaf example.
 * recorder_enumerator: Incorrect cloning of Delegates with a target.
+* Concurrency issue with Converter factories.
 
 
 ## [v0.10.0]

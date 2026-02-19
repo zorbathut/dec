@@ -53,7 +53,7 @@ namespace DecTest
         private Func<string, bool> errorValidator = null;
         private Func<string, bool> warningValidator = null;
 
-        [OneTimeSetUp]
+        [SetUp]
         public void PrepHooks()
         {
             Dec.Config.InfoHandler = str =>

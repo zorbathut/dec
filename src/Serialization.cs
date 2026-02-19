@@ -175,15 +175,10 @@ namespace Dec
 
                     return converter;
                 }
-                else
-                {
-                    // stub it out so we can do the fast path next time
-                    ConverterObjects[inputType] = null;
-                }
             }
 
             var factoriedConverter = Config.ConverterFactory?.Invoke(inputType);
-            ConverterObjects[inputType] = factoriedConverter;   // cache this so we don't generate a million of them
+            ConverterObjects[inputType] = factoriedConverter;   // cache this so we don't generate a million of them; might be null if there's nothing!
             return factoriedConverter;
         }
 
