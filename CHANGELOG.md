@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 
-## [Unreleased]
+## [v0.11.0]
 ### Added
 * Official net10.0 support (nothing changed aside from adding a build target.)
 * Config.CompatDecLookup for remapping old Dec names to new Dec names during lookup, useful for backwards compatibility when renaming Decs.
