@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [unreleased]
 ### Breaking
-* Recorder.WriteValidation(), Composer.ComposeValidation(), Config.UnitTestParameters, and Index.Clear() are now internal. These were testing-only APIs not intended for external use.
+* Recorder.WriteValidation(), Composer.ComposeValidation(), Config.UnitTestParameters, and Index.Clear() are now internal. These were testing-only APIs not intended for external use. If you were using these, let me know!
 
 ### Fixed
 * Race condition in Serialization.Initialize().
