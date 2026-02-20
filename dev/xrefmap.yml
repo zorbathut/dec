@@ -31,19 +31,6 @@ references:
   commentId: T:Dec.Composer
   fullName: Dec.Composer
   nameWithType: Composer
-- uid: Dec.Composer.ComposeValidation(Dec.Recorder.IUserSettings)
-  name: ComposeValidation(IUserSettings)
-  href: api/Dec.Composer.html#Dec_Composer_ComposeValidation_Dec_Recorder_IUserSettings_
-  commentId: M:Dec.Composer.ComposeValidation(Dec.Recorder.IUserSettings)
-  fullName: Dec.Composer.ComposeValidation(Dec.Recorder.IUserSettings)
-  nameWithType: Composer.ComposeValidation(Recorder.IUserSettings)
-- uid: Dec.Composer.ComposeValidation*
-  name: ComposeValidation
-  href: api/Dec.Composer.html#Dec_Composer_ComposeValidation_
-  commentId: Overload:Dec.Composer.ComposeValidation
-  isSpec: "True"
-  fullName: Dec.Composer.ComposeValidation
-  nameWithType: Composer.ComposeValidation
 - uid: Dec.Composer.ComposeXml(System.Boolean,Dec.Recorder.IUserSettings)
   name: ComposeXml(bool, IUserSettings)
   href: api/Dec.Composer.html#Dec_Composer_ComposeXml_System_Boolean_Dec_Recorder_IUserSettings_
@@ -179,30 +166,6 @@ references:
   isSpec: "True"
   fullName: Dec.Config.InfoHandler
   nameWithType: Config.InfoHandler
-- uid: Dec.Config.UnitTestParameters
-  name: Config.UnitTestParameters
-  href: api/Dec.Config.UnitTestParameters.html
-  commentId: T:Dec.Config.UnitTestParameters
-  fullName: Dec.Config.UnitTestParameters
-  nameWithType: Config.UnitTestParameters
-- uid: Dec.Config.UnitTestParameters.explicitConverters
-  name: explicitConverters
-  href: api/Dec.Config.UnitTestParameters.html#Dec_Config_UnitTestParameters_explicitConverters
-  commentId: F:Dec.Config.UnitTestParameters.explicitConverters
-  fullName: Dec.Config.UnitTestParameters.explicitConverters
-  nameWithType: Config.UnitTestParameters.explicitConverters
-- uid: Dec.Config.UnitTestParameters.explicitStaticRefs
-  name: explicitStaticRefs
-  href: api/Dec.Config.UnitTestParameters.html#Dec_Config_UnitTestParameters_explicitStaticRefs
-  commentId: F:Dec.Config.UnitTestParameters.explicitStaticRefs
-  fullName: Dec.Config.UnitTestParameters.explicitStaticRefs
-  nameWithType: Config.UnitTestParameters.explicitStaticRefs
-- uid: Dec.Config.UnitTestParameters.explicitTypes
-  name: explicitTypes
-  href: api/Dec.Config.UnitTestParameters.html#Dec_Config_UnitTestParameters_explicitTypes
-  commentId: F:Dec.Config.UnitTestParameters.explicitTypes
-  fullName: Dec.Config.UnitTestParameters.explicitTypes
-  nameWithType: Config.UnitTestParameters.explicitTypes
 - uid: Dec.Config.UsingNamespaces
   name: UsingNamespaces
   href: api/Dec.Config.html#Dec_Config_UsingNamespaces
@@ -2273,22 +2236,6 @@ references:
   fullName.vb: Dec.Recorder.WriteSimple(Of T)(T, String, Dec.Recorder.IUserSettings)
   nameWithType: Recorder.WriteSimple<T>(T, string, Recorder.IUserSettings)
   nameWithType.vb: Recorder.WriteSimple(Of T)(T, String, Recorder.IUserSettings)
-- uid: Dec.Recorder.WriteValidation*
-  name: WriteValidation
-  href: api/Dec.Recorder.html#Dec_Recorder_WriteValidation_
-  commentId: Overload:Dec.Recorder.WriteValidation
-  isSpec: "True"
-  fullName: Dec.Recorder.WriteValidation
-  nameWithType: Recorder.WriteValidation
-- uid: Dec.Recorder.WriteValidation``1(``0,Dec.Recorder.IUserSettings)
-  name: WriteValidation<T>(T, IUserSettings)
-  href: api/Dec.Recorder.html#Dec_Recorder_WriteValidation__1___0_Dec_Recorder_IUserSettings_
-  commentId: M:Dec.Recorder.WriteValidation``1(``0,Dec.Recorder.IUserSettings)
-  name.vb: WriteValidation(Of T)(T, IUserSettings)
-  fullName: Dec.Recorder.WriteValidation<T>(T, Dec.Recorder.IUserSettings)
-  fullName.vb: Dec.Recorder.WriteValidation(Of T)(T, Dec.Recorder.IUserSettings)
-  nameWithType: Recorder.WriteValidation<T>(T, Recorder.IUserSettings)
-  nameWithType.vb: Recorder.WriteValidation(Of T)(T, Recorder.IUserSettings)
 - uid: Dec.Recorder.Write``1(``0,System.Boolean,Dec.Recorder.IUserSettings)
   name: Write<T>(T, bool, IUserSettings)
   href: api/Dec.Recorder.html#Dec_Recorder_Write__1___0_System_Boolean_Dec_Recorder_IUserSettings_

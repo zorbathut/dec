@@ -74,20 +74,6 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/Dec.Config.UnitTestParameters.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/Dec.Config.UnitTestParameters.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "Dec.Config.UnitTestParameters",
-      "Summary": "<p sourcefile=\"api/Dec.Config.UnitTestParameters.yml\" sourcestartlinenumber=\"1\">Used for unit tests. Not recommended or supported for actual code.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/Dec.Config.yml",
       "output": {
         ".html": {
