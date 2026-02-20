@@ -40,23 +40,12 @@ namespace DecTest
             // Verify it works single-threaded first.
             Dec.Recorder.Checksum(new ConverterTargetType { value = 42 });
 
-            // Thread-safe error/exception collection for the parallel section.
-            var errors = new ConcurrentBag<string>();
-            var exceptions = new ConcurrentBag<Exception>();
-
-            Dec.Config.ErrorHandler = str => errors.Add(str);
-            Dec.Config.WarningHandler = str => { };
-            Dec.Config.ExceptionHandler = e => exceptions.Add(e);
-
             int threadCount = Math.Max(Environment.ProcessorCount, 4);
             int iterations = 200;
             int failedIterations = 0;
 
             for (int iter = 0; iter < iterations; iter++)
             {
-                errors = new ConcurrentBag<string>();
-                exceptions = new ConcurrentBag<Exception>();
-
                 // Reset serialization state so Initialize() must run again.
                 // Database.Clear() calls Serialization.Clear() internally.
                 Dec.Database.Clear();
@@ -68,6 +57,7 @@ namespace DecTest
                 // to use the empty (not yet populated) ConverterObjects dictionary.
                 var barrier = new Barrier(threadCount);
                 var threads = new Thread[threadCount];
+                var exceptions = new ConcurrentBag<Exception>();
 
                 for (int i = 0; i < threadCount; i++)
                 {
@@ -91,7 +81,7 @@ namespace DecTest
                     t.Join();
                 }
 
-                if (!errors.IsEmpty || !exceptions.IsEmpty)
+                if (!exceptions.IsEmpty)
                 {
                     failedIterations++;
                 }

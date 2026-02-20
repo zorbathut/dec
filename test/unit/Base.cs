@@ -45,13 +45,13 @@ namespace DecTest
             AssertWrapper.Assert.FailureCallback = null;
         }
 
-        private bool handlingWarnings = false;
-        private bool handledWarning = false;
+        [ThreadStatic] private static bool handlingWarnings;
+        [ThreadStatic] private static bool handledWarning;
 
-        private bool handlingErrors = false;
-        private bool handledError = false;
-        private Func<string, bool> errorValidator = null;
-        private Func<string, bool> warningValidator = null;
+        [ThreadStatic] private static bool handlingErrors;
+        [ThreadStatic] private static bool handledError;
+        [ThreadStatic] private static Func<string, bool> errorValidator;
+        [ThreadStatic] private static Func<string, bool> warningValidator;
 
         [SetUp]
         public void PrepHooks()
@@ -157,7 +157,7 @@ namespace DecTest
             Tolerate,
             Expect,
         }
-        private bool withinExpect = false;
+        [ThreadStatic] private static bool withinExpect;
         protected void ExpectGeneral(Action action, string context = "unlabeled context", ExpectationType warning = ExpectationType.Disallow, Func<string, bool> warningValidator = null, ExpectationType error = ExpectationType.Disallow, Func<string, bool> errorValidator = null)
         {
             Assert.IsFalse(withinExpect);
@@ -169,7 +169,7 @@ namespace DecTest
                 Assert.IsFalse(handlingWarnings, "Already handling warnings");
                 handlingWarnings = true;
                 handledWarning = false;
-                this.warningValidator = warningValidator;
+                Base.warningValidator = warningValidator;
             }
 
             if (error != ExpectationType.Disallow)
@@ -177,7 +177,7 @@ namespace DecTest
                 Assert.IsFalse(handlingErrors, "Already handling errors");
                 handlingErrors = true;
                 handledError = false;
-                this.errorValidator = errorValidator;
+                Base.errorValidator = errorValidator;
             }
 
             // Execute the action
@@ -202,7 +202,7 @@ namespace DecTest
             {
                 handlingWarnings = false;
                 handledWarning = false;
-                this.warningValidator = null;
+                Base.warningValidator = null;
             }
 
             // Reset state for errors
@@ -210,7 +210,7 @@ namespace DecTest
             {
                 handlingErrors = false;
                 handledError = false;
-                this.errorValidator = null;
+                Base.errorValidator = null;
             }
 
             withinExpect = false;
