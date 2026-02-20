@@ -538,6 +538,15 @@ namespace Dec
             }
         }
 
+        // These caches depend only on type metadata (attributes/inheritance), not database contents,
+        // so they never need clearing in normal operation. Exposed for thread-safety tests that need
+        // to force concurrent cache re-population.
+        internal static void ClearStaticCachesForTest()
+        {
+            GetDecDatabaseStatusCache.Clear();
+            GetDecRootTypeCache.Clear();
+        }
+
         static UtilType()
         {
             // seed the cache
@@ -551,7 +560,7 @@ namespace Dec
             Root,
             Branch,
         }
-        private static Dictionary<Type, DecDatabaseStatus> GetDecDatabaseStatusCache = new Dictionary<Type, DecDatabaseStatus>();
+        private static ConcurrentDictionary<Type, DecDatabaseStatus> GetDecDatabaseStatusCache = new ConcurrentDictionary<Type, DecDatabaseStatus>();
         internal static DecDatabaseStatus GetDecDatabaseStatus(this Type type)
         {
             if (!GetDecDatabaseStatusCache.TryGetValue(type, out var result))
@@ -592,13 +601,13 @@ namespace Dec
                     result = DecDatabaseStatus.Branch;
                 }
 
-                GetDecDatabaseStatusCache.Add(type, result);
+                GetDecDatabaseStatusCache[type] = result;
             }
 
             return result;
         }
 
-        private static Dictionary<Type, Type> GetDecRootTypeCache = new Dictionary<Type, Type>();
+        private static ConcurrentDictionary<Type, Type> GetDecRootTypeCache = new ConcurrentDictionary<Type, Type>();
         internal static Type GetDecRootType(this Type type)
         {
             if (!GetDecRootTypeCache.TryGetValue(type, out var result))
@@ -619,7 +628,7 @@ namespace Dec
                     result = currentType;
                 }
 
-                GetDecRootTypeCache.Add(type, result);
+                GetDecRootTypeCache[type] = result;
             }
 
             return result;
