@@ -25,7 +25,7 @@ namespace Dec
             }
         }
 
-        public string ComposeValidation(Recorder.IUserSettings userSettings = null)
+        internal string ComposeValidation(Recorder.IUserSettings userSettings = null)
         {
             Serialization.Initialize();
 

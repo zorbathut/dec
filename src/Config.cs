@@ -173,10 +173,7 @@ namespace Dec
         /// </remarks>
         public static Func<Type, Converter> ConverterFactory;
 
-        /// <summary>
-        /// Used for unit tests. Not recommended or supported for actual code.
-        /// </summary>
-        public class UnitTestParameters
+        internal class UnitTestParameters
         {
             public Type[] explicitTypes = null;
             public Type[] explicitStaticRefs = null;

@@ -126,9 +126,15 @@ namespace DecTest
             PrepCwd();
         }
 
-        public static void UpdateTestParameters(Dec.Config.UnitTestParameters parameters)
+        internal static void UpdateTestParameters(Dec.Config.UnitTestParameters parameters)
         {
             typeof(Dec.Config).GetField("TestParameters", BindingFlags.NonPublic | BindingFlags.Static).SetValue(null, parameters);
+        }
+
+        // Public entry point for runtime-compiled test harnesses (golden tests) that can't access internal types.
+        public static void UpdateTestParametersExplicitTypes(Type[] explicitTypes)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = explicitTypes });
         }
 
         public static void UpdateTestRefEverything(bool testRefEverything)

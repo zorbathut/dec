@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 
 
 ## [unreleased]
+### Breaking
+* Recorder.WriteValidation(), Composer.ComposeValidation(), Config.UnitTestParameters, and Index.Clear() are now internal. These were testing-only APIs not intended for external use.
+
 ### Fixed
 * Race condition in Serialization.Initialize() where parallel Recorder/Checksum calls could see partially-populated converter dictionaries.
 * Missing converter initialization in Composer, which could cause errors when using converters without a preceding Parser.Finish() call.

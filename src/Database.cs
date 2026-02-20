@@ -340,7 +340,7 @@ namespace Dec
         /// Clears all global dec state, preparing the environment for a new Parser run.
         /// </summary>
         /// <remarks>
-        /// This exists mostly for the sake of unit tests. It is generally not recommended to use this during actual gameplay. Be aware that re-parsing XML files will create an entire new set of Dec objects, it will not replace data in existing objects.
+        /// Be aware that re-parsing XML files will create an entire new set of Dec objects, it will not replace data in existing objects. This may be useful for reloading the game environment for the sake of editors or mods, but should not be used during gameplay.
         /// </remarks>
         public static void Clear()
         {

@@ -18,10 +18,7 @@ namespace Dec
         /// <summary>
         /// Clears all index state, preparing the environment for a new Parser run.
         /// </summary>
-        /// <remarks>
-        /// This exists mostly for the sake of unit tests, but can be used in production as well.
-        /// </remarks>
-        public static void Clear()
+        internal static void Clear()
         {
             foreach (var db in Indices)
             {

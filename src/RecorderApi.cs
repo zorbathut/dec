@@ -43,7 +43,7 @@ namespace Dec
         /// <summary>
         /// Returns C# validation code starting at an option.
         /// </summary>
-        public static string WriteValidation<T>(T target, Recorder.IUserSettings userSettings = null)
+        internal static string WriteValidation<T>(T target, Recorder.IUserSettings userSettings = null)
         {
             Serialization.Initialize();
 
