@@ -45,6 +45,8 @@ namespace Dec
         /// </summary>
         public static string WriteValidation<T>(T target, Recorder.IUserSettings userSettings = null)
         {
+            Serialization.Initialize();
+
             using (var _ = new CultureInfoScope(Config.CultureInfo))
             {
                 var writerContext = new WriterValidationRecord(userSettings);

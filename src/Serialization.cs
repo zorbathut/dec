@@ -13,11 +13,11 @@ namespace Dec
     /// </summary>
     internal static class Serialization
     {
-        // Initialize it to empty in order to support Recorder operations without Dec initialization.
-        // At some point we'll figure out how to support Converters at that point as well.
-        internal static bool ConverterInitialized = false;
-        internal static System.Collections.Concurrent.ConcurrentDictionary<Type, Converter> ConverterObjects = new System.Collections.Concurrent.ConcurrentDictionary<Type, Converter>();
-        internal static System.Collections.Concurrent.ConcurrentDictionary<Type, Type> ConverterGenericPrototypes = new System.Collections.Concurrent.ConcurrentDictionary<Type, Type>();
+        // These start null and are populated by Initialize(). Initialize() builds complete
+        // dictionaries locally then swaps the references, so no thread ever sees a partially-populated dict.
+        // ConverterObjects being non-null is the signal that initialization is complete.
+        internal static System.Collections.Concurrent.ConcurrentDictionary<Type, Converter> ConverterObjects = null;
+        internal static System.Collections.Concurrent.ConcurrentDictionary<Type, Type> ConverterGenericPrototypes = null;
 
         internal class ConverterNullableString<T> : ConverterString<T?> where T : struct
         {
@@ -122,6 +122,12 @@ namespace Dec
 
         internal static Converter ConverterFor(Type inputType)
         {
+            if (ConverterObjects == null)
+            {
+                Dbg.Err($"Attempting to look up converter for {inputType} before initialization");
+                return null;
+            }
+
             if (ConverterObjects.TryGetValue(inputType, out var converter))
             {
                 return converter;
@@ -185,15 +191,13 @@ namespace Dec
 
         internal static void Initialize()
         {
-            if (ConverterInitialized)
+            if (ConverterObjects != null)
             {
                 return;
             }
 
-            // this is here just so we don't keep thrashing if something breaks
-            ConverterInitialized = true;
-
-            ConverterObjects = new System.Collections.Concurrent.ConcurrentDictionary<Type, Converter>();
+            var converterObjects = new System.Collections.Concurrent.ConcurrentDictionary<Type, Converter>();
+            var converterGenericPrototypes = new System.Collections.Concurrent.ConcurrentDictionary<Type, Type>();
 
             IEnumerable<Type> conversionTypes;
             if (Config.TestParameters == null)
@@ -236,12 +240,12 @@ namespace Dec
                     }
 
                     converterTarget = converterTarget.GetGenericTypeDefinition();
-                    if (ConverterGenericPrototypes.ContainsKey(converterTarget))
+                    if (converterGenericPrototypes.ContainsKey(converterTarget))
                     {
-                        Dbg.Err($"Found multiple converters for {converterTarget}: {ConverterGenericPrototypes[converterTarget]} and {type}");
+                        Dbg.Err($"Found multiple converters for {converterTarget}: {converterGenericPrototypes[converterTarget]} and {type}");
                     }
 
-                    ConverterGenericPrototypes[converterTarget] = type;
+                    converterGenericPrototypes[converterTarget] = type;
                     continue;
                 }
 
@@ -249,15 +253,19 @@ namespace Dec
                 if (converter != null && (converter is ConverterString || converter is ConverterRecord || converter is ConverterFactory))
                 {
                     Type convertedType = converter.GetConvertedTypeHint();
-                    if (ConverterObjects.ContainsKey(convertedType))
+                    if (converterObjects.ContainsKey(convertedType))
                     {
-                        Dbg.Err($"Found multiple converters for {convertedType}: {ConverterObjects[convertedType]} and {type}");
+                        Dbg.Err($"Found multiple converters for {convertedType}: {converterObjects[convertedType]} and {type}");
                     }
 
-                    ConverterObjects[convertedType] = converter;
+                    converterObjects[convertedType] = converter;
                     continue;
                 }
             }
+
+            // Set ConverterGenericPrototypes first; ConverterObjects being non-null is the signal that initialization is complete.
+            ConverterGenericPrototypes = converterGenericPrototypes;
+            ConverterObjects = converterObjects;
         }
 
         internal static object GenerateResultFallback(object model, Type type)
@@ -2089,9 +2097,8 @@ namespace Dec
 
         internal static void Clear()
         {
-            ConverterInitialized = false;
-            ConverterObjects = new System.Collections.Concurrent.ConcurrentDictionary<Type, Converter>();
-            ConverterGenericPrototypes = new System.Collections.Concurrent.ConcurrentDictionary<Type, Type>();
+            ConverterObjects = null;
+            ConverterGenericPrototypes = null;
         }
     }
 }

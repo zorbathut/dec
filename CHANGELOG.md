@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 
 
+## [unreleased]
+### Fixed
+* Race condition in Serialization.Initialize() where parallel Recorder/Checksum calls could see partially-populated converter dictionaries.
+* Missing converter initialization in Composer, which could cause errors when using converters without a preceding Parser.Finish() call.
+
+
 ## [v0.11.0]
 ### Added
 * Official net10.0 support (nothing changed aside from adding a build target.)

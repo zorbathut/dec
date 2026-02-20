@@ -10,6 +10,8 @@ namespace Dec
     {
         public string ComposeXml(bool pretty, Recorder.IUserSettings userSettings = null)
         {
+            Serialization.Initialize();
+
             using (var _ = new CultureInfoScope(Config.CultureInfo))
             {
                 var writerContext = new WriterXmlCompose(userSettings);
@@ -25,6 +27,8 @@ namespace Dec
 
         public string ComposeValidation(Recorder.IUserSettings userSettings = null)
         {
+            Serialization.Initialize();
+
             using (var _ = new CultureInfoScope(Config.CultureInfo))
             {
                 var writerContext = new WriterValidationCompose(userSettings);
