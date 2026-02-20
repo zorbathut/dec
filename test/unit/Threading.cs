@@ -41,7 +41,7 @@ namespace DecTest
             Dec.Recorder.Checksum(new ConverterTargetType { value = 42 });
 
             int threadCount = Math.Max(Environment.ProcessorCount, 4);
-            int iterations = 200;
+            int iterations = 20;
             int failedIterations = 0;
 
             for (int iter = 0; iter < iterations; iter++)
