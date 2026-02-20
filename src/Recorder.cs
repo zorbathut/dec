@@ -351,6 +351,7 @@ namespace Dec
         /// Also, be aware that excessively deep hierarchies full of factory callbacks may result in performance issues when writing pretty-print XML; this is not likely to be a problem in normal code, however.
         /// For performance's sake, this function does not duplicate `factories` and may modify it for efficiency reasons.
         /// It can be reused, but should not be modified by the user once passed into a function once.
+        /// Recorder may modify this for caching purposes; if using multithreading, each concurrent Recorder call must use its own `factories` dictionary instance.
         ///
         /// This is incompatible with Shared().
         /// </remarks>
