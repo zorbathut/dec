@@ -6,6 +6,9 @@ All notable changes to this project will be documented in this file.
 ### Breaking
 * Recorder.WriteValidation(), Composer.ComposeValidation(), Config.UnitTestParameters, and Index.Clear() are now internal. These were testing-only APIs not intended for external use. If you were using these, let me know!
 
+### Improved
+* Dictionary checksums can now deal with shared objects introduced in the Value (though still not in the Key).
+
 ### Fixed
 * Race condition in Serialization.Initialize().
 * Missing converter initialization in Composer.

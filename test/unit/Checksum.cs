@@ -532,6 +532,76 @@ namespace DecTest
             ChecksumDiffTests(value1, value2);
         }
 
+        private class DictValueSharedRefTester : Dec.IRecordable
+        {
+            public Dictionary<string, StubRecordable> dict;
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Shared().Record(ref dict, nameof(dict));
+            }
+        }
+
+        [Test]
+        public void DictionaryValueSharedRef()
+        {
+            var sharedObj = new StubRecordable();
+            var value1 = new DictValueSharedRefTester
+            {
+                dict = new Dictionary<string, StubRecordable> { { "a", sharedObj }, { "b", sharedObj } },
+            };
+            var value2 = new DictValueSharedRefTester
+            {
+                dict = new Dictionary<string, StubRecordable> { { "a", new StubRecordable() }, { "b", new StubRecordable() } },
+            };
+
+            ulong checksum1 = Dec.Recorder.Checksum(value1);
+            ulong checksum2 = Dec.Recorder.Checksum(value2);
+
+            Assert.AreNotEqual(checksum1, checksum2, "Shared vs non-shared dictionary values should produce different checksums");
+            Assert.AreEqual(checksum1, Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), "Cloned shared-ref dictionary should produce the same checksum");
+
+            ChecksumDiffTests(value1, value2);
+        }
+
+        private class DictKeySharedRefTester : Dec.IRecordable
+        {
+            public Dictionary<StubRecordable, StubRecordable> dict;
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Shared().Record(ref dict, nameof(dict));
+            }
+        }
+
+        [Test]
+        public void DictionaryKeySharedRef()
+        {
+            var keyA = new StubRecordable();
+            var value1 = new DictKeySharedRefTester
+            {
+                dict = new Dictionary<StubRecordable, StubRecordable> { { keyA, keyA } },
+            };
+            var keyB = new StubRecordable();
+            var keyC = new StubRecordable();
+            var value2 = new DictKeySharedRefTester
+            {
+                dict = new Dictionary<StubRecordable, StubRecordable> { { keyB, keyB }, { keyC, keyC } },
+            };
+
+            ulong checksum1 = 0;
+            ulong checksum2 = 0;
+
+            ExpectErrors(() => checksum1 = Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)));
+            ExpectErrors(() => checksum2 = Dec.Recorder.Checksum(value2));
+
+            ulong checksum3 = 0;
+
+            ExpectErrors(() => checksum3 = Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)));
+
+            // these aren't really guaranteed due to how messy this is, but it will probably be true on a local machine, at least
+            Assert.AreNotEqual(checksum1, checksum2, "Different dictionary-key-shared-ref objects should produce different checksums");
+            Assert.AreEqual(checksum1, checksum3, "Identical dictionary-key-shared-ref objects should produce the same checksums");
+        }
+
         class StubRecordableChildA : StubRecordable { }
         class StubRecordableChildB : StubRecordable { }
 

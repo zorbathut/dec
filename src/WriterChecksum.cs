@@ -349,23 +349,74 @@ namespace Dec
             writer.AddChecksum((int)NodeTag.Dictionary, Path);
             writer.AddChecksum((ulong)value.Count, Path);
 
-            // This is a weird setup.
-            // We want to be order-independent here, but we don't know what order dictionary keys are in.
-            // My current solution is to accumulate the checksum of the keys and XOR them.
-            // These are full key/value checksums, not independent, so this should be immune to [A,A], [B,B] vs [A,B], [B,A] issues.
-            ulong accumulator = 0;
+            // Dictionary iteration order is non-deterministic, which breaks reference
+            // tracking (we can't assign stable reference IDs if encounter order varies).
+            //
+            // Solution: checksum each key in unordered mode, then sort entries by key
+            // checksum to get a canonical order. Values are then serialized in that
+            // sorted order as ordered children, where reference tracking works normally.
+            //
+            // If two keys produce the same checksum (hash collision), we can't
+            // canonically order their values, so those fall back to unordered
+            // accumulation — no worse than the previous fully-unordered behavior.
+            //
+            // Key checksums are always paired with their values in the same checksum
+            // block. Without pairing, {[A,A],[B,B]} and {[A,B],[B,A]} produce the same
+            // checksum since both key and value sums are independently commutative.
+
+            // Phase 1: Compute key checksums in unordered mode for sorting. Any key
+            // references are added to seenReferencesUnordered, same as before.
+            var entries = new List<(ulong keyChecksum, object val)>();
             foreach (DictionaryEntry entry in value)
             {
                 ulong push = writer.PushChecksum();
                 Serialization.ComposeElement(CreateNamedChild("key", true, RecorderSettings.CreateChild(), new PathMember(Path, "key")), entry.Key, typeof(object));
-                Serialization.ComposeElement(CreateNamedChild("val", true, RecorderSettings.CreateChild(), new PathMember(Path, "val")), entry.Value, referencedType);
-                ulong result = writer.PopChecksum(push);
+                ulong keyChecksum = writer.PopChecksum(push);
 
-                // this is a weird way to combine, but this avoids issues where pairs of identical items cancel out, and I haven't found a good case where this doesn't work
-                accumulator += result;
+                entries.Add((keyChecksum, entry.Value));
             }
 
-            writer.AddChecksum(accumulator, Path);
+            // Phase 2: Sort by key checksum for canonical value ordering.
+            entries.Sort((a, b) => a.keyChecksum.CompareTo(b.keyChecksum));
+
+            // Phase 3: Serialize paired (key checksum + value) blocks in sorted order.
+            int i = 0;
+            while (i < entries.Count)
+            {
+                int groupStart = i;
+                ulong groupKey = entries[i].keyChecksum;
+
+                // Find extent of entries sharing this key checksum.
+                while (i < entries.Count && entries[i].keyChecksum == groupKey)
+                {
+                    i++;
+                }
+
+                if (i - groupStart == 1)
+                {
+                    // Unique key checksum: this entry has a deterministic position.
+                    // Pair the key checksum with the value, serialized as ordered.
+                    writer.AddChecksum(entries[groupStart].keyChecksum, Path);
+                    Serialization.ComposeElement(CreateNamedChild("val", false, RecorderSettings.CreateChild(), new PathIndex(Path, groupStart)), entries[groupStart].val, referencedType);
+                }
+                else
+                {
+                    // Colliding key checksums: can't determine canonical order among
+                    // these entries. Pair each key checksum with its value, then
+                    // accumulate pairs order-independently (addition, not XOR, so
+                    // identical pairs don't cancel out).
+                    ulong groupAccumulator = 0;
+                    for (int j = groupStart; j < i; j++)
+                    {
+                        ulong push = writer.PushChecksum();
+                        writer.AddChecksum(entries[j].keyChecksum, Path);
+                        Serialization.ComposeElement(CreateNamedChild("val", true, RecorderSettings.CreateChild(), new PathMember(Path, "val")), entries[j].val, referencedType);
+                        ulong result = writer.PopChecksum(push);
+                        groupAccumulator += result;
+                    }
+                    writer.AddChecksum(groupAccumulator, Path);
+                }
+            }
         }
 
         public override void WriteHashSet(IEnumerable value)
