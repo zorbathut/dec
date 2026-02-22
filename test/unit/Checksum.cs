@@ -2,6 +2,7 @@
 using Dec;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 
 namespace DecTest
@@ -600,6 +601,56 @@ namespace DecTest
             // these aren't really guaranteed due to how messy this is, but it will probably be true on a local machine, at least
             Assert.AreNotEqual(checksum1, checksum2, "Different dictionary-key-shared-ref objects should produce different checksums");
             Assert.AreEqual(checksum1, checksum3, "Identical dictionary-key-shared-ref objects should produce the same checksums");
+        }
+
+        private class DictCollidingKeysOrderTester : Dec.IRecordable
+        {
+            public Dictionary<StubRecordable, StubRecordableInt> dict;
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Shared().Record(ref dict, nameof(dict));
+            }
+        }
+
+        [Test]
+        public void DictionaryCollidingKeysOrder()
+        {
+            // StubRecordable has an empty Record(), so all instances produce identical key checksums,
+            // forcing the collision path in WriteDictionary. Two dictionaries with the same
+            // (key_checksum, value_checksum) pairs but different insertion order should produce
+            // the same checksum, since dictionary order is not semantically meaningful.
+            var value1 = new DictCollidingKeysOrderTester
+            {
+                dict = new Dictionary<StubRecordable, StubRecordableInt>
+                {
+                    { new StubRecordable(), new StubRecordableInt { data = 1 } },
+                    { new StubRecordable(), new StubRecordableInt { data = 2 } },
+                },
+            };
+            DictCollidingKeysOrderTester value2;
+
+            // keep resetting value2 until we get a different dictionary iteration order
+            while (true)
+            {
+                value2 = new DictCollidingKeysOrderTester
+                {
+                    dict = new Dictionary<StubRecordable, StubRecordableInt>
+                    {
+                        { new StubRecordable(), new StubRecordableInt { data = 2 } },
+                        { new StubRecordable(), new StubRecordableInt { data = 1 } },
+                    },
+                };
+
+                if (value1.dict.First().Value != value2.dict.First().Value)
+                {
+                    break;
+                }
+            }
+
+            ulong checksum1 = Dec.Recorder.Checksum(value1);
+            ulong checksum2 = Dec.Recorder.Checksum(value2);
+
+            Assert.AreEqual(checksum1, checksum2, "Dictionaries with same content in different insertion order should have equal checksums");
         }
 
         class StubRecordableChildA : StubRecordable { }
