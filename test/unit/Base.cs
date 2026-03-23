@@ -40,6 +40,8 @@ namespace DecTest
 
             withinExpect = false;
 
+            Dec.Config.TestForceFallbackArray = false;
+
             Dec.Config.UsingNamespaces = new string[0];
 
             AssertWrapper.Assert.FailureCallback = null;

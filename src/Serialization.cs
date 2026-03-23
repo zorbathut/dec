@@ -1243,7 +1243,7 @@ namespace Dec
                             if (!match)
                             {
                                 // Otherwise just make a new one, no harm done.
-                                array = Array.CreateInstance(referencedType, arrayDimensions);
+                                array = UtilType.CreateDynamicArray(referencedType, arrayDimensions);
                             }
 
                             break;
@@ -1262,7 +1262,7 @@ namespace Dec
                             startOffset = oldArray.Length;
                             var arrayDimensions = node.GetArrayDimensions(type.GetArrayRank());
                             arrayDimensions[0] += startOffset;
-                            array = Array.CreateInstance(referencedType, arrayDimensions);
+                            array = UtilType.CreateDynamicArray(referencedType, arrayDimensions);
                             if (arrayDimensions.Length == 1)
                             {
                                 oldArray.CopyTo(array, 0);

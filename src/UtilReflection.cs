@@ -218,7 +218,7 @@ namespace Dec
             {
                 // Special handling, we need a fancy constructor with an int array parameter
                 // Conveniently, arrays are really easy to deal with in this pathway :D
-                return Array.CreateInstance(type.GetElementType(), node.GetArrayDimensions(type.GetArrayRank()));
+                return UtilType.CreateDynamicArray(type.GetElementType(), node.GetArrayDimensions(type.GetArrayRank()));
             }
             else if (!type.IsValueType && type.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { }, null) == null)
             {

@@ -3,6 +3,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 namespace Dec
@@ -795,6 +797,38 @@ namespace Dec
                 dimensions[i] = array.GetLength(i);
             }
             return dimensions;
+        }
+
+        private static readonly ConcurrentDictionary<Type, Func<int, Array>> ArrayCreators1D = new ConcurrentDictionary<Type, Func<int, Array>>();
+
+        internal static Array CreateDynamicArray(Type elementType, int[] dimensions)
+        {
+            // Use IL-generated array creators for 1D arrays when dynamic code is supported (not AOT)
+            if (dimensions.Length == 1 && RuntimeFeature.IsDynamicCodeSupported && !Config.TestForceFallbackArray)
+            {
+                var creator = ArrayCreators1D.GetOrAdd(elementType, type =>
+                {
+                    var dynamicMethod = new DynamicMethod(
+                        $"CreateArray1D_{type.FullName}",
+                        typeof(Array),
+                        new[] { typeof(int) },
+                        typeof(UtilType).Module,
+                        true);
+
+                    var il = dynamicMethod.GetILGenerator();
+                    il.Emit(OpCodes.Ldarg_0);
+                    il.Emit(OpCodes.Newarr, type);
+                    il.Emit(OpCodes.Ret);
+
+                    return (Func<int, Array>)dynamicMethod.CreateDelegate(typeof(Func<int, Array>));
+                });
+
+                return creator(dimensions[0]);
+            }
+            else
+            {
+                return Array.CreateInstance(elementType, dimensions);
+            }
         }
     }
 }
