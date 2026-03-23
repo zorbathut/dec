@@ -1,0 +1,1112 @@
+{
+  "source_base_path": "/home/runner/work/dec/dec/doc",
+  "xrefmap": "xrefmap.yml",
+  "files": [
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.AbstractAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.AbstractAttribute.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.AbstractAttribute",
+      "Summary": "<p sourcefile=\"api/Dec.AbstractAttribute.yml\" sourcestartlinenumber=\"1\">Signals that this Dec-deriving class is not a valid database root. No classes of this type will be instantiated and children of this class will have their own namespaces.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.CloneClassAsSharedRef.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.CloneClassAsSharedRef.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.CloneClassAsSharedRef",
+      "Summary": "<p sourcefile=\"api/Dec.CloneClassAsSharedRef.yml\" sourcestartlinenumber=\"1\">Signals that this class should be &quot;cloned&quot; by simply duplicating the reference.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.CloneStructPiecewiseAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.CloneStructPiecewiseAttribute.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.CloneStructPiecewiseAttribute",
+      "Summary": "<p sourcefile=\"api/Dec.CloneStructPiecewiseAttribute.yml\" sourcestartlinenumber=\"1\">Signals that this struct should be cloned with standard shallow-copy assignment semantics.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.Composer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.Composer.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.Composer",
+      "Summary": "<p sourcefile=\"api/Dec.Composer.yml\" sourcestartlinenumber=\"1\">Handles writing dec structures into files. Generally useful for in-game editors.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.Config.DefaultExceptionBehavior.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.Config.DefaultExceptionBehavior.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.Config.DefaultExceptionBehavior",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.Config.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.Config.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.Config",
+      "Summary": "<p sourcefile=\"api/Dec.Config.yml\" sourcestartlinenumber=\"1\">Contains global configuration data that may be needed before parsing.\nInitialize as soon as possible.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.Context.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.Context.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.Context",
+      "Summary": "<p sourcefile=\"api/Dec.Context.yml\" sourcestartlinenumber=\"1\">Information on the current cursor position when reading files.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.ConverterFactory-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.ConverterFactory-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.ConverterFactory<T>",
+      "Summary": "<p sourcefile=\"api/Dec.ConverterFactory-1.yml\" sourcestartlinenumber=\"1\">Base class for converting to arbitrary types via the Recorder API, with full control over the object creation process.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.ConverterFactoryDynamic.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.ConverterFactoryDynamic.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.ConverterFactoryDynamic",
+      "Summary": "<p sourcefile=\"api/Dec.ConverterFactoryDynamic.yml\" sourcestartlinenumber=\"1\">Alternate dynamic-typed class for converting to arbitrary types via the Recorder API, with full control over the object creation process.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.ConverterReadException.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.ConverterReadException.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.ConverterReadException",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.ConverterRecord-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.ConverterRecord-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.ConverterRecord<T>",
+      "Summary": "<p sourcefile=\"api/Dec.ConverterRecord-1.yml\" sourcestartlinenumber=\"1\">Base class for converting to arbitrary types via the Recorder API.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.ConverterRecordDynamic.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.ConverterRecordDynamic.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.ConverterRecordDynamic",
+      "Summary": "<p sourcefile=\"api/Dec.ConverterRecordDynamic.yml\" sourcestartlinenumber=\"1\">Alternate dynamic-typed class for converting to arbitrary types via the Recorder API.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.ConverterString-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.ConverterString-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.ConverterString<T>",
+      "Summary": "<p sourcefile=\"api/Dec.ConverterString-1.yml\" sourcestartlinenumber=\"1\">Base class for converting to arbitrary types via strings.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.ConverterStringDynamic.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.ConverterStringDynamic.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.ConverterStringDynamic",
+      "Summary": "<p sourcefile=\"api/Dec.ConverterStringDynamic.yml\" sourcestartlinenumber=\"1\">Alternate dynamic-typed class for converting to arbitrary types via strings.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.Dag-1.Dependency.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.Dag-1.Dependency.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.Dag<T>.Dependency",
+      "Summary": "<p sourcefile=\"api/Dec.Dag-1.Dependency.yml\" sourcestartlinenumber=\"1\">Information on a single dag dependency.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.Dag-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.Dag-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.Dag<T>",
+      "Summary": "<p sourcefile=\"api/Dec.Dag-1.yml\" sourcestartlinenumber=\"1\">A simple stable Dag evaluation class, made public for utility usage.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.Database-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.Database-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.Database<T>",
+      "Summary": "<p sourcefile=\"api/Dec.Database-1.yml\" sourcestartlinenumber=\"1\">Contains information on a single type of Dec.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.Database.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.Database.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.Database",
+      "Summary": "<p sourcefile=\"api/Dec.Database.yml\" sourcestartlinenumber=\"1\">Contains information on all decs that exist.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.Dec.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.Dec.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.Dec",
+      "Summary": "<p sourcefile=\"api/Dec.Dec.yml\" sourcestartlinenumber=\"1\">Base class of all dec-provided datatypes.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.IConditionalRecordable.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.IConditionalRecordable.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.IConditionalRecordable",
+      "Summary": "<p sourcefile=\"api/Dec.IConditionalRecordable.yml\" sourcestartlinenumber=\"1\">Allows the Recordable aspect to be disabled based on local properties, usersettings, or other factors.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.IPostCloneNew.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.IPostCloneNew.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.IPostCloneNew",
+      "Summary": "<p sourcefile=\"api/Dec.IPostCloneNew.yml\" sourcestartlinenumber=\"1\">Used to provide a per-object post-clone callback, applying to the new object.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.IPostCloneOriginal.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.IPostCloneOriginal.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.IPostCloneOriginal",
+      "Summary": "<p sourcefile=\"api/Dec.IPostCloneOriginal.yml\" sourcestartlinenumber=\"1\">Used to provide a per-object post-clone callback, applying to the original object.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.IRecordable.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.IRecordable.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.IRecordable",
+      "Summary": "<p sourcefile=\"api/Dec.IRecordable.yml\" sourcestartlinenumber=\"1\">Base class for recordable elements.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.Index-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.Index-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.Index<T>",
+      "Summary": "<p sourcefile=\"api/Dec.Index-1.yml\" sourcestartlinenumber=\"1\">Contains information on a single type of index.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.IndexAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.IndexAttribute.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.IndexAttribute",
+      "Summary": "<p sourcefile=\"api/Dec.IndexAttribute.yml\" sourcestartlinenumber=\"1\">Applied to mark an <code sourcefile=\"api/Dec.IndexAttribute.yml\" sourcestartlinenumber=\"1\">int</code> member as an index.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.Parser.FileType.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.Parser.FileType.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.Parser.FileType",
+      "Summary": "<p sourcefile=\"api/Dec.Parser.FileType.yml\" sourcestartlinenumber=\"1\">Indicates which file type the input should be parsed as.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.Parser.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.Parser.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.Parser",
+      "Summary": "<p sourcefile=\"api/Dec.Parser.yml\" sourcestartlinenumber=\"1\">Handles all parsing and initialization of dec structures.</p>\n<p sourcefile=\"api/Dec.Parser.yml\" sourcestartlinenumber=\"3\">Intended for prototype or non-moddable games; use ParserModdable for mod support.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.ParserModular.Module.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.ParserModular.Module.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.ParserModular.Module",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.ParserModular.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.ParserModular.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.ParserModular",
+      "Summary": "<p sourcefile=\"api/Dec.ParserModular.yml\" sourcestartlinenumber=\"1\">Handles all parsing and initialization of dec structures.</p>\n<p sourcefile=\"api/Dec.ParserModular.yml\" sourcestartlinenumber=\"3\">Intended for moddable games; use Parser for non-moddable or prototype games.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.Path.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.Path.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.Path",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.PathDec.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.PathDec.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.PathDec",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.PathDictionaryKey.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.PathDictionaryKey.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.PathDictionaryKey",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.PathDictionaryValue.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.PathDictionaryValue.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.PathDictionaryValue",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.PathDictionaryValueUnpathable.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.PathDictionaryValueUnpathable.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.PathDictionaryValueUnpathable",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.PathHashSetElement.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.PathHashSetElement.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.PathHashSetElement",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.PathIndex.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.PathIndex.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.PathIndex",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.PathIndexMultidim.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.PathIndexMultidim.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.PathIndexMultidim",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.PathMember.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.PathMember.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.PathMember",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.PathRef.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.PathRef.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.PathRef",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.PathRoot.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.PathRoot.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.PathRoot",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.Recorder.Direction.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.Recorder.Direction.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.Recorder.Direction",
+      "Summary": "<p sourcefile=\"api/Dec.Recorder.Direction.yml\" sourcestartlinenumber=\"1\">Indicates whether this Recorder is being used for reading or writing.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.Recorder.IUserSettings.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.Recorder.IUserSettings.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.Recorder.IUserSettings",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.Recorder.Parameters.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.Recorder.Parameters.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.Recorder.Parameters",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.Recorder.Purpose.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.Recorder.Purpose.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.Recorder.Purpose",
+      "Summary": "<p sourcefile=\"api/Dec.Recorder.Purpose.yml\" sourcestartlinenumber=\"1\">Indicates what this Recorder is being used for.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.Recorder.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.Recorder.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.Recorder",
+      "Summary": "<p sourcefile=\"api/Dec.Recorder.yml\" sourcestartlinenumber=\"1\">Main class for the serialization/deserialization system.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.SetupDependsOnAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.SetupDependsOnAttribute.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.SetupDependsOnAttribute",
+      "Summary": "<p sourcefile=\"api/Dec.SetupDependsOnAttribute.yml\" sourcestartlinenumber=\"1\">Signals that this class should have its ConfigErrors/PostLoad run after a different class.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.StaticReferencesAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.StaticReferencesAttribute.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.StaticReferencesAttribute",
+      "Summary": "<p sourcefile=\"api/Dec.StaticReferencesAttribute.yml\" sourcestartlinenumber=\"1\">Signals that static references in this class should be filled out after parsing is complete.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.Util.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.Util.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.Util",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec",
+      "Summary": null
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "api/index.md",
+      "output": {
+        ".html": {
+          "relative_path": "api/index.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "api/toc.yml",
+      "output": {
+        ".json": {
+          "relative_path": "api/toc.json"
+        },
+        ".html": {
+          "relative_path": "api/toc.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/custom.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/custom.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/hierarchy.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/hierarchy.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/indexes.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/indexes.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/inheritance.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/inheritance.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/justifications.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/justifications.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/mergemodes.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/mergemodes.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/modding.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/modding.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/nonserialized.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/nonserialized.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/parsing.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/parsing.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/security.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/security.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/serialization.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/serialization.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "documentation/toc.yml",
+      "output": {
+        ".json": {
+          "relative_path": "documentation/toc.json"
+        },
+        ".html": {
+          "relative_path": "documentation/toc.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/type.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/type.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "future/csv.md",
+      "output": {
+        ".html": {
+          "relative_path": "future/csv.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "future/dynamic.md",
+      "output": {
+        ".html": {
+          "relative_path": "future/dynamic.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "future/factories.md",
+      "output": {
+        ".html": {
+          "relative_path": "future/factories.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "future/future.md",
+      "output": {
+        ".html": {
+          "relative_path": "future/future.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "future/inplace.md",
+      "output": {
+        ".html": {
+          "relative_path": "future/inplace.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "future/invdatabase.md",
+      "output": {
+        ".html": {
+          "relative_path": "future/invdatabase.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "future/mods.md",
+      "output": {
+        ".html": {
+          "relative_path": "future/mods.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "future/multipleinheritance.md",
+      "output": {
+        ".html": {
+          "relative_path": "future/multipleinheritance.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "future/performance.md",
+      "output": {
+        ".html": {
+          "relative_path": "future/performance.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "future/serialization_compatibility.md",
+      "output": {
+        ".html": {
+          "relative_path": "future/serialization_compatibility.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "future/serialization_interior.md",
+      "output": {
+        ".html": {
+          "relative_path": "future/serialization_interior.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "future/toc.yml",
+      "output": {
+        ".json": {
+          "relative_path": "future/toc.json"
+        },
+        ".html": {
+          "relative_path": "future/toc.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "future/translation.md",
+      "output": {
+        ".html": {
+          "relative_path": "future/translation.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "future/typeconstraints.md",
+      "output": {
+        ".html": {
+          "relative_path": "future/typeconstraints.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "index.md",
+      "output": {
+        ".html": {
+          "relative_path": "index.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "quickstart/decs.md",
+      "output": {
+        ".html": {
+          "relative_path": "quickstart/decs.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "quickstart/installation.md",
+      "output": {
+        ".html": {
+          "relative_path": "quickstart/installation.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "quickstart/installation_godot.png",
+      "output": {
+        "resource": {
+          "relative_path": "quickstart/installation_godot.png"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "quickstart/installation_unity.png",
+      "output": {
+        "resource": {
+          "relative_path": "quickstart/installation_unity.png"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "quickstart/introduction.md",
+      "output": {
+        ".html": {
+          "relative_path": "quickstart/introduction.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "quickstart/setup.md",
+      "output": {
+        ".html": {
+          "relative_path": "quickstart/setup.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "quickstart/tldr.md",
+      "output": {
+        ".html": {
+          "relative_path": "quickstart/tldr.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "quickstart/toc.yml",
+      "output": {
+        ".json": {
+          "relative_path": "quickstart/toc.json"
+        },
+        ".html": {
+          "relative_path": "quickstart/toc.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "quickstart/using.md",
+      "output": {
+        ".html": {
+          "relative_path": "quickstart/using.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "toc.yml",
+      "output": {
+        ".json": {
+          "relative_path": "toc.json"
+        },
+        ".html": {
+          "relative_path": "toc.html"
+        }
+      },
+      "version": ""
+    }
+  ],
+  "groups": [
+    {
+      "xrefmap": "xrefmap.yml"
+    }
+  ]
+}
