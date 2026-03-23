@@ -8,11 +8,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dotnet-version: ["2.1", "3.1", "6.0", "7.0", "8.0", "9.0", "10.0"]
+        dotnet-version: ["3.1", "6.0", "7.0", "8.0", "9.0", "10.0"]
     steps:
     - uses: actions/checkout@v3
 
-    # This is unnecessary for 6.0 and later, but is still needed for 2.1/3.1.
+    # This is unnecessary for 6.0 and later, but is still needed for 3.1.
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v3
       with:

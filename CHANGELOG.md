@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [unreleased]
 ### Breaking
 * Recorder.WriteValidation(), Composer.ComposeValidation(), Config.UnitTestParameters, and Index.Clear() are now internal. These were testing-only APIs not intended for external use. If you were using these, let me know!
+* Removed netcoreapp2.1/netstandard2.0 targets. Unity is on netstandard2.1 and that's basically the only reason I'm going this far back, no point in making my life even harder, I'd just thought netstandard2.1 implied netcoreapp2.1. Also, Microsoft, your numbering system sucks. Let me know if you were for whatever reason relying on these. 
 
 ### Improved
 * Dictionary checksums can now deal with shared objects introduced in the Value (though still not in the Key).
