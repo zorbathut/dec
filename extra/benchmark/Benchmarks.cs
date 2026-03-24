@@ -147,6 +147,27 @@ namespace DecBenchmark
         }
     }
 
+    // Plain class with no IRecordable — exercises the reflection fallback path during Dec parsing
+    public class ReflectionData
+    {
+        public int intVal = 0;
+        public float floatVal = 0;
+        public double doubleVal = 0;
+        public bool boolVal = false;
+        public string strVal = "";
+        public SimpleEnum enumVal = SimpleEnum.Alpha;
+        public int extra1 = 0;
+        public int extra2 = 0;
+        public int extra3 = 0;
+        public string extra4 = "";
+    }
+
+    public class ReflectionDec : Dec.Dec
+    {
+        public ReflectionData data;
+        public List<ReflectionData> dataList;
+    }
+
     public class SharedRefHolder : IRecordable
     {
         public PrimitivesRecordable refA;
@@ -571,6 +592,73 @@ namespace DecBenchmark
         [Benchmark] public string WriteManyFields() => Recorder.Write(manyFields);
         [Benchmark] public ManyFieldsRecordable ReadManyFields() => Recorder.Read<ManyFieldsRecordable>(manyFieldsSerialized);
         [Benchmark] public ManyFieldsRecordable CloneManyFields() => Recorder.Clone(manyFields);
+    }
+
+    [MemoryDiagnoser]
+    public class ReflectionBenchmarks : BenchmarkBase
+    {
+        [Params(10, 100)]
+        public int Count;
+
+        private string xml;
+
+        private static string GenerateXml(int count)
+        {
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine("<Decs>");
+            for (int i = 0; i < count; i++)
+            {
+                sb.AppendLine($"  <ReflectionDec decName=\"Dec{i}\">");
+                sb.AppendLine("    <data>");
+                sb.AppendLine($"      <intVal>{i * 17}</intVal>");
+                sb.AppendLine($"      <floatVal>{i * 1.5f}</floatVal>");
+                sb.AppendLine($"      <doubleVal>{i * 2.718}</doubleVal>");
+                sb.AppendLine($"      <boolVal>{(i % 2 == 0).ToString().ToLower()}</boolVal>");
+                sb.AppendLine($"      <strVal>string_{i}</strVal>");
+                sb.AppendLine($"      <enumVal>{(SimpleEnum)(i % 5)}</enumVal>");
+                sb.AppendLine($"      <extra1>{i * 10}</extra1>");
+                sb.AppendLine($"      <extra2>{i * 20}</extra2>");
+                sb.AppendLine($"      <extra3>{i * 30}</extra3>");
+                sb.AppendLine($"      <extra4>extra_{i}</extra4>");
+                sb.AppendLine("    </data>");
+                sb.AppendLine("    <dataList>");
+                for (int j = 0; j < 5; j++)
+                {
+                    sb.AppendLine("      <li>");
+                    sb.AppendLine($"        <intVal>{i * 100 + j}</intVal>");
+                    sb.AppendLine($"        <strVal>list_{i}_{j}</strVal>");
+                    sb.AppendLine("      </li>");
+                }
+                sb.AppendLine("    </dataList>");
+                sb.AppendLine("  </ReflectionDec>");
+            }
+            sb.AppendLine("</Decs>");
+            return sb.ToString();
+        }
+
+        [GlobalSetup]
+        public void Setup()
+        {
+            xml = GenerateXml(Count);
+
+            // Do an initial parse so Compose benchmark has data
+            SetupDec(explicitTypes: new[] { typeof(ReflectionDec) });
+            FinishParser(xml);
+        }
+
+        [GlobalCleanup]
+        public void Cleanup() => CleanupDec();
+
+        [Benchmark]
+        public void Parse()
+        {
+            CleanupDec();
+            SetupDec(explicitTypes: new[] { typeof(ReflectionDec) });
+            FinishParser(xml);
+        }
+
+        [Benchmark]
+        public string Compose() => new Composer().ComposeXml(false);
     }
 
     [MemoryDiagnoser]
