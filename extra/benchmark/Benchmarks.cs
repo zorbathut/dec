@@ -147,20 +147,6 @@ namespace DecBenchmark
         }
     }
 
-    public class ReflectionOnlyClass
-    {
-        public int intVal = 42;
-        public float floatVal = 3.14f;
-        public double doubleVal = 2.718;
-        public bool boolVal = true;
-        public string strVal = "hello";
-        public SimpleEnum enumVal = SimpleEnum.Gamma;
-        public int extra1 = 100;
-        public int extra2 = 200;
-        public int extra3 = 300;
-        public string extra4 = "world";
-    }
-
     public class SharedRefHolder : IRecordable
     {
         public PrimitivesRecordable refA;
@@ -331,11 +317,11 @@ namespace DecBenchmark
                 explicitConverters = explicitConverters ?? Type.EmptyTypes,
             };
 
-            // Silence all output during benchmarks
+            // Silence info/warnings but throw on errors so broken benchmarks fail loudly
             Dec.Config.InfoHandler = _ => { };
             Dec.Config.WarningHandler = _ => { };
-            Dec.Config.ErrorHandler = _ => { };
-            Dec.Config.ExceptionHandler = _ => { };
+            Dec.Config.ErrorHandler = str => throw new Exception($"Dec error: {str}");
+            Dec.Config.ExceptionHandler = ex => throw ex;
         }
 
         protected void FinishParser(string xml = null)
@@ -585,29 +571,6 @@ namespace DecBenchmark
         [Benchmark] public string WriteManyFields() => Recorder.Write(manyFields);
         [Benchmark] public ManyFieldsRecordable ReadManyFields() => Recorder.Read<ManyFieldsRecordable>(manyFieldsSerialized);
         [Benchmark] public ManyFieldsRecordable CloneManyFields() => Recorder.Clone(manyFields);
-    }
-
-    [MemoryDiagnoser]
-    public class ReflectionBenchmarks : BenchmarkBase
-    {
-        private ReflectionOnlyClass data;
-        private string serialized;
-
-        [GlobalSetup]
-        public void Setup()
-        {
-            SetupDec();
-            FinishParser();
-            data = new ReflectionOnlyClass();
-            serialized = Recorder.Write(data);
-        }
-
-        [GlobalCleanup]
-        public void Cleanup() => CleanupDec();
-
-        [Benchmark] public string Write() => Recorder.Write(data);
-        [Benchmark] public ReflectionOnlyClass Read() => Recorder.Read<ReflectionOnlyClass>(serialized);
-        [Benchmark] public ReflectionOnlyClass Clone() => Recorder.Clone(data);
     }
 
     [MemoryDiagnoser]
