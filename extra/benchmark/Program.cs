@@ -1,3 +1,4 @@
+using System.Linq;
 using BenchmarkDotNet.Running;
 
 var switcher = BenchmarkSwitcher.FromAssembly(typeof(DecBenchmark.BenchmarkBase).Assembly);
