@@ -1,5 +1,3 @@
-Workspace("dec");
-
 Step("benchmark")
     .Image("mcr.microsoft.com/dotnet/sdk:9.0")
     .Run(async ctx => {
