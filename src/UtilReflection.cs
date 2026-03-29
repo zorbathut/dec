@@ -34,10 +34,16 @@ namespace Dec
             return result;
         }
 
-        internal static IEnumerable<FieldInfo> GetSerializableFieldsFromHierarchy(this Type type)
-        {
-            // this probably needs to be cached
+        internal static System.Collections.Concurrent.ConcurrentDictionary<Type, FieldInfo[]> SerializableFieldsCached = new System.Collections.Concurrent.ConcurrentDictionary<Type, FieldInfo[]>();
 
+        internal static FieldInfo[] GetSerializableFieldsFromHierarchy(this Type type)
+        {
+            if (SerializableFieldsCached.TryGetValue(type, out var cached))
+            {
+                return cached;
+            }
+
+            var result = new List<FieldInfo>();
             var seenFields = new HashSet<string>();
 
             Type curType = type;
@@ -68,12 +74,16 @@ namespace Dec
                         continue;
                     }
 
-                    yield return field;
+                    result.Add(field);
                     seenFields.Add(field.Name);
                 }
 
                 curType = curType.BaseType;
             }
+
+            var array = result.ToArray();
+            SerializableFieldsCached.TryAdd(type, array);
+            return array;
         }
 
         internal static bool IsUserAssembly(this Assembly asm)

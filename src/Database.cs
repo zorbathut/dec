@@ -372,6 +372,7 @@ namespace Dec
             Index.Clear();
 
             UtilReflection.IndexInfoCached.Clear();
+            UtilReflection.SerializableFieldsCached.Clear();
 
             SuppressEmptyWarningFlag = false;
         }
