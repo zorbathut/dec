@@ -328,6 +328,7 @@ namespace DecBenchmark
     // Base class
     // ───────────────────────────────────────────────
 
+    [JsonExporterAttribute.Full]
     public abstract class BenchmarkBase
     {
         protected void SetupDec(Type[] explicitTypes = null, Type[] explicitConverters = null)
