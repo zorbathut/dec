@@ -68,7 +68,7 @@ namespace Dec
         private int depth;
         private const int MaxRecursionDepth = 100;
 
-        private Dictionary<string, WriterNodeClone> recorderChildren;
+        private List<(string key, WriterNodeClone value)> recorderChildren;
 
         public override bool AllowReflection { get => writer.AllowReflection; }
         public override bool AllowDecPath { get => true; }
@@ -647,11 +647,11 @@ namespace Dec
         {
             if (recorderChildren == null)
             {
-                recorderChildren = new Dictionary<string, WriterNodeClone>();
+                recorderChildren = new List<(string, WriterNodeClone)>();
             }
 
             var child = new WriterNodeClone(writer, depth + 1, settings, new PathMember(Path, label));
-            recorderChildren[label] = child;
+            recorderChildren.Add((label, child));
             return child;
         }
 
@@ -803,9 +803,9 @@ namespace Dec
         public override Recorder.Purpose Intent { get => Recorder.Purpose.Cloning; }
         public override Recorder.IUserSettings UserSettings { get; }
 
-        private Dictionary<string, WriterNodeClone> recorderChildren;
-        private HashSet<string> recorderChildrenConsumed = new HashSet<string>();
-        public ReaderNodeCloneRecorder(Dictionary<string, WriterNodeClone> recorderChildren, Recorder.IUserSettings userSettings)
+        private List<(string key, WriterNodeClone value)> recorderChildren;
+        private int searchHint = 0;
+        public ReaderNodeCloneRecorder(List<(string key, WriterNodeClone value)> recorderChildren, Recorder.IUserSettings userSettings)
         {
             this.UserSettings = userSettings;
             this.recorderChildren = recorderChildren;
@@ -824,25 +824,56 @@ namespace Dec
 
         public override ReaderNode GetChildNamed(string name)
         {
-            if (recorderChildren.TryGetValue(name, out var child))
-            {
-                if (recorderChildrenConsumed.Contains(name))
-                {
-                    Dbg.Err($"Clone child {name} accessed twice; this is probably an attempt to record the same field twice, which is not supported");
-                    return null;
-                }
+            int count = recorderChildren.Count;
 
-                recorderChildrenConsumed.Add(name);
-                return new ReaderNodeCloneRecorderItem(child, UserSettings);
-            }
-            else
+            // Fast path: check the hint position (read order usually matches write order)
+            if (searchHint < count)
             {
-                return null;
+                var hintEntry = recorderChildren[searchHint];
+                if (hintEntry.key == name)
+                {
+                    if (hintEntry.value == null)
+                    {
+                        Dbg.Err($"Clone child {name} accessed twice; this is probably an attempt to record the same field twice, which is not supported");
+                        return null;
+                    }
+
+                    var result = new ReaderNodeCloneRecorderItem(hintEntry.value, UserSettings);
+                    recorderChildren[searchHint] = (name, null);
+                    searchHint++;
+                    return result;
+                }
             }
+
+            // Slow path: linear scan
+            for (int i = 0; i < count; i++)
+            {
+                var entry = recorderChildren[i];
+                if (entry.key == name)
+                {
+                    if (entry.value == null)
+                    {
+                        Dbg.Err($"Clone child {name} accessed twice; this is probably an attempt to record the same field twice, which is not supported");
+                        return null;
+                    }
+
+                    var result = new ReaderNodeCloneRecorderItem(entry.value, UserSettings);
+                    recorderChildren[i] = (name, null);
+                    searchHint = i + 1;
+                    return result;
+                }
+            }
+
+            return null;
         }
         public override string[] GetAllChildren()
         {
-            return recorderChildren.Keys.ToArray();
+            var result = new string[recorderChildren.Count];
+            for (int i = 0; i < recorderChildren.Count; i++)
+            {
+                result[i] = recorderChildren[i].key;
+            }
+            return result;
         }
         public override bool HasText()
         {
