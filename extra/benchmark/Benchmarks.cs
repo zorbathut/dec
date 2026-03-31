@@ -663,6 +663,68 @@ namespace DecBenchmark
     }
 
     [MemoryDiagnoser]
+    public class ChecksumBenchmarks : BenchmarkBase
+    {
+        private List<NestedRecordable> largeList;
+        private Dictionary<string, NestedRecordable> largeDict;
+        private HashSet<int> largeHashSet;
+        private ComplexGraph complexGraph;
+        private DeeplyNestedRecordable deepNest;
+
+        [GlobalSetup]
+        public void Setup()
+        {
+            SetupDec(
+                explicitTypes: new[] { typeof(SampleDec) }
+            );
+            FinishParser(@"
+                <Decs>
+                    <SampleDec decName=""TestDec"">
+                        <hitPoints>250</hitPoints>
+                        <displayName>Benchmark Dec</displayName>
+                    </SampleDec>
+                </Decs>");
+
+            // Large list of nested recordables: 500 items, each with collections of size 20
+            largeList = Enumerable.Range(0, 500).Select(i => NestedRecordable.Create(i, 20)).ToList();
+
+            // Large dictionary: 1000 entries with nested recordable values
+            largeDict = new Dictionary<string, NestedRecordable>();
+            for (int i = 0; i < 1000; i++)
+            {
+                largeDict[$"key_{i}"] = NestedRecordable.Create(i, 10);
+            }
+
+            // Large hash set: 10000 entries (exercises unordered accumulation)
+            largeHashSet = new HashSet<int>(Enumerable.Range(0, 10000));
+
+            // Complex graph with shared references, multiple collection types, etc.
+            complexGraph = ComplexGraph.Create(Dec.Database<SampleDec>.Get("TestDec"));
+
+            // Deep nesting: 100 levels
+            deepNest = DeeplyNestedRecordable.Create(100);
+        }
+
+        [GlobalCleanup]
+        public void Cleanup() => CleanupDec();
+
+        [Benchmark]
+        public ulong LargeList() => Recorder.Checksum(largeList);
+
+        [Benchmark]
+        public ulong LargeDict() => Recorder.Checksum(largeDict);
+
+        [Benchmark]
+        public ulong LargeHashSet() => Recorder.Checksum(largeHashSet);
+
+        [Benchmark]
+        public ulong Complex() => Recorder.Checksum(complexGraph);
+
+        [Benchmark]
+        public ulong DeepNest() => Recorder.Checksum(deepNest);
+    }
+
+    [MemoryDiagnoser]
     public class ConverterBenchmarks : BenchmarkBase
     {
         private ConverterHolder data;
