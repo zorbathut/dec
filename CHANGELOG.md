@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 * Added support for runtime-IL-emitted array creation functions, which are about 2.5x faster on very small arrays. This degrades smoothly to a non-IL-emitted solution on systems that don't support it.
 * Added caching for part of the XML reflection system, improving some benchmarks by up to 100%.
 * Added caching for sharability testing, improving general performance by around 5%.
+* Added caching for object construction, improving general performance by around 2%.
 
 ### Fixed
 * Race condition in Serialization.Initialize().

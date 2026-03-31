@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -212,54 +213,117 @@ namespace Dec
             return field.Name.StartsWith("<");
         }
 
+        private enum CreateInstanceAction : byte
+        {
+            Construct,
+            ConstructValueType,
+            Abstract,
+            Array,
+            NoConstructor,
+        }
+
+        private static ConcurrentDictionary<Type, (CreateInstanceAction action, ConstructorInfo ctor, Type constructType)> CreateInstanceCache = new ConcurrentDictionary<Type, (CreateInstanceAction, ConstructorInfo, Type)>();
+
         internal static object CreateInstanceSafe(this Type type, string errorType, ReaderNode node)
         {
+            if (!CreateInstanceCache.TryGetValue(type, out var cached))
+            {
+                // Unwrap Nullable<T> to T; T is always a non-nullable value type
+                var resolvedType = type;
+                if (type.IsConstructedGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+                {
+                    resolvedType = type.GenericTypeArguments[0];
+                }
+
+                if (resolvedType.IsAbstract)
+                {
+                    cached = (CreateInstanceAction.Abstract, null, null);
+                }
+                else if (resolvedType.IsArray)
+                {
+                    // Special handling, we need a fancy constructor with an int array parameter
+                    // Conveniently, arrays are really easy to deal with in this pathway :D
+                    cached = (CreateInstanceAction.Array, null, null);
+                }
+                else if (resolvedType.IsValueType)
+                {
+                    // Note: Structs don't have constructors. I actually can't tell if ints do, I'm kind of bypassing that system.
+                    cached = (CreateInstanceAction.ConstructValueType, null, resolvedType);
+                }
+                else
+                {
+                    var ctor = resolvedType.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { }, null);
+                    if (ctor == null)
+                    {
+                        cached = (CreateInstanceAction.NoConstructor, null, null);
+                    }
+                    else
+                    {
+                        cached = (CreateInstanceAction.Construct, ctor, null);
+                    }
+                }
+
+                CreateInstanceCache[type] = cached;
+            }
+
             string BuiltContext()
             {
                 return node?.GetContext().ToString() ?? "setup";
             }
 
-            if (type.IsAbstract)
+            switch (cached.action)
             {
-                Dbg.Err($"{BuiltContext()}: Attempting to create {errorType} of abstract type {type}");
-                return null;    // thankfully all abstract types can accept being null
-            }
-            else if (type.IsArray)
-            {
-                // Special handling, we need a fancy constructor with an int array parameter
-                // Conveniently, arrays are really easy to deal with in this pathway :D
-                return UtilType.CreateDynamicArray(type.GetElementType(), node.GetArrayDimensions(type.GetArrayRank()));
-            }
-            else if (!type.IsValueType && type.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { }, null) == null)
-            {
-                // Note: Structs don't have constructors. I actually can't tell if ints do, I'm kind of bypassing that system.
-
-                Dbg.Err($"{BuiltContext()}: Attempting to create {errorType} of type {type} without a no-argument constructor");
-                return null;    // similarly, anything that is capable of not having a no-argument constructor can accept being null
-            }
-            else if (type.IsConstructedGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
-            {
-                // we actually just treat this like the object itself, C# will handle the details
-                return CreateInstanceSafe(type.GenericTypeArguments[0], errorType, node);
-            }
-            else
-            {
-                try
-                {
-                    var result = Activator.CreateInstance(type, true);
-                    if (result == null)
-                    {
-                        // This is difficult to test; there are very few things that can get CreateInstance to return null, and we supposedly handle all of them in the above tests.
-                        // In theory a malformed COM object might do it.
-                        Dbg.Err($"{BuiltContext()}: {errorType} of type {type} was not properly created; this will cause issues");
-                    }
-                    return result;
-                }
-                catch (TargetInvocationException e)
-                {
-                    Dbg.Ex(e);
+                case CreateInstanceAction.Abstract:
+                    Dbg.Err($"{BuiltContext()}: Attempting to create {errorType} of abstract type {type}");
+                    // thankfully all abstract types can accept being null
                     return null;
-                }
+
+                case CreateInstanceAction.Array:
+                    return UtilType.CreateDynamicArray(type.GetElementType(), node.GetArrayDimensions(type.GetArrayRank()));
+
+                case CreateInstanceAction.NoConstructor:
+                    Dbg.Err($"{BuiltContext()}: Attempting to create {errorType} of type {type} without a no-argument constructor");
+                    // anything that is capable of not having a no-argument constructor can accept being null
+                    return null;
+
+                case CreateInstanceAction.Construct:
+                    try
+                    {
+                        var result = cached.ctor.Invoke(null);
+                        if (result == null)
+                        {
+                            // this is supposedly impossible, but I'm putting this here just because I'm paranoid as hell
+                            Dbg.Err($"{BuiltContext()}: {errorType} of type {type} was not properly created; this will cause issues");
+                        }
+                        return result;
+                    }
+                    catch (TargetInvocationException e)
+                    {
+                        Dbg.Ex(e);
+                        return null;
+                    }
+
+                case CreateInstanceAction.ConstructValueType:
+                    try
+                    {
+                        var result = Activator.CreateInstance(cached.constructType, true);
+                        if (result == null)
+                        {
+                            // This is difficult to test; there are very few things that can get CreateInstance to return null, and we supposedly handle all of them in the above tests.
+                            // In theory a malformed COM object might do it.
+                            Dbg.Err($"{BuiltContext()}: {errorType} of type {type} was not properly created; this will cause issues");
+                        }
+                        return result;
+                    }
+                    catch (TargetInvocationException e)
+                    {
+                        Dbg.Ex(e);
+                        return null;
+                    }
+
+                default:
+                    Dbg.Err($"{BuiltContext()}: Internal error in CreateInstanceSafe for type {type}");
+                    return null;
             }
         }
     }
