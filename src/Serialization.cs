@@ -1798,37 +1798,12 @@ namespace Dec
 
         internal static Type TypeSystemRuntimeType = Type.GetType("System.RuntimeType");
 
-        private enum ComposeAction : byte
-        {
-            // Unreferenceable types — written before reference tracking
-            Primitive,
-            Enum,
-            String,
-            Type,
-
-            // Referenceable types — written after reference tracking
-            ByteArray,
-            Array,
-            List,
-            Dictionary,
-            HashSet,
-            Queue,
-            Stack,
-            Tuple,
-            ValueTuple,
-            Recordable,
-            Convertible,
-            ReflectionOrError,
-        }
-
         private class ComposeStrategy
         {
-            internal ComposeAction action;
+            internal Action<WriterNode, object, FieldInfo> writer;
             internal bool unreferenceable;
             internal bool canBeShared;
             internal bool canBeCloneCopied;
-            internal bool isConditionalRecordable;  // if action==Recordable and ShouldRecord returns false, fall through to converter/reflection
-            internal Converter converter;            // for Convertible, or for Recordable fallthrough
         }
 
         private static System.Collections.Concurrent.ConcurrentDictionary<Type, ComposeStrategy> ComposeStrategyCache = new System.Collections.Concurrent.ConcurrentDictionary<Type, ComposeStrategy>();
@@ -1842,28 +1817,28 @@ namespace Dec
             // Check unreferenceable types first — these are written before reference tracking
             if (valType.IsPrimitive)
             {
-                strategy.action = ComposeAction.Primitive;
+                strategy.writer = (node, value, fi) => node.WritePrimitive(value);
                 strategy.unreferenceable = true;
                 return strategy;
             }
 
             if (typeof(System.Enum).IsAssignableFrom(valType))
             {
-                strategy.action = ComposeAction.Enum;
+                strategy.writer = (node, value, fi) => node.WriteEnum(value);
                 strategy.unreferenceable = true;
                 return strategy;
             }
 
             if (valType == typeof(string))
             {
-                strategy.action = ComposeAction.String;
+                strategy.writer = (node, value, fi) => node.WriteString(value as string);
                 strategy.unreferenceable = true;
                 return strategy;
             }
 
             if (valType == typeof(Type))
             {
-                strategy.action = ComposeAction.Type;
+                strategy.writer = (node, value, fi) => node.WriteType(value as Type);
                 strategy.unreferenceable = true;
                 return strategy;
             }
@@ -1871,13 +1846,13 @@ namespace Dec
             // Referenceable types
             if (valType == typeof(byte[]))
             {
-                strategy.action = ComposeAction.ByteArray;
+                strategy.writer = (node, value, fi) => node.WriteByteArray(value as byte[]);
                 return strategy;
             }
 
             if (valType.IsArray)
             {
-                strategy.action = ComposeAction.Array;
+                strategy.writer = (node, value, fi) => node.WriteArray(value as Array);
                 return strategy;
             }
 
@@ -1885,11 +1860,11 @@ namespace Dec
             {
                 var genericDef = valType.GetGenericTypeDefinition();
 
-                if (genericDef == typeof(List<>)) { strategy.action = ComposeAction.List; return strategy; }
-                if (genericDef == typeof(Dictionary<,>)) { strategy.action = ComposeAction.Dictionary; return strategy; }
-                if (genericDef == typeof(HashSet<>)) { strategy.action = ComposeAction.HashSet; return strategy; }
-                if (genericDef == typeof(Queue<>)) { strategy.action = ComposeAction.Queue; return strategy; }
-                if (genericDef == typeof(Stack<>)) { strategy.action = ComposeAction.Stack; return strategy; }
+                if (genericDef == typeof(List<>)) { strategy.writer = (node, value, fi) => node.WriteList(value as IList); return strategy; }
+                if (genericDef == typeof(Dictionary<,>)) { strategy.writer = (node, value, fi) => node.WriteDictionary(value as IDictionary); return strategy; }
+                if (genericDef == typeof(HashSet<>)) { strategy.writer = (node, value, fi) => node.WriteHashSet(value as IEnumerable); return strategy; }
+                if (genericDef == typeof(Queue<>)) { strategy.writer = (node, value, fi) => node.WriteQueue(value as IEnumerable); return strategy; }
+                if (genericDef == typeof(Stack<>)) { strategy.writer = (node, value, fi) => node.WriteStack(value as IEnumerable); return strategy; }
 
                 if (genericDef == typeof(Tuple<>) ||
                     genericDef == typeof(Tuple<,>) ||
@@ -1900,7 +1875,7 @@ namespace Dec
                     genericDef == typeof(Tuple<,,,,,,>) ||
                     genericDef == typeof(Tuple<,,,,,,,>))
                 {
-                    strategy.action = ComposeAction.Tuple;
+                    strategy.writer = (node, value, fi) => node.WriteTuple(value, fi?.GetCustomAttribute<System.Runtime.CompilerServices.TupleElementNamesAttribute>());
                     return strategy;
                 }
 
@@ -1913,34 +1888,77 @@ namespace Dec
                     genericDef == typeof(ValueTuple<,,,,,,>) ||
                     genericDef == typeof(ValueTuple<,,,,,,,>))
                 {
-                    strategy.action = ComposeAction.ValueTuple;
+                    strategy.writer = (node, value, fi) => node.WriteValueTuple(value, fi?.GetCustomAttribute<System.Runtime.CompilerServices.TupleElementNamesAttribute>());
                     return strategy;
+                }
+            }
+
+            // Build the converter-or-reflection fallthrough writer; used standalone for non-IRecordable types,
+            // or captured by the IRecordable closure for IConditionalRecordable fallthrough.
+            Action<WriterNode, object, FieldInfo> fallthrough;
+            {
+                var converter = ConverterFor(valType);
+                if (converter != null)
+                {
+                    fallthrough = (node, value, fi) =>
+                    {
+                        // Check if this type can be reconstructed with its converter
+                        if (!valType.CanBeConstructed())
+                        {
+                            Dbg.Wrn($"{node.Path}: Serializing type {valType} with converter {converter.GetType().Name} but the type cannot be constructed (missing no-argument constructor for ConverterRecord, or no ConverterString/ConverterFactory). This object will fail to deserialize.");
+                        }
+
+                        node.WriteConvertible(converter, value);
+                    };
+                }
+                else
+                {
+                    // Reflection fallback (or error if node doesn't allow reflection)
+                    // We absolutely should not be doing reflection when in recorder mode; that way lies madness.
+                    fallthrough = (node, value, fi) =>
+                    {
+                        if (!node.AllowReflection)
+                        {
+                            Dbg.Err($"Couldn't find a composition method for type {valType}; either you shouldn't be trying to serialize it, or it should implement Dec.IRecorder (https://zorbathut.github.io/dec/release/documentation/serialization.html), or you need a Dec.Converter (https://zorbathut.github.io/dec/release/documentation/custom.html)");
+                            node.WriteError();
+                            return;
+                        }
+
+                        foreach (var field in valType.GetSerializableFieldsFromHierarchy())
+                        {
+                            ComposeElement(node.CreateReflectionChild(field, node.RecorderSettings), field.GetValue(value), field.FieldType, fieldInfo: field);
+                        }
+                    };
                 }
             }
 
             // IRecordable check
             if (typeof(IRecordable).IsAssignableFrom(valType))
             {
-                strategy.action = ComposeAction.Recordable;
-                strategy.isConditionalRecordable = typeof(IConditionalRecordable).IsAssignableFrom(valType);
-                // Pre-lookup converter for IConditionalRecordable fallthrough path
-                strategy.converter = ConverterFor(valType);
+                bool isConditional = typeof(IConditionalRecordable).IsAssignableFrom(valType);
+
+                strategy.writer = (node, value, fi) =>
+                {
+                    if (!isConditional || (value as IConditionalRecordable).ShouldRecord(node.UserSettings))
+                    {
+                        // Check if this type can be reconstructed
+                        if (!valType.CanBeConstructed())
+                        {
+                            Dbg.Wrn($"{node.Path}: Serializing type {valType} which implements IRecordable but cannot be constructed (missing no-argument constructor). This object will fail to deserialize!");
+                        }
+
+                        node.WriteRecord(value as IRecordable);
+                        return;
+                    }
+
+                    // IConditionalRecordable.ShouldRecord() returned false; fall through to converter or reflection
+                    fallthrough(node, value, fi);
+                };
                 return strategy;
             }
 
-            // Converter check
-            {
-                var converter = ConverterFor(valType);
-                if (converter != null)
-                {
-                    strategy.action = ComposeAction.Convertible;
-                    strategy.converter = converter;
-                    return strategy;
-                }
-            }
-
-            // Reflection fallback (or error if node doesn't allow reflection)
-            strategy.action = ComposeAction.ReflectionOrError;
+            // Not IRecordable; use the fallthrough writer directly
+            strategy.writer = fallthrough;
             return strategy;
         }
 
@@ -2042,13 +2060,7 @@ namespace Dec
             // Unreferenceable types (primitives, enums, strings, Types) are written before reference tracking
             if (strategy.unreferenceable)
             {
-                switch (strategy.action)
-                {
-                    case ComposeAction.Primitive: node.WritePrimitive(value); break;
-                    case ComposeAction.Enum: node.WriteEnum(value); break;
-                    case ComposeAction.String: node.WriteString(value as string); break;
-                    case ComposeAction.Type: node.WriteType(value as Type); break;
-                }
+                strategy.writer(node, value, fieldInfo);
 
                 // If we have a type that isn't the expected type, tag it. We may need this even for unreferencable value types because everything fits in an `object`.
                 ComposeElement_TagClass(node, valType, fieldType, asThis);
@@ -2082,90 +2094,7 @@ namespace Dec
                 return;
             }
 
-            switch (strategy.action)
-            {
-                case ComposeAction.ByteArray:
-                    node.WriteByteArray(value as byte[]);
-                    return;
-
-                case ComposeAction.Array:
-                    node.WriteArray(value as Array);
-                    return;
-
-                case ComposeAction.List:
-                    node.WriteList(value as IList);
-                    return;
-
-                case ComposeAction.Dictionary:
-                    node.WriteDictionary(value as IDictionary);
-                    return;
-
-                case ComposeAction.HashSet:
-                    node.WriteHashSet(value as IEnumerable);
-                    return;
-
-                case ComposeAction.Queue:
-                    node.WriteQueue(value as IEnumerable);
-                    return;
-
-                case ComposeAction.Stack:
-                    node.WriteStack(value as IEnumerable);
-                    return;
-
-                case ComposeAction.Tuple:
-                    node.WriteTuple(value, fieldInfo?.GetCustomAttribute<System.Runtime.CompilerServices.TupleElementNamesAttribute>());
-                    return;
-
-                case ComposeAction.ValueTuple:
-                    node.WriteValueTuple(value, fieldInfo?.GetCustomAttribute<System.Runtime.CompilerServices.TupleElementNamesAttribute>());
-                    return;
-
-                case ComposeAction.Recordable:
-                    if (!strategy.isConditionalRecordable || (value as IConditionalRecordable).ShouldRecord(node.UserSettings))
-                    {
-                        // Check if this type can be reconstructed
-                        if (!valType.CanBeConstructed())
-                        {
-                            Dbg.Wrn($"{node.Path}: Serializing type {valType} which implements IRecordable but cannot be constructed (missing no-argument constructor). This object will fail to deserialize!");
-                        }
-
-                        node.WriteRecord(value as IRecordable);
-                        return;
-                    }
-
-                    // IConditionalRecordable.ShouldRecord() returned false; fall through to converter or reflection
-                    if (strategy.converter != null)
-                    {
-                        goto case ComposeAction.Convertible;
-                    }
-                    goto case ComposeAction.ReflectionOrError;
-
-                case ComposeAction.Convertible:
-                    // Check if this type can be reconstructed with its converter
-                    if (!valType.CanBeConstructed())
-                    {
-                        Dbg.Wrn($"{node.Path}: Serializing type {valType} with converter {strategy.converter.GetType().Name} but the type cannot be constructed (missing no-argument constructor for ConverterRecord, or no ConverterString/ConverterFactory). This object will fail to deserialize.");
-                    }
-
-                    node.WriteConvertible(strategy.converter, value);
-                    return;
-
-                case ComposeAction.ReflectionOrError:
-                    if (!node.AllowReflection)
-                    {
-                        Dbg.Err($"Couldn't find a composition method for type {valType}; either you shouldn't be trying to serialize it, or it should implement Dec.IRecorder (https://zorbathut.github.io/dec/release/documentation/serialization.html), or you need a Dec.Converter (https://zorbathut.github.io/dec/release/documentation/custom.html)");
-                        node.WriteError();
-                        return;
-                    }
-
-                    // We absolutely should not be doing reflection when in recorder mode; that way lies madness.
-
-                    foreach (var field in valType.GetSerializableFieldsFromHierarchy())
-                    {
-                        ComposeElement(node.CreateReflectionChild(field, node.RecorderSettings), field.GetValue(value), field.FieldType, fieldInfo: field);
-                    }
-                    return;
-            }
+            strategy.writer(node, value, fieldInfo);
         }
 
         private static void ComposeElement_TagClass(WriterNode node, Type valType, Type fieldType, bool asThis)
