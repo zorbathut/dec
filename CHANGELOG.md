@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 * Added caching for object construction, improving general performance by around 2%.
 * Added caching for compose decisions, improving write performance by around 5% in some cases (and reducing it in others that will be solved through other methods.)
 * Added caching for clone decisions and reflection targets, improving clone performance by up to 60% when dealing with small objects.
+* Reorganized structures for cloning, generally improving clone performance by 10-20%.
 
 ### Fixed
 * Race condition in Serialization.Initialize().
