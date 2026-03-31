@@ -9,8 +9,8 @@ Step("benchmark")
             dotnet run --project extra/benchmark/benchmark.csproj -c Release -- --artifacts /workspace/benchmark-{describe}
         ");
 
-        await ctx.Shell($"echo '{describe}' > /workspace/benchmark-{describe}/results/git-describe.txt");
-        await ctx.Shell($"tar -czf /workspace/benchmark-{describe}.tar.gz -C /workspace/benchmark-{describe} results/");
+        await ctx.Shell($"mv /workspace/benchmark-{describe}/results /workspace/benchmark-{describe}/results-{describe}");
+        await ctx.Shell($"tar -czf /workspace/benchmark-{describe}.tar.gz -C /workspace/benchmark-{describe} results-{describe}/");
         var artifact = await ctx.SaveArtifact($"/workspace/benchmark-{describe}.tar.gz");
         Console.WriteLine($"Saved artifact: {artifact.Name} ({artifact.Size} bytes)");
     });
