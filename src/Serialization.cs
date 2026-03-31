@@ -2125,6 +2125,7 @@ namespace Dec
             ConverterObjects = null;
             ConverterGenericPrototypes = null;
             ComposeStrategyCache.Clear();
+            WriterNodeClone.ResolveStrategyCache.Clear();
         }
     }
 }
