@@ -1797,6 +1797,171 @@ namespace Dec
         }
 
         internal static Type TypeSystemRuntimeType = Type.GetType("System.RuntimeType");
+
+        private class ComposeStrategy
+        {
+            internal Action<WriterNode, object, FieldInfo> writer;
+            internal bool unreferenceable;
+            internal bool canBeShared;
+            internal bool canBeCloneCopied;
+        }
+
+        private static System.Collections.Concurrent.ConcurrentDictionary<Type, ComposeStrategy> ComposeStrategyCache = new System.Collections.Concurrent.ConcurrentDictionary<Type, ComposeStrategy>();
+
+        private static ComposeStrategy BuildComposeStrategy(Type valType)
+        {
+            var strategy = new ComposeStrategy();
+            strategy.canBeShared = Util.CanBeShared(valType);
+            strategy.canBeCloneCopied = UtilType.CanBeCloneCopied(valType);
+
+            // Check unreferenceable types first — these are written before reference tracking
+            if (valType.IsPrimitive)
+            {
+                strategy.writer = (node, value, fi) => node.WritePrimitive(value);
+                strategy.unreferenceable = true;
+                return strategy;
+            }
+
+            if (typeof(System.Enum).IsAssignableFrom(valType))
+            {
+                strategy.writer = (node, value, fi) => node.WriteEnum(value);
+                strategy.unreferenceable = true;
+                return strategy;
+            }
+
+            if (valType == typeof(string))
+            {
+                strategy.writer = (node, value, fi) => node.WriteString(value as string);
+                strategy.unreferenceable = true;
+                return strategy;
+            }
+
+            if (valType == typeof(Type))
+            {
+                strategy.writer = (node, value, fi) => node.WriteType(value as Type);
+                strategy.unreferenceable = true;
+                return strategy;
+            }
+
+            // Referenceable types
+            if (valType == typeof(byte[]))
+            {
+                strategy.writer = (node, value, fi) => node.WriteByteArray(value as byte[]);
+                return strategy;
+            }
+
+            if (valType.IsArray)
+            {
+                strategy.writer = (node, value, fi) => node.WriteArray(value as Array);
+                return strategy;
+            }
+
+            if (valType.IsGenericType)
+            {
+                var genericDef = valType.GetGenericTypeDefinition();
+
+                if (genericDef == typeof(List<>)) { strategy.writer = (node, value, fi) => node.WriteList(value as IList); return strategy; }
+                if (genericDef == typeof(Dictionary<,>)) { strategy.writer = (node, value, fi) => node.WriteDictionary(value as IDictionary); return strategy; }
+                if (genericDef == typeof(HashSet<>)) { strategy.writer = (node, value, fi) => node.WriteHashSet(value as IEnumerable); return strategy; }
+                if (genericDef == typeof(Queue<>)) { strategy.writer = (node, value, fi) => node.WriteQueue(value as IEnumerable); return strategy; }
+                if (genericDef == typeof(Stack<>)) { strategy.writer = (node, value, fi) => node.WriteStack(value as IEnumerable); return strategy; }
+
+                if (genericDef == typeof(Tuple<>) ||
+                    genericDef == typeof(Tuple<,>) ||
+                    genericDef == typeof(Tuple<,,>) ||
+                    genericDef == typeof(Tuple<,,,>) ||
+                    genericDef == typeof(Tuple<,,,,>) ||
+                    genericDef == typeof(Tuple<,,,,,>) ||
+                    genericDef == typeof(Tuple<,,,,,,>) ||
+                    genericDef == typeof(Tuple<,,,,,,,>))
+                {
+                    strategy.writer = (node, value, fi) => node.WriteTuple(value, fi?.GetCustomAttribute<System.Runtime.CompilerServices.TupleElementNamesAttribute>());
+                    return strategy;
+                }
+
+                if (genericDef == typeof(ValueTuple<>) ||
+                    genericDef == typeof(ValueTuple<,>) ||
+                    genericDef == typeof(ValueTuple<,,>) ||
+                    genericDef == typeof(ValueTuple<,,,>) ||
+                    genericDef == typeof(ValueTuple<,,,,>) ||
+                    genericDef == typeof(ValueTuple<,,,,,>) ||
+                    genericDef == typeof(ValueTuple<,,,,,,>) ||
+                    genericDef == typeof(ValueTuple<,,,,,,,>))
+                {
+                    strategy.writer = (node, value, fi) => node.WriteValueTuple(value, fi?.GetCustomAttribute<System.Runtime.CompilerServices.TupleElementNamesAttribute>());
+                    return strategy;
+                }
+            }
+
+            // Build the converter-or-reflection fallthrough writer; used standalone for non-IRecordable types,
+            // or captured by the IRecordable closure for IConditionalRecordable fallthrough.
+            Action<WriterNode, object, FieldInfo> fallthrough;
+            {
+                var converter = ConverterFor(valType);
+                if (converter != null)
+                {
+                    fallthrough = (node, value, fi) =>
+                    {
+                        // Check if this type can be reconstructed with its converter
+                        if (!valType.CanBeConstructed())
+                        {
+                            Dbg.Wrn($"{node.Path}: Serializing type {valType} with converter {converter.GetType().Name} but the type cannot be constructed (missing no-argument constructor for ConverterRecord, or no ConverterString/ConverterFactory). This object will fail to deserialize.");
+                        }
+
+                        node.WriteConvertible(converter, value);
+                    };
+                }
+                else
+                {
+                    // Reflection fallback (or error if node doesn't allow reflection)
+                    // We absolutely should not be doing reflection when in recorder mode; that way lies madness.
+                    fallthrough = (node, value, fi) =>
+                    {
+                        if (!node.AllowReflection)
+                        {
+                            Dbg.Err($"Couldn't find a composition method for type {valType}; either you shouldn't be trying to serialize it, or it should implement Dec.IRecorder (https://zorbathut.github.io/dec/release/documentation/serialization.html), or you need a Dec.Converter (https://zorbathut.github.io/dec/release/documentation/custom.html)");
+                            node.WriteError();
+                            return;
+                        }
+
+                        foreach (var field in valType.GetSerializableFieldsFromHierarchy())
+                        {
+                            ComposeElement(node.CreateReflectionChild(field, node.RecorderSettings), field.GetValue(value), field.FieldType, fieldInfo: field);
+                        }
+                    };
+                }
+            }
+
+            // IRecordable check
+            if (typeof(IRecordable).IsAssignableFrom(valType))
+            {
+                bool isConditional = typeof(IConditionalRecordable).IsAssignableFrom(valType);
+
+                strategy.writer = (node, value, fi) =>
+                {
+                    if (!isConditional || (value as IConditionalRecordable).ShouldRecord(node.UserSettings))
+                    {
+                        // Check if this type can be reconstructed
+                        if (!valType.CanBeConstructed())
+                        {
+                            Dbg.Wrn($"{node.Path}: Serializing type {valType} which implements IRecordable but cannot be constructed (missing no-argument constructor). This object will fail to deserialize!");
+                        }
+
+                        node.WriteRecord(value as IRecordable);
+                        return;
+                    }
+
+                    // IConditionalRecordable.ShouldRecord() returned false; fall through to converter or reflection
+                    fallthrough(node, value, fi);
+                };
+                return strategy;
+            }
+
+            // Not IRecordable; use the fallthrough writer directly
+            strategy.writer = fallthrough;
+            return strategy;
+        }
+
         internal static void ComposeElement(WriterNode node, object value, Type fieldType, FieldInfo fieldInfo = null, bool isRootDec = false, bool asThis = false)
         {
             // Verify our Shared flags as the *very* first step to ensure nothing gets past us.
@@ -1885,38 +2050,27 @@ namespace Dec
                 valType = typeof(Type);
             }
 
-            // Do all our unreferencables first
-            bool unreferenceableComplete = false;
-
-            if (valType.IsPrimitive)
+            // Look up the cached strategy for this type
+            if (!ComposeStrategyCache.TryGetValue(valType, out var strategy))
             {
-                node.WritePrimitive(value);
-
-                unreferenceableComplete = true;
+                strategy = BuildComposeStrategy(valType);
+                ComposeStrategyCache[valType] = strategy;
             }
-            else if (value is System.Enum)
-            {
-                node.WriteEnum(value);
 
-                unreferenceableComplete = true;
-            }
-            else if (value is string)
+            // Unreferenceable types (primitives, enums, strings, Types) are written before reference tracking
+            if (strategy.unreferenceable)
             {
-                node.WriteString(value as string);
+                strategy.writer(node, value, fieldInfo);
 
-                unreferenceableComplete = true;
-            }
-            else if (value is Type)
-            {
-                node.WriteType(value as Type);
+                // If we have a type that isn't the expected type, tag it. We may need this even for unreferencable value types because everything fits in an `object`.
+                ComposeElement_TagClass(node, valType, fieldType, asThis);
 
-                unreferenceableComplete = true;
+                return;
             }
 
             // Check to see if we should make this into a ref (yes, even if we're not tagged as Shared)
             // Do this *before* we do the class tagging, otherwise we may add ref/class tags to a single node, which is invalid.
-            // Note that it's important we don't write a reference if we had an unreferenceable; it's unnecessarily slow and some of our writer types don't support it.
-            if (Util.CanBeShared(valType) && !asThis)
+            if (strategy.canBeShared && !asThis)
             {
                 if (node.WriteReference(value, node.Path))
                 {
@@ -1928,177 +2082,49 @@ namespace Dec
                 // If we don't support references at all then obviously we *really* need to finish serializing it.
             }
 
-            // If we have a type that isn't the expected type, tag it. We may need this even for unreferencable value types because everything fits in an `object`.
-            {
-                bool tagClass = valType != fieldType;
-                if (fieldType.IsConstructedGenericType && fieldType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                {
-                    // If we're a Nullable<> then we know the type, so we unwrap it a layer
-                    tagClass = valType != fieldType.GetGenericArguments()[0];
-                }
-
-                if (tagClass)
-                {
-                    if (asThis)
-                    {
-                        Dbg.Err($"RecordAsThis() call attempted to add a class tag, which is currently not allowed; AsThis() calls must not be polymorphic (ask the devs for chained class tags if this is a thing you need)");
-                        // . . . I guess we just keep going?
-                    }
-                    else
-                    {
-                        node.TagClass(valType);
-                    }
-                }
-            }
-
-
-            // Did we actually write our node type? Alright, we're done.
-            if (unreferenceableComplete)
-            {
-                return;
-            }
+            // If we have a type that isn't the expected type, tag it.
+            ComposeElement_TagClass(node, valType, fieldType, asThis);
 
             // Now we have things that *could* be references, but aren't.
 
-            if (node.AllowCloning && UtilType.CanBeCloneCopied(valType))
+            if (node.AllowCloning && strategy.canBeCloneCopied)
             {
                 node.WriteCloneCopy(value);
 
                 return;
             }
 
-            if (valType == typeof(byte[]))
-            {
-                node.WriteByteArray(value as byte[]);
+            strategy.writer(node, value, fieldInfo);
+        }
 
-                return;
+        private static void ComposeElement_TagClass(WriterNode node, Type valType, Type fieldType, bool asThis)
+        {
+            bool tagClass = valType != fieldType;
+            if (fieldType.IsConstructedGenericType && fieldType.GetGenericTypeDefinition() == typeof(Nullable<>))
+            {
+                // If we're a Nullable<> then we know the type, so we unwrap it a layer
+                tagClass = valType != fieldType.GetGenericArguments()[0];
             }
 
-            if (valType.IsArray)
+            if (tagClass)
             {
-                node.WriteArray(value as Array);
-
-                return;
-            }
-
-            if (valType.IsGenericType && valType.GetGenericTypeDefinition() == typeof(List<>))
-            {
-                node.WriteList(value as IList);
-
-                return;
-            }
-
-            if (valType.IsGenericType && valType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
-            {
-                node.WriteDictionary(value as IDictionary);
-
-                return;
-            }
-
-            if (valType.IsGenericType && valType.GetGenericTypeDefinition() == typeof(HashSet<>))
-            {
-                node.WriteHashSet(value as IEnumerable);
-
-                return;
-            }
-
-            if (valType.IsGenericType && valType.GetGenericTypeDefinition() == typeof(Queue<>))
-            {
-                node.WriteQueue(value as IEnumerable);
-
-                return;
-            }
-
-            if (valType.IsGenericType && valType.GetGenericTypeDefinition() == typeof(Stack<>))
-            {
-                node.WriteStack(value as IEnumerable);
-
-                return;
-            }
-
-            if (valType.IsGenericType && (
-                    valType.GetGenericTypeDefinition() == typeof(Tuple<>) ||
-                    valType.GetGenericTypeDefinition() == typeof(Tuple<,>) ||
-                    valType.GetGenericTypeDefinition() == typeof(Tuple<,,>) ||
-                    valType.GetGenericTypeDefinition() == typeof(Tuple<,,,>) ||
-                    valType.GetGenericTypeDefinition() == typeof(Tuple<,,,,>) ||
-                    valType.GetGenericTypeDefinition() == typeof(Tuple<,,,,,>) ||
-                    valType.GetGenericTypeDefinition() == typeof(Tuple<,,,,,,>) ||
-                    valType.GetGenericTypeDefinition() == typeof(Tuple<,,,,,,,>)
-                ))
-            {
-                node.WriteTuple(value, fieldInfo?.GetCustomAttribute<System.Runtime.CompilerServices.TupleElementNamesAttribute>());
-
-                return;
-            }
-
-            if (valType.IsGenericType && (
-                    valType.GetGenericTypeDefinition() == typeof(ValueTuple<>) ||
-                    valType.GetGenericTypeDefinition() == typeof(ValueTuple<,>) ||
-                    valType.GetGenericTypeDefinition() == typeof(ValueTuple<,,>) ||
-                    valType.GetGenericTypeDefinition() == typeof(ValueTuple<,,,>) ||
-                    valType.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,>) ||
-                    valType.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,,>) ||
-                    valType.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,,,>) ||
-                    valType.GetGenericTypeDefinition() == typeof(ValueTuple<,,,,,,,>)
-                ))
-            {
-                node.WriteValueTuple(value, fieldInfo?.GetCustomAttribute<System.Runtime.CompilerServices.TupleElementNamesAttribute>());
-
-                return;
-            }
-
-            if (value is IRecordable
-                && (!(value is IConditionalRecordable) || (value as IConditionalRecordable).ShouldRecord(node.UserSettings)))
-            {
-                // Check if this type can be reconstructed
-                if (!valType.CanBeConstructed())
+                if (asThis)
                 {
-                    Dbg.Wrn($"{node.Path}: Serializing type {valType} which implements IRecordable but cannot be constructed (missing no-argument constructor). This object will fail to deserialize!");
+                    Dbg.Err($"RecordAsThis() call attempted to add a class tag, which is currently not allowed; AsThis() calls must not be polymorphic (ask the devs for chained class tags if this is a thing you need)");
+                    // . . . I guess we just keep going?
                 }
-
-                node.WriteRecord(value as IRecordable);
-
-                return;
-            }
-
-            {
-                // Look for a converter; that's the only way to handle this before we fall back to reflection
-                var converter = Serialization.ConverterFor(valType);
-                if (converter != null)
+                else
                 {
-                    // Check if this type can be reconstructed with its converter
-                    if (!valType.CanBeConstructed())
-                    {
-                        Dbg.Wrn($"{node.Path}: Serializing type {valType} with converter {converter.GetType().Name} but the type cannot be constructed (missing no-argument constructor for ConverterRecord, or no ConverterString/ConverterFactory). This object will fail to deserialize.");
-                    }
-
-                    node.WriteConvertible(converter, value);
-                    return;
+                    node.TagClass(valType);
                 }
             }
-
-            if (!node.AllowReflection)
-            {
-                Dbg.Err($"Couldn't find a composition method for type {valType}; either you shouldn't be trying to serialize it, or it should implement Dec.IRecorder (https://zorbathut.github.io/dec/release/documentation/serialization.html), or you need a Dec.Converter (https://zorbathut.github.io/dec/release/documentation/custom.html)");
-                node.WriteError();
-                return;
-            }
-
-            // We absolutely should not be doing reflection when in recorder mode; that way lies madness.
-
-            foreach (var field in valType.GetSerializableFieldsFromHierarchy())
-            {
-                ComposeElement(node.CreateReflectionChild(field, node.RecorderSettings), field.GetValue(value), field.FieldType, fieldInfo: field);
-            }
-
-            return;
         }
 
         internal static void Clear()
         {
             ConverterObjects = null;
             ConverterGenericPrototypes = null;
+            ComposeStrategyCache.Clear();
         }
     }
 }

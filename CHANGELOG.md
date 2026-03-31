@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 * Added caching for part of the XML reflection system, improving some benchmarks by up to 100%.
 * Added caching for sharability testing, improving general performance by around 5%.
 * Added caching for object construction, improving general performance by around 2%.
+* Added caching for compose decisions, improving write performance by around 5% in some cases (and reducing it in others that will be solved through other methods.)
 
 ### Fixed
 * Race condition in Serialization.Initialize().
