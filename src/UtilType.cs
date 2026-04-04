@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -641,6 +642,26 @@ namespace Dec
             return Util.CanBeShared(type);
         }
 
+        internal static bool ImplementsGenericInterface(this Type type, Type genericInterfaceDefinition)
+        {
+            foreach (var iface in type.GetInterfaces())
+            {
+                if (iface.IsGenericType && iface.GetGenericTypeDefinition() == genericInterfaceDefinition)
+                    return true;
+            }
+            return false;
+        }
+
+        internal static Type[] GetGenericInterfaceArguments(this Type type, Type genericInterfaceDefinition)
+        {
+            foreach (var iface in type.GetInterfaces())
+            {
+                if (iface.IsGenericType && iface.GetGenericTypeDefinition() == genericInterfaceDefinition)
+                    return iface.GetGenericArguments();
+            }
+            return null;
+        }
+
         private static ConcurrentDictionary<Type, bool> CanBeCloneCopiedCache = new ConcurrentDictionary<Type, bool>();
         internal static bool CanBeCloneCopied(this Type type)
         {
@@ -747,17 +768,17 @@ namespace Dec
                 return ParseModeCategory.Value;
             }
             else if (
-                (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>)) ||
                 type.IsArray ||
                 (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Stack<>)) ||
-                (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Queue<>))
+                (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Queue<>)) ||
+                typeof(IList).IsAssignableFrom(type)
             )
             {
                 return ParseModeCategory.OrderedContainer;
             }
             else if (
-                (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>)) ||
-                (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(HashSet<>))
+                typeof(IDictionary).IsAssignableFrom(type) ||
+                type.ImplementsGenericInterface(typeof(ISet<>))
             )
             {
                 return ParseModeCategory.UnorderedContainer;

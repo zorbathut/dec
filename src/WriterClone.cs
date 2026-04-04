@@ -351,16 +351,16 @@ namespace Dec
                 };
             }
 
-            if (valType.IsGenericType)
+            if (typeof(IList).IsAssignableFrom(valType))
             {
-                var genericTypeDefinition = valType.GetGenericTypeDefinition();
+                var listElementType = valType.GetGenericInterfaceArguments(typeof(IList<>))[0];
+                bool isExactList = valType.IsGenericType && valType.GetGenericTypeDefinition() == typeof(List<>);
+                var versionField = isExactList ? valType.GetField("_version", BindingFlags.Instance | BindingFlags.NonPublic) : null;
 
-                if (genericTypeDefinition == typeof(List<>))
+                // if the list members are valuelike, we can just copy the whole thing
+                if (UtilType.CanBeCloneCopied(listElementType))
                 {
-                    var versionField = valType.GetField("_version", BindingFlags.Instance | BindingFlags.NonPublic);
-
-                    // if the list members are valuelike, we can just copy the whole thing
-                    if (UtilType.CanBeCloneCopied(valType.GetGenericArguments()[0]))
+                    if (isExactList)
                     {
                         var addRangeMethod = valType.GetMethod("AddRange");
 
@@ -390,106 +390,129 @@ namespace Dec
 
                             for (int i = 0; i < originalList.Count; i++)
                             {
-                                resultList.Add(self.CloneChild(originalList[i], resetDepth));
+                                resultList.Add(originalList[i]);
                             }
-
-                            versionField.SetValue(resultList, Util.CollectionDeserializationVersion);
                         };
                     }
                 }
-
-                if (genericTypeDefinition == typeof(Dictionary<,>))
+                else
                 {
-                    bool canCloneKey = UtilType.CanBeCloneCopied(valType.GetGenericArguments()[0]);
-                    bool canCloneValue = UtilType.CanBeCloneCopied(valType.GetGenericArguments()[1]);
+                    return (self, resetDepth) =>
+                    {
+                        var originalList = self.original as IList;
+                        var resultList = self.result as IList;
 
-                    // if the dictionary members are valuelike, we can just copy the whole thing
-                    // skipping the tests is important enough that we'll just specialcase the various options
-                    if (canCloneKey && canCloneValue)
-                    {
-                        return (self, resetDepth) =>
+                        // just in case; maybe we should be reusing originals as models?
+                        resultList.Clear();
+
+                        for (int i = 0; i < originalList.Count; i++)
                         {
-                            var originalDict = self.original as IDictionary;
-                            var resultDict = self.result as IDictionary;
-                            resultDict.Clear();
-                            foreach (DictionaryEntry kvp in originalDict)
-                            {
-                                resultDict[kvp.Key] = kvp.Value;
-                            }
-                        };
-                    }
-                    else if (canCloneKey)
-                    {
-                        return (self, resetDepth) =>
-                        {
-                            var originalDict = self.original as IDictionary;
-                            var resultDict = self.result as IDictionary;
-                            resultDict.Clear();
-                            foreach (DictionaryEntry kvp in originalDict)
-                            {
-                                resultDict[kvp.Key] = self.CloneChild(kvp.Value, resetDepth);
-                            }
-                        };
-                    }
-                    else if (canCloneValue)
-                    {
-                        return (self, resetDepth) =>
-                        {
-                            var originalDict = self.original as IDictionary;
-                            var resultDict = self.result as IDictionary;
-                            resultDict.Clear();
-                            foreach (DictionaryEntry kvp in originalDict)
-                            {
-                                resultDict[self.CloneChild(kvp.Key, resetDepth)] = kvp.Value;
-                            }
-                        };
-                    }
-                    else
-                    {
-                        return (self, resetDepth) =>
-                        {
-                            var originalDict = self.original as IDictionary;
-                            var resultDict = self.result as IDictionary;
-                            resultDict.Clear();
-                            foreach (DictionaryEntry kvp in originalDict)
-                            {
-                                resultDict[self.CloneChild(kvp.Key, resetDepth)] = self.CloneChild(kvp.Value, resetDepth);
-                            }
-                        };
-                    }
+                            resultList.Add(self.CloneChild(originalList[i], resetDepth));
+                        }
+
+                        versionField?.SetValue(resultList, Util.CollectionDeserializationVersion);
+                    };
                 }
+            }
 
-                if (genericTypeDefinition == typeof(HashSet<>))
+            if (typeof(IDictionary).IsAssignableFrom(valType))
+            {
+                var dictArgs = valType.GetGenericInterfaceArguments(typeof(IDictionary<,>));
+                bool canCloneKey = UtilType.CanBeCloneCopied(dictArgs[0]);
+                bool canCloneValue = UtilType.CanBeCloneCopied(dictArgs[1]);
+
+                // if the dictionary members are valuelike, we can just copy the whole thing
+                // skipping the tests is important enough that we'll just specialcase the various options
+                if (canCloneKey && canCloneValue)
                 {
-                    var clearMethod = valType.GetMethod("Clear");
-                    var addMethod = valType.GetMethod("Add");
-
-                    // if the hashset members are valuelike, we can just copy the whole thing
-                    if (UtilType.CanBeCloneCopied(valType.GetGenericArguments()[0]))
+                    return (self, resetDepth) =>
                     {
-                        return (self, resetDepth) =>
+                        var originalDict = self.original as IDictionary;
+                        var resultDict = self.result as IDictionary;
+                        resultDict.Clear();
+                        foreach (DictionaryEntry kvp in originalDict)
                         {
-                            var originalSet = self.original as IEnumerable;
-                            clearMethod.Invoke(self.result, null);
-                            foreach (var item in originalSet)
-                            {
-                                addMethod.Invoke(self.result, new object[] { item });
-                            }
-                        };
-                    }
-                    else
-                    {
-                        return (self, resetDepth) =>
-                        {
-                            var originalSet = self.original as IEnumerable;
-                            clearMethod.Invoke(self.result, null);
-                            foreach (var item in originalSet)
-                            {
-                                addMethod.Invoke(self.result, new object[] { self.CloneChild(item, resetDepth) });
-                            }
-                        };
-                    }
+                            resultDict[kvp.Key] = kvp.Value;
+                        }
+                    };
                 }
+                else if (canCloneKey)
+                {
+                    return (self, resetDepth) =>
+                    {
+                        var originalDict = self.original as IDictionary;
+                        var resultDict = self.result as IDictionary;
+                        resultDict.Clear();
+                        foreach (DictionaryEntry kvp in originalDict)
+                        {
+                            resultDict[kvp.Key] = self.CloneChild(kvp.Value, resetDepth);
+                        }
+                    };
+                }
+                else if (canCloneValue)
+                {
+                    return (self, resetDepth) =>
+                    {
+                        var originalDict = self.original as IDictionary;
+                        var resultDict = self.result as IDictionary;
+                        resultDict.Clear();
+                        foreach (DictionaryEntry kvp in originalDict)
+                        {
+                            resultDict[self.CloneChild(kvp.Key, resetDepth)] = kvp.Value;
+                        }
+                    };
+                }
+                else
+                {
+                    return (self, resetDepth) =>
+                    {
+                        var originalDict = self.original as IDictionary;
+                        var resultDict = self.result as IDictionary;
+                        resultDict.Clear();
+                        foreach (DictionaryEntry kvp in originalDict)
+                        {
+                            resultDict[self.CloneChild(kvp.Key, resetDepth)] = self.CloneChild(kvp.Value, resetDepth);
+                        }
+                    };
+                }
+            }
+
+            if (valType.ImplementsGenericInterface(typeof(ISet<>)))
+            {
+                var clearMethod = valType.GetMethod("Clear");
+                var addMethod = valType.GetMethod("Add");
+                var setElementType = valType.GetGenericInterfaceArguments(typeof(ISet<>))[0];
+
+                // if the set members are valuelike, we can just copy the whole thing
+                if (UtilType.CanBeCloneCopied(setElementType))
+                {
+                    return (self, resetDepth) =>
+                    {
+                        var originalSet = self.original as IEnumerable;
+                        clearMethod.Invoke(self.result, null);
+                        foreach (var item in originalSet)
+                        {
+                            addMethod.Invoke(self.result, new object[] { item });
+                        }
+                    };
+                }
+                else
+                {
+                    return (self, resetDepth) =>
+                    {
+                        var originalSet = self.original as IEnumerable;
+                        clearMethod.Invoke(self.result, null);
+                        foreach (var item in originalSet)
+                        {
+                            addMethod.Invoke(self.result, new object[] { self.CloneChild(item, resetDepth) });
+                        }
+                    };
+                }
+            }
+
+            if (valType.IsGenericType)
+            {
+                var genericTypeDefinition = valType.GetGenericTypeDefinition();
 
                 if (genericTypeDefinition == typeof(Queue<>))
                 {

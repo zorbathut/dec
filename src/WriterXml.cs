@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -241,7 +242,7 @@ namespace Dec
 
         public override void WriteList(IList value)
         {
-            Type referencedType = value.GetType().GetGenericArguments()[0];
+            Type referencedType = value.GetType().GetGenericInterfaceArguments(typeof(IList<>))[0];
 
             for (int i = 0; i < value.Count; ++i)
             {
@@ -251,8 +252,9 @@ namespace Dec
 
         public override void WriteDictionary(IDictionary value)
         {
-            Type keyType = value.GetType().GetGenericArguments()[0];
-            Type valueType = value.GetType().GetGenericArguments()[1];
+            var dictArgs = value.GetType().GetGenericInterfaceArguments(typeof(IDictionary<,>));
+            Type keyType = dictArgs[0];
+            Type valueType = dictArgs[1];
 
             // I really want some way to canonicalize this ordering
             IDictionaryEnumerator iterator = value.GetEnumerator();
@@ -272,7 +274,7 @@ namespace Dec
 
         public override void WriteHashSet(IEnumerable value)
         {
-            Type keyType = value.GetType().GetGenericArguments()[0];
+            Type keyType = value.GetType().GetGenericInterfaceArguments(typeof(ISet<>))[0];
 
             // I really want some way to canonicalize this ordering
             IEnumerator iterator = value.GetEnumerator();

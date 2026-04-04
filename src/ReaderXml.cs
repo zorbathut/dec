@@ -118,7 +118,12 @@ namespace Dec
                 list.Add(Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, new PathIndex(path, list.Count), UserSettings) }, referencedType, null, readerGlobals, recorderChildContext));
             }
 
-            list.GetType().GetField("_version", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(list, Util.CollectionDeserializationVersion);
+            var versionField = list.GetType().GetField("_version", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (versionField != null)
+            {
+                // possible that a collection won't have this, I suppose
+                versionField.SetValue(list, Util.CollectionDeserializationVersion);
+            }
         }
 
         private void ParseArrayRank(ReaderNodeXml node, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings, Array value, Type referencedType, int rank, int[] indices, int startAt)

@@ -275,7 +275,7 @@ namespace Dec
 
         public override void WriteList(IList value)
         {
-            Type referencedType = value.GetType().GetGenericArguments()[0];
+            Type referencedType = value.GetType().GetGenericInterfaceArguments(typeof(IList<>))[0];
 
             // Maybe this should just be a giant AreEqual with a dynamically allocated list?
             writer.AppendLine($"Assert.AreEqual({accessor}.Count, {value.Count});");
@@ -291,8 +291,9 @@ namespace Dec
 
         public override void WriteDictionary(IDictionary value)
         {
-            Type keyType = value.GetType().GetGenericArguments()[0];
-            Type valueType = value.GetType().GetGenericArguments()[1];
+            var dictArgs = value.GetType().GetGenericInterfaceArguments(typeof(IDictionary<,>));
+            Type keyType = dictArgs[0];
+            Type valueType = dictArgs[1];
 
             writer.AppendLine($"Assert.AreEqual({accessor}.Count, {value.Count});");
 
@@ -312,7 +313,7 @@ namespace Dec
 
         public override void WriteHashSet(IEnumerable value)
         {
-            Type keyType = value.GetType().GetGenericArguments()[0];
+            Type keyType = value.GetType().GetGenericInterfaceArguments(typeof(ISet<>))[0];
 
             int count = 0;
             IEnumerator iterator = value.GetEnumerator();

@@ -331,7 +331,7 @@ namespace Dec
 
         public override void WriteList(IList value)
         {
-            Type referencedType = value.GetType().GetGenericArguments()[0];
+            Type referencedType = value.GetType().GetGenericInterfaceArguments(typeof(IList<>))[0];
 
             writer.AddChecksum((int)NodeTag.List, Path);
             writer.AddChecksum((ulong)value.Count, Path);
@@ -344,7 +344,7 @@ namespace Dec
 
         public override void WriteDictionary(IDictionary value)
         {
-            Type referencedType = value.GetType().GetGenericArguments()[1];
+            Type referencedType = value.GetType().GetGenericInterfaceArguments(typeof(IDictionary<,>))[1];
 
             writer.AddChecksum((int)NodeTag.Dictionary, Path);
             writer.AddChecksum((ulong)value.Count, Path);
@@ -421,7 +421,7 @@ namespace Dec
 
         public override void WriteHashSet(IEnumerable value)
         {
-            Type referencedType = value.GetType().GetGenericArguments()[0];
+            Type referencedType = value.GetType().GetGenericInterfaceArguments(typeof(ISet<>))[0];
 
             writer.AddChecksum((int)NodeTag.HashSet, Path);
             writer.AddChecksum((ulong)value.Cast<object>().Count(), Path);

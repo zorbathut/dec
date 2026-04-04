@@ -1162,46 +1162,8 @@ namespace Dec
                 return result;
             }
 
-            // Special case: Lists
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
-            {
-                foreach (var (parseCommand, node) in orders)
-                {
-                    switch (parseCommand)
-                    {
-                        case ParseCommand.Replace:
-                            // If you have a default list, but specify it in XML, we assume this is a full override. Clear the original list to cut down on GC churn.
-                            // TODO: Is some bozo going to store the same "constant" global list on init, then be surprised when we re-use the list instead of creating a new one? Detect this and yell about it I guess.
-                            // If you are reading this because you're the bozo, [insert angry emoji here], but also feel free to be annoyed that I haven't fixed it yet despite realizing it's a problem. Ping me on Discord, I'll take care of it, sorry 'bout that.
-                            if (result != null)
-                            {
-                                ((IList)result).Clear();
-                            }
-                            break;
-
-                        case ParseCommand.Append:
-                            // we're good
-                            break;
-
-                        default:
-                            Dbg.Err($"{node.GetContext()}: Internal error, got invalid mode {parseCommand}");
-                            break;
-                    }
-
-                    // List<> handling
-                    Type referencedType = type.GetGenericArguments()[0];
-
-                    var list = (IList)(result ?? Activator.CreateInstance(type));
-
-                    node.ParseList(list, referencedType, globals, recSettings);
-
-                    result = list;
-                }
-
-                return result;
-            }
-
             // Special case: Arrays
+            // Arrays are technically a subset of list but they're *weird* so we're just handling them independently.
             if (type.IsArray)
             {
                 Type referencedType = type.GetElementType();
@@ -1309,9 +1271,50 @@ namespace Dec
                 return result;
             }
 
-            // Special case: Dictionaries
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+            // Special case: Lists (any IList implementation, aside from Array)
+            if (typeof(IList).IsAssignableFrom(type))
             {
+                foreach (var (parseCommand, node) in orders)
+                {
+                    switch (parseCommand)
+                    {
+                        case ParseCommand.Replace:
+                            // If you have a default list, but specify it in XML, we assume this is a full override. Clear the original list to cut down on GC churn.
+                            // TODO: Is some bozo going to store the same "constant" global list on init, then be surprised when we re-use the list instead of creating a new one? Detect this and yell about it I guess.
+                            // If you are reading this because you're the bozo, [insert angry emoji here], but also feel free to be annoyed that I haven't fixed it yet despite realizing it's a problem. Ping me on Discord, I'll take care of it, sorry 'bout that.
+                            if (result != null)
+                            {
+                                ((IList)result).Clear();
+                            }
+                            break;
+
+                        case ParseCommand.Append:
+                            // we're good
+                            break;
+
+                        default:
+                            Dbg.Err($"{node.GetContext()}: Internal error, got invalid mode {parseCommand}");
+                            break;
+                    }
+
+                    // IList handling
+                    Type referencedType = type.GetGenericInterfaceArguments(typeof(IList<>))[0];
+
+                    var list = (IList)(result ?? Activator.CreateInstance(type));
+
+                    node.ParseList(list, referencedType, globals, recSettings);
+
+                    result = list;
+                }
+
+                return result;
+            }
+
+            // Special case: Dictionaries
+            if (typeof(IDictionary).IsAssignableFrom(type))
+            {
+                var dictArgs = type.GetGenericInterfaceArguments(typeof(IDictionary<,>));
+
                 foreach (var (parseCommand, node) in orders)
                 {
                     bool permitPatch = false;
@@ -1343,9 +1346,9 @@ namespace Dec
                             break;
                     }
 
-                    // Dictionary<> handling
-                    Type keyType = type.GetGenericArguments()[0];
-                    Type valueType = type.GetGenericArguments()[1];
+                    // Dictionary handling
+                    Type keyType = dictArgs[0];
+                    Type valueType = dictArgs[1];
 
                     var dict = (IDictionary)(result ?? Activator.CreateInstance(type));
 
@@ -1357,8 +1360,8 @@ namespace Dec
                 return result;
             }
 
-            // Special case: HashSet
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(HashSet<>))
+            // Special case: Sets (any ISet<> implementation)
+            if (type.ImplementsGenericInterface(typeof(ISet<>)))
             {
                 foreach (var (parseCommand, node) in orders)
                 {
@@ -1395,7 +1398,7 @@ namespace Dec
                             break;
                     }
 
-                    Type keyType = type.GetGenericArguments()[0];
+                    Type keyType = type.GetGenericInterfaceArguments(typeof(ISet<>))[0];
 
                     var set = result ?? Activator.CreateInstance(type);
 
@@ -1860,9 +1863,6 @@ namespace Dec
             {
                 var genericDef = valType.GetGenericTypeDefinition();
 
-                if (genericDef == typeof(List<>)) { strategy.writer = (node, value, fi) => node.WriteList(value as IList); return strategy; }
-                if (genericDef == typeof(Dictionary<,>)) { strategy.writer = (node, value, fi) => node.WriteDictionary(value as IDictionary); return strategy; }
-                if (genericDef == typeof(HashSet<>)) { strategy.writer = (node, value, fi) => node.WriteHashSet(value as IEnumerable); return strategy; }
                 if (genericDef == typeof(Queue<>)) { strategy.writer = (node, value, fi) => node.WriteQueue(value as IEnumerable); return strategy; }
                 if (genericDef == typeof(Stack<>)) { strategy.writer = (node, value, fi) => node.WriteStack(value as IEnumerable); return strategy; }
 
@@ -1892,6 +1892,11 @@ namespace Dec
                     return strategy;
                 }
             }
+
+            // Interface-based collection checks (after Array and exact Queue/Stack/Tuple checks)
+            if (typeof(IList).IsAssignableFrom(valType)) { strategy.writer = (node, value, fi) => node.WriteList(value as IList); return strategy; }
+            if (typeof(IDictionary).IsAssignableFrom(valType)) { strategy.writer = (node, value, fi) => node.WriteDictionary(value as IDictionary); return strategy; }
+            if (valType.ImplementsGenericInterface(typeof(ISet<>))) { strategy.writer = (node, value, fi) => node.WriteHashSet(value as IEnumerable); return strategy; }
 
             // Build the converter-or-reflection fallthrough writer; used standalone for non-IRecordable types,
             // or captured by the IRecordable closure for IConditionalRecordable fallthrough.
