@@ -24,6 +24,7 @@ All notable changes to this project will be documented in this file.
 * Race condition in Serialization.Initialize().
 * Missing converter initialization in Composer.
 * Race condition in type-hierarchy caches.
+* Thrown exception and parse failure if given a StaticReferences class with readonly members.
 
 
 ## [v0.11.0]

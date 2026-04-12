@@ -431,6 +431,20 @@ namespace Dec
                     bool touched = false;
                     foreach (var field in stat.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static))
                     {
+                        if (field.IsInitOnly)
+                        {
+                            Dbg.Err($"Static reference class {stat} has readonly member `{field.FieldType} {field.Name}`; static reference fields cannot be readonly");
+                            touched = true;
+                            continue;
+                        }
+
+                        if (!typeof(Dec).IsAssignableFrom(field.FieldType))
+                        {
+                            Dbg.Err($"Static reference class {stat} has member `{field.FieldType} {field.Name}` that is not a Dec type");
+                            touched = true;
+                            continue;
+                        }
+
                         var dec = Database.Get(field.FieldType, field.Name);
                         if (dec == null)
                         {

@@ -367,6 +367,54 @@ namespace DecTest
         }
 
         [Dec.StaticReferences]
+        public static class ReadonlyFieldDecs
+        {
+            static ReadonlyFieldDecs() { Dec.StaticReferencesAttribute.Initialized(); }
+
+            public static readonly StubDec TestDec;
+        }
+
+        [Test]
+        public void ReadonlyField([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) }, explicitStaticRefs = new Type[] { typeof(ReadonlyFieldDecs) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <StubDec decName=""TestDec"" />
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoParserTests(mode, rewrite_expectParseErrors: true);
+
+            var result = Dec.Database<StubDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+        }
+
+        [Dec.StaticReferences]
+        public static class ReadonlyNonDecFieldDecs
+        {
+            static ReadonlyNonDecFieldDecs() { Dec.StaticReferencesAttribute.Initialized(); }
+
+            public static readonly int TestDec = 0;
+        }
+
+        [Test]
+        public void ReadonlyNonDecField([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) }, explicitStaticRefs = new Type[] { typeof(ReadonlyNonDecFieldDecs) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                </Decs>");
+            ExpectErrors(() => parser.Finish());
+
+            DoParserTests(mode, rewrite_expectParseErrors: true);
+        }
+
+        [Dec.StaticReferences]
         public static class EmptyDecs
         {
             static EmptyDecs() { Dec.StaticReferencesAttribute.Initialized(); }
