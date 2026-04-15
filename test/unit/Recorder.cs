@@ -820,6 +820,51 @@ namespace DecTest
             Assert.AreEqual(root.nullableStructB, deserialized.nullableStructB);
         }
 
+        public struct NullableTextualStruct : Dec.IRecordable
+        {
+            public int value;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                if (recorder.Mode == Dec.Recorder.Direction.Read)
+                {
+                    string textual = null;
+                    recorder.RecordAsThis(ref textual);
+                    value = int.Parse(textual);
+                }
+                else
+                {
+                    string textual = value.ToString();
+                    recorder.RecordAsThis(ref textual);
+                }
+            }
+        }
+
+        public class NullableTextuals : Dec.IRecordable
+        {
+            public NullableTextualStruct? present;
+            public NullableTextualStruct? absent;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref present, "present");
+                recorder.Record(ref absent, "absent");
+            }
+        }
+
+        [Test]
+        public void NullableTextualRecordable([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
+        {
+            var root = new NullableTextuals();
+            root.present = new NullableTextualStruct { value = 42 };
+
+            var deserialized = DoRecorderRoundTrip(root, mode);
+
+            Assert.IsTrue(deserialized.present.HasValue);
+            Assert.AreEqual(42, deserialized.present.Value.value);
+            Assert.IsNull(deserialized.absent);
+        }
+
         class NonConstructableRecorderClass : Dec.IRecordable
         {
             public NonConstructableRecorderClass(int x) { }

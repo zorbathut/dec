@@ -25,6 +25,7 @@ All notable changes to this project will be documented in this file.
 * Missing converter initialization in Composer.
 * Race condition in type-hierarchy caches.
 * Thrown exception and parse failure if given a StaticReferences class with readonly members.
+* Deserialization failure on Nullable IRecordable value types whose Record uses textual content.
 
 
 ## [v0.11.0]

@@ -1044,9 +1044,15 @@ namespace Dec
                 return result;
             }
 
-            // Special case: IRecordables
+            // Special case: IRecordables (including Nullable<T> where T : IRecordable)
+            Type recordableType = type;
+            if (type.IsConstructedGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>) && typeof(IRecordable).IsAssignableFrom(type.GetGenericArguments()[0]))
+            {
+                recordableType = type.GetGenericArguments()[0];
+            }
+
             IRecordable recordableBuffered = null;
-            if (typeof(IRecordable).IsAssignableFrom(type))
+            if (typeof(IRecordable).IsAssignableFrom(recordableType))
             {
                 // we're going to need to make one anyway so let's just go ahead and do that
                 IRecordable recordable = null;
@@ -1057,11 +1063,11 @@ namespace Dec
                 }
                 else if (recSettings.factories == null)
                 {
-                    recordable = (IRecordable)type.CreateInstanceSafe("recordable", orders[0].node);
+                    recordable = (IRecordable)recordableType.CreateInstanceSafe("recordable", orders[0].node);
                 }
                 else
                 {
-                    recordable = recSettings.CreateRecordableFromFactory(type, "recordable", orders[0].node);
+                    recordable = recSettings.CreateRecordableFromFactory(recordableType, "recordable", orders[0].node);
                 }
 
                 // we hold on to this so that, *if* we end up not using this object, we can optionally reuse it later for reflection
