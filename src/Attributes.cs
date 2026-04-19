@@ -60,7 +60,7 @@ namespace Dec
     /// This is (obviously) much faster than copying the class, though it also (obviously) leaves you with a "clone" that shares state with the original. Great for immutable classes or classes wrapped in copy-on-write structures.
     /// </remarks>
     [AttributeUsage(AttributeTargets.Class)]
-    public class CloneClassAsSharedRef : Attribute
+    public class CloneClassAsSharedRefAttribute : Attribute
     {
 
     }
