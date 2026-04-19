@@ -13,12 +13,12 @@ references:
   commentId: T:Dec.AbstractAttribute
   fullName: Dec.AbstractAttribute
   nameWithType: AbstractAttribute
-- uid: Dec.CloneClassAsSharedRef
-  name: CloneClassAsSharedRef
-  href: api/Dec.CloneClassAsSharedRef.html
-  commentId: T:Dec.CloneClassAsSharedRef
-  fullName: Dec.CloneClassAsSharedRef
-  nameWithType: CloneClassAsSharedRef
+- uid: Dec.CloneClassAsSharedRefAttribute
+  name: CloneClassAsSharedRefAttribute
+  href: api/Dec.CloneClassAsSharedRefAttribute.html
+  commentId: T:Dec.CloneClassAsSharedRefAttribute
+  fullName: Dec.CloneClassAsSharedRefAttribute
+  nameWithType: CloneClassAsSharedRefAttribute
 - uid: Dec.CloneStructPiecewiseAttribute
   name: CloneStructPiecewiseAttribute
   href: api/Dec.CloneStructPiecewiseAttribute.html

@@ -18,17 +18,17 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/Dec.CloneClassAsSharedRef.yml",
+      "source_relative_path": "api/Dec.CloneClassAsSharedRefAttribute.yml",
       "output": {
         ".html": {
-          "relative_path": "api/Dec.CloneClassAsSharedRef.html"
+          "relative_path": "api/Dec.CloneClassAsSharedRefAttribute.html"
         }
       },
       "version": "",
       "Uid": null,
       "IsMRef": true,
-      "Title": "Dec.CloneClassAsSharedRef",
-      "Summary": "<p sourcefile=\"api/Dec.CloneClassAsSharedRef.yml\" sourcestartlinenumber=\"1\">Signals that this class should be &quot;cloned&quot; by simply duplicating the reference.</p>\n"
+      "Title": "Dec.CloneClassAsSharedRefAttribute",
+      "Summary": "<p sourcefile=\"api/Dec.CloneClassAsSharedRefAttribute.yml\" sourcestartlinenumber=\"1\">Signals that this class should be &quot;cloned&quot; by simply duplicating the reference.</p>\n"
     },
     {
       "type": "ManagedReference",
