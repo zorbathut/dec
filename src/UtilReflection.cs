@@ -87,64 +87,115 @@ namespace Dec
             return array;
         }
 
-        internal static bool IsUserAssembly(this Assembly asm)
-        {
-            var name = asm.FullName;
-
-            // Filter out system libraries
-            if (name.StartsWith("mscorlib,") || name.StartsWith("System,") || name.StartsWith("System.") || name.StartsWith("netstandard"))
-            {
-                return false;
-            }
-
-            // Filter out Mono
-            if (name.StartsWith("Mono."))
-            {
-                return false;
-            }
-
-            // Filter out nunit, almost entirely so our test results look better
-            if (name.StartsWith("nunit.framework,"))
-            {
-                return false;
-            }
-
-            // Filter out Microsoft test platform to avoid weird .NET 9 compatibility issues
-            if (name.StartsWith("Microsoft.TestPlatform") || name.StartsWith("Microsoft.VisualStudio.TestPlatform"))
-            {
-                return false;
-            }
-
-            // Filter out Unity
-            if (name.StartsWith("Unity.") || name.StartsWith("UnityEngine,") || name.StartsWith("UnityEngine.") || name.StartsWith("UnityEditor,") || name.StartsWith("UnityEditor.") || name.StartsWith("ExCSS.Unity,"))
-            {
-                return false;
-            }
-
-            // Filter out dec
-            if (name.StartsWith("dec,"))
-            {
-                return false;
-            }
-
-            return true;
-        }
+        // Cached transitive-reference closure of Dec. Invalidated when AppDomain.GetAssemblies().Length changes.
+        // Eventually-consistent: a collectible AssemblyLoadContext unload-and-reload with the same final count
+        // would escape detection, but Dec does not support that scenario (see ARCHITECTURE.md threading contract).
+        // Returned arrays are never mutated after publication, so callers iterating an older snapshot are safe.
+        private static Assembly[] cachedUserAssemblies;
+        private static int cachedUserAssembliesAssemblyCount = -1;
+        private static readonly object userAssembliesLock = new object();
 
         internal static IEnumerable<Assembly> GetAllUserAssemblies()
         {
-            return AppDomain.CurrentDomain.GetAssemblies().Where(asm => asm.IsUserAssembly());
+            // An assembly contains types this method's callers care about (Converter subclasses,
+            // [StaticReferences]-attributed classes) only if it directly or transitively references Dec's
+            // own assembly - those types can't be declared without the C# compiler emitting a manifest-level
+            // reference to Dec. That makes this narrower than UtilType.GetTypeFromAnyAssembly's scan, which
+            // has to find plain data classes in assemblies that don't themselves reference Dec.
+            //
+            // Matching is by AssemblyName.Name only (no version / public-key-token / culture). In practice
+            // Dec ships as a single-version DLL per process; side-by-side loads of two different dec.dlls
+            // in separate AssemblyLoadContexts are not a supported configuration.
+            var loaded = AppDomain.CurrentDomain.GetAssemblies();
+            lock (userAssembliesLock)
+            {
+                if (cachedUserAssemblies == null || loaded.Length != cachedUserAssembliesAssemblyCount)
+                {
+                    cachedUserAssemblies = ComputeDecReferrerClosure(loaded);
+                    cachedUserAssembliesAssemblyCount = loaded.Length;
+                }
+                return cachedUserAssemblies;
+            }
+        }
+
+        private static Assembly[] ComputeDecReferrerClosure(Assembly[] loaded)
+        {
+            var decAssembly = typeof(Dec).Assembly;
+
+            // Build a reverse-reference graph: for each assembly name, who references it?
+            // Keyed by simple name (AssemblyName.Name) since that's how references identify their target.
+            var referrers = new Dictionary<string, List<Assembly>>();
+            foreach (var asm in loaded)
+            {
+                AssemblyName[] references;
+                try
+                {
+                    references = asm.GetReferencedAssemblies();
+                }
+                catch (NotSupportedException)
+                {
+                    // Dynamic (AssemblyBuilder) and reflection-only assemblies throw this; skip them.
+                    continue;
+                }
+                catch (Exception e)
+                {
+                    // Something unexpected - don't silently swallow it, but keep going so one broken
+                    // assembly doesn't take out type discovery for the whole process.
+                    Dbg.Err($"Failed to read references from {asm.FullName}: {e}");
+                    continue;
+                }
+
+                foreach (var reference in references)
+                {
+                    if (!referrers.TryGetValue(reference.Name, out var list))
+                    {
+                        list = new List<Assembly>();
+                        referrers[reference.Name] = list;
+                    }
+                    list.Add(asm);
+                }
+            }
+
+            // BFS outward from Dec, following "who references me?" edges. Seed with decAssembly itself so
+            // the embedded-source case works (where Dec is compiled directly into the user's assembly and
+            // there is no separate dec.dll to reference).
+            var closure = new HashSet<Assembly> { decAssembly };
+            var queue = new Queue<Assembly>();
+            queue.Enqueue(decAssembly);
+            while (queue.Count > 0)
+            {
+                var current = queue.Dequeue();
+                if (referrers.TryGetValue(current.GetName().Name, out var directReferrers))
+                {
+                    foreach (var referrer in directReferrers)
+                    {
+                        if (closure.Add(referrer))
+                        {
+                            queue.Enqueue(referrer);
+                        }
+                    }
+                }
+            }
+
+            return closure.ToArray();
         }
 
         internal static IEnumerable<Type> GetAllUserTypes()
         {
-            return GetAllUserAssemblies().SelectMany(a => a.GetTypes()).Where(t => {
-                var ns = t.Namespace;
-                if (ns == null)
+            // Filter out Dec's own internal types. We key off (assembly, namespace) rather than namespace
+            // alone, so user code that happens to live in a "Dec" namespace (in a user assembly) is still
+            // surfaced. This matters for the embedded-source configuration where decAssembly is the user's
+            // assembly: we still want to exclude Dec's own types from discovery, but we can only identify
+            // them by namespace since the assembly check won't help.
+            var decAssembly = typeof(Dec).Assembly;
+            return GetAllUserAssemblies().SelectMany(a => a.GetTypes()).Where(t =>
+            {
+                if (t.Assembly != decAssembly)
                 {
                     return true;
                 }
-
-                return !t.Namespace.StartsWith("Dec.") && t.Namespace != "Dec";
+                var ns = t.Namespace;
+                return ns != null && ns != "Dec" && !ns.StartsWith("Dec.");
             });
         }
 
