@@ -28,7 +28,7 @@ All notable changes to this project will be documented in this file.
 * Thrown exception and parse failure if given a StaticReferences class with readonly members.
 * Deserialization failure on Nullable IRecordable value types whose Record uses textual content.
 * CloneClassAsSharedRef missing the Attribute suffix. This is technically breaking but it'd be really weird to rely on the exact class name.
-
+* Obsolete documentation on StaticReferencesAttribute.Initialized(), along with a related anti-optimization.
 
 ## [v0.11.0]
 ### Added

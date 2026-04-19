@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 
 namespace Dec
 {
@@ -567,7 +566,6 @@ namespace Dec
             s_Status = Status.Uninitialized;
         }
 
-        [MethodImpl(MethodImplOptions.NoInlining)]
         internal static void StaticReferencesInitialized()
         {
             if (s_StaticReferenceHandler != null)
