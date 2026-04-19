@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
 * Added delegate caching for Set/Stack/Queue, increasing performance by a few percent for reads and by 50%+ for clones.
 * A bunch of diagnostic messages rephrased to reduce confusion.
 * Too-many-types-found error message now gives a lot more diagnostic info.
+* Actually provide a native net10 build, whoops.
 
 ### Fixed
 * Race condition in Serialization.Initialize().
