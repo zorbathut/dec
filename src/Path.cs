@@ -223,7 +223,7 @@ namespace Dec
 
         public override string Serialize()
         {
-            return $"{parent.Serialize()}[KEY]";
+            return $"{parent.Serialize()}[SETELEM]";
         }
 
         public override bool IsValidForWriting()

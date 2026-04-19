@@ -197,7 +197,7 @@ namespace DecTest
                 <Decs>
                     <PathDec decName=""TestDec"">
                         <set>
-                            <li>PathDec.TestDec.set[KEY]</li>
+                            <li>PathDec.TestDec.set[SETELEM]</li>
                         </set>
                     </PathDec>
                 </Decs>");

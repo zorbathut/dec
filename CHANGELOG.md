@@ -27,6 +27,7 @@ All notable changes to this project will be documented in this file.
 * Actually provide a native net10 build, whoops.
 * Do a better job of detecting backing fields.
 * Removed the workaround for the .NET Core 2.1 float-roundtrip bug since we no longer support that target.
+* Distinguished Set element paths from dictionary key paths.
 
 ### Fixed
 * Race condition in Serialization.Initialize().
