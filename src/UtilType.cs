@@ -6,6 +6,9 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
+#if !NETSTANDARD2_1
+using System.Runtime.Loader;
+#endif
 using System.Text.RegularExpressions;
 
 namespace Dec
@@ -58,7 +61,13 @@ namespace Dec
             {
                 location = "<dynamic>";
             }
-            return $"{t.AssemblyQualifiedName} [{location}]";
+            int instanceId = RuntimeHelpers.GetHashCode(t.Assembly);
+#if NETSTANDARD2_1
+            return $"{t.AssemblyQualifiedName} [{location}] (instance#{instanceId:x8})";
+#else
+            string alcName = AssemblyLoadContext.GetLoadContext(t.Assembly)?.Name ?? "<unknown>";
+            return $"{t.AssemblyQualifiedName} [{location}] (ALC: {alcName}, instance#{instanceId:x8})";
+#endif
         }
 
         private static string DescribeTypeOverloadError(Type[] types)
