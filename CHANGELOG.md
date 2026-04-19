@@ -25,6 +25,7 @@ All notable changes to this project will be documented in this file.
 * A bunch of diagnostic messages rephrased to reduce confusion.
 * Too-many-types-found error message now gives a lot more diagnostic info.
 * Actually provide a native net10 build, whoops.
+* Do a better job of detecting backing fields.
 
 ### Fixed
 * Race condition in Serialization.Initialize().

@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace Dec
 {
@@ -52,8 +53,9 @@ namespace Dec
             {
                 foreach (var field in curType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly))
                 {
-                    if (field.IsBackingField())
+                    if (field.GetCustomAttribute<CompilerGeneratedAttribute>() != null)
                     {
+                        // we don't save backing fields
                         continue;
                     }
 
@@ -256,12 +258,6 @@ namespace Dec
             IndexInfoCached[type] = indices;
 
             return indices;
-        }
-
-        internal static bool IsBackingField(this FieldInfo field)
-        {
-            // I wish I could find something more authoritative on this.
-            return field.Name.StartsWith("<");
         }
 
         private enum CreateInstanceAction : byte

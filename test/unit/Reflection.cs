@@ -49,5 +49,23 @@ namespace DecTest
             Assert.IsFalse(types.Contains(typeof(Dec.Parser)), "Dec.Parser should not be surfaced as a user type");
             Assert.IsFalse(types.Contains(typeof(Dec.Recorder)), "Dec.Recorder should not be surfaced as a user type");
         }
+
+        private class ClassWithAutoProperty
+        {
+            public int RegularField;
+            public int AutoProperty { get; set; }
+        }
+
+        [Test]
+        public void SerializableFieldsExcludesAutoPropertyBackingField()
+        {
+            // Auto-property backing fields are emitted by the compiler with [CompilerGenerated] and a
+            // "<Name>k__BackingField" name. GetSerializableFieldsFromHierarchy must skip them so the
+            // user's auto-properties aren't silently serialized as data members.
+            var fields = Dec.UtilReflection.GetSerializableFieldsFromHierarchy(typeof(ClassWithAutoProperty));
+            var names = fields.Select(f => f.Name).ToArray();
+
+            Assert.AreEqual(new[] { "RegularField" }, names);
+        }
     }
 }
