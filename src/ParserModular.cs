@@ -127,7 +127,7 @@ namespace Dec
             {
                 if (s_Status != Status.Accumulating)
                 {
-                    Dbg.Err($"Adding data while while the world is in {s_Status} state; should be {Status.Accumulating} state");
+                    Dbg.Err($"Adding data while the world is in {s_Status} state; should be {Status.Accumulating} state");
                 }
 
                 string bakedIdentifier = (name == "core") ? identifier : $"{name}:{identifier}";
@@ -469,7 +469,7 @@ namespace Dec
                         if (touched)
                         {
                             // Otherwise we shouldn't even expect this to have been registered, but at least there's literally no fields in it so it doesn't matter
-                            Dbg.Err($"Failed to properly register {stat}; you may be missing a call to Dec.StaticReferencesAttribute.Initialized() in its static constructor, or the class may already have been initialized elsewhere (this should have thrown an error)");
+                            Dbg.Err($"Failed to properly register {stat}; you may be missing a call to Dec.StaticReferencesAttribute.Initialized() in its static constructor, or the class may already have been initialized elsewhere (this should have registered or thrown an error, go look for it!)");
                         }
 
                         s_StaticReferenceHandler = null;

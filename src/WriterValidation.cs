@@ -442,7 +442,7 @@ namespace Dec
         {
             if (SerializedString != null)
             {
-                Dbg.Err("String is already set!");
+                Dbg.Err("Internal error: WriterNodeStringize.WriteToken() called twice; a dict key is being serialized as multiple tokens");
             }
 
             SerializedString = token;

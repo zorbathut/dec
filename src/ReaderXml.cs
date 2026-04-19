@@ -294,7 +294,7 @@ namespace Dec
                     {
                         if (referencedKeyType != typeof(Type))
                         {
-                            Dbg.Err($"{elementContext}: Bespoke_Keytypedict used on a dictionary that isn't a Type key");
+                            Dbg.Err($"{elementContext}: Bespoke_KeyTypeDict() requires a dictionary with a Type key, but this dictionary's key type is {referencedKeyType}");
                         }
 
                         // make sure the value of `key` can be implicitly converted to `referencedValueType`

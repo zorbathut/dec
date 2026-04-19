@@ -127,7 +127,7 @@ namespace Dec
                 Parameters parameters = this;
                 if (parameters.factories != null)
                 {
-                    Dbg.Err("Recorder.WithFactory() called on Recorder.Parameters that already has factories. This is undefined results; currently replacing the old factory dictionary with the new one.");
+                    Dbg.Err("Recorder.WithFactory() called on Recorder.Parameters that already has factories. This has undefined results; currently replacing the old factory dictionary with the new one.");
                 }
 
                 if (parameters.shared)
@@ -520,7 +520,7 @@ namespace Dec
         {
             if (!disallowShared)
             {
-                Dbg.Err($"{node.GetContext()}: Internal error, RecorderReader.AllowShared() called on a RecorderReader that does not disallow shared objects");
+                Dbg.Err($"{node.GetContext()}: Internal error, RecorderReader.AllowShared() called on a RecorderReader that already allows shared objects");
             }
 
             this.readerGlobals = newGlobals;
@@ -603,7 +603,7 @@ namespace Dec
             // Check for unused text content when no fields were accessed
             if (seen.Count == 0 && node.HasText())
             {
-                Dbg.Err($"{node.GetContext()}: XML contains text content which was ignored. This is probably not meant to be a text node and will be treated as default values.");
+                Dbg.Err($"{node.GetContext()}: XML contains text content which was ignored, and no fields were read from this object; the text will be ignored and the object will be left with default values.");
             }
 
             var allChildren = node.GetAllChildren();
@@ -617,7 +617,7 @@ namespace Dec
             var unused = new HashSet<string>(allChildren);
             unused.ExceptWith(seen);
 
-            Dbg.Wrn($"{node.GetContext()}: Unused fields: {string.Join(", ", unused)}");
+            Dbg.Wrn($"{node.GetContext()}: Elements specified that don't exist on the object: {string.Join(", ", unused)}");
         }
     }
 }
