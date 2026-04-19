@@ -26,6 +26,7 @@ All notable changes to this project will be documented in this file.
 * Too-many-types-found error message now gives a lot more diagnostic info.
 * Actually provide a native net10 build, whoops.
 * Do a better job of detecting backing fields.
+* Removed the workaround for the .NET Core 2.1 float-roundtrip bug since we no longer support that target.
 
 ### Fixed
 * Race condition in Serialization.Initialize().

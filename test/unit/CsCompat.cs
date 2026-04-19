@@ -1,4 +1,3 @@
-using System.Linq;
 using NUnit.Framework;
 
 namespace DecTest
@@ -20,29 +19,13 @@ namespace DecTest
             }
         }
 
+        // Regression corpus for the .NET Core 2.1 float-roundtrip bug (dotnet/runtime#12035).
+        // The bug is fixed in every runtime Dec still targets, but the specific values that broke it
+        // remain useful as round-trip regression data.
         [Test]
         public void DotNet21FloatIssue([Values] RecorderMode mode)
         {
             System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
-
-            // Intended to verify that this test doesn't stop working somehow, so we actually test both codepaths . . .
-            bool floatSuccess = -8.22272715124268E-63 == double.Parse("-8.22272715124268E-63");
-            int[] assemblyVersion = typeof(float)
-                .Assembly
-                .CustomAttributes
-                .Where(ca => ca.AttributeType == typeof(System.Reflection.AssemblyFileVersionAttribute))
-                .Single()
-                .ConstructorArguments[0]
-                .ToString()
-                .Trim('"')
-                .Split('.')
-                .Select(n => int.Parse(n))
-                .ToArray();
-            bool bugShouldBeFixed =
-                assemblyVersion[0] > 4 ||
-                (assemblyVersion[0] == 4 && assemblyVersion[1] > 7);
-
-            Assert.IsTrue(floatSuccess == bugShouldBeFixed);
 
             var mr = new DoubleRec();
             mr.a = -8.22272715124268E-63;

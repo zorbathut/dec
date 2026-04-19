@@ -94,12 +94,9 @@ namespace Dec
                     // oops, all nan boxing!
                     node.Add(new XText("NaNbox" + BitConverter.DoubleToInt64Bits(val).ToString("X16")));
                 }
-                else if (CsCompat.FloatRoundtripBroken)
-                {
-                    node.Add(new XText(val.ToString("G17")));
-                }
                 else
                 {
+                    // .NET Core 3.0+ default ToString() is shortest-round-trippable, which is what we need.
                     node.Add(new XText(val.ToString()));
                 }
             }
@@ -110,10 +107,6 @@ namespace Dec
                 {
                     // oops, all nan boxing!
                     node.Add(new XText("NaNbox" + BitConverter.SingleToInt32Bits(val).ToString("X8")));
-                }
-                else if (CsCompat.FloatRoundtripBroken)
-                {
-                    node.Add(new XText(val.ToString("G9")));
                 }
                 else
                 {
