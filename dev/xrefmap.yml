@@ -82,7 +82,14 @@ references:
 - uid: Dec.Config.ConverterFactory
   name: ConverterFactory
   href: api/Dec.Config.html#Dec_Config_ConverterFactory
-  commentId: F:Dec.Config.ConverterFactory
+  commentId: P:Dec.Config.ConverterFactory
+  fullName: Dec.Config.ConverterFactory
+  nameWithType: Config.ConverterFactory
+- uid: Dec.Config.ConverterFactory*
+  name: ConverterFactory
+  href: api/Dec.Config.html#Dec_Config_ConverterFactory_
+  commentId: Overload:Dec.Config.ConverterFactory
+  isSpec: "True"
   fullName: Dec.Config.ConverterFactory
   nameWithType: Config.ConverterFactory
 - uid: Dec.Config.CultureInfo
