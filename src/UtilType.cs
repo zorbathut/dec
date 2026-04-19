@@ -494,7 +494,7 @@ namespace Dec
             }
         }
 
-        private static Dictionary<Type, string> ComposeCSCache = new Dictionary<Type, string>();
+        private static ConcurrentDictionary<Type, string> ComposeCSCache = new ConcurrentDictionary<Type, string>();
         internal static string ComposeCSFormatted(this Type type)
         {
             if (ComposeCSCache.TryGetValue(type, out string cacheVal))
