@@ -291,7 +291,7 @@ namespace Dec
         {
             // We actually just treat this like an array right now; it's the same behavior and it's easier
             Type keyType = value.GetType().GetGenericArguments()[0];
-            var array = value.GetType().GetMethod("ToArray").Invoke(value, new object[] { }) as Array;
+            var array = UtilCollectionReflect.QueueToArray(keyType)(value);
 
             WriteArray(array);
         }
@@ -300,7 +300,7 @@ namespace Dec
         {
             // We actually just treat this like an array right now; it's the same behavior and it's easier
             Type keyType = value.GetType().GetGenericArguments()[0];
-            var array = value.GetType().GetMethod("ToArray").Invoke(value, new object[] { }) as Array;
+            var array = UtilCollectionReflect.StackToArray(keyType)(value);
 
             // For some reason this writes it out to an array in the reverse order than I'd expect
             // (and also the reverse order it inputs in!)

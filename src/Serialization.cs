@@ -1383,8 +1383,8 @@ namespace Dec
                                 // Did you know there's no non-generic interface that HashSet<> supports that includes a Clear function?
                                 // Fun fact:
                                 // That thing I just wrote!
-                                var clearFunction = result.GetType().GetMethod("Clear");
-                                clearFunction.Invoke(result, null);
+                                // Route it through a cached delegate instead I guess.
+                                UtilCollectionReflect.SetClear(type.GetGenericInterfaceArguments(typeof(ISet<>))[0])(result);
                             }
                             break;
 
@@ -1420,7 +1420,7 @@ namespace Dec
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Stack<>))
             {
                 // Stack<> handling
-                // Again, no sensible non-generic interface to use, so we're stuck with reflection
+                // Again, no sensible non-generic interface to use, so, UtilCollectionReflect.
 
                 foreach (var (parseCommand, node) in orders)
                 {
@@ -1432,8 +1432,7 @@ namespace Dec
                             // If you are reading this because you're the bozo, [insert angry emoji here], but also feel free to be annoyed that I haven't fixed it yet despite realizing it's a problem. Ping me on Discord, I'll take care of it, sorry 'bout that.
                             if (result != null)
                             {
-                                var clearFunction = result.GetType().GetMethod("Clear");
-                                clearFunction.Invoke(result, null);
+                                UtilCollectionReflect.StackClear(type.GetGenericArguments()[0])(result);
                             }
                             break;
 
@@ -1463,7 +1462,7 @@ namespace Dec
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Queue<>))
             {
                 // Queue<> handling
-                // Again, no sensible non-generic interface to use, so we're stuck with reflection
+                // Again, no sensible non-generic interface to use, so, UtilCollectionReflect.
 
                 foreach (var (parseCommand, node) in orders)
                 {
@@ -1475,8 +1474,7 @@ namespace Dec
                             // If you are reading this because you're the bozo, [insert angry emoji here], but also feel free to be annoyed that I haven't fixed it yet despite realizing it's a problem. Ping me on Discord, I'll take care of it, sorry 'bout that.
                             if (result != null)
                             {
-                                var clearFunction = result.GetType().GetMethod("Clear");
-                                clearFunction.Invoke(result, null);
+                                UtilCollectionReflect.QueueClear(type.GetGenericArguments()[0])(result);
                             }
                             break;
 

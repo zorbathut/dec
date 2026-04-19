@@ -479,9 +479,9 @@ namespace Dec
 
             if (valType.ImplementsGenericInterface(typeof(ISet<>)))
             {
-                var clearMethod = valType.GetMethod("Clear");
-                var addMethod = valType.GetMethod("Add");
                 var setElementType = valType.GetGenericInterfaceArguments(typeof(ISet<>))[0];
+                var clearSet = UtilCollectionReflect.SetClear(setElementType);
+                var addSet = UtilCollectionReflect.SetAdd(setElementType);
 
                 // if the set members are valuelike, we can just copy the whole thing
                 if (UtilType.CanBeCloneCopied(setElementType))
@@ -489,10 +489,10 @@ namespace Dec
                     return (self, resetDepth) =>
                     {
                         var originalSet = self.original as IEnumerable;
-                        clearMethod.Invoke(self.result, null);
+                        clearSet(self.result);
                         foreach (var item in originalSet)
                         {
-                            addMethod.Invoke(self.result, new object[] { item });
+                            addSet(self.result, item);
                         }
                     };
                 }
@@ -501,10 +501,10 @@ namespace Dec
                     return (self, resetDepth) =>
                     {
                         var originalSet = self.original as IEnumerable;
-                        clearMethod.Invoke(self.result, null);
+                        clearSet(self.result);
                         foreach (var item in originalSet)
                         {
-                            addMethod.Invoke(self.result, new object[] { self.CloneChild(item, resetDepth) });
+                            addSet(self.result, self.CloneChild(item, resetDepth));
                         }
                     };
                 }
@@ -516,20 +516,21 @@ namespace Dec
 
                 if (genericTypeDefinition == typeof(Queue<>))
                 {
-                    var clearMethod = valType.GetMethod("Clear");
-                    var enqueueMethod = valType.GetMethod("Enqueue");
+                    var queueElementType = valType.GetGenericArguments()[0];
+                    var clearQueue = UtilCollectionReflect.QueueClear(queueElementType);
+                    var enqueue = UtilCollectionReflect.QueueEnqueue(queueElementType);
 
                     // if the queue members are valuelike, we can just copy the whole thing
-                    if (UtilType.CanBeCloneCopied(valType.GetGenericArguments()[0]))
+                    if (UtilType.CanBeCloneCopied(queueElementType))
                     {
                         return (self, resetDepth) =>
                         {
                             var originalQueue = self.original as IEnumerable;
-                            clearMethod.Invoke(self.result, null);
+                            clearQueue(self.result);
                             // there might be a faster way to do this?
                             foreach (var item in originalQueue)
                             {
-                                enqueueMethod.Invoke(self.result, new object[] { item });
+                                enqueue(self.result, item);
                             }
                         };
                     }
@@ -538,10 +539,10 @@ namespace Dec
                         return (self, resetDepth) =>
                         {
                             var originalQueue = self.original as IEnumerable;
-                            clearMethod.Invoke(self.result, null);
+                            clearQueue(self.result);
                             foreach (var item in originalQueue)
                             {
-                                enqueueMethod.Invoke(self.result, new object[] { self.CloneChild(item, resetDepth) });
+                                enqueue(self.result, self.CloneChild(item, resetDepth));
                             }
                         };
                     }
@@ -549,8 +550,9 @@ namespace Dec
 
                 if (genericTypeDefinition == typeof(Stack<>))
                 {
-                    var clearMethod = valType.GetMethod("Clear");
-                    var pushMethod = valType.GetMethod("Push");
+                    var stackElementType = valType.GetGenericArguments()[0];
+                    var clearStack = UtilCollectionReflect.StackClear(stackElementType);
+                    var push = UtilCollectionReflect.StackPush(stackElementType);
 
                     return (self, resetDepth) =>
                     {
@@ -558,18 +560,18 @@ namespace Dec
                         var tempStack = new Stack<object>();
 
                         // just in case; maybe we should be reusing originals as models?
-                        clearMethod.Invoke(self.result, null);
+                        clearStack(self.result);
 
                         foreach (var item in originalStack)
                         {
                             tempStack.Push(self.CloneChild(item, resetDepth));
                         }
 
-                        clearMethod.Invoke(self.result, null);
+                        clearStack(self.result);
 
                         while (tempStack.Count > 0)
                         {
-                            pushMethod.Invoke(self.result, new object[] { tempStack.Pop() });
+                            push(self.result, tempStack.Pop());
                         }
                     };
                 }

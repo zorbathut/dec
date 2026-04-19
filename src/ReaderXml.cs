@@ -326,17 +326,11 @@ namespace Dec
 
         public override void ParseHashset(object hashset, Type referencedType, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings, bool permitPatch)
         {
-            // This is a gigantic pain because HashSet<> doesn't inherit from any non-generic interface that provides the functionality we want
-            // So we're stuck doing it all through object and reflection
-            // Thanks, HashSet
-            // This might be a performance problem and we'll . . . deal with it later I guess?
-            // This might actually be a good first place to use IL generation.
-
-            var containsFunction = hashset.GetType().GetMethod("Contains");
-            var addFunction = hashset.GetType().GetMethod("Add");
+            // ISet<> doesn't inherit from a non-generic interface exposing Contains/Add, so we route through per-element-type cached delegates.
+            var containsFunction = UtilCollectionReflect.SetContains(referencedType);
+            var addFunction = UtilCollectionReflect.SetAdd(referencedType);
 
             var recorderChildContext = recorderSettings.CreateChild();
-            var keyParam = new object[1];   // this is just to cut down on GC churn
 
             // avoid the heap allocation if we can
             var writtenFields = permitPatch ? new HashSet<object>() : null;
@@ -361,15 +355,13 @@ namespace Dec
                         continue;
                     }
 
-                    keyParam[0] = key;
-
-                    if ((bool)containsFunction.Invoke(hashset, keyParam) && (writtenFields == null || writtenFields.Contains(key)))
+                    if (containsFunction(hashset, key) && (writtenFields == null || writtenFields.Contains(key)))
                     {
                         Dbg.Err($"{elementContext}: HashSet includes duplicate key `{key.ToString()}`");
                     }
                     writtenFields?.Add(key);
 
-                    addFunction.Invoke(hashset, keyParam);
+                    addFunction(hashset, key);
                 }
                 else
                 {
@@ -387,26 +379,24 @@ namespace Dec
                         continue;
                     }
 
-                    keyParam[0] = key;
-
-                    if ((bool)containsFunction.Invoke(hashset, keyParam) && (writtenFields == null || writtenFields.Contains(key)))
+                    if (containsFunction(hashset, key) && (writtenFields == null || writtenFields.Contains(key)))
                     {
                         Dbg.Err($"{elementContext}: HashSet includes duplicate key `{key.ToString()}`");
                     }
                     writtenFields?.Add(key);
 
-                    addFunction.Invoke(hashset, keyParam);
+                    addFunction(hashset, key);
                 }
             }
         }
 
         public override void ParseStack(object stack, Type referencedType, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings)
         {
-            var pushFunction = stack.GetType().GetMethod("Push");
+            var pushFunction = UtilCollectionReflect.StackPush(referencedType);
 
             var recorderChildContext = recorderSettings.CreateChild();
 
-            int index = (int)stack.GetType().GetProperty("Count").GetValue(stack);
+            int index = UtilCollectionReflect.StackCount(referencedType)(stack);
             foreach (var fieldElement in xml.Elements())
             {
                 var newPath = new PathIndex(path, index);
@@ -417,18 +407,18 @@ namespace Dec
                     Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                 }
 
-                pushFunction.Invoke(stack, new object[] { Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, newPath, UserSettings) }, referencedType, null, readerGlobals, recorderChildContext) });
+                pushFunction(stack, Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, newPath, UserSettings) }, referencedType, null, readerGlobals, recorderChildContext));
                 ++index;
             }
         }
 
         public override void ParseQueue(object queue, Type referencedType, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings)
         {
-            var enqueueFunction = queue.GetType().GetMethod("Enqueue");
+            var enqueueFunction = UtilCollectionReflect.QueueEnqueue(referencedType);
 
             var recorderChildContext = recorderSettings.CreateChild();
 
-            int index = (int)queue.GetType().GetProperty("Count").GetValue(queue);
+            int index = UtilCollectionReflect.QueueCount(referencedType)(queue);
             foreach (var fieldElement in xml.Elements())
             {
                 var newPath = new PathIndex(path, index);
@@ -439,7 +429,7 @@ namespace Dec
                     Dbg.Err($"{elementContext}: Tag should be <li>, is <{fieldElement.Name.LocalName}>");
                 }
 
-                enqueueFunction.Invoke(queue, new object[] { Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, newPath, UserSettings) }, referencedType, null, readerGlobals, recorderChildContext) });
+                enqueueFunction(queue, Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, newPath, UserSettings) }, referencedType, null, readerGlobals, recorderChildContext));
                 ++index;
             }
         }

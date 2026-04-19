@@ -449,7 +449,7 @@ namespace Dec
             writer.AddChecksum((int)NodeTag.Queue, Path);
 
             Type keyType = value.GetType().GetGenericArguments()[0];
-            var array = value.GetType().GetMethod("ToArray").Invoke(value, new object[] { }) as Array;
+            var array = UtilCollectionReflect.QueueToArray(keyType)(value);
 
             WriteArray(array);
         }
@@ -459,7 +459,7 @@ namespace Dec
             writer.AddChecksum((int)NodeTag.Stack, Path);
 
             Type keyType = value.GetType().GetGenericArguments()[0];
-            var array = value.GetType().GetMethod("ToArray").Invoke(value, new object[] { }) as Array;
+            var array = UtilCollectionReflect.StackToArray(keyType)(value);
 
             WriteArray(array);
         }

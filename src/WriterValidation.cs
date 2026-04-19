@@ -335,7 +335,7 @@ namespace Dec
         {
             Type referencedType = value.GetType().GetGenericArguments()[0];
 
-            var count = (int)value.GetType().GetProperty("Count").GetValue(value);
+            var count = UtilCollectionReflect.QueueCount(referencedType)(value);
 
             // Maybe this should just be a giant AreEqual with a dynamically allocated list?
             writer.AppendLine($"Assert.AreEqual({accessor}.Count, {count});");
@@ -346,7 +346,7 @@ namespace Dec
             writer.AppendLine($"{accessor}.CopyTo(tempArray, 0);");
 
             // and meanwhile . . .
-            var array = value.GetType().GetMethod("ToArray").Invoke(value, new object[] { }) as Array;
+            var array = UtilCollectionReflect.QueueToArray(referencedType)(value);
 
             for (int i = 0; i < count; ++i)
             {
@@ -360,7 +360,7 @@ namespace Dec
         {
             Type referencedType = value.GetType().GetGenericArguments()[0];
 
-            var count = (int)value.GetType().GetProperty("Count").GetValue(value);
+            var count = UtilCollectionReflect.StackCount(referencedType)(value);
 
             // Maybe this should just be a giant AreEqual with a dynamically allocated list?
             writer.AppendLine($"Assert.AreEqual({accessor}.Count, {count});");
@@ -371,7 +371,7 @@ namespace Dec
             writer.AppendLine($"{accessor}.CopyTo(tempArray, 0);");
 
             // and meanwhile . . .
-            var array = value.GetType().GetMethod("ToArray").Invoke(value, new object[] { }) as Array;
+            var array = UtilCollectionReflect.StackToArray(referencedType)(value);
 
             for (int i = 0; i < count; ++i)
             {

@@ -725,6 +725,53 @@ namespace DecBenchmark
     }
 
     [MemoryDiagnoser]
+    public class CollectionBenchmarks : BenchmarkBase
+    {
+        [Params(100, 1000, 10000)]
+        public int Size;
+
+        private HashSet<int> hashSet;
+        private string hashSetSerialized;
+
+        private Stack<int> stack;
+        private string stackSerialized;
+
+        private Queue<int> queue;
+        private string queueSerialized;
+
+        [GlobalSetup]
+        public void Setup()
+        {
+            SetupDec();
+            FinishParser();
+
+            hashSet = new HashSet<int>(Enumerable.Range(0, Size));
+            hashSetSerialized = Recorder.Write(hashSet);
+
+            stack = new Stack<int>(Enumerable.Range(0, Size));
+            stackSerialized = Recorder.Write(stack);
+
+            queue = new Queue<int>(Enumerable.Range(0, Size));
+            queueSerialized = Recorder.Write(queue);
+        }
+
+        [GlobalCleanup]
+        public void Cleanup() => CleanupDec();
+
+        [Benchmark] public string WriteHashSet() => Recorder.Write(hashSet);
+        [Benchmark] public HashSet<int> ReadHashSet() => Recorder.Read<HashSet<int>>(hashSetSerialized);
+        [Benchmark] public HashSet<int> CloneHashSet() => Recorder.Clone(hashSet);
+
+        [Benchmark] public string WriteStack() => Recorder.Write(stack);
+        [Benchmark] public Stack<int> ReadStack() => Recorder.Read<Stack<int>>(stackSerialized);
+        [Benchmark] public Stack<int> CloneStack() => Recorder.Clone(stack);
+
+        [Benchmark] public string WriteQueue() => Recorder.Write(queue);
+        [Benchmark] public Queue<int> ReadQueue() => Recorder.Read<Queue<int>>(queueSerialized);
+        [Benchmark] public Queue<int> CloneQueue() => Recorder.Clone(queue);
+    }
+
+    [MemoryDiagnoser]
     public class ConverterBenchmarks : BenchmarkBase
     {
         private ConverterHolder data;
