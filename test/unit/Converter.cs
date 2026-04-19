@@ -236,5 +236,58 @@ namespace DecTest
             Assert.AreEqual(42, result.a.Value.x);
             Assert.IsFalse(result.b.HasValue);
         }
+
+        public class FactorySwapTarget : Dec.IRecordable
+        {
+            public int value;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref value, "value");
+            }
+        }
+
+        [Test]
+        public void ConverterFactoryChangeInvalidatesCache()
+        {
+            try
+            {
+                int factory1Calls = 0;
+                int factory2Calls = 0;
+
+                Dec.Config.ConverterFactory = t =>
+                {
+                    if (t == typeof(FactorySwapTarget)) factory1Calls++;
+                    return null;
+                };
+
+                UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+                new Dec.Parser().Finish();
+
+                var target = new FactorySwapTarget { value = 42 };
+
+                Dec.Recorder.Write(target);
+                Assert.AreEqual(1, factory1Calls, "factory1 should have been invoked once for FactorySwapTarget");
+
+                // Second write should hit the cache (including the cached-null factory result).
+                Dec.Recorder.Write(target);
+                Assert.AreEqual(1, factory1Calls, "factory1 should not be re-invoked when cache is valid");
+
+                // Swapping the factory must invalidate the cache so the new factory gets consulted.
+                Dec.Config.ConverterFactory = t =>
+                {
+                    if (t == typeof(FactorySwapTarget)) factory2Calls++;
+                    return null;
+                };
+
+                Dec.Recorder.Write(target);
+                Assert.AreEqual(1, factory1Calls, "factory1 should not be called again after the swap");
+                Assert.AreEqual(1, factory2Calls, "factory2 should be invoked after the swap");
+            }
+            finally
+            {
+                Dec.Config.ConverterFactory = null;
+            }
+        }
     }
 }

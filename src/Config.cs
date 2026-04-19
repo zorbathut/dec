@@ -170,8 +170,24 @@ namespace Dec
         /// </summary>
         /// <remarks>
         /// This is a tool of last resort; in most cases you should just be inheriting from ConverterString'1 et al. This is intended for converters from non-public classes, which can be access through (ab)use of reflection.
+        ///
+        /// Assigning a new factory here invalidates Dec's internal converter cache so that previously-queried types see the new factory on their next lookup. As with other Config mutations, this must not race with Recorder operations on other threads.
         /// </remarks>
-        public static Func<Type, Converter> ConverterFactory;
+        public static Func<Type, Converter> ConverterFactory
+        {
+            get => ConverterFactoryBacking;
+            set
+            {
+                if (ReferenceEquals(ConverterFactoryBacking, value))
+                {
+                    return;
+                }
+                ConverterFactoryBacking = value;
+                // Invalidate every Serialization-level cache that could have baked in the old factory's output
+                Serialization.Clear();
+            }
+        }
+        private static Func<Type, Converter> ConverterFactoryBacking;
 
         internal class UnitTestParameters
         {
