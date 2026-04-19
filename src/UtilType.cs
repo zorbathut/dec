@@ -47,6 +47,40 @@ namespace Dec
             new PrimitiveTypeLookup { type = typeof(string), str = "string" },
         };
 
+        private static string DescribeTypeWithAssembly(Type t)
+        {
+            string location;
+            try
+            {
+                location = string.IsNullOrEmpty(t.Assembly.Location) ? "<no location>" : t.Assembly.Location;
+            }
+            catch (NotSupportedException)
+            {
+                location = "<dynamic>";
+            }
+            return $"{t.AssemblyQualifiedName} [{location}]";
+        }
+
+        private static string DescribeTypeOverloadError(Type[] types)
+        {
+            var distinctAssemblies = types.Select(t => t.Assembly).Distinct().ToArray();
+            string callout = "";
+            if (distinctAssemblies.Length > 1)
+            {
+                var distinctNames = distinctAssemblies.Select(a => a.GetName().Name).Distinct().ToArray();
+                if (distinctNames.Length == 1)
+                {
+                    callout = $"; assembly `{distinctNames[0]}` appears to be loaded more than once";
+                }
+                else
+                {
+                    callout = $"; matched types span {distinctAssemblies.Length} distinct assemblies";
+                }
+            }
+            var detail = string.Join("", types.Select(t => $"\n  {DescribeTypeWithAssembly(t)}"));
+            return $"{callout}:{detail}";
+        }
+
         private static Regex GenericParameterMatcher = new Regex("`[0-9]+", RegexOptions.Compiled);
         private static Dictionary<(string, int), Type[]> StrippedTypeCache = null;  // this is fine not being concurrent; it's set once and then never modified
         private static Type GetTypeFromAnyAssembly(string text, int gparams, Context context)
@@ -98,7 +132,7 @@ namespace Dec
             }
             else
             {
-                Dbg.Err($"{context}: Too many types found with name {text}");
+                Dbg.Err($"{context}: Too many types found with name {text}{DescribeTypeOverloadError(result)}");
                 return result[0];
             }
         }
@@ -392,7 +426,7 @@ namespace Dec
                 }
                 else if (possibleTypes.Length > 1)
                 {
-                    Dbg.Err($"{context}: Found too many types named `{text}` ({possibleTypes.Select(t => t.FullName).ToCommaString()})");
+                    Dbg.Err($"{context}: Found too many types named `{text}`{DescribeTypeOverloadError(possibleTypes)}");
                     result = possibleTypes[0];
                 }
                 else

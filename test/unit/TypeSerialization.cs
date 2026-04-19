@@ -124,7 +124,13 @@ namespace DecTest
         {
             Dec.Config.UsingNamespaces = new string[] { "DecTest.OverloadedSampleA", "DecTest.OverloadedSampleB" };
 
-            ExpectErrors(() => Assert.IsNotNull(parseType("TooManyOfThese")));
+            ExpectErrors(
+                () => Assert.IsNotNull(parseType("TooManyOfThese")),
+                errorValidator: error =>
+                    error.Contains("DecTest.OverloadedSampleA.TooManyOfThese")
+                    && error.Contains("DecTest.OverloadedSampleB.TooManyOfThese")
+                    && !error.Contains("loaded more than once")
+                    && !error.Contains("duplicate assembly loads"));
         }
 
         [Test]

@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file.
 * Reorganized structures for cloning, generally improving clone performance by 10-20%.
 * Added delegate caching for Set/Stack/Queue, increasing performance by a few percent for reads and by 50%+ for clones.
 * A bunch of diagnostic messages rephrased to reduce confusion.
+* Too-many-types-found error message now gives a lot more diagnostic info.
 
 ### Fixed
 * Race condition in Serialization.Initialize().
