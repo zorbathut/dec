@@ -36,6 +36,22 @@ namespace Dec
             return result;
         }
 
+        // GetTypes() can throw ReflectionTypeLoadException on some platforms when a dependency fails to load;
+        // the partial results in .Types (with nulls for the failed entries) are usually what we want.
+        internal static IEnumerable<Type> GetTypesSafe(this Assembly assembly)
+        {
+            try
+            {
+                return assembly.GetTypes();
+            }
+            catch (ReflectionTypeLoadException e)
+            {
+                // Hard to code-coverage: happens on some platforms, not on our test server. To reproduce,
+                // you'd have to build a fake .dll that references a missing dependency.
+                return e.Types.Where(t => t != null);
+            }
+        }
+
         internal static System.Collections.Concurrent.ConcurrentDictionary<Type, FieldInfo[]> SerializableFieldsCached = new System.Collections.Concurrent.ConcurrentDictionary<Type, FieldInfo[]>();
 
         internal static FieldInfo[] GetSerializableFieldsFromHierarchy(this Type type)
@@ -190,7 +206,7 @@ namespace Dec
             // assembly: we still want to exclude Dec's own types from discovery, but we can only identify
             // them by namespace since the assembly check won't help.
             var decAssembly = typeof(Dec).Assembly;
-            return GetAllUserAssemblies().SelectMany(a => a.GetTypes()).Where(t =>
+            return GetAllUserAssemblies().SelectMany(a => a.GetTypesSafe()).Where(t =>
             {
                 if (t.Assembly != decAssembly)
                 {

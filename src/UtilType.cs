@@ -100,18 +100,7 @@ namespace Dec
             if (StrippedTypeCache == null)
             {
                 StrippedTypeCache = AppDomain.CurrentDomain.GetAssemblies()
-                    .SelectMany(asm => {
-                        try
-                        {
-                            return asm.GetTypes();
-                        }
-                        catch (ReflectionTypeLoadException reflectionException)
-                        {
-                            // This is very difficult to code-coverage - it happens on some platforms sometimes, but not on our automatic test server.
-                            // To test this, we'd have to create a fake .dll that existed just to trigger this issue.
-                            return reflectionException.Types.Where(t => t != null);
-                        }
-                    })
+                    .SelectMany(asm => asm.GetTypesSafe())
                     .Where(t => t.DeclaringType == null)    // we have to split these up anyway, so including declaring types just makes our life a little harder
                     .Distinct()
                     .GroupBy(t => {
