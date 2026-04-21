@@ -43,6 +43,7 @@ All notable changes to this project will be documented in this file.
 * User-type discovery could crash when a user assembly had a broken dependency.
 * Changing `Config.ConverterFactory` would not update caches properly.
 * `Recorder.Ignore()` could generate errors instead of suppressing them.
+* Primitive-parse errors leak obscure exception messages.
 
 
 ## [v0.11.0]

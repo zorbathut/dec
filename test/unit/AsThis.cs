@@ -70,7 +70,7 @@ namespace DecTest
             lat.data = new List<int>() { 1, 1, 2, 3, 5, 8, 13, 21 };
             lat.data2 = 19;
 
-            var deserialized = DoRecorderRoundTrip(lat, mode, expectReadErrors: true, expectWriteErrors: true, errorValidator: err => err.Contains("RecordAsThis call after writing a field") || err.Contains("Child nodes are not valid when parsing") || err.Contains("is not a valid value for Int32") || err.Contains("Int32Converter cannot convert from"));
+            var deserialized = DoRecorderRoundTrip(lat, mode, expectReadErrors: true, expectWriteErrors: true, errorValidator: err => err.Contains("RecordAsThis call after writing a field") || err.Contains("Child nodes are not valid when parsing") || err.Contains("is not a valid value for Int32") || err.Contains("Empty field provided"));
 
             Assert.AreEqual(lat.data, deserialized.data);
         }

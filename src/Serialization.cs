@@ -1711,7 +1711,7 @@ namespace Dec
             }
 
             // Various non-composite-type special-cases
-            if (text != "")
+            if (!string.IsNullOrEmpty(text))
             {
                 // If we've got text, treat us as an object of appropriate type
                 try
@@ -1786,7 +1786,7 @@ namespace Dec
                 }
                 catch (System.Exception e)  // I would normally not catch System.Exception, but TypeConverter is wrapping FormatException in an Exception for some reason
                 {
-                    Dbg.Err($"{context}: {e.ToString()}");
+                    Dbg.Err($"{context}: {text} is not a valid value for {type.Name}");
                     return original;
                 }
             }

@@ -39,7 +39,7 @@ namespace DecTest
                         <value />
                     </IntDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish(), err => err.Contains("Int32Converter cannot convert from (null)"));
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Empty field provided") && err.Contains("Int32"));
 
             DoParserTests(mode);
 
@@ -127,7 +127,7 @@ namespace DecTest
                         <value />
                     </BoolDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish(), err => err.Contains("BooleanConverter cannot convert from (null)"));
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Empty field provided") && err.Contains("Boolean"));
 
             DoParserTests(mode);
 
