@@ -580,7 +580,12 @@ namespace Dec
 
         public override void Ignore(string label)
         {
-            seen?.Add(label);
+            // The seen != null short-circuit is load-bearing: ReaderNodeCloneRecorder.GetChildNamed has side effects
+            // (consumes the entry) but is only used in clone mode where trackUsage is always false.
+            if (seen != null && node.GetChildNamed(label) != null)
+            {
+                seen.Add(label);
+            }
         }
 
         public override Direction Mode { get => Direction.Read; }
@@ -590,7 +595,7 @@ namespace Dec
         {
             if (seen == null)
             {
-                Dbg.Err($"{node.GetContext()}: Internal error, RecorderReader.HasUnusedFields() called without trackUsage set");
+                Dbg.Err($"{node.GetContext()}: Internal error, RecorderReader.ReportUnusedFields() called without trackUsage set");
                 return;
             }
 

@@ -39,6 +39,8 @@ All notable changes to this project will be documented in this file.
 * Obsolete documentation on StaticReferencesAttribute.Initialized(), along with a related anti-optimization.
 * User-type discovery could crash when a user assembly had a broken dependency.
 * Changing `Config.ConverterFactory` would not update caches properly.
+* `Recorder.Ignore()` could generate errors instead of suppressing them.
+
 
 ## [v0.11.0]
 ### Added

@@ -606,6 +606,60 @@ namespace DecTest
             Assert.IsNotNull(deserialized);
         }
 
+        public class IgnoreFieldRecordable : Dec.IRecordable
+        {
+            public int value;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref value, "value");
+                record.Ignore("legacy");
+            }
+        }
+
+        [Test]
+        public void IgnoreRoundtrip([Values] RecorderMode mode)
+        {
+            var item = new IgnoreFieldRecordable { value = 42 };
+
+            var deserialized = DoRecorderRoundTrip(item, mode);
+
+            Assert.AreEqual(42, deserialized.value);
+        }
+
+        [Test]
+        public void IgnoreLegacyPresentInXml()
+        {
+            string serialized = @"
+                <Record>
+                  <recordFormatVersion>1</recordFormatVersion>
+                  <data>
+                    <value>42</value>
+                    <legacy>oldStuff</legacy>
+                  </data>
+                </Record>";
+            var deserialized = Dec.Recorder.Read<IgnoreFieldRecordable>(serialized);
+
+            Assert.AreEqual(42, deserialized.value);
+        }
+
+        [Test]
+        public void UnusedFieldStillWarns()
+        {
+            string serialized = @"
+                <Record>
+                  <recordFormatVersion>1</recordFormatVersion>
+                  <data>
+                    <value>42</value>
+                    <stray>oops</stray>
+                  </data>
+                </Record>";
+            IgnoreFieldRecordable deserialized = null;
+            ExpectWarnings(() => deserialized = Dec.Recorder.Read<IgnoreFieldRecordable>(serialized), warningValidator: w => w.Contains("stray"));
+
+            Assert.AreEqual(42, deserialized.value);
+        }
+
         public class IntContainerClass : Dec.IRecordable
         {
             public int value;
