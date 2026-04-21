@@ -116,7 +116,7 @@ namespace DecTest
         [Test]
         public void Missing()
         {
-            ExpectErrors(() => Assert.IsNull(parseType("Qwijibo")));
+            ExpectErrors(() => Assert.IsNull(parseType("Qwijibo")), err => err.Contains("Couldn't find type named `Qwijibo`"));
         }
 
         [Test]
@@ -309,22 +309,22 @@ namespace DecTest
             Dec.Config.UsingNamespaces = new string[] { "DecTest.TypeSerialization" };
 
             // This is just me verifying a bunch of generic error behaviors.
-            ExpectErrors(() => parseType("int<int>"));
-            ExpectErrors(() => parseType("Generic<>"));
-            ExpectErrors(() => parseType("Generic<int"));
-            ExpectErrors(() => parseType("Generic<int, int>"));
-            ExpectErrors(() => parseType("Generic<int><int>"));
-            ExpectErrors(() => parseType("Generic<int>>"));
-            ExpectErrors(() => parseType("Generic<int>."));
-            ExpectErrors(() => parseType(".Generic<int>"));
-            ExpectErrors(() => parseType("Generic<int>NestedStandard"));
-            ExpectErrors(() => parseType("Generic<int>..NestedStandard"));
+            ExpectErrors(() => parseType("int<int>"), err => err.Contains("int<int>"));
+            ExpectErrors(() => parseType("Generic<>"), err => err.Contains("Generic<>"));
+            ExpectErrors(() => parseType("Generic<int"), err => err.Contains("Mismatched angle brackets") || err.Contains("Failed to parse generic arguments") || err.Contains("Generic<int"));
+            ExpectErrors(() => parseType("Generic<int, int>"), err => err.Contains("Generic<int, int>"));
+            ExpectErrors(() => parseType("Generic<int><int>"), err => err.Contains("Unexpected character after end of generic") || err.Contains("Failed to parse generic arguments") || err.Contains("Generic<int><int>"));
+            ExpectErrors(() => parseType("Generic<int>>"), err => err.Contains("Unexpected character after end of generic") || err.Contains("Failed to parse generic arguments") || err.Contains("Generic<int>>"));
+            ExpectErrors(() => parseType("Generic<int>."), err => err.Contains("trailing .") || err.Contains("Generic<int>."));
+            ExpectErrors(() => parseType(".Generic<int>"), err => err.Contains(".Generic<int>"));
+            ExpectErrors(() => parseType("Generic<int>NestedStandard"), err => err.Contains("Unexpected character after end of generic") || err.Contains("Failed to parse generic arguments") || err.Contains("Generic<int>NestedStandard"));
+            ExpectErrors(() => parseType("Generic<int>..NestedStandard"), err => err.Contains("Generic<int>..NestedStandard"));
 
-            ExpectErrors(() => parseType(""));
-            ExpectErrors(() => parseType("."));
-            ExpectErrors(() => parseType("<"));
-            ExpectErrors(() => parseType(">"));
-            ExpectErrors(() => parseType("<>"));
+            ExpectErrors(() => parseType(""), err => err.Contains("empty string is not a valid type"));
+            ExpectErrors(() => parseType("."), err => err.Contains("Couldn't find type named `.`"));
+            ExpectErrors(() => parseType("<"), err => err.Contains("Couldn't find type named `<`"));
+            ExpectErrors(() => parseType(">"), err => err.Contains("Couldn't find type named `>`"));
+            ExpectErrors(() => parseType("<>"), err => err.Contains("Couldn't find type named `<>`"));
         }
 
         [Test]
@@ -348,7 +348,7 @@ namespace DecTest
         {
             Dec.Config.UsingNamespaces = new string[] { "DecTest.TypeSerialization" };
 
-            ExpectErrors(() => parseType("Generic<Alakazam>"));
+            ExpectErrors(() => parseType("Generic<Alakazam>"), err => err.Contains("Alakazam"));
         }
 
         [Test]
@@ -357,8 +357,8 @@ namespace DecTest
             Dec.Config.UsingNamespaces = new string[] { "DecTest.TypeSerialization" };
 
             // make sure caching doesn't suppress errors
-            ExpectErrors(() => parseType("horse"));
-            ExpectErrors(() => parseType("horse"));
+            ExpectErrors(() => parseType("horse"), err => err.Contains("Couldn't find type named `horse`"));
+            ExpectErrors(() => parseType("horse"), err => err.Contains("Repeating previous failure") || err.Contains("horse"));
         }
 
         [Test]
@@ -494,7 +494,7 @@ namespace DecTest
             Dec.Config.CompatTypeLookup = null;
 
             // Should now fail to find the type
-            ExpectErrors(() => Assert.IsNull(parseType("TestType")));
+            ExpectErrors(() => Assert.IsNull(parseType("TestType")), err => err.Contains("Couldn't find type named `TestType`"));
         }
 
         [Test]

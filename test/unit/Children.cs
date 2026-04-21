@@ -218,7 +218,7 @@ namespace DecTest
                         </child>
                     </ExplicitTypeDerivedDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("cannot be assigned to expected type"));
 
             DoParserTests(mode);
 
@@ -252,7 +252,7 @@ namespace DecTest
                         <child class=""ETDerivedAlt"" />
                     </ExplicitTypeConflictDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("does not match already-provided instance"));
 
             DoParserTests(mode);
 
@@ -314,7 +314,7 @@ namespace DecTest
                         <childValid4 />
                     </ContainerDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("without a no-argument constructor") || err.Contains("TargetInvocationException"));
 
             DoParserTests(mode);
 
@@ -343,7 +343,7 @@ namespace DecTest
                         <childParameter />
                     </ContainerDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("without a no-argument constructor"));
 
             DoParserTests(mode);
 
@@ -365,7 +365,7 @@ namespace DecTest
                         <childException />
                     </ContainerDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("TargetInvocationException"));
 
             DoParserTests(mode);
 

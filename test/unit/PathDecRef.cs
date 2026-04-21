@@ -234,7 +234,7 @@ namespace DecTest
             var stub = new StubRecordable();
             Dec.Database.DecRegisterForbid(stub);
 
-            var result = DoRecorderRoundTrip(stub, mode, expectWriteErrors: true);
+            var result = DoRecorderRoundTrip(stub, mode, expectWriteErrors: true, errorValidator: err => err.Contains("explicitly forbidden from recording"));
 
             Assert.IsNull(result);
         }
@@ -247,7 +247,7 @@ namespace DecTest
             var stub = new StubRecordable();
             Dec.Database.DecRegisterForbid(stub);
 
-            ExpectErrors(() => Dec.Database.DecLookupRegisterCustom(stub, new PathRoot("stub")));
+            ExpectErrors(() => Dec.Database.DecLookupRegisterCustom(stub, new PathRoot("stub")), err => err.Contains("explicitly forbidden from recording"));
         }
 
         [Test]
@@ -258,7 +258,7 @@ namespace DecTest
             var stub = new StubRecordable();
             Dec.Database.DecLookupRegisterCustom(stub, new PathRoot("stub"));
 
-            ExpectErrors(() => Dec.Database.DecRegisterForbid(stub));
+            ExpectErrors(() => Dec.Database.DecRegisterForbid(stub), err => err.Contains("already registered"));
         }
 
         [Test]
@@ -278,7 +278,7 @@ namespace DecTest
             var dec = Dec.Database<ForbidDec>.Get("TestDec");
             Dec.Database.DecRegisterForbid(dec.member);
 
-            ExpectErrors(() => Dec.Database.DecLookupEnable(dec.member));
+            ExpectErrors(() => Dec.Database.DecLookupEnable(dec.member), err => err.Contains("explicitly forbidden from recording"));
         }
 
         [Test]
@@ -286,7 +286,7 @@ namespace DecTest
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
-            ExpectErrors(() => Dec.Database.DecRegisterForbid(42));
+            ExpectErrors(() => Dec.Database.DecRegisterForbid(42), err => err.Contains("value type"));
         }
 
         [Test]
@@ -304,7 +304,7 @@ namespace DecTest
             parser.Finish();
 
             var dec = Dec.Database<ForbidDec>.Get("TestDec");
-            ExpectErrors(() => Dec.Database.DecRegisterForbid(dec));
+            ExpectErrors(() => Dec.Database.DecRegisterForbid(dec), err => err.Contains("is a Dec"));
         }
     }
 }

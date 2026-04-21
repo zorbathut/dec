@@ -100,7 +100,7 @@ namespace DecTest
             ExpectErrors(() => parser.CreateModule("Base").AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <TwoIntsDec decName=""Second"" />
-                </Decs>"));
+                </Decs>"), err => err.Contains("duplicate module"));
             parser.Finish();
 
             DoParserTests(mode);
@@ -126,7 +126,7 @@ namespace DecTest
                         <b>4</b>
                     </TwoIntsDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("defined twice"));
 
             DoParserTests(mode);
 
@@ -268,7 +268,7 @@ namespace DecTest
                 <Decs>
                     <DerivedAlterDec decName=""Thing"" mode=""patch"" />
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("conflicting types") || err.Contains("subclass"));
 
             DoParserTests(mode);
 

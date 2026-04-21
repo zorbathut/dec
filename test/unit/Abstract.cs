@@ -56,7 +56,7 @@ namespace DecTest
 
             DoParserTests(ParserMode.Bare);
 
-            ExpectErrors(() => Dec.Database<AbstractRootDec>.Get("TestDec"));
+            ExpectErrors(() => Dec.Database<AbstractRootDec>.Get("TestDec"), err => err.Contains("abstract Dec and cannot be used as a database root"));
         }
 
         [Dec.Abstract]
@@ -78,7 +78,7 @@ namespace DecTest
 
             DoParserTests(ParserMode.Bare);
 
-            ExpectErrors(() => Dec.Database<SemiAbstractRootDec>.Get("TestDec"));
+            ExpectErrors(() => Dec.Database<SemiAbstractRootDec>.Get("TestDec"), err => err.Contains("abstract Dec and cannot be used as a database root") || err.Contains("tagged Dec.Abstract, but is not abstract"));
         }
 
         public class NotAbstractDec : Dec.Dec
@@ -110,7 +110,7 @@ namespace DecTest
 
             DoParserTests(ParserMode.Bare);
 
-            ExpectErrors(() => Dec.Database<ConfusingHierarchyDec>.Get("TestDec"));
+            ExpectErrors(() => Dec.Database<ConfusingHierarchyDec>.Get("TestDec"), err => err.Contains("tagged Dec.Abstract, but inherits from"));
         }
     }
 }

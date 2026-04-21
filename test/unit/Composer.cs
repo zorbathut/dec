@@ -48,7 +48,7 @@ namespace DecTest
         [Test]
         public void CreationNonGenericNonDec([Values] ParserMode mode)
         {
-            ExpectErrors(() => Dec.Database.Create(typeof(NotADec), "NotADec"));
+            ExpectErrors(() => Dec.Database.Create(typeof(NotADec), "NotADec"), err => err.Contains("which is not actually a Dec"));
         }
 
         [Test]
@@ -70,11 +70,11 @@ namespace DecTest
         public void FailedCreation()
         {
             Dec.Database.Create<SomeDecsDec>("Dec");
-            ExpectErrors(() => Dec.Database.Create<SomeDecsDec>("Dec"));
+            ExpectErrors(() => Dec.Database.Create<SomeDecsDec>("Dec"), err => err.Contains("when it already exists"));
             Dec.Database.Delete(Dec.Database<SomeDecsDec>.Get("Dec"));
             Dec.Database.Create<SomeDecsDec>("Dec");
-            ExpectErrors(() => Dec.Database.Create<SomeDecsDec>("Dec"));
-            ExpectErrors(() => Dec.Database.Create<SomeDecsDec>("Dec"));
+            ExpectErrors(() => Dec.Database.Create<SomeDecsDec>("Dec"), err => err.Contains("when it already exists"));
+            ExpectErrors(() => Dec.Database.Create<SomeDecsDec>("Dec"), err => err.Contains("when it already exists"));
         }
 
         private class RootDec : Dec.Dec { }
@@ -85,11 +85,11 @@ namespace DecTest
         public void FailedForkCreation()
         {
             Dec.Database.Create<LeafADec>("Dec");
-            ExpectErrors(() => Dec.Database.Create<LeafBDec>("Dec"));
+            ExpectErrors(() => Dec.Database.Create<LeafBDec>("Dec"), err => err.Contains("conflicting Dec already exists"));
             Dec.Database.Delete(Dec.Database<RootDec>.Get("Dec"));
             Dec.Database.Create<RootDec>("Dec");
-            ExpectErrors(() => Dec.Database.Create<LeafADec>("Dec"));
-            ExpectErrors(() => Dec.Database.Create<LeafBDec>("Dec"));
+            ExpectErrors(() => Dec.Database.Create<LeafADec>("Dec"), err => err.Contains("conflicting Dec already exists"));
+            ExpectErrors(() => Dec.Database.Create<LeafBDec>("Dec"), err => err.Contains("conflicting Dec already exists"));
         }
 
         [Test]
@@ -172,7 +172,7 @@ namespace DecTest
 
             var one = Dec.Database<IntDec>.Get("One");
             Dec.Database.Delete(one);
-            ExpectErrors(() => Dec.Database.Delete(one));
+            ExpectErrors(() => Dec.Database.Delete(one), err => err.Contains("has already been deleted or never existed"));
             Dec.Database.Delete(Dec.Database<IntDec>.Get("Three"));
 
             DoParserTests(mode);
@@ -234,7 +234,7 @@ namespace DecTest
             var b = Dec.Database.Create<StubDec>("B");
             var c = Dec.Database.Create<StubDec>("C");
 
-            ExpectErrors(() => Dec.Database.Rename(a, "B"));
+            ExpectErrors(() => Dec.Database.Rename(a, "B"), err => err.Contains("when it already exists"));
             Dec.Database.Rename(c, "C");
 
             DoParserTests(mode);
@@ -260,7 +260,7 @@ namespace DecTest
 
             var three = Dec.Database<IntDec>.Get("Three");
             Dec.Database.Delete(three);
-            ExpectErrors(() => Dec.Database.Rename(three, "ThreePhoenix"));
+            ExpectErrors(() => Dec.Database.Rename(three, "ThreePhoenix"), err => err.Contains("is no longer a registered Dec"));
 
             DoParserTests(mode);
 
@@ -280,7 +280,7 @@ namespace DecTest
 
             Dec.Database.Delete(ephemeral);
 
-            DoParserTests(mode, rewrite_expectWriteErrors: true, rewrite_expectParseErrors: true, validation_expectWriteErrors: true);
+            DoParserTests(mode, rewrite_expectWriteErrors: true, rewrite_expectParseErrors: true, validation_expectWriteErrors: true, errorValidator: err => err.Contains("does not exist in the database") || err.Contains("Couldn't find"));
 
             if (mode != ParserMode.Bare)
             {
@@ -301,7 +301,7 @@ namespace DecTest
 
             Dec.Database.Create<SomeDecsDec>("Ephemeral");
 
-            DoParserTests(mode, rewrite_expectWriteErrors: true, rewrite_expectParseErrors: true, validation_expectWriteErrors: true);
+            DoParserTests(mode, rewrite_expectWriteErrors: true, rewrite_expectParseErrors: true, validation_expectWriteErrors: true, errorValidator: err => err.Contains("does not exist in the database") || err.Contains("Couldn't find"));
 
             if (mode != ParserMode.Bare)
             {

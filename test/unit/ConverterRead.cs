@@ -72,7 +72,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(StubConv1), typeof(StubConv2) } });
 
             Dec.Parser parser = null;
-            ExpectErrors(() => parser = new Dec.Parser());
+            ExpectErrors(() => parser = new Dec.Parser(), err => err.Contains("Found multiple converters"));
             parser.Finish();
         }
 
@@ -295,7 +295,7 @@ namespace DecTest
                         </payload>
                     </FallbackDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Cannot have both text and child nodes") || err.Contains("called with child XML nodes"));
 
             DoParserTests(mode);
 
@@ -757,7 +757,7 @@ namespace DecTest
             var dat = new RefsForThings();
             dat.listA = dat.listB = new List<int>() { 1, 3, 5, 7, 11 };
 
-            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: mode != RecorderMode.Clone);
+            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: mode != RecorderMode.Clone, errorValidator: err => err.Contains("before refs are initialized") || err.Contains("Exception thrown by") || err.Contains("Shared object used in a context that disallows shared objects"));
 
             if (mode != RecorderMode.RefEverything)
             {
@@ -781,7 +781,7 @@ namespace DecTest
             var dat = new RefsForThings();
             // these are null, so we'll get the right result, but we want to make sure the errors happen as well
 
-            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: mode != RecorderMode.Clone && mode != RecorderMode.Checksum);
+            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: mode != RecorderMode.Clone && mode != RecorderMode.Checksum, errorValidator: err => err.Contains("before refs are initialized") || err.Contains("Exception thrown by") || err.Contains("Shared object used in a context that disallows shared objects"));
 
             Assert.IsNull(deserialized.listA);
             Assert.IsNull(deserialized.listB);
@@ -797,7 +797,7 @@ namespace DecTest
             dat.a = dat.b = new RefsForThings();
             dat.a.listA = dat.a.listB = new List<int>() { 1, 3, 5, 7, 11 };
 
-            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: mode != RecorderMode.Clone);
+            var deserialized = DoRecorderRoundTrip(dat, mode, expectReadErrors: mode != RecorderMode.Clone, errorValidator: err => err.Contains("before refs are initialized") || err.Contains("Exception thrown by") || err.Contains("Shared object used in a context that disallows shared objects"));
 
             Assert.IsNotNull(deserialized.a);
             Assert.AreSame(deserialized.a, deserialized.b);
@@ -896,7 +896,7 @@ namespace DecTest
                         <data>42</data>
                     </SomeChunkOfDataDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("XML contains text content which was ignored"));
 
             DoParserTests(mode);
 

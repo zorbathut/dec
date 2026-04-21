@@ -387,12 +387,12 @@ namespace DecTest
             ulong checksum1 = 0;
             ulong checksum2 = 0;
 
-            ExpectErrors(() => checksum1 = Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)));
-            ExpectErrors(() => checksum2 = Dec.Recorder.Checksum(value2));
+            ExpectErrors(() => checksum1 = Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), err => err.Contains("reference object first seen in an unordered context"));
+            ExpectErrors(() => checksum2 = Dec.Recorder.Checksum(value2), err => err.Contains("reference object first seen in an unordered context"));
 
             ulong checksum3 = 0;
 
-            ExpectErrors(() => checksum3 = Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)));
+            ExpectErrors(() => checksum3 = Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), err => err.Contains("reference object first seen in an unordered context"));
 
             Assert.AreNotEqual(checksum1, checksum2, "Different decs should produce different checksums");
             Assert.AreEqual(checksum1, checksum3, "Identical decs should produce the same checksums");
@@ -591,12 +591,12 @@ namespace DecTest
             ulong checksum1 = 0;
             ulong checksum2 = 0;
 
-            ExpectErrors(() => checksum1 = Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)));
-            ExpectErrors(() => checksum2 = Dec.Recorder.Checksum(value2));
+            ExpectErrors(() => checksum1 = Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), err => err.Contains("reference object first seen in an unordered context"));
+            ExpectErrors(() => checksum2 = Dec.Recorder.Checksum(value2), err => err.Contains("reference object first seen in an unordered context"));
 
             ulong checksum3 = 0;
 
-            ExpectErrors(() => checksum3 = Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)));
+            ExpectErrors(() => checksum3 = Dec.Recorder.Checksum(Dec.Recorder.Clone(value1)), err => err.Contains("reference object first seen in an unordered context"));
 
             // these aren't really guaranteed due to how messy this is, but it will probably be true on a local machine, at least
             Assert.AreNotEqual(checksum1, checksum2, "Different dictionary-key-shared-ref objects should produce different checksums");

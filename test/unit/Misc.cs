@@ -40,7 +40,7 @@ namespace DecTest
 
             string recorded = "<Record><recordFormatVersion>1</recordFormatVersion><data /></Record>";
 
-            ExpectErrors(() => Dec.Recorder.Read<TestStruct>(recorded));
+            ExpectErrors(() => Dec.Recorder.Read<TestStruct>(recorded), err => err.Contains("TestStruct") && err.Contains("reflection"));
         }
 
         [Test]
@@ -50,7 +50,7 @@ namespace DecTest
 
             string recorded = "<record />";
 
-            ExpectErrors(() => Dec.Recorder.ReadSimple<TestStruct>(recorded, "record"));
+            ExpectErrors(() => Dec.Recorder.ReadSimple<TestStruct>(recorded, "record"), err => err.Contains("TestStruct") && err.Contains("reflection"));
         }
 
         [Test]
@@ -60,7 +60,7 @@ namespace DecTest
 
             string recorded = "<Record><recordFormatVersion>1</recordFormatVersion><data /></Record>";
 
-            ExpectErrors(() => Dec.Recorder.Read<TestStructAsThis>(recorded));
+            ExpectErrors(() => Dec.Recorder.Read<TestStructAsThis>(recorded), err => err.Contains("TestStruct") && err.Contains("reflection"));
         }
 
         [Test]
@@ -68,7 +68,7 @@ namespace DecTest
         {
             var initial = new TestStructMember();
 
-            ExpectErrors(() => Dec.Recorder.Clone(initial));
+            ExpectErrors(() => Dec.Recorder.Clone(initial), err => err.Contains("TestStruct") && err.Contains("Couldn't find a composition method"));
         }
     }
 }

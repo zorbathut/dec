@@ -137,7 +137,7 @@ namespace DecTest
                     <Cyclic_CDec decName=""C"" />
                 </Decs>");
 
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Cycle detected"));
 
             CollectionAssert.AreEqual(new[] { "Cyclic_CDec", "Cyclic_BDec", "Cyclic_ADec" }, postLoadOrder);
         }
@@ -182,7 +182,7 @@ namespace DecTest
                     <Partial_BDec decName=""B"" />
                 </Decs>");
 
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("not a known Dec type") || err.Contains("SetupDependsOn"));
 
             CollectionAssert.AreEqual(new[] { "Partial_BDec", "Partial_ADec" }, postLoadOrder);
         }

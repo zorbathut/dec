@@ -61,7 +61,7 @@ namespace DecTest
             }
             else
             {
-                ExpectErrors(() => parser.Finish());
+                ExpectErrors(() => parser.Finish(), err => err.Contains("mode used when a Dec doesn't exist") || err.Contains("Mode provided for root Dec") || (err.Contains("Invalid") && (err.Contains("mode") || err.Contains("Mode"))));
             }
 
             DoParserTests(mode);
@@ -109,7 +109,7 @@ namespace DecTest
             }
             else
             {
-                ExpectErrors(() => parser.Finish());
+                ExpectErrors(() => parser.Finish(), err => err.Contains("Invalid") && (err.Contains("Object-type") || err.Contains("mode")));
             }
 
             DoParserTests(mode);
@@ -140,7 +140,7 @@ namespace DecTest
             }
             else
             {
-                ExpectErrors(() => parser.Finish());
+                ExpectErrors(() => parser.Finish(), err => err.Contains("Invalid") && (err.Contains("Object-type") || err.Contains("mode")));
             }
 
             DoParserTests(mode);
@@ -188,7 +188,7 @@ namespace DecTest
             }
             else
             {
-                ExpectErrors(() => parser.Finish());
+                ExpectErrors(() => parser.Finish(), err => err.Contains("Invalid") && (err.Contains("Object-type") || err.Contains("mode")));
             }
 
             DoParserTests(mode);
@@ -219,7 +219,7 @@ namespace DecTest
             }
             else
             {
-                ExpectErrors(() => parser.Finish());
+                ExpectErrors(() => parser.Finish(), err => err.Contains("Invalid") && (err.Contains("Object-type") || err.Contains("mode")));
             }
 
             DoParserTests(mode);
@@ -254,7 +254,7 @@ namespace DecTest
             }
             else
             {
-                ExpectErrors(() => parser.Finish());
+                ExpectErrors(() => parser.Finish(), err => err.Contains("Invalid") && (err.Contains("value-type") || err.Contains("mode")));
             }
 
             DoParserTests(mode);
@@ -291,7 +291,7 @@ namespace DecTest
             }
             else
             {
-                ExpectErrors(() => parser.Finish());
+                ExpectErrors(() => parser.Finish(), err => err.Contains("Invalid") && (err.Contains("ordered-container") || err.Contains("mode")));
             }
 
             DoParserTests(mode);
@@ -323,7 +323,7 @@ namespace DecTest
             }
             else
             {
-                ExpectErrors(() => parser.Finish());
+                ExpectErrors(() => parser.Finish(), err => err.Contains("Invalid") && (err.Contains("ordered-container") || err.Contains("mode")));
             }
 
             DoParserTests(mode);
@@ -368,7 +368,7 @@ namespace DecTest
             }
             else
             {
-                ExpectErrors(() => parser.Finish());
+                ExpectErrors(() => parser.Finish(), err => err.Contains("Invalid") && (err.Contains("ordered-container") || err.Contains("mode")));
             }
 
             DoParserTests(mode);
@@ -400,7 +400,7 @@ namespace DecTest
             }
             else
             {
-                ExpectErrors(() => parser.Finish());
+                ExpectErrors(() => parser.Finish(), err => err.Contains("Invalid") && (err.Contains("ordered-container") || err.Contains("mode")));
             }
 
             DoParserTests(mode);
@@ -444,7 +444,7 @@ namespace DecTest
             }
             else
             {
-                ExpectErrors(() => parser.Finish());
+                ExpectErrors(() => parser.Finish(), err => err.Contains("Invalid") && (err.Contains("unordered-container") || err.Contains("mode")));
             }
 
             DoParserTests(mode);
@@ -475,7 +475,7 @@ namespace DecTest
             }
             else
             {
-                ExpectErrors(() => parser.Finish());
+                ExpectErrors(() => parser.Finish(), err => err.Contains("Invalid") && (err.Contains("unordered-container") || err.Contains("mode")));
             }
 
             DoParserTests(mode);
@@ -514,7 +514,7 @@ namespace DecTest
             }
             else
             {
-                ExpectErrors(() => parser.Finish());
+                ExpectErrors(() => parser.Finish(), err => err.Contains("duplicate key") || (err.Contains("Invalid") && err.Contains("mode")));
             }
 
             DoParserTests(mode);
@@ -548,7 +548,7 @@ namespace DecTest
                     </DictionaryDec>
                 </Decs>");
 
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("duplicate key") || (err.Contains("Invalid") && err.Contains("mode")));
 
             DoParserTests(mode);
 
@@ -592,7 +592,7 @@ namespace DecTest
             }
             else
             {
-                ExpectErrors(() => parser.Finish());
+                ExpectErrors(() => parser.Finish(), err => err.Contains("Invalid") && (err.Contains("unordered-container") || err.Contains("mode")));
             }
 
             DoParserTests(mode);
@@ -624,7 +624,7 @@ namespace DecTest
             }
             else
             {
-                ExpectErrors(() => parser.Finish());
+                ExpectErrors(() => parser.Finish(), err => err.Contains("Invalid") && (err.Contains("unordered-container") || err.Contains("mode")));
             }
 
             DoParserTests(mode);
@@ -664,7 +664,7 @@ namespace DecTest
             }
             else
             {
-                ExpectErrors(() => parser.Finish());
+                ExpectErrors(() => parser.Finish(), err => err.Contains("duplicate key") || (err.Contains("Invalid") && err.Contains("mode")));
             }
 
             DoParserTests(mode);
@@ -699,7 +699,7 @@ namespace DecTest
                     </HashSetDec>
                 </Decs>");
 
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("duplicate key") || (err.Contains("Invalid") && err.Contains("mode")));
 
             DoParserTests(mode);
 
@@ -741,7 +741,7 @@ namespace DecTest
             }
             else
             {
-                ExpectErrors(() => parser.Finish());
+                ExpectErrors(() => parser.Finish(), err => err.Contains("Invalid") && (err.Contains("value-type") || err.Contains("mode")));
             }
 
             DoParserTests(mode);
@@ -780,7 +780,7 @@ namespace DecTest
             }
             else
             {
-                ExpectErrors(() => parser.Finish());
+                ExpectErrors(() => parser.Finish(), err => err.Contains("Invalid") && (err.Contains("Object-type") || err.Contains("mode")));
             }
 
             DoParserTests(mode);
@@ -811,7 +811,7 @@ namespace DecTest
             }
             else
             {
-                ExpectErrors(() => parser.Finish());
+                ExpectErrors(() => parser.Finish(), err => err.Contains("Invalid") && (err.Contains("Object-type") || err.Contains("mode")));
             }
 
             DoParserTests(mode);

@@ -41,7 +41,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConverterParameter) } });
 
             Dec.Parser parser = null;
-            ExpectErrors(() => parser = new Dec.Parser());
+            ExpectErrors(() => parser = new Dec.Parser(), err => err.Contains("without a no-argument constructor"));
             parser.Finish();
         }
 
@@ -93,7 +93,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(RegenericedConverter<>) } });
 
             // so what happens here?
-            ExpectErrors(() => new Dec.Parser().Finish());
+            ExpectErrors(() => new Dec.Parser().Finish(), err => err.Contains("not referring to a generic constructed type"));
         }
 
         public abstract class AbstractConverter : Dec.ConverterRecord<Stub>
@@ -107,7 +107,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(AbstractConverter) } });
 
             // so what happens here?
-            ExpectErrors(() => new Dec.Parser().Finish());
+            ExpectErrors(() => new Dec.Parser().Finish(), err => err.Contains("which is abstract"));
         }
 
         public struct Number

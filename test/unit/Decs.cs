@@ -54,7 +54,7 @@ namespace DecTest
                     <NonexistentDec decName=""TestDecA"" />
                     <StubDec decName=""TestDecB"" />
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("NonexistentDec") && (err.Contains("Couldn't find type") || err.Contains("does not inherit from Dec.Dec")));
 
             DoParserTests(mode);
 
@@ -72,7 +72,7 @@ namespace DecTest
                 <Decs>
                     <StubDec />
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("No dec name provided"));
 
             DoParserTests(mode);
         }
@@ -91,7 +91,7 @@ namespace DecTest
                     <StubDec decName=""&quot;Quotes&quot;"" />
                     <StubDec decName=""ActuallyAValidDecName"" />
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("not a valid identifier"));
 
             DoParserTests(mode);
 
@@ -120,7 +120,7 @@ namespace DecTest
                         <value>6</value>
                     </IntDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("value") && (err.Contains("Duplicate") || err.Contains("duplicate")));
 
             DoParserTests(mode);
 
@@ -145,7 +145,7 @@ namespace DecTest
                         <value>20</value>
                     </IntDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("IntDec:TestDec") && err.Contains("defined twice"));
 
             DoParserTests(mode, errorValidator: err => err.Contains("IntDec:TestDec"));
 
@@ -204,7 +204,7 @@ namespace DecTest
             var dec_utilreflection = GetDecAssembly().GetType("Dec.UtilReflection");
             var getFieldsFromHierarchy = dec_utilreflection.GetMethod("GetSerializableFieldsFromHierarchy", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
             System.Reflection.FieldInfo[] fields = null;
-            ExpectErrors(() => fields = (getFieldsFromHierarchy.Invoke(null, new[] { typeof(DupeChildDec) }) as IEnumerable<System.Reflection.FieldInfo>).ToArray());
+            ExpectErrors(() => fields = (getFieldsFromHierarchy.Invoke(null, new[] { typeof(DupeChildDec) }) as IEnumerable<System.Reflection.FieldInfo>).ToArray(), err => err.Contains("duplicates of field") && err.Contains("value"));
             Assert.AreEqual(1, fields.Count(field => field.Name == "value"));
         }
 
@@ -220,9 +220,9 @@ namespace DecTest
                         <value>12</value>
                     </DupeChildDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => (err.Contains("Found duplicates of field") || err.Contains("Found multiple examples of field")) && err.Contains("value"));
 
-            DoParserTests(mode, rewrite_expectWriteErrors: true, rewrite_expectParseErrors: true, validation_expectWriteErrors: true);
+            DoParserTests(mode, rewrite_expectWriteErrors: true, rewrite_expectParseErrors: true, validation_expectWriteErrors: true, errorValidator: err => (err.Contains("Found duplicates of field") || err.Contains("Found multiple examples of field")) && err.Contains("value"));
 
             var result = (DupeChildDec)Dec.Database<DupeParentDec>.Get("TestDec");
             Assert.IsNotNull(result);
@@ -241,7 +241,7 @@ namespace DecTest
                 <Decs>
                     <StubDec decName=""TestDec"" invalidAttribute=""hello"" />
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("invalidAttribute"));
 
             DoParserTests(mode);
 
@@ -350,9 +350,9 @@ namespace DecTest
                     <ErrorDec decName=""TestDecA"" />
                     <ErrorDec decName=""TestDecB"" />
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("I am never valid"));
 
-            DoParserTests(mode, rewrite_expectParseErrors: true);
+            DoParserTests(mode, rewrite_expectParseErrors: true, errorValidator: err => err.Contains("I am never valid"));
 
             Assert.IsTrue(Dec.Database<ErrorDec>.Get("TestDecA").touchedBefore);
             Assert.IsTrue(Dec.Database<ErrorDec>.Get("TestDecA").touchedAfter);
@@ -371,9 +371,9 @@ namespace DecTest
                     <PostLoadErrorDec decName=""TestDecA"" />
                     <PostLoadErrorDec decName=""TestDecB"" />
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("I am never valid"));
 
-            DoParserTests(mode, rewrite_expectParseErrors: true);
+            DoParserTests(mode, rewrite_expectParseErrors: true, errorValidator: err => err.Contains("I am never valid"));
 
             Assert.IsTrue(Dec.Database<PostLoadErrorDec>.Get("TestDecA").touchedBefore);
             Assert.IsTrue(Dec.Database<PostLoadErrorDec>.Get("TestDecA").touchedAfter);
@@ -392,9 +392,9 @@ namespace DecTest
                     <ErrorExceptionDec decName=""TestDecA"" />
                     <ErrorExceptionDec decName=""TestDecB"" />
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("ConfigErrors") || err.Contains("FormatException"));
 
-            DoParserTests(mode, rewrite_expectParseErrors: true);
+            DoParserTests(mode, rewrite_expectParseErrors: true, errorValidator: err => err.Contains("ConfigErrors") || err.Contains("FormatException"));
 
             Assert.IsTrue(Dec.Database<ErrorExceptionDec>.Get("TestDecA").touched);
             Assert.IsTrue(Dec.Database<ErrorExceptionDec>.Get("TestDecB").touched);
@@ -411,9 +411,9 @@ namespace DecTest
                     <PostLoadErrorExceptionDec decName=""TestDecA"" />
                     <PostLoadErrorExceptionDec decName=""TestDecB"" />
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("PostLoad") || err.Contains("FormatException"));
 
-            DoParserTests(mode, rewrite_expectParseErrors: true);
+            DoParserTests(mode, rewrite_expectParseErrors: true, errorValidator: err => err.Contains("PostLoad") || err.Contains("FormatException"));
 
             Assert.IsTrue(Dec.Database<PostLoadErrorExceptionDec>.Get("TestDecA").touched);
             Assert.IsTrue(Dec.Database<PostLoadErrorExceptionDec>.Get("TestDecB").touched);
@@ -466,7 +466,7 @@ namespace DecTest
                         <invalidReference>TestDec</invalidReference>
                     </DecMemberDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Dec.Dec does not exist within a database hierarchy") || err.Contains("Non-hierarchy decs cannot be used as references"));
 
             DoParserTests(mode);
 
@@ -651,9 +651,9 @@ namespace DecTest
                         </value>
                      </ConflictInheritanceDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => (err.Contains("Found duplicates of field") || err.Contains("Found multiple examples of field")) && err.Contains("conflict"));
 
-            DoParserTests(mode, rewrite_expectWriteErrors: true, rewrite_expectParseErrors: true, validation_expectWriteErrors: true);
+            DoParserTests(mode, rewrite_expectWriteErrors: true, rewrite_expectParseErrors: true, validation_expectWriteErrors: true, errorValidator: err => (err.Contains("Found duplicates of field") || err.Contains("Found multiple examples of field")) && err.Contains("conflict"));
 
             // This behavior is absolutely not guaranteed, for the record.
             Assert.AreEqual(1, Dec.Database<ConflictInheritanceDec>.Get("TestDec").value.conflict);
@@ -706,7 +706,7 @@ namespace DecTest
                     <AbstractDec decName=""Abstract"" />
                     <ConcreteDec decName=""Concrete"" />
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("abstract type"));
 
             DoParserTests(mode);
 
@@ -742,7 +742,7 @@ namespace DecTest
                 </Decs>");
             if (!classSpecified)
             {
-                ExpectErrors(() => parser.Finish());
+                ExpectErrors(() => parser.Finish(), err => err.Contains("Dec.Dec does not exist within a database hierarchy") || err.Contains("Non-hierarchy decs cannot be used as references"));
             }
             else
             {
@@ -778,7 +778,7 @@ namespace DecTest
                 </Decs>");
             if (!classSpecified)
             {
-                ExpectErrors(() => parser.Finish());
+                ExpectErrors(() => parser.Finish(), err => err.Contains("Non-hierarchy decs cannot be used as references") || err.Contains("does not exist within a database hierarchy"));
             }
             else
             {
@@ -836,7 +836,7 @@ namespace DecTest
                 <Decs>
                     <ConstructorParameterDec decName=""TestDec"" />
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("without a no-argument constructor"));
 
             DoParserTests(mode);
 
@@ -853,7 +853,7 @@ namespace DecTest
                 <Decs>
                     <StubDec decName=""TestDec"" horse=""horse"" />
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("horse") && err.Contains("unknown attribute"));
 
             DoParserTests(mode);
         }

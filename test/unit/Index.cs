@@ -187,9 +187,9 @@ namespace DecTest
                     <ExcessiveIndicesDec decName=""TestDecB"" />
                     <ExcessiveIndicesDec decName=""TestDecC"" />
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Too many indices"));
 
-            DoParserTests(mode, rewrite_expectParseErrors: true);
+            DoParserTests(mode, rewrite_expectParseErrors: true, errorValidator: err => err.Contains("Too many indices"));
 
             // It's guaranteed that either indexA or indexB has some behavior that causes 0, 1, and 2 to be distributed among TestDec.
             // This is a massive over-constraint of allowable behavior; loosen it up if it fails somewhere.

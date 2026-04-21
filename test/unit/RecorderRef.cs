@@ -236,7 +236,7 @@ namespace DecTest
                 }
             }
 
-            var deserialized = DoRecorderRoundTrip(root, mode, expectWriteErrors: mode != RecorderMode.Simple, expectWriteWarnings: mode == RecorderMode.Clone);
+            var deserialized = DoRecorderRoundTrip(root, mode, expectWriteErrors: mode != RecorderMode.Simple, expectWriteWarnings: mode == RecorderMode.Clone, errorValidator: err => err.Contains("Depth limiter") && err.Contains("unshareable node stack"), warningValidator: wrn => wrn.Contains("Depth limiter") && wrn.Contains("unshareable node stack"));
 
             {
                 var seen = new HashSet<UnsharedRecorder>();
@@ -286,7 +286,7 @@ namespace DecTest
                 link.payload = new int[] { 1 };
             }
 
-            var deserialized = DoRecorderRoundTrip(chains, mode, expectWriteWarnings: mode == RecorderMode.Clone);
+            var deserialized = DoRecorderRoundTrip(chains, mode, expectWriteWarnings: mode == RecorderMode.Clone, warningValidator: wrn => wrn.Contains("Depth limiter") && wrn.Contains("unshareable node stack"));
         }
 
         [Test]
@@ -306,7 +306,7 @@ namespace DecTest
                   </data>
                 </Record>";
             RefsRootRecordable deserialized = null;
-            ExpectWarnings(() => deserialized = Dec.Recorder.Read<RefsRootRecordable>(serialized));
+            ExpectWarnings(() => deserialized = Dec.Recorder.Read<RefsRootRecordable>(serialized), wrn => wrn.Contains("Reference element should be named 'Ref'"));
 
             Assert.IsNotNull(deserialized.childAone);
             Assert.IsNotNull(deserialized.childAtwo);
@@ -335,7 +335,7 @@ namespace DecTest
                   </data>
                 </Record>";
             RefsRootRecordable deserialized = null;
-            ExpectErrors(() => deserialized = Dec.Recorder.Read<RefsRootRecordable>(serialized));
+            ExpectErrors(() => deserialized = Dec.Recorder.Read<RefsRootRecordable>(serialized), err => err.Contains("Missing reference ID"));
 
             Assert.IsNotNull(deserialized.childAone);
             Assert.IsNotNull(deserialized.childAtwo);
@@ -364,7 +364,7 @@ namespace DecTest
                   </data>
                 </Record>";
             RefsRootRecordable deserialized = null;
-            ExpectErrors(() => deserialized = Dec.Recorder.Read<RefsRootRecordable>(serialized));
+            ExpectErrors(() => deserialized = Dec.Recorder.Read<RefsRootRecordable>(serialized), err => err.Contains("Missing reference class name"));
 
             Assert.IsNotNull(deserialized.childAone);
             Assert.IsNotNull(deserialized.childAtwo);
@@ -395,7 +395,7 @@ namespace DecTest
                   </data>
                 </Record>";
             RefsRootRecordable deserialized = null;
-            ExpectErrors(() => deserialized = Dec.Recorder.Read<RefsRootRecordable>(serialized));
+            ExpectErrors(() => deserialized = Dec.Recorder.Read<RefsRootRecordable>(serialized), err => err.Contains("which is a value type"));
 
             Assert.IsNotNull(deserialized.childAone);
             Assert.IsNotNull(deserialized.childAtwo);
@@ -452,7 +452,7 @@ namespace DecTest
                   </data>
                 </Record>";
             Recorder.PrimitivesContainer deserialized = null;
-            ExpectErrors(() => deserialized = Dec.Recorder.Read<Recorder.PrimitivesContainer>(serialized));
+            ExpectErrors(() => deserialized = Dec.Recorder.Read<Recorder.PrimitivesContainer>(serialized), err => err.Contains("Found a reference in a non-.Shared() context") || err.Contains("Null element may not have ref"));
 
             Assert.IsNotNull(deserialized.recordable);
         }
@@ -475,7 +475,7 @@ namespace DecTest
                   </data>
                 </Record>";
             Recorder.PrimitivesContainer deserialized = null;
-            ExpectErrors(() => deserialized = Dec.Recorder.Read<Recorder.PrimitivesContainer>(serialized));
+            ExpectErrors(() => deserialized = Dec.Recorder.Read<Recorder.PrimitivesContainer>(serialized), err => err.Contains("Found a reference in a non-.Shared() context") || err.Contains("unknown attributes"));
 
             Assert.AreEqual(42, deserialized.recordable.intValue);
         }
@@ -493,7 +493,7 @@ namespace DecTest
                   </data>
                 </Record>";
             Recorder.PrimitivesContainer deserialized = null;
-            ExpectErrors(() => deserialized = Dec.Recorder.Read<Recorder.PrimitivesContainer>(serialized));
+            ExpectErrors(() => deserialized = Dec.Recorder.Read<Recorder.PrimitivesContainer>(serialized), err => err.Contains("Found a reference in a non-.Shared() context") || err.Contains("without a valid reference mapping"));
 
             Assert.IsNull(deserialized.recordable);
         }
@@ -514,7 +514,7 @@ namespace DecTest
                   </data>
                 </Record>";
             Recorder.PrimitivesContainer deserialized = null;
-            ExpectErrors(() => deserialized = Dec.Recorder.Read<Recorder.PrimitivesContainer>(serialized));
+            ExpectErrors(() => deserialized = Dec.Recorder.Read<Recorder.PrimitivesContainer>(serialized), err => err.Contains("Found a reference in a non-.Shared() context") || err.Contains("cannot be converted to expected type"));
 
             Assert.IsNull(deserialized.recordable);
         }
@@ -569,7 +569,7 @@ namespace DecTest
                         <setToNull ref=""invalid"" />
                     </ParserRefDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Found a reference tag while not evaluating Recorder mode"));
 
             DoParserTests(mode);
 

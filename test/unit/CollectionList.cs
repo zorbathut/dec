@@ -101,7 +101,7 @@ namespace DecTest
                         </data>
                     </ListDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Tag should be <li>"));
 
             DoParserTests(mode);
 

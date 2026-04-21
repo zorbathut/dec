@@ -34,7 +34,7 @@ namespace DecTest
                 <NotDecs>
                     <StubDec decName=""TestDec"" />
                 </NotDecs>");
-            ExpectWarnings(() => parser.Finish());
+            ExpectWarnings(() => parser.Finish(), warn => warn.Contains("root element with name `NotDecs`") || warn.Contains("should be `Decs`"));
 
             DoParserTests(mode);
 
@@ -53,7 +53,7 @@ namespace DecTest
                 </Decs>
                 <Decs>
                     <StubDec decName=""TestDecB"" />
-                </Decs>"));
+                </Decs>"), err => err.Contains("multiple root elements") || err.Contains("XmlException"));
             parser.Finish();
 
             DoParserTests(mode);
@@ -89,7 +89,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) } });
 
             var parser = new Dec.Parser();
-            ExpectErrors(() => parser.AddString(Dec.Parser.FileType.Xml, @"test.xml"));
+            ExpectErrors(() => parser.AddString(Dec.Parser.FileType.Xml, @"test.xml"), err => err.Contains("passed the filename") || err.Contains("AddFile()") || err.Contains("XmlException"));
             parser.Finish();
 
             DoParserTests(mode);
@@ -128,7 +128,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { });
 
             var parser = new Dec.Parser();
-            ExpectErrors(() => parser.AddString(Dec.Parser.FileType.Xml, @""));
+            ExpectErrors(() => parser.AddString(Dec.Parser.FileType.Xml, @""), err => err.Contains("null or empty string"));
             parser.Finish();
 
             DoParserTests(mode);

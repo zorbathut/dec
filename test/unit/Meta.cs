@@ -19,7 +19,7 @@ namespace DecTest
         [Test]
         public void Clear()
         {
-            ExpectWarnings(() => Assert.IsNull(Dec.Database<StubDec>.Get("TestDec")));
+            ExpectWarnings(() => Assert.IsNull(Dec.Database<StubDec>.Get("TestDec")), wrn => wrn.Contains("no Decs loaded"));
             // we don't test StubDecs.TestDec here because if we do, we'll kick off the detection
 
             {
@@ -38,7 +38,7 @@ namespace DecTest
 
             Dec.Database.Clear();
 
-            ExpectWarnings(() => Assert.IsNull(Dec.Database<StubDec>.Get("TestDec")));
+            ExpectWarnings(() => Assert.IsNull(Dec.Database<StubDec>.Get("TestDec")), wrn => wrn.Contains("no Decs loaded"));
             Assert.IsNull(StubDecs.TestDec);
 
             {
@@ -57,7 +57,7 @@ namespace DecTest
 
             Dec.Database.Clear();
 
-            ExpectWarnings(() => Assert.IsNull(Dec.Database<StubDec>.Get("TestDec")));
+            ExpectWarnings(() => Assert.IsNull(Dec.Database<StubDec>.Get("TestDec")), wrn => wrn.Contains("no Decs loaded"));
             Assert.IsNull(StubDecs.TestDec);
         }
 
@@ -112,7 +112,7 @@ namespace DecTest
                             <target>Target</target>
                         </RefSourceDec>
                     </Decs>");
-                ExpectErrors(() => parser.Finish());
+                ExpectErrors(() => parser.Finish(), err => err.Contains("Couldn't find") && err.Contains("Target"));
             }
 
             {
@@ -139,7 +139,7 @@ namespace DecTest
             parseCache["Meta"] = typeof(Meta);
             Assert.AreEqual(baseSize + 1, parseCache.Count);
 
-            ExpectWarnings(() => DoParserTests(ParserMode.RewrittenBare));
+            ExpectWarnings(() => DoParserTests(ParserMode.RewrittenBare), wrn => wrn.Contains("no Decs loaded"));
 
             // Hopefully we reset after doing the DoParserTests()!
             Assert.AreEqual(baseSize, parseCache.Count);

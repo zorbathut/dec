@@ -61,7 +61,7 @@ namespace DecTest
             }
             else
             {
-                ExpectErrors(() => deserialized = Dec.Recorder.Read<StringMemberRecordable>(serialized));
+                ExpectErrors(() => deserialized = Dec.Recorder.Read<StringMemberRecordable>(serialized), err => err.Contains("may not have") || err.Contains("cannot be converted to expected type"));
             }
 
             if (refTag && classTag)
@@ -110,7 +110,7 @@ namespace DecTest
             }
             else
             {
-                ExpectErrors(() => parser.Finish());
+                ExpectErrors(() => parser.Finish(), err => err.Contains("may not have") || err.Contains("Found a reference tag while not evaluating Recorder mode"));
             }
 
             DoParserTests(mode);

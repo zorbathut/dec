@@ -118,9 +118,9 @@ namespace DecTest
                 <Decs>
                     <StubDec decName=""TestDec"" />
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("is not compatible with actual"));
 
-            DoParserTests(mode, rewrite_expectParseErrors: true);
+            DoParserTests(mode, rewrite_expectParseErrors: true, errorValidator: err => err.Contains("is not compatible with actual"));
 
             var result = Dec.Database<StubDec>.Get("TestDec");
             Assert.IsNotNull(result);
@@ -141,14 +141,14 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) }, explicitStaticRefs = new Type[] { typeof(NoAttributeDecs) } });
 
             Dec.Parser parser = null;
-            ExpectErrors(() => parser = new Dec.Parser());
+            ExpectErrors(() => parser = new Dec.Parser(), err => err.Contains("is not tagged as StaticReferences"));
             parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <StubDec decName=""TestDec"" />
                 </Decs>");
             parser.Finish();
 
-            DoParserTests(mode, rewrite_expectParseErrors: true);
+            DoParserTests(mode, rewrite_expectParseErrors: true, errorValidator: err => err.Contains("is not tagged as StaticReferences"));
 
             var result = Dec.Database<StubDec>.Get("TestDec");
             Assert.IsNotNull(result);
@@ -172,9 +172,9 @@ namespace DecTest
                 <Decs>
                     <StubDec decName=""TestDec"" />
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Failed to properly register") || err.Contains("Initialized()"));
 
-            DoParserTests(mode, rewrite_expectParseErrors: true);
+            DoParserTests(mode, rewrite_expectParseErrors: true, errorValidator: err => err.Contains("Failed to properly register") || err.Contains("Initialized()"));
 
             var result = Dec.Database<StubDec>.Get("TestDec");
             Assert.IsNotNull(result);
@@ -196,14 +196,14 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) }, explicitStaticRefs = new Type[] { typeof(NoStaticDecs) } });
 
             Dec.Parser parser = null;
-            ExpectErrors(() => parser = new Dec.Parser());
+            ExpectErrors(() => parser = new Dec.Parser(), err => err.Contains("is not static"));
             parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <StubDec decName=""TestDec"" />
                 </Decs>");
             parser.Finish();
 
-            DoParserTests(mode, rewrite_expectParseErrors: true);
+            DoParserTests(mode, rewrite_expectParseErrors: true, errorValidator: err => err.Contains("is not static"));
 
             var result = Dec.Database<StubDec>.Get("TestDec");
             Assert.IsNotNull(result);
@@ -228,9 +228,9 @@ namespace DecTest
             parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("does not correspond to any loaded Dec"));
 
-            DoParserTests(mode, rewrite_expectParseErrors: true);
+            DoParserTests(mode, rewrite_expectParseErrors: true, errorValidator: err => err.Contains("does not correspond to any loaded Dec"));
         }
 
         [Dec.StaticReferences]
@@ -244,7 +244,7 @@ namespace DecTest
         [Test]
         public void EarlyTouch()
         {
-            ExpectErrors(() => EarlyTouchDecs.TestDec = null);
+            ExpectErrors(() => EarlyTouchDecs.TestDec = null, err => err.Contains("Initializing static reference class at an inappropriate time"));
         }
 
         [Dec.StaticReferences]
@@ -268,7 +268,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            ExpectErrors(() => LateTouchDecs.TestDec = null);
+            ExpectErrors(() => LateTouchDecs.TestDec = null, err => err.Contains("Initializing static reference class at an inappropriate time"));
         }
 
         [Dec.StaticReferences]
@@ -299,7 +299,7 @@ namespace DecTest
                 <Decs>
                     <UnexpectedTouchDec decName=""TestDec"" />
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Initializing static reference class at an inappropriate time"));
 
             Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDec"));
         }
@@ -334,7 +334,7 @@ namespace DecTest
                 <Decs>
                     <ConstructorTouchDec decName=""TestDec"" />
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Failed to properly register") || err.Contains("Initializing static reference class at an inappropriate time"));
 
             Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDec"));
         }
@@ -384,9 +384,9 @@ namespace DecTest
                 <Decs>
                     <StubDec decName=""TestDec"" />
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Failed to properly register") || err.Contains("readonly member") || err.Contains("cannot be readonly"));
 
-            DoParserTests(mode, rewrite_expectParseErrors: true);
+            DoParserTests(mode, rewrite_expectParseErrors: true, errorValidator: err => err.Contains("Failed to properly register") || err.Contains("readonly member") || err.Contains("cannot be readonly"));
 
             var result = Dec.Database<StubDec>.Get("TestDec");
             Assert.IsNotNull(result);
@@ -409,9 +409,9 @@ namespace DecTest
             parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Failed to properly register") || err.Contains("readonly member") || err.Contains("cannot be readonly"));
 
-            DoParserTests(mode, rewrite_expectParseErrors: true);
+            DoParserTests(mode, rewrite_expectParseErrors: true, errorValidator: err => err.Contains("Failed to properly register") || err.Contains("readonly member") || err.Contains("cannot be readonly"));
         }
 
         [Dec.StaticReferences]

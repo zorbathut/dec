@@ -119,7 +119,7 @@ namespace DecTest
             element.one = new Factoried();
             element.two = new Factoried();
 
-            var deserialized = DoRecorderRoundTrip(element, mode, expectWriteErrors: true, expectReadErrors: true);
+            var deserialized = DoRecorderRoundTrip(element, mode, expectWriteErrors: true, expectReadErrors: true, errorValidator: err => err.Contains("already has factories"));
 
             Assert.AreEqual(-1, deserialized.one.value);
             Assert.AreEqual(-2, deserialized.two.value);
@@ -205,7 +205,7 @@ namespace DecTest
                 (result == InheritanceTestResult.SiblingError) ||
                 (result == InheritanceTestResult.InvalidError);
 
-            var deserialized = DoRecorderRoundTrip(element, mode, expectReadErrors: expectErrors);
+            var deserialized = DoRecorderRoundTrip(element, mode, expectReadErrors: expectErrors, errorValidator: err => err.Contains("Custom factory generated") && err.Contains("falling back on a default object"));
 
             if (result == InheritanceTestResult.Derived)
             {
@@ -437,7 +437,7 @@ namespace DecTest
             element.one.nonrecorded = 11;
             element.one.recorded = 12;
 
-            var deserialized = DoRecorderRoundTrip(element, mode, expectWriteErrors: mode != RecorderMode.Clone && mode != RecorderMode.Checksum);
+            var deserialized = DoRecorderRoundTrip(element, mode, expectWriteErrors: mode != RecorderMode.Clone && mode != RecorderMode.Checksum, errorValidator: err => err.Contains("previously-seen unshared object") || err.Contains("shared objects do not work in simple mode"));
 
             if (mode != RecorderMode.Clone)
             {
@@ -478,7 +478,7 @@ namespace DecTest
                 </Record>";
 
             SharedWriteCode deserialized = null;
-            ExpectErrors(() => deserialized = Dec.Recorder.Read<SharedWriteCode>(serialized));
+            ExpectErrors(() => deserialized = Dec.Recorder.Read<SharedWriteCode>(serialized), err => err.Contains("Found a reference in a non-.Shared() context"));
 
             Assert.IsNotNull(deserialized.one);
             Assert.AreEqual(0, deserialized.one.nonrecorded);

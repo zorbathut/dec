@@ -46,7 +46,7 @@ namespace DecTest
             lat.data = new List<int>() { 1, 1, 2, 3, 5, 8, 13, 21 };
             lat.data2 = 19;
 
-            var deserialized = DoRecorderRoundTrip(lat, mode, expectReadErrors: true, expectWriteErrors: true);
+            var deserialized = DoRecorderRoundTrip(lat, mode, expectReadErrors: true, expectWriteErrors: true, errorValidator: err => err.Contains("field after a RecordAsThis call"));
 
             Assert.AreEqual(lat.data, deserialized.data);
         }
@@ -70,7 +70,7 @@ namespace DecTest
             lat.data = new List<int>() { 1, 1, 2, 3, 5, 8, 13, 21 };
             lat.data2 = 19;
 
-            var deserialized = DoRecorderRoundTrip(lat, mode, expectReadErrors: true, expectWriteErrors: true);
+            var deserialized = DoRecorderRoundTrip(lat, mode, expectReadErrors: true, expectWriteErrors: true, errorValidator: err => err.Contains("RecordAsThis call after writing a field") || err.Contains("Child nodes are not valid when parsing") || err.Contains("is not a valid value for Int32") || err.Contains("Int32Converter cannot convert from"));
 
             Assert.AreEqual(lat.data, deserialized.data);
         }
@@ -94,7 +94,7 @@ namespace DecTest
             lat.data = new List<int>() { 1, 1, 2, 3, 5, 8, 13, 21 };
             lat.data2 = 19;
 
-            var deserialized = DoRecorderRoundTrip(lat, mode, expectReadErrors: true, expectWriteErrors: true);
+            var deserialized = DoRecorderRoundTrip(lat, mode, expectReadErrors: true, expectWriteErrors: true, errorValidator: err => err.Contains("field after a RecordAsThis call"));
 
             Assert.AreEqual(lat.data, deserialized.data);
         }
@@ -127,7 +127,7 @@ namespace DecTest
             var item = new ThisThenClassOuter();
             item.data = new ThisThenClassInnerDerived();
 
-            var deserialized = DoRecorderRoundTrip(item, mode, expectWriteErrors: mode != RecorderMode.Clone && mode != RecorderMode.Checksum);
+            var deserialized = DoRecorderRoundTrip(item, mode, expectWriteErrors: mode != RecorderMode.Clone && mode != RecorderMode.Checksum, errorValidator: err => err.Contains("RecordAsThis() call attempted to add a class tag"));
         }
 
         public class ClassThenThisOuterBase : Dec.IRecordable
@@ -156,7 +156,7 @@ namespace DecTest
             var item = new ClassThenThisOuterDerived();
             ClassThenThisOuterBase itemBase = item;
 
-            var deserialized = DoRecorderRoundTrip(itemBase, mode, expectWriteErrors: mode != RecorderMode.Clone && mode != RecorderMode.Checksum);
+            var deserialized = DoRecorderRoundTrip(itemBase, mode, expectWriteErrors: mode != RecorderMode.Clone && mode != RecorderMode.Checksum, errorValidator: err => err.Contains("Null tag detected after a class tag or a RecordAsThis()"));
         }
 
         public class Inner : Dec.IRecordable
@@ -197,7 +197,7 @@ namespace DecTest
 
             // be sweet if this worked, wouldn't it?
             // doesn't though
-            var deserialized = DoRecorderRoundTrip(item, mode, expectWriteErrors: true, expectReadErrors: true);
+            var deserialized = DoRecorderRoundTrip(item, mode, expectWriteErrors: true, expectReadErrors: true, errorValidator: err => err.Contains("Recorder.RecordAsThis() called on Recorder.Parameters with sharing enabled"));
         }
     }
 }

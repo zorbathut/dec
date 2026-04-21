@@ -103,7 +103,7 @@ namespace DecTest
             var parser = new Dec.Parser();
             parser.Finish();
 
-            ExpectErrors(() => Assert.IsNull(Dec.Database.Get(typeof(NotActuallyADec), "Fake")));
+            ExpectErrors(() => Assert.IsNull(Dec.Database.Get(typeof(NotActuallyADec), "Fake")), err => err.Contains("NotActuallyADec") && (err.Contains("not a valid Dec") || err.Contains("doesn't even inherit from Dec") || err.Contains("does not exist within a database hierarchy")));
         }
 
         private Func<Type, Type> getDecRootType;
@@ -182,8 +182,8 @@ namespace DecTest
             Assert.AreEqual(typeof(FullAbstractTypeDerivedDec), getDecRootType(typeof(FullAbstractTypeDerivedDec)));
 
             // now for some errors
-            ExpectErrors(() => Assert.IsNull(getDecRootType(typeof(FullAbstractTypeDec))));
-            ExpectErrors(() => Assert.IsNull(getDecRootType(typeof(DecAbstractTypeDec))));
+            ExpectErrors(() => Assert.IsNull(getDecRootType(typeof(FullAbstractTypeDec))), err => err.Contains("FullAbstractTypeDec") && (err.Contains("tagged Dec.Abstract") || err.Contains("does not exist within a database hierarchy")));
+            ExpectErrors(() => Assert.IsNull(getDecRootType(typeof(DecAbstractTypeDec))), err => err.Contains("DecAbstractTypeDec") && (err.Contains("tagged Dec.Abstract") || err.Contains("does not exist within a database hierarchy")));
 
             // We've already errored once on DecAbstract, so it's currently not required to happen again (but it's allowed to.)
             Assert.AreEqual(typeof(DecAbstractTypeDerivedDec), getDecRootType(typeof(DecAbstractTypeDerivedDec)));
@@ -192,8 +192,8 @@ namespace DecTest
             Assert.AreEqual(typeof(DecAbstractTypeDerivedDec), getDecRootType(typeof(DecAbstractTypeDerived2Dec)));
             Assert.AreEqual(typeof(FullAbstractTypeDerivedDec), getDecRootType(typeof(FullAbstractTypeDerived2Dec)));
 
-            ExpectErrors(() => Assert.IsNull(getDecRootType(typeof(FullAbstractTypeDerived3ADec))));
-            ExpectErrors(() => Assert.AreEqual(typeof(FullAbstractTypeDerived4BDec), getDecRootType(typeof(FullAbstractTypeDerived4BDec))));
+            ExpectErrors(() => Assert.IsNull(getDecRootType(typeof(FullAbstractTypeDerived3ADec))), err => err.Contains("FullAbstractTypeDerived3ADec") && (err.Contains("tagged Dec.Abstract") || err.Contains("does not exist within a database hierarchy")));
+            ExpectErrors(() => Assert.AreEqual(typeof(FullAbstractTypeDerived4BDec), getDecRootType(typeof(FullAbstractTypeDerived4BDec))), err => err.Contains("FullAbstractTypeDerived3BDec") && err.Contains("tagged Dec.Abstract"));
         }
 
 
@@ -203,13 +203,13 @@ namespace DecTest
             int x = 0;
 
             Dec.Database.Clear();
-            ExpectWarnings(() => Dec.Database.Get(typeof(CppAbstractTypeDec), "MissingDec"));
+            ExpectWarnings(() => Dec.Database.Get(typeof(CppAbstractTypeDec), "MissingDec"), wrn => wrn.Contains("no Decs loaded"));
 
             Dec.Database.Clear();
-            ExpectWarnings(() => x = Dec.Database.List.Count());
+            ExpectWarnings(() => x = Dec.Database.List.Count(), wrn => wrn.Contains("no Decs loaded"));
 
             Dec.Database.Clear();
-            ExpectWarnings(() => x = Dec.Database.Count);
+            ExpectWarnings(() => x = Dec.Database.Count, wrn => wrn.Contains("no Decs loaded"));
         }
     }
 }

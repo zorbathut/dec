@@ -160,8 +160,24 @@ namespace DecTest
             Expect,
         }
         [ThreadStatic] private static bool withinExpect;
-        protected void ExpectGeneral(Action action, string context = "unlabeled context", ExpectationType warning = ExpectationType.Disallow, Func<string, bool> warningValidator = null, ExpectationType error = ExpectationType.Disallow, Func<string, bool> errorValidator = null)
+        // Validators and ExpectationType interaction:
+        // - Disallow: validator is ignored (must be null; no error/warning is expected at all).
+        // - Tolerate: if an error/warning fires, it must match the validator; if none fires, fine.
+        // - Expect: at least one error/warning must fire, and every fired one must match the validator.
+        // [ThreadStatic] means the validator only covers the test thread. Tests that spawn worker threads
+        // (e.g. Threading.cs) don't see the validator there; those tests don't currently use Expect*.
+        protected void ExpectGeneral(Action action, string context, ExpectationType warning, Func<string, bool> warningValidator, ExpectationType error, Func<string, bool> errorValidator)
         {
+            if (warning != ExpectationType.Disallow)
+            {
+                Assert.IsNotNull(warningValidator, $"ExpectGeneral in {context}: warningValidator is required when warning is {warning}");
+            }
+
+            if (error != ExpectationType.Disallow)
+            {
+                Assert.IsNotNull(errorValidator, $"ExpectGeneral in {context}: errorValidator is required when error is {error}");
+            }
+
             Assert.IsFalse(withinExpect);
             withinExpect = true;
 
@@ -218,22 +234,22 @@ namespace DecTest
             withinExpect = false;
         }
 
-        protected void ExpectWarnings(Action action, string context = "unlabeled context", Func<string, bool> warningValidator = null)
+        protected void ExpectWarnings(Action action, Func<string, bool> warningValidator, string context = "unlabeled context")
         {
             ExpectGeneral(action, context, ExpectationType.Expect, warningValidator, ExpectationType.Disallow, null);
         }
 
-        // Return "true" if this is the expected error, "false" if this is a bad error
-        protected void ExpectErrors(Action action, string context = "unlabeled context", Func<string, bool> errorValidator = null)
+        protected void ExpectErrors(Action action, Func<string, bool> errorValidator, string context = "unlabeled context")
         {
             ExpectGeneral(action, context, ExpectationType.Disallow, null, ExpectationType.Expect, errorValidator);
         }
 
-        protected void ExpectWarningsAndErrors(Action action, string context = "unlabeled context",
-            Func<string, bool> warningValidator = null, Func<string, bool> errorValidator = null)
+        protected void ExpectWarningsAndErrors(Action action,
+            Func<string, bool> warningValidator, Func<string, bool> errorValidator, string context = "unlabeled context")
         {
             ExpectGeneral(action, context, ExpectationType.Expect, warningValidator, ExpectationType.Expect, errorValidator);
         }
+
 
         // Some stubs and universally-useful tools
 
@@ -321,6 +337,11 @@ namespace DecTest
             Func<string, bool> errorValidator = null,
             Func<string, bool> xmlValidator = null)
         {
+            if (rewrite_expectWriteErrors || rewrite_expectParseErrors || validation_expectWriteErrors)
+            {
+                Assert.IsNotNull(errorValidator, "DoParserTests: errorValidator is required when any expect-error flag is set");
+            }
+
             if (mode == ParserMode.Bare)
             {
                 // we actually have nothing to do here, we're good
@@ -336,7 +357,7 @@ namespace DecTest
 
                 if (rewrite_expectWriteErrors)
                 {
-                    ExpectErrors(() => RunComposer(), "DoParserTests.Write", errorValidator: errorValidator);
+                    ExpectErrors(() => RunComposer(), errorValidator, "DoParserTests.Write");
                 }
                 else
                 {
@@ -359,7 +380,7 @@ namespace DecTest
 
                 if (rewrite_expectParseErrors)
                 {
-                    ExpectErrors(() => RunParser(), "DoParserTests.Read", errorValidator: errorValidator);
+                    ExpectErrors(() => RunParser(), errorValidator, "DoParserTests.Read");
                 }
                 else
                 {
@@ -377,7 +398,7 @@ namespace DecTest
 
                 if (validation_expectWriteErrors)
                 {
-                    ExpectErrors(() => RunComposer(), errorValidator: errorValidator);
+                    ExpectErrors(() => RunComposer(), errorValidator);
                 }
                 else
                 {
@@ -432,6 +453,15 @@ namespace DecTest
 
         public T DoRecorderRoundTrip<T>(T input, RecorderMode mode, Action<string> testSerializedResult = null, bool expectWriteErrors = false, bool expectWriteWarnings = false, bool expectReadErrors = false, bool expectReadWarnings = false, Func<string, bool> errorValidator = null, Func<string, bool> warningValidator = null)
         {
+            if (expectWriteErrors || expectReadErrors)
+            {
+                Assert.IsNotNull(errorValidator, "DoRecorderRoundTrip: errorValidator is required when any expect*Errors flag is set");
+            }
+            if (expectWriteWarnings || expectReadWarnings)
+            {
+                Assert.IsNotNull(warningValidator, "DoRecorderRoundTrip: warningValidator is required when any expect*Warnings flag is set");
+            }
+
             if (mode == RecorderMode.Clone || mode == RecorderMode.Checksum)
             {
                 // this is all its own special thing
@@ -446,15 +476,15 @@ namespace DecTest
 
                 if (expectErrors && expectWarnings)
                 {
-                    ExpectWarningsAndErrors(DoClone, "DoRecorder.Clone", warningValidator: warningValidator, errorValidator: errorValidator);
+                    ExpectWarningsAndErrors(DoClone, warningValidator, errorValidator, "DoRecorder.Clone");
                 }
                 else if (expectErrors)
                 {
-                    ExpectErrors(DoClone, "DoRecorder.Clone", errorValidator: errorValidator);
+                    ExpectErrors(DoClone, errorValidator, "DoRecorder.Clone");
                 }
                 else if (expectWarnings)
                 {
-                    ExpectWarnings(DoClone, "DoRecorder.Clone", warningValidator: warningValidator);
+                    ExpectWarnings(DoClone, warningValidator, "DoRecorder.Clone");
                 }
                 else
                 {
@@ -507,11 +537,11 @@ namespace DecTest
             Assert.IsFalse(expectWriteErrors && expectWriteWarnings); // nyi
             if (expectWriteErrors)
             {
-                ExpectErrors(DoSerialize, "DoRecorder.Write", errorValidator: errorValidator);
+                ExpectErrors(DoSerialize, errorValidator, "DoRecorder.Write");
             }
             else if (expectWriteWarnings)
             {
-                ExpectWarnings(DoSerialize, "DoRecorder.Write", warningValidator: warningValidator);
+                ExpectWarnings(DoSerialize, warningValidator, "DoRecorder.Write");
             }
             else
             {
@@ -539,11 +569,11 @@ namespace DecTest
             Assert.IsFalse(expectReadErrors && expectReadWarnings); // nyi
             if (expectReadErrors)
             {
-                ExpectErrors(DoDeserialize, "DoRecorder.Read", errorValidator: errorValidator);
+                ExpectErrors(DoDeserialize, errorValidator, "DoRecorder.Read");
             }
             else if (expectReadWarnings)
             {
-                ExpectWarnings(DoDeserialize, "DoRecorder.Read", warningValidator: warningValidator);
+                ExpectWarnings(DoDeserialize, warningValidator, "DoRecorder.Read");
             }
             else
             {

@@ -12,7 +12,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters());
 
             var parserA = new Dec.Parser();
-            ExpectErrors(() => new Dec.Parser());
+            ExpectErrors(() => new Dec.Parser(), err => err.Contains("Parser created while the world is in"));
         }
 
         [Test]
@@ -23,7 +23,7 @@ namespace DecTest
             var parser = new Dec.Parser();
             parser.Finish();
 
-            ExpectErrors(() => parser.AddString(Dec.Parser.FileType.Xml, "<Decs />"));
+            ExpectErrors(() => parser.AddString(Dec.Parser.FileType.Xml, "<Decs />"), err => err.Contains("Adding data while the world is in"));
         }
 
         [Test]
@@ -34,7 +34,7 @@ namespace DecTest
             var parser = new Dec.Parser();
             parser.Finish();
 
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Finishing while the world is in"));
         }
 
         [Test]
@@ -45,7 +45,7 @@ namespace DecTest
             var parserA = new Dec.Parser();
             parserA.Finish();
 
-            ExpectErrors(() => new Dec.Parser());
+            ExpectErrors(() => new Dec.Parser(), err => err.Contains("Parser created while the world is in"));
         }
 
         [Test]
@@ -69,7 +69,7 @@ namespace DecTest
 
             var parserA = new Dec.Parser();
 
-            ExpectErrors(() => Dec.Database.Clear());
+            ExpectErrors(() => Dec.Database.Clear(), err => err.Contains("Clearing while the world is in"));
         }
 
         public class IntDec : Dec.Dec
@@ -113,7 +113,7 @@ namespace DecTest
                         <nonSerializedValue>65</nonSerializedValue>
                     </IntDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("nonserialized field") || err.Contains("nonSerializedValue"));
 
             DoParserTests(mode);
 
@@ -273,7 +273,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
 
             var parser = new Dec.Parser();
-            ExpectErrors((() => parser.AddDirectory(null)));
+            ExpectErrors((() => parser.AddDirectory(null)), err => err.Contains("null or empty directory"));
             parser.Finish();
 
             DoParserTests(mode);
@@ -285,7 +285,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
 
             var parser = new Dec.Parser();
-            ExpectErrors((() => parser.AddDirectory("")));
+            ExpectErrors((() => parser.AddDirectory("")), err => err.Contains("null or empty directory"));
             parser.Finish();
 
             DoParserTests(mode);
@@ -297,7 +297,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
 
             var parser = new Dec.Parser();
-            ExpectErrors((() => parser.AddFile(Dec.Parser.FileType.Xml, null)));
+            ExpectErrors((() => parser.AddFile(Dec.Parser.FileType.Xml, null)), err => err.Contains("null or empty filename"));
             parser.Finish();
 
             DoParserTests(mode);
@@ -309,7 +309,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
 
             var parser = new Dec.Parser();
-            ExpectErrors((() => parser.AddFile(Dec.Parser.FileType.Xml, "")));
+            ExpectErrors((() => parser.AddFile(Dec.Parser.FileType.Xml, "")), err => err.Contains("null or empty filename"));
             parser.Finish();
 
             DoParserTests(mode);
@@ -321,7 +321,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
 
             var parser = new Dec.Parser();
-            ExpectErrors((() => parser.AddString(Dec.Parser.FileType.Xml, null)));
+            ExpectErrors((() => parser.AddString(Dec.Parser.FileType.Xml, null)), err => err.Contains("null or empty string"));
             parser.Finish();
 
             DoParserTests(mode);
@@ -333,7 +333,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
 
             var parser = new Dec.Parser();
-            ExpectErrors((() => parser.AddString(Dec.Parser.FileType.Xml, "")));
+            ExpectErrors((() => parser.AddString(Dec.Parser.FileType.Xml, "")), err => err.Contains("null or empty string"));
             parser.Finish();
 
             DoParserTests(mode);
@@ -345,7 +345,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IntDec) } });
 
             var parser = new Dec.Parser();
-            ExpectErrors((() => parser.AddStream(Dec.Parser.FileType.Xml, null)));
+            ExpectErrors((() => parser.AddStream(Dec.Parser.FileType.Xml, null)), err => err.Contains("null stream"));
             parser.Finish();
 
             DoParserTests(mode);

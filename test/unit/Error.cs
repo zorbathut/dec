@@ -12,7 +12,7 @@ namespace DecTest
             // This doesn't happen normally, but does in our test framework
             Assert.Throws(typeof(ArgumentException), () => Dec.Config.WarningHandler("Test"));
 
-            ExpectWarnings(() => Dec.Config.WarningHandler("Test"));
+            ExpectWarnings(() => Dec.Config.WarningHandler("Test"), wrn => wrn == "Test");
 
             // Make sure things are deinited properly
             Assert.Throws(typeof(ArgumentException), () => Dec.Config.WarningHandler("Test"));
@@ -23,7 +23,7 @@ namespace DecTest
         {
             Assert.Throws(typeof(ArgumentException), () => Dec.Config.ErrorHandler("Test"));
 
-            ExpectErrors(() => Dec.Config.ErrorHandler("Test"));
+            ExpectErrors(() => Dec.Config.ErrorHandler("Test"), err => err == "Test");
 
             // Make sure things are deinited properly
             Assert.Throws(typeof(ArgumentException), () => Dec.Config.ErrorHandler("Test"));

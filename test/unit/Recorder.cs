@@ -184,7 +184,7 @@ namespace DecTest
 
             Dec.Database.Delete(StaticReferenceDecs.TestDecA);
 
-            var deserialized = DoRecorderRoundTrip(decs, mode, expectWriteErrors: mode != RecorderMode.Clone && mode != RecorderMode.Checksum, expectReadErrors: mode != RecorderMode.Clone && mode != RecorderMode.Checksum);
+            var deserialized = DoRecorderRoundTrip(decs, mode, expectWriteErrors: mode != RecorderMode.Clone && mode != RecorderMode.Checksum, expectReadErrors: mode != RecorderMode.Clone && mode != RecorderMode.Checksum, errorValidator: err => err.Contains("TestDecA_DELETED") || err.Contains("does not exist in the database"));
 
             if (mode != RecorderMode.Clone && mode != RecorderMode.Checksum)
             {
@@ -285,7 +285,7 @@ namespace DecTest
 
             var misparse = new MisparseRecordable();
 
-            var deserialized = DoRecorderRoundTrip(misparse, mode, expectWriteErrors: true, expectReadErrors: true);
+            var deserialized = DoRecorderRoundTrip(misparse, mode, expectWriteErrors: true, expectReadErrors: true, errorValidator: err => err.Contains("Couldn't find a composition method") || err.Contains("Falling back to reflection within a Record system"));
 
             Assert.IsNotNull(deserialized);
 
@@ -511,7 +511,7 @@ namespace DecTest
             mr.x = 3;
             mr.y = 5;
 
-            var deserialized = DoRecorderRoundTrip(mr, mode, expectWriteErrors: true, expectReadWarnings: true);
+            var deserialized = DoRecorderRoundTrip(mr, mode, expectWriteErrors: true, expectReadWarnings: true, errorValidator: err => err.Contains("Field `x` written multiple times") || err.Contains("Field `x` read multiple times"), warningValidator: wrn => wrn.Contains("Field `x` read multiple times"));
 
             Assert.AreEqual(mr.x, deserialized.x);
             Assert.AreEqual(mr.x, deserialized.y);
@@ -542,7 +542,7 @@ namespace DecTest
             tr.c = 13;
             tr.d = 17;
 
-            var deserialized = DoRecorderRoundTrip(tr, mode, expectWriteErrors: true, expectReadWarnings: true);
+            var deserialized = DoRecorderRoundTrip(tr, mode, expectWriteErrors: true, expectReadWarnings: true, errorValidator: err => err.Contains("Field `x` written multiple times") || err.Contains("Field `x` read multiple times"), warningValidator: wrn => wrn.Contains("Field `x` read multiple times"));
 
             Assert.AreEqual(tr.a, deserialized.a);
             Assert.AreEqual(tr.a, deserialized.b);
@@ -567,7 +567,7 @@ namespace DecTest
             var item = new IgnoreThenRecordRec();
             item.y = 42;
 
-            var deserialized = DoRecorderRoundTrip(item, mode, expectReadWarnings: true);
+            var deserialized = DoRecorderRoundTrip(item, mode, expectReadWarnings: true, warningValidator: wrn => wrn.Contains("Field `x` read multiple times"));
 
             Assert.AreEqual(item.y, deserialized.y);
         }
@@ -591,7 +591,7 @@ namespace DecTest
             item.a = new PrimitivesRecordable { intValue = 11, stringValue = "hello" };
             item.b = new PrimitivesRecordable { intValue = 22, stringValue = "world" };
 
-            var deserialized = DoRecorderRoundTrip(item, mode, expectWriteErrors: true, expectReadWarnings: true);
+            var deserialized = DoRecorderRoundTrip(item, mode, expectWriteErrors: true, expectReadWarnings: true, errorValidator: err => err.Contains("Field `payload` written multiple times") || err.Contains("Field `payload` read multiple times"), warningValidator: wrn => wrn.Contains("Field `payload` read multiple times"));
 
             Assert.IsNotNull(deserialized.a);
             Assert.IsNotNull(deserialized.b);
@@ -657,7 +657,7 @@ namespace DecTest
         {
             var item = new RecordableParameter(3);
 
-            var output = DoRecorderRoundTrip(item, mode, expectWriteWarnings: true, expectReadErrors: true);
+            var output = DoRecorderRoundTrip(item, mode, expectWriteWarnings: true, expectReadErrors: true, errorValidator: err => err.Contains("without a no-argument constructor"), warningValidator: wrn => wrn.Contains("implements IRecordable but cannot be constructed"));
 
             Assert.IsNull(output);
         }
@@ -686,7 +686,7 @@ namespace DecTest
                   </data>
                 </Record>";
             StubRecordableIgnoring deserialized = null;
-            ExpectErrors(() => deserialized = Dec.Recorder.Read<StubRecordableIgnoring>(serialized));
+            ExpectErrors(() => deserialized = Dec.Recorder.Read<StubRecordableIgnoring>(serialized), err => err.Contains("without a no-argument constructor"));
 
             Assert.IsNotNull(deserialized);
         }
@@ -1016,7 +1016,7 @@ namespace DecTest
         {
             var item = new NonConstructableRecorderClass(42);
 
-            var output = DoRecorderRoundTrip(item, mode, expectWriteWarnings: true, expectReadErrors: true, warningValidator: wrn => wrn.Contains("cannot be constructed"));
+            var output = DoRecorderRoundTrip(item, mode, expectWriteWarnings: true, expectReadErrors: true, warningValidator: wrn => wrn.Contains("cannot be constructed"), errorValidator: err => err.Contains("Attempting to create recordable") || err.Contains("Attempting to create object"));
 
             Assert.IsNull(output);
         }
@@ -1071,7 +1071,7 @@ namespace DecTest
 
             var item = new NonConstructableConverterRecordClass(42);
 
-            var output = DoRecorderRoundTrip(item, mode, expectWriteWarnings: true, expectReadErrors: true, warningValidator: wrn => wrn.Contains("cannot be constructed"));
+            var output = DoRecorderRoundTrip(item, mode, expectWriteWarnings: true, expectReadErrors: true, warningValidator: wrn => wrn.Contains("cannot be constructed"), errorValidator: err => err.Contains("Attempting to create converterrecord") || err.Contains("Attempting to create object") || err.Contains("Attempting to create recordable"));
 
             Assert.IsNull(output);
         }

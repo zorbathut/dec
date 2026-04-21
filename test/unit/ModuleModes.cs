@@ -83,7 +83,7 @@ namespace DecTest
                         <a>-42</a>
                     </TwoIntsDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Create mode used when a Dec already exists") || err.Contains("already exists"));
 
             DoParserTests(mode);
 
@@ -114,7 +114,7 @@ namespace DecTest
 
                     <TwoIntsDec decName=""ModFromBase"" parent=""BaseAbstract"" {StrFromVis(vis)} />
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Create mode used when a Dec already exists") || err.Contains("already exists"));
 
             DoParserTests(mode);
 
@@ -205,7 +205,7 @@ namespace DecTest
                         <b>2</b>
                     </TwoIntsDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Replace mode used when a Dec doesn't exist") || err.Contains("doesn't exist"));
 
             DoParserTests(mode);
 
@@ -295,7 +295,7 @@ namespace DecTest
                         <b>2</b>
                     </TwoIntsDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Patch mode used when a Dec doesn't exist") || err.Contains("doesn't exist"));
 
             DoParserTests(mode);
 
@@ -620,7 +620,7 @@ namespace DecTest
                 <Decs>
                     <TwoIntsDec decName=""ParentAbstract"" mode=""delete"" />
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("no such dec exists") || err.Contains("parent"));
 
             DoParserTests(mode);
 
@@ -643,7 +643,7 @@ namespace DecTest
                 <Decs>
                     <TwoIntsDec decName=""Missing"" mode=""delete"" />
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Delete mode used when a Dec doesn't exist") || err.Contains("deleteIfExists"));
 
             DoParserTests(mode);
 
@@ -699,7 +699,7 @@ namespace DecTest
                         <b>20</b>
                     </TwoIntsDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Patch mode used when a Dec doesn't exist") || err.Contains("doesn't exist"));
 
             DoParserTests(mode);
 
@@ -983,7 +983,7 @@ namespace DecTest
                 <Decs>
                     <TwoIntsDec decName=""ParentAbstract"" mode=""deleteIfExists"" />
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("no such dec exists") || err.Contains("parent"));
 
             DoParserTests(mode);
 

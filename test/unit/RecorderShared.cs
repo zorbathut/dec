@@ -56,7 +56,7 @@ namespace DecTest
 
             rec.cargoLink = rec.cargo;
 
-            var deserialized = DoRecorderRoundTrip(rec, mode, expectWriteErrors: true, expectReadErrors: true);
+            var deserialized = DoRecorderRoundTrip(rec, mode, expectWriteErrors: true, expectReadErrors: true, errorValidator: err => err.Contains("Recorder.Shared() called on a WithFactory") || err.Contains("shared objects do not work in simple mode"));
 
             // In this case, we don't factory, but do share
             Assert.AreEqual(8, deserialized.cargo.recorded);
@@ -74,7 +74,7 @@ namespace DecTest
 
             rec.cargoLink = rec.cargo;
 
-            var deserialized = DoRecorderRoundTrip(rec, mode, expectWriteErrors: true, expectReadErrors: true);
+            var deserialized = DoRecorderRoundTrip(rec, mode, expectWriteErrors: true, expectReadErrors: true, errorValidator: err => err.Contains("Recorder.WithFactory() called on a Shared") || err.Contains("previously-seen unshared object") || err.Contains("shared objects do not work in simple mode"));
 
             // In this case, we factory, then kinda fuck up the sharing weirdly
             Assert.AreEqual(8, deserialized.cargo.recorded);
@@ -111,7 +111,7 @@ namespace DecTest
             rec.cargo = new List<int> { 100 };
 
             // clone probably *should* error on this, but right now it doesn't, it has unspecified behavior with the interaction of shared and non-null
-            var deserialized = DoRecorderRoundTrip(rec, mode, expectReadErrors: mode != RecorderMode.Clone && mode != RecorderMode.Checksum);
+            var deserialized = DoRecorderRoundTrip(rec, mode, expectReadErrors: mode != RecorderMode.Clone && mode != RecorderMode.Checksum, errorValidator: err => err.Contains("provided with non-null default object"));
 
             Assert.AreEqual(deserialized.cargo, rec.cargo);
         }
@@ -143,7 +143,7 @@ namespace DecTest
                   </data>
                 </Record>";
             UnexpectedRefBase deserialized = null;
-            ExpectErrors(() => deserialized = Dec.Recorder.Read<UnexpectedRefBase>(serialized));
+            ExpectErrors(() => deserialized = Dec.Recorder.Read<UnexpectedRefBase>(serialized), err => err.Contains("Found a reference in a non-.Shared() context"));
 
             Assert.IsNotNull(deserialized.stub);
         }
@@ -179,7 +179,7 @@ namespace DecTest
         {
             var rec = new SharingIntRecorder();
 
-            var deserialized = DoRecorderRoundTrip(rec, mode, expectWriteWarnings: true, expectReadWarnings: true);
+            var deserialized = DoRecorderRoundTrip(rec, mode, expectWriteWarnings: true, expectReadWarnings: true, warningValidator: wrn => wrn.Contains("Value type") && wrn.Contains("tagged as Shared"));
         }
 
         public class SharingDecRecorder : Dec.IRecordable
@@ -196,7 +196,7 @@ namespace DecTest
         {
             var rec = new SharingDecRecorder();
 
-            var deserialized = DoRecorderRoundTrip(rec, mode, expectWriteWarnings: true, expectReadWarnings: true);
+            var deserialized = DoRecorderRoundTrip(rec, mode, expectWriteWarnings: true, expectReadWarnings: true, warningValidator: wrn => wrn.Contains("Value type") && wrn.Contains("tagged as Shared"));
         }
 
         public class SharingStringRecorder : Dec.IRecordable
@@ -213,7 +213,7 @@ namespace DecTest
         {
             var rec = new SharingStringRecorder();
 
-            var deserialized = DoRecorderRoundTrip(rec, mode, expectWriteWarnings: true, expectReadWarnings: true);
+            var deserialized = DoRecorderRoundTrip(rec, mode, expectWriteWarnings: true, expectReadWarnings: true, warningValidator: wrn => wrn.Contains("Value type") && wrn.Contains("tagged as Shared"));
         }
 
         public class SharingTypeRecorder : Dec.IRecordable
@@ -230,7 +230,7 @@ namespace DecTest
         {
             var rec = new SharingTypeRecorder();
 
-            var deserialized = DoRecorderRoundTrip(rec, mode, expectWriteWarnings: true, expectReadWarnings: true);
+            var deserialized = DoRecorderRoundTrip(rec, mode, expectWriteWarnings: true, expectReadWarnings: true, warningValidator: wrn => wrn.Contains("Value type") && wrn.Contains("tagged as Shared"));
         }
 
         public class SharedRoot : Dec.IRecordable

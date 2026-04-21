@@ -53,7 +53,7 @@ namespace DecTest
                         </data>
                     </HashSetStringDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("HashSet non-li member includes data"));
 
             DoParserTests(mode);
 
@@ -79,7 +79,7 @@ namespace DecTest
                         </data>
                     </HashSetStringDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("HashSet non-li member includes data"));
 
             DoParserTests(mode);
 
@@ -106,7 +106,7 @@ namespace DecTest
                         </data>
                     </HashSetStringDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("HashSet includes duplicate key"));
 
             DoParserTests(mode);
 
@@ -133,7 +133,7 @@ namespace DecTest
                         </data>
                     </HashSetStringDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("HashSet includes duplicate key"));
 
             DoParserTests(mode);
 

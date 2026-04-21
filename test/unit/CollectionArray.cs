@@ -64,7 +64,7 @@ namespace DecTest
                         <dataProvided>nope</dataProvided>
                     </ArrayDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Text detected"));
 
             DoParserTests(mode);
 
@@ -152,7 +152,7 @@ namespace DecTest
                         </dataProvided>
                     </ArrayDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("is not a valid value for Int32"));
 
             DoParserTests(mode);
 
@@ -189,7 +189,7 @@ namespace DecTest
                         </dataProvided>
                     </ArrayDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Tag should be <li>"));
 
             DoParserTests(mode);
 
@@ -256,7 +256,7 @@ namespace DecTest
                             </data>
                     </MultidimDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("padding with default values"));
 
             DoParserTests(mode);
 
@@ -308,7 +308,7 @@ namespace DecTest
                             </data>
                     </MultidimDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("truncating"));
 
             DoParserTests(mode);
 
@@ -345,7 +345,7 @@ namespace DecTest
                             </data>
                     </MultidimDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("padding with default values"));
 
             DoParserTests(mode);
 
@@ -380,7 +380,7 @@ namespace DecTest
                         </data>
                     </ObjectArrayDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Couldn't find type named") || err.Contains("cannot be assigned to expected type") || err.Contains("Text detected"));
 
             DoParserTests(mode);
 

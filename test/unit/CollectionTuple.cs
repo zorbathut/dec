@@ -231,7 +231,7 @@ namespace DecTest
                         </tuple>
                     </QuadDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Tuple expects"));
 
             DoParserTests(mode);
 
@@ -259,7 +259,7 @@ namespace DecTest
                         </tuple>
                     </QuadDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Tuple expects"));
 
             DoParserTests(mode);
 
@@ -286,7 +286,7 @@ namespace DecTest
                         </tuple>
                     </QuadDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Found field with unexpected name") || err.Contains("Missing field with name"));
 
             DoParserTests(mode, xmlValidator: xml => xml.Contains("li") && !xml.Contains("groot"));
 
@@ -427,7 +427,7 @@ namespace DecTest
                         </kbn>
                     </NamedDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Missing field with name"));
 
             DoParserTests(mode);
 
@@ -456,7 +456,7 @@ namespace DecTest
                         </kbn>
                     </NamedDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Found duplicate of field"));
 
             DoParserTests(mode, xmlValidator: xml => xml.Contains("klaatu") && xml.Contains("barada") && xml.Contains("nikto"));
 
@@ -543,7 +543,7 @@ namespace DecTest
                         </kbn>
                     </NamedAsLiDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Tuple expects"));
 
             DoParserTests(mode);
 

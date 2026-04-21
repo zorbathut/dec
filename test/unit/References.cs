@@ -111,7 +111,7 @@ namespace DecTest
                         Source
                     </RefSourceDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Text detected in a situation where it is invalid"));
 
             DoParserTests(mode);
 
@@ -183,7 +183,7 @@ namespace DecTest
                         <target></target>
                     </RefCircularDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Duplicate field `target`"));
 
             DoParserTests(mode);
 
@@ -205,7 +205,7 @@ namespace DecTest
                         <target>MissingDec</target>
                     </RefSourceDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Couldn't find") && err.Contains("MissingDec"));
 
             DoParserTests(mode);
 
@@ -232,7 +232,7 @@ namespace DecTest
                         <target>TestDec</target>
                     </BareDecDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Dec.Dec does not exist within a database hierarchy") || err.Contains("Non-hierarchy decs cannot be used as references"));
 
             DoParserTests(mode);
 

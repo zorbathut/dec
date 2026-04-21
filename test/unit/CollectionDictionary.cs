@@ -111,7 +111,7 @@ namespace DecTest
                         </data>
                     </DictionaryStringDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Dictionary includes duplicate key"));
 
             DoParserTests(mode);
 
@@ -173,7 +173,7 @@ namespace DecTest
                         </data>
                     </DictionaryStringDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Dictionary includes null key"));
 
             DoParserTests(mode);
 
@@ -285,7 +285,7 @@ namespace DecTest
 
             if (badKey || badValue)
             {
-                ExpectErrors(() => parser.Finish());
+                ExpectErrors(() => parser.Finish(), err => err.Contains("Dictionary includes li tag without"));
             }
             else
             {
@@ -349,7 +349,7 @@ namespace DecTest
                     </DictionaryStringDec>
                 </Decs>");
 
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Dictionary includes li tag without"));
 
             DoParserTests(mode);
 
@@ -388,7 +388,7 @@ namespace DecTest
                     </DictionaryStringDec>
                 </Decs>");
 
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Dictionary includes duplicate key"));
 
             DoParserTests(mode);
 

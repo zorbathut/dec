@@ -134,7 +134,7 @@ namespace DecTest
                         <dataProvided>invalid_base64!</dataProvided>
                     </ByteArrayDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Invalid base64 string for byte array"));
 
             DoParserTests(mode);
 

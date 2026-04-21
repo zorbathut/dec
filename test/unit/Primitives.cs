@@ -39,7 +39,7 @@ namespace DecTest
                         <value />
                     </IntDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Int32Converter cannot convert from (null)"));
 
             DoParserTests(mode);
 
@@ -61,7 +61,7 @@ namespace DecTest
                         <value>NotAnInt</value>
                     </IntDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("NotAnInt is not a valid value for Int32"));
 
             DoParserTests(mode);
 
@@ -83,7 +83,7 @@ namespace DecTest
                         <value>10NotAnInt</value>
                     </IntDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("10NotAnInt is not a valid value for Int32"));
 
             DoParserTests(mode);
 
@@ -105,7 +105,7 @@ namespace DecTest
                         <value>1234123412341234123412341234123412341234</value>
                     </IntDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("is not a valid value for Int32"));
 
             DoParserTests(mode);
 
@@ -127,7 +127,7 @@ namespace DecTest
                         <value />
                     </BoolDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("BooleanConverter cannot convert from (null)"));
 
             DoParserTests(mode);
 
@@ -149,7 +149,7 @@ namespace DecTest
                         <value>NotABool</value>
                     </BoolDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("NotABool is not a valid value for Boolean"));
 
             DoParserTests(mode);
 
@@ -260,7 +260,7 @@ namespace DecTest
                         <value3>999</value3>
                     </MissingMemberDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Field `value2` does not exist"));
 
             DoParserTests(mode);
 
@@ -317,7 +317,7 @@ namespace DecTest
                         <value invalid=""yes"">5</value>
                     </IntDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("unknown attributes") && err.Contains("invalid"));
 
             DoParserTests(mode);
 
@@ -465,7 +465,7 @@ namespace DecTest
                         <type>Generic</type>
                     </TypeDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Couldn't find type named `Generic`"));
 
             DoParserTests(mode);
 
@@ -487,7 +487,7 @@ namespace DecTest
                         <type>Generic&lt;&gt;</type>
                     </TypeDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Couldn't find type named `Generic<>`"));
 
             DoParserTests(mode);
 
@@ -509,7 +509,7 @@ namespace DecTest
                         <type>Generic&lt;int&gt;</type>
                     </TypeDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Couldn't find type named `Generic<int>`"));
 
             DoParserTests(mode);
 
@@ -532,9 +532,9 @@ namespace DecTest
                         <type>Overridden</type>
                     </TypeDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Found too many types named `Overridden`"));
 
-            DoParserTests(mode, rewrite_expectParseErrors: true);
+            DoParserTests(mode, rewrite_expectParseErrors: true, errorValidator: err => err.Contains("Found too many types named `Overridden`"));
 
             var result = Dec.Database<TypeDec>.Get("TestDec");
             Assert.IsNotNull(result);

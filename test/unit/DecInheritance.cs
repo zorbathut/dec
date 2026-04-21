@@ -172,7 +172,7 @@ namespace DecTest
                         </subObject>
                     </SimpleDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Base") && (err.Contains("no such dec exists") || err.Contains("does not exist")));
 
             DoParserTests(mode);
 
@@ -192,7 +192,7 @@ namespace DecTest
                     <SimpleDec decName=""Base"" abstract=""true"" />
                     <SimpleDec decName=""Base"" abstract=""true"" />
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("defined twice"));
 
             DoParserTests(mode);
 
@@ -220,7 +220,7 @@ namespace DecTest
                         <overridden>40</overridden>
                      </SimpleDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("defined twice"));
 
             DoParserTests(mode);
 
@@ -240,7 +240,7 @@ namespace DecTest
                         <overridden>10</overridden>
                      </SimpleDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish());
+            ExpectErrors(() => parser.Finish(), err => err.Contains("abstract attribute"));
 
             DoParserTests(mode);
 
