@@ -511,11 +511,96 @@ namespace DecTest
             mr.x = 3;
             mr.y = 5;
 
-            var deserialized = DoRecorderRoundTrip(mr, mode, expectWriteErrors: true);
+            var deserialized = DoRecorderRoundTrip(mr, mode, expectWriteErrors: true, expectReadWarnings: true);
 
             Assert.AreEqual(mr.x, deserialized.x);
-            // y's value is left undefined
+            Assert.AreEqual(mr.x, deserialized.y);
         }
+
+        public class TripleRecordRec : Dec.IRecordable
+        {
+            public int a;
+            public int b;
+            public int c;
+            public int d;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref a, "x");
+                record.Record(ref b, "x");
+                record.Record(ref c, "x");
+                record.Record(ref d, "x");
+            }
+        }
+
+        [Test]
+        public void TripleRecord([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
+        {
+            var tr = new TripleRecordRec();
+            tr.a = 7;
+            tr.b = 11;
+            tr.c = 13;
+            tr.d = 17;
+
+            var deserialized = DoRecorderRoundTrip(tr, mode, expectWriteErrors: true, expectReadWarnings: true);
+
+            Assert.AreEqual(tr.a, deserialized.a);
+            Assert.AreEqual(tr.a, deserialized.b);
+            Assert.AreEqual(tr.a, deserialized.c);
+            Assert.AreEqual(tr.a, deserialized.d);
+        }
+
+        public class IgnoreThenRecordRec : Dec.IRecordable
+        {
+            public int y;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Ignore("x");
+                record.Record(ref y, "x");
+            }
+        }
+
+        [Test]
+        public void IgnoreThenRecord([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
+        {
+            var item = new IgnoreThenRecordRec();
+            item.y = 42;
+
+            var deserialized = DoRecorderRoundTrip(item, mode, expectReadWarnings: true);
+
+            Assert.AreEqual(item.y, deserialized.y);
+        }
+
+        public class SharedDupRec : Dec.IRecordable
+        {
+            public PrimitivesRecordable a;
+            public PrimitivesRecordable b;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Shared().Record(ref a, "payload");
+                record.Shared().Record(ref b, "payload");
+            }
+        }
+
+        [Test]
+        public void SharedDuplicateRecord([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
+        {
+            var item = new SharedDupRec();
+            item.a = new PrimitivesRecordable { intValue = 11, stringValue = "hello" };
+            item.b = new PrimitivesRecordable { intValue = 22, stringValue = "world" };
+
+            var deserialized = DoRecorderRoundTrip(item, mode, expectWriteErrors: true, expectReadWarnings: true);
+
+            Assert.IsNotNull(deserialized.a);
+            Assert.IsNotNull(deserialized.b);
+            Assert.AreEqual(11, deserialized.a.intValue);
+            Assert.AreEqual(11, deserialized.b.intValue);
+            Assert.AreEqual("hello", deserialized.a.stringValue);
+            Assert.AreEqual("hello", deserialized.b.stringValue);
+        }
+
 
         public class PrimitivesContainer : Dec.IRecordable
         {

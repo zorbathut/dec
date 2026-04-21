@@ -87,7 +87,8 @@ namespace Dec
         {
             if (modelSet)
             {
-                Dbg.Err("Internal error: WriterNodeClone.SetModel() called twice");
+                // Duplicate read; RecorderReader has already warned. The first model won.
+                return;
             }
 
             // if it's valuelike, we already have the result, which is fine
@@ -857,16 +858,8 @@ namespace Dec
                 var hintEntry = recorderChildren[searchHint];
                 if (hintEntry.key == name)
                 {
-                    if (hintEntry.value == null)
-                    {
-                        Dbg.Err($"Clone child {name} accessed twice; this is probably an attempt to record the same field twice, which is not supported");
-                        return null;
-                    }
-
-                    var result = new ReaderNodeCloneRecorderItem(hintEntry.value, UserSettings);
-                    recorderChildren[searchHint] = (name, null);
                     searchHint++;
-                    return result;
+                    return new ReaderNodeCloneRecorderItem(hintEntry.value, UserSettings);
                 }
             }
 
@@ -876,16 +869,8 @@ namespace Dec
                 var entry = recorderChildren[i];
                 if (entry.key == name)
                 {
-                    if (entry.value == null)
-                    {
-                        Dbg.Err($"Clone child {name} accessed twice; this is probably an attempt to record the same field twice, which is not supported");
-                        return null;
-                    }
-
-                    var result = new ReaderNodeCloneRecorderItem(entry.value, UserSettings);
-                    recorderChildren[i] = (name, null);
                     searchHint = i + 1;
-                    return result;
+                    return new ReaderNodeCloneRecorderItem(entry.value, UserSettings);
                 }
             }
 

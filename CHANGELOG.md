@@ -12,6 +12,9 @@ All notable changes to this project will be documented in this file.
 * Removed netcoreapp2.1/netstandard2.0 targets. Unity is on netstandard2.1 and that's basically the only reason I'm going this far back, no point in making my life even harder, I'd just thought netstandard2.1 implied netcoreapp2.1. Also, Microsoft, your numbering system sucks. Let me know if you were for whatever reason relying on these. 
 * Changed user type discovery to look for assemblies depending on Dec instead of a hand-maintained substring blocklist. This should result in much faster loads and much less chance of error; if you're doing something weird, it *might* end up having trouble finding your assembly. Let me know if this happens and we'll fix it.
 
+### Changed
+* Reading the same-named field twice now generates a warning and provides the same data twice.
+
 ### Improved
 * Dictionary checksums can now deal with shared objects introduced in the Value (though still not in the Key).
 * Added support for runtime-IL-emitted array creation functions, which are about 2.5x faster on very small arrays. This degrades smoothly to a non-IL-emitted solution on systems that don't support it.

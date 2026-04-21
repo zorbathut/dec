@@ -503,18 +503,15 @@ namespace Dec
         private readonly ReaderNode node;
         private ReaderGlobals readerGlobals;
         private bool disallowShared;
-        private HashSet<string> seen;
+        private readonly bool trackUsage;
+        private readonly HashSet<string> seen = new HashSet<string>();
 
         internal RecorderReader(ReaderNode node, ReaderGlobals globals, bool disallowShared = false, bool trackUsage = false)
         {
             this.node = node;
             this.readerGlobals = globals;
             this.disallowShared = disallowShared;
-
-            if (trackUsage)
-            {
-                seen = new HashSet<string>();
-            }
+            this.trackUsage = trackUsage;
         }
         internal void AllowShared(ReaderGlobals newGlobals)
         {
@@ -558,13 +555,18 @@ namespace Dec
                 Dbg.Err($"{node.GetContext()}: Shared object used in a context that disallows shared objects (probably ConverterFactory<>.Create())");
             }
 
+            if (seen.Contains(label))
+            {
+                Dbg.Wrn($"{node.GetContext()}: Field `{label}` read multiple times");
+            }
+
             var recorded = node.GetChildNamed(label);
             if (recorded == null)
             {
                 return;
             }
 
-            seen?.Add(label);
+            seen.Add(label);
 
             // Avoid an explicit cast because that can cause null reference errors
             var result = recorded.ParseElement(typeof(T), value, readerGlobals, parameters.CreateSettings());
@@ -580,9 +582,7 @@ namespace Dec
 
         public override void Ignore(string label)
         {
-            // The seen != null short-circuit is load-bearing: ReaderNodeCloneRecorder.GetChildNamed has side effects
-            // (consumes the entry) but is only used in clone mode where trackUsage is always false.
-            if (seen != null && node.GetChildNamed(label) != null)
+            if (node.GetChildNamed(label) != null)
             {
                 seen.Add(label);
             }
@@ -593,7 +593,7 @@ namespace Dec
 
         internal void ReportUnusedFields()
         {
-            if (seen == null)
+            if (!trackUsage)
             {
                 Dbg.Err($"{node.GetContext()}: Internal error, RecorderReader.ReportUnusedFields() called without trackUsage set");
                 return;
