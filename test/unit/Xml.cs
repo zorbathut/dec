@@ -89,7 +89,7 @@ namespace DecTest
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StubDec) } });
 
             var parser = new Dec.Parser();
-            ExpectErrors(() => parser.AddString(Dec.Parser.FileType.Xml, @"test.xml"), err => err.Contains("passed the filename") || err.Contains("AddFile()") || err.Contains("XmlException"));
+            ExpectErrors(() => parser.AddString(Dec.Parser.FileType.Xml, @"test.xml"), err => err.Contains("passed the filename") || err.Contains("AddFile()") || err.Contains("Malformed XML"));
             parser.Finish();
 
             DoParserTests(mode);

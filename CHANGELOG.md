@@ -44,6 +44,7 @@ All notable changes to this project will be documented in this file.
 * Changing `Config.ConverterFactory` would not update caches properly.
 * `Recorder.Ignore()` could generate errors instead of suppressing them.
 * Primitive-parse errors leak obscure exception messages.
+* XML parse errors leak obscure exception messages.
 
 
 ## [v0.11.0]

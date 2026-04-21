@@ -101,9 +101,7 @@ namespace Dec
                     }
                     catch (System.Xml.XmlException e)
                     {
-                        // Wrap the exception with file context while preserving the original as InnerException
-                        var contextException = new System.Xml.XmlException($"{identifier}: {e.Message}", e);
-                        Dbg.Ex(contextException);
+                        Dbg.Err($"{identifier}: Malformed XML: {e.Message}");
                         return null;
                     }
                 }
