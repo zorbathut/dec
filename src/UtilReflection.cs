@@ -36,8 +36,7 @@ namespace Dec
             return result;
         }
 
-        // GetTypes() can throw ReflectionTypeLoadException on some platforms when a dependency fails to load;
-        // the partial results in .Types (with nulls for the failed entries) are usually what we want.
+        // GetTypes() can throw ReflectionTypeLoadException on some platforms when a dependency fails to load; the partial results in .Types (with nulls for the failed entries) are usually what we want.
         internal static IEnumerable<Type> GetTypesSafe(this Assembly assembly)
         {
             try
@@ -46,8 +45,7 @@ namespace Dec
             }
             catch (ReflectionTypeLoadException e)
             {
-                // Hard to code-coverage: happens on some platforms, not on our test server. To reproduce,
-                // you'd have to build a fake .dll that references a missing dependency.
+                // Hard to code-coverage: happens on some platforms, not on our test server. To reproduce, you'd have to build a fake .dll that references a missing dependency.
                 return e.Types.Where(t => t != null);
             }
         }
@@ -106,8 +104,7 @@ namespace Dec
         }
 
         // Cached transitive-reference closure of Dec. Invalidated when AppDomain.GetAssemblies().Length changes.
-        // Eventually-consistent: a collectible AssemblyLoadContext unload-and-reload with the same final count
-        // would escape detection, but Dec does not support that scenario (see ARCHITECTURE.md threading contract).
+        // Eventually-consistent: a collectible AssemblyLoadContext unload-and-reload with the same final count would escape detection, but Dec does not support that scenario (see ARCHITECTURE.md threading contract).
         // Returned arrays are never mutated after publication, so callers iterating an older snapshot are safe.
         private static Assembly[] cachedUserAssemblies;
         private static int cachedUserAssembliesAssemblyCount = -1;
@@ -115,15 +112,9 @@ namespace Dec
 
         internal static IEnumerable<Assembly> GetAllUserAssemblies()
         {
-            // An assembly contains types this method's callers care about (Converter subclasses,
-            // [StaticReferences]-attributed classes) only if it directly or transitively references Dec's
-            // own assembly - those types can't be declared without the C# compiler emitting a manifest-level
-            // reference to Dec. That makes this narrower than UtilType.GetTypeFromAnyAssembly's scan, which
-            // has to find plain data classes in assemblies that don't themselves reference Dec.
+            // An assembly contains types this method's callers care about (Converter subclasses, [StaticReferences]-attributed classes) only if it directly or transitively references Dec's own assembly - those types can't be declared without the C# compiler emitting a manifest-level reference to Dec. That makes this narrower than UtilType.GetTypeFromAnyAssembly's scan, which has to find plain data classes in assemblies that don't themselves reference Dec.
             //
-            // Matching is by AssemblyName.Name only (no version / public-key-token / culture). In practice
-            // Dec ships as a single-version DLL per process; side-by-side loads of two different dec.dlls
-            // in separate AssemblyLoadContexts are not a supported configuration.
+            // Matching is by AssemblyName.Name only (no version / public-key-token / culture). In practice Dec ships as a single-version DLL per process; side-by-side loads of two different dec.dlls in separate AssemblyLoadContexts are not a supported configuration.
             var loaded = AppDomain.CurrentDomain.GetAssemblies();
             lock (userAssembliesLock)
             {
@@ -140,8 +131,7 @@ namespace Dec
         {
             var decAssembly = typeof(Dec).Assembly;
 
-            // Build a reverse-reference graph: for each assembly name, who references it?
-            // Keyed by simple name (AssemblyName.Name) since that's how references identify their target.
+            // Build a reverse-reference graph: for each assembly name, who references it? Keyed by simple name (AssemblyName.Name) since that's how references identify their target.
             var referrers = new Dictionary<string, List<Assembly>>();
             foreach (var asm in loaded)
             {
@@ -157,8 +147,7 @@ namespace Dec
                 }
                 catch (Exception e)
                 {
-                    // Something unexpected - don't silently swallow it, but keep going so one broken
-                    // assembly doesn't take out type discovery for the whole process.
+                    // Something unexpected - don't silently swallow it, but keep going so one broken assembly doesn't take out type discovery for the whole process.
                     Dbg.Err($"Failed to read references from {asm.FullName}: {e}");
                     continue;
                 }
@@ -174,9 +163,7 @@ namespace Dec
                 }
             }
 
-            // BFS outward from Dec, following "who references me?" edges. Seed with decAssembly itself so
-            // the embedded-source case works (where Dec is compiled directly into the user's assembly and
-            // there is no separate dec.dll to reference).
+            // BFS outward from Dec, following "who references me?" edges. Seed with decAssembly itself so the embedded-source case works (where Dec is compiled directly into the user's assembly and there is no separate dec.dll to reference).
             var closure = new HashSet<Assembly> { decAssembly };
             var queue = new Queue<Assembly>();
             queue.Enqueue(decAssembly);

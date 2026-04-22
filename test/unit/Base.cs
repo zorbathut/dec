@@ -164,8 +164,7 @@ namespace DecTest
         // - Disallow: validator is ignored (must be null; no error/warning is expected at all).
         // - Tolerate: if an error/warning fires, it must match the validator; if none fires, fine.
         // - Expect: at least one error/warning must fire, and every fired one must match the validator.
-        // [ThreadStatic] means the validator only covers the test thread. Tests that spawn worker threads
-        // (e.g. Threading.cs) don't see the validator there; those tests don't currently use Expect*.
+        // [ThreadStatic] means the validator only covers the test thread. Tests that spawn worker threads (e.g. Threading.cs) don't see the validator there; those tests don't currently use Expect*.
         protected void ExpectGeneral(Action action, string context, ExpectationType warning, Func<string, bool> warningValidator, ExpectationType error, Func<string, bool> errorValidator)
         {
             if (warning != ExpectationType.Disallow)

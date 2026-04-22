@@ -10,8 +10,7 @@ namespace DecTest
         [Test]
         public void UserAssembliesContainTestAssembly()
         {
-            // The test assembly directly references Dec and defines Converters / StaticReferences, so it
-            // must be in the closure - otherwise nothing in this test suite could work.
+            // The test assembly directly references Dec and defines Converters / StaticReferences, so it must be in the closure - otherwise nothing in this test suite could work.
             var result = Dec.UtilReflection.GetAllUserAssemblies().ToArray();
             var names = result.Select(a => a.GetName().Name).ToArray();
 
@@ -21,9 +20,7 @@ namespace DecTest
         [Test]
         public void UserAssembliesIncludeDecItself()
         {
-            // Required for the embedded-source configuration (Dec compiled directly into user assembly).
-            // If this invariant breaks, the dec-test-integration-unified project fails with confusing
-            // "StaticReferences initialized at inappropriate time" errors rather than a clear failure.
+            // Required for the embedded-source configuration (Dec compiled directly into user assembly). If this invariant breaks, the dec-test-integration-unified project fails with confusing "StaticReferences initialized at inappropriate time" errors rather than a clear failure.
             var result = Dec.UtilReflection.GetAllUserAssemblies().ToArray();
             Assert.Contains(typeof(Dec.Dec).Assembly, result);
         }
@@ -31,8 +28,7 @@ namespace DecTest
         [Test]
         public void UserAssembliesExcludeThirdParty()
         {
-            // Dec's reference-closure scan should not surface NUnit or CoreLib, neither of which
-            // references Dec. These were the motivating cases for replacing the substring blocklist.
+            // Dec's reference-closure scan should not surface NUnit or CoreLib, neither of which references Dec. These were the motivating cases for replacing the substring blocklist.
             var result = Dec.UtilReflection.GetAllUserAssemblies().ToArray();
             var names = result.Select(a => a.GetName().Name).ToArray();
 
@@ -63,9 +59,7 @@ namespace DecTest
         [Test]
         public void SerializableFieldsExcludesAutoPropertyBackingField()
         {
-            // Auto-property backing fields are emitted by the compiler with [CompilerGenerated] and a
-            // "<Name>k__BackingField" name. GetSerializableFieldsFromHierarchy must skip them so the
-            // user's auto-properties aren't silently serialized as data members.
+            // Auto-property backing fields are emitted by the compiler with [CompilerGenerated] and a "<Name>k__BackingField" name. GetSerializableFieldsFromHierarchy must skip them so the user's auto-properties aren't silently serialized as data members.
             var fields = Dec.UtilReflection.GetSerializableFieldsFromHierarchy(typeof(ClassWithAutoProperty));
             var names = fields.Select(f => f.Name).ToArray();
 
