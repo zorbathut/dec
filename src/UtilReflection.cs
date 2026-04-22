@@ -198,23 +198,29 @@ namespace Dec
             return closure.ToArray();
         }
 
+        // Dec's own Converter-hierarchy types, which must not surface through user-type discovery: abstract bases would produce "found abstract converter" errors in Serialization's scan, and the non-abstract Nullable helpers would all try to register as the generic prototype for Nullable<>. We exclude by type identity rather than namespace so user code living in the "Dec" namespace (realistic only in the embedded-source configuration) is still surfaced.
+        //
+        // Drift safety: the Reflection.UserTypesExcludeDecConverterHierarchy test reflectively discovers every Converter subclass in Dec's own assembly and asserts each is excluded, so forgetting to add a new entry here fails that test.
+        private static readonly HashSet<Type> DecInternalNonUserTypes = new HashSet<Type>
+        {
+            typeof(Converter),
+            typeof(ConverterString),
+            typeof(ConverterString<>),
+            typeof(ConverterStringDynamic),
+            typeof(ConverterRecord),
+            typeof(ConverterRecord<>),
+            typeof(ConverterRecordDynamic),
+            typeof(ConverterFactory),
+            typeof(ConverterFactory<>),
+            typeof(ConverterFactoryDynamic),
+            typeof(Serialization.ConverterNullableString<>),
+            typeof(Serialization.ConverterNullableRecord<>),
+            typeof(Serialization.ConverterNullableFactory<>),
+        };
+
         internal static IEnumerable<Type> GetAllUserTypes()
         {
-            // Filter out Dec's own internal types. We key off (assembly, namespace) rather than namespace
-            // alone, so user code that happens to live in a "Dec" namespace (in a user assembly) is still
-            // surfaced. This matters for the embedded-source configuration where decAssembly is the user's
-            // assembly: we still want to exclude Dec's own types from discovery, but we can only identify
-            // them by namespace since the assembly check won't help.
-            var decAssembly = typeof(Dec).Assembly;
-            return GetAllUserAssemblies().SelectMany(a => a.GetTypesSafe()).Where(t =>
-            {
-                if (t.Assembly != decAssembly)
-                {
-                    return true;
-                }
-                var ns = t.Namespace;
-                return ns != null && ns != "Dec" && !ns.StartsWith("Dec.");
-            });
+            return GetAllUserAssemblies().SelectMany(a => a.GetTypesSafe()).Where(t => !DecInternalNonUserTypes.Contains(t));
         }
 
         internal struct IndexInfo

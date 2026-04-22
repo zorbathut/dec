@@ -41,13 +41,17 @@ namespace DecTest
         }
 
         [Test]
-        public void UserTypesExcludeDecInternals()
+        public void UserTypesExcludeDecConverterHierarchy()
         {
-            // Dec's own types (e.g., Dec.Parser, Dec.Recorder, Dec.UtilType) should never surface through
-            // GetAllUserTypes even though Dec's assembly is in the user-assembly closure.
-            var types = Dec.UtilReflection.GetAllUserTypes().ToArray();
-            Assert.IsFalse(types.Contains(typeof(Dec.Parser)), "Dec.Parser should not be surfaced as a user type");
-            Assert.IsFalse(types.Contains(typeof(Dec.Recorder)), "Dec.Recorder should not be surfaced as a user type");
+            // Discover every Converter-derived type in Dec's own assembly and assert it's excluded from GetAllUserTypes. Discovering reflectively (rather than listing the known types) means adding a new abstract Converter base or Nullable<> helper to Dec without updating UtilReflection.DecInternalNonUserTypes fails here immediately. Note this test relies on the non-embedded configuration: Dec.Dec's assembly is dec.dll, which contains only Dec's own Converter subclasses. In the embedded-source configuration, that assembly would also contain user Converters, so this test would need rework there; integration_unified doesn't duplicate it for that reason.
+            var decAssembly = typeof(Dec.Dec).Assembly;
+            var decConverters = decAssembly.GetTypes().Where(t => typeof(Dec.Converter).IsAssignableFrom(t)).ToArray();
+            Assert.IsNotEmpty(decConverters, "Expected Dec's assembly to contain at least one Converter type; reflection lookup likely broken.");
+            var surfaced = new System.Collections.Generic.HashSet<System.Type>(Dec.UtilReflection.GetAllUserTypes());
+            foreach (var t in decConverters)
+            {
+                Assert.IsFalse(surfaced.Contains(t), $"Dec-internal Converter type {t} should not be surfaced as a user type. If this is a newly-added abstract base or Nullable<> helper, add it to UtilReflection.DecInternalNonUserTypes.");
+            }
         }
 
         private class ClassWithAutoProperty

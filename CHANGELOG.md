@@ -48,6 +48,7 @@ All notable changes to this project will be documented in this file.
 * `Recorder.Ignore()` could generate errors instead of suppressing them.
 * Primitive-parse errors leak obscure exception messages.
 * XML parse errors leak obscure exception messages.
+* Types not discovered if placed in the Dec namespace (which is weird, why are you doing that, but okay fine.)
 
 
 ## [v0.11.0]
