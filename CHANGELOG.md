@@ -31,6 +31,8 @@ All notable changes to this project will be documented in this file.
 * Do a better job of detecting backing fields.
 * Removed the workaround for the .NET Core 2.1 float-roundtrip bug since we no longer support that target.
 * Distinguished Set element paths from dictionary key paths.
+* Error messages when you're trying to use a generic of a missing arity.
+* Various type-parsing error messages.
 
 ### Fixed
 * Race condition in Serialization.Initialize().

@@ -487,7 +487,7 @@ namespace DecTest
                         <type>Generic&lt;&gt;</type>
                     </TypeDec>
                 </Decs>");
-            ExpectErrors(() => parser.Finish(), err => err.Contains("Couldn't find type named `Generic<>`"));
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Empty generic argument list") || err.Contains("Couldn't find type named `Generic<>`"));
 
             DoParserTests(mode);
 

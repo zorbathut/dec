@@ -318,13 +318,13 @@ namespace DecTest
             ExpectErrors(() => parseType("Generic<int>."), err => err.Contains("trailing .") || err.Contains("Generic<int>."));
             ExpectErrors(() => parseType(".Generic<int>"), err => err.Contains(".Generic<int>"));
             ExpectErrors(() => parseType("Generic<int>NestedStandard"), err => err.Contains("Unexpected character after end of generic") || err.Contains("Failed to parse generic arguments") || err.Contains("Generic<int>NestedStandard"));
-            ExpectErrors(() => parseType("Generic<int>..NestedStandard"), err => err.Contains("Generic<int>..NestedStandard"));
+            ExpectErrors(() => parseType("Generic<int>..NestedStandard"), err => err.Contains("empty path segment") || err.Contains("Generic<int>..NestedStandard"));
 
             ExpectErrors(() => parseType(""), err => err.Contains("empty string is not a valid type"));
-            ExpectErrors(() => parseType("."), err => err.Contains("Couldn't find type named `.`"));
-            ExpectErrors(() => parseType("<"), err => err.Contains("Couldn't find type named `<`"));
-            ExpectErrors(() => parseType(">"), err => err.Contains("Couldn't find type named `>`"));
-            ExpectErrors(() => parseType("<>"), err => err.Contains("Couldn't find type named `<>`"));
+            ExpectErrors(() => parseType("."), err => err.Contains("empty path segment") || err.Contains("Couldn't find type named `.`"));
+            ExpectErrors(() => parseType("<"), err => err.Contains("empty path segment") || err.Contains("Couldn't find type named `<`"));
+            ExpectErrors(() => parseType(">"), err => err.Contains("empty path segment") || err.Contains("Couldn't find type named `>`"));
+            ExpectErrors(() => parseType("<>"), err => err.Contains("empty path segment") || err.Contains("Couldn't find type named `<>`"));
         }
 
         [Test]
@@ -385,6 +385,25 @@ namespace DecTest
             TypeConversionBidirectional(typeof(OverloadedNames.Foo<int, double>.Overloaded<string, float>), "Foo<int, double>.Overloaded<string, float>");
 
             TypeConversionBidirectional(typeof(OverloadedNames.Foo<Dictionary<int, double>, double>.Overloaded<string, Dictionary<int, double>>), "Foo<System.Collections.Generic.Dictionary<int, double>, double>.Overloaded<string, System.Collections.Generic.Dictionary<int, double>>");
+        }
+
+        [Test]
+        public void OverloadedArities()
+        {
+            Dec.Config.UsingNamespaces = new string[] { "DecTest.OverloadedNames" };
+
+            // The same bare name resolved at three different arities must each pick the matching type.
+            TypeConversionBidirectional(typeof(OverloadedNames.Foo), "Foo");
+            TypeConversionBidirectional(typeof(OverloadedNames.Foo<int>), "Foo<int>");
+            TypeConversionBidirectional(typeof(OverloadedNames.Foo<int, double>), "Foo<int, double>");
+
+            // A request at an arity that doesn't exist should fail; the diagnostic should enumerate the arities that do.
+            ExpectErrors(
+                () => Assert.IsNull(parseType("Foo<int, double, string>")),
+                err => err.Contains("Foo")
+                    && err.Contains("no type parameters")
+                    && err.Contains("1 type parameter")
+                    && err.Contains("2 type parameters"));
         }
 
         [Test]

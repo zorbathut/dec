@@ -135,6 +135,39 @@ namespace Dec
             }
         }
 
+        // Returns a human-readable list of generic arities at which `name` exists, or null if there are no matches at any arity.
+        private static string DescribeAvailableArities(string name)
+        {
+            var arities = new SortedSet<int>();
+
+            if (ParseCache.TryGetValue(name, out _))
+            {
+                arities.Add(0);
+            }
+
+            if (StrippedTypeCache != null)
+            {
+                foreach (var ns in Config.UsingNamespaces.Concat(new[] { (string)null }))
+                {
+                    string candidate = ns == null ? name : $"{ns}.{name}";
+                    foreach (var entry in StrippedTypeCache.Keys)
+                    {
+                        if (entry.Item1 == candidate)
+                        {
+                            arities.Add(entry.Item2);
+                        }
+                    }
+                }
+            }
+
+            if (arities.Count == 0)
+            {
+                return null;
+            }
+
+            return string.Join(", ", arities.Select(a => a == 0 ? "no type parameters" : $"{a} type parameter{(a == 1 ? "" : "s")}"));
+        }
+
         private static Type ParseSubtype(Type root, string text, ref List<Type> genericTypes, Context context)
         {
             if (root == null)
@@ -174,9 +207,17 @@ namespace Dec
             int nameEnd = Math.Min(input.IndexOfUnbounded('.'), input.IndexOfUnbounded('<', 1));
             name = input.Substring(0, nameEnd);
 
+            if (name.Length == 0)
+            {
+                Dbg.Err($"{context}: Type name `{input}` has an empty path segment (extra `.` or leading `.`)");
+                endIndex = input.Length;
+                return false;
+            }
+
             // If we have a < we need to extract generic arguments.
             if (nameEnd < input.Length && input[nameEnd] == '<')
             {
+                int typesBefore = types?.Count ?? 0;
                 if (!ParseGenericParams(input.Substring(nameEnd + 1), context, out int endOfGenericsAdjustment, ref types))
                 {
                     // just kinda give up to ensure we don't get trapped in a loop
@@ -184,6 +225,14 @@ namespace Dec
                     endIndex = input.Length;
                     return false;
                 }
+
+                if ((types?.Count ?? 0) == typesBefore)
+                {
+                    Dbg.Err($"{context}: Empty generic argument list `<>` in type containing `{input}`");
+                    endIndex = input.Length;
+                    return false;
+                }
+
                 endIndex = nameEnd + endOfGenericsAdjustment + 3; // adjustment for <>.
                 // . . . but also, make sure we don't have a trailing dot!
                 if (endIndex == input.Length && input[endIndex - 1] == '.')
@@ -419,7 +468,24 @@ namespace Dec
 
                 if (possibleTypes.Length == 0)
                 {
-                    Dbg.Err($"{context}: Couldn't find type named `{text}`");
+                    // Try to give a more specific diagnostic. If the user wrote `Foo<X>` and `Foo` exists at other arities, list them.
+                    string availableArities = null;
+                    int ltIdx = text.IndexOf('<');
+                    if (ltIdx > 0)
+                    {
+                        string baseName = text.Substring(0, ltIdx);
+                        availableArities = DescribeAvailableArities(baseName);
+                    }
+
+                    if (availableArities != null)
+                    {
+                        Dbg.Err($"{context}: Couldn't find type named `{text}`; `{text.Substring(0, ltIdx)}` exists with {availableArities}");
+                    }
+                    else
+                    {
+                        Dbg.Err($"{context}: Couldn't find type named `{text}`");
+                    }
+
                     result = null;
                 }
                 else if (possibleTypes.Length > 1)
