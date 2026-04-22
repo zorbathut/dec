@@ -8,7 +8,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Evaluate, don't assume**: "Why don't we X?" is a request for evaluation, not a suggestion to do X. Explain the tradeoffs, potential issues, or reasons why X might or might not be a good idea.
 
-**Don't hand-wrap lines**: Don't manually break comments or code onto multiple lines to fit a character limit. Good editors handle soft-wrapping. Let lines be as long as they naturally want to be; only break when it genuinely improves readability (e.g. a paragraph split, or a structurally-motivated break in a long expression).
+**Don't hand-wrap lines**: Never split a sentence across multiple comment lines (`//`, `/// `, `* `, `#`) to fit a column limit. Let each sentence run its natural length on a single line. Paragraph breaks (a blank comment line between sentences) are the only legitimate reason to start a new comment line — a mid-sentence newline is always wrong. Same rule for code: break only when it genuinely improves readability (e.g. a structurally-motivated break in a long expression), never for character count. Good editors soft-wrap for display.
+
+If a comment you're about to write has a newline before the sentence ends, delete that newline. Concretely:
+```
+// Wrong:
+// Dec's Converter types must not surface through discovery: abstract bases
+// produce errors in Serialization's scan.
+
+// Right:
+// Dec's Converter types must not surface through discovery: abstract bases produce errors in Serialization's scan.
+```
 
 ## Workflow
 
