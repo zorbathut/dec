@@ -174,7 +174,7 @@ namespace Dec
                 {
                     // construct `prototype` with the same generic arguments that `type` has
                     var concreteConverterType = converterType.MakeGenericType(inputType.GenericTypeArguments);
-                    converter = (Converter)concreteConverterType.CreateInstanceSafe("converter", null);
+                    converter = (Converter)concreteConverterType.CreateInstanceSafe("converter", null, "tag the class with [Dec.FactoryOnly] if this converter is produced on demand via Config.ConverterFactory");
 
                     // yes, do this even if it's null
                     ConverterObjects[inputType] = converter;
@@ -221,6 +221,11 @@ namespace Dec
                     continue;
                 }
 
+                if (type.GetCustomAttribute<FactoryOnlyAttribute>() != null)
+                {
+                    continue;
+                }
+
                 if (type.IsGenericType)
                 {
                     var baseConverterType = type;
@@ -249,7 +254,7 @@ namespace Dec
                     continue;
                 }
 
-                var converter = (Converter)type.CreateInstanceSafe("converter", null);
+                var converter = (Converter)type.CreateInstanceSafe("converter", null, "tag the class with [Dec.FactoryOnly] if this converter is produced on demand via Config.ConverterFactory");
                 if (converter != null && (converter is ConverterString || converter is ConverterRecord || converter is ConverterFactory))
                 {
                     Type convertedType = converter.GetConvertedTypeHint();

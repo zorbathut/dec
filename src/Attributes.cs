@@ -83,4 +83,18 @@ namespace Dec
             this.type = type;
         }
     }
+
+    /// <summary>
+    /// Marks a Converter class as factory-only: it will not be auto-registered by Dec's converter scan, and must be produced on demand by a `Config.ConverterFactory` callback instead.
+    /// </summary>
+    /// <remarks>
+    /// Without this attribute, Dec's scan would treat the class as a normal Converter, try to instantiate it via its parameterless constructor, and register it against the type declared in its Converter base. For factory-only converters the parameterless-constructor requirement is usually unsatisfiable, and even when it isn't, the declared-type registration would shadow the `Config.ConverterFactory` lookup that's supposed to produce the right instance.
+    ///
+    /// `ConverterStringDynamic`, `ConverterRecordDynamic`, and `ConverterFactoryDynamic` already carry this attribute themselves, so every Dynamic subclass inherits it automatically and doesn't need to be tagged.
+    /// </remarks>
+    [AttributeUsage(AttributeTargets.Class, Inherited = true)]
+    public class FactoryOnlyAttribute : Attribute
+    {
+
+    }
 }

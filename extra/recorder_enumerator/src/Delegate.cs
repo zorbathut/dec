@@ -4,6 +4,7 @@ using System.Reflection;
 
 namespace Dec.RecorderEnumerator
 {
+    [FactoryOnly]
     public class System_Delegate_Converter : ConverterFactory<Delegate>
     {
         public static bool IsGenericDelegate(Type type)

@@ -4,6 +4,7 @@ using System.Reflection;
 
 namespace Dec.RecorderEnumerator
 {
+    [FactoryOnly]
     public class MethodInfo_Converter : ConverterFactory<MethodInfo>
     {
         public override bool TreatAsValuelike()

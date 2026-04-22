@@ -280,7 +280,7 @@ namespace Dec
 
         private static ConcurrentDictionary<Type, (CreateInstanceAction action, ConstructorInfo ctor, Type constructType)> CreateInstanceCache = new ConcurrentDictionary<Type, (CreateInstanceAction, ConstructorInfo, Type)>();
 
-        internal static object CreateInstanceSafe(this Type type, string errorType, ReaderNode node)
+        internal static object CreateInstanceSafe(this Type type, string errorType, ReaderNode node, string missingCtorHint = null)
         {
             if (!CreateInstanceCache.TryGetValue(type, out var cached))
             {
@@ -338,7 +338,7 @@ namespace Dec
                     return UtilType.CreateDynamicArray(type.GetElementType(), node.GetArrayDimensions(type.GetArrayRank()));
 
                 case CreateInstanceAction.NoConstructor:
-                    Dbg.Err($"{BuiltContext()}: Attempting to create {errorType} of type {type} without a no-argument constructor");
+                    Dbg.Err($"{BuiltContext()}: Attempting to create {errorType} of type {type} without a no-argument constructor{(missingCtorHint != null ? $"; {missingCtorHint}" : "")}");
                     // anything that is capable of not having a no-argument constructor can accept being null
                     return null;
 

@@ -45,6 +45,61 @@ namespace DecTest
             parser.Finish();
         }
 
+        [Dec.FactoryOnly]
+        public class ConverterFactoryOnlyTagged : Dec.ConverterFactory<Stub>
+        {
+            public ConverterFactoryOnlyTagged(Type type) { }
+
+            public override void Write(Stub input, Dec.Recorder recorder) { }
+            public override Stub Create(Dec.Recorder recorder) { return null; }
+            public override void Read(ref Stub input, Dec.Recorder recorder) { }
+        }
+
+        [Test]
+        public void FactoryOnlyAttributeSkipsScan()
+        {
+            // A Converter marked [FactoryOnly] with no parameterless constructor should be silently skipped by the auto-registration scan rather than producing "without a no-argument constructor". Regression guard for the factory-only opt-out path used by recorder_enumerator's System_Delegate_Converter.
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConverterFactoryOnlyTagged) } });
+
+            new Dec.Parser().Finish();
+        }
+
+        public class ConverterFactoryDynamicDerived : Dec.ConverterFactoryDynamic
+        {
+            public ConverterFactoryDynamicDerived(Type type) { }
+
+            public override void Write(object input, Dec.Recorder recorder) { }
+            public override object Create(Dec.Recorder recorder) { return null; }
+            public override void Read(ref object input, Dec.Recorder recorder) { }
+        }
+
+        [Test]
+        public void DynamicBaseSkipsScan()
+        {
+            // *Dynamic Converter bases carry [FactoryOnly] themselves, so subclasses inherit it without needing their own annotation. Regression guard for the ~32 recorder_enumerator converters that extend ConverterFactoryDynamic / ConverterRecordDynamic and would otherwise crash the scan.
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConverterFactoryDynamicDerived) } });
+
+            new Dec.Parser().Finish();
+        }
+
+        public class OpenGenericDynamicDerived<T> : Dec.ConverterFactoryDynamic
+        {
+            public OpenGenericDynamicDerived(Type type) { }
+
+            public override void Write(object input, Dec.Recorder recorder) { }
+            public override object Create(Dec.Recorder recorder) { return null; }
+            public override void Read(ref object input, Dec.Recorder recorder) { }
+        }
+
+        [Test]
+        public void OpenGenericDynamicBaseSkipsScan()
+        {
+            // Same as DynamicBaseSkipsScan but with an open generic subclass, matching the actual shape of recorder_enumerator's SystemLinqEnumerable_WhereEnumerable_Converter<Iterator, T> and friends. The earlier crash manifested specifically on open-generic Dynamic derivations via the scan's generic-handling path doing GenericTypeArguments[0] on a non-generic Dynamic base; this test locks in that inherited [FactoryOnly] kicks in before that crash point.
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(OpenGenericDynamicDerived<>) } });
+
+            new Dec.Parser().Finish();
+        }
+
         public class MissingComposer { }
 
         [Test]

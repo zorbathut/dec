@@ -88,6 +88,7 @@ namespace Dec
     ///
     /// In most cases it should be avoided.
     /// </remarks>
+    [FactoryOnly]
     public abstract class ConverterStringDynamic : ConverterString
     {
         /// <summary>
@@ -167,6 +168,7 @@ namespace Dec
     ///
     /// In most cases it should be avoided.
     /// </remarks>
+    [FactoryOnly]
     public abstract class ConverterRecordDynamic : ConverterRecord
     {
         /// <summary>
@@ -266,6 +268,7 @@ namespace Dec
     ///
     /// In most cases it should be avoided.
     /// </remarks>
+    [FactoryOnly]
     public abstract class ConverterFactoryDynamic : ConverterFactory
     {
         /// <summary>

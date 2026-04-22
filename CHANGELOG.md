@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 * Support for IList/IDictionary/ISet containers, besides the "standard" examples of those.
 * Threading contract documentation in ARCHITECTURE.md.
+* `[Dec.FactoryOnly]` attribute for Converter classes that must be produced on demand instead of auto-registered.
 
 ### Breaking
 * Recorder.WriteValidation(), Composer.ComposeValidation(), Config.UnitTestParameters, and Index.Clear() are now internal. These were testing-only APIs not intended for external use. If you were using these, let me know!
