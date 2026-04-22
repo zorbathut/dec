@@ -2,11 +2,11 @@
 <html>
   <head>
     <meta charset="utf-8">
-      <title>Class ConverterRecord&lt;T&gt; </title>
+      <title>Class FactoryOnlyAttribute </title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="title" content="Class ConverterRecord&lt;T&gt; ">
+      <meta name="title" content="Class FactoryOnlyAttribute ">
       
-      <meta name="description" content="Base class for converting to arbitrary types via the Recorder API.">
+      <meta name="description" content="Marks a Converter class as factory-only: it will not be auto-registered by Dec&#39;s converter scan, and must be produced on demand by a Config.ConverterFactory callback instead.">
       <link rel="icon" href="../favicon.ico">
       <link rel="stylesheet" href="../public/docfx.min.css">
       <link rel="stylesheet" href="../public/main.css">
@@ -16,7 +16,7 @@
       
       
       
-      <meta name="docfx:docurl" content="https://github.com/zorbathut/dec/new/dev/apiSpec/new?filename=Dec_ConverterRecord_1.md&amp;value=---%0Auid%3A%20Dec.ConverterRecord%601%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/zorbathut/dec/new/dev/apiSpec/new?filename=Dec_FactoryOnlyAttribute.md&amp;value=---%0Auid%3A%20Dec.FactoryOnlyAttribute%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -80,12 +80,12 @@
           <nav id="breadcrumb"></nav>
         </div>
 
-        <article data-uid="Dec.ConverterRecord`1">
+        <article data-uid="Dec.FactoryOnlyAttribute">
 
 
 
-  <h1 id="Dec_ConverterRecord_1" data-uid="Dec.ConverterRecord`1" class="text-break">
-Class ConverterRecord&lt;T&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Converter.cs/#L140"><i class="bi bi-code-slash"></i></a>
+  <h1 id="Dec_FactoryOnlyAttribute" data-uid="Dec.FactoryOnlyAttribute" class="text-break">
+Class FactoryOnlyAttribute  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Attributes.cs/#L95"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -93,29 +93,24 @@ Class ConverterRecord&lt;T&gt;  <a class="header-action link-secondary" title="V
   <dl><dt>Assembly</dt><dd>dec.dll</dd></dl>
   </div>
 
-  <div class="markdown summary"><p>Base class for converting to arbitrary types via the Recorder API.</p>
+  <div class="markdown summary"><p>Marks a Converter class as factory-only: it will not be auto-registered by Dec's converter scan, and must be produced on demand by a <code>Config.ConverterFactory</code> callback instead.</p>
 </div>
   <div class="markdown conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public abstract class ConverterRecord&lt;T&gt; : ConverterRecord</code></pre>
+    <pre><code class="lang-csharp hljs">[AttributeUsage(AttributeTargets.Class, Inherited = true)]
+public class FactoryOnlyAttribute : Attribute</code></pre>
   </div>
 
 
 
-  <h4 class="section">Type Parameters</h4>
-  <dl class="parameters">
-    <dt><code>T</code></dt>
-    <dd></dd>
-  </dl>
 
   <dl class="typelist inheritance">
     <dt>Inheritance</dt>
     <dd>
       <div><span class="xref">object</span></div>
-      <div><span class="xref">Converter</span></div>
-      <div><span class="xref">ConverterRecord</span></div>
-      <div><span class="xref">ConverterRecord&lt;T&gt;</span></div>
+      <div><span class="xref">Attribute</span></div>
+      <div><span class="xref">FactoryOnlyAttribute</span></div>
     </dd>
   </dl>
 
@@ -125,60 +120,17 @@ Class ConverterRecord&lt;T&gt;  <a class="header-action link-secondary" title="V
 
 
 
-  <h2 id="Dec_ConverterRecord_1_remarks">Remarks</h2>
-  <div class="markdown level0 remarks"><p>This is a standalone class to allow implementation of converters of third-party types. It's useful when implementing converters for types that were not created by you (ex: UnityEngine.Vector).</p>
-<p>ConverterRecord is suitable only for converting to and from objects with usable default constructors. It does not allow you to create your own objects or return objects that are provided by your framework (see ConverterString and ConverterFactory).</p>
-<p>It does allow you to reference other objects within the Recorder hierarchy. It also allows you to respect pre-set defaults (if not shared) and build complex hierarchies for complicated data types.</p>
-<p>This should likely be your second choice of Converter, used only if ConverterString is inappropriate.</p>
+  <h2 id="Dec_FactoryOnlyAttribute_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>Without this attribute, Dec's scan would treat the class as a normal Converter, try to instantiate it via its parameterless constructor, and register it against the type declared in its Converter base. For factory-only converters the parameterless-constructor requirement is usually unsatisfiable, and even when it isn't, the declared-type registration would shadow the <code>Config.ConverterFactory</code> lookup that's supposed to produce the right instance.</p>
+<p><code>ConverterStringDynamic</code>, <code>ConverterRecordDynamic</code>, and <code>ConverterFactoryDynamic</code> already carry this attribute themselves, so every Dynamic subclass inherits it automatically and doesn't need to be tagged.</p>
 </div>
-
-
-  <h2 class="section" id="methods">Methods
-</h2>
-
-
-  <a id="Dec_ConverterRecord_1_Record_" data-uid="Dec.ConverterRecord`1.Record*"></a>
-
-  <h3 id="Dec_ConverterRecord_1_Record__0__Dec_Recorder_" data-uid="Dec.ConverterRecord`1.Record(`0@,Dec.Recorder)">
-  Record(ref T, Recorder)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Converter.cs/#L148"><i class="bi bi-code-slash"></i></a>
-  </h3>
-
-  <div class="markdown level1 summary"><p>Records an object.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public abstract void Record(ref T input, Recorder recorder)</code></pre>
-  </div>
-
-  <h4 class="section">Parameters</h4>
-  <dl class="parameters">
-    <dt><code>input</code> <span class="xref">T</span></dt>
-    <dd></dd>
-    <dt><code>recorder</code> <a class="xref" href="Dec.Recorder.html">Recorder</a></dt>
-    <dd></dd>
-  </dl>
-
-
-
-
-
-
-
-
-  <h4 class="section" id="Dec_ConverterRecord_1_Record__0__Dec_Recorder__remarks">Remarks</h4>
-  <div class="markdown level1 remarks"><p>See <a class="xref" href="Dec.IRecordable.html#Dec_IRecordable_Record_"><code>Dec.IRecordable.Record</code></a> for details, although you'll need to use <code>this</code> instead of <code>input</code>.</p>
-</div>
-
-
 
 
 
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/zorbathut/dec/blob/dev/src/Converter.cs/#L140" class="edit-link">Edit this page</a>
+          <a href="https://github.com/zorbathut/dec/blob/dev/src/Attributes.cs/#L95" class="edit-link">Edit this page</a>
         </div>
 
 

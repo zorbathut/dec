@@ -270,6 +270,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Dec.FactoryOnlyAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.FactoryOnlyAttribute.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.FactoryOnlyAttribute",
+      "Summary": "<p sourcefile=\"api/Dec.FactoryOnlyAttribute.yml\" sourcestartlinenumber=\"1\">Marks a Converter class as factory-only: it will not be auto-registered by Dec's converter scan, and must be produced on demand by a <code sourcefile=\"api/Dec.FactoryOnlyAttribute.yml\" sourcestartlinenumber=\"1\">Config.ConverterFactory</code> callback instead.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Dec.IConditionalRecordable.yml",
       "output": {
         ".html": {
