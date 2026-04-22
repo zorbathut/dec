@@ -244,7 +244,7 @@ namespace DecTest
         [Test]
         public void EarlyTouch()
         {
-            ExpectErrors(() => EarlyTouchDecs.TestDec = null, err => err.Contains("Initializing static reference class at an inappropriate time"));
+            ExpectErrors(() => EarlyTouchDecs.TestDec = null, err => err.Contains("before any Parser had been created"));
         }
 
         [Dec.StaticReferences]
@@ -268,7 +268,7 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            ExpectErrors(() => LateTouchDecs.TestDec = null, err => err.Contains("Initializing static reference class at an inappropriate time"));
+            ExpectErrors(() => LateTouchDecs.TestDec = null, err => err.Contains("was not registered with this Parser"));
         }
 
         [Dec.StaticReferences]
@@ -299,7 +299,7 @@ namespace DecTest
                 <Decs>
                     <UnexpectedTouchDec decName=""TestDec"" />
                 </Decs>");
-            ExpectErrors(() => parser.Finish(), err => err.Contains("Initializing static reference class at an inappropriate time"));
+            ExpectErrors(() => parser.Finish(), err => err.Contains("during dec parsing"));
 
             Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDec"));
         }
@@ -334,7 +334,7 @@ namespace DecTest
                 <Decs>
                     <ConstructorTouchDec decName=""TestDec"" />
                 </Decs>");
-            ExpectErrors(() => parser.Finish(), err => err.Contains("Failed to properly register") || err.Contains("Initializing static reference class at an inappropriate time"));
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Failed to properly register") || err.Contains("during dec parsing"));
 
             Assert.IsNotNull(Dec.Database<StubDec>.Get("TestDec"));
         }

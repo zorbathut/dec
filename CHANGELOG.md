@@ -33,6 +33,7 @@ All notable changes to this project will be documented in this file.
 * Distinguished Set element paths from dictionary key paths.
 * Error messages when you're trying to use a generic of a missing arity.
 * Various type-parsing error messages.
+* Error messages given by accessing StaticReferencesAttribute at the wrong time.
 
 ### Fixed
 * Race condition in Serialization.Initialize().

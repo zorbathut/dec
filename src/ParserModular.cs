@@ -574,7 +574,25 @@ namespace Dec
                 return;
             }
 
-            Dbg.Err($"Initializing static reference class at an inappropriate time. Either you forgot to add [StaticReferences] to the class, or you accessed it before it was ready.");
+            switch (s_Status)
+            {
+                case Status.Uninitialized:
+                    Dbg.Err($"A static reference class was accessed before any Parser had been created; the dec database is empty. Static reference fields are not populated until the ConfigErrors/PostLoad step of Parser.Finish().");
+                    break;
+                case Status.Accumulating:
+                    Dbg.Err($"A static reference class was accessed while the Parser was still accumulating input, before Parser.Finish() was called. Static reference fields are not populated until the ConfigErrors/PostLoad step of Parser.Finish().");
+                    break;
+                case Status.Processing:
+                    Dbg.Err($"A static reference class was accessed during dec parsing, most likely from a Dec constructor, field initializer, or converter. Static reference fields are not populated until the ConfigErrors/PostLoad step of Parser.Finish().");
+                    break;
+                case Status.Distributing:
+                    Dbg.Err($"A static reference class was accessed during the static-reference distribution phase, but was not registered with this Parser. Verify that it is tagged with [StaticReferences] and is reachable by Dec's type discovery.");
+                    break;
+                case Status.Finalizing:
+                case Status.Finished:
+                    Dbg.Err($"A static reference class was accessed, but was not registered with this Parser and so was never populated. Verify that it is tagged with [StaticReferences] and is reachable by Dec's type discovery.");
+                    break;
+            }
         }
     }
 }
