@@ -8,6 +8,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Evaluate, don't assume**: "Why don't we X?" is a request for evaluation, not a suggestion to do X. Explain the tradeoffs, potential issues, or reasons why X might or might not be a good idea.
 
+**Don't hand-wrap lines**: Don't manually break comments or code onto multiple lines to fit a character limit. Good editors handle soft-wrapping. Let lines be as long as they naturally want to be; only break when it genuinely improves readability (e.g. a paragraph split, or a structurally-motivated break in a long expression).
+
 ## Workflow
 
 **Step 1 — Plan.** Enter plan mode (the actual `EnterPlanMode` tool — not a freeform text plan) and research the task and produce a plan. Skippable for trivial changes (under ~a dozen lines). Include unit tests in the plan whenever they're plausible to add — UI generally can't be tested, most other things can.
