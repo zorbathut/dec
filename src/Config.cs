@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Dec
 {
@@ -213,103 +214,175 @@ namespace Dec
                 }
             }
 
-            #if UNITY_5_3_OR_NEWER
-                InfoHandler = (str) =>
+            // initialize defaults so we can at least pretend to send errors somewhere if something goes wrong
+            InfoHandler = (str) =>
+            {
+                System.Diagnostics.Debug.Print(str);
+            };
+            WarningHandler = (str) =>
+            {
+                System.Diagnostics.Debug.Print(str);
+                Console.WriteLine(str);
+                if (DefaultHandlerThrowExceptions >= DefaultExceptionBehavior.ErrorAndWarning)
                 {
-                    UnityEngine.Debug.Log(str);
-                };
-
-                WarningHandler = (str) =>
+                    throw new ArgumentException(str + ExceptionSuffix());
+                }
+            };
+            ErrorHandler = (str) =>
+            {
+                System.Diagnostics.Debug.Print(str);
+                Console.WriteLine(str);
+                if (DefaultHandlerThrowExceptions >= DefaultExceptionBehavior.ErrorOnly)
                 {
-                    UnityEngine.Debug.LogWarning(str);
-                    if (DefaultHandlerThrowExceptions >= DefaultExceptionBehavior.ErrorAndWarning)
-                    {
-                        throw new ArgumentException(str + ExceptionSuffix());
-                    }
-                };
-
-                ErrorHandler = (str) =>
+                    throw new ArgumentException(str + ExceptionSuffix());
+                }
+            };
+            ExceptionHandler = (e) =>
+            {
+                System.Diagnostics.Debug.Print(e.ToString());
+                Console.WriteLine(e.ToString());
+                if (DefaultHandlerThrowExceptions >= DefaultExceptionBehavior.ErrorOnly)
                 {
-                    UnityEngine.Debug.LogError(str);
-                    if (DefaultHandlerThrowExceptions >= DefaultExceptionBehavior.ErrorOnly)
-                    {
-                        throw new ArgumentException(str + ExceptionSuffix());
-                    }
-                };
-
-                ExceptionHandler = (e) =>
-                {
-                    UnityEngine.Debug.LogException(e);
                     throw e;
-                };
-            #elif GODOT
-                InfoHandler = (str) =>
-                {
-                    Godot.GD.Print(str);
-                };
+                }
+            };
 
-                WarningHandler = (str) =>
+            // Engine detection via reflection; we build a single version via nuget that needs to be able to handle multiple hosts, so we can't do this via ifdef
+            // well okay we sort of can on unity because unity doesn't support nuget but I'm not gonna jump through those hoops
+            Type unityDebug = null;
+            Type godotGd = null;
+            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                try
                 {
-                    Godot.GD.PushWarning(str);
-                    if (DefaultHandlerThrowExceptions >= DefaultExceptionBehavior.ErrorAndWarning)
-                    {
-                        throw new ArgumentException(str + ExceptionSuffix());
-                    }
-                };
+                    unityDebug ??= asm.GetType("UnityEngine.Debug", throwOnError: false);
+                    godotGd ??= asm.GetType("Godot.GD", throwOnError: false);
+                }
+                catch
+                {
+                    // Some assemblies throw on GetType() if a dependency is missing. If the engine type lives in such an assembly, the engine isn't really usable anyway.
+                }
+                if (unityDebug != null && godotGd != null) break;
+            }
 
-                ErrorHandler = (str) =>
-                {
-                    Godot.GD.PushError(str);
-                    if (DefaultHandlerThrowExceptions >= DefaultExceptionBehavior.ErrorOnly)
-                    {
-                        throw new ArgumentException(str + ExceptionSuffix());
-                    }
-                };
+            if (unityDebug != null)
+            {
+                var log = BindStaticStringMethod(unityDebug, "Log");
+                var logWarning = BindStaticStringMethod(unityDebug, "LogWarning");
+                var logError = BindStaticStringMethod(unityDebug, "LogError");
+                var logException = BindStaticExceptionMethod(unityDebug, "LogException");
 
-                ExceptionHandler = (e) =>
+                if (log != null && logWarning != null && logError != null && logException != null)
                 {
-                    Godot.GD.PushError(e.ToString());
-                    if (DefaultHandlerThrowExceptions >= DefaultExceptionBehavior.ErrorOnly)
+                    InfoHandler = log;
+                    WarningHandler = (str) =>
                     {
+                        logWarning(str);
+                        if (DefaultHandlerThrowExceptions >= DefaultExceptionBehavior.ErrorAndWarning)
+                        {
+                            throw new ArgumentException(str + ExceptionSuffix());
+                        }
+                    };
+                    ErrorHandler = (str) =>
+                    {
+                        logError(str);
+                        if (DefaultHandlerThrowExceptions >= DefaultExceptionBehavior.ErrorOnly)
+                        {
+                            throw new ArgumentException(str + ExceptionSuffix());
+                        }
+                    };
+                    // Unity's exception handler rethrows unconditionally, ignoring DefaultHandlerThrowExceptions.
+                    ExceptionHandler = (e) =>
+                    {
+                        logException(e);
                         throw e;
-                    }
-                };
-            #else
-                InfoHandler = (str) =>
+                    };
+                    return;
+                }
+                else
                 {
-                    System.Diagnostics.Debug.Print(str);
-                };
+                    Dbg.Wrn("Dec detected UnityEngine.Debug but was unable to bind to its logging methods; falling back to default handlers. If you're seeing this message, please report it to the developer so they can add support for your version of Unity.");
 
-                WarningHandler = (str) =>
-                {
-                    System.Diagnostics.Debug.Print(str);
-                    Console.WriteLine(str);
-                    if (DefaultHandlerThrowExceptions >= DefaultExceptionBehavior.ErrorAndWarning)
-                    {
-                        throw new ArgumentException(str + ExceptionSuffix());
-                    }
-                };
+                    // misshapen silver star labeled "you tried"
+                }
+            }
 
-                ErrorHandler = (str) =>
-                {
-                    System.Diagnostics.Debug.Print(str);
-                    Console.WriteLine(str);
-                    if (DefaultHandlerThrowExceptions >= DefaultExceptionBehavior.ErrorOnly)
-                    {
-                        throw new ArgumentException(str + ExceptionSuffix());
-                    }
-                };
+            if (godotGd != null)
+            {
+                var print = BindStaticStringMethod(godotGd, "Print");
+                var pushWarning = BindStaticStringMethod(godotGd, "PushWarning");
+                var pushError = BindStaticStringMethod(godotGd, "PushError");
 
-                ExceptionHandler = (e) =>
+                if (print != null && pushWarning != null && pushError != null)
                 {
-                    System.Diagnostics.Debug.Print(e.ToString());
-                    Console.WriteLine(e.ToString());
-                    if (DefaultHandlerThrowExceptions >= DefaultExceptionBehavior.ErrorOnly)
+                    InfoHandler = print;
+                    WarningHandler = (str) =>
                     {
-                        throw e;
-                    }
-                };
-            #endif
+                        pushWarning(str);
+                        if (DefaultHandlerThrowExceptions >= DefaultExceptionBehavior.ErrorAndWarning)
+                        {
+                            throw new ArgumentException(str + ExceptionSuffix());
+                        }
+                    };
+                    ErrorHandler = (str) =>
+                    {
+                        pushError(str);
+                        if (DefaultHandlerThrowExceptions >= DefaultExceptionBehavior.ErrorOnly)
+                        {
+                            throw new ArgumentException(str + ExceptionSuffix());
+                        }
+                    };
+                    ExceptionHandler = (e) =>
+                    {
+                        pushError(e.ToString());
+                        if (DefaultHandlerThrowExceptions >= DefaultExceptionBehavior.ErrorOnly)
+                        {
+                            throw e;
+                        }
+                    };
+                    return;
+                }
+                else
+                {
+                    Dbg.Wrn("Dec detected Godot.GD but was unable to bind to its logging methods; falling back to default handlers. If you're seeing this message, please report it to the developer so they can add support for your version of Godot.");
+
+                    // a repeat of the misshapen silver star
+                }
+            }
+        }
+
+        // Probes for a public static method on `type` named `methodName` taking exactly one parameter of `string`, then `object`, then `object[]`. The `object[]` branch is what reaches Godot 4's `GD.Print(params object[])` — reflection lookup does NOT auto-expand `params`, so the parameter type really is `object[]`.
+        private static Action<string> BindStaticStringMethod(Type type, string methodName)
+        {
+            const BindingFlags flags = BindingFlags.Public | BindingFlags.Static;
+
+            var m = type.GetMethod(methodName, flags, null, new[] { typeof(string) }, null);
+            if (m != null)
+            {
+                return (str) => m.Invoke(null, new object[] { str });
+            }
+
+            m = type.GetMethod(methodName, flags, null, new[] { typeof(object) }, null);
+            if (m != null)
+            {
+                return (str) => m.Invoke(null, new object[] { str });
+            }
+
+            m = type.GetMethod(methodName, flags, null, new[] { typeof(object[]) }, null);
+            if (m != null)
+            {
+                return (str) => m.Invoke(null, new object[] { new object[] { str } });
+            }
+
+            return null;
+        }
+
+        private static Action<Exception> BindStaticExceptionMethod(Type type, string methodName)
+        {
+            const BindingFlags flags = BindingFlags.Public | BindingFlags.Static;
+            var m = type.GetMethod(methodName, flags, null, new[] { typeof(Exception) }, null);
+            if (m == null) return null;
+            return (e) => m.Invoke(null, new object[] { e });
         }
     }
 }

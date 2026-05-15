@@ -50,6 +50,7 @@ All notable changes to this project will be documented in this file.
 * Primitive-parse errors leak obscure exception messages.
 * XML parse errors leak obscure exception messages.
 * Types not discovered if placed in the Dec namespace (which is weird, why are you doing that, but okay fine.)
+* Default Unity and Godot handlers don't work when Dec is consumed as a NuGet package.
 
 
 ## [v0.11.0]
