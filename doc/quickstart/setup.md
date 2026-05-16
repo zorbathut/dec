@@ -25,9 +25,9 @@ Read on for more explanation.
 
 ## Logging
 
-Dec will generate warning and error messages. <i>It is strongly recommended that you make these unignorable to developers.</i> Popup windows and modal dialogs may be appropriate here; Dec does its best to recover from errors, which is great for mod compatibility but can be frustrating for developers if the error message is easily missable.
+Dec generates warning and error messages. *It is strongly recommended that you make these unignorable to developers.* We recommend popup windows and modal dialogs; Dec is designed to aggressively recover from errors, which is great for mod compatibility and frustrating for developers if the error message is easily missable.
 
-By default, Dec will output to your normal system error log (Unity log for Unity programs, C# console otherwise) <i>and also throw exceptions</i>. If you have your own logging framework, or want to decorate Dec messages with a recognizable tag, this is the place to do it. [Dec.Config.InfoHandler](xref:Dec.Config.InfoHandler), [Dec.Config.WarningHandler](xref:Dec.Config.WarningHandler), [Dec.Config.ErrorHandler](xref:Dec.Config.ErrorHandler), and [Dec.Config.ExceptionHandler](xref:Dec.Config.ExceptionHandler) can all be assigned separately for their respective type of log message.
+By default, Dec routes messages to the engine-appropriate log (Unity, Godot, or the C# console) <i>and also throws exceptions on warnings and errors</i>. The first time you hit one, the exception will tell you how to turn this off. You'll usually want to install your own [InfoHandler](xref:Dec.Config.InfoHandler) / [WarningHandler](xref:Dec.Config.WarningHandler) / [ErrorHandler](xref:Dec.Config.ErrorHandler) / [ExceptionHandler](xref:Dec.Config.ExceptionHandler):
 
 ```cs
 Dec.Config.InfoHandler = str => YourGame.Logging.LogInfoMessage(str);
@@ -36,29 +36,7 @@ Dec.Config.ErrorHandler = str => YourGame.Logging.LogErrorMessage(str);
 Dec.Config.ExceptionHandler = e => YourGame.Logging.LogException(e);
 ```
 
-If you're fine with warnings and errors reaching your standard error log, <i>and expect to see them</i>, then it is strongly recommended that you disable error exceptions. Dec will automatically recover from a wide variety of issues, usually guessing reasonably regarding the intent and the safest fallback. This is not recommended if you're unlikely to see errors; errors are there to be fixed!
-
-```cs
-Dec.Config.DefaultHandlerThrowExceptions = Dec.Config.DefaultExceptionBehavior.None;
-```
-
-This is not necessary if you're overridden the handlers yourself; it applies only to the default handlers.
-
-## Exceptions
-
-As mentioned above, Dec attempts to recover from errors whenever possible. However, we've found that new Dec developers often miss error messages and end up very confused. To help with that, Dec's default log handler throws exceptions on warnings and errors, along with an explanatory message about how this can be suppressed; specifically, through [Dec.Config.DefaultHandlerThrowExceptions](xref:Dec.Config.DefaultHandlerThrowExceptions).
-
-```cs
-Dec.Config.DefaultHandlerThrowExceptions = Dec.Config.DefaultExceptionBehavior.Never;
-```
-
-If you want to keep the exception behavior, but don't want the message, the message alone can be suppressed with [Dec.Config.DefaultHandlerShowConfigOnException](xref:Dec.Config.DefaultHandlerShowConfigOnException).
-
-```cs
-Dec.Config.DefaultHandlerShowConfigOnException = false;
-```
-
-If you've defined your own logging handlers, Dec's default exception throwing will be automatically disabled. You can throw your own exceptions if you prefer that behavior.
+See [Logging](~/documentation/logging.md) for more details and justifications.
 
 ## Namespaces
 

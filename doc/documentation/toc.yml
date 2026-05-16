@@ -1,3 +1,5 @@
+- name: Logging
+  href: logging.md
 - name: Member parsing
   href: parsing.md
 - name: Explicit type specification

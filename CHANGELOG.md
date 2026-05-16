@@ -35,6 +35,7 @@ All notable changes to this project will be documented in this file.
 * Error messages when you're trying to use a generic of a missing arity.
 * Various type-parsing error messages.
 * Error messages given by accessing StaticReferencesAttribute at the wrong time.
+* Logging documentation.
 
 ### Fixed
 * Race condition in Serialization.Initialize().

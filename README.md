@@ -28,7 +28,7 @@ If you run into a bug, please report it; bugfixes are high priority. If you have
 * [Frontpage](https://zorbathut.github.io/dec/release/)
 
 * [Quick start](https://zorbathut.github.io/dec/release/quickstart/introduction.html)
-
+* 
 * [API reference](https://zorbathut.github.io/dec/release/api/index.html)
 
 * [Example project: Legend of the Amethyst Futon](example/loaf)
@@ -179,6 +179,9 @@ public class GoblinGenerator
 }
 ```
 
+#### Set up the logging so you don't miss errors.
+
+[Read this](https://zorbathut.github.io/dec/release/documentation/logging.html), it's important.
 
 ### Extras
 
