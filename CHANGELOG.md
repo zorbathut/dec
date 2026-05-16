@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 
-## [unreleased]
+## [v0.11.1]
 ### Added
 * Support for IList/IDictionary/ISet containers, besides the "standard" examples of those.
 * Threading contract documentation in ARCHITECTURE.md.
