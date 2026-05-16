@@ -100,25 +100,14 @@
 </code></pre>
 <p>Read on for more explanation.</p>
 <h2 id="logging">Logging</h2>
-<p>Dec will generate warning and error messages. <i>It is strongly recommended that you make these unignorable to developers.</i> Popup windows and modal dialogs may be appropriate here; Dec does its best to recover from errors, which is great for mod compatibility but can be frustrating for developers if the error message is easily missable.</p>
-<p>By default, Dec will output to your normal system error log (Unity log for Unity programs, C# console otherwise) <i>and also throw exceptions</i>. If you have your own logging framework, or want to decorate Dec messages with a recognizable tag, this is the place to do it. <a class="xref" href="../api/Dec.Config.html#Dec_Config_InfoHandler">Dec.Config.InfoHandler</a>, <a class="xref" href="../api/Dec.Config.html#Dec_Config_WarningHandler">Dec.Config.WarningHandler</a>, <a class="xref" href="../api/Dec.Config.html#Dec_Config_ErrorHandler">Dec.Config.ErrorHandler</a>, and <a class="xref" href="../api/Dec.Config.html#Dec_Config_ExceptionHandler">Dec.Config.ExceptionHandler</a> can all be assigned separately for their respective type of log message.</p>
+<p>Dec generates warning and error messages. <em>It is strongly recommended that you make these unignorable to developers.</em> We recommend popup windows and modal dialogs; Dec is designed to aggressively recover from errors, which is great for mod compatibility and frustrating for developers if the error message is easily missable.</p>
+<p>By default, Dec routes messages to the engine-appropriate log (Unity, Godot, or the C# console) <i>and also throws exceptions on warnings and errors</i>. The first time you hit one, the exception will tell you how to turn this off. You'll usually want to install your own <a class="xref" href="../api/Dec.Config.html#Dec_Config_InfoHandler">InfoHandler</a> / <a class="xref" href="../api/Dec.Config.html#Dec_Config_WarningHandler">WarningHandler</a> / <a class="xref" href="../api/Dec.Config.html#Dec_Config_ErrorHandler">ErrorHandler</a> / <a class="xref" href="../api/Dec.Config.html#Dec_Config_ExceptionHandler">ExceptionHandler</a>:</p>
 <pre><code class="lang-cs">Dec.Config.InfoHandler = str =&gt; YourGame.Logging.LogInfoMessage(str);
 Dec.Config.WarningHandler = str =&gt; YourGame.Logging.LogWarningMessage(str);
 Dec.Config.ErrorHandler = str =&gt; YourGame.Logging.LogErrorMessage(str);
 Dec.Config.ExceptionHandler = e =&gt; YourGame.Logging.LogException(e);
 </code></pre>
-<p>If you're fine with warnings and errors reaching your standard error log, <i>and expect to see them</i>, then it is strongly recommended that you disable error exceptions. Dec will automatically recover from a wide variety of issues, usually guessing reasonably regarding the intent and the safest fallback. This is not recommended if you're unlikely to see errors; errors are there to be fixed!</p>
-<pre><code class="lang-cs">Dec.Config.DefaultHandlerThrowExceptions = Dec.Config.DefaultExceptionBehavior.None;
-</code></pre>
-<p>This is not necessary if you're overridden the handlers yourself; it applies only to the default handlers.</p>
-<h2 id="exceptions">Exceptions</h2>
-<p>As mentioned above, Dec attempts to recover from errors whenever possible. However, we've found that new Dec developers often miss error messages and end up very confused. To help with that, Dec's default log handler throws exceptions on warnings and errors, along with an explanatory message about how this can be suppressed; specifically, through <a class="xref" href="../api/Dec.Config.html#Dec_Config_DefaultHandlerThrowExceptions">Dec.Config.DefaultHandlerThrowExceptions</a>.</p>
-<pre><code class="lang-cs">Dec.Config.DefaultHandlerThrowExceptions = Dec.Config.DefaultExceptionBehavior.Never;
-</code></pre>
-<p>If you want to keep the exception behavior, but don't want the message, the message alone can be suppressed with <a class="xref" href="../api/Dec.Config.html#Dec_Config_DefaultHandlerShowConfigOnException">Dec.Config.DefaultHandlerShowConfigOnException</a>.</p>
-<pre><code class="lang-cs">Dec.Config.DefaultHandlerShowConfigOnException = false;
-</code></pre>
-<p>If you've defined your own logging handlers, Dec's default exception throwing will be automatically disabled. You can throw your own exceptions if you prefer that behavior.</p>
+<p>See <a href="../documentation/logging.html">Logging</a> for more details and justifications.</p>
 <h2 id="namespaces">Namespaces</h2>
 <p>It's common to specify classes within Dec XML. It's also common for games to be contained within their own namespaces, which makes class names verbose and slow to type. <a class="xref" href="../api/Dec.Config.html#Dec_Config_UsingNamespaces">Dec.Config.UsingNamespaces</a> lets you provide Dec with your game namespaces in the manner of a C# <code>using</code> directive. You can specify as many namespaces as you like.</p>
 <pre><code class="lang-cs">Dec.Config.UsingNamespaces = new string[] { &quot;YourGame&quot;, &quot;YourGame.Gameplay&quot; };

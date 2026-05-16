@@ -777,6 +777,16 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "documentation/logging.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/logging.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "documentation/mergemodes.md",
       "output": {
         ".html": {

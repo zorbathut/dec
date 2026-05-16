@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Logging </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Logging ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/zorbathut/dec/blob/dev/doc/documentation/logging.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="logging">Logging</h1>
+
+<p><strong>THIS IS VERY IMPORTANT AND YOU SHOULD READ IT.</strong></p>
+<p>Dec is designed to be highly robust in the face of errors. It will recover from missing fields, dubious XML, broken references, and type mismatches whenever possible, and it will do its absolute best to make reasonable decisions as to what an intuitive fallback would be. This is a critical property for mod support - you don't want a single broken mod to crash the entire load - but it has the unfortunate side effect that errors can be easy to miss if you don't have good logging in place.</p>
+<p>As a result, Dec defaults to treating errors as immediately lethal. It will throw an exception for the slightest issue. However, because this isn't the intended run mode, that exception will include a message telling you how to turn off the throw-on-error behavior, and directing you to this webpage. (Perhaps that's how you found it?)</p>
+<p>It is <em>strongly</em> recommended that you set up something that will be impossible to miss. In this author's experience, anything directed to an error log is not visible enough; how many errors does your game output on startup? This author has seen &quot;about four hundred&quot; considered perfectly reasonable and not worthy of concern, and disagrees strongly with that choice. We recommend modal popups of one kind or another so you can't miss them and so they're annoying enough that you fix them. See Rimworld's development-mode console log window for a good example.</p>
+<p>If you have a bug report, and the bug turned out to be &quot;I wasn't reading the error&quot;, we will direct you to this webpage. If you complain about Dec throwing exceptions for the slightest issue, we will direct you to this webpage. In both cases, the solution is &quot;first, read your errors&quot;.</p>
+<p>Note that I won't blame you <em>too</em> much for making this mistake because ignoring errors is endemic in the game industry, which you are presumably part of. But you should still do better; your life will be improved by it.</p>
+<p> </p>
+<p>If you have a better idea for how to get people to <em>read this webpage and stop ignoring errors</em>, please suggest it, 'cause I'm all out of ideas.</p>
+<h2 id="recommended-setup">Recommended setup</h2>
+<p>For a shipping game, the recommended configuration is:</p>
+<ol>
+<li>Replace <a class="xref" href="../api/Dec.Config.html#Dec_Config_WarningHandler">WarningHandler</a> and <a class="xref" href="../api/Dec.Config.html#Dec_Config_ErrorHandler">ErrorHandler</a> with something that surfaces messages visibly and unignorably to whoever is running the build - devs see popups, testers see extremely visible in-game banners, CI sees a build failure.</li>
+<li>Replace <a class="xref" href="../api/Dec.Config.html#Dec_Config_ExceptionHandler">ExceptionHandler</a> with the same (often implemented in terms of ErrorHandler.)</li>
+<li><a class="xref" href="../api/Dec.Config.html#Dec_Config_InfoHandler">InfoHandler</a> can stay routed at a normal log or be silenced entirely in release builds.</li>
+<li>If you've left any of the default warning/error handlers in place, which is reasonable if you're intercepting messages from the engine logging system, set <a class="xref" href="../api/Dec.Config.html#Dec_Config_DefaultHandlerThrowExceptions">DefaultHandlerThrowExceptions</a> to <code>Never</code> so they stop throwing on you.</li>
+</ol>
+<p>Be aware that multithread-capable parts of Dec will happily call these functions from multiple threads simultaneously; ensure your implementations are threadsafe. Don't bother being clever with this - if you're getting enough error spam that simple mutexes are a performance issue, then thread contention is the least of your issues.</p>
+<p>Errors are meant to be fixed, not suppressed. Configure logging so they're impossible to ignore.</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/zorbathut/dec/blob/dev/doc/documentation/logging.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
