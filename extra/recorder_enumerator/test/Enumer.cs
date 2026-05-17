@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Reflection;
 using DecTest;
 using NUnit.Framework;
 
@@ -56,6 +57,36 @@ namespace RecorderEnumeratorTest
             var clone = DoRecorderRoundTrip(lienum, recorderMode);
 
             // there's not much I can really test here
+        }
+
+        [Test]
+        public void InitialThreadIdReset([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode recorderMode)
+        {
+            var dataReporter = new DataReporter();
+            dataReporter.reporter = dataReporter.PrintTheNumber().GetEnumerator();
+
+            var clone = DoRecorderRoundTrip(dataReporter, recorderMode);
+
+            var field = clone.reporter.GetType().GetField("<>l__initialThreadId", BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.IsNotNull(field, "<>l__initialThreadId field not found on iterator state machine");
+            Assert.AreEqual(-1, field.GetValue(clone.reporter));
+        }
+
+        [Test]
+        public void InitialThreadIdChecksumInvariant()
+        {
+            var dataReporter = new DataReporter();
+            dataReporter.reporter = dataReporter.PrintTheNumber().GetEnumerator();
+
+            var field = dataReporter.reporter.GetType().GetField("<>l__initialThreadId", BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.IsNotNull(field);
+
+            var originalChecksum = Dec.Recorder.Checksum(dataReporter);
+
+            field.SetValue(dataReporter.reporter, 12345);
+            var mutatedChecksum = Dec.Recorder.Checksum(dataReporter);
+
+            Assert.AreEqual(originalChecksum, mutatedChecksum);
         }
     }
 }

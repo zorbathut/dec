@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 
 
+## [unreleased]
+### Improved
+* RecorderEnumerator: Skip `<>l__initialThreadId` and reset it to an invalid value on deserialization, making behavior and checksums slightly more reliable.
+
+
 ## [v0.11.1]
 ### Added
 * Support for IList/IDictionary/ISet containers, besides the "standard" examples of those.
