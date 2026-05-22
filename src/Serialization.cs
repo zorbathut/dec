@@ -1789,7 +1789,7 @@ namespace Dec
 
                     return TypeDescriptor.GetConverter(type).ConvertFromString(text);
                 }
-                catch (System.Exception e)  // I would normally not catch System.Exception, but TypeConverter is wrapping FormatException in an Exception for some reason
+                catch (System.Exception)  // I would normally not catch System.Exception, but TypeConverter is wrapping FormatException in an Exception for some reason
                 {
                     Dbg.Err($"{context}: {text} is not a valid value for {type.Name}");
                     return original;
