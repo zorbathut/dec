@@ -375,6 +375,36 @@ namespace DecTest
             Assert.AreNotEqual(deserialized.childAone, deserialized.childB);
         }
 
+        [Test]
+        public void UnresolvableClass()
+        {
+            // Simulates a stale save file referencing a class that has since been renamed or deleted.
+            string serialized = @"
+                <Record>
+                  <recordFormatVersion>1</recordFormatVersion>
+                  <refs>
+                    <Ref id=""PLACE"" class=""DecTest.RecorderRef.ClassThatNoLongerExists"" />
+                    <Ref id=""ref00000"" class=""DecTest.RecorderRef.RefsChildRecordable"" />
+                  </refs>
+                  <data>
+                    <childAone ref=""ref00000"" />
+                    <childAtwo ref=""ref00000"" />
+                    <childB />
+                    <childEmpty ref=""PLACE"" />
+                  </data>
+                </Record>";
+            RefsRootRecordable deserialized = null;
+            ExpectErrors(() => deserialized = Dec.Recorder.Read<RefsRootRecordable>(serialized), err => err.Contains("Couldn't find type named") || err.Contains("without a valid reference mapping"));
+
+            Assert.IsNotNull(deserialized.childAone);
+            Assert.IsNotNull(deserialized.childAtwo);
+            Assert.IsNotNull(deserialized.childB);
+            Assert.IsNull(deserialized.childEmpty);
+
+            Assert.AreEqual(deserialized.childAone, deserialized.childAtwo);
+            Assert.AreNotEqual(deserialized.childAone, deserialized.childB);
+        }
+
         struct AStruct { }
 
         [Test]

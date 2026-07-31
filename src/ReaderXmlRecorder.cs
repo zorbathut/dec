@@ -81,13 +81,19 @@ namespace Dec
                     reference.Attribute("id").Remove();
 
                     var className = reference.Attribute("class")?.Value;
-                    if (className == null)
+                    if (string.IsNullOrEmpty(className))
                     {
                         Dbg.Err($"{context}: Missing reference class name");
                         continue;
                     }
 
                     readerRef.type = (Type)Serialization.ParseString(className, typeof(Type), null, context);
+                    if (readerRef.type == null)
+                    {
+                        // ParseString has already reported the error
+                        continue;
+                    }
+
                     if (readerRef.type.IsValueType)
                     {
                         Dbg.Err($"{context}: Reference assigned type {readerRef.type}, which is a value type");

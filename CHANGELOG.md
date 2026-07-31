@@ -6,6 +6,9 @@ All notable changes to this project will be documented in this file.
 ### Improved
 * RecorderEnumerator: Skip `<>l__initialThreadId` and reset it to an invalid value on deserialization, making behavior and checksums slightly more reliable.
 
+### Fixed
+* Recorder.Read crash on a `<Ref>` element with invalid `class`.
+
 
 ## [v0.11.1]
 ### Added
