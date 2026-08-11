@@ -45,24 +45,28 @@ namespace Dec
             var inputOrder = input.OrderBy(tiebreaker).ToArray();
             var seen = new Status[inputOrder.Length];
 
-            List<List<T>> dependenciesCompiled = new List<List<T>>();
+            var indexLookup = new Dictionary<T, int>();
+            for (int i = 0; i < inputOrder.Length; i++)
+            {
+                indexLookup[inputOrder[i]] = i;
+            }
+
+            List<List<int>> dependenciesCompiled = new List<List<int>>();
             foreach (var t in inputOrder)
             {
                 // unnecessary allocations but whatever
-                dependenciesCompiled.Add(new List<T>());
+                dependenciesCompiled.Add(new List<int>());
             }
 
             foreach (var dep in dependencies)
             {
-                int beforeIndex = Array.IndexOf(inputOrder, dep.before);
-                int afterIndex = Array.IndexOf(inputOrder, dep.after);
-                if (beforeIndex == -1 || afterIndex == -1)
+                if (!indexLookup.TryGetValue(dep.before, out int beforeIndex) || !indexLookup.TryGetValue(dep.after, out int afterIndex))
                 {
                     Dbg.Err($"Dependency references an item not in the input list: {dep.before} -> {dep.after}. If you want this to work, go pester Zorba on Discord.");
                     continue;
                 }
 
-                dependenciesCompiled[afterIndex].Add(dep.before);
+                dependenciesCompiled[afterIndex].Add(beforeIndex);
             }
 
             List<T> result = new List<T>();
@@ -74,7 +78,7 @@ namespace Dec
             return result;
         }
 
-        private static void Visit(T[] inputOrder, int i, Status[] status, List<List<T>> dependenciesCompiled, List<T> result)
+        private static void Visit(T[] inputOrder, int i, Status[] status, List<List<int>> dependenciesCompiled, List<T> result)
         {
             if (status[i] == Status.Visited)
             {
@@ -89,10 +93,8 @@ namespace Dec
 
             status[i] = Status.Visiting;
 
-            foreach (var dep in dependenciesCompiled[i])
+            foreach (var depIndex in dependenciesCompiled[i])
             {
-                // this is absolutely a lot slower than it needs to be
-                int depIndex = Array.IndexOf(inputOrder, dep);
                 Visit(inputOrder, depIndex, status, dependenciesCompiled, result);
             }
 
