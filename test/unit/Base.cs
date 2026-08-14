@@ -21,7 +21,7 @@ namespace DecTest
             Dec.Config.CompatDecLookup = null;
 
             // flatten these entirely for the sake of tests that don't list anything
-            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] {}, explicitConverters = new Type[] {}, explicitStaticRefs = new Type[] {}});
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] {}, explicitConverters = new Type[] {}, explicitStaticRefs = new Type[] {}, explicitSetupScanTypes = new Type[] {}});
 
             // stop verifying things
             errorValidator = null;

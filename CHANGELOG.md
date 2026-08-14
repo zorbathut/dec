@@ -3,6 +3,15 @@ All notable changes to this project will be documented in this file.
 
 
 ## [unreleased]
+### Added
+* `[Dec.Setup]`, `[Dec.SetupAfter]`, and `[Dec.SetupBefore]` attributes, enabling an attribute-driven setup graph that generalizes ConfigErrors/PostLoad.
+
+### Breaking
+* `SetupDependsOnAttribute` removed, replaced with `[Dec.SetupAfter]`.
+
+### Obsoleted
+* `ConfigErrors` and `PostLoad` are now marked `[Obsolete]` in favor of `[Dec.Setup]` functions. They'll be removed in the future.
+
 ### Improved
 * RecorderEnumerator: Skip `<>l__initialThreadId` and reset it to an invalid value on deserialization, making behavior and checksums slightly more reliable.
 * `Dag.CalculateOrder` no longer has quadratic behavior on large inputs.

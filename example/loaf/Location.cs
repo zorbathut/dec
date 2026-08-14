@@ -54,7 +54,8 @@ namespace Loaf
             return (Location)Activator.CreateInstance(type, this);
         }
 
-        public override void ConfigErrors(Action<string> report)
+        [Dec.Setup]
+        private void ValidateType(Action<string> report)
         {
             if (type == null)
             {

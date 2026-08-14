@@ -77,12 +77,8 @@ namespace Dec
         }
 
         /// <summary>
-        /// Finish all parsing.
+        /// Finish all parsing and run Dec.Setup functions.
         /// </summary>
-        /// <remarks>
-        /// The `dependencies` parameter can be used to feed in dependencies for the PostLoad function.
-        /// This is a placeholder and is probably going to be replaced at some point, though only with something more capable.
-        /// </remarks>
         public void Finish()
         {
             parserModdable.Finish();

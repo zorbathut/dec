@@ -166,6 +166,7 @@ namespace Dec
 
         // Data stored from initialization parameters
         private List<Type> staticReferences = new List<Type>();
+        private List<Setup.StaticSetupMethod> staticSetupMethods = new List<Setup.StaticSetupMethod>();
         private Recorder.IUserSettings userSettings;
 
         // Modules
@@ -220,6 +221,77 @@ namespace Dec
                 }
             }
 
+            {
+                // Scan for static [Dec.Setup] functions, and for setup attributes misplaced on structs. Instance setup functions are not scanned; they're discovered lazily as instances of their types are parsed.
+                IEnumerable<Type> setupScanTypes;
+                if (!unitTestMode)
+                {
+                    setupScanTypes = UtilReflection.GetAllUserTypes();
+                }
+                else if (Config.TestParameters.explicitSetupScanTypes != null)
+                {
+                    setupScanTypes = Config.TestParameters.explicitSetupScanTypes;
+                }
+                else
+                {
+                    setupScanTypes = Enumerable.Empty<Type>();
+                }
+
+                foreach (var type in setupScanTypes)
+                {
+                    if (type.IsValueType)
+                    {
+                        if (type.IsEnum || type.IsPrimitive)
+                        {
+                            continue;
+                        }
+
+                        foreach (var method in type.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
+                        {
+                            if (method.GetCustomAttribute<SetupAttribute>(inherit: false) != null || method.GetCustomAttributes<SetupAfterAttribute>(inherit: false).Any() || method.GetCustomAttributes<SetupBeforeAttribute>(inherit: false).Any())
+                            {
+                                string rationale = method.IsStatic ? "" : "; struct instances are copied during parsing and any mutations would be lost";
+                                Dbg.Err($"{type}.{method.Name} is tagged as a setup function, but setup functions are not supported on structs{rationale}");
+                            }
+                        }
+
+                        continue;
+                    }
+
+                    if (!type.IsClass)
+                    {
+                        continue;
+                    }
+
+                    foreach (var method in type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
+                    {
+                        var setupAttribute = method.GetCustomAttribute<SetupAttribute>(inherit: false);
+                        if (setupAttribute == null)
+                        {
+                            if (method.GetCustomAttributes<SetupAfterAttribute>(inherit: false).Any() || method.GetCustomAttributes<SetupBeforeAttribute>(inherit: false).Any())
+                            {
+                                Dbg.Err($"{type}.{method.Name} has a [Dec.SetupAfter] or [Dec.SetupBefore] attribute but no [Dec.Setup]; the ordering constraint has no effect");
+                            }
+
+                            continue;
+                        }
+
+                        if (type.IsGenericTypeDefinition)
+                        {
+                            Dbg.Err($"{type}.{method.Name} cannot be a setup function because {type} is a generic type definition");
+                            continue;
+                        }
+
+                        if (!UtilReflection.ValidateSetupSignature(method))
+                        {
+                            continue;
+                        }
+
+                        staticSetupMethods.Add(new Setup.StaticSetupMethod { method = method, attribute = setupAttribute });
+                    }
+                }
+            }
+
             Serialization.Initialize();
         }
 
@@ -241,12 +313,8 @@ namespace Dec
         }
 
         /// <summary>
-        /// Finish all parsing.
+        /// Finish all parsing and run Dec.Setup functions.
         /// </summary>
-        /// <remarks>
-        /// The `dependencies` parameter can be used to feed in dependencies for the PostLoad function.
-        /// This is a placeholder and is probably going to be replaced at some point, though only with something more capable.
-        /// </remarks>
         public void Finish()
         {
             using (var _ = new CultureInfoScope(Config.CultureInfo))
@@ -257,7 +325,8 @@ namespace Dec
                 }
                 s_Status = Status.Processing;
 
-                var readerContext = new ReaderGlobals() { allowReflection = true, allowRefs = false, writeDecPaths = true };
+                var setupCollection = new Setup.Collection(excludeDatabaseOwned: false);
+                var readerContext = new ReaderGlobals() { allowReflection = true, allowRefs = false, writeDecPaths = true, setupCollection = setupCollection };
 
                 // Collate reader decs
                 var registeredDecs = new Dictionary<(Type, string), List<ReaderFileDec.ReaderDec>>();
@@ -496,55 +565,7 @@ namespace Dec
                     list.Add(dec);
                 }
 
-                List<Dag<Type>.Dependency> postLoadDependencies = new List<Dag<Type>.Dependency>();
-                foreach (var type in decTypes)
-                {
-                    foreach (var rsaa in type.Key.GetCustomAttributes<SetupDependsOnAttribute>())
-                    {
-                        var dependsOn = rsaa.Type;
-
-                        // make sure it inherits from Dec.Dec
-                        if (!dependsOn.IsSubclassOf(typeof(Dec)))
-                        {
-                            Dbg.Err($"{type.Key} has a SetupDependsOnAttribute on {dependsOn}, but {dependsOn} is not a Dec type");
-                            continue;
-                        }
-
-                        if (!decTypes.ContainsKey(rsaa.Type))
-                        {
-                            Dbg.Err($"{type.Key} has a SetupDependsOnAttribute on {dependsOn}, but {dependsOn} is not a known Dec type; this might result in weird behavior, either create an instance of {dependsOn} or pester ZorbaTHut on Discord if you need this fixed");
-                            continue;
-                        }
-
-                        postLoadDependencies.Add(new Dag<Type>.Dependency { before = rsaa.Type, after = type.Key });
-                    }
-                }
-
-                var postprocessOrder = Dag<Type>.CalculateOrder(decTypes.Keys, postLoadDependencies, t => t.Name);
-
-                foreach (var type in postprocessOrder)
-                {
-                    foreach (var dec in decTypes[type])
-                    {
-                        try
-                        {
-                            dec.ConfigErrors(err => Dbg.Err($"{dec}: {err}"));
-                        }
-                        catch (Exception e)
-                        {
-                            Dbg.Ex(new Exception($"Exception thrown during ConfigErrors on {dec}", e));
-                        }
-
-                        try
-                        {
-                            dec.PostLoad(err => Dbg.Err($"{dec}: {err}"));
-                        }
-                        catch (Exception e)
-                        {
-                            Dbg.Ex(new Exception($"Exception thrown during PostLoad on {dec}", e));
-                        }
-                    }
-                }
+                Setup.ExecuteParser(staticSetupMethods, decTypes, setupCollection);
 
                 // Invert the dec path lookup tables; these were presumably filled out during PostLoad
                 Database.DecPathResolveDatabase();
@@ -577,13 +598,13 @@ namespace Dec
             switch (s_Status)
             {
                 case Status.Uninitialized:
-                    Dbg.Err($"A static reference class was accessed before any Parser had been created; the dec database is empty. Static reference fields are not populated until the ConfigErrors/PostLoad step of Parser.Finish().");
+                    Dbg.Err($"A static reference class was accessed before any Parser had been created; the dec database is empty. Static reference fields are not populated until the setup step of Parser.Finish().");
                     break;
                 case Status.Accumulating:
-                    Dbg.Err($"A static reference class was accessed while the Parser was still accumulating input, before Parser.Finish() was called. Static reference fields are not populated until the ConfigErrors/PostLoad step of Parser.Finish().");
+                    Dbg.Err($"A static reference class was accessed while the Parser was still accumulating input, before Parser.Finish() was called. Static reference fields are not populated until the setup step of Parser.Finish().");
                     break;
                 case Status.Processing:
-                    Dbg.Err($"A static reference class was accessed during dec parsing, most likely from a Dec constructor, field initializer, or converter. Static reference fields are not populated until the ConfigErrors/PostLoad step of Parser.Finish().");
+                    Dbg.Err($"A static reference class was accessed during dec parsing, most likely from a Dec constructor, field initializer, or converter. Static reference fields are not populated until the setup step of Parser.Finish().");
                     break;
                 case Status.Distributing:
                     Dbg.Err($"A static reference class was accessed during the static-reference distribution phase, but was not registered with this Parser. Verify that it is tagged with [StaticReferences] and is reachable by Dec's type discovery.");

@@ -282,6 +282,7 @@ namespace DecTest
             public bool touchedBefore = false;
             public bool touchedAfter = false;
 
+            #pragma warning disable CS0672, CS0618
             public override void ConfigErrors(Action<string> report)
             {
                 base.ConfigErrors(report);
@@ -292,6 +293,7 @@ namespace DecTest
 
                 touchedAfter = true;
             }
+            #pragma warning restore CS0672, CS0618
         }
 
         public class PostLoadErrorDec : Dec.Dec
@@ -299,6 +301,7 @@ namespace DecTest
             public bool touchedBefore = false;
             public bool touchedAfter = false;
 
+            #pragma warning disable CS0672, CS0618
             public override void PostLoad(Action<string> report)
             {
                 base.PostLoad(report);
@@ -309,12 +312,14 @@ namespace DecTest
 
                 touchedAfter = true;
             }
+            #pragma warning restore CS0672, CS0618
         }
 
         public class ErrorExceptionDec : Dec.Dec
         {
             public bool touched = false;
 
+            #pragma warning disable CS0672, CS0618
             public override void ConfigErrors(Action<string> report)
             {
                 base.ConfigErrors(report);
@@ -323,12 +328,14 @@ namespace DecTest
 
                 throw new FormatException();
             }
+            #pragma warning restore CS0672, CS0618
         }
 
         public class PostLoadErrorExceptionDec : Dec.Dec
         {
             public bool touched = false;
 
+            #pragma warning disable CS0672, CS0618
             public override void PostLoad(Action<string> report)
             {
                 base.PostLoad(report);
@@ -337,6 +344,7 @@ namespace DecTest
 
                 throw new FormatException();
             }
+            #pragma warning restore CS0672, CS0618
         }
 
         [Test]
@@ -423,12 +431,14 @@ namespace DecTest
         {
             public bool initted = false;
 
+            #pragma warning disable CS0672, CS0618
             public override void PostLoad(Action<string> report)
             {
                 base.PostLoad(report);
 
                 initted = true;
             }
+            #pragma warning restore CS0672, CS0618
         }
 
         [Test]

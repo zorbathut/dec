@@ -52,9 +52,19 @@ namespace Dec
             return DecForbidden.Contains(obj);
         }
 
+        // Reference-identity mirror of DecPathLookupComplete's key set, for DecPathKnown. The dictionaries use default equality, which is fine for their own lookups, but the setup exclusion must not treat a fresh savegame object as database-owned just because it Equals one, and must never run user GetHashCode/Equals during a Read.
+        private static HashSet<object> DecPathKnownSet = new HashSet<object>(Setup.ReferenceEqualityComparer.Instance);
+
         internal static void DecPathRegister(object obj, Path path)
         {
             DecPathLookupComplete[obj] = path;
+            DecPathKnownSet.Add(obj);
+        }
+
+        // Whether this exact object is owned by the dec database; a dec-path ref always resolves to the identical database instance, so reference identity is the correct membership test. Safe to call from concurrent Recorder reads; the only post-Finish mutation path is DecLookupRegisterCustom, which the threading contract already restricts to single-threaded use.
+        internal static bool DecPathKnown(object obj)
+        {
+            return DecPathKnownSet.Contains(obj);
         }
 
         internal static object GetFromDecPath(string path)
@@ -134,6 +144,7 @@ namespace Dec
 
             DecPathLookup[obj] = path;
             DecPathLookupComplete[obj] = path;
+            DecPathKnownSet.Add(obj);
             DecPathLookupReverse[serialized] = obj;
         }
 
@@ -348,6 +359,7 @@ namespace Dec
             Lookup.Clear();
             DecPathLookup.Clear();
             DecPathLookupComplete.Clear();
+            DecPathKnownSet.Clear();
             DecPathLookupReverse.Clear();
             DecPathLookupUnusable.Clear();
             DecPathLookupConflicts.Clear();
@@ -373,6 +385,7 @@ namespace Dec
 
             UtilReflection.IndexInfoCached.Clear();
             UtilReflection.SerializableFieldsCached.Clear();
+            UtilReflection.SetupInfoCached.Clear();
 
             SuppressEmptyWarningFlag = false;
         }

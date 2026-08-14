@@ -578,17 +578,23 @@ namespace Dec
             var result = ParseElement_Worker(nodes, type, original, globals, recSettings, fieldInfo, isRootDec, hasReferenceId, asThis, ordersOverride);
 
             // I just really don't want to put this code at the end of *every single return*, that would be insane
-            // we don't allow dec references, we've already got those!
-            if (globals.writeDecPaths && result != null)
+            if (result != null)
             {
-                var resultType = result.GetType();
-
-                // I really feel like whatever I'm expressing here must exist elsewhere in the codebase, but I can't find it
-                if (!resultType.IsValueType && resultType != typeof(string) && resultType != typeof(Type) && resultType != TypeSystemRuntimeType && !typeof(Dec).IsAssignableFrom(resultType))
+                // dec-path registration is parser-only; it writes static database state
+                if (globals.writeDecPaths)
                 {
-                    // these paths *should* all match up, so we're just choosing one
-                    Database.DecPathRegister(result, nodes[0].GetContext().path);
+                    var resultType = result.GetType();
+
+                    // I really feel like whatever I'm expressing here must exist elsewhere in the codebase, but I can't find it
+                    if (!resultType.IsValueType && resultType != typeof(string) && resultType != typeof(Type) && resultType != TypeSystemRuntimeType && !typeof(Dec).IsAssignableFrom(resultType))
+                    {
+                        // these paths *should* all match up, so we're just choosing one
+                        Database.DecPathRegister(result, nodes[0].GetContext().path);
+                    }
                 }
+
+                // setup collection is per-load-operation and does its own filtering; present for parser and recorder loads, null for clones
+                globals.setupCollection?.RegisterInstance(result);
             }
 
             return result;

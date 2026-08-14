@@ -17,6 +17,7 @@ namespace DecTest
             public List<StubRecordable> list;
             public Dictionary<string, StubRecordable> dictionary;
 
+            #pragma warning disable CS0672, CS0618
             public override void PostLoad(Action<string> reporter)
             {
                 base.PostLoad(reporter);
@@ -43,6 +44,7 @@ namespace DecTest
                     Dec.Database.DecLookupEnable(item);
                 }
             }
+            #pragma warning restore CS0672, CS0618
         }
 
         [SetUp]

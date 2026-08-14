@@ -23,7 +23,8 @@ public class MonsterDec : Dec.Dec
 
     [NonSerialized] public float[] blessingChance;
 
-    public void PostLoad(Action<string> reporter)
+    [Dec.Setup]
+    private void CalculateBlessings(Action<string> reporter)
     {
         blessingChance = new float[Index<BlessingDec>.Count];
         for (int i = 0; i < Index<BlessingDec>.Count; ++i)
@@ -46,6 +47,8 @@ public float FindBlessingChance(MonsterDec monster, BlessingDec blessing)
     return monster.blessingChance[blessing.index];
 }
 ```
+
+(`[Dec.Setup]` marks a post-load setup function; see [Setup functions](setup.md) for the details, including how to order these against each other.)
 
 These values have no defined order and are *not* consistent between execution runs - don't use them as part of serializing savegames!
 

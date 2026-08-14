@@ -123,7 +123,7 @@ dotnet pack src/dec.csproj -c Release
 ### Data Flow
 
 1. XML files → Parser → Serialization → Dec instances → Database registration
-2. After loading: Static references filled → ConfigErrors() → PostLoad()
+2. After loading: Static references filled → setup DAG (ConfigErrors/PostLoad plus [Dec.Setup] functions, ordered by [Dec.SetupAfter]/[Dec.SetupBefore])
 3. For serialization: Objects → Recorder → Serialization → XML output
 
 ## Testing Structure

@@ -78,7 +78,7 @@ namespace Dec
                 // We'll be doing a second parse to parse *many* of these, but not all
                 var furtherParsing = new List<Action>();
                 var refDict = new Dictionary<string, object>();
-                var readerGlobals = new ReaderGlobals() { allowReflection = false, allowRefs = true };
+                var readerGlobals = new ReaderGlobals() { allowReflection = false, allowRefs = true, setupCollection = new Setup.Collection(excludeDatabaseOwned: true) };
 
                 foreach (var reference in refs)
                 {
@@ -204,7 +204,17 @@ namespace Dec
 
                 // And now, we can finally parse our actual root element!
                 // (which accounts for a tiny percentage of things that need to be parsed)
-                return Serialization.ParseElementTyped<T>(new List<ReaderNodeParseable>() { parseNode }, typeof(T), null, readerGlobals, new Recorder.Settings() { shared = Settings.Shared.Flexible });
+                var result = Serialization.ParseElementTyped<T>(new List<ReaderNodeParseable>() { parseNode }, typeof(T), null, readerGlobals, new Recorder.Settings() { shared = Settings.Shared.Flexible });
+
+                // Register the ref objects for setup now rather than at creation time; three of the four creation branches above never pass through ParseElement's hook, and registering pre-population stubs would probe user GetHashCode/Equals on default-fields objects. By this point everything is populated, and dedup absorbs whatever the hook already caught.
+                foreach (var reference in refs)
+                {
+                    readerGlobals.setupCollection.RegisterInstance(refDict[reference.id]);
+                }
+
+                Setup.ExecuteRecorder(readerGlobals.setupCollection);
+
+                return result;
             }
         }
 
@@ -223,11 +233,15 @@ namespace Dec
                     return default;
                 }
 
-                var readerContext = new ReaderGlobals() { allowReflection = false, allowRefs = false };
+                var readerContext = new ReaderGlobals() { allowReflection = false, allowRefs = false, setupCollection = new Setup.Collection(excludeDatabaseOwned: true) };
 
                 // And now, we can finally parse our actual root element!
                 // (which accounts for a tiny percentage of things that need to be parsed)
-                return Serialization.ParseElementTyped<T>(new List<ReaderNodeParseable>() { reader }, typeof(T), null, readerContext, new Recorder.Settings() { shared = Settings.Shared.Flexible });
+                var result = Serialization.ParseElementTyped<T>(new List<ReaderNodeParseable>() { reader }, typeof(T), null, readerContext, new Recorder.Settings() { shared = Settings.Shared.Flexible });
+
+                Setup.ExecuteRecorder(readerContext.setupCollection);
+
+                return result;
             }
         }
 

@@ -116,6 +116,91 @@ namespace DecTest
             Assert.AreEqual(0, failedIterations, $"Serialization.Initialize() race condition detected in {failedIterations}/{iterations} iterations");
         }
 
+        // Setup-bearing recordable for ParallelReadSetupIsolation; records itself into a shared map so we can verify exactly-once execution per instance.
+        public class SetupTrackObj : Dec.IRecordable
+        {
+            public static ConcurrentDictionary<object, int> Invocations = new ConcurrentDictionary<object, int>();
+
+            public int payload;
+
+            [Dec.Setup]
+            internal void M(Action<string> reporter)
+            {
+                Invocations.AddOrUpdate(this, 1, (_, count) => count + 1);
+            }
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref payload, "payload");
+            }
+        }
+
+        public class SetupTrackRoot : Dec.IRecordable
+        {
+            public System.Collections.Generic.List<SetupTrackObj> items;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref items, "items");
+            }
+        }
+
+        [Test]
+        public void ParallelReadSetupIsolation()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { } });
+
+            SetupTrackObj.Invocations = new ConcurrentDictionary<object, int>();
+
+            const int perDocument = 5;
+            var root = new SetupTrackRoot { items = new System.Collections.Generic.List<SetupTrackObj>() };
+            for (int i = 0; i < perDocument; i++)
+            {
+                root.items.Add(new SetupTrackObj { payload = i });
+            }
+            string serialized = Dec.Recorder.Write(root);
+
+            int threadCount = Math.Max(Environment.ProcessorCount, 4);
+            var barrier = new Barrier(threadCount);
+            var threads = new Thread[threadCount];
+            var exceptions = new ConcurrentBag<Exception>();
+
+            for (int i = 0; i < threadCount; i++)
+            {
+                threads[i] = new Thread(() =>
+                {
+                    barrier.SignalAndWait();
+                    try
+                    {
+                        var result = Dec.Recorder.Read<SetupTrackRoot>(serialized);
+                        if (result?.items?.Count != perDocument)
+                        {
+                            throw new InvalidOperationException("bad read result");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        exceptions.Add(e);
+                    }
+                });
+                threads[i].Start();
+            }
+
+            foreach (var t in threads)
+            {
+                t.Join();
+            }
+
+            Assert.IsTrue(exceptions.IsEmpty, $"exceptions during concurrent reads: {string.Join("; ", exceptions)}");
+
+            // every read produced its own instances, each of which got setup exactly once
+            Assert.AreEqual(threadCount * perDocument, SetupTrackObj.Invocations.Count);
+            foreach (var kvp in SetupTrackObj.Invocations)
+            {
+                Assert.AreEqual(1, kvp.Value);
+            }
+        }
+
         [Test]
         public void ParallelDecDatabaseStatusCacheRace()
         {

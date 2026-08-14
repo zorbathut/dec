@@ -269,6 +269,99 @@ namespace Dec
             return indices;
         }
 
+        internal class SetupMethodInfo
+        {
+            // Always the base definition, so node identity is uniform across derived types; invoking it dispatches virtually to the most-derived body.
+            public MethodInfo method;
+            // The method the [Dec.Setup] attribute was actually found on; [Dec.SetupAfter]/[Dec.SetupBefore] are read from here, which matters when the attribute lives on an override of an untagged base method.
+            public MethodInfo attributeSource;
+            public bool parallel;
+            public Type explicitStage;
+        }
+        internal static System.Collections.Concurrent.ConcurrentDictionary<Type, SetupMethodInfo[]> SetupInfoCached = new System.Collections.Concurrent.ConcurrentDictionary<Type, SetupMethodInfo[]>();
+
+        // Returns the instance setup functions applicable to `type`, including inherited ones, or null if there are none. Static setup functions are handled by the parser's scan, not here.
+        internal static SetupMethodInfo[] GetSetupInfoForType(Type type)
+        {
+            if (SetupInfoCached.TryGetValue(type, out var result))
+            {
+                return result;
+            }
+
+            SetupMethodInfo[] setups = null;
+
+            if (type.BaseType != null)
+            {
+                setups = GetSetupInfoForType(type.BaseType);
+            }
+
+            List<SetupMethodInfo> added = null;
+            foreach (var method in type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
+            {
+                // inherit: false is important; the default would find the base declaration's attribute through an override and misreport it as a new declaration
+                var attribute = method.GetCustomAttribute<SetupAttribute>(inherit: false);
+                if (attribute == null)
+                {
+                    if (method.GetCustomAttributes<SetupAfterAttribute>(inherit: false).Any() || method.GetCustomAttributes<SetupBeforeAttribute>(inherit: false).Any())
+                    {
+                        Dbg.Err($"{type}.{method.Name} has a [Dec.SetupAfter] or [Dec.SetupBefore] attribute but no [Dec.Setup]; the ordering constraint has no effect");
+                    }
+
+                    continue;
+                }
+
+                var baseDefinition = method.GetBaseDefinition();
+                if (baseDefinition.DeclaringType == typeof(Dec))
+                {
+                    Dbg.Err($"{type}.{method.Name} has a [Dec.Setup] attribute, but ConfigErrors and PostLoad already run automatically as part of setup; remove the attribute");
+                    continue;
+                }
+
+                if (baseDefinition != method && setups != null && Array.Exists(setups, s => s.method == baseDefinition))
+                {
+                    Dbg.Wrn($"{type}.{method.Name} has a [Dec.Setup] attribute, but it overrides a method that is already a setup function; the base declaration's settings are used");
+                    continue;
+                }
+
+                if (!ValidateSetupSignature(method))
+                {
+                    continue;
+                }
+
+                if (added == null)
+                {
+                    added = new List<SetupMethodInfo>();
+                }
+                added.Add(new SetupMethodInfo { method = baseDefinition, attributeSource = method, parallel = attribute.Parallel, explicitStage = attribute.Stage });
+            }
+
+            if (added != null)
+            {
+                if (setups != null)
+                {
+                    added.InsertRange(0, setups);
+                }
+                setups = added.ToArray();
+            }
+
+            SetupInfoCached[type] = setups;
+
+            return setups;
+        }
+
+        // Shared between the instance-setup cache above and the parser's static-setup scan. The reporter parameter is deliberately mandatory; it's the encouraged error-reporting channel, and it's the only channel that works inside Parallel setup functions.
+        internal static bool ValidateSetupSignature(MethodInfo method)
+        {
+            var parameters = method.GetParameters();
+            if (method.ReturnType == typeof(void) && !method.IsGenericMethodDefinition && parameters.Length == 1 && parameters[0].ParameterType == typeof(Action<string>))
+            {
+                return true;
+            }
+
+            Dbg.Err($"Setup function {method.DeclaringType}.{method.Name} has an unsupported signature; setup functions must be `void M(Action<string> reporter)`");
+            return false;
+        }
+
         private enum CreateInstanceAction : byte
         {
             Construct,

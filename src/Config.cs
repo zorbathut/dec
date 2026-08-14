@@ -195,6 +195,7 @@ namespace Dec
             public Type[] explicitTypes = null;
             public Type[] explicitStaticRefs = null;
             public Type[] explicitConverters = null;
+            public Type[] explicitSetupScanTypes = null;
         }
         internal static UnitTestParameters TestParameters = null;
         internal static bool TestRefEverything = false;

@@ -7,20 +7,21 @@ namespace DecTest
     [TestFixture]
     public class ParserDependency : Base
     {
-        private static List<string> postLoadOrder;
+        private static List<string> setupOrder;
 
         [SetUp]
         public void SetUp()
         {
-            postLoadOrder = new List<string>();
+            setupOrder = new List<string>();
         }
 
         [Dec.Abstract]
         public abstract class TestDec : Dec.Dec
         {
-            public override void PostLoad(Action<string> reporter)
+            [Dec.Setup]
+            internal void Record(Action<string> reporter)
             {
-                postLoadOrder.Add(this.GetType().Name);
+                setupOrder.Add(this.GetType().Name);
             }
         }
 
@@ -43,10 +44,10 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            CollectionAssert.AreEquivalent(new[] { "NoDep_ADec", "NoDep_BDec", "NoDep_CDec" }, postLoadOrder);
+            CollectionAssert.AreEquivalent(new[] { "NoDep_ADec", "NoDep_BDec", "NoDep_CDec" }, setupOrder);
         }
 
-        [Dec.SetupDependsOn(typeof(SimpleAlpha_BDec))]
+        [Dec.SetupAfter(typeof(SimpleAlpha_BDec))]
         public class SimpleAlpha_ADec : TestDec { }
         public class SimpleAlpha_BDec : TestDec { }
 
@@ -64,11 +65,11 @@ namespace DecTest
 
             parser.Finish();
 
-            CollectionAssert.AreEqual(new[] { "SimpleAlpha_BDec", "SimpleAlpha_ADec" }, postLoadOrder);
+            CollectionAssert.AreEqual(new[] { "SimpleAlpha_BDec", "SimpleAlpha_ADec" }, setupOrder);
         }
 
         public class SimpleNonAlpha_ADec : TestDec { }
-        [Dec.SetupDependsOn(typeof(SimpleNonAlpha_ADec))]
+        [Dec.SetupAfter(typeof(SimpleNonAlpha_ADec))]
         public class SimpleNonAlpha_BDec : TestDec { }
 
         [Test]
@@ -85,16 +86,16 @@ namespace DecTest
 
             parser.Finish();
 
-            CollectionAssert.AreEqual(new[] { "SimpleNonAlpha_ADec", "SimpleNonAlpha_BDec" }, postLoadOrder);
+            CollectionAssert.AreEqual(new[] { "SimpleNonAlpha_ADec", "SimpleNonAlpha_BDec" }, setupOrder);
         }
 
         // Classes for TestComplexDependencies
-        [Dec.SetupDependsOn(typeof(Complex_BDec))]
-        [Dec.SetupDependsOn(typeof(Complex_CDec))]
+        [Dec.SetupAfter(typeof(Complex_BDec))]
+        [Dec.SetupAfter(typeof(Complex_CDec))]
         public class Complex_ADec : TestDec { }
         public class Complex_BDec : TestDec { }
-        [Dec.SetupDependsOn(typeof(Complex_BDec))]
-        [Dec.SetupDependsOn(typeof(Complex_DDec))]
+        [Dec.SetupAfter(typeof(Complex_BDec))]
+        [Dec.SetupAfter(typeof(Complex_DDec))]
         public class Complex_CDec : TestDec { }
         public class Complex_DDec : TestDec { }
 
@@ -113,15 +114,15 @@ namespace DecTest
                 </Decs>");
             parser.Finish();
 
-            CollectionAssert.AreEqual(new[] { "Complex_BDec", "Complex_DDec", "Complex_CDec", "Complex_ADec" }, postLoadOrder);
+            CollectionAssert.AreEqual(new[] { "Complex_BDec", "Complex_DDec", "Complex_CDec", "Complex_ADec" }, setupOrder);
         }
 
         // Classes for TestCyclicDependencies
-        [Dec.SetupDependsOn(typeof(Cyclic_BDec))]
+        [Dec.SetupAfter(typeof(Cyclic_BDec))]
         public class Cyclic_ADec : TestDec { }
-        [Dec.SetupDependsOn(typeof(Cyclic_CDec))]
+        [Dec.SetupAfter(typeof(Cyclic_CDec))]
         public class Cyclic_BDec : TestDec { }
-        [Dec.SetupDependsOn(typeof(Cyclic_ADec))]
+        [Dec.SetupAfter(typeof(Cyclic_ADec))]
         public class Cyclic_CDec : TestDec { }
 
         [Test]
@@ -139,15 +140,16 @@ namespace DecTest
 
             ExpectErrors(() => parser.Finish(), err => err.Contains("Cycle detected"));
 
-            CollectionAssert.AreEqual(new[] { "Cyclic_CDec", "Cyclic_BDec", "Cyclic_ADec" }, postLoadOrder);
+            // The exact recovery order after a cycle is arbitrary; this pins the current behavior, not a contract.
+            CollectionAssert.AreEqual(new[] { "Cyclic_ADec", "Cyclic_CDec", "Cyclic_BDec" }, setupOrder);
         }
 
         // Classes for TestPartialDependencies and TestDependenciesWithMissingTypes
-        [Dec.SetupDependsOn(typeof(Partial_BDec))]
+        [Dec.SetupAfter(typeof(Partial_BDec))]
         public class Partial_ADec : TestDec { }
-        [Dec.SetupDependsOn(typeof(Partial_CDec))]
+        [Dec.SetupAfter(typeof(Partial_CDec))]
         public class Partial_BDec : TestDec { }
-        [Dec.SetupDependsOn(typeof(Partial_DDec))]
+        [Dec.SetupAfter(typeof(Partial_DDec))]
         public class Partial_CDec : TestDec { }
         public class Partial_DDec : TestDec { }
 
@@ -167,7 +169,7 @@ namespace DecTest
 
             parser.Finish();
 
-            CollectionAssert.AreEqual(new[] { "Partial_DDec", "Partial_CDec", "Partial_BDec", "Partial_ADec" }, postLoadOrder);
+            CollectionAssert.AreEqual(new[] { "Partial_DDec", "Partial_CDec", "Partial_BDec", "Partial_ADec" }, setupOrder);
         }
 
         [Test]
@@ -182,9 +184,9 @@ namespace DecTest
                     <Partial_BDec decName=""B"" />
                 </Decs>");
 
-            ExpectErrors(() => parser.Finish(), err => err.Contains("not a known Dec type") || err.Contains("SetupDependsOn"));
+            ExpectErrors(() => parser.Finish(), err => err.Contains("no instances"));
 
-            CollectionAssert.AreEqual(new[] { "Partial_BDec", "Partial_ADec" }, postLoadOrder);
+            CollectionAssert.AreEqual(new[] { "Partial_BDec", "Partial_ADec" }, setupOrder);
         }
     }
 }

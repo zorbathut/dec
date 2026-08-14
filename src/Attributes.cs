@@ -64,23 +64,86 @@ namespace Dec
     }
 
     /// <summary>
-    /// Signals that this class should have its ConfigErrors/PostLoad run after a different class.
+    /// Marks a method as a setup function, run automatically at the end of Parser.Finish() and Recorder.Read/ReadSimple.
     /// </summary>
     /// <remarks>
-    /// Currently valid and meaningful only when applied to, and referencing, things inheriting from Dec.Dec.
+    /// An instance setup function runs once for each instance of its class, during Parser.Finish() or at the end of Recorder.Read/ReadSimple. Static setup functions run exactly once during Parser.Finish(). Recorder.Clone never triggers setup. The method must have the signature `void M(Action&lt;string&gt; reporter)`; call the reporter to report errors attributed to the instance being processed.
     ///
-    /// Configuration order will be (mostly) stable with a fixed set of constraints into account.
+    /// Execution order is controlled by [Dec.SetupAfter] and [Dec.SetupBefore]; all setup functions, including the built-in ConfigErrors/PostLoad passes, are ordered together in one dependency graph.
+    ///
+    /// Set Parallel to true to allow an instance setup function to run across its instances on multiple threads; reports go through the Config handlers from worker threads (handlers must be threadsafe), and a parallel function must not call Dec's database mutation APIs.
+    ///
+    /// Set Stage to add this function to a stage class; other setup functions can then order themselves against the entire stage by referencing that class in [Dec.SetupAfter] or [Dec.SetupBefore].
+    ///
+    /// Setup functions are not valid on structs. Instances created inside constructors or field initializers and never touched by the loaded data may not be seen and may not have setup functions run on them. Don't rely on this though.
     /// </remarks>
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public class SetupDependsOnAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Method)]
+    public class SetupAttribute : Attribute
+    {
+        /// <summary>
+        /// Optional stage class this function is a member of; dependencies on that class include this function.
+        /// </summary>
+        public Type Stage { get; set; }
+
+        /// <summary>
+        /// Allows this instance setup function to be run across its instances in parallel.
+        /// </summary>
+        public bool Parallel { get; set; }
+    }
+
+    /// <summary>
+    /// Declares that a setup function, or every setup function of a class, must run after another class's or function's setup.
+    /// </summary>
+    /// <remarks>
+    /// Applied to a method, it constrains that single setup function; applied to a class, it constrains every setup function belonging to that class's stage, including ConfigErrors/PostLoad on Dec classes.
+    ///
+    /// Referencing a type means "after that type's entire setup stage": all of its setup functions, its ConfigErrors/PostLoad if it's a Dec class, and those of its derived classes. Referencing a type plus a member name means "after that specific setup function"; the names "ConfigErrors" and "PostLoad" are accepted for the built-in passes on Dec classes.
+    /// </remarks>
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
+    public class SetupAfterAttribute : Attribute
     {
         private Type type;
+        private string memberName;
 
         internal Type Type => type;
+        internal string MemberName => memberName;
 
-        public SetupDependsOnAttribute(Type type)
+        public SetupAfterAttribute(Type type)
         {
             this.type = type;
+        }
+
+        public SetupAfterAttribute(Type type, string memberName)
+        {
+            this.type = type;
+            this.memberName = memberName;
+        }
+    }
+
+    /// <summary>
+    /// Declares that a setup function, or every setup function of a class, must run before another class's or function's setup.
+    /// </summary>
+    /// <remarks>
+    /// This is the mirror image of [Dec.SetupAfter]; see that attribute for the full semantics. It exists chiefly so a class can insert its setup ahead of a class it can't modify, which is common in mod modules.
+    /// </remarks>
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
+    public class SetupBeforeAttribute : Attribute
+    {
+        private Type type;
+        private string memberName;
+
+        internal Type Type => type;
+        internal string MemberName => memberName;
+
+        public SetupBeforeAttribute(Type type)
+        {
+            this.type = type;
+        }
+
+        public SetupBeforeAttribute(Type type, string memberName)
+        {
+            this.type = type;
+            this.memberName = memberName;
         }
     }
 

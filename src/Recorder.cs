@@ -495,6 +495,8 @@ namespace Dec
         public bool writeDecPaths;
         public bool allowRefs;
         public bool allowReflection;
+        // Set at construction by Parser and Recorder.Read/ReadSimple, null for Clone; assigning at construction matters, because copies of this struct (RecorderReader, deferred ref closures) are taken before parsing starts.
+        public Setup.Collection setupCollection;
     }
 
     internal class RecorderReader : Recorder
