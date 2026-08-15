@@ -648,17 +648,45 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/Dec.SetupDependsOnAttribute.yml",
+      "source_relative_path": "api/Dec.SetupAfterAttribute.yml",
       "output": {
         ".html": {
-          "relative_path": "api/Dec.SetupDependsOnAttribute.html"
+          "relative_path": "api/Dec.SetupAfterAttribute.html"
         }
       },
       "version": "",
       "Uid": null,
       "IsMRef": true,
-      "Title": "Dec.SetupDependsOnAttribute",
-      "Summary": "<p sourcefile=\"api/Dec.SetupDependsOnAttribute.yml\" sourcestartlinenumber=\"1\">Signals that this class should have its ConfigErrors/PostLoad run after a different class.</p>\n"
+      "Title": "Dec.SetupAfterAttribute",
+      "Summary": "<p sourcefile=\"api/Dec.SetupAfterAttribute.yml\" sourcestartlinenumber=\"1\">Declares that a setup function, or every setup function of a class, must run after another class's or function's setup.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.SetupAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.SetupAttribute.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.SetupAttribute",
+      "Summary": "<p sourcefile=\"api/Dec.SetupAttribute.yml\" sourcestartlinenumber=\"1\">Marks a method as a setup function, run automatically at the end of Parser.Finish() and Recorder.Read/ReadSimple.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.SetupBeforeAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.SetupBeforeAttribute.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.SetupBeforeAttribute",
+      "Summary": "<p sourcefile=\"api/Dec.SetupBeforeAttribute.yml\" sourcestartlinenumber=\"1\">Declares that a setup function, or every setup function of a class, must run before another class's or function's setup.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -716,11 +744,11 @@
       "type": "Toc",
       "source_relative_path": "api/toc.yml",
       "output": {
-        ".html": {
-          "relative_path": "api/toc.html"
-        },
         ".json": {
           "relative_path": "api/toc.json"
+        },
+        ".html": {
+          "relative_path": "api/toc.html"
         }
       },
       "version": ""
@@ -846,14 +874,24 @@
       "version": ""
     },
     {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/setup.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/setup.html"
+        }
+      },
+      "version": ""
+    },
+    {
       "type": "Toc",
       "source_relative_path": "documentation/toc.yml",
       "output": {
-        ".html": {
-          "relative_path": "documentation/toc.html"
-        },
         ".json": {
           "relative_path": "documentation/toc.json"
+        },
+        ".html": {
+          "relative_path": "documentation/toc.html"
         }
       },
       "version": ""
@@ -982,11 +1020,11 @@
       "type": "Toc",
       "source_relative_path": "future/toc.yml",
       "output": {
-        ".html": {
-          "relative_path": "future/toc.html"
-        },
         ".json": {
           "relative_path": "future/toc.json"
+        },
+        ".html": {
+          "relative_path": "future/toc.html"
         }
       },
       "version": ""
@@ -1095,11 +1133,11 @@
       "type": "Toc",
       "source_relative_path": "quickstart/toc.yml",
       "output": {
-        ".html": {
-          "relative_path": "quickstart/toc.html"
-        },
         ".json": {
           "relative_path": "quickstart/toc.json"
+        },
+        ".html": {
+          "relative_path": "quickstart/toc.html"
         }
       },
       "version": ""
@@ -1118,11 +1156,11 @@
       "type": "Toc",
       "source_relative_path": "toc.yml",
       "output": {
-        ".html": {
-          "relative_path": "toc.html"
-        },
         ".json": {
           "relative_path": "toc.json"
+        },
+        ".html": {
+          "relative_path": "toc.html"
         }
       },
       "version": ""

@@ -2274,31 +2274,106 @@ references:
   isSpec: "True"
   fullName: Dec.Recorder.Wrn
   nameWithType: Recorder.Wrn
-- uid: Dec.SetupDependsOnAttribute
-  name: SetupDependsOnAttribute
-  href: api/Dec.SetupDependsOnAttribute.html
-  commentId: T:Dec.SetupDependsOnAttribute
-  fullName: Dec.SetupDependsOnAttribute
-  nameWithType: SetupDependsOnAttribute
-- uid: Dec.SetupDependsOnAttribute.#ctor(System.Type)
-  name: SetupDependsOnAttribute(Type)
-  href: api/Dec.SetupDependsOnAttribute.html#Dec_SetupDependsOnAttribute__ctor_System_Type_
-  commentId: M:Dec.SetupDependsOnAttribute.#ctor(System.Type)
+- uid: Dec.SetupAfterAttribute
+  name: SetupAfterAttribute
+  href: api/Dec.SetupAfterAttribute.html
+  commentId: T:Dec.SetupAfterAttribute
+  fullName: Dec.SetupAfterAttribute
+  nameWithType: SetupAfterAttribute
+- uid: Dec.SetupAfterAttribute.#ctor(System.Type)
+  name: SetupAfterAttribute(Type)
+  href: api/Dec.SetupAfterAttribute.html#Dec_SetupAfterAttribute__ctor_System_Type_
+  commentId: M:Dec.SetupAfterAttribute.#ctor(System.Type)
   name.vb: New(Type)
-  fullName: Dec.SetupDependsOnAttribute.SetupDependsOnAttribute(System.Type)
-  fullName.vb: Dec.SetupDependsOnAttribute.New(System.Type)
-  nameWithType: SetupDependsOnAttribute.SetupDependsOnAttribute(Type)
-  nameWithType.vb: SetupDependsOnAttribute.New(Type)
-- uid: Dec.SetupDependsOnAttribute.#ctor*
-  name: SetupDependsOnAttribute
-  href: api/Dec.SetupDependsOnAttribute.html#Dec_SetupDependsOnAttribute__ctor_
-  commentId: Overload:Dec.SetupDependsOnAttribute.#ctor
+  fullName: Dec.SetupAfterAttribute.SetupAfterAttribute(System.Type)
+  fullName.vb: Dec.SetupAfterAttribute.New(System.Type)
+  nameWithType: SetupAfterAttribute.SetupAfterAttribute(Type)
+  nameWithType.vb: SetupAfterAttribute.New(Type)
+- uid: Dec.SetupAfterAttribute.#ctor(System.Type,System.String)
+  name: SetupAfterAttribute(Type, string)
+  href: api/Dec.SetupAfterAttribute.html#Dec_SetupAfterAttribute__ctor_System_Type_System_String_
+  commentId: M:Dec.SetupAfterAttribute.#ctor(System.Type,System.String)
+  name.vb: New(Type, String)
+  fullName: Dec.SetupAfterAttribute.SetupAfterAttribute(System.Type, string)
+  fullName.vb: Dec.SetupAfterAttribute.New(System.Type, String)
+  nameWithType: SetupAfterAttribute.SetupAfterAttribute(Type, string)
+  nameWithType.vb: SetupAfterAttribute.New(Type, String)
+- uid: Dec.SetupAfterAttribute.#ctor*
+  name: SetupAfterAttribute
+  href: api/Dec.SetupAfterAttribute.html#Dec_SetupAfterAttribute__ctor_
+  commentId: Overload:Dec.SetupAfterAttribute.#ctor
   isSpec: "True"
   name.vb: New
-  fullName: Dec.SetupDependsOnAttribute.SetupDependsOnAttribute
-  fullName.vb: Dec.SetupDependsOnAttribute.New
-  nameWithType: SetupDependsOnAttribute.SetupDependsOnAttribute
-  nameWithType.vb: SetupDependsOnAttribute.New
+  fullName: Dec.SetupAfterAttribute.SetupAfterAttribute
+  fullName.vb: Dec.SetupAfterAttribute.New
+  nameWithType: SetupAfterAttribute.SetupAfterAttribute
+  nameWithType.vb: SetupAfterAttribute.New
+- uid: Dec.SetupAttribute
+  name: SetupAttribute
+  href: api/Dec.SetupAttribute.html
+  commentId: T:Dec.SetupAttribute
+  fullName: Dec.SetupAttribute
+  nameWithType: SetupAttribute
+- uid: Dec.SetupAttribute.Parallel
+  name: Parallel
+  href: api/Dec.SetupAttribute.html#Dec_SetupAttribute_Parallel
+  commentId: P:Dec.SetupAttribute.Parallel
+  fullName: Dec.SetupAttribute.Parallel
+  nameWithType: SetupAttribute.Parallel
+- uid: Dec.SetupAttribute.Parallel*
+  name: Parallel
+  href: api/Dec.SetupAttribute.html#Dec_SetupAttribute_Parallel_
+  commentId: Overload:Dec.SetupAttribute.Parallel
+  isSpec: "True"
+  fullName: Dec.SetupAttribute.Parallel
+  nameWithType: SetupAttribute.Parallel
+- uid: Dec.SetupAttribute.Stage
+  name: Stage
+  href: api/Dec.SetupAttribute.html#Dec_SetupAttribute_Stage
+  commentId: P:Dec.SetupAttribute.Stage
+  fullName: Dec.SetupAttribute.Stage
+  nameWithType: SetupAttribute.Stage
+- uid: Dec.SetupAttribute.Stage*
+  name: Stage
+  href: api/Dec.SetupAttribute.html#Dec_SetupAttribute_Stage_
+  commentId: Overload:Dec.SetupAttribute.Stage
+  isSpec: "True"
+  fullName: Dec.SetupAttribute.Stage
+  nameWithType: SetupAttribute.Stage
+- uid: Dec.SetupBeforeAttribute
+  name: SetupBeforeAttribute
+  href: api/Dec.SetupBeforeAttribute.html
+  commentId: T:Dec.SetupBeforeAttribute
+  fullName: Dec.SetupBeforeAttribute
+  nameWithType: SetupBeforeAttribute
+- uid: Dec.SetupBeforeAttribute.#ctor(System.Type)
+  name: SetupBeforeAttribute(Type)
+  href: api/Dec.SetupBeforeAttribute.html#Dec_SetupBeforeAttribute__ctor_System_Type_
+  commentId: M:Dec.SetupBeforeAttribute.#ctor(System.Type)
+  name.vb: New(Type)
+  fullName: Dec.SetupBeforeAttribute.SetupBeforeAttribute(System.Type)
+  fullName.vb: Dec.SetupBeforeAttribute.New(System.Type)
+  nameWithType: SetupBeforeAttribute.SetupBeforeAttribute(Type)
+  nameWithType.vb: SetupBeforeAttribute.New(Type)
+- uid: Dec.SetupBeforeAttribute.#ctor(System.Type,System.String)
+  name: SetupBeforeAttribute(Type, string)
+  href: api/Dec.SetupBeforeAttribute.html#Dec_SetupBeforeAttribute__ctor_System_Type_System_String_
+  commentId: M:Dec.SetupBeforeAttribute.#ctor(System.Type,System.String)
+  name.vb: New(Type, String)
+  fullName: Dec.SetupBeforeAttribute.SetupBeforeAttribute(System.Type, string)
+  fullName.vb: Dec.SetupBeforeAttribute.New(System.Type, String)
+  nameWithType: SetupBeforeAttribute.SetupBeforeAttribute(Type, string)
+  nameWithType.vb: SetupBeforeAttribute.New(Type, String)
+- uid: Dec.SetupBeforeAttribute.#ctor*
+  name: SetupBeforeAttribute
+  href: api/Dec.SetupBeforeAttribute.html#Dec_SetupBeforeAttribute__ctor_
+  commentId: Overload:Dec.SetupBeforeAttribute.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: Dec.SetupBeforeAttribute.SetupBeforeAttribute
+  fullName.vb: Dec.SetupBeforeAttribute.New
+  nameWithType: SetupBeforeAttribute.SetupBeforeAttribute
+  nameWithType.vb: SetupBeforeAttribute.New
 - uid: Dec.StaticReferencesAttribute
   name: StaticReferencesAttribute
   href: api/Dec.StaticReferencesAttribute.html

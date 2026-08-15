@@ -2,11 +2,11 @@
 <html>
   <head>
     <meta charset="utf-8">
-      <title>Class ParserModular </title>
+      <title>Class SetupAttribute </title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="title" content="Class ParserModular ">
+      <meta name="title" content="Class SetupAttribute ">
       
-      <meta name="description" content="Handles all parsing and initialization of dec structures. Intended for moddable games; use Parser for non-moddable or prototype games.">
+      <meta name="description" content="Marks a method as a setup function, run automatically at the end of Parser.Finish() and Recorder.Read/ReadSimple.">
       <link rel="icon" href="../favicon.ico">
       <link rel="stylesheet" href="../public/docfx.min.css">
       <link rel="stylesheet" href="../public/main.css">
@@ -16,7 +16,7 @@
       
       
       
-      <meta name="docfx:docurl" content="https://github.com/zorbathut/dec/new/dev/apiSpec/new?filename=Dec_ParserModular.md&amp;value=---%0Auid%3A%20Dec.ParserModular%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/zorbathut/dec/new/dev/apiSpec/new?filename=Dec_SetupAttribute.md&amp;value=---%0Auid%3A%20Dec.SetupAttribute%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -80,12 +80,12 @@
           <nav id="breadcrumb"></nav>
         </div>
 
-        <article data-uid="Dec.ParserModular">
+        <article data-uid="Dec.SetupAttribute">
 
 
 
-  <h1 id="Dec_ParserModular" data-uid="Dec.ParserModular" class="text-break">
-Class ParserModular  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/ParserModular.cs/#L14"><i class="bi bi-code-slash"></i></a>
+  <h1 id="Dec_SetupAttribute" data-uid="Dec.SetupAttribute" class="text-break">
+Class SetupAttribute  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Attributes.cs/#L80"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -93,13 +93,13 @@ Class ParserModular  <a class="header-action link-secondary" title="View source"
   <dl><dt>Assembly</dt><dd>dec.dll</dd></dl>
   </div>
 
-  <div class="markdown summary"><p>Handles all parsing and initialization of dec structures.</p>
-<p>Intended for moddable games; use Parser for non-moddable or prototype games.</p>
+  <div class="markdown summary"><p>Marks a method as a setup function, run automatically at the end of Parser.Finish() and Recorder.Read/ReadSimple.</p>
 </div>
   <div class="markdown conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class ParserModular</code></pre>
+    <pre><code class="lang-csharp hljs">[AttributeUsage(AttributeTargets.Method)]
+public class SetupAttribute : Attribute</code></pre>
   </div>
 
 
@@ -109,7 +109,8 @@ Class ParserModular  <a class="header-action link-secondary" title="View source"
     <dt>Inheritance</dt>
     <dd>
       <div><span class="xref">object</span></div>
-      <div><span class="xref">ParserModular</span></div>
+      <div><span class="xref">Attribute</span></div>
+      <div><span class="xref">SetupAttribute</span></div>
     </dd>
   </dl>
 
@@ -119,30 +120,41 @@ Class ParserModular  <a class="header-action link-secondary" title="View source"
 
 
 
+  <h2 id="Dec_SetupAttribute_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>An instance setup function runs once for each instance of its class, during Parser.Finish() or at the end of Recorder.Read/ReadSimple. Static setup functions run exactly once during Parser.Finish(). Recorder.Clone never triggers setup. The method must have the signature <code>void M(Action&lt;string&gt; reporter)</code>; call the reporter to report errors attributed to the instance being processed.</p>
+<p>Execution order is controlled by [Dec.SetupAfter] and [Dec.SetupBefore]; all setup functions, including the built-in ConfigErrors/PostLoad passes, are ordered together in one dependency graph.</p>
+<p>Set Parallel to true to allow an instance setup function to run across its instances on multiple threads; reports go through the Config handlers from worker threads (handlers must be threadsafe), and a parallel function must not call Dec's database mutation APIs.</p>
+<p>Set Stage to add this function to a stage class; other setup functions can then order themselves against the entire stage by referencing that class in [Dec.SetupAfter] or [Dec.SetupBefore].</p>
+<p>Setup functions are not valid on structs. Instances created inside constructors or field initializers and never touched by the loaded data may not be seen and may not have setup functions run on them. Don't rely on this though.</p>
+</div>
 
 
-  <h2 class="section" id="constructors">Constructors
+  <h2 class="section" id="properties">Properties
 </h2>
 
 
-  <a id="Dec_ParserModular__ctor_" data-uid="Dec.ParserModular.#ctor*"></a>
+  <a id="Dec_SetupAttribute_Parallel_" data-uid="Dec.SetupAttribute.Parallel*"></a>
 
-  <h3 id="Dec_ParserModular__ctor_Dec_Recorder_IUserSettings_" data-uid="Dec.ParserModular.#ctor(Dec.Recorder.IUserSettings)">
-  ParserModular(IUserSettings)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/ParserModular.cs/#L181"><i class="bi bi-code-slash"></i></a>
+  <h3 id="Dec_SetupAttribute_Parallel" data-uid="Dec.SetupAttribute.Parallel">
+  Parallel
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Attributes.cs/#L91"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"><p>Creates a Parser.</p>
+  <div class="markdown level1 summary"><p>Allows this instance setup function to be run across its instances in parallel.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ParserModular(Recorder.IUserSettings userSettings = null)</code></pre>
+    <pre><code class="lang-csharp hljs">public bool Parallel { get; set; }</code></pre>
   </div>
 
-  <h4 class="section">Parameters</h4>
+
+
+
+
+  <h4 class="section">Property Value</h4>
   <dl class="parameters">
-    <dt><code>userSettings</code> <a class="xref" href="Dec.Recorder.html">Recorder</a>.<a class="xref" href="Dec.Recorder.IUserSettings.html">IUserSettings</a></dt>
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
     <dd></dd>
   </dl>
 
@@ -153,70 +165,30 @@ Class ParserModular  <a class="header-action link-secondary" title="View source"
 
 
 
+  <a id="Dec_SetupAttribute_Stage_" data-uid="Dec.SetupAttribute.Stage*"></a>
 
-
-
-
-  <h2 class="section" id="methods">Methods
-</h2>
-
-
-  <a id="Dec_ParserModular_CreateModule_" data-uid="Dec.ParserModular.CreateModule*"></a>
-
-  <h3 id="Dec_ParserModular_CreateModule_System_String_" data-uid="Dec.ParserModular.CreateModule(System.String)">
-  CreateModule(string)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/ParserModular.cs/#L301"><i class="bi bi-code-slash"></i></a>
+  <h3 id="Dec_SetupAttribute_Stage" data-uid="Dec.SetupAttribute.Stage">
+  Stage
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Attributes.cs/#L86"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"><p>Creates and registers a new module with a given name.</p>
+  <div class="markdown level1 summary"><p>Optional stage class this function is a member of; dependencies on that class include this function.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ParserModular.Module CreateModule(string name)</code></pre>
-  </div>
-
-  <h4 class="section">Parameters</h4>
-  <dl class="parameters">
-    <dt><code>name</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
-    <dd></dd>
-  </dl>
-
-  <h4 class="section">Returns</h4>
-  <dl class="parameters">
-    <dt><a class="xref" href="Dec.ParserModular.html">ParserModular</a>.<a class="xref" href="Dec.ParserModular.Module.html">Module</a></dt>
-    <dd></dd>
-  </dl>
-
-
-
-
-
-
-
-
-
-
-
-  <a id="Dec_ParserModular_Finish_" data-uid="Dec.ParserModular.Finish*"></a>
-
-  <h3 id="Dec_ParserModular_Finish" data-uid="Dec.ParserModular.Finish">
-  Finish()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/ParserModular.cs/#L318"><i class="bi bi-code-slash"></i></a>
-  </h3>
-
-  <div class="markdown level1 summary"><p>Finish all parsing and run Dec.Setup functions.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void Finish()</code></pre>
+    <pre><code class="lang-csharp hljs">public Type Stage { get; set; }</code></pre>
   </div>
 
 
 
 
 
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Type</a></dt>
+    <dd></dd>
+  </dl>
 
 
 
@@ -229,7 +201,7 @@ Class ParserModular  <a class="header-action link-secondary" title="View source"
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/zorbathut/dec/blob/dev/src/ParserModular.cs/#L14" class="edit-link">Edit this page</a>
+          <a href="https://github.com/zorbathut/dec/blob/dev/src/Attributes.cs/#L80" class="edit-link">Edit this page</a>
         </div>
 
 

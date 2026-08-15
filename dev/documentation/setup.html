@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Setup functions </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Setup functions ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/zorbathut/dec/blob/dev/doc/documentation/setup.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="setup-functions">Setup functions</h1>
+
+<p>After <code>Parser.Finish()</code> loads all your decs and fills static references, it runs a setup pass; <code>Recorder.Read</code> and <code>Recorder.ReadSimple</code> run the same pass on the objects they load. The setup functions are standard functions tagged with the <code>[Dec.Setup]</code> attribute, which can go on methods of any class and gives you explicit control over ordering and parallelism. (The older <code>ConfigErrors</code>/<code>PostLoad</code> overrides on dec classes are deprecated predecessors of this; they still work and run as part of the same graph, but new code should use <code>[Dec.Setup]</code>.)</p>
+<pre><code class="lang-cs">public class MonsterDec : Dec.Dec
+{
+    [NonSerialized] public float[] blessingChance;
+
+    [Dec.Setup]
+    private void CalculateBlessings(Action&lt;string&gt; reporter)
+    {
+        blessingChance = new float[Index&lt;BlessingDec&gt;.Count];
+        for (int i = 0; i &lt; Index&lt;BlessingDec&gt;.Count; ++i)
+        {
+            blessingChance[i] = CalculateBlessingChance(this, Index&lt;BlessingDec&gt;.Get(i));
+        }
+    }
+}
+</code></pre>
+<p>A setup function is either an instance method, which runs once for every instance of its class that a load created or encountered, or a static method, which runs exactly once per parser load. Instance setup functions work on non-Dec classes too - if your decs contain component objects, the components' setup functions run for every component the parser created, and the same goes for objects inside a savegame when it's read back. Static setup functions are good for building cross-instance lookup tables.</p>
+<p>The method signature must be <code>void M(Action&lt;string&gt; reporter)</code>; call the reporter to report configuration errors attributed to the instance being processed. Setup functions aren't supported on structs.</p>
+<h2 id="ordering">Ordering</h2>
+<p>By default, setup functions run in an unspecified (but deterministic) order. To constrain the order, use <code>[Dec.SetupAfter]</code> and <code>[Dec.SetupBefore]</code>:</p>
+<pre><code class="lang-cs">public class RoomDec : Dec.Dec
+{
+    // Runs after every setup function on ItemDec and its subclasses, including ItemDec's ConfigErrors and PostLoad.
+    [Dec.Setup]
+    [Dec.SetupAfter(typeof(ItemDec))]
+    private void PlaceItems(Action&lt;string&gt; reporter) { /* ... */ }
+
+    // Or reference one specific function.
+    [Dec.SetupAfter(typeof(DoorDec), nameof(DoorDec.BuildIndex))]
+    [Dec.Setup]
+    private void ConnectDoors(Action&lt;string&gt; reporter) { /* ... */ }
+}
+</code></pre>
+<p>Referencing a bare type means &quot;after that type's entire setup&quot;: all of its setup functions and everything belonging to its derived classes. Referencing a type plus a member name targets that one function.</p>
+<p>Both attributes can also go on a class, where they constrain every setup function belonging to that class. <code>[Dec.SetupBefore]</code> is particularly useful in mods, where you can order your setup ahead of a class you can't edit.</p>
+<p>All constraints are combined into one dependency graph and executed in a stable topological order. Cycles are reported as errors and broken arbitrarily.</p>
+<h2 id="stages">Stages</h2>
+<p>When several unrelated functions form a phase that others need to order against, referencing each function individually gets brittle - it turns private method names into a contract. Instead, declare a stage: any class acts as a named rendezvous point.</p>
+<pre><code class="lang-cs">public static class SetupStage
+{
+    public class IndexesBuilt { }
+}
+
+public class ItemDec : Dec.Dec
+{
+    [Dec.Setup(Stage = typeof(SetupStage.IndexesBuilt))]
+    private void BuildIndex(Action&lt;string&gt; reporter) { /* ... */ }
+}
+
+public class RoomDec : Dec.Dec
+{
+    // waits for every member of the stage, without naming any of them
+    [Dec.Setup]
+    [Dec.SetupAfter(typeof(SetupStage.IndexesBuilt))]
+    private void PlaceItems(Action&lt;string&gt; reporter) { /* ... */ }
+}
+</code></pre>
+<p>A stage marker class can itself carry <code>[Dec.SetupAfter]</code>/<code>[Dec.SetupBefore]</code> attributes, which apply to all of its members at once.</p>
+<h2 id="parallelism">Parallelism</h2>
+<p>An instance setup function can opt into running across its instances on multiple threads:</p>
+<pre><code class="lang-cs">[Dec.Setup(Parallel = true)]
+private void ExpensivePrecalculation(Action&lt;string&gt; reporter) { /* ... */ }
+</code></pre>
+<p>Rules for parallel setup functions: don't call Dec's database mutation APIs, and don't touch shared mutable state without your own synchronization. Reporter output and any thrown exceptions are reported as they happen, from whatever thread the instance ran on - your error handlers must be threadsafe if you use any of Dec's threaded features, and report order across instances isn't deterministic. An error handler that throws won't stop the other instances from running. See ARCHITECTURE.md's threading contract for the full details.</p>
+<h2 id="boundaries-worth-knowing">Boundaries worth knowing</h2>
+<ul>
+<li>Instance collection happens while a load is traversing data. An object created in a constructor or field initializer that's never mentioned in the XML is invisible to the load and won't get setup functions run on it - the same boundary Indexes have. Like Indexes, this may change later - don't rely on this behavior! If you need full traversal, let me know on Discord.</li>
+<li>Instance setup functions run at the end of <code>Parser.Finish()</code>, <code>Recorder.Read</code>, and <code>Recorder.ReadSimple</code>, on whatever thread you called from. <code>Recorder.Clone</code> doesn't trigger them, and neither does creating decs at runtime through <code>Database.Create</code>. Static setup functions run only from <code>Parser.Finish()</code>.</li>
+<li>Decs and dec-owned objects referenced by a savegame keep their parse-time setup; reading a savegame never re-runs setup on them. Ordering constraints naming types with nothing present in a given load are silently satisfied. Declaration mistakes (bad signatures and the like) on savegame-only types surface as errors when a savegame first loads them.</li>
+<li>If you call <code>Recorder.Read</code> concurrently from multiple threads, your setup functions can run concurrently with themselves on different instances; keep them safe for that, or don't read concurrently.</li>
+<li>Setup functions declared as interface default implementations aren't discovered.</li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/zorbathut/dec/blob/dev/doc/documentation/setup.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

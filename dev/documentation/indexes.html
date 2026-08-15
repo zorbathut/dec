@@ -103,7 +103,8 @@ public class MonsterDec : Dec.Dec
 
     [NonSerialized] public float[] blessingChance;
 
-    public void PostLoad(Action&lt;string&gt; reporter)
+    [Dec.Setup]
+    private void CalculateBlessings(Action&lt;string&gt; reporter)
     {
         blessingChance = new float[Index&lt;BlessingDec&gt;.Count];
         for (int i = 0; i &lt; Index&lt;BlessingDec&gt;.Count; ++i)
@@ -126,6 +127,7 @@ public float FindBlessingChance(MonsterDec monster, BlessingDec blessing)
     return monster.blessingChance[blessing.index];
 }
 </code></pre>
+<p>(<code>[Dec.Setup]</code> marks a post-load setup function; see <a href="setup.html">Setup functions</a> for the details, including how to order these against each other.)</p>
 <p>These values have no defined order and are <em>not</em> consistent between execution runs - don't use them as part of serializing savegames!</p>
 <p>You're limited to one Index per type, but you can have multiple indexes at different parts in a class hierarchy.</p>
 <pre><code class="lang-cs">// This class still has `.index` which refers to its position in BlessingDecs.

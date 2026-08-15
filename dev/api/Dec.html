@@ -251,8 +251,18 @@ Initialize as soon as possible.</p>
 </dd>
     </dl>
     <dl class="jumplist">
-      <dt><a class="xref" href="Dec.SetupDependsOnAttribute.html">SetupDependsOnAttribute</a></dt>
-      <dd><p>Signals that this class should have its ConfigErrors/PostLoad run after a different class.</p>
+      <dt><a class="xref" href="Dec.SetupAfterAttribute.html">SetupAfterAttribute</a></dt>
+      <dd><p>Declares that a setup function, or every setup function of a class, must run after another class's or function's setup.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dec.SetupAttribute.html">SetupAttribute</a></dt>
+      <dd><p>Marks a method as a setup function, run automatically at the end of Parser.Finish() and Recorder.Read/ReadSimple.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Dec.SetupBeforeAttribute.html">SetupBeforeAttribute</a></dt>
+      <dd><p>Declares that a setup function, or every setup function of a class, must run before another class's or function's setup.</p>
 </dd>
     </dl>
     <dl class="jumplist">
