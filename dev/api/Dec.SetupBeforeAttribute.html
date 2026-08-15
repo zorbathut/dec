@@ -85,7 +85,7 @@
 
 
   <h1 id="Dec_SetupBeforeAttribute" data-uid="Dec.SetupBeforeAttribute" class="text-break">
-Class SetupBeforeAttribute  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Attributes.cs/#L129"><i class="bi bi-code-slash"></i></a>
+Class SetupBeforeAttribute  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Attributes.cs/#L136"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -98,7 +98,7 @@ Class SetupBeforeAttribute  <a class="header-action link-secondary" title="View 
   <div class="markdown conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[AttributeUsage(AttributeTargets.Class|AttributeTargets.Method, AllowMultiple = true)]
+    <pre><code class="lang-csharp hljs">[AttributeUsage(AttributeTargets.Class|AttributeTargets.Method|AttributeTargets.Interface, AllowMultiple = true)]
 public class SetupBeforeAttribute : Attribute</code></pre>
   </div>
 
@@ -133,7 +133,7 @@ public class SetupBeforeAttribute : Attribute</code></pre>
 
   <h3 id="Dec_SetupBeforeAttribute__ctor_System_Type_" data-uid="Dec.SetupBeforeAttribute.#ctor(System.Type)">
   SetupBeforeAttribute(Type)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Attributes.cs/#L138"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Attributes.cs/#L150"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -164,7 +164,7 @@ public class SetupBeforeAttribute : Attribute</code></pre>
 
   <h3 id="Dec_SetupBeforeAttribute__ctor_System_Type_System_String_" data-uid="Dec.SetupBeforeAttribute.#ctor(System.Type,System.String)">
   SetupBeforeAttribute(Type, string)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Attributes.cs/#L143"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Attributes.cs/#L155"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -193,11 +193,47 @@ public class SetupBeforeAttribute : Attribute</code></pre>
 
 
 
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Dec_SetupBeforeAttribute_IncludeDerived_" data-uid="Dec.SetupBeforeAttribute.IncludeDerived*"></a>
+
+  <h3 id="Dec_SetupBeforeAttribute_IncludeDerived" data-uid="Dec.SetupBeforeAttribute.IncludeDerived">
+  IncludeDerived
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Attributes.cs/#L148"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Extends a bare-type reference to also cover setup functions introduced by the referenced type's derived classes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IncludeDerived { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
 
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/zorbathut/dec/blob/dev/src/Attributes.cs/#L129" class="edit-link">Edit this page</a>
+          <a href="https://github.com/zorbathut/dec/blob/dev/src/Attributes.cs/#L136" class="edit-link">Edit this page</a>
         </div>
 
 

@@ -85,7 +85,7 @@
 
 
   <h1 id="Dec_SetupAfterAttribute" data-uid="Dec.SetupAfterAttribute" class="text-break">
-Class SetupAfterAttribute  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Attributes.cs/#L102"><i class="bi bi-code-slash"></i></a>
+Class SetupAfterAttribute  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Attributes.cs/#L104"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -98,7 +98,7 @@ Class SetupAfterAttribute  <a class="header-action link-secondary" title="View s
   <div class="markdown conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[AttributeUsage(AttributeTargets.Class|AttributeTargets.Method, AllowMultiple = true)]
+    <pre><code class="lang-csharp hljs">[AttributeUsage(AttributeTargets.Class|AttributeTargets.Method|AttributeTargets.Interface, AllowMultiple = true)]
 public class SetupAfterAttribute : Attribute</code></pre>
   </div>
 
@@ -122,7 +122,8 @@ public class SetupAfterAttribute : Attribute</code></pre>
 
   <h2 id="Dec_SetupAfterAttribute_remarks">Remarks</h2>
   <div class="markdown level0 remarks"><p>Applied to a method, it constrains that single setup function; applied to a class, it constrains every setup function belonging to that class's stage, including ConfigErrors/PostLoad on Dec classes.</p>
-<p>Referencing a type means &quot;after that type's entire setup stage&quot;: all of its setup functions, its ConfigErrors/PostLoad if it's a Dec class, and those of its derived classes. Referencing a type plus a member name means &quot;after that specific setup function&quot;; the names &quot;ConfigErrors&quot; and &quot;PostLoad&quot; are accepted for the built-in passes on Dec classes.</p>
+<p>Referencing a type means &quot;after that type's own setup&quot;: every setup function the type has - declared on it or inherited into it, including ConfigErrors/PostLoad on Dec classes - as it runs on instances of the type and its subclasses. Setup functions introduced by derived classes are not included; set IncludeDerived to true to also wait on those.</p>
+<p>Referencing a type plus a member name means &quot;after that specific setup function&quot;. IncludeDerived cannot be combined with a member name.</p>
 </div>
 
 
@@ -134,7 +135,7 @@ public class SetupAfterAttribute : Attribute</code></pre>
 
   <h3 id="Dec_SetupAfterAttribute__ctor_System_Type_" data-uid="Dec.SetupAfterAttribute.#ctor(System.Type)">
   SetupAfterAttribute(Type)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Attributes.cs/#L111"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Attributes.cs/#L118"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -165,7 +166,7 @@ public class SetupAfterAttribute : Attribute</code></pre>
 
   <h3 id="Dec_SetupAfterAttribute__ctor_System_Type_System_String_" data-uid="Dec.SetupAfterAttribute.#ctor(System.Type,System.String)">
   SetupAfterAttribute(Type, string)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Attributes.cs/#L116"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Attributes.cs/#L123"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -194,11 +195,47 @@ public class SetupAfterAttribute : Attribute</code></pre>
 
 
 
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Dec_SetupAfterAttribute_IncludeDerived_" data-uid="Dec.SetupAfterAttribute.IncludeDerived*"></a>
+
+  <h3 id="Dec_SetupAfterAttribute_IncludeDerived" data-uid="Dec.SetupAfterAttribute.IncludeDerived">
+  IncludeDerived
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Attributes.cs/#L116"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Extends a bare-type reference to also cover setup functions introduced by the referenced type's derived classes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IncludeDerived { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
 
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/zorbathut/dec/blob/dev/src/Attributes.cs/#L102" class="edit-link">Edit this page</a>
+          <a href="https://github.com/zorbathut/dec/blob/dev/src/Attributes.cs/#L104" class="edit-link">Edit this page</a>
         </div>
 
 

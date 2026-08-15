@@ -2308,6 +2308,19 @@ references:
   fullName.vb: Dec.SetupAfterAttribute.New
   nameWithType: SetupAfterAttribute.SetupAfterAttribute
   nameWithType.vb: SetupAfterAttribute.New
+- uid: Dec.SetupAfterAttribute.IncludeDerived
+  name: IncludeDerived
+  href: api/Dec.SetupAfterAttribute.html#Dec_SetupAfterAttribute_IncludeDerived
+  commentId: P:Dec.SetupAfterAttribute.IncludeDerived
+  fullName: Dec.SetupAfterAttribute.IncludeDerived
+  nameWithType: SetupAfterAttribute.IncludeDerived
+- uid: Dec.SetupAfterAttribute.IncludeDerived*
+  name: IncludeDerived
+  href: api/Dec.SetupAfterAttribute.html#Dec_SetupAfterAttribute_IncludeDerived_
+  commentId: Overload:Dec.SetupAfterAttribute.IncludeDerived
+  isSpec: "True"
+  fullName: Dec.SetupAfterAttribute.IncludeDerived
+  nameWithType: SetupAfterAttribute.IncludeDerived
 - uid: Dec.SetupAttribute
   name: SetupAttribute
   href: api/Dec.SetupAttribute.html
@@ -2374,6 +2387,19 @@ references:
   fullName.vb: Dec.SetupBeforeAttribute.New
   nameWithType: SetupBeforeAttribute.SetupBeforeAttribute
   nameWithType.vb: SetupBeforeAttribute.New
+- uid: Dec.SetupBeforeAttribute.IncludeDerived
+  name: IncludeDerived
+  href: api/Dec.SetupBeforeAttribute.html#Dec_SetupBeforeAttribute_IncludeDerived
+  commentId: P:Dec.SetupBeforeAttribute.IncludeDerived
+  fullName: Dec.SetupBeforeAttribute.IncludeDerived
+  nameWithType: SetupBeforeAttribute.IncludeDerived
+- uid: Dec.SetupBeforeAttribute.IncludeDerived*
+  name: IncludeDerived
+  href: api/Dec.SetupBeforeAttribute.html#Dec_SetupBeforeAttribute_IncludeDerived_
+  commentId: Overload:Dec.SetupBeforeAttribute.IncludeDerived
+  isSpec: "True"
+  fullName: Dec.SetupBeforeAttribute.IncludeDerived
+  nameWithType: SetupBeforeAttribute.IncludeDerived
 - uid: Dec.StaticReferencesAttribute
   name: StaticReferencesAttribute
   href: api/Dec.StaticReferencesAttribute.html
