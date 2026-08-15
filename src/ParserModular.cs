@@ -258,6 +258,13 @@ namespace Dec
                         continue;
                     }
 
+                    if (type.IsInterface)
+                    {
+                        // Interfaces can't hold static setup functions, but their contract declarations can be malformed; running the contract scan here surfaces those declaration bugs even for interfaces nothing implements.
+                        UtilReflection.GetDeclaredInterfaceContract(type);
+                        continue;
+                    }
+
                     if (!type.IsClass)
                     {
                         continue;

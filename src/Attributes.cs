@@ -97,9 +97,11 @@ namespace Dec
     /// <remarks>
     /// Applied to a method, it constrains that single setup function; applied to a class, it constrains every setup function belonging to that class's stage, including ConfigErrors/PostLoad on Dec classes.
     ///
-    /// Referencing a type means "after that type's entire setup stage": all of its setup functions, its ConfigErrors/PostLoad if it's a Dec class, and those of its derived classes. Referencing a type plus a member name means "after that specific setup function"; the names "ConfigErrors" and "PostLoad" are accepted for the built-in passes on Dec classes.
+    /// Referencing a type means "after that type's own setup": every setup function the type has - declared on it or inherited into it, including ConfigErrors/PostLoad on Dec classes - as it runs on instances of the type and its subclasses. Setup functions introduced by derived classes are not included; set IncludeDerived to true to also wait on those.
+    ///
+    /// Referencing a type plus a member name means "after that specific setup function". IncludeDerived cannot be combined with a member name.
     /// </remarks>
-    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class | AttributeTargets.Interface, AllowMultiple = true)]
     public class SetupAfterAttribute : Attribute
     {
         private Type type;
@@ -107,6 +109,11 @@ namespace Dec
 
         internal Type Type => type;
         internal string MemberName => memberName;
+
+        /// <summary>
+        /// Extends a bare-type reference to also cover setup functions introduced by the referenced type's derived classes.
+        /// </summary>
+        public bool IncludeDerived { get; set; }
 
         public SetupAfterAttribute(Type type)
         {
@@ -126,7 +133,7 @@ namespace Dec
     /// <remarks>
     /// This is the mirror image of [Dec.SetupAfter]; see that attribute for the full semantics. It exists chiefly so a class can insert its setup ahead of a class it can't modify, which is common in mod modules.
     /// </remarks>
-    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class | AttributeTargets.Interface, AllowMultiple = true)]
     public class SetupBeforeAttribute : Attribute
     {
         private Type type;
@@ -134,6 +141,11 @@ namespace Dec
 
         internal Type Type => type;
         internal string MemberName => memberName;
+
+        /// <summary>
+        /// Extends a bare-type reference to also cover setup functions introduced by the referenced type's derived classes.
+        /// </summary>
+        public bool IncludeDerived { get; set; }
 
         public SetupBeforeAttribute(Type type)
         {

@@ -386,41 +386,1388 @@ namespace DecTest
             Assert.Less(idxB, idxLate, "stage member B must precede the stage-dependent function");
         }
 
-        // Classes for TestBaseStageIncludesDerived
+        // Classes for TestBareTypeDepExcludesDerivedIntroduced and TestIncludeDerived; a bare-type dependency on the base must not wait on the derived-introduced function, and IncludeDerived must restore exactly that edge. The base is deliberately named to sort after the user so the traversal reaches the user's function before the stage sentinels can pull the derived function in.
         [Dec.Abstract]
-        public abstract class BaseInc_Base : Dec.Dec { }
-        public class BaseInc_DDec : BaseInc_Base
+        public abstract class DeclOnly_ZBase : Dec.Dec { }
+        public class DeclOnly_ZZDec : DeclOnly_ZBase
         {
             [Dec.Setup]
             internal void M(Action<string> reporter)
             {
-                RecordSetup("D.M");
+                RecordSetup("derived.M");
             }
         }
-        public class BaseInc_UserDec : Dec.Dec
+        public class DeclOnly_AUserDec : Dec.Dec
         {
             [Dec.Setup]
-            [Dec.SetupAfter(typeof(BaseInc_Base))]
+            [Dec.SetupAfter(typeof(DeclOnly_ZBase))]
             internal void M(Action<string> reporter)
             {
-                RecordSetup("User.M");
+                RecordSetup("user.M");
             }
         }
 
         [Test]
-        public void TestBaseStageIncludesDerived()
+        public void TestBareTypeDepExcludesDerivedIntroduced()
         {
-            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(BaseInc_DDec), typeof(BaseInc_UserDec) } });
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DeclOnly_ZZDec), typeof(DeclOnly_AUserDec) } });
 
             var parser = new Dec.Parser();
             parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
-                    <BaseInc_DDec decName=""D"" />
-                    <BaseInc_UserDec decName=""U"" />
+                    <DeclOnly_ZZDec decName=""D"" />
+                    <DeclOnly_AUserDec decName=""U"" />
                 </Decs>");
             parser.Finish();
 
-            CollectionAssert.AreEqual(new[] { "D.M", "User.M" }, setupOrder);
+            CollectionAssert.AreEqual(new[] { "user.M", "derived.M" }, setupOrder);
+        }
+
+        // Classes for TestIncludeDerived; same shape as above, opt-in flips the order
+        [Dec.Abstract]
+        public abstract class IncDer_ZBase : Dec.Dec { }
+        public class IncDer_ZZDec : IncDer_ZBase
+        {
+            [Dec.Setup]
+            internal void M(Action<string> reporter)
+            {
+                RecordSetup("derived.M");
+            }
+        }
+        public class IncDer_AUserDec : Dec.Dec
+        {
+            [Dec.Setup]
+            [Dec.SetupAfter(typeof(IncDer_ZBase), IncludeDerived = true)]
+            internal void M(Action<string> reporter)
+            {
+                RecordSetup("user.M");
+            }
+        }
+
+        [Test]
+        public void TestIncludeDerived()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IncDer_ZZDec), typeof(IncDer_AUserDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <IncDer_ZZDec decName=""D"" />
+                    <IncDer_AUserDec decName=""U"" />
+                </Decs>");
+            parser.Finish();
+
+            CollectionAssert.AreEqual(new[] { "derived.M", "user.M" }, setupOrder);
+        }
+
+        // Classes for TestMethodLevelAncestorDep; a derived-introduced function may depend on its own ancestor's setup, which reaches the inherited function on every instance, siblings included. G's tiebreak would run it first without the edges.
+        [Dec.Abstract]
+        public abstract class MethAnc_Base : Dec.Dec
+        {
+            [Dec.Setup]
+            internal void M(Action<string> reporter)
+            {
+                RecordSetup($"{GetType().Name}.M");
+            }
+        }
+        public class MethAnc_ADec : MethAnc_Base
+        {
+            [Dec.Setup]
+            [Dec.SetupAfter(typeof(MethAnc_Base))]
+            internal void G(Action<string> reporter)
+            {
+                RecordSetup("A.G");
+            }
+        }
+        public class MethAnc_BDec : MethAnc_Base { }
+
+        [Test]
+        public void TestMethodLevelAncestorDep()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(MethAnc_ADec), typeof(MethAnc_BDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <MethAnc_ADec decName=""A1"" />
+                    <MethAnc_BDec decName=""B1"" />
+                </Decs>");
+            parser.Finish();
+
+            CollectionAssert.AreEqual(new[] { "MethAnc_ADec.M", "MethAnc_BDec.M", "A.G" }, setupOrder);
+        }
+
+        // Classes for TestIncludeDerivedAncestorSelfErrors; the opt-in puts the derived-introduced function back inside the ancestor's stage, so the dependency must be rejected again
+        [Dec.Abstract]
+        public abstract class IncSelf_Base : Dec.Dec
+        {
+            [Dec.Setup]
+            internal void M(Action<string> reporter)
+            {
+                RecordSetup("base.M");
+            }
+        }
+        public class IncSelf_DDec : IncSelf_Base
+        {
+            [Dec.Setup]
+            [Dec.SetupAfter(typeof(IncSelf_Base), IncludeDerived = true)]
+            internal void G(Action<string> reporter)
+            {
+                RecordSetup("derived.G");
+            }
+        }
+
+        [Test]
+        public void TestIncludeDerivedAncestorSelfErrors()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IncSelf_DDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <IncSelf_DDec decName=""A"" />
+                </Decs>");
+            ExpectErrors(() => parser.Finish(), err => err.Contains("part of"));
+
+            // the dependency is dropped; tiebreak runs G first
+            CollectionAssert.AreEqual(new[] { "derived.G", "base.M" }, setupOrder);
+        }
+
+        // Classes for TestClassLevelIncludeDerived; the class-level opt-in must wait on the derived-introduced function, which the user's tiebreak would otherwise precede
+        [Dec.Abstract]
+        public abstract class CLInc_ZBase : Dec.Dec { }
+        public class CLInc_ZZDec : CLInc_ZBase
+        {
+            [Dec.Setup]
+            internal void M(Action<string> reporter)
+            {
+                RecordSetup("derived.M");
+            }
+        }
+        [Dec.SetupAfter(typeof(CLInc_ZBase), IncludeDerived = true)]
+        public class CLInc_AUserDec : Dec.Dec
+        {
+            [Dec.Setup]
+            internal void M(Action<string> reporter)
+            {
+                RecordSetup("user.M");
+            }
+        }
+
+        [Test]
+        public void TestClassLevelIncludeDerived()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(CLInc_ZZDec), typeof(CLInc_AUserDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <CLInc_ZZDec decName=""D"" />
+                    <CLInc_AUserDec decName=""U"" />
+                </Decs>");
+            parser.Finish();
+
+            CollectionAssert.AreEqual(new[] { "derived.M", "user.M" }, setupOrder);
+        }
+
+        // Classes for TestNamedTargetHiddenByNew; a base-targeted name must resolve to the base's function even when a derived class new-hides it with a distinct function, rather than reporting ambiguity
+        [Dec.Abstract]
+        public abstract class NamedHide_ZBase : Dec.Dec
+        {
+            [Dec.Setup]
+            internal void M(Action<string> reporter)
+            {
+                RecordSetup("base.M");
+            }
+        }
+        public class NamedHide_ZZDec : NamedHide_ZBase
+        {
+            [Dec.Setup]
+            internal new void M(Action<string> reporter)
+            {
+                RecordSetup("derived.M");
+            }
+        }
+        public class NamedHide_AUserDec : Dec.Dec
+        {
+            [Dec.Setup]
+            [Dec.SetupAfter(typeof(NamedHide_ZBase), "M")]
+            internal void MU(Action<string> reporter)
+            {
+                RecordSetup("user.MU");
+            }
+        }
+
+        [Test]
+        public void TestNamedTargetHiddenByNew()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(NamedHide_ZZDec), typeof(NamedHide_AUserDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <NamedHide_ZZDec decName=""D"" />
+                    <NamedHide_AUserDec decName=""U"" />
+                </Decs>");
+            parser.Finish();
+
+            CollectionAssert.AreEquivalent(new[] { "base.M", "derived.M", "user.MU" }, setupOrder);
+            Assert.Less(setupOrder.IndexOf("base.M"), setupOrder.IndexOf("user.MU"));
+        }
+
+        // Classes for TestNamedTargetDerivedOnlyErrors; a base-targeted name for a function that exists only on a derived class is a declaration bug, not a resolution
+        [Dec.Abstract]
+        public abstract class NamedNeg_ZBase : Dec.Dec { }
+        public class NamedNeg_ZZDec : NamedNeg_ZBase
+        {
+            [Dec.Setup]
+            internal void M(Action<string> reporter)
+            {
+                RecordSetup("derived.M");
+            }
+        }
+        public class NamedNeg_AUserDec : Dec.Dec
+        {
+            [Dec.Setup]
+            [Dec.SetupAfter(typeof(NamedNeg_ZBase), "M")]
+            internal void MU(Action<string> reporter)
+            {
+                RecordSetup("user.MU");
+            }
+        }
+
+        [Test]
+        public void TestNamedTargetDerivedOnlyErrors()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(NamedNeg_ZZDec), typeof(NamedNeg_AUserDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <NamedNeg_ZZDec decName=""D"" />
+                    <NamedNeg_AUserDec decName=""U"" />
+                </Decs>");
+            ExpectErrors(() => parser.Finish(), err => err.Contains("no such setup function"));
+
+            CollectionAssert.AreEquivalent(new[] { "derived.M", "user.MU" }, setupOrder);
+        }
+
+        // Classes for TestIncludeDerivedWithMemberNameErrors
+        public class IncName_ZTargetDec : Dec.Dec
+        {
+            [Dec.Setup]
+            internal void M(Action<string> reporter)
+            {
+                RecordSetup("target.M");
+            }
+        }
+        public class IncName_AUserDec : Dec.Dec
+        {
+            [Dec.Setup]
+            [Dec.SetupAfter(typeof(IncName_ZTargetDec), "M", IncludeDerived = true)]
+            internal void MU(Action<string> reporter)
+            {
+                RecordSetup("user.MU");
+            }
+        }
+
+        [Test]
+        public void TestIncludeDerivedWithMemberNameErrors()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IncName_ZTargetDec), typeof(IncName_AUserDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <IncName_ZTargetDec decName=""T"" />
+                    <IncName_AUserDec decName=""U"" />
+                </Decs>");
+            ExpectErrors(() => parser.Finish(), err => err.Contains("IncludeDerived"));
+
+            // the constraint is dropped; tiebreak runs the user function first
+            CollectionAssert.AreEqual(new[] { "user.MU", "target.M" }, setupOrder);
+        }
+
+        // Classes for TestInterfaceContract; a [Dec.Setup] tag on the interface member makes every implementation a setup function with no attribute on the implementation itself
+        public interface IContract_Iface
+        {
+            [Dec.Setup]
+            void M(Action<string> reporter);
+        }
+        public class Contract_Dec : Dec.Dec, IContract_Iface
+        {
+            public void M(Action<string> reporter)
+            {
+                RecordSetup($"impl.M:{DecName}");
+            }
+        }
+
+        [Test]
+        public void TestInterfaceContract()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(Contract_Dec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <Contract_Dec decName=""A"" />
+                    <Contract_Dec decName=""B"" />
+                </Decs>");
+            parser.Finish();
+
+            CollectionAssert.AreEqual(new[] { "impl.M:A", "impl.M:B" }, setupOrder);
+        }
+
+        // Classes for TestInterfaceContractExplicitImpl
+        public interface IExpl_Iface
+        {
+            [Dec.Setup]
+            void M(Action<string> reporter);
+        }
+        public class Expl_Dec : Dec.Dec, IExpl_Iface
+        {
+            void IExpl_Iface.M(Action<string> reporter)
+            {
+                RecordSetup("explicit.M");
+            }
+        }
+
+        [Test]
+        public void TestInterfaceContractExplicitImpl()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(Expl_Dec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <Expl_Dec decName=""A"" />
+                </Decs>");
+            parser.Finish();
+
+            CollectionAssert.AreEqual(new[] { "explicit.M" }, setupOrder);
+        }
+
+        // Classes for TestInterfaceContractDefaultImpl; the tagged member's default body runs when the implementor doesn't provide one
+        public interface IDim_Iface
+        {
+            [Dec.Setup]
+            void M(Action<string> reporter)
+            {
+                RecordSetup("dim.M");
+            }
+        }
+        public class Dim_Dec : Dec.Dec, IDim_Iface { }
+
+        [Test]
+        public void TestInterfaceContractDefaultImpl()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(Dim_Dec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <Dim_Dec decName=""A"" />
+                </Decs>");
+            parser.Finish();
+
+            CollectionAssert.AreEqual(new[] { "dim.M" }, setupOrder);
+        }
+
+        // Classes for TestInterfaceContractVirtualOverride; the contract function dispatches to the most-derived body
+        public interface IVirtC_Iface
+        {
+            [Dec.Setup]
+            void M(Action<string> reporter);
+        }
+        [Dec.Abstract]
+        public abstract class VirtC_Base : Dec.Dec, IVirtC_Iface
+        {
+            public virtual void M(Action<string> reporter)
+            {
+                RecordSetup("base");
+            }
+        }
+        public class VirtC_DDec : VirtC_Base
+        {
+            public override void M(Action<string> reporter)
+            {
+                RecordSetup("derived");
+            }
+        }
+
+        [Test]
+        public void TestInterfaceContractVirtualOverride()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(VirtC_DDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <VirtC_DDec decName=""A"" />
+                </Decs>");
+            parser.Finish();
+
+            CollectionAssert.AreEqual(new[] { "derived" }, setupOrder);
+        }
+
+        // Classes for TestInterfaceBareDepIsContractOnly; the bare dependency waits on the contract but not on the implementor's extra function or its ConfigErrors/PostLoad, all of which the user's tiebreak precedes
+        public interface IBareC_Iface
+        {
+            [Dec.Setup]
+            void CM(Action<string> reporter);
+        }
+        public class BareC_ZDec : Dec.Dec, IBareC_Iface
+        {
+            public void CM(Action<string> reporter)
+            {
+                RecordSetup("contract.CM");
+            }
+
+            [Dec.Setup]
+            internal void Extra(Action<string> reporter)
+            {
+                RecordSetup("impl.Extra");
+            }
+
+            #pragma warning disable CS0672
+            public override void PostLoad(Action<string> reporter)
+            {
+                RecordSetup("impl.PostLoad");
+            }
+            #pragma warning restore CS0672
+        }
+        public class BareC_AUserDec : Dec.Dec
+        {
+            [Dec.Setup]
+            [Dec.SetupAfter(typeof(IBareC_Iface))]
+            internal void MU(Action<string> reporter)
+            {
+                RecordSetup("user.MU");
+            }
+        }
+
+        [Test]
+        public void TestInterfaceBareDepIsContractOnly()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(BareC_ZDec), typeof(BareC_AUserDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <BareC_ZDec decName=""Z"" />
+                    <BareC_AUserDec decName=""U"" />
+                </Decs>");
+            parser.Finish();
+
+            CollectionAssert.AreEqual(new[] { "contract.CM", "user.MU", "impl.Extra", "impl.PostLoad" }, setupOrder);
+        }
+
+        // Classes for TestInterfaceIncludeDerived; the opt-in additionally waits on the implementor's extra function
+        public interface IIncDIf_Iface
+        {
+            [Dec.Setup]
+            void CM(Action<string> reporter);
+        }
+        public class IncDIf_ZDec : Dec.Dec, IIncDIf_Iface
+        {
+            public void CM(Action<string> reporter)
+            {
+                RecordSetup("contract.CM");
+            }
+
+            [Dec.Setup]
+            internal void Extra(Action<string> reporter)
+            {
+                RecordSetup("impl.Extra");
+            }
+        }
+        public class IncDIf_AUserDec : Dec.Dec
+        {
+            [Dec.Setup]
+            [Dec.SetupAfter(typeof(IIncDIf_Iface), IncludeDerived = true)]
+            internal void MU(Action<string> reporter)
+            {
+                RecordSetup("user.MU");
+            }
+        }
+
+        [Test]
+        public void TestInterfaceIncludeDerived()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IncDIf_ZDec), typeof(IncDIf_AUserDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <IncDIf_ZDec decName=""Z"" />
+                    <IncDIf_AUserDec decName=""U"" />
+                </Decs>");
+            parser.Finish();
+
+            CollectionAssert.AreEqual(new[] { "contract.CM", "impl.Extra", "user.MU" }, setupOrder);
+        }
+
+        // Classes for TestMethodLevelAncestorDepBefore; the Before mirror of the ancestor dependency, which must invert Q's natural tiebreak position after M
+        [Dec.Abstract]
+        public abstract class MethAncB_ZBase : Dec.Dec
+        {
+            [Dec.Setup]
+            internal void M(Action<string> reporter)
+            {
+                RecordSetup($"{GetType().Name}.M");
+            }
+        }
+        public class MethAncB_ZZDec : MethAncB_ZBase
+        {
+            [Dec.Setup]
+            [Dec.SetupBefore(typeof(MethAncB_ZBase))]
+            internal void Q(Action<string> reporter)
+            {
+                RecordSetup("derived.Q");
+            }
+        }
+
+        [Test]
+        public void TestMethodLevelAncestorDepBefore()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(MethAncB_ZZDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <MethAncB_ZZDec decName=""A"" />
+                </Decs>");
+            parser.Finish();
+
+            CollectionAssert.AreEqual(new[] { "derived.Q", "MethAncB_ZZDec.M" }, setupOrder);
+        }
+
+        // Classes for TestStaticDeclaredOnMembership; a static setup function introduced on a derived class is outside the base's own setup but inside its IncludeDerived stage
+        public class StatDecl_ZBase { }
+        public class StatDecl_ZZHolder : StatDecl_ZBase
+        {
+            [Dec.Setup]
+            internal static void Init(Action<string> reporter)
+            {
+                RecordSetup("static.Init");
+            }
+        }
+        public class StatDecl_AUserDec : Dec.Dec
+        {
+            [Dec.Setup]
+            [Dec.SetupAfter(typeof(StatDecl_ZBase), IncludeDerived = true)]
+            internal void MU(Action<string> reporter)
+            {
+                RecordSetup("user.MU");
+            }
+        }
+
+        [Test]
+        public void TestStaticDeclaredOnMembership()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StatDecl_AUserDec) }, explicitSetupScanTypes = new Type[] { typeof(StatDecl_ZZHolder) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <StatDecl_AUserDec decName=""U"" />
+                </Decs>");
+            parser.Finish();
+
+            CollectionAssert.AreEqual(new[] { "static.Init", "user.MU" }, setupOrder);
+        }
+
+        // Classes for TestInterfaceNamedDep; a member-named interface reference resolves to that contract function, and not to the implementor's other functions
+        public interface IIfaceNamed
+        {
+            [Dec.Setup]
+            void M(Action<string> reporter);
+        }
+        public class IfaceNamed_ZDec : Dec.Dec, IIfaceNamed
+        {
+            public void M(Action<string> reporter)
+            {
+                RecordSetup("impl.M");
+            }
+
+            [Dec.Setup]
+            internal void Extra(Action<string> reporter)
+            {
+                RecordSetup("impl.Extra");
+            }
+        }
+        public class IfaceNamed_AUserDec : Dec.Dec
+        {
+            [Dec.Setup]
+            [Dec.SetupAfter(typeof(IIfaceNamed), "M")]
+            internal void MU(Action<string> reporter)
+            {
+                RecordSetup("user.MU");
+            }
+        }
+
+        [Test]
+        public void TestInterfaceNamedDep()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(IfaceNamed_ZDec), typeof(IfaceNamed_AUserDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <IfaceNamed_ZDec decName=""Z"" />
+                    <IfaceNamed_AUserDec decName=""U"" />
+                </Decs>");
+            parser.Finish();
+
+            CollectionAssert.AreEqual(new[] { "impl.M", "user.MU", "impl.Extra" }, setupOrder);
+        }
+
+        // Classes for TestInterfaceImplRetagWarns; the implementation is already a setup function through the contract, so its own tag is redundant and its settings are ignored
+        public interface IRetagI_Iface
+        {
+            [Dec.Setup]
+            void M(Action<string> reporter);
+        }
+        public class RetagI_Dec : Dec.Dec, IRetagI_Iface
+        {
+            [Dec.Setup]
+            public void M(Action<string> reporter)
+            {
+                RecordSetup("impl.M");
+            }
+        }
+
+        [Test]
+        public void TestInterfaceImplRetagWarns()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(RetagI_Dec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <RetagI_Dec decName=""A"" />
+                </Decs>");
+            ExpectWarnings(() => parser.Finish(), wrn => wrn.Contains("already a setup function"));
+
+            CollectionAssert.AreEqual(new[] { "impl.M" }, setupOrder);
+        }
+
+        // Classes for TestInterfaceRetaggedOverrideWarns; the tagged override of a retagged implementation must not sneak in a second class-identity function
+        public interface IReOver_Iface
+        {
+            [Dec.Setup]
+            void M(Action<string> reporter);
+        }
+        [Dec.Abstract]
+        public abstract class ReOver_Base : Dec.Dec, IReOver_Iface
+        {
+            [Dec.Setup]
+            public virtual void M(Action<string> reporter)
+            {
+                RecordSetup("base");
+            }
+        }
+        public class ReOver_DDec : ReOver_Base
+        {
+            [Dec.Setup]
+            public override void M(Action<string> reporter)
+            {
+                RecordSetup("derived");
+            }
+        }
+
+        [Test]
+        public void TestInterfaceRetaggedOverrideWarns()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ReOver_DDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <ReOver_DDec decName=""A"" />
+                </Decs>");
+            ExpectWarnings(() => parser.Finish(), wrn => wrn.Contains("already a setup function"));
+
+            CollectionAssert.AreEqual(new[] { "derived" }, setupOrder);
+        }
+
+        // Classes for TestInterfaceTaggedOverrideOfUntaggedImplWarns; the base's implementation carries no tag, so only the derived override's tag is at fault
+        public interface ITagOver_Iface
+        {
+            [Dec.Setup]
+            void M(Action<string> reporter);
+        }
+        [Dec.Abstract]
+        public abstract class TagOver_Base : Dec.Dec, ITagOver_Iface
+        {
+            public virtual void M(Action<string> reporter)
+            {
+                RecordSetup("base");
+            }
+        }
+        public class TagOver_DDec : TagOver_Base
+        {
+            [Dec.Setup]
+            public override void M(Action<string> reporter)
+            {
+                RecordSetup("derived");
+            }
+        }
+
+        [Test]
+        public void TestInterfaceTaggedOverrideOfUntaggedImplWarns()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(TagOver_DDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <TagOver_DDec decName=""A"" />
+                </Decs>");
+            ExpectWarnings(() => parser.Finish(), wrn => wrn.Contains("already a setup function"));
+
+            CollectionAssert.AreEqual(new[] { "derived" }, setupOrder);
+        }
+
+        // Classes for TestInterfaceCrossLevelOverlapWarns; the class-tagged function pre-dates the interface, so the class identity wins: one warning at the level introducing the interface, no re-warn below, no double run - and bare deps on the interface don't reach the function while IncludeDerived ones do
+        public interface ICross_Iface
+        {
+            [Dec.Setup]
+            void M(Action<string> reporter);
+        }
+        [Dec.Abstract]
+        public abstract class Cross_ZBase : Dec.Dec
+        {
+            [Dec.Setup]
+            public virtual void M(Action<string> reporter)
+            {
+                RecordSetup($"{GetType().Name}.M");
+            }
+        }
+        public class Cross_ZZDec : Cross_ZBase, ICross_Iface { }
+        public class Cross_ZZZDec : Cross_ZZDec { }
+        public class Cross_AUserDec : Dec.Dec
+        {
+            [Dec.Setup]
+            [Dec.SetupAfter(typeof(ICross_Iface))]
+            internal void MU(Action<string> reporter)
+            {
+                RecordSetup("user.MU");
+            }
+        }
+        public class Cross_BUserDec : Dec.Dec
+        {
+            [Dec.Setup]
+            [Dec.SetupAfter(typeof(ICross_Iface), IncludeDerived = true)]
+            internal void MW(Action<string> reporter)
+            {
+                RecordSetup("user.MW");
+            }
+        }
+
+        [Test]
+        public void TestInterfaceCrossLevelOverlapWarns()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(Cross_ZZDec), typeof(Cross_ZZZDec), typeof(Cross_AUserDec), typeof(Cross_BUserDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <Cross_ZZDec decName=""Z1"" />
+                    <Cross_ZZZDec decName=""Z2"" />
+                    <Cross_AUserDec decName=""U1"" />
+                    <Cross_BUserDec decName=""U2"" />
+                </Decs>");
+            int warningCount = 0;
+            ExpectWarnings(() => parser.Finish(), wrn => { ++warningCount; return wrn.Contains("already a setup function"); });
+
+            // exactly one warning: the conflict is reported at the level introducing the interface, not re-reported by descendants
+            Assert.AreEqual(1, warningCount);
+            CollectionAssert.AreEqual(new[] { "user.MU", "Cross_ZZDec.M", "Cross_ZZZDec.M", "user.MW" }, setupOrder);
+        }
+
+        // Classes for TestInterfaceGenericContract
+        public interface IGen_Iface<T>
+        {
+            [Dec.Setup]
+            void M(Action<string> reporter);
+        }
+        public class Gen_ZDec : Dec.Dec, IGen_Iface<int>
+        {
+            public void M(Action<string> reporter)
+            {
+                RecordSetup("impl.M");
+            }
+        }
+        public class Gen_AUserDec : Dec.Dec
+        {
+            [Dec.Setup]
+            [Dec.SetupAfter(typeof(IGen_Iface<int>))]
+            internal void MU(Action<string> reporter)
+            {
+                RecordSetup("user.MU");
+            }
+        }
+
+        [Test]
+        public void TestInterfaceGenericContract()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(Gen_ZDec), typeof(Gen_AUserDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <Gen_ZDec decName=""Z"" />
+                    <Gen_AUserDec decName=""U"" />
+                </Decs>");
+            parser.Finish();
+
+            CollectionAssert.AreEqual(new[] { "impl.M", "user.MU" }, setupOrder);
+        }
+
+        // Classes for TestInterfaceGenericDoubleConstruction; one body satisfying two constructions of a tagged generic interface is two contract functions and runs once per contract
+        public interface IGenD_Iface<T>
+        {
+            [Dec.Setup]
+            void M(Action<string> reporter);
+        }
+        public class GenD_Dec : Dec.Dec, IGenD_Iface<int>, IGenD_Iface<string>
+        {
+            public void M(Action<string> reporter)
+            {
+                RecordSetup("impl.M");
+            }
+        }
+
+        [Test]
+        public void TestInterfaceGenericDoubleConstruction()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(GenD_Dec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <GenD_Dec decName=""A"" />
+                </Decs>");
+            parser.Finish();
+
+            CollectionAssert.AreEqual(new[] { "impl.M", "impl.M" }, setupOrder);
+        }
+
+        // Classes for TestInterfaceOwnExtraAfterOwnContract; the implementor's extra function may order after its own interface's contract, since it isn't part of it. The class is named to sort before the interface so the traversal reaches the extra function before the sentinels can pull anything.
+        public interface IOwnEx_Iface
+        {
+            [Dec.Setup]
+            void CM(Action<string> reporter);
+        }
+        public class AOwnEx_Dec : Dec.Dec, IOwnEx_Iface
+        {
+            public void CM(Action<string> reporter)
+            {
+                RecordSetup("contract.CM");
+            }
+
+            [Dec.Setup]
+            [Dec.SetupAfter(typeof(IOwnEx_Iface))]
+            internal void AExtra(Action<string> reporter)
+            {
+                RecordSetup("impl.AExtra");
+            }
+        }
+
+        [Test]
+        public void TestInterfaceOwnExtraAfterOwnContract()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(AOwnEx_Dec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <AOwnEx_Dec decName=""A"" />
+                </Decs>");
+            parser.Finish();
+
+            CollectionAssert.AreEqual(new[] { "contract.CM", "impl.AExtra" }, setupOrder);
+        }
+
+        // Classes for TestInterfaceImplOrderingAttrsError; ordering attributes on an implementation are dead, the constraint belongs on the interface member
+        public interface IImplOrd_Iface
+        {
+            [Dec.Setup]
+            void M(Action<string> reporter);
+        }
+        public class ImplOrd_Dec : Dec.Dec, IImplOrd_Iface
+        {
+            [Dec.SetupAfter(typeof(IImplOrd_Iface))]
+            public void M(Action<string> reporter)
+            {
+                RecordSetup("impl.M");
+            }
+        }
+
+        [Test]
+        public void TestInterfaceImplOrderingAttrsError()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ImplOrd_Dec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <ImplOrd_Dec decName=""A"" />
+                </Decs>");
+            ExpectErrors(() => parser.Finish(), err => err.Contains("declare them on the interface member"));
+
+            CollectionAssert.AreEqual(new[] { "impl.M" }, setupOrder);
+        }
+
+        // Classes for TestClassLevelAttrOnMarkerInterface; class-level ordering attributes on an interface must constrain implementors' functions with nothing else referencing the interface - attribute inheritance can't reach them, so both the discovery and the hierarchy own-side binding have to come from the implementors. The target is named to sort before the implementor so the Before edge is what inverts the order.
+        [Dec.SetupBefore(typeof(MarkCL_ATargetDec))]
+        public interface IMarkCL_Iface { }
+        public class MarkCL_ATargetDec : Dec.Dec
+        {
+            [Dec.Setup]
+            internal void M(Action<string> reporter)
+            {
+                RecordSetup("target.M");
+            }
+        }
+        public class MarkCL_ZImplDec : Dec.Dec, IMarkCL_Iface
+        {
+            [Dec.Setup]
+            internal void M(Action<string> reporter)
+            {
+                RecordSetup("impl.M");
+            }
+        }
+
+        [Test]
+        public void TestClassLevelAttrOnMarkerInterface()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(MarkCL_ATargetDec), typeof(MarkCL_ZImplDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <MarkCL_ATargetDec decName=""T"" />
+                    <MarkCL_ZImplDec decName=""Z"" />
+                </Decs>");
+            parser.Finish();
+
+            CollectionAssert.AreEqual(new[] { "impl.M", "target.M" }, setupOrder);
+        }
+
+        // Classes for TestClassLevelMarkerInterfaceSelfOverlapErrors; the marker's implementor sits inside the target's IncludeDerived stage, which must be caught as a self-in-stage error rather than surfacing as a raw cycle
+        [Dec.SetupBefore(typeof(MarkOv_ZBase), IncludeDerived = true)]
+        public interface IMarkOv_Iface { }
+        [Dec.Abstract]
+        public abstract class MarkOv_ZBase : Dec.Dec { }
+        public class MarkOv_DDec : MarkOv_ZBase, IMarkOv_Iface
+        {
+            [Dec.Setup]
+            internal void M(Action<string> reporter)
+            {
+                RecordSetup("d.M");
+            }
+        }
+
+        [Test]
+        public void TestClassLevelMarkerInterfaceSelfOverlapErrors()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(MarkOv_DDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <MarkOv_DDec decName=""A"" />
+                </Decs>");
+            ExpectErrors(() => parser.Finish(), err => err.Contains("part of"));
+
+            CollectionAssert.AreEqual(new[] { "d.M" }, setupOrder);
+        }
+
+        // Classes for TestInterfaceLegacyBindErrors; a contract member binding to Dec's built-in hooks would run them twice, so it's rejected at declaration
+        public interface ILegacyBind_Iface
+        {
+            [Dec.Setup]
+            void ConfigErrors(Action<string> reporter);
+        }
+        public class LegacyBind_Dec : Dec.Dec, ILegacyBind_Iface
+        {
+            #pragma warning disable CS0672
+            public override void ConfigErrors(Action<string> reporter)
+            {
+                RecordSetup("cfg");
+            }
+            #pragma warning restore CS0672
+        }
+
+        [Test]
+        public void TestInterfaceLegacyBindErrors()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(LegacyBind_Dec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <LegacyBind_Dec decName=""A"" />
+                </Decs>");
+            ExpectErrors(() => parser.Finish(), err => err.Contains("already run automatically"));
+
+            // exactly once, through the built-in pass
+            CollectionAssert.AreEqual(new[] { "cfg" }, setupOrder);
+        }
+
+        // Classes for TestInterfaceStaticMemberErrors
+        public interface IStatIf_Iface
+        {
+            [Dec.Setup]
+            static void Init(Action<string> reporter) { }
+        }
+        public class StatIf_Dec : Dec.Dec, IStatIf_Iface { }
+
+        [Test]
+        public void TestInterfaceStaticMemberErrors()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StatIf_Dec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <StatIf_Dec decName=""A"" />
+                </Decs>");
+            ExpectErrors(() => parser.Finish(), err => err.Contains("static"));
+
+            CollectionAssert.AreEqual(new string[] { }, setupOrder);
+        }
+
+        // Classes for TestInterfaceScanDiagnostics; a malformed contract declaration must surface from the parser's scan even when nothing implements the interface
+        public interface IScanBad_Iface
+        {
+            [Dec.Setup]
+            void M(int wrong);
+        }
+
+        [Test]
+        public void TestInterfaceScanDiagnostics()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { }, explicitSetupScanTypes = new Type[] { typeof(IScanBad_Iface) } });
+
+            // the setup scan runs during parser construction
+            ExpectErrors(() =>
+            {
+                var parser = new Dec.Parser();
+                parser.Finish();
+            }, err => err.Contains("unsupported signature"));
+
+            CollectionAssert.AreEqual(new string[] { }, setupOrder);
+        }
+
+        // Classes for TestInterfaceMemberOrderingAttrs; [Dec.SetupAfter] on the interface member constrains every implementation, and the implementor's tiebreak would run first without it
+        public interface IMemOrd_Iface
+        {
+            [Dec.Setup]
+            [Dec.SetupAfter(typeof(MemOrd_ZTargetDec))]
+            void M(Action<string> reporter);
+        }
+        public class MemOrd_ZTargetDec : Dec.Dec
+        {
+            [Dec.Setup]
+            internal void MT(Action<string> reporter)
+            {
+                RecordSetup("target.MT");
+            }
+        }
+        public class MemOrd_AImplDec : Dec.Dec, IMemOrd_Iface
+        {
+            public void M(Action<string> reporter)
+            {
+                RecordSetup("impl.M");
+            }
+        }
+
+        [Test]
+        public void TestInterfaceMemberOrderingAttrs()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(MemOrd_ZTargetDec), typeof(MemOrd_AImplDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <MemOrd_ZTargetDec decName=""T"" />
+                    <MemOrd_AImplDec decName=""A"" />
+                </Decs>");
+            parser.Finish();
+
+            CollectionAssert.AreEqual(new[] { "target.MT", "impl.M" }, setupOrder);
+        }
+
+        // Classes for TestInterfaceInheritedMember; the contract of a derived interface includes members tagged on its base interfaces
+        public interface IInhB_Base
+        {
+            [Dec.Setup]
+            void M(Action<string> reporter);
+        }
+        public interface IInhB_Derived : IInhB_Base { }
+        public class InhB_ZDec : Dec.Dec, IInhB_Derived
+        {
+            public void M(Action<string> reporter)
+            {
+                RecordSetup("impl.M");
+            }
+        }
+        public class InhB_AUserDec : Dec.Dec
+        {
+            [Dec.Setup]
+            [Dec.SetupAfter(typeof(IInhB_Derived))]
+            internal void MU(Action<string> reporter)
+            {
+                RecordSetup("user.MU");
+            }
+        }
+
+        [Test]
+        public void TestInterfaceInheritedMember()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(InhB_ZDec), typeof(InhB_AUserDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <InhB_ZDec decName=""Z"" />
+                    <InhB_AUserDec decName=""U"" />
+                </Decs>");
+            parser.Finish();
+
+            CollectionAssert.AreEqual(new[] { "impl.M", "user.MU" }, setupOrder);
+        }
+
+        // Classes for TestInterfaceBadSignature
+        public interface IBadSigI_Iface
+        {
+            [Dec.Setup]
+            void M(int wrong);
+        }
+        public class BadSigI_Dec : Dec.Dec, IBadSigI_Iface
+        {
+            public void M(int wrong) { }
+        }
+
+        [Test]
+        public void TestInterfaceBadSignature()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(BadSigI_Dec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <BadSigI_Dec decName=""A"" />
+                </Decs>");
+            ExpectErrors(() => parser.Finish(), err => err.Contains("unsupported signature"));
+
+            CollectionAssert.AreEqual(new string[] { }, setupOrder);
+        }
+
+        // Classes for TestUntaggedInterfaceHint; the interface declares no contract, so the bare dependency is a likely IncludeDerived mistake and the warning must say so
+        public interface IHintI_Iface { }
+        public class HintI_ZDec : Dec.Dec, IHintI_Iface
+        {
+            [Dec.Setup]
+            internal void M(Action<string> reporter)
+            {
+                RecordSetup("impl.M");
+            }
+        }
+        public class HintI_AUserDec : Dec.Dec
+        {
+            [Dec.Setup]
+            [Dec.SetupAfter(typeof(IHintI_Iface))]
+            internal void MU(Action<string> reporter)
+            {
+                RecordSetup("user.MU");
+            }
+        }
+
+        [Test]
+        public void TestUntaggedInterfaceHint()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(HintI_ZDec), typeof(HintI_AUserDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <HintI_ZDec decName=""Z"" />
+                    <HintI_AUserDec decName=""U"" />
+                </Decs>");
+            ExpectWarnings(() => parser.Finish(), wrn => wrn.Contains("IncludeDerived"));
+
+            CollectionAssert.AreEquivalent(new[] { "impl.M", "user.MU" }, setupOrder);
+        }
+
+        // Classes for TestTwoInterfaceContractsOneMethod; one body satisfying two contracts is two functions and runs once per contract
+        public interface ITwoA_Iface
+        {
+            [Dec.Setup]
+            void M(Action<string> reporter);
+        }
+        public interface ITwoB_Iface
+        {
+            [Dec.Setup]
+            void M(Action<string> reporter);
+        }
+        public class Two_Dec : Dec.Dec, ITwoA_Iface, ITwoB_Iface
+        {
+            public void M(Action<string> reporter)
+            {
+                RecordSetup("impl.M");
+            }
+        }
+
+        [Test]
+        public void TestTwoInterfaceContractsOneMethod()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(Two_Dec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <Two_Dec decName=""A"" />
+                </Decs>");
+            parser.Finish();
+
+            CollectionAssert.AreEqual(new[] { "impl.M", "impl.M" }, setupOrder);
+        }
+
+        // Classes for TestClassLevelMarkerOwnSideSilent; the marker's own class-level constraint is enforced on derived owners through attribute inheritance, so the marker's own-setup emptiness must not draw the IncludeDerived hint
+        public class OwnSideM_TargetDec : Dec.Dec
+        {
+            [Dec.Setup]
+            internal void M(Action<string> reporter)
+            {
+                RecordSetup("target.M");
+            }
+        }
+        [Dec.SetupBefore(typeof(OwnSideM_TargetDec))]
+        public class OwnSideM_Marker { }
+        public class OwnSideM_Derived : OwnSideM_Marker
+        {
+            [Dec.Setup]
+            internal void M(Action<string> reporter)
+            {
+                RecordSetup("derived.M");
+            }
+        }
+        public class OwnSideM_HolderDec : Dec.Dec
+        {
+            public OwnSideM_Derived obj;
+        }
+        public class OwnSideM_UserDec : Dec.Dec
+        {
+            [Dec.Setup]
+            [Dec.SetupAfter(typeof(OwnSideM_Marker), IncludeDerived = true)]
+            internal void MU(Action<string> reporter)
+            {
+                RecordSetup("user.MU");
+            }
+        }
+
+        [Test]
+        public void TestClassLevelMarkerOwnSideSilent()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(OwnSideM_TargetDec), typeof(OwnSideM_HolderDec), typeof(OwnSideM_UserDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <OwnSideM_TargetDec decName=""T"" />
+                    <OwnSideM_HolderDec decName=""H"">
+                        <obj />
+                    </OwnSideM_HolderDec>
+                    <OwnSideM_UserDec decName=""U"" />
+                </Decs>");
+            parser.Finish();
+
+            // the inherited class-level Before applies through the derived owner, and the IncludeDerived dependency reaches the derived member
+            Assert.Less(setupOrder.IndexOf("derived.M"), setupOrder.IndexOf("target.M"));
+            Assert.Less(setupOrder.IndexOf("derived.M"), setupOrder.IndexOf("user.MU"));
+        }
+
+        // Classes for TestEmptyDeclaredOnStageHints; the base declares nothing, so the dependency is a likely IncludeDerived mistake and the warning must say so. Non-dec classes are load-bearing here: a dec base always has ConfigErrors/PostLoad in its own setup, so this hint can never fire for dec hierarchies.
+        public class Hint_Base { }
+        public class Hint_Derived : Hint_Base
+        {
+            [Dec.Setup]
+            internal void M(Action<string> reporter)
+            {
+                RecordSetup("derived.M");
+            }
+        }
+        public class Hint_HolderDec : Dec.Dec
+        {
+            public Hint_Derived obj;
+        }
+        public class Hint_UserDec : Dec.Dec
+        {
+            [Dec.Setup]
+            [Dec.SetupAfter(typeof(Hint_Base))]
+            internal void MU(Action<string> reporter)
+            {
+                RecordSetup("user.MU");
+            }
+        }
+
+        [Test]
+        public void TestEmptyDeclaredOnStageHints()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(Hint_HolderDec), typeof(Hint_UserDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <Hint_HolderDec decName=""H"">
+                        <obj />
+                    </Hint_HolderDec>
+                    <Hint_UserDec decName=""U"" />
+                </Decs>");
+            ExpectWarnings(() => parser.Finish(), wrn => wrn.Contains("IncludeDerived"));
+
+            CollectionAssert.AreEquivalent(new[] { "derived.M", "user.MU" }, setupOrder);
+        }
+
+        // Classes for TestEmptyStageMixedVariantTransitivity; the marker is empty, but a declared-on Before and an IncludeDerived After routed through it must still order the endpoints. Adversarial tiebreak: A would run first without the constraints.
+        public class MixTrans_Marker { }
+        public class MixTrans_ADec : Dec.Dec
+        {
+            [Dec.Setup]
+            [Dec.SetupAfter(typeof(MixTrans_Marker), IncludeDerived = true)]
+            internal void M(Action<string> reporter)
+            {
+                RecordSetup("A.M");
+            }
+        }
+        public class MixTrans_ZDec : Dec.Dec
+        {
+            [Dec.Setup]
+            [Dec.SetupBefore(typeof(MixTrans_Marker))]
+            internal void M(Action<string> reporter)
+            {
+                RecordSetup("Z.M");
+            }
+        }
+
+        [Test]
+        public void TestEmptyStageMixedVariantTransitivity()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(MixTrans_ADec), typeof(MixTrans_ZDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <MixTrans_ADec decName=""A"" />
+                    <MixTrans_ZDec decName=""Z"" />
+                </Decs>");
+            ExpectWarnings(() => parser.Finish(), wrn => wrn.Contains("no setup functions"));
+
+            CollectionAssert.AreEqual(new[] { "Z.M", "A.M" }, setupOrder);
         }
 
         // Classes for TestSiblingOrderWithSharedBaseMethod; regression test for false cycles when a shared base declares the setup function
@@ -1574,6 +2921,109 @@ namespace DecTest
             Dec.Recorder.Read<ReadOrd_Root>(serialized);
 
             CollectionAssert.AreEqual(new[] { "Z.M", "A.M" }, setupOrder);
+        }
+
+        // Classes for TestReadIncludeDerived; IncludeDerived must reach a derived-introduced function inside a Read too, and the tiebreak would run A first without the edge
+        public class ReadInc_Base { }
+        public class ReadInc_ZObj : ReadInc_Base, Dec.IRecordable
+        {
+            [Dec.Setup]
+            internal void M(Action<string> reporter)
+            {
+                RecordSetup("Z.M");
+            }
+
+            public void Record(Dec.Recorder recorder) { }
+        }
+        public class ReadInc_AObj : Dec.IRecordable
+        {
+            [Dec.Setup]
+            [Dec.SetupAfter(typeof(ReadInc_Base), IncludeDerived = true)]
+            internal void M(Action<string> reporter)
+            {
+                RecordSetup("A.M");
+            }
+
+            public void Record(Dec.Recorder recorder) { }
+        }
+        public class ReadInc_Root : Dec.IRecordable
+        {
+            public ReadInc_AObj a;
+            public ReadInc_ZObj z;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref a, "a");
+                recorder.Record(ref z, "z");
+            }
+        }
+
+        [Test]
+        public void TestReadIncludeDerived()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { } });
+
+            var serialized = Dec.Recorder.Write(new ReadInc_Root { a = new ReadInc_AObj(), z = new ReadInc_ZObj() });
+            Dec.Recorder.Read<ReadInc_Root>(serialized);
+
+            CollectionAssert.AreEqual(new[] { "Z.M", "A.M" }, setupOrder);
+        }
+
+        // Classes for TestReadInterfaceContract
+        public interface IReadC_Iface
+        {
+            [Dec.Setup]
+            void M(Action<string> reporter);
+        }
+        public class ReadC_Obj : Dec.IRecordable, IReadC_Iface
+        {
+            public void M(Action<string> reporter)
+            {
+                RecordSetup("obj.M");
+            }
+
+            public void Record(Dec.Recorder recorder) { }
+        }
+
+        [Test]
+        public void TestReadInterfaceContract()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { } });
+
+            var serialized = Dec.Recorder.Write(new ReadC_Obj());
+            Dec.Recorder.Read<ReadC_Obj>(serialized);
+
+            CollectionAssert.AreEqual(new[] { "obj.M" }, setupOrder);
+        }
+
+        // Classes for TestReadInterfaceAbsentDepSatisfied; interface contract dependencies referencing nothing present in this read are satisfied, not diagnosed
+        public interface IReadCAbs_Iface
+        {
+            [Dec.Setup]
+            void M(Action<string> reporter);
+        }
+        public class ReadCAbs_Obj : Dec.IRecordable
+        {
+            [Dec.Setup]
+            [Dec.SetupAfter(typeof(IReadCAbs_Iface))]
+            [Dec.SetupAfter(typeof(IReadCAbs_Iface), "M")]
+            internal void M(Action<string> reporter)
+            {
+                RecordSetup("present.M");
+            }
+
+            public void Record(Dec.Recorder recorder) { }
+        }
+
+        [Test]
+        public void TestReadInterfaceAbsentDepSatisfied()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { } });
+
+            var serialized = Dec.Recorder.Write(new ReadCAbs_Obj());
+            Dec.Recorder.Read<ReadCAbs_Obj>(serialized);
+
+            CollectionAssert.AreEqual(new[] { "present.M" }, setupOrder);
         }
 
         // Classes for TestReadStage; the marker's class-level Before must apply inside a Read, and the target is named to sort before the member

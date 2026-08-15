@@ -386,6 +386,7 @@ namespace Dec
             UtilReflection.IndexInfoCached.Clear();
             UtilReflection.SerializableFieldsCached.Clear();
             UtilReflection.SetupInfoCached.Clear();
+            UtilReflection.InterfaceContractDeclaredCached.Clear();
 
             SuppressEmptyWarningFlag = false;
         }

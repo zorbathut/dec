@@ -279,8 +279,63 @@ namespace Dec
             public Type explicitStage;
         }
         internal static System.Collections.Concurrent.ConcurrentDictionary<Type, SetupMethodInfo[]> SetupInfoCached = new System.Collections.Concurrent.ConcurrentDictionary<Type, SetupMethodInfo[]>();
+        internal static System.Collections.Concurrent.ConcurrentDictionary<Type, SetupMethodInfo[]> InterfaceContractDeclaredCached = new System.Collections.Concurrent.ConcurrentDictionary<Type, SetupMethodInfo[]>();
 
-        // Returns the instance setup functions applicable to `type`, including inherited ones, or null if there are none. Static setup functions are handled by the parser's scan, not here.
+        // Setup functions declared as [Dec.Setup]-tagged members directly on `iface`, excluding inherited interfaces; validation errors report once per load thanks to the cache, which Database.Clear resets so they re-report like every other declaration diagnostic.
+        internal static SetupMethodInfo[] GetDeclaredInterfaceContract(Type iface)
+        {
+            if (InterfaceContractDeclaredCached.TryGetValue(iface, out var cached))
+            {
+                return cached;
+            }
+
+            List<SetupMethodInfo> found = null;
+            foreach (var method in iface.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
+            {
+                var attribute = method.GetCustomAttribute<SetupAttribute>(inherit: false);
+                if (attribute == null)
+                {
+                    if (method.GetCustomAttributes<SetupAfterAttribute>(inherit: false).Any() || method.GetCustomAttributes<SetupBeforeAttribute>(inherit: false).Any())
+                    {
+                        Dbg.Err($"{iface}.{method.Name} has a [Dec.SetupAfter] or [Dec.SetupBefore] attribute but no [Dec.Setup]; the ordering constraint has no effect");
+                    }
+
+                    continue;
+                }
+
+                if (method.IsStatic)
+                {
+                    Dbg.Err($"{iface}.{method.Name} is a static interface member with a [Dec.Setup] attribute; static setup functions are not supported on interfaces");
+                    continue;
+                }
+
+                if (!ValidateSetupSignature(method))
+                {
+                    continue;
+                }
+
+                if (found == null)
+                {
+                    found = new List<SetupMethodInfo>();
+                }
+                found.Add(new SetupMethodInfo { method = method, attributeSource = method, parallel = attribute.Parallel, explicitStage = attribute.Stage });
+            }
+
+            // GetMethods order is unspecified, and contract entry order must be deterministic because same-named nodes tie on the setup graph's sort key
+            found?.Sort((a, b) => string.CompareOrdinal(a.method.Name, b.method.Name));
+
+            var result = found?.ToArray();
+            InterfaceContractDeclaredCached[iface] = result;
+            return result;
+        }
+
+        private static IEnumerable<Type> SortedInterfaces(Type type)
+        {
+            // GetInterfaces order is unspecified; see GetDeclaredInterfaceContract for why determinism matters
+            return type.GetInterfaces().OrderBy(i => i.FullName ?? i.Name, StringComparer.Ordinal);
+        }
+
+        // Returns the instance setup functions applicable to `type`, including inherited and interface-contract ones, or null if there are none. Static setup functions are handled by the parser's scan, not here.
         internal static SetupMethodInfo[] GetSetupInfoForType(Type type)
         {
             if (SetupInfoCached.TryGetValue(type, out var result))
@@ -290,9 +345,61 @@ namespace Dec
 
             SetupMethodInfo[] setups = null;
 
+            if (type.IsInterface)
+            {
+                // An interface's setup is its contract: tagged members declared on it or on any interface it inherits. Interfaces have no BaseType, so this chains through GetInterfaces(), which is already the transitive closure.
+                List<SetupMethodInfo> contract = null;
+                foreach (var iface in type.GetInterfaces().Concat(new[] { type }).OrderBy(i => i.FullName ?? i.Name, StringComparer.Ordinal))
+                {
+                    var declared = GetDeclaredInterfaceContract(iface);
+                    if (declared != null)
+                    {
+                        if (contract == null)
+                        {
+                            contract = new List<SetupMethodInfo>();
+                        }
+                        contract.AddRange(declared);
+                    }
+                }
+
+                setups = contract?.ToArray();
+                SetupInfoCached[type] = setups;
+                return setups;
+            }
+
             if (type.BaseType != null)
             {
                 setups = GetSetupInfoForType(type.BaseType);
+            }
+
+            // Tagged contract members reachable from this type, paired with each member's implementing method here; used by the class scan below and the contract-entry pass after it. GetInterfaceMap is unavailable on generic type definitions, but those never own instances or setup nodes.
+            List<(Type iface, SetupMethodInfo info, MethodInfo target)> contractMembers = null;
+            if (!type.IsGenericTypeDefinition)
+            {
+                foreach (var iface in SortedInterfaces(type))
+                {
+                    var declared = GetDeclaredInterfaceContract(iface);
+                    if (declared == null)
+                    {
+                        continue;
+                    }
+
+                    var map = type.GetInterfaceMap(iface);
+                    foreach (var info in declared)
+                    {
+                        int index = Array.IndexOf(map.InterfaceMethods, info.method);
+                        if (index < 0)
+                        {
+                            continue;
+                        }
+
+                        if (contractMembers == null)
+                        {
+                            contractMembers = new List<(Type, SetupMethodInfo, MethodInfo)>();
+                        }
+                        contractMembers.Add((iface, info, map.TargetMethods[index]));
+                    }
+                }
             }
 
             List<SetupMethodInfo> added = null;
@@ -304,7 +411,14 @@ namespace Dec
                 {
                     if (method.GetCustomAttributes<SetupAfterAttribute>(inherit: false).Any() || method.GetCustomAttributes<SetupBeforeAttribute>(inherit: false).Any())
                     {
-                        Dbg.Err($"{type}.{method.Name} has a [Dec.SetupAfter] or [Dec.SetupBefore] attribute but no [Dec.Setup]; the ordering constraint has no effect");
+                        if (contractMembers != null && contractMembers.Any(c => c.target == method))
+                        {
+                            Dbg.Err($"{type}.{method.Name} implements a setup function and has a [Dec.SetupAfter] or [Dec.SetupBefore] attribute; ordering attributes on an implementation are ignored, declare them on the interface member");
+                        }
+                        else
+                        {
+                            Dbg.Err($"{type}.{method.Name} has a [Dec.SetupAfter] or [Dec.SetupBefore] attribute but no [Dec.Setup]; the ordering constraint has no effect");
+                        }
                     }
 
                     continue;
@@ -315,6 +429,17 @@ namespace Dec
                 {
                     Dbg.Err($"{type}.{method.Name} has a [Dec.Setup] attribute, but ConfigErrors and PostLoad already run automatically as part of setup; remove the attribute");
                     continue;
+                }
+
+                if (contractMembers != null)
+                {
+                    // Comparing against the map's target - the most-derived implementation - catches tagged overrides of an implementing method at every level, not just the level that introduced the interface.
+                    var contract = contractMembers.FirstOrDefault(c => c.target == method);
+                    if (contract.info != null)
+                    {
+                        Dbg.Wrn($"{type}.{method.Name} has a [Dec.Setup] attribute, but it is already a setup function through {contract.iface}.{contract.info.method.Name}; the interface declaration's settings are used and this method's ordering attributes are ignored");
+                        continue;
+                    }
                 }
 
                 if (baseDefinition != method && setups != null && Array.Exists(setups, s => s.method == baseDefinition))
@@ -333,6 +458,40 @@ namespace Dec
                     added = new List<SetupMethodInfo>();
                 }
                 added.Add(new SetupMethodInfo { method = baseDefinition, attributeSource = method, parallel = attribute.Parallel, explicitStage = attribute.Stage });
+            }
+
+            // Contract entries are added only at the level that first implements the interface; lower levels inherit them, which both dedups a re-listed interface and keeps the cross-level conflict below warning once.
+            if (contractMembers != null)
+            {
+                var inheritedInterfaces = new HashSet<Type>(type.BaseType?.GetInterfaces() ?? Type.EmptyTypes);
+                foreach (var c in contractMembers)
+                {
+                    if (inheritedInterfaces.Contains(c.iface))
+                    {
+                        continue;
+                    }
+
+                    // Legacy hooks never appear in the entry list, so the conflict check below can't catch a contract member binding to them; without this, ConfigErrors/PostLoad would run a second time through the contract node.
+                    var targetBase = c.target.GetBaseDefinition();
+                    if (targetBase.DeclaringType == typeof(Dec))
+                    {
+                        Dbg.Err($"{c.iface}.{c.info.method.Name} is a setup function bound to {type}'s ConfigErrors or PostLoad, but those already run automatically as part of setup; the interface member is ignored");
+                        continue;
+                    }
+
+                    // One body keeps one function identity; here the class-tagged identity was born first (its owners exist without the interface), so it wins - the mirror of the interface winning when both appear on one type.
+                    if (setups != null && Array.Exists(setups, s => s.method == targetBase))
+                    {
+                        Dbg.Wrn($"{c.iface}.{c.info.method.Name} is a setup function implemented by {targetBase.DeclaringType}.{targetBase.Name}, which is already a setup function; the class declaration's settings are used, and bare setup dependencies on {c.iface} will not order against it (IncludeDerived dependencies will)");
+                        continue;
+                    }
+
+                    if (added == null)
+                    {
+                        added = new List<SetupMethodInfo>();
+                    }
+                    added.Add(c.info);
+                }
             }
 
             if (added != null)

@@ -144,6 +144,7 @@ namespace Dec
             public MethodInfo attributeSource;
             public Type explicitStage;
             public bool parallel;
+            public bool includeDerivedSentinel;
             public List<object> instances;
             public SortKey sortKey;
 
@@ -151,8 +152,8 @@ namespace Dec
             {
                 switch (kind)
                 {
-                    case NodeKind.StageBegin: return $"{owner} setup stage begin";
-                    case NodeKind.StageEnd: return $"{owner} setup stage end";
+                    case NodeKind.StageBegin: return $"{owner} setup stage{(includeDerivedSentinel ? " (IncludeDerived)" : "")} begin";
+                    case NodeKind.StageEnd: return $"{owner} setup stage{(includeDerivedSentinel ? " (IncludeDerived)" : "")} end";
                     case NodeKind.LegacyConfigErrors: return $"{owner} ConfigErrors";
                     case NodeKind.LegacyPostLoad: return $"{owner} PostLoad";
                     default: return $"{owner}.{method.Name}";
@@ -160,11 +161,56 @@ namespace Dec
             }
         }
 
+        // Each stage has two nested sentinel pairs, chained hierarchyBegin -> ownBegin -> ownEnd -> hierarchyEnd. The inner "own" pair brackets the stage's own setup functions (declared on the stage type or inherited into it); the outer "hierarchy" pair additionally brackets functions introduced by derived types, which is what IncludeDerived dependencies attach to. Own membership is a strict subset of hierarchy membership, so the nesting edges are always semantically true - and they keep mixed-variant third parties transitively ordered even when the stage has no members this load.
         private class StageInfo
         {
-            public Node begin;
-            public Node end;
+            public Node ownBegin;
+            public Node ownEnd;
+            public Node hierarchyBegin;
+            public Node hierarchyEnd;
             public bool valid;
+
+            // Membership and reference tracking for the deferred empty-stage warning; whether a dependency is suspicious depends on which variant it referenced.
+            public bool anyOwn;
+            public bool anyHierarchy;
+            public bool referencedOwn;
+            public bool referencedHierarchy;
+
+            public Node Begin(bool hierarchy)
+            {
+                return hierarchy ? hierarchyBegin : ownBegin;
+            }
+
+            public Node End(bool hierarchy)
+            {
+                return hierarchy ? hierarchyEnd : ownEnd;
+            }
+
+            public void MarkReferenced(bool hierarchy)
+            {
+                if (hierarchy)
+                {
+                    referencedHierarchy = true;
+                }
+                else
+                {
+                    referencedOwn = true;
+                }
+            }
+        }
+
+        // The type a node's function is declared on, used for declared-on stage membership; the legacy hooks are declared on Dec itself, which makes them part of every dec type's own setup.
+        private static Type FunctionDeclaringType(Node node)
+        {
+            switch (node.kind)
+            {
+                case NodeKind.LegacyConfigErrors:
+                case NodeKind.LegacyPostLoad:
+                    return typeof(Dec);
+                default:
+                    // for instance functions, method is already the base definition or the interface member
+                    return node.method.DeclaringType;
+            }
         }
 
         private static readonly List<StaticSetupMethod> EmptyStatics = new List<StaticSetupMethod>();
@@ -193,6 +239,7 @@ namespace Dec
             var sentinelNodes = new List<Node>();
             var edges = new List<Dag<Node>.Dependency>();
             var stages = new Dictionary<Type, StageInfo>();
+            var classLevelProcessed = new HashSet<Type>();
 
             var sortedDecsByType = new Dictionary<Type, List<object>>();
             foreach (var kvp in decsByType)
@@ -318,6 +365,12 @@ namespace Dec
                         continue;
                     }
 
+                    // Interfaces carry ordering attributes that inherit:true can't surface through an implementor, so they're chased explicitly; sorted because synthesis order feeds edge insertion order, which must stay deterministic.
+                    foreach (var iface in type.GetInterfaces().OrderBy(i => i.FullName ?? i.Name, StringComparer.Ordinal))
+                    {
+                        pending.Enqueue(iface);
+                    }
+
                     foreach (var attr in type.GetCustomAttributes<SetupAfterAttribute>(inherit: true))
                     {
                         if (attr.Type != null)
@@ -362,34 +415,40 @@ namespace Dec
 
                 var info = new StageInfo
                 {
-                    begin = new Node { kind = NodeKind.StageBegin, owner = stageType, sortKey = new SortKey(stageType, 0, null) },
-                    end = new Node { kind = NodeKind.StageEnd, owner = stageType, sortKey = new SortKey(stageType, 2, null) },
+                    ownBegin = new Node { kind = NodeKind.StageBegin, owner = stageType, sortKey = new SortKey(stageType, 0, null) },
+                    ownEnd = new Node { kind = NodeKind.StageEnd, owner = stageType, sortKey = new SortKey(stageType, 2, null) },
+                    hierarchyBegin = new Node { kind = NodeKind.StageBegin, owner = stageType, includeDerivedSentinel = true, sortKey = new SortKey(stageType, 0, "IncludeDerived") },
+                    hierarchyEnd = new Node { kind = NodeKind.StageEnd, owner = stageType, includeDerivedSentinel = true, sortKey = new SortKey(stageType, 2, "IncludeDerived") },
                     valid = true,
                 };
 
                 // registered before processing class-level attributes, so mutually-referencing stages can't recurse forever
                 stages[stageType] = info;
-                sentinelNodes.Add(info.begin);
-                sentinelNodes.Add(info.end);
+                sentinelNodes.Add(info.ownBegin);
+                sentinelNodes.Add(info.ownEnd);
+                sentinelNodes.Add(info.hierarchyBegin);
+                sentinelNodes.Add(info.hierarchyEnd);
 
-                // even a stage with no members must order its dependents transitively; whether a stage happens to have instances this load must not change ordering between third parties
-                edges.Add(new Dag<Node>.Dependency { before = info.begin, after = info.end });
+                // even a stage with no members must order its dependents transitively; whether a stage happens to have instances this load must not change ordering between third parties, and the nesting chain extends that guarantee across the two membership variants
+                edges.Add(new Dag<Node>.Dependency { before = info.hierarchyBegin, after = info.ownBegin });
+                edges.Add(new Dag<Node>.Dependency { before = info.ownBegin, after = info.ownEnd });
+                edges.Add(new Dag<Node>.Dependency { before = info.ownEnd, after = info.hierarchyEnd });
 
-                bool anyMember = false;
                 foreach (var node in methodNodes)
                 {
-                    if (stageType.IsAssignableFrom(node.owner) || node.explicitStage == stageType)
+                    if (NodeIsMemberOfStage(node, stageType, includeDerived: false))
                     {
-                        edges.Add(new Dag<Node>.Dependency { before = info.begin, after = node });
-                        edges.Add(new Dag<Node>.Dependency { before = node, after = info.end });
-                        anyMember = true;
+                        edges.Add(new Dag<Node>.Dependency { before = info.ownBegin, after = node });
+                        edges.Add(new Dag<Node>.Dependency { before = node, after = info.ownEnd });
+                        info.anyOwn = true;
+                        info.anyHierarchy = true;
                     }
-                }
-
-                if (!anyMember && !typeof(Dec).IsAssignableFrom(stageType) && mode == Mode.Parser)
-                {
-                    // suppressed during recorder loads; a stage that simply has nothing present in this savegame is satisfied, not suspicious
-                    Dbg.Wrn($"{stageType} is referenced in setup ordering, but contains no setup functions; the constraint has no effect");
+                    else if (NodeIsMemberOfStage(node, stageType, includeDerived: true))
+                    {
+                        edges.Add(new Dag<Node>.Dependency { before = info.hierarchyBegin, after = node });
+                        edges.Add(new Dag<Node>.Dependency { before = node, after = info.hierarchyEnd });
+                        info.anyHierarchy = true;
+                    }
                 }
 
                 // A pure marker class owns no setup functions, so the class-level attribute pass below never visits it; its own ordering attributes get processed here instead.
@@ -401,9 +460,25 @@ namespace Dec
                 return info;
             }
 
-            bool NodeIsMemberOfStage(Node node, Type stageType)
+            bool NodeIsMemberOfStage(Node node, Type stageType, bool includeDerived)
             {
-                return stageType.IsAssignableFrom(node.owner) || node.explicitStage == stageType;
+                if (node.explicitStage == stageType)
+                {
+                    return true;
+                }
+
+                if (!stageType.IsAssignableFrom(node.owner))
+                {
+                    return false;
+                }
+
+                if (includeDerived)
+                {
+                    return true;
+                }
+
+                // For interface stages, FunctionDeclaringType is the interface for contract functions, so this covers "the contract's implementations" the same way it covers "the class's own functions" for class stages.
+                return FunctionDeclaringType(node).IsAssignableFrom(stageType);
             }
 
             bool ValidateDecTargetHasInstances(object site, Type target)
@@ -423,7 +498,7 @@ namespace Dec
                 return true;
             }
 
-            // Resolves a (type, memberName) reference to the matching setup nodes; stage-like in that one name can legitimately match nodes on several concrete types, but distinct *functions* sharing the name are ambiguous.
+            // Resolves a (type, memberName) reference to the matching setup nodes; stage-like in that one name can legitimately match nodes on several concrete types, but distinct *functions* sharing the name are ambiguous. Only functions belonging to the target's own setup match: a name introduced below the target is treated as nonexistent, and a derived new-hide doesn't create ambiguity.
             List<Node> ResolveNamedTarget(object site, Type target, string memberName)
             {
                 bool NameMatches(Node n)
@@ -438,7 +513,7 @@ namespace Dec
                     }
                 }
 
-                var candidates = methodNodes.Where(n => target.IsAssignableFrom(n.owner) && NameMatches(n)).ToList();
+                var candidates = methodNodes.Where(n => target.IsAssignableFrom(n.owner) && FunctionDeclaringType(n).IsAssignableFrom(target) && NameMatches(n)).ToList();
 
                 if (candidates.Count == 0)
                 {
@@ -490,7 +565,7 @@ namespace Dec
                     continue;
                 }
 
-                void ProcessMethodEdge(Type target, string memberName, bool after)
+                void ProcessMethodEdge(Type target, string memberName, bool includeDerived, bool after)
                 {
                     if (target == null)
                     {
@@ -500,6 +575,12 @@ namespace Dec
 
                     if (memberName != null)
                     {
+                        if (includeDerived)
+                        {
+                            Dbg.Err($"{node} has a setup dependency on {target}.{memberName} with IncludeDerived; IncludeDerived is only meaningful for bare-type dependencies");
+                            return;
+                        }
+
                         var targets = ResolveNamedTarget(node, target, memberName);
                         if (targets == null)
                         {
@@ -520,7 +601,7 @@ namespace Dec
                         return;
                     }
 
-                    if (NodeIsMemberOfStage(node, target))
+                    if (NodeIsMemberOfStage(node, target, includeDerived))
                     {
                         Dbg.Err($"{node} has a setup dependency on {target}, but it is itself part of {target}'s setup stage; ignoring the dependency");
                         return;
@@ -537,17 +618,18 @@ namespace Dec
                         return;
                     }
 
-                    edges.Add(after ? new Dag<Node>.Dependency { before = stage.end, after = node } : new Dag<Node>.Dependency { before = node, after = stage.begin });
+                    stage.MarkReferenced(includeDerived);
+                    edges.Add(after ? new Dag<Node>.Dependency { before = stage.End(includeDerived), after = node } : new Dag<Node>.Dependency { before = node, after = stage.Begin(includeDerived) });
                 }
 
                 foreach (var attr in node.attributeSource.GetCustomAttributes<SetupAfterAttribute>(inherit: false))
                 {
-                    ProcessMethodEdge(attr.Type, attr.MemberName, after: true);
+                    ProcessMethodEdge(attr.Type, attr.MemberName, attr.IncludeDerived, after: true);
                 }
 
                 foreach (var attr in node.attributeSource.GetCustomAttributes<SetupBeforeAttribute>(inherit: false))
                 {
-                    ProcessMethodEdge(attr.Type, attr.MemberName, after: false);
+                    ProcessMethodEdge(attr.Type, attr.MemberName, attr.IncludeDerived, after: false);
                 }
 
                 if (node.explicitStage != null)
@@ -559,7 +641,13 @@ namespace Dec
             // Class-level [SetupAfter]/[SetupBefore]: stage-to-stage constraints. Read per concrete owner with inheritance, so a constraint on a base class applies to each derived type's stage as well. Also called from GetStage for pure marker classes, which own no nodes and are therefore missed by the owner pass below.
             void ProcessClassLevelAttributes(Type classType)
             {
-                void ProcessClassEdge(Type target, string memberName, bool after)
+                // Reachable from the marker branch in GetStage, the per-owner pass, and the owners'-interfaces pass; process each type once no matter which finds it first.
+                if (!classLevelProcessed.Add(classType))
+                {
+                    return;
+                }
+
+                void ProcessClassEdge(Type target, string memberName, bool includeDerived, bool after)
                 {
                     if (target == null)
                     {
@@ -573,7 +661,8 @@ namespace Dec
                         return;
                     }
 
-                    if (target.IsAssignableFrom(classType) || methodNodes.Any(n => NodeIsMemberOfStage(n, classType) && NodeIsMemberOfStage(n, target)))
+                    // The ancestor short-circuit fires even when the ancestor declares no functions of its own and the stages therefore wouldn't overlap; "run my own stage after my ancestor's" is at best a no-op there, and erroring uniformly keeps the rule predictable. Method-level ancestor dependencies are the supported form. The own-side membership variant must match the pair the edge below binds - hierarchy for interfaces - or an overlap surfaces as a raw cycle instead of this diagnostic.
+                    if (target.IsAssignableFrom(classType) || methodNodes.Any(n => NodeIsMemberOfStage(n, classType, includeDerived: classType.IsInterface) && NodeIsMemberOfStage(n, target, includeDerived)))
                     {
                         Dbg.Err($"{classType} has a setup dependency on {target}, but it is itself part of {target}'s setup stage; ignoring the dependency");
                         return;
@@ -591,23 +680,60 @@ namespace Dec
                         return;
                     }
 
-                    edges.Add(after ? new Dag<Node>.Dependency { before = targetStage.end, after = ownStage.begin } : new Dag<Node>.Dependency { before = ownStage.end, after = targetStage.begin });
+                    // The own side binds the class's own setup; functions introduced by derived classes get constrained when the per-owner pass processes the inherited attribute against the derived owner's own stage. That inheritance leg doesn't exist for interfaces - GetCustomAttributes never traverses them - so an interface's class-level attributes bind its hierarchy stage to keep constraining what implementors declare beyond the contract.
+                    bool targetHierarchy = includeDerived;
+                    bool ownHierarchy = classType.IsInterface;
+                    targetStage.MarkReferenced(targetHierarchy);
+                    // For warning purposes the own side counts as a hierarchy reference: attribute inheritance extends the constraint to derived owners, so a class whose own setup is empty but whose derived classes have functions is fully enforced, not suspicious.
+                    ownStage.MarkReferenced(hierarchy: true);
+                    edges.Add(after ? new Dag<Node>.Dependency { before = targetStage.End(targetHierarchy), after = ownStage.Begin(ownHierarchy) } : new Dag<Node>.Dependency { before = ownStage.End(ownHierarchy), after = targetStage.Begin(targetHierarchy) });
                 }
 
                 foreach (var attr in classType.GetCustomAttributes<SetupAfterAttribute>(inherit: true))
                 {
-                    ProcessClassEdge(attr.Type, attr.MemberName, after: true);
+                    ProcessClassEdge(attr.Type, attr.MemberName, attr.IncludeDerived, after: true);
                 }
 
                 foreach (var attr in classType.GetCustomAttributes<SetupBeforeAttribute>(inherit: true))
                 {
-                    ProcessClassEdge(attr.Type, attr.MemberName, after: false);
+                    ProcessClassEdge(attr.Type, attr.MemberName, attr.IncludeDerived, after: false);
                 }
             }
 
-            foreach (var owner in methodNodes.Select(n => n.owner).Distinct().OrderBy(t => t.FullName ?? t.Name, StringComparer.Ordinal).ToList())
+            // Owners' interfaces are included because attribute inheritance never traverses interfaces; without this leg, ordering attributes declared on an interface would only be discovered when something happens to reference it.
+            foreach (var owner in methodNodes.Select(n => n.owner).Concat(methodNodes.SelectMany(n => n.owner.GetInterfaces())).Distinct().OrderBy(t => t.FullName ?? t.Name, StringComparer.Ordinal).ToList())
             {
                 ProcessClassLevelAttributes(owner);
+            }
+
+            // Empty-stage warnings, deferred until every dependency is attached because they depend on which membership variants got referenced. Suppressed during recorder loads (a stage with nothing present in this savegame is satisfied, not suspicious) and for dec stage types (a dec type's own setup always contains ConfigErrors/PostLoad, so an empty dec stage just means no instances - already diagnosed by ValidateDecTargetHasInstances).
+            if (mode == Mode.Parser)
+            {
+                foreach (var kvp in stages.OrderBy(kvp => kvp.Key.FullName ?? kvp.Key.Name, StringComparer.Ordinal))
+                {
+                    var stageType = kvp.Key;
+                    var info = kvp.Value;
+                    if (!info.valid || typeof(Dec).IsAssignableFrom(stageType))
+                    {
+                        continue;
+                    }
+
+                    if (info.referencedOwn && !info.anyOwn)
+                    {
+                        if (info.anyHierarchy)
+                        {
+                            Dbg.Wrn($"{stageType} is referenced in setup ordering, but contains no setup functions of its own; {(stageType.IsInterface ? "its implementors" : "its derived classes")} do, so use IncludeDerived = true if you meant those");
+                        }
+                        else
+                        {
+                            Dbg.Wrn($"{stageType} is referenced in setup ordering, but contains no setup functions; the constraint has no effect");
+                        }
+                    }
+                    else if (info.referencedHierarchy && !info.anyHierarchy)
+                    {
+                        Dbg.Wrn($"{stageType} is referenced in setup ordering, but contains no setup functions; the constraint has no effect");
+                    }
+                }
             }
 
             var order = Dag<Node>.CalculateOrder(methodNodes.Concat(sentinelNodes), edges, n => n.sortKey);

@@ -30,7 +30,7 @@ By default, setup functions run in an unspecified (but deterministic) order. To 
 ```cs
 public class RoomDec : Dec.Dec
 {
-    // Runs after every setup function on ItemDec and its subclasses, including ItemDec's ConfigErrors and PostLoad.
+    // Runs after every setup function on ItemDec
     [Dec.Setup]
     [Dec.SetupAfter(typeof(ItemDec))]
     private void PlaceItems(Action<string> reporter) { /* ... */ }
@@ -42,9 +42,20 @@ public class RoomDec : Dec.Dec
 }
 ```
 
-Referencing a bare type means "after that type's entire setup": all of its setup functions and everything belonging to its derived classes. Referencing a type plus a member name targets that one function.
+Referencing a bare type means after every setup function the type has, declared on it or inherited into it, as it runs on instances of the type and all of its subclasses. Setup functions *introduced by* subclasses are not included. If you mean "after everything inheriting from this type is fully ready", use `IncludeDerived`:
 
-Both attributes can also go on a class, where they constrain every setup function belonging to that class. `[Dec.SetupBefore]` is particularly useful in mods, where you can order your setup ahead of a class you can't edit.
+```cs
+// Runs after every setup function on ItemDec and everything derived from it
+[Dec.Setup]
+[Dec.SetupAfter(typeof(ItemDec), IncludeDerived = true)]
+private void BuildItemCatalog(Action<string> reporter) { /* ... */ }
+```
+
+Referencing a type plus a member name targets that one function, which must belong to the referenced type's own setup.
+
+Because subclass-introduced functions are outside the base's own setup, a subclass can order its additions relative to its ancestor: a setup function introduced on a derived class can declare `[Dec.SetupAfter(typeof(BaseClass))]` and run after the inherited functions, on every instance of the hierarchy including its own.
+
+Both attributes can also go on a class or interface, where they constrain every setup function belonging to that stage. `[Dec.SetupBefore]` is particularly useful in mods, where you can order your setup ahead of a class you can't edit.
 
 All constraints are combined into one dependency graph and executed in a stable topological order. Cycles are reported as errors and broken arbitrarily.
 
@@ -92,4 +103,3 @@ Rules for parallel setup functions: don't call Dec's database mutation APIs, and
 * Instance setup functions run at the end of `Parser.Finish()`, `Recorder.Read`, and `Recorder.ReadSimple`, on whatever thread you called from. `Recorder.Clone` doesn't trigger them, and neither does creating decs at runtime through `Database.Create`. Static setup functions run only from `Parser.Finish()`.
 * Decs and dec-owned objects referenced by a savegame keep their parse-time setup; reading a savegame never re-runs setup on them. Ordering constraints naming types with nothing present in a given load are silently satisfied. Declaration mistakes (bad signatures and the like) on savegame-only types surface as errors when a savegame first loads them.
 * If you call `Recorder.Read` concurrently from multiple threads, your setup functions can run concurrently with themselves on different instances; keep them safe for that, or don't read concurrently.
-* Setup functions declared as interface default implementations aren't discovered.
