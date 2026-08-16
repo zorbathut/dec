@@ -24,6 +24,7 @@ namespace DecTest
         {
             setupOrder = new List<string>();
             SharedConv_Payload.Singleton = new SharedConv_Payload();
+            ReportNDShare_Payload.Singleton = new ReportNDShare_Payload();
         }
 
         // Classes for TestStaticRunsOnce
@@ -1892,7 +1893,8 @@ namespace DecTest
                 <Decs>
                     <Reporter_Dec decName=""A"" />
                 </Decs>");
-            ExpectErrors(() => parser.Finish(), err => err.Contains("intentional setup gripe") && err.Contains("Reporter_Dec"));
+            // the exact dec-side format matters; non-dec reports gained a path prefix and this one deliberately didn't change
+            ExpectErrors(() => parser.Finish(), err => err.Contains("intentional setup gripe") && err.Contains("[Reporter_Dec:A]"));
 
             var dec = Dec.Database<Reporter_Dec>.Get("A");
             Assert.IsTrue(dec.touchedBefore);
@@ -3428,6 +3430,551 @@ namespace DecTest
 
             Assert.AreNotSame(Dec.Database<ValEq_Dec>.Get("A").obj, deserialized);
             CollectionAssert.AreEqual(new[] { "valeq.M:7", "valeq.M:7" }, setupOrder);
+        }
+
+        // ExpectErrors requires *every* error it sees to match its validator, so tests that want to inspect several distinct messages collect them all and assert afterwards.
+        private List<string> CollectErrors(Action action)
+        {
+            var reported = new List<string>();
+            ExpectErrors(action, err => { reported.Add(err); return true; });
+            return reported;
+        }
+
+        // Classes for TestReporterNonDec
+        public class ReportND_Obj
+        {
+            public int id;
+
+            [Dec.Setup]
+            internal void M(Action<string> reporter)
+            {
+                reporter("nondec gripe");
+            }
+        }
+        public class ReportND_Dec : Dec.Dec
+        {
+            public ReportND_Obj obj;
+        }
+
+        [Test]
+        public void TestReporterNonDec()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ReportND_Dec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <ReportND_Dec decName=""A"">
+                        <obj><id>1</id></obj>
+                    </ReportND_Dec>
+                    <ReportND_Dec decName=""B"">
+                        <obj><id>2</id></obj>
+                    </ReportND_Dec>
+                </Decs>");
+            var reported = CollectErrors(() => parser.Finish());
+
+            // the entire point of the feature: two instances of one type produce two distinguishable reports
+            Assert.AreEqual(2, reported.Count);
+            Assert.IsTrue(reported.Any(r => r.Contains("ReportND_Dec.A.obj")), string.Join(" / ", reported));
+            Assert.IsTrue(reported.Any(r => r.Contains("ReportND_Dec.B.obj")), string.Join(" / ", reported));
+            Assert.IsTrue(reported.All(r => r.Contains("ReportND_Obj") && r.Contains("nondec gripe")), string.Join(" / ", reported));
+        }
+
+        // Classes for TestReporterNonDecIndexed
+        public class ReportNDIdx_Obj
+        {
+            public int id;
+
+            [Dec.Setup]
+            internal void M(Action<string> reporter)
+            {
+                reporter("indexed gripe");
+            }
+        }
+        public class ReportNDIdx_Dec : Dec.Dec
+        {
+            public List<ReportNDIdx_Obj> list;
+        }
+
+        [Test]
+        public void TestReporterNonDecIndexed()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ReportNDIdx_Dec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <ReportNDIdx_Dec decName=""A"">
+                        <list>
+                            <li><id>0</id></li>
+                            <li><id>1</id></li>
+                        </list>
+                    </ReportNDIdx_Dec>
+                </Decs>");
+            var reported = CollectErrors(() => parser.Finish());
+
+            Assert.AreEqual(2, reported.Count);
+            Assert.IsTrue(reported.Any(r => r.Contains("ReportNDIdx_Dec.A.list[0]")), string.Join(" / ", reported));
+            Assert.IsTrue(reported.Any(r => r.Contains("ReportNDIdx_Dec.A.list[1]")), string.Join(" / ", reported));
+        }
+
+        // Classes for TestReporterNonDecUnpathable
+        public class ReportNDSet_Obj
+        {
+            public int id;
+
+            [Dec.Setup]
+            internal void M(Action<string> reporter)
+            {
+                reporter("set gripe");
+            }
+        }
+        public class ReportNDSet_Dec : Dec.Dec
+        {
+            public HashSet<ReportNDSet_Obj> set;
+        }
+
+        [Test]
+        public void TestReporterNonDecUnpathable()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ReportNDSet_Dec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <ReportNDSet_Dec decName=""A"">
+                        <set>
+                            <li><id>0</id></li>
+                            <li><id>1</id></li>
+                        </set>
+                    </ReportNDSet_Dec>
+                </Decs>");
+            var reported = CollectErrors(() => parser.Finish());
+
+            // Known limitation, pinned deliberately: set elements have no individually addressable path, so both instances report at the same place. This is as good as the path system currently gets.
+            Assert.AreEqual(2, reported.Count);
+            Assert.IsTrue(reported.All(r => r.Contains("ReportNDSet_Dec.A.set[SETELEM]")), string.Join(" / ", reported));
+        }
+
+        // Classes for TestReporterNonDecShared
+        public class ReportNDShare_Payload
+        {
+            public static ReportNDShare_Payload Singleton;
+
+            [Dec.Setup]
+            internal void M(Action<string> reporter)
+            {
+                reporter("shared gripe");
+            }
+        }
+        public class ReportNDShare_Converter : Dec.ConverterString<ReportNDShare_Payload>
+        {
+            public override ReportNDShare_Payload Read(string input, Dec.Context context)
+            {
+                return ReportNDShare_Payload.Singleton;
+            }
+
+            public override string Write(ReportNDShare_Payload input)
+            {
+                return "singleton";
+            }
+        }
+        public class ReportNDShare_Dec : Dec.Dec
+        {
+            public ReportNDShare_Payload payload;
+        }
+
+        [Test]
+        public void TestReporterNonDecShared()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ReportNDShare_Dec) }, explicitConverters = new Type[] { typeof(ReportNDShare_Converter) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <ReportNDShare_Dec decName=""A"">
+                        <payload>x</payload>
+                    </ReportNDShare_Dec>
+                    <ReportNDShare_Dec decName=""B"">
+                        <payload>x</payload>
+                    </ReportNDShare_Dec>
+                </Decs>");
+            var reported = CollectErrors(() => parser.Finish());
+
+            // One object reached through two decs: setup runs once, and it reports at one of the two places it was found. Which one isn't pinned here - that would be testing dec iteration order - but it must be a real member path, not a fallback.
+            Assert.AreEqual(1, reported.Count);
+            Assert.IsTrue(reported[0].Contains("ReportNDShare_Dec.A.payload") || reported[0].Contains("ReportNDShare_Dec.B.payload"), reported[0]);
+        }
+
+        // Classes for TestReporterNonDecRecorder
+        public class ReportNDRec_Obj : Dec.IRecordable
+        {
+            [Dec.Setup]
+            internal void M(Action<string> reporter)
+            {
+                reporter("recorder gripe");
+            }
+
+            public void Record(Dec.Recorder recorder) { }
+        }
+        public class ReportNDRec_Root : Dec.IRecordable
+        {
+            public ReportNDRec_Obj member;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref member, "member");
+            }
+        }
+
+        [Test]
+        public void TestReporterNonDecRecorder()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { } });
+
+            var serialized = Dec.Recorder.Write(new ReportNDRec_Root { member = new ReportNDRec_Obj() });
+            var reported = CollectErrors(() => Dec.Recorder.Read<ReportNDRec_Root>(serialized));
+
+            Assert.AreEqual(1, reported.Count);
+            Assert.IsTrue(reported[0].Contains("RECORD.member"), reported[0]);
+        }
+
+        // Classes for TestReporterNonDecRecorderShared; a shared object is parsed through its <Ref> node before the root parse ever reaches a pointer to it, so the useful structural path arrives second
+        public class ReportNDShareRec_Obj : Dec.IRecordable
+        {
+            [Dec.Setup]
+            internal void M(Action<string> reporter)
+            {
+                reporter("shared recorder gripe");
+            }
+
+            public void Record(Dec.Recorder recorder) { }
+        }
+        public class ReportNDShareRec_Root : Dec.IRecordable
+        {
+            public ReportNDShareRec_Obj one;
+            public ReportNDShareRec_Obj two;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Shared().Record(ref one, "one");
+                recorder.Shared().Record(ref two, "two");
+            }
+        }
+
+        [Test]
+        public void TestReporterNonDecRecorderShared()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { } });
+
+            var root = new ReportNDShareRec_Root();
+            root.one = new ReportNDShareRec_Obj();
+            root.two = root.one;
+
+            var serialized = Dec.Recorder.Write(root);
+            var reported = CollectErrors(() => Dec.Recorder.Read<ReportNDShareRec_Root>(serialized));
+
+            Assert.AreEqual(1, reported.Count);
+            Assert.IsTrue(reported[0].Contains("RECORD.one"), reported[0]);
+            Assert.IsFalse(reported[0].Contains("REF."), reported[0]);
+        }
+
+        // Classes for TestReporterNonDecRecorderNestedShared
+        public class ReportNDNest_Leaf : Dec.IRecordable
+        {
+            [Dec.Setup]
+            internal void M(Action<string> reporter)
+            {
+                reporter("leaf gripe");
+            }
+
+            public void Record(Dec.Recorder recorder) { }
+        }
+        public class ReportNDNest_Mid : Dec.IRecordable
+        {
+            public ReportNDNest_Leaf a;
+            public ReportNDNest_Leaf b;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Shared().Record(ref a, "a");
+                recorder.Shared().Record(ref b, "b");
+            }
+        }
+        public class ReportNDNest_Root : Dec.IRecordable
+        {
+            public ReportNDNest_Mid one;
+            public ReportNDNest_Mid two;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Shared().Record(ref one, "one");
+                recorder.Shared().Record(ref two, "two");
+            }
+        }
+
+        [Test]
+        public void TestReporterNonDecRecorderNestedShared()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { } });
+
+            var root = new ReportNDNest_Root();
+            root.one = new ReportNDNest_Mid();
+            root.two = root.one;
+            root.one.a = new ReportNDNest_Leaf();
+            root.one.b = root.one.a;
+
+            var serialized = Dec.Recorder.Write(root);
+            var reported = CollectErrors(() => Dec.Recorder.Read<ReportNDNest_Root>(serialized));
+
+            // A shared object reachable only through other shared objects has no path that can re-find it from the root, so it's identified by its own reference. Pinned deliberately: it's unique and greppable in the savegame, but it won't say who pointed at it.
+            Assert.AreEqual(1, reported.Count);
+            Assert.IsTrue(System.Text.RegularExpressions.Regex.IsMatch(reported[0], @"^REF\.[^.]+ \("), reported[0]);
+            Assert.IsTrue(reported[0].Contains("ReportNDNest_Leaf"), reported[0]);
+        }
+
+        // Classes for TestReporterNonDecRecorderNestedSharedConverter; structurally identical to the nested-shared case above, but routed through a ConverterRecord, which reaches the setup collection in a different order
+        public class ReportNDNestConv_Leaf
+        {
+            public int value;
+
+            [Dec.Setup]
+            internal void M(Action<string> reporter)
+            {
+                reporter("converter leaf gripe");
+            }
+        }
+        public class ReportNDNestConv_Converter : Dec.ConverterRecord<ReportNDNestConv_Leaf>
+        {
+            public override void Record(ref ReportNDNestConv_Leaf input, Dec.Recorder recorder)
+            {
+                recorder.Record(ref input.value, "value");
+            }
+        }
+        public class ReportNDNestConv_Mid : Dec.IRecordable
+        {
+            public ReportNDNestConv_Leaf a;
+            public ReportNDNestConv_Leaf b;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Shared().Record(ref a, "a");
+                recorder.Shared().Record(ref b, "b");
+            }
+        }
+        public class ReportNDNestConv_Root : Dec.IRecordable
+        {
+            public ReportNDNestConv_Mid one;
+            public ReportNDNestConv_Mid two;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Shared().Record(ref one, "one");
+                recorder.Shared().Record(ref two, "two");
+            }
+        }
+
+        [Test]
+        public void TestReporterNonDecRecorderNestedSharedConverter()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { }, explicitConverters = new Type[] { typeof(ReportNDNestConv_Converter) } });
+
+            var root = new ReportNDNestConv_Root();
+            root.one = new ReportNDNestConv_Mid();
+            root.two = root.one;
+            root.one.a = new ReportNDNestConv_Leaf { value = 5 };
+            root.one.b = root.one.a;
+
+            var serialized = Dec.Recorder.Write(root);
+            var reported = CollectErrors(() => Dec.Recorder.Read<ReportNDNestConv_Root>(serialized));
+
+            // Same answer as the non-converter case: the object's own reference, not a pointer to it from inside another reference. Which registration arrives first differs between the two, so this pins that the choice is made by rule and not by arrival order.
+            Assert.AreEqual(1, reported.Count);
+            Assert.IsTrue(System.Text.RegularExpressions.Regex.IsMatch(reported[0], @"^REF\.[^.]+ \("), reported[0]);
+            Assert.IsTrue(reported[0].Contains("ReportNDNestConv_Leaf"), reported[0]);
+        }
+
+        // Classes for TestReporterNonDecDictionaryValue
+        public class ReportNDDict_Obj
+        {
+            public int id;
+
+            [Dec.Setup]
+            internal void M(Action<string> reporter)
+            {
+                reporter("dict gripe");
+            }
+        }
+        public class ReportNDDict_Dec : Dec.Dec
+        {
+            public Dictionary<string, ReportNDDict_Obj> dict;
+        }
+
+        [Test]
+        public void TestReporterNonDecDictionaryValue()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ReportNDDict_Dec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <ReportNDDict_Dec decName=""A"">
+                        <dict>
+                            <alpha><id>0</id></alpha>
+                            <beta><id>1</id></beta>
+                        </dict>
+                    </ReportNDDict_Dec>
+                </Decs>");
+            var reported = CollectErrors(() => parser.Finish());
+
+            Assert.AreEqual(2, reported.Count);
+            Assert.IsTrue(reported.Any(r => r.Contains("ReportNDDict_Dec.A.dict[alpha]")), string.Join(" / ", reported));
+            Assert.IsTrue(reported.Any(r => r.Contains("ReportNDDict_Dec.A.dict[beta]")), string.Join(" / ", reported));
+        }
+
+        // Classes for TestReporterNonDecReadSimple
+        public class ReportNDSimple_Obj : Dec.IRecordable
+        {
+            [Dec.Setup]
+            internal void M(Action<string> reporter)
+            {
+                reporter("simple gripe");
+            }
+
+            public void Record(Dec.Recorder recorder) { }
+        }
+        public class ReportNDSimple_Root : Dec.IRecordable
+        {
+            public ReportNDSimple_Obj member;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref member, "member");
+            }
+        }
+
+        [Test]
+        public void TestReporterNonDecReadSimple()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { } });
+
+            var serialized = Dec.Recorder.WriteSimple(new ReportNDSimple_Root { member = new ReportNDSimple_Obj() }, "root");
+            var reported = CollectErrors(() => Dec.Recorder.ReadSimple<ReportNDSimple_Root>(serialized, "root"));
+
+            // ReadSimple roots at the caller's tag name instead of RECORD
+            Assert.AreEqual(1, reported.Count);
+            Assert.IsTrue(reported[0].Contains("root.member"), reported[0]);
+        }
+
+        // Classes for TestReporterNonDecParallel
+        public class ReportNDPar_Obj
+        {
+            public int id;
+
+            [Dec.Setup(Parallel = true)]
+            internal void M(Action<string> reporter)
+            {
+                reporter("parallel gripe");
+            }
+        }
+        public class ReportNDPar_Dec : Dec.Dec
+        {
+            public ReportNDPar_Obj obj;
+        }
+
+        [Test]
+        public void TestReporterNonDecParallel()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ReportNDPar_Dec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <ReportNDPar_Dec decName=""A"">
+                        <obj><id>1</id></obj>
+                    </ReportNDPar_Dec>
+                    <ReportNDPar_Dec decName=""B"">
+                        <obj><id>2</id></obj>
+                    </ReportNDPar_Dec>
+                </Decs>");
+
+            // parallel reports arrive from worker threads, which the thread-static ExpectErrors machinery can't see
+            var reported = new List<string>();
+            var oldHandler = Dec.Config.ErrorHandler;
+            Dec.Config.ErrorHandler = err => { lock (reported) { reported.Add(err); } };
+            try
+            {
+                parser.Finish();
+            }
+            finally
+            {
+                Dec.Config.ErrorHandler = oldHandler;
+            }
+
+            Assert.AreEqual(2, reported.Count);
+            Assert.IsTrue(reported.Any(r => r.Contains("ReportNDPar_Dec.A.obj")), string.Join(" / ", reported));
+            Assert.IsTrue(reported.Any(r => r.Contains("ReportNDPar_Dec.B.obj")), string.Join(" / ", reported));
+        }
+
+        // Classes for TestReporterNonDecException
+        public class ReportNDEx_Obj
+        {
+            public int id;
+
+            [Dec.Setup]
+            internal void M(Action<string> reporter)
+            {
+                throw new InvalidOperationException("intentional nondec explosion");
+            }
+        }
+        public class ReportNDEx_Dec : Dec.Dec
+        {
+            public ReportNDEx_Obj obj;
+        }
+
+        [Test]
+        public void TestReporterNonDecException()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ReportNDEx_Dec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <ReportNDEx_Dec decName=""A"">
+                        <obj><id>1</id></obj>
+                    </ReportNDEx_Dec>
+                </Decs>");
+            ExpectErrors(() => parser.Finish(), err => err.Contains("intentional nondec explosion") && err.Contains("ReportNDEx_Dec.A.obj"));
+        }
+
+        // Classes for TestReporterNonDecRecorderException
+        public class ReportNDRecEx_Obj : Dec.IRecordable
+        {
+            [Dec.Setup]
+            internal void M(Action<string> reporter)
+            {
+                throw new InvalidOperationException("intentional recorder nondec explosion");
+            }
+
+            public void Record(Dec.Recorder recorder) { }
+        }
+        public class ReportNDRecEx_Root : Dec.IRecordable
+        {
+            public ReportNDRecEx_Obj member;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref member, "member");
+            }
+        }
+
+        [Test]
+        public void TestReporterNonDecRecorderException()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { } });
+
+            var serialized = Dec.Recorder.Write(new ReportNDRecEx_Root { member = new ReportNDRecEx_Obj() });
+            ExpectErrors(() => Dec.Recorder.Read<ReportNDRecEx_Root>(serialized), err => err.Contains("intentional recorder nondec explosion") && err.Contains("RECORD.member"));
         }
     }
 }

@@ -578,7 +578,7 @@ namespace Dec
             var result = ParseElement_Worker(nodes, type, original, globals, recSettings, fieldInfo, isRootDec, hasReferenceId, asThis, ordersOverride);
 
             // I just really don't want to put this code at the end of *every single return*, that would be insane
-            if (result != null)
+            if (result != null && nodes != null && nodes.Count > 0)
             {
                 // dec-path registration is parser-only; it writes static database state
                 if (globals.writeDecPaths)
@@ -594,7 +594,7 @@ namespace Dec
                 }
 
                 // setup collection is per-load-operation and does its own filtering; present for parser and recorder loads, null for clones
-                globals.setupCollection?.RegisterInstance(result);
+                globals.setupCollection?.RegisterInstance(result, nodes[0]);
             }
 
             return result;

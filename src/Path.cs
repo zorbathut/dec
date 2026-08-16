@@ -5,6 +5,7 @@ namespace Dec
     {
         public abstract string Serialize();
 
+        // Whether this path re-finds the object it describes. Besides deciding what the database can write a reference to, this is what setup diagnostics use to choose between several paths to one shared object, on the grounds that a path which can't re-find the object also can't tell a human which object it is.
         public abstract bool IsValidForWriting();
     }
 

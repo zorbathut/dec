@@ -29,13 +29,20 @@ namespace Dec
             Recorder,
         }
 
+        // An object awaiting setup, plus the path it was parsed from; the path is what lets a report name which of many identical-typed objects it came from. Null for decs, which identify themselves by name.
+        internal struct Entry
+        {
+            public object obj;
+            public Path path;
+        }
+
         // One Collection per load operation (a Parser run, or one Recorder.Read/ReadSimple call), carried through ReaderGlobals. Per-operation isolation is what makes concurrent Recorder.Read calls safe; registration order stays deterministic because each single load parses single-threaded.
         internal class Collection
         {
             // Keyed by concrete runtime type; list preserves registration order.
-            private readonly Dictionary<Type, List<object>> instancesByType = new Dictionary<Type, List<object>>();
-            // Dedup for genuinely shared instances - a ConverterString returning the same object for two elements, or a savegame ref resolved through multiple pointers. Per-type sets suffice; a shared instance has exactly one concrete type.
-            private readonly Dictionary<Type, HashSet<object>> instancesSeen = new Dictionary<Type, HashSet<object>>();
+            private readonly Dictionary<Type, List<Entry>> instancesByType = new Dictionary<Type, List<Entry>>();
+            // Dedup for genuinely shared instances - a ConverterString returning the same object for two elements, or a savegame ref resolved through multiple pointers. Per-type maps suffice; a shared instance has exactly one concrete type. The value is the instance's index in its type's list, which is what lets a later registration upgrade the stored path in place.
+            private readonly Dictionary<Type, Dictionary<object, int>> instancesSeen = new Dictionary<Type, Dictionary<object, int>>();
             // Recorder loads must not re-run setup on objects owned by the dec database (dec-path refs); the parser must NOT apply this exclusion, because its hook registers the dec path and the instance in the same call and the exclusion would suppress its entire collection.
             private readonly bool excludeDatabaseOwned;
 
@@ -45,10 +52,10 @@ namespace Dec
             }
 
             internal bool IsEmpty => instancesByType.Count == 0;
-            internal Dictionary<Type, List<object>> InstancesByType => instancesByType;
+            internal Dictionary<Type, List<Entry>> InstancesByType => instancesByType;
 
             // Called from Serialization.ParseElement's hook during parser and recorder loads, and from RecorderApi's refs sweep.
-            internal void RegisterInstance(object instance)
+            internal void RegisterInstance(object instance, ReaderNode node)
             {
                 if (instance == null)
                 {
@@ -74,16 +81,50 @@ namespace Dec
                     return;
                 }
 
+                // Deliberately after every rejection above: GetContext is on the hot path for every parsed element, and by this point we've already established that this object is one of the rare ones with setup functions.
+                var path = node.GetContext().path;
+
                 if (!instancesByType.TryGetValue(type, out var list))
                 {
-                    list = new List<object>();
+                    list = new List<Entry>();
                     instancesByType[type] = list;
-                    instancesSeen[type] = new HashSet<object>(ReferenceEqualityComparer.Instance);
+                    instancesSeen[type] = new Dictionary<object, int>(ReferenceEqualityComparer.Instance);
                 }
 
-                if (instancesSeen[type].Add(instance))
+                var seen = instancesSeen[type];
+                if (seen.TryGetValue(instance, out int index))
                 {
-                    list.Add(instance);
+                    // A shared object gets registered once per pointer to it, and the first registration is frequently the worst description of the three - which one arrives first depends on details like whether the type goes through a converter, so the choice has to be by rule rather than by arrival.
+                    if (PathQuality(path) > PathQuality(list[index].path))
+                    {
+                        list[index] = new Entry { obj = instance, path = path };
+                    }
+
+                    return;
+                }
+
+                seen[instance] = list.Count;
+                list.Add(new Entry { obj = instance, path = path });
+            }
+
+            // How well a path identifies the object it points at, for picking between the several paths a shared object accumulates. A path that can re-find the object is best. A bare savegame reference is next: the id is generated, but it names the object's own serialized body, so it's a unique locator. Everything else - a pointer to the object from inside some other reference, an unaddressable container slot - only says where something pointed at it from.
+            private static int PathQuality(Path path)
+            {
+                if (path == null)
+                {
+                    return 0;
+                }
+                else if (path.IsValidForWriting())
+                {
+                    return 3;
+                }
+                else if (path is PathRef)
+                {
+                    return 2;
+                }
+                else
+                {
+                    return 1;
                 }
             }
         }
@@ -145,7 +186,7 @@ namespace Dec
             public Type explicitStage;
             public bool parallel;
             public bool includeDerivedSentinel;
-            public List<object> instances;
+            public List<Entry> instances;
             public SortKey sortKey;
 
             public override string ToString()
@@ -241,10 +282,10 @@ namespace Dec
             var stages = new Dictionary<Type, StageInfo>();
             var classLevelProcessed = new HashSet<Type>();
 
-            var sortedDecsByType = new Dictionary<Type, List<object>>();
+            var sortedDecsByType = new Dictionary<Type, List<Entry>>();
             foreach (var kvp in decsByType)
             {
-                sortedDecsByType[kvp.Key] = kvp.Value.OrderBy(d => d.DecName, StringComparer.Ordinal).Cast<object>().ToList();
+                sortedDecsByType[kvp.Key] = kvp.Value.OrderBy(d => d.DecName, StringComparer.Ordinal).Select(d => new Entry { obj = d }).ToList();
             }
 
             // Legacy nodes: one ConfigErrors and one PostLoad node per concrete dec type, always, matching the old always-call behavior.
@@ -278,7 +319,7 @@ namespace Dec
                     continue;
                 }
 
-                List<object> instances = sortedDecsByType.TryGetValue(owner, out var decs) ? decs : collection.InstancesByType[owner];
+                List<Entry> instances = sortedDecsByType.TryGetValue(owner, out var decs) ? decs : collection.InstancesByType[owner];
 
                 foreach (var info in setupInfo)
                 {
@@ -307,7 +348,7 @@ namespace Dec
 
                 foreach (var info in setupInfo)
                 {
-                    var node = new Node { kind = NodeKind.InstanceMethod, owner = type, method = info.method, attributeSource = info.attributeSource, explicitStage = info.explicitStage, parallel = info.parallel, instances = new List<object>(), sortKey = new SortKey(type, 1, info.method.Name) };
+                    var node = new Node { kind = NodeKind.InstanceMethod, owner = type, method = info.method, attributeSource = info.attributeSource, explicitStage = info.explicitStage, parallel = info.parallel, instances = new List<Entry>(), sortKey = new SortKey(type, 1, info.method.Name) };
                     methodNodes.Add(node);
                     created.Add(node);
                 }
@@ -753,8 +794,9 @@ namespace Dec
                     return;
 
                 case NodeKind.LegacyConfigErrors:
-                    foreach (Dec dec in node.instances)
+                    foreach (var entry in node.instances)
                     {
+                        var dec = (Dec)entry.obj;
                         try
                         {
                             // the engine is the one legitimate caller of the deprecated hook
@@ -770,8 +812,9 @@ namespace Dec
                     return;
 
                 case NodeKind.LegacyPostLoad:
-                    foreach (Dec dec in node.instances)
+                    foreach (var entry in node.instances)
                     {
+                        var dec = (Dec)entry.obj;
                         try
                         {
                             // the engine is the one legitimate caller of the deprecated hook
@@ -787,15 +830,15 @@ namespace Dec
                     return;
 
                 case NodeKind.StaticMethod:
-                    InvokeSetupMethod(node, null, err => Dbg.Err($"{node.owner}.{node.method.Name}: {err}"));
+                    InvokeSetupMethod(node, default, err => Dbg.Err($"{node.owner.ComposeCSFormatted()}.{node.method.Name}: {err}"));
                     return;
 
                 case NodeKind.InstanceMethod:
                     if (!node.parallel)
                     {
-                        foreach (var instance in node.instances)
+                        foreach (var entry in node.instances)
                         {
-                            InvokeSetupMethod(node, instance, err => Dbg.Err($"{InstancePrefix(node, instance)}: {err}"));
+                            InvokeSetupMethod(node, entry, err => Dbg.Err($"{InstancePrefix(node, entry)}: {err}"));
                         }
                     }
                     else
@@ -806,16 +849,23 @@ namespace Dec
             }
         }
 
-        private static string InstancePrefix(Node node, object instance)
+        // Decs name themselves; everything else is identified by where it was loaded from, because a savegame full of identically-typed objects is otherwise indistinguishable in a report. Path is immutable and Serialize bottoms out in concurrent caches, so this is safe from parallel setup workers.
+        private static string InstancePrefix(Node node, Entry entry)
         {
-            return instance is Dec dec ? dec.ToString() : node.owner.ToString();
+            if (entry.obj is Dec dec)
+            {
+                return dec.ToString();
+            }
+
+            // The pathless case is defensive; every reader node that reaches setup collection carries a path today.
+            return entry.path != null ? $"{entry.path.Serialize()} ({node.owner.ComposeCSFormatted()})" : node.owner.ComposeCSFormatted();
         }
 
-        private static void InvokeSetupMethod(Node node, object instance, Action<string> reporter)
+        private static void InvokeSetupMethod(Node node, Entry entry, Action<string> reporter)
         {
             try
             {
-                node.method.Invoke(instance, new object[] { reporter });
+                node.method.Invoke(entry.obj, new object[] { reporter });
             }
             catch (Exception e)
             {
@@ -824,8 +874,9 @@ namespace Dec
                     e = e.InnerException;
                 }
 
-                string suffix = instance is Dec dec ? $" on {dec}" : "";
-                Dbg.Ex(new Exception($"Exception thrown during setup function {node.owner}.{node.method.Name}{suffix}", e));
+                // no type here, unlike InstancePrefix; the message already names the declaring type and method
+                string suffix = entry.obj is Dec dec ? $" on {dec}" : (entry.path != null ? $" on {entry.path.Serialize()}" : "");
+                Dbg.Ex(new Exception($"Exception thrown during setup function {node.owner.ComposeCSFormatted()}.{node.method.Name}{suffix}", e));
             }
         }
 
@@ -840,10 +891,10 @@ namespace Dec
                     // CurrentCulture flows into Parallel work items via ExecutionContext on every supported .NET runtime, so this assignment is belt-and-suspenders for less-certain runtimes like Mono. It's deliberately a bare assignment rather than a restoring scope; a scope's Dispose can itself error on the worker if user code mutates the culture.
                     System.Threading.Thread.CurrentThread.CurrentCulture = Config.CultureInfo;
 
-                    var instance = instances[i];
+                    var entry = instances[i];
 
                     // Reports go straight through the Config handlers from whatever thread this lands on; handlers are required to be threadsafe when threading is in use, as documented on Config.
-                    InvokeSetupMethod(node, instance, err => Dbg.Err($"{InstancePrefix(node, instance)}: {err}"));
+                    InvokeSetupMethod(node, entry, err => Dbg.Err($"{InstancePrefix(node, entry)}: {err}"));
                 }
                 catch
                 {

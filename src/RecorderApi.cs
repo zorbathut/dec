@@ -209,7 +209,7 @@ namespace Dec
                 // Register the ref objects for setup now rather than at creation time; three of the four creation branches above never pass through ParseElement's hook, and registering pre-population stubs would probe user GetHashCode/Equals on default-fields objects. By this point everything is populated, and dedup absorbs whatever the hook already caught.
                 foreach (var reference in refs)
                 {
-                    readerGlobals.setupCollection.RegisterInstance(refDict[reference.id]);
+                    readerGlobals.setupCollection.RegisterInstance(refDict[reference.id], reference.node);
                 }
 
                 Setup.ExecuteRecorder(readerGlobals.setupCollection);
