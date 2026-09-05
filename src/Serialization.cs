@@ -1984,6 +1984,9 @@ namespace Dec
 
         internal static void ComposeElement(WriterNode node, object value, Type fieldType, FieldInfo fieldInfo = null, bool isRootDec = false, bool asThis = false)
         {
+            // Hands the node the position's declared type, which the dispatch below never passes along otherwise.
+            node.NoteDeclaredType(fieldType, value);
+
             // Verify our Shared flags as the *very* first step to ensure nothing gets past us.
             // In theory this should be fine with Flexible; Flexible only happens on an outer wrapper that was shared, and therefore was null, and therefore this is default also
             bool canBeShared = fieldType.CanBeShared();

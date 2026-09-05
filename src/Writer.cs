@@ -33,6 +33,9 @@ namespace Dec
         public abstract WriterNode CreateRecorderChild(string label, Recorder.Settings settings);
         public abstract WriterNode CreateReflectionChild(System.Reflection.FieldInfo field, Recorder.Settings settings);
 
+        // Take record of the declared type; currently used only by the introspection system.
+        internal virtual void NoteDeclaredType(Type fieldType, object value) { }
+
         public abstract void WritePrimitive(object value);
         public abstract void WriteEnum(object value);
         public abstract void WriteString(string value);
