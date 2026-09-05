@@ -286,7 +286,10 @@ namespace Dec
             Type keyType = value.GetType().GetGenericArguments()[0];
             var array = UtilCollectionReflect.QueueToArray(keyType)(value);
 
-            WriteArray(array);
+            for (int i = 0; i < array.Length; ++i)
+            {
+                Serialization.ComposeElement(CreateNamedChild("li", RecorderSettings.CreateChild(), new PathQueueElement(Path, i)), array.GetValue(i), keyType);
+            }
         }
 
         public override void WriteStack(IEnumerable value)
@@ -300,7 +303,10 @@ namespace Dec
             // so, uh, time to munge
             Array.Reverse(array);
 
-            WriteArray(array);
+            for (int i = 0; i < array.Length; ++i)
+            {
+                Serialization.ComposeElement(CreateNamedChild("li", RecorderSettings.CreateChild(), new PathStackElement(Path, i)), array.GetValue(i), keyType);
+            }
         }
 
         public override void WriteTuple(object value, System.Runtime.CompilerServices.TupleElementNamesAttribute names)
@@ -312,7 +318,7 @@ namespace Dec
 
             for (int i = 0; i < length; ++i)
             {
-                Serialization.ComposeElement(CreateNamedChild(nameArray != null ? nameArray[i] : "li", RecorderSettings.CreateChild(), new PathIndex(Path, i)), value.GetType().GetProperty(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
+                Serialization.ComposeElement(CreateNamedChild(nameArray != null ? nameArray[i] : "li", RecorderSettings.CreateChild(), new PathTupleItem(Path, i)), value.GetType().GetProperty(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
             }
         }
 
@@ -325,7 +331,7 @@ namespace Dec
 
             for (int i = 0; i < length; ++i)
             {
-                Serialization.ComposeElement(CreateNamedChild(nameArray != null ? nameArray[i] : "li", RecorderSettings.CreateChild(), new PathIndex(Path, i)), value.GetType().GetField(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
+                Serialization.ComposeElement(CreateNamedChild(nameArray != null ? nameArray[i] : "li", RecorderSettings.CreateChild(), new PathTupleItem(Path, i)), value.GetType().GetField(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
             }
         }
 

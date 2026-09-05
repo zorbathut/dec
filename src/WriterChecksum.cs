@@ -454,7 +454,7 @@ namespace Dec
 
             for (int i = 0; i < array.Length; ++i)
             {
-                Serialization.ComposeElement(CreateNamedChild("li", false, RecorderSettings.CreateChild(), new PathIndex(Path, i)), array.GetValue(i), keyType);
+                Serialization.ComposeElement(CreateNamedChild("li", false, RecorderSettings.CreateChild(), new PathQueueElement(Path, i)), array.GetValue(i), keyType);
             }
         }
 
@@ -468,7 +468,7 @@ namespace Dec
 
             for (int i = 0; i < array.Length; ++i)
             {
-                Serialization.ComposeElement(CreateNamedChild("li", false, RecorderSettings.CreateChild(), new PathIndex(Path, i)), array.GetValue(i), keyType);
+                Serialization.ComposeElement(CreateNamedChild("li", false, RecorderSettings.CreateChild(), new PathStackElement(Path, i)), array.GetValue(i), keyType);
             }
         }
 
@@ -483,7 +483,7 @@ namespace Dec
 
             for (int i = 0; i < length; ++i)
             {
-                Serialization.ComposeElement(CreateNamedChild("li", false, RecorderSettings.CreateChild(), new PathIndex(Path, i)), value.GetType().GetProperty(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
+                Serialization.ComposeElement(CreateNamedChild("li", false, RecorderSettings.CreateChild(), new PathTupleItem(Path, i)), value.GetType().GetProperty(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
             }
         }
 
@@ -498,7 +498,7 @@ namespace Dec
 
             for (int i = 0; i < length; ++i)
             {
-                Serialization.ComposeElement(CreateNamedChild("li", false, RecorderSettings.CreateChild(), new PathIndex(Path, i)), value.GetType().GetField(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
+                Serialization.ComposeElement(CreateNamedChild("li", false, RecorderSettings.CreateChild(), new PathTupleItem(Path, i)), value.GetType().GetField(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
             }
         }
 

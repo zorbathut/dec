@@ -399,7 +399,7 @@ namespace Dec
             int index = UtilCollectionReflect.StackCount(referencedType)(stack);
             foreach (var fieldElement in xml.Elements())
             {
-                var newPath = new PathIndex(path, index);
+                var newPath = new PathStackElement(path, index);
 
                 if (fieldElement.Name.LocalName != "li")
                 {
@@ -421,7 +421,7 @@ namespace Dec
             int index = UtilCollectionReflect.QueueCount(referencedType)(queue);
             foreach (var fieldElement in xml.Elements())
             {
-                var newPath = new PathIndex(path, index);
+                var newPath = new PathQueueElement(path, index);
 
                 if (fieldElement.Name.LocalName != "li")
                 {
@@ -461,7 +461,7 @@ namespace Dec
 
                 for (int i = 0; i < Math.Min(parameters.Length, elements.Count); ++i)
                 {
-                    parameters[i] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(elements[i], fileIdentifier, new PathIndex(path, i), UserSettings) }, referencedType.GenericTypeArguments[i], null, readerGlobals, recorderChildContext);
+                    parameters[i] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(elements[i], fileIdentifier, new PathTupleItem(path, i), UserSettings) }, referencedType.GenericTypeArguments[i], null, readerGlobals, recorderChildContext);
                 }
 
                 // fill in anything missing

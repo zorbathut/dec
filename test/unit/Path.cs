@@ -306,6 +306,19 @@ namespace DecTest
             // cross-class
             Assert.IsFalse(memberA.Equals(rootA));
             Assert.IsFalse(index1.Equals(memberA));
+
+            // ordered read-only positions serialize like indices but are distinct classes
+            var queue1 = new Dec.PathQueueElement(memberA, 1);
+            Assert.IsTrue(queue1.Equals(new Dec.PathQueueElement(memberA2, 1)));
+            Assert.AreEqual(queue1.Serialize(), index1.Serialize());
+            Assert.IsFalse(queue1.Equals(index1));
+            Assert.IsFalse(new Dec.PathStackElement(memberA, 1).Equals(queue1));
+            Assert.IsFalse(new Dec.PathTupleItem(memberA, 1).Equals(index1));
+
+            var pairA = new Dec.PathDictionaryPair(memberA, "k");
+            Assert.IsTrue(pairA.Equals(new Dec.PathDictionaryPair(memberA2, "k")));
+            Assert.IsFalse(pairA.Equals(new Dec.PathDictionaryPair(memberA, "other")));
+            Assert.IsFalse(pairA.Equals(new Dec.PathDictionaryValue(memberA, "k")));
         }
     }
 }

@@ -350,7 +350,7 @@ namespace Dec
 
             for (int i = 0; i < count; ++i)
             {
-                Serialization.ComposeElement(new WriterNodeValidation(writer, $"tempArray[{i}]", new PathIndex(Path, i)), array.GetValue(i), referencedType);
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"tempArray[{i}]", new PathQueueElement(Path, i)), array.GetValue(i), referencedType);
             }
 
             writer.AppendLine($"}}");
@@ -375,7 +375,7 @@ namespace Dec
 
             for (int i = 0; i < count; ++i)
             {
-                Serialization.ComposeElement(new WriterNodeValidation(writer, $"tempArray[{i}]", new PathIndex(Path, i)), array.GetValue(i), referencedType);
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"tempArray[{i}]", new PathStackElement(Path, i)), array.GetValue(i), referencedType);
             }
 
             writer.AppendLine($"}}");
@@ -391,7 +391,7 @@ namespace Dec
             for (int i = 0; i < length; ++i)
             {
                 var propertyName = nameArray[i];
-                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}.{propertyName}", new PathIndex(Path, i)), value.GetType().GetProperty(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}.{propertyName}", new PathTupleItem(Path, i)), value.GetType().GetProperty(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
             }
         }
 
@@ -405,7 +405,7 @@ namespace Dec
             for (int i = 0; i < length; ++i)
             {
                 var propertyName = nameArray[i];
-                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}.{propertyName}", new PathIndex(Path, i)), value.GetType().GetField(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
+                Serialization.ComposeElement(new WriterNodeValidation(writer, $"{accessor}.{propertyName}", new PathTupleItem(Path, i)), value.GetType().GetField(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
             }
         }
 

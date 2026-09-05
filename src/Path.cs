@@ -327,6 +327,175 @@ namespace Dec
         }
     }
 
+    // Ordered positions that serialize like array elements but are not writable positions; Serialize output is deliberately identical to PathIndex.
+    public class PathQueueElement : Path
+    {
+        private Path parent;
+        private int index;
+
+        public PathQueueElement(Path parent, int index)
+        {
+            this.parent = parent;
+            this.index = index;
+        }
+
+        public override string Serialize()
+        {
+            return $"{parent.Serialize()}[{index}]";
+        }
+
+        public override bool IsValidForWriting()
+        {
+            return parent.IsValidForWriting();
+        }
+
+        internal override Path GetParent()
+        {
+            return parent;
+        }
+
+        internal override bool IsSettable()
+        {
+            return false;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is PathQueueElement rhs && index == rhs.index && ParentsEqual(parent, rhs.parent);
+        }
+
+        public override int GetHashCode()
+        {
+            return unchecked((0x50a7_000B * 31 + (parent?.GetHashCode() ?? 0)) * 31 + index);
+        }
+    }
+
+    public class PathStackElement : Path
+    {
+        private Path parent;
+        private int index;
+
+        public PathStackElement(Path parent, int index)
+        {
+            this.parent = parent;
+            this.index = index;
+        }
+
+        public override string Serialize()
+        {
+            return $"{parent.Serialize()}[{index}]";
+        }
+
+        public override bool IsValidForWriting()
+        {
+            return parent.IsValidForWriting();
+        }
+
+        internal override Path GetParent()
+        {
+            return parent;
+        }
+
+        internal override bool IsSettable()
+        {
+            return false;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is PathStackElement rhs && index == rhs.index && ParentsEqual(parent, rhs.parent);
+        }
+
+        public override int GetHashCode()
+        {
+            return unchecked((0x50a7_000C * 31 + (parent?.GetHashCode() ?? 0)) * 31 + index);
+        }
+    }
+
+    public class PathTupleItem : Path
+    {
+        private Path parent;
+        private int index;
+
+        public PathTupleItem(Path parent, int index)
+        {
+            this.parent = parent;
+            this.index = index;
+        }
+
+        public override string Serialize()
+        {
+            return $"{parent.Serialize()}[{index}]";
+        }
+
+        public override bool IsValidForWriting()
+        {
+            return parent.IsValidForWriting();
+        }
+
+        internal override Path GetParent()
+        {
+            return parent;
+        }
+
+        internal override bool IsSettable()
+        {
+            return false;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is PathTupleItem rhs && index == rhs.index && ParentsEqual(parent, rhs.parent);
+        }
+
+        public override int GetHashCode()
+        {
+            return unchecked((0x50a7_000D * 31 + (parent?.GetHashCode() ?? 0)) * 31 + index);
+        }
+    }
+
+    public class PathDictionaryPair : Path
+    {
+        private Path parent;
+        private string key;
+
+        public PathDictionaryPair(Path parent, string key)
+        {
+            this.parent = parent;
+            this.key = key;
+        }
+
+        public override string Serialize()
+        {
+            return $"{parent.Serialize()}[{key}]";
+        }
+
+        public override bool IsValidForWriting()
+        {
+            return parent.IsValidForWriting();
+        }
+
+        internal override Path GetParent()
+        {
+            return parent;
+        }
+
+        internal override bool IsSettable()
+        {
+            return false;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is PathDictionaryPair rhs && key == rhs.key && ParentsEqual(parent, rhs.parent);
+        }
+
+        public override int GetHashCode()
+        {
+            return unchecked((0x50a7_000E * 31 + (parent?.GetHashCode() ?? 0)) * 31 + (key?.GetHashCode() ?? 0));
+        }
+    }
+
     public class PathDictionaryValue : Path
     {
         private Path parent;
