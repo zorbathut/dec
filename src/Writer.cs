@@ -36,6 +36,9 @@ namespace Dec
         // Take record of the declared type; currently used only by the introspection system.
         internal virtual void NoteDeclaredType(Type fieldType, object value) { }
 
+        // Consulted before the node's fields are walked by reflection; a backend that trims or depth-limits its traversal declines here.
+        internal virtual bool ShouldReflectFields() { return true; }
+
         public abstract void WritePrimitive(object value);
         public abstract void WriteEnum(object value);
         public abstract void WriteString(string value);

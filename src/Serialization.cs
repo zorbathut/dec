@@ -1944,6 +1944,11 @@ namespace Dec
                             return;
                         }
 
+                        if (!node.ShouldReflectFields())
+                        {
+                            return;
+                        }
+
                         foreach (var field in valType.GetSerializableFieldsFromHierarchy())
                         {
                             ComposeElement(node.CreateReflectionChild(field, node.RecorderSettings), field.GetValue(value), field.FieldType, fieldInfo: field);
