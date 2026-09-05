@@ -448,6 +448,12 @@ namespace DecTest
 
             // Generate validation code beforehand, then run that code.
             Validation,
+
+            // Enumerate the object through Reflection.Enumerate, do a bare write/read, and check the read-back object enumerates to the same tree.
+            Reflection,
+
+            // Reflection, plus: write every writable position through Reflection.SetByPath, with a distinct value wherever one can be made, verify those landed, restore the originals, and verify the tree is back.
+            ReflectionSet,
         }
 
         public T DoRecorderRoundTrip<T>(T input, RecorderMode mode, Action<string> testSerializedResult = null, bool expectWriteErrors = false, bool expectWriteWarnings = false, bool expectReadErrors = false, bool expectReadWarnings = false, Func<string, bool> errorValidator = null, Func<string, bool> warningValidator = null)
@@ -508,6 +514,18 @@ namespace DecTest
             }
 
             UpdateTestRefEverything(mode == RecorderMode.RefEverything);
+
+            // The Reflection modes' enumerations replay the same write-direction pipeline, so they run under the write-phase expectations.
+            void UnderWriteExpectations(Action action)
+            {
+                ExpectGeneral(action, "DoRecorder.Reflection", expectWriteWarnings ? ExpectationType.Tolerate : ExpectationType.Disallow, warningValidator, expectWriteErrors ? ExpectationType.Tolerate : ExpectationType.Disallow, errorValidator);
+            }
+
+            Dec.Reflection.Entry reflectionBefore = null;
+            if ((mode == RecorderMode.Reflection || mode == RecorderMode.ReflectionSet) && input != null)
+            {
+                reflectionBefore = ReflectionBeforeWrite(input, sweep: mode == RecorderMode.ReflectionSet && !expectWriteErrors, UnderWriteExpectations);
+            }
 
             if (mode == RecorderMode.Validation)
             {
@@ -578,7 +596,13 @@ namespace DecTest
             {
                 DoDeserialize();
             }
-            Assert.IsNotNull(serialized);
+
+            // Only a clean round trip is expected to reproduce the tree: an errored write is lossy by definition, and an errored read leaves no object worth comparing. Warnings are advisory and do not gate.
+            if (reflectionBefore != null && !expectWriteErrors && !expectReadErrors)
+            {
+                Assert.IsNotNull(deserialized, "a clean round trip produced no object");
+                ReflectionAfterRead(deserialized, reflectionBefore, UnderWriteExpectations);
+            }
 
             // reset
             UpdateTestRefEverything(false);
