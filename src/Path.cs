@@ -10,6 +10,9 @@ namespace Dec
 
         internal abstract Path GetParent();
 
+        // Whether a write could address this position: every segment must be a recorder member or an array/list index. A different axis than IsValidForWriting, which is about reference re-finding.
+        internal abstract bool IsSettable();
+
         internal static bool ParentsEqual(Path lhs, Path rhs)
         {
             if (ReferenceEquals(lhs, rhs))
@@ -52,6 +55,11 @@ namespace Dec
         internal override Path GetParent()
         {
             return null;
+        }
+
+        internal override bool IsSettable()
+        {
+            return true;
         }
 
         public override bool Equals(object obj)
@@ -104,6 +112,11 @@ namespace Dec
             return null;
         }
 
+        internal override bool IsSettable()
+        {
+            return true;
+        }
+
         public override bool Equals(object obj)
         {
             return obj is PathDec rhs && decName == rhs.decName && EffectiveTypeName() == rhs.EffectiveTypeName();
@@ -139,6 +152,11 @@ namespace Dec
         internal override Path GetParent()
         {
             return null;
+        }
+
+        internal override bool IsSettable()
+        {
+            return false;
         }
 
         public override bool Equals(object obj)
@@ -178,6 +196,11 @@ namespace Dec
             return parent;
         }
 
+        internal override bool IsSettable()
+        {
+            return parent.IsSettable();
+        }
+
         public override bool Equals(object obj)
         {
             return obj is PathMember rhs && memberName == rhs.memberName && ParentsEqual(parent, rhs.parent);
@@ -215,6 +238,11 @@ namespace Dec
             return parent;
         }
 
+        internal override bool IsSettable()
+        {
+            return parent.IsSettable();
+        }
+
         public override bool Equals(object obj)
         {
             return obj is PathIndex rhs && index == rhs.index && ParentsEqual(parent, rhs.parent);
@@ -250,6 +278,11 @@ namespace Dec
         internal override Path GetParent()
         {
             return parent;
+        }
+
+        internal override bool IsSettable()
+        {
+            return false;
         }
 
         public override bool Equals(object obj)
@@ -320,6 +353,11 @@ namespace Dec
             return parent;
         }
 
+        internal override bool IsSettable()
+        {
+            return false;
+        }
+
         public override bool Equals(object obj)
         {
             return obj is PathDictionaryValue rhs && key == rhs.key && ParentsEqual(parent, rhs.parent);
@@ -358,6 +396,11 @@ namespace Dec
             return parent;
         }
 
+        internal override bool IsSettable()
+        {
+            return false;
+        }
+
         public override bool Equals(object obj)
         {
             return obj is PathDictionaryKey rhs && ParentsEqual(parent, rhs.parent);
@@ -394,6 +437,11 @@ namespace Dec
             return parent;
         }
 
+        internal override bool IsSettable()
+        {
+            return false;
+        }
+
         public override bool Equals(object obj)
         {
             return obj is PathDictionaryValueUnpathable rhs && ParentsEqual(parent, rhs.parent);
@@ -428,6 +476,11 @@ namespace Dec
         internal override Path GetParent()
         {
             return parent;
+        }
+
+        internal override bool IsSettable()
+        {
+            return false;
         }
 
         public override bool Equals(object obj)
