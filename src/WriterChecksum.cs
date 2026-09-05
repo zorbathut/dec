@@ -446,22 +446,30 @@ namespace Dec
 
         public override void WriteQueue(IEnumerable value)
         {
-            writer.AddChecksum((int)NodeTag.Queue, Path);
-
             Type keyType = value.GetType().GetGenericArguments()[0];
             var array = UtilCollectionReflect.QueueToArray(keyType)(value);
 
-            WriteArray(array);
+            writer.AddChecksum((int)NodeTag.Queue, Path);
+            writer.AddChecksum((ulong)array.Length, Path);
+
+            for (int i = 0; i < array.Length; ++i)
+            {
+                Serialization.ComposeElement(CreateNamedChild("li", false, RecorderSettings.CreateChild(), new PathIndex(Path, i)), array.GetValue(i), keyType);
+            }
         }
 
         public override void WriteStack(IEnumerable value)
         {
-            writer.AddChecksum((int)NodeTag.Stack, Path);
-
             Type keyType = value.GetType().GetGenericArguments()[0];
             var array = UtilCollectionReflect.StackToArray(keyType)(value);
 
-            WriteArray(array);
+            writer.AddChecksum((int)NodeTag.Stack, Path);
+            writer.AddChecksum((ulong)array.Length, Path);
+
+            for (int i = 0; i < array.Length; ++i)
+            {
+                Serialization.ComposeElement(CreateNamedChild("li", false, RecorderSettings.CreateChild(), new PathIndex(Path, i)), array.GetValue(i), keyType);
+            }
         }
 
         public override void WriteTuple(object value, TupleElementNamesAttribute names)
