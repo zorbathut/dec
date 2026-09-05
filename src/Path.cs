@@ -8,6 +8,8 @@ namespace Dec
         // Whether this path re-finds the object it describes. Besides deciding what the database can write a reference to, this is what setup diagnostics use to choose between several paths to one shared object, on the grounds that a path which can't re-find the object also can't tell a human which object it is.
         public abstract bool IsValidForWriting();
 
+        internal abstract Path GetParent();
+
         internal static bool ParentsEqual(Path lhs, Path rhs)
         {
             if (ReferenceEquals(lhs, rhs))
@@ -45,6 +47,11 @@ namespace Dec
         public override bool IsValidForWriting()
         {
             return true;
+        }
+
+        internal override Path GetParent()
+        {
+            return null;
         }
 
         public override bool Equals(object obj)
@@ -92,6 +99,11 @@ namespace Dec
             return true;
         }
 
+        internal override Path GetParent()
+        {
+            return null;
+        }
+
         public override bool Equals(object obj)
         {
             return obj is PathDec rhs && decName == rhs.decName && EffectiveTypeName() == rhs.EffectiveTypeName();
@@ -122,6 +134,11 @@ namespace Dec
         {
             // how did this even happen?
             return false;
+        }
+
+        internal override Path GetParent()
+        {
+            return null;
         }
 
         public override bool Equals(object obj)
@@ -156,6 +173,11 @@ namespace Dec
             return parent.IsValidForWriting();
         }
 
+        internal override Path GetParent()
+        {
+            return parent;
+        }
+
         public override bool Equals(object obj)
         {
             return obj is PathMember rhs && memberName == rhs.memberName && ParentsEqual(parent, rhs.parent);
@@ -188,6 +210,11 @@ namespace Dec
             return parent.IsValidForWriting();
         }
 
+        internal override Path GetParent()
+        {
+            return parent;
+        }
+
         public override bool Equals(object obj)
         {
             return obj is PathIndex rhs && index == rhs.index && ParentsEqual(parent, rhs.parent);
@@ -218,6 +245,11 @@ namespace Dec
         public override bool IsValidForWriting()
         {
             return parent.IsValidForWriting();
+        }
+
+        internal override Path GetParent()
+        {
+            return parent;
         }
 
         public override bool Equals(object obj)
@@ -283,6 +315,11 @@ namespace Dec
             return parent.IsValidForWriting();
         }
 
+        internal override Path GetParent()
+        {
+            return parent;
+        }
+
         public override bool Equals(object obj)
         {
             return obj is PathDictionaryValue rhs && key == rhs.key && ParentsEqual(parent, rhs.parent);
@@ -316,6 +353,11 @@ namespace Dec
             return false;
         }
 
+        internal override Path GetParent()
+        {
+            return parent;
+        }
+
         public override bool Equals(object obj)
         {
             return obj is PathDictionaryKey rhs && ParentsEqual(parent, rhs.parent);
@@ -347,6 +389,11 @@ namespace Dec
             return false;
         }
 
+        internal override Path GetParent()
+        {
+            return parent;
+        }
+
         public override bool Equals(object obj)
         {
             return obj is PathDictionaryValueUnpathable rhs && ParentsEqual(parent, rhs.parent);
@@ -376,6 +423,11 @@ namespace Dec
         {
             // not yet identifiable; I'm not sure how this even can work, frankly
             return false;
+        }
+
+        internal override Path GetParent()
+        {
+            return parent;
         }
 
         public override bool Equals(object obj)

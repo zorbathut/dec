@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 
 ### Breaking
 * `SetupDependsOnAttribute` removed, replaced with `[Dec.SetupAfter]`.
+* `Dec.Path` can no longer be subclassed outside the library; it gained an internal abstract member. Let me know if you needed that.
 
 ### Obsoleted
 * `ConfigErrors` and `PostLoad` are now marked `[Obsolete]` in favor of `[Dec.Setup]` functions. They'll be removed in the future.
