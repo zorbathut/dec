@@ -702,7 +702,7 @@ namespace DecTest
             }
             else if (!firstShared)
             {
-                expectedError = "Attempted to create a new shared reference at [RECORD[1].stub] to an previously-seen unshared object at [RECORD[0].stub].";
+                expectedError = "Attempted to create a new shared reference at [RECORD[1].stub] to a previously-seen unshared object at [RECORD[0].stub].";
             }
             else if (!secondShared)
             {

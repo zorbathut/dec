@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 * Recorder.Read crash on a `<Ref>` element with invalid `class`.
+* Typo in the shared-reference mismatch error message.
 
 
 ## [v0.11.1]
