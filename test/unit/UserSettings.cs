@@ -105,7 +105,7 @@ namespace DecTest
         }
 
         [Test]
-        public void SpecialParserMode([ValuesExcept(ParserMode.Bare, ParserMode.Validation)] ParserMode mode)
+        public void SpecialParserMode([ValuesExcept(ParserMode.Bare, ParserMode.Validation, ParserMode.ReflectionSet)] ParserMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(UserSettingsDec), typeof(UserSettingsObj) } });
 

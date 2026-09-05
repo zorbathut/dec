@@ -104,7 +104,15 @@ namespace DecTest
             Assert.AreEqual(lhs.Writable, rhs.Writable, where);
             Assert.AreEqual(lhs.Path, rhs.Path, where);
 
-            if (lhs.Value is byte[] lhsBytes)
+            if (lhs.Value is Dec.Dec lhsDec)
+            {
+                // Dec identity does not survive a database reload; type and name do.
+                var rhsDec = rhs.Value as Dec.Dec;
+                Assert.IsNotNull(rhsDec, where);
+                Assert.AreEqual(lhsDec.GetType(), rhsDec.GetType(), where);
+                Assert.AreEqual(lhsDec.DecName, rhsDec.DecName, where);
+            }
+            else if (lhs.Value is byte[] lhsBytes)
             {
                 Assert.AreEqual(lhsBytes, rhs.Value as byte[], where);
             }
@@ -133,13 +141,13 @@ namespace DecTest
             }
 
             var type = value.GetType();
-            return type.IsPrimitive || type.IsEnum || value is string || value is Type || value is Dec.Dec;
+            return type.IsPrimitive || type.IsEnum || value is string || value is Type;
         }
 
         // Roots the sweep can write back into: a reference type resolved through Record(), reflection, or an index. Not a value type, and not a converter's instance, whose body may hand back a replacement the root has no slot for.
         private static bool CanSweep(object input)
         {
-            return !input.GetType().IsValueType && (input is Dec.IRecordable || input is IList);
+            return !input.GetType().IsValueType && (input is Dec.IRecordable || input is Dec.Dec || input is IList);
         }
 
         private static Dec.Reflection.Entry ReflectionBeforeWrite<T>(T input, bool sweep, Action<Action> underWriteExpectations)
@@ -155,7 +163,46 @@ namespace DecTest
             return before;
         }
 
-        // Unlike WritableEntriesAccept in the Reflection goldens, which re-enumerates after each write, this verifies once after all writes and then restores, because the fixture goes on to a real round trip. Only recorded positions are restored, so a Record() body's side effects outside its Record calls persist.
+        private static List<(Dec.Dec dec, Dec.Reflection.Entry tree)> ReflectionEnumerateDatabase(Action<Action> underWriteExpectations)
+        {
+            var trees = new List<(Dec.Dec, Dec.Reflection.Entry)>();
+            underWriteExpectations(() =>
+            {
+                foreach (var dec in Dec.Database.List)
+                {
+                    trees.Add((dec, Dec.Reflection.Enumerate(dec)));
+                }
+            });
+
+            return trees;
+        }
+
+        private static void ReflectionSweepDatabase(List<(Dec.Dec dec, Dec.Reflection.Entry tree)> trees, Action<Action> underWriteExpectations)
+        {
+            underWriteExpectations(() =>
+            {
+                foreach (var (dec, tree) in trees)
+                {
+                    ReflectionSweep(dec, tree);
+                }
+            });
+        }
+
+        private static void ReflectionAfterReparse(List<(Dec.Dec dec, Dec.Reflection.Entry tree)> before, Action<Action> underWriteExpectations)
+        {
+            underWriteExpectations(() =>
+            {
+                foreach (var (dec, tree) in before)
+                {
+                    var reparsed = Dec.Database.Get(dec.GetType(), dec.DecName);
+                    Assert.IsNotNull(reparsed, $"{dec} did not survive the reparse");
+                    Assert.AreEqual(dec.GetType(), reparsed.GetType(), dec.ToString());
+                    AssertTreesEquivalent(tree, Dec.Reflection.Enumerate(reparsed));
+                }
+            });
+        }
+
+        // Unlike WritableEntriesAccept in the Reflection goldens, which re-enumerates after each write, this verifies once after all writes and then restores, because the caller goes on to use the object: the recorder harness serializes it, and the parser harness hands the database back to the test's own assertions. Only recorded positions are restored, so a Record() body's side effects outside its Record calls persist. Under a Dec root a type without a converter (a decimal, say) enumerates its private fields exactly as the composer writes them, so the sentinels land in those too; harmless while nothing formats the value before the restore.
         private static void ReflectionSweep<T>(T input, Dec.Reflection.Entry before)
         {
             // Parent before child, so a struct written back whole never lands on top of a sentinel already placed in one of its fields.

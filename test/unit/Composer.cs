@@ -282,7 +282,7 @@ namespace DecTest
 
             DoParserTests(mode, rewrite_expectWriteErrors: true, rewrite_expectParseErrors: true, validation_expectWriteErrors: true, errorValidator: err => err.Contains("does not exist in the database") || err.Contains("Couldn't find"));
 
-            if (mode != ParserMode.Bare)
+            if (mode != ParserMode.Bare && mode != ParserMode.ReflectionSet)
             {
                 Assert.IsNull(Dec.Database<SomeDecsDec>.Get("Stored").decs);
                 Assert.IsNull(Dec.Database<SomeDecsDec>.Get("Ephemeral"));
@@ -303,7 +303,7 @@ namespace DecTest
 
             DoParserTests(mode, rewrite_expectWriteErrors: true, rewrite_expectParseErrors: true, validation_expectWriteErrors: true, errorValidator: err => err.Contains("does not exist in the database") || err.Contains("Couldn't find"));
 
-            if (mode != ParserMode.Bare)
+            if (mode != ParserMode.Bare && mode != ParserMode.ReflectionSet)
             {
                 Assert.IsNull(Dec.Database<SomeDecsDec>.Get("Stored").decs);
                 Assert.IsNotNull(Dec.Database<SomeDecsDec>.Get("Ephemeral"));

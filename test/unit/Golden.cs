@@ -49,10 +49,10 @@ namespace DecTest
             foreach (var path in Directory.GetDirectories(targetDir))
             {
                 var id = System.IO.Path.GetFileName(path);
-                yield return new object[] { id, ParserMode.Bare };
-                yield return new object[] { id, ParserMode.RewrittenBare };
-                yield return new object[] { id, ParserMode.RewrittenPretty };
-                yield return new object[] { id, ParserMode.Validation };
+                foreach (ParserMode mode in System.Enum.GetValues(typeof(ParserMode)))
+                {
+                    yield return new object[] { id, mode };
+                }
             }
         }
     }

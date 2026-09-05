@@ -45,6 +45,22 @@ namespace DecTest
             PathTester.validations = 0;
         }
 
+        // Every pass over the data runs each PathTester once: the initial parse, then per mode either the compose and the reparse (with an enumeration before and after under Reflection), or under ReflectionSet an enumeration plus two more around the sweep's restore. The sweep's own writes add none, because RecordAsThis flattens each PathTester onto its owning field and a write there never replays Record().
+        private static int ExpectedValidations(ParserMode mode, int perPass)
+        {
+            switch (mode)
+            {
+                case ParserMode.Bare:
+                    return perPass;
+                case ParserMode.Reflection:
+                    return perPass * 5;
+                case ParserMode.ReflectionSet:
+                    return perPass * 4;
+                default:
+                    return perPass * 3;
+            }
+        }
+
         [Test]
         public void MemberPath([ValuesExcept(ParserMode.Validation)] ParserMode mode)
         {
@@ -61,7 +77,7 @@ namespace DecTest
 
             DoParserTests(mode);
 
-            Assert.IsTrue(PathTester.validations == (mode == ParserMode.Bare ? 1 : 3));
+            Assert.AreEqual(ExpectedValidations(mode, 1), PathTester.validations);
         }
 
         [Test]
@@ -83,7 +99,7 @@ namespace DecTest
 
             DoParserTests(mode);
 
-            Assert.IsTrue(PathTester.validations == (mode == ParserMode.Bare ? 2 : 6));
+            Assert.AreEqual(ExpectedValidations(mode, 2), PathTester.validations);
         }
 
         [Test]
@@ -111,7 +127,7 @@ namespace DecTest
 
             DoParserTests(mode);
 
-            Assert.IsTrue(PathTester.validations == (mode == ParserMode.Bare ? 4 : 12));
+            Assert.AreEqual(ExpectedValidations(mode, 4), PathTester.validations);
         }
 
         [Test]
@@ -133,7 +149,7 @@ namespace DecTest
 
             DoParserTests(mode);
 
-            Assert.IsTrue(PathTester.validations == (mode == ParserMode.Bare ? 2 : 6));
+            Assert.AreEqual(ExpectedValidations(mode, 2), PathTester.validations);
         }
 
         [Test]
@@ -157,7 +173,7 @@ namespace DecTest
 
             DoParserTests(mode);
 
-            Assert.IsTrue(PathTester.validations == (mode == ParserMode.Bare ? 1 : 3));
+            Assert.AreEqual(ExpectedValidations(mode, 1), PathTester.validations);
         }
 
         [Test]
@@ -186,7 +202,7 @@ namespace DecTest
 
             DoParserTests(mode);
 
-            Assert.IsTrue(PathTester.validations == (mode == ParserMode.Bare ? 2 : 6));
+            Assert.AreEqual(ExpectedValidations(mode, 2), PathTester.validations);
         }
 
         [Test]
@@ -207,7 +223,7 @@ namespace DecTest
 
             DoParserTests(mode);
 
-            Assert.IsTrue(PathTester.validations == (mode == ParserMode.Bare ? 1 : 3));
+            Assert.AreEqual(ExpectedValidations(mode, 1), PathTester.validations);
         }
 
         [Test]
@@ -229,7 +245,7 @@ namespace DecTest
 
             DoParserTests(mode);
 
-            Assert.IsTrue(PathTester.validations == (mode == ParserMode.Bare ? 1 : 3));
+            Assert.AreEqual(ExpectedValidations(mode, 1), PathTester.validations);
         }
 
         [Test]

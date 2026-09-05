@@ -326,6 +326,12 @@ namespace DecTest
 
             // Run it through the Validation writer, compile that code at runtime, make sure it matches.
             Validation,
+
+            // Enumerate every Dec through Reflection.Enumerate, rewrite and reload as RewrittenBare does, and check each reloaded Dec enumerates to the same tree.
+            Reflection,
+
+            // Enumerate every Dec, write every writable position through Reflection.SetByPath with a distinct value wherever one can be made, verify those landed, restore the originals, and verify the tree is back.
+            ReflectionSet,
         }
 
         public void DoParserTests(ParserMode mode,
@@ -341,17 +347,13 @@ namespace DecTest
                 Assert.IsNotNull(errorValidator, "DoParserTests: errorValidator is required when any expect-error flag is set");
             }
 
-            if (mode == ParserMode.Bare)
-            {
-                // we actually have nothing to do here, we're good
-            }
-            else if (mode == ParserMode.RewrittenBare || mode == ParserMode.RewrittenPretty)
+            string ComposeDatabase(bool pretty)
             {
                 string data = null;
                 void RunComposer()
                 {
                     var composer = new Dec.Composer();
-                    data = composer.ComposeXml(mode == ParserMode.RewrittenPretty);
+                    data = composer.ComposeXml(pretty);
                 }
 
                 if (rewrite_expectWriteErrors)
@@ -364,7 +366,11 @@ namespace DecTest
                 }
 
                 Assert.IsTrue(xmlValidator == null || xmlValidator(data));
+                return data;
+            }
 
+            void ReparseDatabase(string data)
+            {
                 Dec.Database.Clear();
 
                 // This is a janky hack; it resets the type caches so we also generate errors again properly.
@@ -384,6 +390,45 @@ namespace DecTest
                 else
                 {
                     RunParser();
+                }
+            }
+
+            // The Reflection modes' enumerations and writes replay the compose pipeline, so they run under the write-phase expectations.
+            void UnderWriteExpectations(Action action)
+            {
+                ExpectGeneral(action, "DoParserTests.Reflection", ExpectationType.Disallow, null, rewrite_expectWriteErrors ? ExpectationType.Tolerate : ExpectationType.Disallow, errorValidator);
+            }
+
+            if (mode == ParserMode.Bare)
+            {
+                // we actually have nothing to do here, we're good
+            }
+            else if (mode == ParserMode.RewrittenBare || mode == ParserMode.RewrittenPretty)
+            {
+                ReparseDatabase(ComposeDatabase(mode == ParserMode.RewrittenPretty));
+            }
+            else if (mode == ParserMode.Reflection)
+            {
+                // The composer runs first so it stays the first consumer of every once-per-type diagnostic.
+                string data = ComposeDatabase(false);
+                var before = ReflectionEnumerateDatabase(UnderWriteExpectations);
+                ReparseDatabase(data);
+
+                // Only a clean rewrite is expected to reproduce every tree.
+                if (!rewrite_expectWriteErrors && !rewrite_expectParseErrors)
+                {
+                    ReflectionAfterReparse(before, UnderWriteExpectations);
+                }
+            }
+            else if (mode == ParserMode.ReflectionSet)
+            {
+                // Nothing composes first here, so the enumeration is the first consumer of any once-per-type diagnostic; no test currently depends on which pass raises one.
+                var before = ReflectionEnumerateDatabase(UnderWriteExpectations);
+
+                // A database the test expects the composer to reject is left alone: a sweep proves little on an error shape. A clean one is swept and left restored for the test's own assertions to check.
+                if (!rewrite_expectWriteErrors)
+                {
+                    ReflectionSweepDatabase(before, UnderWriteExpectations);
                 }
             }
             else if (mode == ParserMode.Validation)

@@ -2501,8 +2501,8 @@ namespace DecTest
 
             DoParserTests(mode);
 
-            // only the Rewritten modes clear the database and reparse, which is what re-runs setup
-            bool reparses = mode == ParserMode.RewrittenPretty || mode == ParserMode.RewrittenBare;
+            // only the modes that clear the database and reparse re-run setup
+            bool reparses = mode == ParserMode.RewrittenPretty || mode == ParserMode.RewrittenBare || mode == ParserMode.Reflection;
             Assert.AreEqual(reparses ? 2 : 1, setupOrder.Count);
         }
 
