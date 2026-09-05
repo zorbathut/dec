@@ -65,7 +65,10 @@ namespace Dec
             Type curType = type;
             while (curType != null)
             {
-                foreach (var field in curType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+                // GetFields order is unspecified and has been observed to change within a process; metadata tokens are assigned in declaration order, which keeps composed output stable.
+                // Right now this exists mostly to stabilize Compose output for the sake of tests.
+                // This is probably not the right solution, but it's easy and this is unlikely to be a perf issue.
+                foreach (var field in curType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly).OrderBy(f => f.MetadataToken))
                 {
                     if (field.GetCustomAttribute<CompilerGeneratedAttribute>() != null)
                     {

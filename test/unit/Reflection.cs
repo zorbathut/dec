@@ -65,5 +65,27 @@ namespace DecTest
 
             Assert.AreEqual(new[] { "RegularField" }, names);
         }
+
+        public class FieldOrderBase
+        {
+            public int baseFirst;
+            public string baseSecond;
+        }
+
+        public class FieldOrderDerived : FieldOrderBase
+        {
+            public string derivedFirst;
+            public int derivedSecond;
+            public object derivedThird;
+        }
+
+        [Test]
+        public void SerializableFieldsInDeclarationOrder()
+        {
+            // GetFields order is unspecified, so serialization walks fields in declaration order, derived class first, keeping composed output stable.
+            var names = Dec.UtilReflection.GetSerializableFieldsFromHierarchy(typeof(FieldOrderDerived)).Select(f => f.Name).ToArray();
+
+            Assert.AreEqual(new[] { "derivedFirst", "derivedSecond", "derivedThird", "baseFirst", "baseSecond" }, names);
+        }
     }
 }
