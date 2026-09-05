@@ -7,6 +7,25 @@ namespace Dec
 
         // Whether this path re-finds the object it describes. Besides deciding what the database can write a reference to, this is what setup diagnostics use to choose between several paths to one shared object, on the grounds that a path which can't re-find the object also can't tell a human which object it is.
         public abstract bool IsValidForWriting();
+
+        internal static bool ParentsEqual(Path lhs, Path rhs)
+        {
+            if (ReferenceEquals(lhs, rhs))
+            {
+                return true;
+            }
+
+            if (lhs is null || rhs is null)
+            {
+                return false;
+            }
+
+            return lhs.Equals(rhs);
+        }
+
+        // Paths compare structurally, so separately constructed chains describing the same position are equal and usable as keys.
+        public abstract override bool Equals(object obj);
+        public abstract override int GetHashCode();
     }
 
     public class PathRoot : Path
@@ -26,6 +45,16 @@ namespace Dec
         public override bool IsValidForWriting()
         {
             return true;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is PathRoot rhs && rootType == rhs.rootType;
+        }
+
+        public override int GetHashCode()
+        {
+            return unchecked(0x50a7_0001 * 31 + (rootType?.GetHashCode() ?? 0));
         }
     }
 
@@ -48,14 +77,29 @@ namespace Dec
             this.decName = decName;
         }
 
+        private string EffectiveTypeName()
+        {
+            return decTypeName ?? decType.ComposeDecFormatted();
+        }
+
         public override string Serialize()
         {
-            return $"{decTypeName ?? decType.ComposeDecFormatted()}.{decName}";
+            return $"{EffectiveTypeName()}.{decName}";
         }
 
         public override bool IsValidForWriting()
         {
             return true;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is PathDec rhs && decName == rhs.decName && EffectiveTypeName() == rhs.EffectiveTypeName();
+        }
+
+        public override int GetHashCode()
+        {
+            return unchecked((0x50a7_0002 * 31 + (decName?.GetHashCode() ?? 0)) * 31 + (EffectiveTypeName()?.GetHashCode() ?? 0));
         }
     }
 
@@ -79,6 +123,16 @@ namespace Dec
             // how did this even happen?
             return false;
         }
+
+        public override bool Equals(object obj)
+        {
+            return obj is PathRef rhs && refName == rhs.refName;
+        }
+
+        public override int GetHashCode()
+        {
+            return unchecked(0x50a7_0003 * 31 + (refName?.GetHashCode() ?? 0));
+        }
     }
 
     public class PathMember : Path
@@ -100,6 +154,16 @@ namespace Dec
         public override bool IsValidForWriting()
         {
             return parent.IsValidForWriting();
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is PathMember rhs && memberName == rhs.memberName && ParentsEqual(parent, rhs.parent);
+        }
+
+        public override int GetHashCode()
+        {
+            return unchecked((0x50a7_0004 * 31 + (parent?.GetHashCode() ?? 0)) * 31 + (memberName?.GetHashCode() ?? 0));
         }
     }
 
@@ -123,6 +187,16 @@ namespace Dec
         {
             return parent.IsValidForWriting();
         }
+
+        public override bool Equals(object obj)
+        {
+            return obj is PathIndex rhs && index == rhs.index && ParentsEqual(parent, rhs.parent);
+        }
+
+        public override int GetHashCode()
+        {
+            return unchecked((0x50a7_0005 * 31 + (parent?.GetHashCode() ?? 0)) * 31 + index);
+        }
     }
 
     public class PathIndexMultidim : Path
@@ -145,6 +219,47 @@ namespace Dec
         {
             return parent.IsValidForWriting();
         }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is PathIndexMultidim rhs) || !ParentsEqual(parent, rhs.parent))
+            {
+                return false;
+            }
+
+            if (indices == null || rhs.indices == null)
+            {
+                return indices == rhs.indices;
+            }
+
+            if (indices.Length != rhs.indices.Length)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < indices.Length; ++i)
+            {
+                if (indices[i] != rhs.indices[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            int hash = unchecked(0x50a7_0006 * 31 + (parent?.GetHashCode() ?? 0));
+            if (indices != null)
+            {
+                foreach (var index in indices)
+                {
+                    hash = unchecked(hash * 31 + index);
+                }
+            }
+            return hash;
+        }
     }
 
     public class PathDictionaryValue : Path
@@ -166,6 +281,16 @@ namespace Dec
         public override bool IsValidForWriting()
         {
             return parent.IsValidForWriting();
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is PathDictionaryValue rhs && key == rhs.key && ParentsEqual(parent, rhs.parent);
+        }
+
+        public override int GetHashCode()
+        {
+            return unchecked((0x50a7_0007 * 31 + (parent?.GetHashCode() ?? 0)) * 31 + (key?.GetHashCode() ?? 0));
         }
     }
 
@@ -190,6 +315,16 @@ namespace Dec
             // not yet identifiable; I'm not sure how this even can work, frankly
             return false;
         }
+
+        public override bool Equals(object obj)
+        {
+            return obj is PathDictionaryKey rhs && ParentsEqual(parent, rhs.parent);
+        }
+
+        public override int GetHashCode()
+        {
+            return unchecked(0x50a7_0008 * 31 + (parent?.GetHashCode() ?? 0));
+        }
     }
 
     public class PathDictionaryValueUnpathable : Path
@@ -211,6 +346,16 @@ namespace Dec
             // if we have a usable key this can be done! but we're not right now
             return false;
         }
+
+        public override bool Equals(object obj)
+        {
+            return obj is PathDictionaryValueUnpathable rhs && ParentsEqual(parent, rhs.parent);
+        }
+
+        public override int GetHashCode()
+        {
+            return unchecked(0x50a7_0009 * 31 + (parent?.GetHashCode() ?? 0));
+        }
     }
 
     public class PathHashSetElement : Path
@@ -231,6 +376,16 @@ namespace Dec
         {
             // not yet identifiable; I'm not sure how this even can work, frankly
             return false;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is PathHashSetElement rhs && ParentsEqual(parent, rhs.parent);
+        }
+
+        public override int GetHashCode()
+        {
+            return unchecked(0x50a7_000A * 31 + (parent?.GetHashCode() ?? 0));
         }
     }
 }

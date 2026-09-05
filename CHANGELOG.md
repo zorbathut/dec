@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [unreleased]
 ### Added
 * `[Dec.Setup]`, `[Dec.SetupAfter]`, and `[Dec.SetupBefore]` attributes, enabling an attribute-driven setup graph that generalizes ConfigErrors/PostLoad.
+* `Dec.Path` now supports `Equals` and `GetHashCode`.
 
 ### Breaking
 * `SetupDependsOnAttribute` removed, replaced with `[Dec.SetupAfter]`.

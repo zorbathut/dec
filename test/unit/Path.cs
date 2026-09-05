@@ -275,5 +275,37 @@ namespace DecTest
 
             Assert.AreEqual(2, PathTester.validations); // Once for write, once for read
         }
+
+        [Test]
+        public void PathEquality()
+        {
+            var rootA = new Dec.PathRoot("R");
+            var rootA2 = new Dec.PathRoot("R");
+            var rootB = new Dec.PathRoot("B");
+
+            Assert.IsTrue(rootA.Equals(rootA2));
+            Assert.AreEqual(rootA.GetHashCode(), rootA2.GetHashCode());
+            Assert.IsFalse(rootA.Equals(rootB));
+
+            var memberA = new Dec.PathMember(rootA, "field");
+            var memberA2 = new Dec.PathMember(rootA2, "field");
+            var memberB = new Dec.PathMember(rootA, "other");
+
+            Assert.IsTrue(memberA.Equals(memberA2));
+            Assert.AreEqual(memberA.GetHashCode(), memberA2.GetHashCode());
+            Assert.IsFalse(memberA.Equals(memberB));
+
+            var index1 = new Dec.PathIndex(memberA, 1);
+            var index1b = new Dec.PathIndex(memberA2, 1);
+            var index2 = new Dec.PathIndex(memberA, 2);
+
+            Assert.IsTrue(index1.Equals(index1b));
+            Assert.AreEqual(index1.GetHashCode(), index1b.GetHashCode());
+            Assert.IsFalse(index1.Equals(index2));
+
+            // cross-class
+            Assert.IsFalse(memberA.Equals(rootA));
+            Assert.IsFalse(index1.Equals(memberA));
+        }
     }
 }
