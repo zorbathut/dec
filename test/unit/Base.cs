@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace DecTest
 {
     [TestFixture]
-    public class Base
+    public partial class Base
     {
         [SetUp] [TearDown]
         public void Clean()

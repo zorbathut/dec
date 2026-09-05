@@ -13,7 +13,7 @@ namespace Dec
         /// A single recorded position in an object's serialization structure, as reported by Enumerate.
         /// </summary>
         /// <remarks>
-        /// An Entry describes one position that a serialization write would produce: what static type it was declared with, what value it currently holds, whether it would serialize as a reference, and whether a write could address it.
+        /// An Entry describes one position that a serialization write would produce: what static type it was declared with, what value it currently holds, whether it would serialize as a reference, and whether SetByPath can address it.
         ///
         /// Entry trees are snapshots of structure and boxed values; they are not live views, and mutating the underlying object does not restructure previously returned entries. Value holds live object references, though, so mutations to a referenced object are visible through it.
         /// </remarks>
@@ -43,7 +43,7 @@ namespace Dec
             public object Value { get; internal set; }
 
             /// <summary>
-            /// Whether a write could address this position.
+            /// Whether SetByPath can address this position.
             /// </summary>
             public bool Writable { get; internal set; }
 
@@ -124,6 +124,79 @@ namespace Dec
                 Serialization.ComposeElement(node, obj, typeof(T), isRootDec: compose);
 
                 return rootEntry;
+            }
+        }
+
+        /// <summary>
+        /// Sets the value at a path previously reported by Enumerate, replaying the same Record() bodies to locate the position.
+        /// </summary>
+        /// <remarks>
+        /// obj is the object the path was enumerated from, or any object with the same structure; the path's root segment is ignored. It must be a reference type: a value-type root arrives boxed, so nothing written beneath it could reach the caller's variable.
+        ///
+        /// Failures — an unresolvable path, a read-only position (including anything beneath a ConverterFactory body), an assignment-incompatible value, or a ShouldRecord-suppressed body — report an error, which throws under the default error handler.
+        ///
+        /// SetByPath writes through the ref the Record() body passed and nothing more; a body that records a temporary computed on the write path will silently discard the assignment. A ConverterRecord body that replaces its instance is honored, since the value it hands back is written into the owning slot; at the root there is no such slot, and that case reports an error.
+        ///
+        /// Under a Dec root, positions the composer reaches by reflection are written through their fields, readonly fields included; an object reachable from several positions is changed for all of them. A Dec-typed field can be replaced but not entered.
+        /// </remarks>
+        public static void SetByPath(object obj, Path path, object value, Recorder.IUserSettings userSettings = null)
+        {
+            if (obj == null)
+            {
+                Dbg.Err("Reflection.SetByPath called with a null object");
+                return;
+            }
+
+            if (obj.GetType().IsValueType)
+            {
+                Dbg.Err($"Reflection.SetByPath called on a value type {obj.GetType()}; it arrives boxed, so nothing written beneath it could reach the caller's variable. Pass the object that contains it instead.");
+                return;
+            }
+
+            if (path == null)
+            {
+                Dbg.Err("Reflection.SetByPath called with a null path");
+                return;
+            }
+
+            Serialization.Initialize();
+
+            using (var _ = new CultureInfoScope(Config.CultureInfo))
+            {
+                // Materialize the parent-linked chain root-first; candidates are built on the chain's own root instance, so any enumeration root works unmodified.
+                var chain = new List<Path>();
+                for (var segment = path; segment != null; segment = segment.GetParent())
+                {
+                    chain.Add(segment);
+                }
+                chain.Reverse();
+
+                if (!(chain[0] is PathRoot) && !(chain[0] is PathDec) && !(chain[0] is PathRef))
+                {
+                    Dbg.Err($"SetByPath: path starts with a {chain[0].GetType()} segment instead of a root, which usually means a segment was constructed with a null parent");
+                    return;
+                }
+
+                if (chain.Count < 2)
+                {
+                    Dbg.Err($"SetByPath: path [{path.Serialize()}] has no segments beyond the root");
+                    return;
+                }
+
+                if (!path.IsSettable())
+                {
+                    Dbg.Err($"SetByPath: path [{path.Serialize()}] addresses a read-only position; dictionary, set, queue, stack, tuple, and multidimensional-array positions are not settable");
+                    return;
+                }
+
+                var state = new RecorderSetByPath.State() { chain = chain, newValue = value, userSettings = userSettings, targetSerialized = path.Serialize(), compose = obj is Dec };
+
+                // Every failure inside ApplyInto reports its own error. A reference-type root needs no write-back, unless a converter body handed back a different instance; nested positions store that into the owning slot, but the root has none.
+                var (landed, updated) = RecorderSetByPath.ApplyInto(obj, 1, state, isRoot: true);
+                if (landed && !ReferenceEquals(updated, obj))
+                {
+                    Dbg.Err($"SetByPath: the write to [{path.Serialize()}] landed on a replacement instance of {obj.GetType()} created by its converter, and a root has no owning slot to store it in; pass an object that contains it instead");
+                }
             }
         }
     }

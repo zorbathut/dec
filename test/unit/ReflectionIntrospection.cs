@@ -199,6 +199,22 @@ namespace DecTest
             }
         }
 
+        // A ConverterRecord body that records a temporary and replaces its instance, so the value handed back from Record is the only carrier of a write.
+        public class ConvRecReplaced
+        {
+            public int v;
+        }
+
+        public class ConvRecReplacedConverter : Dec.ConverterRecord<ConvRecReplaced>
+        {
+            public override void Record(ref ConvRecReplaced input, Dec.Recorder recorder)
+            {
+                int v = input.v;
+                recorder.Record(ref v, "v");
+                input = new ConvRecReplaced() { v = v };
+            }
+        }
+
         public class ConvFacNode
         {
             public int payload;
@@ -264,6 +280,16 @@ namespace DecTest
             }
         }
 
+        public class ConverterReplacedHolderRec : Dec.IRecordable
+        {
+            public ConvRecReplaced rep = new ConvRecReplaced() { v = 3 };
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref rep, "rep");
+            }
+        }
+
         public class ConverterSharedHolderRec : Dec.IRecordable
         {
             public ConvRecPoint shared = new ConvRecPoint() { x = 3, y = 4 };
@@ -276,6 +302,18 @@ namespace DecTest
             }
         }
 
+        public class ConverterArrayHolderRec : Dec.IRecordable
+        {
+            public ConvRecVec[] vecs = { new ConvRecVec() { a = 1, b = 2 }, new ConvRecVec() { a = 3, b = 4 } };
+            public List<ConvRecPoint> pointList = new List<ConvRecPoint>() { new ConvRecPoint() { x = 5, y = 6 } };
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref vecs, "vecs");
+                record.Record(ref pointList, "pointList");
+            }
+        }
+
         public class ConverterNestedHolderRec : Dec.IRecordable
         {
             public ConvOuter outer = new ConvOuter() { k = 1, inner = new ConvRecPoint() { x = 5, y = 6 } };
@@ -283,6 +321,26 @@ namespace DecTest
             public void Record(Dec.Recorder record)
             {
                 record.Record(ref outer, "outer");
+            }
+        }
+
+        public class AsThisConverterRec : Dec.IRecordable
+        {
+            public ConvRecPoint point = new ConvRecPoint() { x = 8, y = 9 };
+
+            public void Record(Dec.Recorder record)
+            {
+                record.RecordAsThis(ref point);
+            }
+        }
+
+        public class AsThisNullRec : Dec.IRecordable
+        {
+            public AsThisPayload payload;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.RecordAsThis(ref payload);
             }
         }
 
@@ -571,6 +629,16 @@ namespace DecTest
             }
         }
 
+        public class NullableRec : Dec.IRecordable
+        {
+            public int? maybe;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref maybe, "maybe");
+            }
+        }
+
         public class IntrospectPlain
         {
             public int p = 1;
@@ -633,6 +701,16 @@ namespace DecTest
             }
         }
 
+        public class PlainHolderRec : Dec.IRecordable
+        {
+            public IntrospectPlain plain = new IntrospectPlain();
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref plain, "plain");
+            }
+        }
+
         public class IntrospectCycleDec : Dec.Dec
         {
             public List<object> loop;
@@ -667,7 +745,7 @@ namespace DecTest
             }
         }
 
-        private static readonly Type[] Converters = { typeof(ConvPointConverter), typeof(CondRecConverter), typeof(ConvRecPointConverter), typeof(ConvRecVecConverter), typeof(ConvFacNodeConverter), typeof(ConvOuterConverter), typeof(CondRecConvConverter) };
+        private static readonly Type[] Converters = { typeof(ConvPointConverter), typeof(CondRecConverter), typeof(ConvRecPointConverter), typeof(ConvRecVecConverter), typeof(ConvRecReplacedConverter), typeof(ConvFacNodeConverter), typeof(ConvOuterConverter), typeof(CondRecConvConverter) };
 
         private void RegisterConverters()
         {
@@ -1517,6 +1595,25 @@ namespace DecTest
         }
 
         [Test]
+        public void DecRootAliasing()
+        {
+            var decA = ParseIntrospectDecs();
+            var decB = Dec.Database<IntrospectDec>.Get("B");
+            decA.plainAlias = decA.plain;
+            decB.plain = decA.plain;
+
+            // an aliased plain object enumerates in full at every position, and a write through any of them shows at all of them
+            var rootA = Dec.Reflection.Enumerate(decA);
+            Assert.AreEqual(2, Child(rootA, "plain").Children.Count);
+            Assert.AreEqual(2, Child(rootA, "plainAlias").Children.Count);
+            Assert.IsTrue(Child(Child(rootA, "plainAlias"), "p").Writable);
+
+            Dec.Reflection.SetByPath(decA, Child(Child(rootA, "plain"), "p").Path, 42);
+            Assert.AreEqual(42, Child(Child(Dec.Reflection.Enumerate(decA), "plainAlias"), "p").Value);
+            Assert.AreEqual(42, Child(Child(Dec.Reflection.Enumerate(decB), "plain"), "p").Value);
+        }
+
+        [Test]
         public void DecRootContainerCycle()
         {
             ParseIntrospectDecs();
@@ -1528,5 +1625,539 @@ namespace DecTest
             ExpectErrors(() => Dec.Reflection.Enumerate(dec), str => str.Contains("Depth limiter"));
         }
 
+        [Test]
+        public void SetDecRoot()
+        {
+            var dec = ParseIntrospectDecs();
+            var root = Dec.Reflection.Enumerate(dec);
+
+            Dec.Reflection.SetByPath(dec, Child(root, "value").Path, 30);
+            Assert.AreEqual(30, dec.value);
+
+            Dec.Reflection.SetByPath(dec, Child(Child(root, "plain"), "q").Path, "six");
+            Assert.AreEqual("six", dec.plain.q);
+
+            // struct field: the boxed write-back through reflection
+            Dec.Reflection.SetByPath(dec, Child(Child(root, "strukt"), "t").Path, 2.5f);
+            Assert.AreEqual(2.5f, dec.strukt.t);
+            Assert.AreEqual(2, dec.strukt.s);
+
+            Dec.Reflection.SetByPath(dec, Child(Child(root, "rec"), "dataRecorded").Path, 90);
+            Assert.AreEqual(90, dec.rec.data);
+
+            Dec.Reflection.SetByPath(dec, Child(root, "other").Path, dec);
+            Assert.AreSame(dec, dec.other);
+
+            Dec.Reflection.SetByPath(dec, Child(root, "list").Path, new List<int>() { 7 });
+            Assert.AreEqual(new[] { 7 }, dec.list.ToArray());
+
+            // readonly and base-private fields are composed, so they are settable too
+            Dec.Reflection.SetByPath(dec, Child(root, "fixedValue").Path, 70);
+            Assert.AreEqual(70, dec.fixedValue);
+            Dec.Reflection.SetByPath(dec, Child(root, "hidden").Path, 40);
+            Assert.AreEqual(40, dec.Hidden());
+
+            var xml = new Dec.Composer().ComposeXml(false);
+            StringAssert.Contains("<value>30</value>", xml);
+            StringAssert.Contains("<q>six</q>", xml);
+            StringAssert.Contains("<t>2.5</t>", xml);
+            StringAssert.Contains("<dataRecorded>90</dataRecorded>", xml);
+            StringAssert.Contains("<other>A</other>", xml);
+            StringAssert.Contains("<hidden>40</hidden>", xml);
+        }
+
+        [Test]
+        public void SetDecFailures()
+        {
+            var dec = ParseIntrospectDecs();
+            var root = Dec.Reflection.Enumerate(dec);
+
+            // a Dec-typed field is a reference leaf mid-path, whatever the root
+            ExpectErrors(() => Dec.Reflection.SetByPath(dec, new Dec.PathMember(Child(root, "other").Path, "value"), 1), str => str.Contains("Dec"));
+
+            // a label no field carries
+            ExpectErrors(() => Dec.Reflection.SetByPath(dec, new Dec.PathMember(root.Path, "nope"), 1), str => str.Contains("could not resolve"));
+
+            // reflection stays refused under a recorder root: a plain class there has no interior
+            var holder = new PlainHolderRec();
+            ExpectErrors(() => Dec.Reflection.SetByPath(holder, new Dec.PathMember(new Dec.PathMember(new Dec.PathRoot("R"), "plain"), "p"), 1), str => str.Contains("no addressable interior"));
+        }
+
+        // ==== SetByPath ====
+
+        [Test]
+        public void SetScalar()
+        {
+            var obj = new ScalarsRec();
+            var root = Dec.Reflection.Enumerate(obj);
+
+            Dec.Reflection.SetByPath(obj, Child(root, "intField").Path, 99);
+            Assert.AreEqual(99, obj.intField);
+            StringAssert.Contains("99", Dec.Recorder.Write(obj));
+
+            Dec.Reflection.SetByPath(obj, Child(root, "stringField").Path, "replaced");
+            Assert.AreEqual("replaced", obj.stringField);
+        }
+
+        [Test]
+        public void SetManualPath()
+        {
+            // a path reconstructed from scratch works regardless of its root
+            var obj = new ScalarsRec();
+            var path = new Dec.PathMember(new Dec.PathRoot("whatever"), "intField");
+
+            Dec.Reflection.SetByPath(obj, path, 123);
+            Assert.AreEqual(123, obj.intField);
+        }
+
+        [Test]
+        public void SetArrayElement()
+        {
+            var obj = new ArraysRec();
+            var root = Dec.Reflection.Enumerate(obj);
+
+            Dec.Reflection.SetByPath(obj, Child(root, "numbers").Children[1].Path, 77);
+            Assert.AreEqual(new[] { 10, 77, 30 }, obj.numbers);
+        }
+
+        [Test]
+        public void SetListElement()
+        {
+            var obj = new ListRec();
+            var root = Dec.Reflection.Enumerate(obj);
+
+            Dec.Reflection.SetByPath(obj, Child(root, "strings").Children[0].Path, "gamma");
+            Assert.AreEqual(new List<string>() { "gamma", "beta" }, obj.strings);
+        }
+
+        [Test]
+        public void SetNestedRecordableField()
+        {
+            var obj = new NestedRec();
+            var root = Dec.Reflection.Enumerate(obj);
+
+            Dec.Reflection.SetByPath(obj, Child(Child(root, "inner"), "dataRecorded").Path, 55);
+            Assert.AreEqual(55, obj.inner.data);
+        }
+
+        [Test]
+        public void SetStructElementField()
+        {
+            // the boxed-struct write-back: mutate a field of a struct element inside an array
+            var obj = new OptionsRec() { options = new[] { new OptionStruct() { text = "one" }, new OptionStruct() { text = "two" } } };
+            var root = Dec.Reflection.Enumerate(obj);
+
+            var textPath = Child(Child(root, "options").Children[1], "text").Path;
+            Dec.Reflection.SetByPath(obj, textPath, "rewritten");
+            Assert.AreEqual("rewritten", obj.options[1].text);
+            Assert.AreEqual("one", obj.options[0].text);
+            StringAssert.Contains("rewritten", Dec.Recorder.Write(obj));
+        }
+
+        [Test]
+        public void SetThroughRecordAsThis()
+        {
+            // top-level asThis
+            var wrapper = new AsThisWrapper();
+            var wrapperRoot = Dec.Reflection.Enumerate(wrapper);
+            Dec.Reflection.SetByPath(wrapper, Child(wrapperRoot, "alpha").Path, 21);
+            Assert.AreEqual(21, wrapper.payload.alpha);
+
+            // nested asThis
+            var holder = new AsThisHolder();
+            var holderRoot = Dec.Reflection.Enumerate(holder);
+            Dec.Reflection.SetByPath(holder, Child(Child(holderRoot, "wrapper"), "alpha").Path, 34);
+            Assert.AreEqual(34, holder.wrapper.payload.alpha);
+
+            // asThis on a struct element in a shared container
+            var container = new AsThisSharedContainerRec() { items = new[] { new AsThisStruct() { payload = new AsThisPayload() } } };
+            var containerRoot = Dec.Reflection.Enumerate(container);
+            Dec.Reflection.SetByPath(container, Child(Child(containerRoot, "items").Children[0], "alpha").Path, 55);
+            Assert.AreEqual(55, container.items[0].payload.alpha);
+
+            // asThis on a container: elements flattened to the wrapper's level, nested and as the root
+            var listHolder = new AsThisListHolder();
+            var listHolderRoot = Dec.Reflection.Enumerate(listHolder);
+            Dec.Reflection.SetByPath(listHolder, Child(listHolderRoot, "wrapper").Children[1].Path, 9);
+            Assert.AreEqual(new List<int>() { 1, 9, 3 }, listHolder.wrapper.items);
+
+            var listWrapper = new AsThisListWrapper();
+            var listWrapperRoot = Dec.Reflection.Enumerate(listWrapper);
+            Dec.Reflection.SetByPath(listWrapper, listWrapperRoot.Children[2].Path, 30);
+            Assert.AreEqual(new List<int>() { 1, 2, 30 }, listWrapper.items);
+        }
+
+        [Test]
+        public void SetSharedRef()
+        {
+            var shared = new StubRecordableInt() { data = 1 };
+            var obj = new SharedRefsRec() { a = shared, b = shared };
+            var root = Dec.Reflection.Enumerate(obj);
+
+            var replacement = new StubRecordableInt() { data = 2 };
+            Dec.Reflection.SetByPath(obj, Child(root, "a").Path, replacement);
+            Assert.AreSame(replacement, obj.a);
+            Assert.AreSame(shared, obj.b);
+        }
+
+        [Test]
+        public void SetWholeArray()
+        {
+            var obj = new ArraysRec();
+            var root = Dec.Reflection.Enumerate(obj);
+
+            Dec.Reflection.SetByPath(obj, Child(root, "numbers").Path, new int[] { 5 });
+            Assert.AreEqual(new[] { 5 }, obj.numbers);
+
+            // populate a null container, the NormalizeNullArrayFields replacement
+            Dec.Reflection.SetByPath(obj, Child(root, "nullArray").Path, new int[0]);
+            Assert.AreEqual(new int[0], obj.nullArray);
+        }
+
+        [Test]
+        public void SetNull()
+        {
+            var obj = new NestedRec();
+            var root = Dec.Reflection.Enumerate(obj);
+
+            Dec.Reflection.SetByPath(obj, Child(root, "inner").Path, null);
+            Assert.IsNull(obj.inner);
+        }
+
+        [Test]
+        public void SetNullable()
+        {
+            var obj = new NullableRec();
+            var root = Dec.Reflection.Enumerate(obj);
+            var path = Child(root, "maybe").Path;
+
+            Dec.Reflection.SetByPath(obj, path, 5);
+            Assert.AreEqual(5, obj.maybe);
+
+            Dec.Reflection.SetByPath(obj, path, null);
+            Assert.IsNull(obj.maybe);
+        }
+
+        [Test]
+        public void SetFailures()
+        {
+            var scalars = new ScalarsRec();
+            var scalarsRoot = Dec.Reflection.Enumerate(scalars);
+            var arrays = new ArraysRec();
+            var arraysRoot = Dec.Reflection.Enumerate(arrays);
+
+            // nonexistent label
+            ExpectErrors(() => Dec.Reflection.SetByPath(scalars, new Dec.PathMember(new Dec.PathRoot("R"), "nope"), 1), str => str.Contains("could not resolve"));
+
+            // index out of range
+            ExpectErrors(() => Dec.Reflection.SetByPath(arrays, new Dec.PathIndex(Child(arraysRoot, "numbers").Path, 10), 1), str => str.Contains("could not resolve"));
+
+            // descent into null
+            ExpectErrors(() => Dec.Reflection.SetByPath(arrays, new Dec.PathIndex(Child(arraysRoot, "nullArray").Path, 0), 1), str => str.Contains("null value"));
+
+            // type mismatch
+            ExpectErrors(() => Dec.Reflection.SetByPath(scalars, Child(scalarsRoot, "intField").Path, "not an int"), str => str.Contains("cannot assign"));
+            Assert.AreEqual(42, scalars.intField);
+
+            // path deeper than structure
+            ExpectErrors(() => Dec.Reflection.SetByPath(scalars, new Dec.PathMember(Child(scalarsRoot, "intField").Path, "deeper"), 1), str => str.Contains("no addressable interior"));
+
+            // positions the compose pipeline settles as leaves before any dispatch: a byte[] interior, and a Dec's interior
+            ExpectErrors(() => Dec.Reflection.SetByPath(arrays, new Dec.PathIndex(Child(arraysRoot, "bytes").Path, 1), (byte)9), str => str.Contains("byte[]"));
+            Assert.AreEqual(2, arrays.bytes[1]);
+
+            scalars.decField = new StubDec();
+            ExpectErrors(() => Dec.Reflection.SetByPath(scalars, new Dec.PathMember(Child(scalarsRoot, "decField").Path, "x"), 1), str => str.Contains("Dec"));
+
+            // read-only position: a dictionary value's own path
+            var shapes = new ReadOnlyShapesRec();
+            var shapesRoot = Dec.Reflection.Enumerate(shapes);
+            var dictValue = Child(Child(shapesRoot, "dict").Children.Single(c => c.Label == "k1"), "value");
+            ExpectErrors(() => Dec.Reflection.SetByPath(shapes, dictValue.Path, 3), str => str.Contains("read-only"));
+
+            // read-only position: a queue element's path, refused up front by the settability scan despite serializing like an index
+            var queueHolder = new QueueStackRec();
+            queueHolder.queue.Enqueue(1);
+            var queueRoot = Dec.Reflection.Enumerate(queueHolder);
+            ExpectErrors(() => Dec.Reflection.SetByPath(queueHolder, Child(queueRoot, "queue").Children[0].Path, 5), str => str.Contains("read-only"));
+        }
+
+        [Test]
+        public void SetSuppressedConditional()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(CondRecConverter) } });
+
+            var obj = new CondHolder();
+            var root = Dec.Reflection.Enumerate(obj);
+            var dataPath = Child(Child(root, "cond"), "data").Path;
+
+            // works under settings that include the body
+            Dec.Reflection.SetByPath(obj, dataPath, 8);
+            Assert.AreEqual(8, obj.cond.data);
+
+            // refused under settings that suppress it: Enumerate reports no such path there
+            ExpectErrors(() => Dec.Reflection.SetByPath(obj, dataPath, 9, userSettings: new ExcludeSettings()), str => str.Contains("suppressed"));
+            Assert.AreEqual(8, obj.cond.data);
+        }
+
+        [Test]
+        public void SetMalformedPath()
+        {
+            // a segment hand-constructed with a null parent must be a loud error, not a NullReferenceException
+            var obj = new ScalarsRec();
+            ExpectErrors(() => Dec.Reflection.SetByPath(obj, new Dec.PathMember(null, "intField"), 1), str => str.Contains("null parent"));
+            ExpectErrors(() => Dec.Reflection.SetByPath(obj, new Dec.PathMember(new Dec.PathMember(null, "a"), "b"), 1), str => str.Contains("null parent"));
+        }
+
+        [Test]
+        public void SetRootErrors()
+        {
+            ExpectErrors(() => Dec.Reflection.SetByPath(null, new Dec.PathMember(new Dec.PathRoot("R"), "x"), 1), str => true);
+
+            // a value-type root arrives boxed, so nothing written beneath it could reach the caller's variable
+            var optionStruct = new OptionStruct() { text = "t" };
+            var structPath = Child(Dec.Reflection.Enumerate(optionStruct), "text").Path;
+            ExpectErrors(() => Dec.Reflection.SetByPath(optionStruct, structPath, "u"), str => str.Contains("value type"));
+
+            // a primitive root is a value type too
+            ExpectErrors(() => Dec.Reflection.SetByPath(5, new Dec.PathMember(new Dec.PathRoot("R"), "x"), 1), str => str.Contains("value type"));
+
+            // a reference-type root with no interior
+            ExpectErrors(() => Dec.Reflection.SetByPath("text", new Dec.PathMember(new Dec.PathRoot("R"), "x"), 1), str => str.Contains("no addressable interior"));
+        }
+
+        [Test]
+        public void SetConverterRoot()
+        {
+            RegisterConverters();
+
+            var point = new ConvRecPoint() { x = 1, y = 2 };
+            Dec.Reflection.SetByPath(point, Child(Dec.Reflection.Enumerate(point), "x").Path, 8);
+            Assert.AreEqual(8, point.x);
+
+            // a body that replaces its instance has nowhere to deliver the replacement at the root
+            var replaced = new ConvRecReplaced() { v = 3 };
+            var vPath = Child(Dec.Reflection.Enumerate(replaced), "v").Path;
+            ExpectErrors(() => Dec.Reflection.SetByPath(replaced, vPath, 11), str => str.Contains("replacement"));
+            Assert.AreEqual(3, replaced.v);
+        }
+
+        [Test]
+        public void SetListRoot()
+        {
+            var list = new List<int>() { 1, 2, 3 };
+            var listRoot = Dec.Reflection.Enumerate(list);
+            Dec.Reflection.SetByPath(list, listRoot.Children[1].Path, 77);
+            Assert.AreEqual(new[] { 1, 77, 3 }, list.ToArray());
+
+            var array = new[] { "a", "b" };
+            var arrayRoot = Dec.Reflection.Enumerate(array);
+            Dec.Reflection.SetByPath(array, arrayRoot.Children[0].Path, "z");
+            Assert.AreEqual(new[] { "z", "b" }, array);
+        }
+
+        [Test]
+        public void SetThroughConverterRecord()
+        {
+            RegisterConverters();
+
+            var obj = new ConverterRecordHolderRec();
+            var root = Dec.Reflection.Enumerate(obj);
+
+            // class-backed: the write lands on the live object
+            Dec.Reflection.SetByPath(obj, Child(Child(root, "point"), "y").Path, 20);
+            Assert.AreEqual(20, obj.point.y);
+
+            // struct-backed: the value the converter's Record(ref) hands back is written into the holder's field
+            Dec.Reflection.SetByPath(obj, Child(Child(root, "vec"), "b").Path, 9.5f);
+            Assert.AreEqual(9.5f, obj.vec.b);
+            Assert.AreEqual(1.5f, obj.vec.a);
+
+            var xml = Dec.Recorder.Write(obj);
+            StringAssert.Contains("<y>20</y>", xml);
+            StringAssert.Contains("<b>9.5</b>", xml);
+        }
+
+        [Test]
+        public void SetThroughConverterRecordReplacingInstance()
+        {
+            RegisterConverters();
+
+            var obj = new ConverterReplacedHolderRec();
+            var original = obj.rep;
+            var root = Dec.Reflection.Enumerate(obj);
+
+            Dec.Reflection.SetByPath(obj, Child(Child(root, "rep"), "v").Path, 11);
+            Assert.AreEqual(11, obj.rep.v);
+            Assert.AreNotSame(original, obj.rep);
+        }
+
+        [Test]
+        public void SetConverterElement()
+        {
+            RegisterConverters();
+
+            var obj = new ConverterArrayHolderRec();
+            var root = Dec.Reflection.Enumerate(obj);
+
+            // struct element of an array: the indexed write-back
+            Dec.Reflection.SetByPath(obj, Child(Child(root, "vecs").Children[1], "a").Path, 30f);
+            Assert.AreEqual(30f, obj.vecs[1].a);
+            Assert.AreEqual(4f, obj.vecs[1].b);
+            Assert.AreEqual(1f, obj.vecs[0].a);
+
+            // class element of a list
+            Dec.Reflection.SetByPath(obj, Child(Child(root, "pointList").Children[0], "x").Path, 50);
+            Assert.AreEqual(50, obj.pointList[0].x);
+        }
+
+        [Test]
+        public void SetThroughNestedConverter()
+        {
+            RegisterConverters();
+
+            var obj = new ConverterNestedHolderRec();
+            var root = Dec.Reflection.Enumerate(obj);
+
+            Dec.Reflection.SetByPath(obj, Child(Child(Child(root, "outer"), "inner"), "x").Path, 55);
+            Assert.AreEqual(55, obj.outer.inner.x);
+        }
+
+        [Test]
+        public void SetThroughRecordAsThisConverter()
+        {
+            RegisterConverters();
+
+            var obj = new AsThisConverterRec();
+            var root = Dec.Reflection.Enumerate(obj);
+            Assert.AreEqual(new[] { "x", "y" }, root.Children.Select(c => c.Label).ToArray());
+
+            Dec.Reflection.SetByPath(obj, Child(root, "y").Path, 90);
+            Assert.AreEqual(90, obj.point.y);
+        }
+
+        [Test]
+        public void SetConverterFailures()
+        {
+            RegisterConverters();
+
+            // ConverterFactory interiors are refused, matching the read-only entries Enumerate reports
+            var factoryHolder = new ConverterFactoryHolderRec();
+            var factoryRoot = Dec.Reflection.Enumerate(factoryHolder);
+            ExpectErrors(() => Dec.Reflection.SetByPath(factoryHolder, Child(Child(factoryRoot, "node"), "payload").Path, 1), str => str.Contains("ConverterFactory"));
+            Assert.AreEqual(7, factoryHolder.node.payload);
+
+            // ConverterString: no interior at all
+            var stringHolder = new ConverterHolderRec();
+            var stringRoot = Dec.Reflection.Enumerate(stringHolder);
+            ExpectErrors(() => Dec.Reflection.SetByPath(stringHolder, new Dec.PathMember(Child(stringRoot, "point").Path, "x"), 1), str => str.Contains("ConverterString"));
+
+            // a label the converter body doesn't record
+            var recordHolder = new ConverterRecordHolderRec();
+            var recordRoot = Dec.Reflection.Enumerate(recordHolder);
+            ExpectErrors(() => Dec.Reflection.SetByPath(recordHolder, new Dec.PathMember(Child(recordRoot, "point").Path, "z"), 1), str => str.Contains("could not resolve"));
+        }
+
+        [Test]
+        public void SetSuppressedConditionalConverterRecord()
+        {
+            RegisterConverters();
+
+            var obj = new CondConvHolder();
+            var dataPath = Child(Child(Dec.Reflection.Enumerate(obj), "cond"), "data").Path;
+            var convertedPath = Child(Child(Dec.Reflection.Enumerate(obj, userSettings: new ExcludeSettings()), "cond"), "converted").Path;
+
+            // each path exists only under the settings it was enumerated with
+            Dec.Reflection.SetByPath(obj, dataPath, 8);
+            Assert.AreEqual(8, obj.cond.data);
+
+            Dec.Reflection.SetByPath(obj, convertedPath, 9, userSettings: new ExcludeSettings());
+            Assert.AreEqual(9, obj.cond.data);
+
+            ExpectErrors(() => Dec.Reflection.SetByPath(obj, dataPath, 10, userSettings: new ExcludeSettings()), str => str.Contains("could not resolve"));
+            ExpectErrors(() => Dec.Reflection.SetByPath(obj, convertedPath, 11), str => str.Contains("could not resolve"));
+            Assert.AreEqual(9, obj.cond.data);
+        }
+
+        [Test]
+        public void SetRecordAsThisNull()
+        {
+            var obj = new AsThisNullRec();
+            ExpectErrors(() => Dec.Reflection.SetByPath(obj, new Dec.PathMember(new Dec.PathRoot("R"), "alpha"), 1), str => str.Contains("null value"));
+        }
+
+        [Test]
+        public void WritableEntriesAccept()
+        {
+            var decA = ParseIntrospectDecs();
+
+            // every entry Enumerate reports as Writable must accept a SetByPath, and where a distinct value can be written it must be visible to a fresh enumeration, so a write that landed in a discarded copy is caught. Roots whose bodies replace their instance are excluded (SetConverterRoot pins that refusal).
+            var node = new StubRecordableInt() { data = 3 };
+            var subjects = new object[]
+            {
+                decA,
+                Dec.Database<IntrospectSharedDec>.Get("S"),
+                new ConvRecPoint() { x = 1, y = 2 },
+                new List<int>() { 1, 2 },
+                new int[] { 1, 2 },
+                new ScalarsRec(),
+                new TypeListRec(),
+                new SharedRefsRec() { a = node, b = node },
+                new ArraysRec(),
+                new ListRec(),
+                new QueueStackRec(),
+                new CombinatorRec() { conditions = new[] { new ConditionRec() { id = 1 } } },
+                new OptionsRec() { options = new[] { new OptionStruct() { text = "one", node = node } } },
+                new NestedRec(),
+                new ConverterHolderRec(),
+                new AsThisHolder(),
+                new AsThisListHolder(),
+                new AsThisSharedContainerRec() { items = new[] { new AsThisStruct() { payload = new AsThisPayload() } } },
+                new PolymorphicHolder(),
+                new ReadOnlyShapesRec(),
+                new NullableRec(),
+                new ConverterRecordHolderRec(),
+                new ConverterFactoryHolderRec(),
+                new ConverterReplacedHolderRec(),
+                new ConverterSharedHolderRec() { points = new[] { new ConvRecPoint() } },
+                new ConverterArrayHolderRec(),
+                new ConverterNestedHolderRec(),
+                new AsThisConverterRec(),
+                new CondConvHolder(),
+            };
+
+            foreach (var subject in subjects)
+            {
+                var root = Dec.Reflection.Enumerate(subject);
+                int writable = 0;
+
+                var pending = new Stack<Dec.Reflection.Entry>();
+                pending.Push(root);
+                while (pending.Count > 0)
+                {
+                    var entry = pending.Pop();
+                    if (entry.Writable)
+                    {
+                        var sentinel = Sentinel(entry.Value);
+                        Dec.Reflection.SetByPath(subject, entry.Path, sentinel ?? entry.Value);
+                        ++writable;
+
+                        if (sentinel != null)
+                        {
+                            var after = FindByPath(Dec.Reflection.Enumerate(subject), entry.Path);
+                            Assert.IsNotNull(after, entry.Path.Serialize());
+                            Assert.AreEqual(sentinel, after.Value, entry.Path.Serialize());
+                        }
+                    }
+
+                    foreach (var child in entry.Children)
+                    {
+                        pending.Push(child);
+                    }
+                }
+
+                Assert.Greater(writable, 0, subject.GetType().Name);
+            }
+        }
     }
 }

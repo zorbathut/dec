@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 * `[Dec.Setup]`, `[Dec.SetupAfter]`, and `[Dec.SetupBefore]` attributes, enabling an attribute-driven setup graph that generalizes ConfigErrors/PostLoad.
 * `Reflection.Enumerate()`, used to inspect every position a `Recorder.Write()` of an object would serialize, including `ConverterRecord` and `ConverterFactory` bodies, or every field a `Composer` write of a Dec would.
+* `Reflection.SetByPath()`, setting a value at a position reported by `Enumerate` by replaying the `Record()` bodies that lead to it, or by writing a Dec's fields through reflection.
 * `Dec.Path` now supports `Equals` and `GetHashCode`.
 
 ### Breaking
