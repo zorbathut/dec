@@ -82,6 +82,12 @@ namespace Dec
 
                 foreach (var reference in refs)
                 {
+                    if (refDict.ContainsKey(reference.id))
+                    {
+                        Dbg.Err($"{reference.node.GetContext()}: Duplicate reference ID `{reference.id}`; ignoring this definition and keeping the first one");
+                        continue;
+                    }
+
                     object refInstance = null;
                     if (Serialization.ConverterFor(reference.type) is Converter converter)
                     {

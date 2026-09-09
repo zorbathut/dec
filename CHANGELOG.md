@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this file.
 * RecorderEnumerator: Skip `<>l__initialThreadId` and reset it to an invalid value on deserialization, making behavior and checksums slightly more reliable.
 * `Dag.CalculateOrder` no longer has quadratic behavior on large inputs.
 * `Dec.Path` is now somewhat more specific.
+* Duplicate reference IDs in a Record are now reported instead of silently overwriting each other.
 
 ### Fixed
 * Recorder.Read crash on a `<Ref>` element with invalid `class`.

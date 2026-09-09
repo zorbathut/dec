@@ -1041,5 +1041,39 @@ namespace DecTest
             Assert.AreSame(deserialized.payload, deep.payload);
             Assert.AreEqual(42, deserialized.payload.value);
         }
+        public class RefValueRootRecordable : Dec.IRecordable
+        {
+            public RefValueRecordable one;
+            public RefValueRecordable two;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Shared().Record(ref one, "one");
+                record.Shared().Record(ref two, "two");
+            }
+        }
+
+        [Test]
+        public void DuplicateRefId()
+        {
+            string serialized = @"
+                <Record>
+                  <recordFormatVersion>1</recordFormatVersion>
+                  <refs>
+                    <Ref id=""dupe"" class=""DecTest.RecorderRef.RefValueRecordable""><value>1</value></Ref>
+                    <Ref id=""dupe"" class=""DecTest.RecorderRef.RefValueRecordable""><value>2</value></Ref>
+                  </refs>
+                  <data>
+                    <one ref=""dupe"" />
+                    <two ref=""dupe"" />
+                  </data>
+                </Record>";
+
+            RefValueRootRecordable deserialized = null;
+            ExpectErrors(() => deserialized = Dec.Recorder.Read<RefValueRootRecordable>(serialized), err => err.Contains("Duplicate reference ID"));
+
+            Assert.AreSame(deserialized.one, deserialized.two);
+            Assert.AreEqual(1, deserialized.one.value);
+        }
     }
 }
