@@ -801,6 +801,13 @@ namespace Dec
 
                 // First we check if this is a valid Dec path ref; those don't require .Shared()
                 var decRef = Database.GetFromDecPath(refKey);
+                if (decRef != null && globals.refs != null && globals.refs.ContainsKey(refKey))
+                {
+                    // The refs entry holds data that exists nowhere but this file, while the dec is findable by name no matter what, so the refs entry is the one worth keeping.
+                    Dbg.Err($"{refKeyNode.GetContext()}: Reference [{refKey}] names both a dec path and an entry in the refs table; using the refs table entry, but one of the two needs renaming");
+                    decRef = null;
+                }
+
                 if (decRef != null)
                 {
                     // check types

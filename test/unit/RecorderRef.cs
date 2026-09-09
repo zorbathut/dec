@@ -1075,5 +1075,61 @@ namespace DecTest
             Assert.AreSame(deserialized.one, deserialized.two);
             Assert.AreEqual(1, deserialized.one.value);
         }
+
+
+    }
+
+    [TestFixture]
+    public class RecorderRefDecPath : Base
+    {
+        public class RefPathDec : Dec.Dec
+        {
+            public RecorderRef.RefValueRecordable member;
+
+            [Dec.Setup]
+            internal void LookupEnable(Action<string> reporter)
+            {
+                Dec.Database.DecLookupEnable(member);
+            }
+        }
+
+        [SetUp]
+        public void Setup()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(RefPathDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <RefPathDec decName=""TestDec"">
+                        <member><value>7</value></member>
+                    </RefPathDec>
+                </Decs>");
+            parser.Finish();
+        }
+
+        [Test]
+        public void RefIdShadowedByDecPath()
+        {
+            // Dec paths are resolved before the refs table, so a ref that shares a name with one would otherwise hand back the dec's object instead of the recorded one.
+            string serialized = @"
+                <Record>
+                  <recordFormatVersion>1</recordFormatVersion>
+                  <refs>
+                    <Ref id=""RefPathDec.TestDec.member"" class=""DecTest.RecorderRef.RefValueRecordable""><value>1</value></Ref>
+                  </refs>
+                  <data>
+                    <one ref=""RefPathDec.TestDec.member"" />
+                    <two ref=""RefPathDec.TestDec.member"" />
+                  </data>
+                </Record>";
+
+            RecorderRef.RefValueRootRecordable deserialized = null;
+            ExpectErrors(() => deserialized = Dec.Recorder.Read<RecorderRef.RefValueRootRecordable>(serialized), err => err.Contains("names both a dec path"));
+
+            Assert.AreSame(deserialized.one, deserialized.two);
+            Assert.AreEqual(1, deserialized.one.value);
+            Assert.AreNotSame(Dec.Database<RefPathDec>.Get("TestDec").member, deserialized.one);
+        }
     }
 }
