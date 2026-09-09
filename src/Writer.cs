@@ -99,19 +99,32 @@ namespace Dec
         // An object met again at a position whose sharedness disagrees with its first encounter; worded once for every backend that tracks references.
         internal static void ErrReferenceMismatch(bool priorWasShared, Path path, Path priorPath, object referenced)
         {
-            string additionalNote = "";
+            // The key position can be either side of this, depending on whether the container or the shared field was recorded first; whichever it is, it's the unshared side.
+            Path unsharedPath = priorWasShared ? path : priorPath;
+
+            string advice;
+            if ((unsharedPath is PathDictionaryKey || unsharedPath is PathHashSetElement) && !Util.HashesByIdentity(referenced.GetType()))
+            {
+                // The unshared side is one Dec chose, not one the user wrote, so the usual advice would just send them looking for a decorator that can't help.
+                advice = $"The dictionary key or hash set element here is unshared because {referenced.GetType()} overrides GetHashCode(), which cannot be .Shared() reliably.";
+            }
+            else
+            {
+                advice = "If this is coming from a Recorder setup, it's likely you either need a .Shared() decorator, or you need to ensure that this object is not serialized elsewhere.";
+            }
+
             if (referenced is Array array && array.Length == 0)
             {
-                additionalNote = " (Note: C# empty arrays often refer to a single shared instance, and it's unclear what Dec should do about this. Come talk to us in Discord if you think you have a good solution. Lists do not have this behavior.)";
+                advice += " (Note: C# empty arrays often refer to a single shared instance, and it's unclear what Dec should do about this. Come talk to us in Discord if you think you have a good solution. Lists do not have this behavior.)";
             }
 
             if (priorWasShared)
             {
-                Dbg.Err($"Attempted to create a new unshared reference at [{path.Serialize()}] to a previously-seen shared object at [{priorPath.Serialize()}]. This may result in an invalid serialization. If this is coming from a Recorder setup, it's likely you either need a .Shared() decorator, or you need to ensure that this object is not serialized elsewhere.{additionalNote}");
+                Dbg.Err($"Attempted to create a new unshared reference at [{path.Serialize()}] to a previously-seen shared object at [{priorPath.Serialize()}]. This may result in an invalid serialization. {advice}");
             }
             else
             {
-                Dbg.Err($"Attempted to create a new shared reference at [{path.Serialize()}] to a previously-seen unshared object at [{priorPath.Serialize()}]. This may result in an invalid serialization. If this is coming from a Recorder setup, it's likely you either need a .Shared() decorator, or you need to ensure that this object is not serialized elsewhere.{additionalNote}");
+                Dbg.Err($"Attempted to create a new shared reference at [{path.Serialize()}] to a previously-seen unshared object at [{priorPath.Serialize()}]. This may result in an invalid serialization. {advice}");
             }
         }
     }

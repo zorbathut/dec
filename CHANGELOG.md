@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 ### Breaking
 * `SetupDependsOnAttribute` removed, replaced with `[Dec.SetupAfter]`.
 * `Dec.Path` can no longer be subclassed outside the library; it gained an internal abstract member. Let me know if you needed that.
+* It is now an error to use a shared class that overrides `GetHashCode()` as a dictionary key or hash set element. Sharing value-hashed keys has never worked properly; this adds an error to it. Classes without GetHashCode() still work; shared identity-hashed keys continue to be supported. If you have a shared class overriding GetHashCode() just to reimplement identity hashing then it will now break, but also, that's weird? Why were you doing that? Let me know if you need a workaround. 
 
 ### Obsoleted
 * `ConfigErrors` and `PostLoad` are now marked `[Obsolete]` in favor of `[Dec.Setup]` functions. They'll be removed in the future.

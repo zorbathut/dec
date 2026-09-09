@@ -566,6 +566,7 @@ namespace DecTest
         [Test]
         public void DictionaryKeyRef([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode mode)
         {
+            // StubRecordable hashes by identity, so it survives being read into the dictionary before its contents arrive.
             var dict = new DictionaryKeyRefDec();
             dict.referenceA = new StubRecordable();
             dict.referenceB = new StubRecordable();
@@ -578,6 +579,52 @@ namespace DecTest
             Assert.AreNotSame(deserialized.referenceA, deserialized.referenceB);
             Assert.AreEqual("Hello", deserialized.dict[deserialized.referenceA]);
             Assert.AreEqual("Goodbye", deserialized.dict[deserialized.referenceB]);
+        }
+
+        public class ContentHashedKey : Dec.IRecordable
+        {
+            public int id;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref id, "id");
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is ContentHashedKey rhs && rhs.id == id;
+            }
+
+            public override int GetHashCode()
+            {
+                return id;
+            }
+        }
+
+        public class ContentHashedKeyRoot : Dec.IRecordable
+        {
+            public ContentHashedKey reference;
+            public Dictionary<ContentHashedKey, string> dict;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Shared().Record(ref reference, "reference");
+                record.Shared().Record(ref dict, "dict");
+            }
+        }
+
+        [Test]
+        public void DictionaryKeyRefContentHashed([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple, RecorderMode.Checksum)] RecorderMode mode)
+        {
+            // A key that hashes on its contents can't be read back as a reference, so it isn't shareable; using one that's shared elsewhere is a conflict. Clone doesn't go through the reference block at all and has no such restriction.
+            var root = new ContentHashedKeyRoot();
+            root.reference = new ContentHashedKey() { id = 1 };
+            root.dict = new Dictionary<ContentHashedKey, string>();
+            root.dict[root.reference] = "Hello";
+
+            var deserialized = DoRecorderRoundTrip(root, mode, expectWriteErrors: mode != RecorderMode.Clone, errorValidator: err => (err.Contains("previously-seen unshared object") || err.Contains("previously-seen shared object")) && err.Contains("overrides GetHashCode"));
+
+            Assert.AreEqual(1, deserialized.dict.Count);
         }
 
         public class ParserRefDec : Dec.Dec
@@ -717,6 +764,27 @@ namespace DecTest
             {
                 DoRecorderRoundTrip(root, mode);
             }
+        }
+        public class NullElementSetRoot : Dec.IRecordable
+        {
+            public HashSet<StubRecordable> set;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Shared().Record(ref set, "set");
+            }
+        }
+
+        [Test]
+        public void HashSetNullElementWrite()
+        {
+            // A null element is legal in a HashSet of a reference type; it isn't readable, but the write must report that rather than crash.
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var root = new NullElementSetRoot() { set = new HashSet<StubRecordable>() { null, new StubRecordable() } };
+
+            string serialized = Dec.Recorder.Write(root);
+            Assert.IsTrue(serialized.Contains("null"));
         }
     }
 }

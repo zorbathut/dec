@@ -373,7 +373,7 @@ namespace Dec
                 pair.entry.DeclaredType = pairType;
                 pair.entry.Value = Activator.CreateInstance(pairType, iterator.Key, iterator.Value);
 
-                Serialization.ComposeElement(pair.CreateChildEntry("key", RecorderSettings.CreateChild(), new PathDictionaryKey(Path)), iterator.Key, keyType);
+                Serialization.ComposeElement(pair.CreateChildEntry("key", RecorderSettings.CreateChildKey(iterator.Key), new PathDictionaryKey(Path)), iterator.Key, keyType);
                 Serialization.ComposeElement(pair.CreateChildEntry("value", RecorderSettings.CreateChild(), new PathDictionaryValueUnpathable(Path)), iterator.Value, valueType);
             }
         }
@@ -391,7 +391,7 @@ namespace Dec
             IEnumerator iterator = value.GetEnumerator();
             while (iterator.MoveNext())
             {
-                Serialization.ComposeElement(CreateChildEntry(i.ToString(CultureInfo.InvariantCulture), RecorderSettings.CreateChild(), new PathHashSetElement(Path)), iterator.Current, keyType);
+                Serialization.ComposeElement(CreateChildEntry(i.ToString(CultureInfo.InvariantCulture), RecorderSettings.CreateChildKey(iterator.Current), new PathHashSetElement(Path)), iterator.Current, keyType);
                 ++i;
             }
         }

@@ -258,7 +258,7 @@ namespace Dec
                 // Revisit this later when someone (possibly myself) really wants it improved.
                 var li = CreateNamedChild("li", RecorderSettings, Path);
 
-                Serialization.ComposeElement(li.CreateNamedChild("key", RecorderSettings.CreateChild(), new PathDictionaryKey(Path)), iterator.Key, keyType);
+                Serialization.ComposeElement(li.CreateNamedChild("key", RecorderSettings.CreateChildKey(iterator.Key), new PathDictionaryKey(Path)), iterator.Key, keyType);
 
                 // unfortunate consequence: we can't generate sensible Paths when doing this
                 Serialization.ComposeElement(li.CreateNamedChild("value", RecorderSettings.CreateChild(), new PathDictionaryValueUnpathable(Path)), iterator.Value, valueType);
@@ -276,7 +276,7 @@ namespace Dec
                 // In theory, some sets support inline format, not li format. Inline format is cleaner and smaller and we should be using it when possible.
                 // In practice, it's hard and I'm lazy and this always works, and we're not providing any guarantees about cleanliness of serialized output.
                 // Revisit this later when someone (possibly myself) really wants it improved.
-                Serialization.ComposeElement(CreateNamedChild("li", RecorderSettings.CreateChild(), new PathHashSetElement(Path)), iterator.Current, keyType);
+                Serialization.ComposeElement(CreateNamedChild("li", RecorderSettings.CreateChildKey(iterator.Current), new PathHashSetElement(Path)), iterator.Current, keyType);
             }
         }
 

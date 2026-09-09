@@ -213,6 +213,19 @@ namespace Dec
                 return rv;
             }
 
+            // For dictionary keys and hash set elements, which are hashed while being read, before anything they reference could have been filled in. Hash-by-value keys therefore cannot be shared, so we cut them off here. The reader has only a declared type, which may be a base class or interface of something that hashes by value, so it judges the object a reference resolves to instead.
+            public Settings CreateChildKey(object key)
+            {
+                Settings rv = CreateChild();
+
+                if (key != null && !Util.HashesByIdentity(key.GetType()))
+                {
+                    rv.shared = Shared.Deny;
+                }
+
+                return rv;
+            }
+
             internal IRecordable CreateRecordableFromFactory(Type type, string name, ReaderNode node)
             {
                 // Iterate back to the appropriate type.

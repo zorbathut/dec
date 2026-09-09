@@ -55,6 +55,8 @@ public class SharedRecordableExample : Dec.IRecorder
 
 When using this feature, classes *cannot* be pre-initialized; they must start as `null`.
 
+Dictionary keys and hash set elements can be shared only when their type hashes by identity - a class that doesn't override `GetHashCode()`. Keys are hashed while being read, before anything they refer to has been filled in, so a key that hashes on its contents would land in the container under a hash that changes out from under it. Sharing an object of such a type while also using it as a key is an error.
+
 ## Dec Compatibility
 
 While the savegame format is not guaranteed and may change without notice, we plan to support full backwards compatibility for all time. The save format includes a version number that Recorder will read and adjust for whenever necessary.
