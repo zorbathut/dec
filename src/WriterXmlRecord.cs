@@ -15,9 +15,11 @@ namespace Dec
         private Dictionary<object, (XElement element, Path path)> refToElement = new Dictionary<object, (XElement, Path)>();
         private Dictionary<XElement, object> elementToRef = new Dictionary<XElement, object>();
 
-        // A map from object to the string intended as a reference. This will be filled in only once a second reference to something is created.
-        // This is cleared after we resolve references, then re-used for the depth capping code.
-        private Dictionary<object, string> refToString = new Dictionary<object, string>();
+        // Every ref name we've handed out, for the lifetime of this writer. An object is named at most once; a name is never reused.
+        private Dictionary<object, string> refNames = new Dictionary<object, string>();
+
+        // The objects whose contents still need to be hoisted out of the tree and into the refs block, drained on every strip pass.
+        private List<object> refsPendingHoist = new List<object>();
 
         // Current reference ID that we're on.
         private int referenceId = 0;
@@ -42,6 +44,17 @@ namespace Dec
             record.Add(refs);
         }
 
+        // The single place a ref name is minted. Names the object and queues its contents for hoisting into the refs block.
+        private string RefNameAcquire(object referenced)
+        {
+            string name = $"ref{referenceId++:D5}";
+
+            refNames[referenced] = name;
+            refsPendingHoist.Add(referenced);
+
+            return name;
+        }
+
         public override bool RegisterReference(object referenced, XElement element, Recorder.Settings recSettings, Path path)
         {
             bool forceProcess = false;
@@ -53,6 +66,7 @@ namespace Dec
                     // Insert it into our refToElement mapping
                     refToElement[referenced] = (element, path);
                     elementToRef[element] = referenced;
+
                 }
                 else
                 {
@@ -61,6 +75,7 @@ namespace Dec
 
                     // Note: It is important not to add an elementToRef entry because this is later used to split long hierarchies
                     // and if you split a long hierarchy around a non-referencable barrier, everything breaks!
+
                 }
 
                 if (Config.TestRefEverything && recSettings.shared != Recorder.Settings.Shared.Deny)
@@ -89,12 +104,11 @@ namespace Dec
                 return true;
             }
 
-            var refId = refToString.TryGetValue(referenced);
+            var refId = refNames.TryGetValue(referenced);
             if (refId == null)
             {
                 // We already had a reference, but we don't have a string ID for it. We need one now though!
-                refId = $"ref{referenceId++:D5}";
-                refToString[referenced] = refId;
+                refId = RefNameAcquire(referenced);
             }
 
             // Tag the XML element properly
@@ -110,12 +124,14 @@ namespace Dec
             // It is *vitally* important that we do this step *after* all references are generated, not inline as we add references.
             // This is because we have to move all the contents of the XML element, but if we do it during generation, a recursive-reference situation could result in us trying to move the XML element before its contents are fully generated.
             // So we do it now, when we know that everything is finished.
-            foreach (var refblock in refToString)
+            foreach (var pending in refsPendingHoist)
             {
-                var result = new XElement("Ref");
-                result.SetAttributeValue("id", refblock.Value);
+                string refName = refNames[pending];
 
-                var src = refToElement[refblock.Key];
+                var result = new XElement("Ref");
+                result.SetAttributeValue("id", refName);
+
+                var src = refToElement[pending];
 
                 // gotta ToArray() because it does not like mutating things while iterating
                 // And yes, you have to .Remove() also, otherwise you get copies in both places.
@@ -137,23 +153,24 @@ namespace Dec
                 }
 
                 // Patch in the ref link
-                src.element.SetAttributeValue("ref", refblock.Value);
+                src.element.SetAttributeValue("ref", refName);
 
                 // We may not have had a class to begin with, but we sure need one now!
-                result.SetAttributeValue("class", refblock.Key.GetType().ComposeDecFormatted());
+                result.SetAttributeValue("class", pending.GetType().ComposeDecFormatted());
 
-                yield return new KeyValuePair<string, XElement>(refblock.Value, result);
+                yield return new KeyValuePair<string, XElement>(refName, result);
             }
 
             // We're now done processing this segment and can erase it; we don't want to try doing this a second time!
-            refToString.Clear();
+            refsPendingHoist.Clear();
         }
 
         public bool ProcessDepthLimitedReferences(XElement node, int depthRemaining)
         {
-            if (depthRemaining <= 0 && elementToRef.ContainsKey(node))
+            // An object we've already named has already been hoisted; its element is still in elementToRef, but it's an empty stub by now and stripping it again would produce a second, contentless Ref.
+            if (depthRemaining <= 0 && elementToRef.TryGetValue(node, out var referenced) && !refNames.ContainsKey(referenced))
             {
-                refToString[elementToRef[node]] = $"ref{referenceId++:D5}";
+                RefNameAcquire(referenced);
                 // We don't continue recursively because then we're threatening a stack overflow; we'll get it on the next pass
 
                 return true;

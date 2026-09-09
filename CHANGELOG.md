@@ -24,6 +24,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 * Recorder.Read crash on a `<Ref>` element with invalid `class`.
+* Deep shared objects at exactly the wrong depth could end up corrupted.
 * Typo in the shared-reference mismatch error message.
 
 

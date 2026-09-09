@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using NUnit.Framework;
 
 namespace DecTest
@@ -981,6 +982,64 @@ namespace DecTest
 
             string serialized = Dec.Recorder.Write(root);
             Assert.IsTrue(serialized.Contains("null"));
+        }
+        public class RefValueRecordable : Dec.IRecordable
+        {
+            public int value;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref value, "value");
+            }
+        }
+
+        public class DeepStrippedHolder : Dec.IRecordable
+        {
+            public DeepStrippedHolder next;
+            public RefValueRecordable payload;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref next, "next");
+                record.Shared().Record(ref payload, "payload");
+            }
+        }
+
+        [Test]
+        public void DepthStrippedTwice([ValuesExcept(RecorderMode.Simple)] RecorderMode mode)
+        {
+            // The payload's home is deeper than the depth limiter's cutoff, so the depth pass gets a look at it after it's already been hoisted into the refs block.
+            const int depth = 30;
+
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var payload = new RefValueRecordable() { value = 42 };
+
+            var root = new DeepStrippedHolder();
+            {
+                var current = root;
+                for (int i = 1; i < depth; ++i)
+                {
+                    current = current.next = new DeepStrippedHolder();
+                }
+                current.payload = payload;
+            }
+            root.payload = payload;
+
+            var deserialized = DoRecorderRoundTrip(root, mode, testSerializedResult: serialized =>
+            {
+                // The class tag shows up only on Ref elements, so this counts the payload's entries in the refs block.
+                Assert.AreEqual(1, Regex.Matches(serialized, "RefValueRecordable").Count);
+            });
+
+            var deep = deserialized;
+            while (deep.next != null)
+            {
+                deep = deep.next;
+            }
+
+            Assert.AreSame(deserialized.payload, deep.payload);
+            Assert.AreEqual(42, deserialized.payload.value);
         }
     }
 }
