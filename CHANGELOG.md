@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
 * `Reflection.Enumerate()`, used to inspect every position a `Recorder.Write()` of an object would serialize, including `ConverterRecord` and `ConverterFactory` bodies, or every field a `Composer` write of a Dec would.
 * `Reflection.SetByPath()`, setting a value at a position reported by `Enumerate` by replaying the `Record()` bodies that lead to it, or by writing a Dec's fields through reflection.
 * `Dec.Path` now supports `Equals` and `GetHashCode`.
+* `IRefName`, letting an object name its own entry in a Recorder's reference block instead of accepting a generated `ref00000`-style name.
+* `IRefForce`, hoisting an object into the reference block even when only one reference to it exists. This requires `.Shared()` positions, just like any other reference.
 
 ### Breaking
 * `SetupDependsOnAttribute` removed, replaced with `[Dec.SetupAfter]`.

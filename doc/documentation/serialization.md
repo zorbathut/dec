@@ -57,6 +57,41 @@ When using this feature, classes *cannot* be pre-initialized; they must start as
 
 Dictionary keys and hash set elements can be shared only when their type hashes by identity - a class that doesn't override `GetHashCode()`. Keys are hashed while being read, before anything they refer to has been filled in, so a key that hashes on its contents would land in the container under a hash that changes out from under it. Sharing an object of such a type while also using it as a key is an error, as is reading a file that holds such a key as a reference.
 
+Shared instances are written once into a reference block at the top of the file, under a generated name like `ref00000`, and referenced from wherever they appear. Two interfaces let you take control of that. `Dec.IRefName` lets you name an instance's entry, which makes the file much easier to read and to diff; `Dec.IRefForce` puts an instance in the reference block even when only one reference to it exists, giving it a stable home instead of being written inline wherever it happens to be reached first.
+
+```cs
+public class NamedSharedClass : Dec.IRecordable, Dec.IRefName, Dec.IRefForce
+{
+    string id;
+
+    // Return null to accept a generated name.
+    public string RefName()
+    {
+        return id;
+    }
+
+    public void Record(Recorder recorder)
+    {
+        recorder.Record(ref id, "id");
+    }
+}
+```
+
+```cs
+public class Holder : Dec.IRecordable
+{
+    NamedSharedClass member;
+
+    public void Record(Recorder recorder)
+    {
+        // Still needed; IRefForce doesn't override the sharing rules, it just uses them.
+        recorder.Shared().Record(ref member, "member");
+    }
+}
+```
+
+Names must be unique within a file and must not collide with a Dec path; an invalid name produces a warning and falls back on a generated name. `IRefForce` still obeys the `.Shared()` rules above - an instance reached only through positions that don't allow sharing is written inline with a warning, because a reference in such a position cannot be read back.
+
 ## Dec Compatibility
 
 While the savegame format is not guaranteed and may change without notice, we plan to support full backwards compatibility for all time. The save format includes a version number that Recorder will read and adjust for whenever necessary.

@@ -787,6 +787,49 @@ namespace DecTest
             }
         }
 
+        public class IdentityHashedForcedKey : Dec.IRecordable, Dec.IRefForce
+        {
+            public int id;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref id, "id");
+            }
+        }
+
+        public class IdentityHashedForcedKeyRoot : Dec.IRecordable
+        {
+            public Dictionary<IdentityHashedForcedKey, string> dict;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Shared().Record(ref dict, "dict");
+            }
+        }
+
+        [Test]
+        public void DictionaryKeyForced([ValuesExcept(RecorderMode.Validation, RecorderMode.Simple)] RecorderMode mode)
+        {
+            // The end of the rule: an identity-hashed key can be hoisted into the refs block and read back into the dictionary before it holds anything.
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var key = new IdentityHashedForcedKey() { id = 7 };
+            var root = new IdentityHashedForcedKeyRoot() { dict = new Dictionary<IdentityHashedForcedKey, string>() };
+            root.dict[key] = "Hello";
+
+            var deserialized = DoRecorderRoundTrip(root, mode, testSerializedResult: serialized =>
+            {
+                Assert.IsTrue(serialized.Contains(@"<key ref="));
+            });
+
+            Assert.AreEqual(1, deserialized.dict.Count);
+            foreach (var kvp in deserialized.dict)
+            {
+                Assert.AreEqual(7, kvp.Key.id);
+                Assert.AreEqual("Hello", deserialized.dict[kvp.Key]);
+            }
+        }
+
         public class ParserRefDec : Dec.Dec
         {
             public Stub initialized = new Stub();
@@ -1076,7 +1119,575 @@ namespace DecTest
             Assert.AreEqual(1, deserialized.one.value);
         }
 
+        public class RefNamedRecordable : Dec.IRecordable, Dec.IRefName
+        {
+            public string name;
+            public int value;
 
+            public string RefName()
+            {
+                return name;
+            }
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref name, "name");
+                record.Record(ref value, "value");
+            }
+        }
+
+        public class RefNamedRootRecordable : Dec.IRecordable
+        {
+            public RefNamedRecordable sharedA;
+            public RefNamedRecordable sharedB;
+            public RefNamedRecordable solo;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Shared().Record(ref sharedA, "sharedA");
+                record.Shared().Record(ref sharedB, "sharedB");
+                record.Shared().Record(ref solo, "solo");
+            }
+        }
+
+        [Test]
+        public void RefNamed([ValuesExcept(RecorderMode.Simple)] RecorderMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var shared = new RefNamedRecordable() { name = "alpha", value = 1 };
+            var root = new RefNamedRootRecordable() { sharedA = shared, sharedB = shared, solo = new RefNamedRecordable() { name = "beta", value = 2 } };
+
+            var deserialized = DoRecorderRoundTrip(root, mode, testSerializedResult: serialized =>
+            {
+                Assert.IsTrue(serialized.Contains(@"id=""alpha"""));
+                Assert.IsTrue(serialized.Contains(@"ref=""alpha"""));
+            });
+
+            Assert.AreSame(deserialized.sharedA, deserialized.sharedB);
+            Assert.AreEqual(1, deserialized.sharedA.value);
+            Assert.AreEqual(2, deserialized.solo.value);
+        }
+
+        [Test]
+        public void RefNamedUnreferenced([ValuesExcept(RecorderMode.Simple, RecorderMode.RefEverything)] RecorderMode mode)
+        {
+            // A name only takes effect on an object that actually lands in the refs block. RefEverything is excluded because it puts everything there.
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var root = new RefNamedRootRecordable() { solo = new RefNamedRecordable() { name = "beta", value = 2 } };
+
+            var deserialized = DoRecorderRoundTrip(root, mode, testSerializedResult: serialized =>
+            {
+                Assert.IsFalse(serialized.Contains(@"id=""beta"""));
+            });
+
+            Assert.AreEqual(2, deserialized.solo.value);
+        }
+
+        public class RefNamedPairRootRecordable : Dec.IRecordable
+        {
+            public RefNamedRecordable oneA;
+            public RefNamedRecordable oneB;
+            public RefNamedRecordable twoA;
+            public RefNamedRecordable twoB;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Shared().Record(ref oneA, "oneA");
+                record.Shared().Record(ref oneB, "oneB");
+                record.Shared().Record(ref twoA, "twoA");
+                record.Shared().Record(ref twoB, "twoB");
+            }
+        }
+
+        [Test]
+        public void RefNamedConflict([ValuesExcept(RecorderMode.Simple)] RecorderMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var one = new RefNamedRecordable() { name = "dupe", value = 1 };
+            var two = new RefNamedRecordable() { name = "dupe", value = 2 };
+            var root = new RefNamedPairRootRecordable() { oneA = one, oneB = one, twoA = two, twoB = two };
+
+            var deserialized = DoRecorderRoundTrip(root, mode, expectWriteWarnings: mode != RecorderMode.Clone && mode != RecorderMode.Checksum, warningValidator: wrn => wrn.Contains("dupe") && wrn.Contains("already in use"));
+
+            Assert.AreSame(deserialized.oneA, deserialized.oneB);
+            Assert.AreSame(deserialized.twoA, deserialized.twoB);
+            Assert.AreNotSame(deserialized.oneA, deserialized.twoA);
+            Assert.AreEqual(1, deserialized.oneA.value);
+            Assert.AreEqual(2, deserialized.twoA.value);
+        }
+
+        public class RefNamedMixedRootRecordable : Dec.IRecordable
+        {
+            public RefNamedRecordable namedA;
+            public RefNamedRecordable namedB;
+            public RefValueRecordable plainA;
+            public RefValueRecordable plainB;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Shared().Record(ref namedA, "namedA");
+                record.Shared().Record(ref namedB, "namedB");
+                record.Shared().Record(ref plainA, "plainA");
+                record.Shared().Record(ref plainB, "plainB");
+            }
+        }
+
+        [Test]
+        public void RefNamedGeneratedCollision([ValuesExcept(RecorderMode.Simple, RecorderMode.RefEverything)] RecorderMode mode)
+        {
+            // A user name out of the generated namespace is fine; the generator just keeps looking until it finds a free slot. RefEverything is excluded because it hands generated names to objects this test doesn't control, which would make the user's name the duplicate instead.
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var named = new RefNamedRecordable() { name = "ref00000", value = 1 };
+            var plain = new RefValueRecordable() { value = 2 };
+            var root = new RefNamedMixedRootRecordable() { namedA = named, namedB = named, plainA = plain, plainB = plain };
+
+            var deserialized = DoRecorderRoundTrip(root, mode, testSerializedResult: serialized =>
+            {
+                Assert.AreEqual(1, Regex.Matches(serialized, @"id=""ref00000""").Count);
+            });
+
+            Assert.AreSame(deserialized.namedA, deserialized.namedB);
+            Assert.AreSame(deserialized.plainA, deserialized.plainB);
+            Assert.AreEqual(1, deserialized.namedA.value);
+            Assert.AreEqual(2, deserialized.plainA.value);
+        }
+
+        [Test]
+        public void RefNamedNull([ValuesExcept(RecorderMode.Simple)] RecorderMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var shared = new RefNamedRecordable() { name = null, value = 1 };
+            var root = new RefNamedRootRecordable() { sharedA = shared, sharedB = shared };
+
+            var deserialized = DoRecorderRoundTrip(root, mode);
+
+            Assert.AreSame(deserialized.sharedA, deserialized.sharedB);
+            Assert.AreEqual(1, deserialized.sharedA.value);
+        }
+
+        [Test]
+        public void RefNamedEmpty([ValuesExcept(RecorderMode.Simple)] RecorderMode mode)
+        {
+            // The empty string is a legal, if unhelpful, ref name.
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var shared = new RefNamedRecordable() { name = "", value = 1 };
+            var root = new RefNamedRootRecordable() { sharedA = shared, sharedB = shared };
+
+            var deserialized = DoRecorderRoundTrip(root, mode);
+
+            Assert.AreSame(deserialized.sharedA, deserialized.sharedB);
+            Assert.AreEqual(1, deserialized.sharedA.value);
+        }
+
+        public class RefNamedChainRecordable : Dec.IRecordable, Dec.IRefName
+        {
+            public string name;
+            public RefNamedChainRecordable next;
+
+            public string RefName()
+            {
+                return name;
+            }
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref name, "name");
+                record.Shared().Record(ref next, "next");
+            }
+        }
+
+        [Test]
+        public void RefNamedDepth([ValuesExcept(RecorderMode.Simple)] RecorderMode mode)
+        {
+            // Nothing here is referenced twice; the refs block is entirely the work of the depth limiter, and it should be using the custom names too.
+            const int depth = 60;
+
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var root = new RefNamedChainRecordable() { name = "node0" };
+            {
+                var current = root;
+                for (int i = 1; i < depth; ++i)
+                {
+                    current = current.next = new RefNamedChainRecordable() { name = $"node{i}" };
+                }
+            }
+
+            var deserialized = DoRecorderRoundTrip(root, mode, testSerializedResult: serialized =>
+            {
+                Assert.IsTrue(serialized.Contains(@"id=""node"));
+                Assert.IsFalse(serialized.Contains(@"id=""ref"));
+            });
+
+            {
+                var current = deserialized;
+                for (int i = 0; i < depth; ++i)
+                {
+                    Assert.IsNotNull(current);
+                    Assert.AreEqual($"node{i}", current.name);
+                    current = current.next;
+                }
+
+                Assert.IsNull(current);
+            }
+        }
+
+        public class RefForcedRecordable : Dec.IRecordable, Dec.IRefForce
+        {
+            public int value;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref value, "value");
+            }
+        }
+
+        public class RefForcedNamedRecordable : Dec.IRecordable, Dec.IRefForce, Dec.IRefName
+        {
+            public string name;
+            public int value;
+
+            public string RefName()
+            {
+                return name;
+            }
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref name, "name");
+                record.Record(ref value, "value");
+            }
+        }
+
+        public class RefForcedRootRecordable : Dec.IRecordable
+        {
+            public RefForcedRecordable shared;
+            public RefForcedNamedRecordable sharedNamed;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Shared().Record(ref shared, "shared");
+                record.Shared().Record(ref sharedNamed, "sharedNamed");
+            }
+        }
+
+        public class RefForcedUnsharedRootRecordable : Dec.IRecordable
+        {
+            public RefForcedRecordable unshared;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref unshared, "unshared");
+            }
+        }
+
+        [Test]
+        public void RefForced([ValuesExcept(RecorderMode.Simple)] RecorderMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var root = new RefForcedRootRecordable() { shared = new RefForcedRecordable() { value = 1 }, sharedNamed = new RefForcedNamedRecordable() { name = "gamma", value = 2 } };
+
+            var deserialized = DoRecorderRoundTrip(root, mode, testSerializedResult: serialized =>
+            {
+                // Both are referenced exactly once, so without forcing they'd be inline.
+                Assert.IsTrue(serialized.Contains(@"<shared ref="));
+                Assert.IsTrue(serialized.Contains(@"<sharedNamed ref=""gamma"""));
+                Assert.IsTrue(serialized.Contains(@"id=""gamma"""));
+            });
+
+            Assert.AreEqual(1, deserialized.shared.value);
+            Assert.AreEqual(2, deserialized.sharedNamed.value);
+        }
+
+        [Test]
+        public void RefForcedUnshared([ValuesExcept(RecorderMode.Simple)] RecorderMode mode)
+        {
+            // A reference in a non-shared position can't be read back, so forcing has to give way to the recorder's sharing rules.
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var root = new RefForcedUnsharedRootRecordable() { unshared = new RefForcedRecordable() { value = 1 } };
+
+            var deserialized = DoRecorderRoundTrip(root, mode, expectWriteWarnings: mode != RecorderMode.Clone && mode != RecorderMode.Checksum, warningValidator: wrn => wrn.Contains("IRefForce"), testSerializedResult: serialized =>
+            {
+                Assert.IsFalse(serialized.Contains(@"<unshared ref="));
+            });
+
+            Assert.AreEqual(1, deserialized.unshared.value);
+        }
+
+        public class RefForcedRootObjectRecordable : Dec.IRecordable, Dec.IRefForce
+        {
+            public int value;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref value, "value");
+            }
+        }
+
+        [Test]
+        public void RefForcedRootObject([ValuesExcept(RecorderMode.Simple)] RecorderMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var root = new RefForcedRootObjectRecordable() { value = 3 };
+
+            var deserialized = DoRecorderRoundTrip(root, mode, testSerializedResult: serialized =>
+            {
+                Assert.IsTrue(serialized.Contains(@"<data ref="));
+            });
+
+            Assert.AreEqual(3, deserialized.value);
+        }
+
+        public class RefForcedConvertedRecord : Dec.IRefForce
+        {
+            public int value;
+        }
+
+        public class RefForcedConvertedRecordConverter : Dec.ConverterRecord<RefForcedConvertedRecord>
+        {
+            public override void Record(ref RefForcedConvertedRecord input, Dec.Recorder recorder)
+            {
+                recorder.Record(ref input.value, "value");
+            }
+        }
+
+        public class RefForcedConvertedRecordRoot : Dec.IRecordable
+        {
+            public RefForcedConvertedRecord converted;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Shared().Record(ref converted, "converted");
+            }
+        }
+
+        [Test]
+        public void RefForcedConverterRecord([ValuesExcept(RecorderMode.Simple, RecorderMode.Validation)] RecorderMode mode)
+        {
+            // Validation is excluded for the same reason the other converter tests exclude it: the validation writer doesn't generate code for converters.
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(RefForcedConvertedRecordConverter) } });
+
+            var parser = new Dec.Parser();
+            parser.Finish();
+
+            var root = new RefForcedConvertedRecordRoot() { converted = new RefForcedConvertedRecord() { value = 4 } };
+
+            var deserialized = DoRecorderRoundTrip(root, mode, testSerializedResult: serialized =>
+            {
+                Assert.IsTrue(serialized.Contains(@"<converted ref="));
+            });
+
+            Assert.AreEqual(4, deserialized.converted.value);
+        }
+
+        public class RefForcedConvertedString : Dec.IRefForce
+        {
+            public int value;
+        }
+
+        public class RefForcedConvertedStringConverter : Dec.ConverterString<RefForcedConvertedString>
+        {
+            public override RefForcedConvertedString Read(string input, Dec.Context context)
+            {
+                return new RefForcedConvertedString() { value = int.Parse(input) };
+            }
+
+            public override string Write(RefForcedConvertedString input)
+            {
+                return input.value.ToString();
+            }
+        }
+
+        public class RefForcedConvertedStringRoot : Dec.IRecordable
+        {
+            public RefForcedConvertedString converted;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Shared().Record(ref converted, "converted");
+            }
+        }
+
+        [Test]
+        public void RefForcedConverterString([ValuesExcept(RecorderMode.Simple, RecorderMode.Validation)] RecorderMode mode)
+        {
+            // Validation is excluded for the same reason the other converter tests exclude it: the validation writer doesn't generate code for converters.
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(RefForcedConvertedStringConverter) } });
+
+            var parser = new Dec.Parser();
+            parser.Finish();
+
+            var root = new RefForcedConvertedStringRoot() { converted = new RefForcedConvertedString() { value = 5 } };
+
+            var deserialized = DoRecorderRoundTrip(root, mode, testSerializedResult: serialized =>
+            {
+                Assert.IsTrue(serialized.Contains(@"<converted ref="));
+            });
+
+            Assert.AreEqual(5, deserialized.converted.value);
+        }
+
+        // Hashes on its contents, so it can't be shared in a key position no matter what it asks for.
+        public class RefForcedKey : Dec.IRecordable, Dec.IRefForce
+        {
+            public int id;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref id, "id");
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is RefForcedKey rhs && rhs.id == id;
+            }
+
+            public override int GetHashCode()
+            {
+                return id;
+            }
+        }
+
+        public class RefForcedKeyRoot : Dec.IRecordable
+        {
+            public Dictionary<RefForcedKey, int> dict;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Shared().Record(ref dict, "dict");
+            }
+        }
+
+        [Test]
+        public void RefForcedDictionaryKey([ValuesExcept(RecorderMode.Simple, RecorderMode.Validation)] RecorderMode mode)
+        {
+            // A content-hashed key isn't a shareable position, so forcing has nothing to work with here.
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var root = new RefForcedKeyRoot() { dict = new Dictionary<RefForcedKey, int>() };
+            root.dict[new RefForcedKey() { id = 1 }] = 42;
+
+            var deserialized = DoRecorderRoundTrip(root, mode, expectWriteWarnings: mode != RecorderMode.Clone && mode != RecorderMode.Checksum, warningValidator: wrn => wrn.Contains("IRefForce"));
+
+            Assert.AreEqual(1, deserialized.dict.Count);
+            Assert.AreEqual(42, deserialized.dict[new RefForcedKey() { id = 1 }]);
+        }
+
+        public class RefForcedListRoot : Dec.IRecordable
+        {
+            public List<RefForcedRecordable> list;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Shared().Record(ref list, "list");
+            }
+        }
+
+        [Test]
+        public void RefForcedList([ValuesExcept(RecorderMode.Simple)] RecorderMode mode)
+        {
+            // Collection elements inherit a Flexible sharing setting from the .Shared() container, which is enough to hold references.
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var root = new RefForcedListRoot() { list = new List<RefForcedRecordable>() { new RefForcedRecordable() { value = 1 }, new RefForcedRecordable() { value = 2 } } };
+
+            var deserialized = DoRecorderRoundTrip(root, mode, testSerializedResult: serialized =>
+            {
+                Assert.IsTrue(serialized.Contains(@"<li ref="));
+            });
+
+            Assert.AreEqual(2, deserialized.list.Count);
+            Assert.AreEqual(1, deserialized.list[0].value);
+            Assert.AreEqual(2, deserialized.list[1].value);
+        }
+
+        public class RefForcedDictionaryValueRoot : Dec.IRecordable
+        {
+            public Dictionary<string, RefForcedRecordable> dict;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Shared().Record(ref dict, "dict");
+            }
+        }
+
+        [Test]
+        public void RefForcedDictionaryValue([ValuesExcept(RecorderMode.Simple)] RecorderMode mode)
+        {
+            // Values don't participate in hashing, so unlike keys they're free to arrive as references.
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var root = new RefForcedDictionaryValueRoot() { dict = new Dictionary<string, RefForcedRecordable>() { ["a"] = new RefForcedRecordable() { value = 5 } } };
+
+            var deserialized = DoRecorderRoundTrip(root, mode);
+
+            Assert.AreEqual(1, deserialized.dict.Count);
+            Assert.AreEqual(5, deserialized.dict["a"].value);
+        }
+
+        public class RefForcedPairRoot : Dec.IRecordable
+        {
+            public RefForcedNamedRecordable one;
+            public RefForcedNamedRecordable two;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Shared().Record(ref one, "one");
+                record.Shared().Record(ref two, "two");
+            }
+        }
+
+        [Test]
+        public void RefForcedDoubleReferenced([ValuesExcept(RecorderMode.Simple)] RecorderMode mode)
+        {
+            // Forcing names the object on its first appearance; the second reference has to reuse that name rather than mint another.
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var shared = new RefForcedNamedRecordable() { name = "delta", value = 1 };
+            var root = new RefForcedPairRoot() { one = shared, two = shared };
+
+            var deserialized = DoRecorderRoundTrip(root, mode, testSerializedResult: serialized =>
+            {
+                Assert.AreEqual(1, Regex.Matches(serialized, @"id=""delta""").Count);
+                Assert.AreEqual(2, Regex.Matches(serialized, @"ref=""delta""").Count);
+            });
+
+            Assert.AreSame(deserialized.one, deserialized.two);
+            Assert.AreEqual(1, deserialized.one.value);
+        }
+
+        public class RefForcedMixedRoot : Dec.IRecordable
+        {
+            public RefForcedRecordable unshared;
+            public RefForcedRecordable shared;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref unshared, "unshared");
+                record.Shared().Record(ref shared, "shared");
+            }
+        }
+
+        [Test]
+        public void RefForcedUnsharedThenShared()
+        {
+            // Forcing doesn't get to paper over the recorder's own sharing mismatch.
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var obj = new RefForcedRecordable() { value = 1 };
+            var root = new RefForcedMixedRoot() { unshared = obj, shared = obj };
+
+            ExpectWarningsAndErrors(() => Dec.Recorder.Write(root), wrn => wrn.Contains("IRefForce"), err => err.Contains("previously-seen unshared object"));
+        }
     }
 
     [TestFixture]
@@ -1130,6 +1741,19 @@ namespace DecTest
             Assert.AreSame(deserialized.one, deserialized.two);
             Assert.AreEqual(1, deserialized.one.value);
             Assert.AreNotSame(Dec.Database<RefPathDec>.Get("TestDec").member, deserialized.one);
+        }
+
+        [Test]
+        public void RefNameCollidesWithDecPath([ValuesExcept(RecorderMode.Simple)] RecorderMode mode)
+        {
+            var shared = new RecorderRef.RefNamedRecordable() { name = "RefPathDec.TestDec.member", value = 1 };
+            var root = new RecorderRef.RefNamedRootRecordable() { sharedA = shared, sharedB = shared };
+
+            var deserialized = DoRecorderRoundTrip(root, mode, expectWriteWarnings: mode != RecorderMode.Clone && mode != RecorderMode.Checksum, warningValidator: wrn => wrn.Contains("is also a dec path"));
+
+            Assert.AreSame(deserialized.sharedA, deserialized.sharedB);
+            Assert.AreEqual(1, deserialized.sharedA.value);
+            Assert.AreNotSame(Dec.Database<RefPathDec>.Get("TestDec").member, deserialized.sharedA);
         }
     }
 }

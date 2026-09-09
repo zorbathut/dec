@@ -18,6 +18,9 @@ namespace Dec
         // Every ref name we've handed out, for the lifetime of this writer. An object is named at most once; a name is never reused.
         private Dictionary<object, string> refNames = new Dictionary<object, string>();
 
+        // Every name we've handed out, generated or user-provided; ref names must be unique within a file.
+        private HashSet<string> usedRefNames = new HashSet<string>();
+
         // The objects whose contents still need to be hoisted out of the tree and into the refs block, drained on every strip pass.
         private List<object> refsPendingHoist = new List<object>();
 
@@ -47,10 +50,49 @@ namespace Dec
         // The single place a ref name is minted. Names the object and queues its contents for hoisting into the refs block.
         private string RefNameAcquire(object referenced)
         {
-            string name = $"ref{referenceId++:D5}";
+            string name = null;
+
+            if (referenced is IRefName refName)
+            {
+                name = RefNameValidate(refName.RefName(), referenced);
+            }
+
+            while (name == null)
+            {
+                // A user may have claimed a name out of the generated namespace, so keep going until we find a free slot.
+                string candidate = $"ref{referenceId++:D5}";
+                if (usedRefNames.Add(candidate))
+                {
+                    name = candidate;
+                }
+            }
 
             refNames[referenced] = name;
             refsPendingHoist.Add(referenced);
+
+            return name;
+        }
+
+        // Vets a user-provided ref name, returning null if we need to fall back on a generated one.
+        private string RefNameValidate(string name, object referenced)
+        {
+            if (name == null)
+            {
+                // No opinion offered, which is not a mistake; that's what generated names are for.
+                return null;
+            }
+
+            if (Database.GetFromDecPath(name) != null)
+            {
+                Dbg.Wrn($"[{refToElement[referenced].path.Serialize()}]: Ref name `{name}` for {referenced.GetType()} is also a dec path, and would be read back as that dec; falling back on a generated name");
+                return null;
+            }
+
+            if (!usedRefNames.Add(name))
+            {
+                Dbg.Wrn($"[{refToElement[referenced].path.Serialize()}]: Ref name `{name}` for {referenced.GetType()} is already in use; falling back on a generated name");
+                return null;
+            }
 
             return name;
         }
@@ -67,6 +109,11 @@ namespace Dec
                     refToElement[referenced] = (element, path);
                     elementToRef[element] = referenced;
 
+                    if (referenced is IRefForce)
+                    {
+                        // Named here so the strip pass in Finish() hoists it, the same way the depth limiter does. This has to follow the registration above, whose path RefNameValidate reads, and precede the refNames lookup below, which would otherwise mint a second name.
+                        RefNameAcquire(referenced);
+                    }
                 }
                 else
                 {
@@ -76,6 +123,10 @@ namespace Dec
                     // Note: It is important not to add an elementToRef entry because this is later used to split long hierarchies
                     // and if you split a long hierarchy around a non-referencable barrier, everything breaks!
 
+                    if (referenced is IRefForce)
+                    {
+                        Dbg.Wrn($"[{path.Serialize()}]: {referenced.GetType()} implements IRefForce, but this position doesn't allow shared references; writing it inline instead");
+                    }
                 }
 
                 if (Config.TestRefEverything && recSettings.shared != Recorder.Settings.Shared.Deny)
