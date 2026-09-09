@@ -844,6 +844,14 @@ namespace Dec
                     return result;
                 }
 
+                // The declared type isn't enough to settle this - it may be an interface or a base class of something that does hash on its contents - so this is the point where we finally know what we're dealing with. Such an object is still being filled in, so its hash isn't settled yet and the container would file it in the wrong place.
+                var refPath = refKeyNode.GetContext().path;
+                if ((refPath is PathDictionaryKey || refPath is PathHashSetElement) && !Util.HashesByIdentity(refObject.GetType()))
+                {
+                    Dbg.Err($"{refKeyNode.GetContext()}: Non-hash-by-identity object {refKey} of type {refObject.GetType()} is used as a dictionary key or hash set element; those are hashed before their contents are filled in, so only a type that hashes by identity can be read back from a reference here; replacing with null to avoid breaking internal structures");
+                    return result;
+                }
+
                 return refObject;
             }
             else if (isNull)

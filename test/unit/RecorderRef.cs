@@ -627,6 +627,165 @@ namespace DecTest
             Assert.AreEqual(1, deserialized.dict.Count);
         }
 
+        public class IdentityHashedBase : Dec.IRecordable
+        {
+            public int id;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref id, "id");
+            }
+        }
+
+        public class ContentHashedDerived : IdentityHashedBase
+        {
+            public override bool Equals(object obj)
+            {
+                return obj is ContentHashedDerived rhs && rhs.id == id;
+            }
+
+            public override int GetHashCode()
+            {
+                return id;
+            }
+        }
+
+        public class IdentityHashedBaseKeyRoot : Dec.IRecordable
+        {
+            public Dictionary<IdentityHashedBase, string> dict;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Shared().Record(ref dict, "dict");
+            }
+        }
+
+        [Test]
+        public void DictionaryKeyRefDerivedContentHashed()
+        {
+            // The declared key type hashes by identity, so nothing about the position rules this out; only the object the reference resolves to gives it away. Dec won't write this, but an older file or a hand-edited one can hold it.
+            string serialized = @"
+                <Record>
+                  <recordFormatVersion>1</recordFormatVersion>
+                  <refs>
+                    <Ref id=""key"" class=""DecTest.RecorderRef.ContentHashedDerived""><id>1</id></Ref>
+                  </refs>
+                  <data>
+                    <dict>
+                      <li>
+                        <key ref=""key"" />
+                        <value>Hello</value>
+                      </li>
+                    </dict>
+                  </data>
+                </Record>";
+
+            IdentityHashedBaseKeyRoot deserialized = null;
+            ExpectErrors(() => deserialized = Dec.Recorder.Read<IdentityHashedBaseKeyRoot>(serialized), err => err.Contains("only a type that hashes by identity") || err.Contains("includes null key"));
+
+            Assert.AreEqual(0, deserialized.dict.Count);
+        }
+
+        public interface IHashKey
+        {
+        }
+
+        public class ContentHashedInterfaced : Dec.IRecordable, IHashKey
+        {
+            public int id;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref id, "id");
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is ContentHashedInterfaced rhs && rhs.id == id;
+            }
+
+            public override int GetHashCode()
+            {
+                return id;
+            }
+        }
+
+        public class InterfaceKeyRoot : Dec.IRecordable
+        {
+            public Dictionary<IHashKey, string> dict;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Shared().Record(ref dict, "dict");
+            }
+        }
+
+        [Test]
+        public void DictionaryKeyRefInterfaceContentHashed()
+        {
+            // Same, for an interface-typed key; reflection can't tell us anything about an interface's GetHashCode at all.
+            string serialized = @"
+                <Record>
+                  <recordFormatVersion>1</recordFormatVersion>
+                  <refs>
+                    <Ref id=""key"" class=""DecTest.RecorderRef.ContentHashedInterfaced""><id>1</id></Ref>
+                  </refs>
+                  <data>
+                    <dict>
+                      <li>
+                        <key ref=""key"" />
+                        <value>Hello</value>
+                      </li>
+                    </dict>
+                  </data>
+                </Record>";
+
+            InterfaceKeyRoot deserialized = null;
+            ExpectErrors(() => deserialized = Dec.Recorder.Read<InterfaceKeyRoot>(serialized), err => err.Contains("only a type that hashes by identity") || err.Contains("includes null key"));
+
+            Assert.AreEqual(0, deserialized.dict.Count);
+        }
+
+        public class IdentityHashedInterfaced : Dec.IRecordable, IHashKey
+        {
+            public int id;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref id, "id");
+            }
+        }
+
+        [Test]
+        public void DictionaryKeyRefInterfaceIdentityHashed()
+        {
+            // The other side of it: an interface-typed key whose concrete type hashes by identity is fine, and mustn't be rejected.
+            string serialized = @"
+                <Record>
+                  <recordFormatVersion>1</recordFormatVersion>
+                  <refs>
+                    <Ref id=""key"" class=""DecTest.RecorderRef.IdentityHashedInterfaced""><id>1</id></Ref>
+                  </refs>
+                  <data>
+                    <dict>
+                      <li>
+                        <key ref=""key"" />
+                        <value>Hello</value>
+                      </li>
+                    </dict>
+                  </data>
+                </Record>";
+
+            var deserialized = Dec.Recorder.Read<InterfaceKeyRoot>(serialized);
+
+            Assert.AreEqual(1, deserialized.dict.Count);
+            foreach (var kvp in deserialized.dict)
+            {
+                Assert.AreEqual(1, (kvp.Key as IdentityHashedInterfaced).id);
+                Assert.AreEqual("Hello", deserialized.dict[kvp.Key]);
+            }
+        }
+
         public class ParserRefDec : Dec.Dec
         {
             public Stub initialized = new Stub();
@@ -765,6 +924,43 @@ namespace DecTest
                 DoRecorderRoundTrip(root, mode);
             }
         }
+
+        public class UnsharedDictRoot : Dec.IRecordable
+        {
+            public Dictionary<IdentityHashedBase, string> dict;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref dict, "dict");
+            }
+        }
+
+        [Test]
+        public void DictionaryKeyRefUnsharedContainer()
+        {
+            // The key type is fine; it's the dictionary that isn't shared, which is the plain non-.Shared() case and has to be reported as one.
+            string serialized = @"
+                <Record>
+                  <recordFormatVersion>1</recordFormatVersion>
+                  <refs>
+                    <Ref id=""key"" class=""DecTest.RecorderRef.IdentityHashedBase""><id>1</id></Ref>
+                  </refs>
+                  <data>
+                    <dict>
+                      <li>
+                        <key ref=""key"" />
+                        <value>Hello</value>
+                      </li>
+                    </dict>
+                  </data>
+                </Record>";
+
+            UnsharedDictRoot deserialized = null;
+            ExpectErrors(() => deserialized = Dec.Recorder.Read<UnsharedDictRoot>(serialized), err => err.Contains("non-.Shared() context"));
+
+            Assert.AreEqual(1, deserialized.dict.Count);
+        }
+
         public class NullElementSetRoot : Dec.IRecordable
         {
             public HashSet<StubRecordable> set;
