@@ -54,7 +54,7 @@ namespace Dec
 
             if (referenced is IRefName refName)
             {
-                name = RefNameValidate(refName.RefName(), referenced);
+                name = RefNameValidate(refName.RefName(UserSettings), referenced);
             }
 
             while (name == null)

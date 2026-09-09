@@ -38,7 +38,7 @@ namespace Dec
         /// <summary>
         /// Returns the name for this object's reference entry, or null to accept a generated name.
         /// </summary>
-        string RefName();
+        string RefName(Recorder.IUserSettings userSettings);
     }
 
     /// <summary>

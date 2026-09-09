@@ -1124,7 +1124,7 @@ namespace DecTest
             public string name;
             public int value;
 
-            public string RefName()
+            public string RefName(Dec.Recorder.IUserSettings userSettings)
             {
                 return name;
             }
@@ -1285,12 +1285,64 @@ namespace DecTest
             Assert.AreEqual(1, deserialized.sharedA.value);
         }
 
+        public class RefNameSettings : Dec.Recorder.IUserSettings
+        {
+            public string name;
+        }
+
+        public class RefNamedSettingsRecordable : Dec.IRecordable, Dec.IRefName
+        {
+            public int value;
+            public Dec.Recorder.IUserSettings receivedSettings;
+
+            public string RefName(Dec.Recorder.IUserSettings userSettings)
+            {
+                receivedSettings = userSettings;
+                return (userSettings as RefNameSettings)?.name;
+            }
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref value, "value");
+            }
+        }
+
+        public class RefNamedSettingsRootRecordable : Dec.IRecordable
+        {
+            public RefNamedSettingsRecordable sharedA;
+            public RefNamedSettingsRecordable sharedB;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Shared().Record(ref sharedA, "sharedA");
+                record.Shared().Record(ref sharedB, "sharedB");
+            }
+        }
+
+        [Test]
+        public void RefNamedSettings()
+        {
+            // Driving Recorder.Write directly because DoRecorderRoundTrip has no way to pass user settings.
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+            UpdateTestRefEverything(false);
+
+            var shared = new RefNamedSettingsRecordable() { value = 1 };
+            var root = new RefNamedSettingsRootRecordable() { sharedA = shared, sharedB = shared };
+
+            var settings = new RefNameSettings() { name = "settingsProvided" };
+            Assert.IsTrue(Dec.Recorder.Write(root, userSettings: settings).Contains(@"id=""settingsProvided"""));
+            Assert.AreSame(settings, shared.receivedSettings);
+
+            Assert.IsTrue(Dec.Recorder.Write(root).Contains(@"id=""ref00000"""));
+            Assert.IsNull(shared.receivedSettings);
+        }
+
         public class RefNamedChainRecordable : Dec.IRecordable, Dec.IRefName
         {
             public string name;
             public RefNamedChainRecordable next;
 
-            public string RefName()
+            public string RefName(Dec.Recorder.IUserSettings userSettings)
             {
                 return name;
             }
@@ -1353,7 +1405,7 @@ namespace DecTest
             public string name;
             public int value;
 
-            public string RefName()
+            public string RefName(Dec.Recorder.IUserSettings userSettings)
             {
                 return name;
             }

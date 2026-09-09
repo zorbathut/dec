@@ -65,7 +65,7 @@ public class NamedSharedClass : Dec.IRecordable, Dec.IRefName, Dec.IRefForce
     string id;
 
     // Return null to accept a generated name.
-    public string RefName()
+    public string RefName(Recorder.IUserSettings userSettings)
     {
         return id;
     }
