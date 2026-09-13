@@ -969,6 +969,31 @@ references:
   isSpec: "True"
   fullName: Dec.IRecordable.Record
   nameWithType: IRecordable.Record
+- uid: Dec.IRefForce
+  name: IRefForce
+  href: api/Dec.IRefForce.html
+  commentId: T:Dec.IRefForce
+  fullName: Dec.IRefForce
+  nameWithType: IRefForce
+- uid: Dec.IRefName
+  name: IRefName
+  href: api/Dec.IRefName.html
+  commentId: T:Dec.IRefName
+  fullName: Dec.IRefName
+  nameWithType: IRefName
+- uid: Dec.IRefName.RefName(Dec.Recorder.IUserSettings)
+  name: RefName(IUserSettings)
+  href: api/Dec.IRefName.html#Dec_IRefName_RefName_Dec_Recorder_IUserSettings_
+  commentId: M:Dec.IRefName.RefName(Dec.Recorder.IUserSettings)
+  fullName: Dec.IRefName.RefName(Dec.Recorder.IUserSettings)
+  nameWithType: IRefName.RefName(Recorder.IUserSettings)
+- uid: Dec.IRefName.RefName*
+  name: RefName
+  href: api/Dec.IRefName.html#Dec_IRefName_RefName_
+  commentId: Overload:Dec.IRefName.RefName
+  isSpec: "True"
+  fullName: Dec.IRefName.RefName
+  nameWithType: IRefName.RefName
 - uid: Dec.IndexAttribute
   name: IndexAttribute
   href: api/Dec.IndexAttribute.html
@@ -1280,6 +1305,35 @@ references:
   commentId: T:Dec.Path
   fullName: Dec.Path
   nameWithType: Path
+- uid: Dec.Path.Equals(System.Object)
+  name: Equals(object)
+  href: api/Dec.Path.html#Dec_Path_Equals_System_Object_
+  commentId: M:Dec.Path.Equals(System.Object)
+  name.vb: Equals(Object)
+  fullName: Dec.Path.Equals(object)
+  fullName.vb: Dec.Path.Equals(Object)
+  nameWithType: Path.Equals(object)
+  nameWithType.vb: Path.Equals(Object)
+- uid: Dec.Path.Equals*
+  name: Equals
+  href: api/Dec.Path.html#Dec_Path_Equals_
+  commentId: Overload:Dec.Path.Equals
+  isSpec: "True"
+  fullName: Dec.Path.Equals
+  nameWithType: Path.Equals
+- uid: Dec.Path.GetHashCode
+  name: GetHashCode()
+  href: api/Dec.Path.html#Dec_Path_GetHashCode
+  commentId: M:Dec.Path.GetHashCode
+  fullName: Dec.Path.GetHashCode()
+  nameWithType: Path.GetHashCode()
+- uid: Dec.Path.GetHashCode*
+  name: GetHashCode
+  href: api/Dec.Path.html#Dec_Path_GetHashCode_
+  commentId: Overload:Dec.Path.GetHashCode
+  isSpec: "True"
+  fullName: Dec.Path.GetHashCode
+  nameWithType: Path.GetHashCode
 - uid: Dec.Path.IsValidForWriting
   name: IsValidForWriting()
   href: api/Dec.Path.html#Dec_Path_IsValidForWriting
@@ -1340,6 +1394,35 @@ references:
   fullName.vb: Dec.PathDec.New
   nameWithType: PathDec.PathDec
   nameWithType.vb: PathDec.New
+- uid: Dec.PathDec.Equals(System.Object)
+  name: Equals(object)
+  href: api/Dec.PathDec.html#Dec_PathDec_Equals_System_Object_
+  commentId: M:Dec.PathDec.Equals(System.Object)
+  name.vb: Equals(Object)
+  fullName: Dec.PathDec.Equals(object)
+  fullName.vb: Dec.PathDec.Equals(Object)
+  nameWithType: PathDec.Equals(object)
+  nameWithType.vb: PathDec.Equals(Object)
+- uid: Dec.PathDec.Equals*
+  name: Equals
+  href: api/Dec.PathDec.html#Dec_PathDec_Equals_
+  commentId: Overload:Dec.PathDec.Equals
+  isSpec: "True"
+  fullName: Dec.PathDec.Equals
+  nameWithType: PathDec.Equals
+- uid: Dec.PathDec.GetHashCode
+  name: GetHashCode()
+  href: api/Dec.PathDec.html#Dec_PathDec_GetHashCode
+  commentId: M:Dec.PathDec.GetHashCode
+  fullName: Dec.PathDec.GetHashCode()
+  nameWithType: PathDec.GetHashCode()
+- uid: Dec.PathDec.GetHashCode*
+  name: GetHashCode
+  href: api/Dec.PathDec.html#Dec_PathDec_GetHashCode_
+  commentId: Overload:Dec.PathDec.GetHashCode
+  isSpec: "True"
+  fullName: Dec.PathDec.GetHashCode
+  nameWithType: PathDec.GetHashCode
 - uid: Dec.PathDec.IsValidForWriting
   name: IsValidForWriting()
   href: api/Dec.PathDec.html#Dec_PathDec_IsValidForWriting
@@ -1391,6 +1474,35 @@ references:
   fullName.vb: Dec.PathDictionaryKey.New
   nameWithType: PathDictionaryKey.PathDictionaryKey
   nameWithType.vb: PathDictionaryKey.New
+- uid: Dec.PathDictionaryKey.Equals(System.Object)
+  name: Equals(object)
+  href: api/Dec.PathDictionaryKey.html#Dec_PathDictionaryKey_Equals_System_Object_
+  commentId: M:Dec.PathDictionaryKey.Equals(System.Object)
+  name.vb: Equals(Object)
+  fullName: Dec.PathDictionaryKey.Equals(object)
+  fullName.vb: Dec.PathDictionaryKey.Equals(Object)
+  nameWithType: PathDictionaryKey.Equals(object)
+  nameWithType.vb: PathDictionaryKey.Equals(Object)
+- uid: Dec.PathDictionaryKey.Equals*
+  name: Equals
+  href: api/Dec.PathDictionaryKey.html#Dec_PathDictionaryKey_Equals_
+  commentId: Overload:Dec.PathDictionaryKey.Equals
+  isSpec: "True"
+  fullName: Dec.PathDictionaryKey.Equals
+  nameWithType: PathDictionaryKey.Equals
+- uid: Dec.PathDictionaryKey.GetHashCode
+  name: GetHashCode()
+  href: api/Dec.PathDictionaryKey.html#Dec_PathDictionaryKey_GetHashCode
+  commentId: M:Dec.PathDictionaryKey.GetHashCode
+  fullName: Dec.PathDictionaryKey.GetHashCode()
+  nameWithType: PathDictionaryKey.GetHashCode()
+- uid: Dec.PathDictionaryKey.GetHashCode*
+  name: GetHashCode
+  href: api/Dec.PathDictionaryKey.html#Dec_PathDictionaryKey_GetHashCode_
+  commentId: Overload:Dec.PathDictionaryKey.GetHashCode
+  isSpec: "True"
+  fullName: Dec.PathDictionaryKey.GetHashCode
+  nameWithType: PathDictionaryKey.GetHashCode
 - uid: Dec.PathDictionaryKey.IsValidForWriting
   name: IsValidForWriting()
   href: api/Dec.PathDictionaryKey.html#Dec_PathDictionaryKey_IsValidForWriting
@@ -1417,6 +1529,86 @@ references:
   isSpec: "True"
   fullName: Dec.PathDictionaryKey.Serialize
   nameWithType: PathDictionaryKey.Serialize
+- uid: Dec.PathDictionaryPair
+  name: PathDictionaryPair
+  href: api/Dec.PathDictionaryPair.html
+  commentId: T:Dec.PathDictionaryPair
+  fullName: Dec.PathDictionaryPair
+  nameWithType: PathDictionaryPair
+- uid: Dec.PathDictionaryPair.#ctor(Dec.Path,System.String)
+  name: PathDictionaryPair(Path, string)
+  href: api/Dec.PathDictionaryPair.html#Dec_PathDictionaryPair__ctor_Dec_Path_System_String_
+  commentId: M:Dec.PathDictionaryPair.#ctor(Dec.Path,System.String)
+  name.vb: New(Path, String)
+  fullName: Dec.PathDictionaryPair.PathDictionaryPair(Dec.Path, string)
+  fullName.vb: Dec.PathDictionaryPair.New(Dec.Path, String)
+  nameWithType: PathDictionaryPair.PathDictionaryPair(Path, string)
+  nameWithType.vb: PathDictionaryPair.New(Path, String)
+- uid: Dec.PathDictionaryPair.#ctor*
+  name: PathDictionaryPair
+  href: api/Dec.PathDictionaryPair.html#Dec_PathDictionaryPair__ctor_
+  commentId: Overload:Dec.PathDictionaryPair.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: Dec.PathDictionaryPair.PathDictionaryPair
+  fullName.vb: Dec.PathDictionaryPair.New
+  nameWithType: PathDictionaryPair.PathDictionaryPair
+  nameWithType.vb: PathDictionaryPair.New
+- uid: Dec.PathDictionaryPair.Equals(System.Object)
+  name: Equals(object)
+  href: api/Dec.PathDictionaryPair.html#Dec_PathDictionaryPair_Equals_System_Object_
+  commentId: M:Dec.PathDictionaryPair.Equals(System.Object)
+  name.vb: Equals(Object)
+  fullName: Dec.PathDictionaryPair.Equals(object)
+  fullName.vb: Dec.PathDictionaryPair.Equals(Object)
+  nameWithType: PathDictionaryPair.Equals(object)
+  nameWithType.vb: PathDictionaryPair.Equals(Object)
+- uid: Dec.PathDictionaryPair.Equals*
+  name: Equals
+  href: api/Dec.PathDictionaryPair.html#Dec_PathDictionaryPair_Equals_
+  commentId: Overload:Dec.PathDictionaryPair.Equals
+  isSpec: "True"
+  fullName: Dec.PathDictionaryPair.Equals
+  nameWithType: PathDictionaryPair.Equals
+- uid: Dec.PathDictionaryPair.GetHashCode
+  name: GetHashCode()
+  href: api/Dec.PathDictionaryPair.html#Dec_PathDictionaryPair_GetHashCode
+  commentId: M:Dec.PathDictionaryPair.GetHashCode
+  fullName: Dec.PathDictionaryPair.GetHashCode()
+  nameWithType: PathDictionaryPair.GetHashCode()
+- uid: Dec.PathDictionaryPair.GetHashCode*
+  name: GetHashCode
+  href: api/Dec.PathDictionaryPair.html#Dec_PathDictionaryPair_GetHashCode_
+  commentId: Overload:Dec.PathDictionaryPair.GetHashCode
+  isSpec: "True"
+  fullName: Dec.PathDictionaryPair.GetHashCode
+  nameWithType: PathDictionaryPair.GetHashCode
+- uid: Dec.PathDictionaryPair.IsValidForWriting
+  name: IsValidForWriting()
+  href: api/Dec.PathDictionaryPair.html#Dec_PathDictionaryPair_IsValidForWriting
+  commentId: M:Dec.PathDictionaryPair.IsValidForWriting
+  fullName: Dec.PathDictionaryPair.IsValidForWriting()
+  nameWithType: PathDictionaryPair.IsValidForWriting()
+- uid: Dec.PathDictionaryPair.IsValidForWriting*
+  name: IsValidForWriting
+  href: api/Dec.PathDictionaryPair.html#Dec_PathDictionaryPair_IsValidForWriting_
+  commentId: Overload:Dec.PathDictionaryPair.IsValidForWriting
+  isSpec: "True"
+  fullName: Dec.PathDictionaryPair.IsValidForWriting
+  nameWithType: PathDictionaryPair.IsValidForWriting
+- uid: Dec.PathDictionaryPair.Serialize
+  name: Serialize()
+  href: api/Dec.PathDictionaryPair.html#Dec_PathDictionaryPair_Serialize
+  commentId: M:Dec.PathDictionaryPair.Serialize
+  fullName: Dec.PathDictionaryPair.Serialize()
+  nameWithType: PathDictionaryPair.Serialize()
+- uid: Dec.PathDictionaryPair.Serialize*
+  name: Serialize
+  href: api/Dec.PathDictionaryPair.html#Dec_PathDictionaryPair_Serialize_
+  commentId: Overload:Dec.PathDictionaryPair.Serialize
+  isSpec: "True"
+  fullName: Dec.PathDictionaryPair.Serialize
+  nameWithType: PathDictionaryPair.Serialize
 - uid: Dec.PathDictionaryValue
   name: PathDictionaryValue
   href: api/Dec.PathDictionaryValue.html
@@ -1442,6 +1634,35 @@ references:
   fullName.vb: Dec.PathDictionaryValue.New
   nameWithType: PathDictionaryValue.PathDictionaryValue
   nameWithType.vb: PathDictionaryValue.New
+- uid: Dec.PathDictionaryValue.Equals(System.Object)
+  name: Equals(object)
+  href: api/Dec.PathDictionaryValue.html#Dec_PathDictionaryValue_Equals_System_Object_
+  commentId: M:Dec.PathDictionaryValue.Equals(System.Object)
+  name.vb: Equals(Object)
+  fullName: Dec.PathDictionaryValue.Equals(object)
+  fullName.vb: Dec.PathDictionaryValue.Equals(Object)
+  nameWithType: PathDictionaryValue.Equals(object)
+  nameWithType.vb: PathDictionaryValue.Equals(Object)
+- uid: Dec.PathDictionaryValue.Equals*
+  name: Equals
+  href: api/Dec.PathDictionaryValue.html#Dec_PathDictionaryValue_Equals_
+  commentId: Overload:Dec.PathDictionaryValue.Equals
+  isSpec: "True"
+  fullName: Dec.PathDictionaryValue.Equals
+  nameWithType: PathDictionaryValue.Equals
+- uid: Dec.PathDictionaryValue.GetHashCode
+  name: GetHashCode()
+  href: api/Dec.PathDictionaryValue.html#Dec_PathDictionaryValue_GetHashCode
+  commentId: M:Dec.PathDictionaryValue.GetHashCode
+  fullName: Dec.PathDictionaryValue.GetHashCode()
+  nameWithType: PathDictionaryValue.GetHashCode()
+- uid: Dec.PathDictionaryValue.GetHashCode*
+  name: GetHashCode
+  href: api/Dec.PathDictionaryValue.html#Dec_PathDictionaryValue_GetHashCode_
+  commentId: Overload:Dec.PathDictionaryValue.GetHashCode
+  isSpec: "True"
+  fullName: Dec.PathDictionaryValue.GetHashCode
+  nameWithType: PathDictionaryValue.GetHashCode
 - uid: Dec.PathDictionaryValue.IsValidForWriting
   name: IsValidForWriting()
   href: api/Dec.PathDictionaryValue.html#Dec_PathDictionaryValue_IsValidForWriting
@@ -1493,6 +1714,35 @@ references:
   fullName.vb: Dec.PathDictionaryValueUnpathable.New
   nameWithType: PathDictionaryValueUnpathable.PathDictionaryValueUnpathable
   nameWithType.vb: PathDictionaryValueUnpathable.New
+- uid: Dec.PathDictionaryValueUnpathable.Equals(System.Object)
+  name: Equals(object)
+  href: api/Dec.PathDictionaryValueUnpathable.html#Dec_PathDictionaryValueUnpathable_Equals_System_Object_
+  commentId: M:Dec.PathDictionaryValueUnpathable.Equals(System.Object)
+  name.vb: Equals(Object)
+  fullName: Dec.PathDictionaryValueUnpathable.Equals(object)
+  fullName.vb: Dec.PathDictionaryValueUnpathable.Equals(Object)
+  nameWithType: PathDictionaryValueUnpathable.Equals(object)
+  nameWithType.vb: PathDictionaryValueUnpathable.Equals(Object)
+- uid: Dec.PathDictionaryValueUnpathable.Equals*
+  name: Equals
+  href: api/Dec.PathDictionaryValueUnpathable.html#Dec_PathDictionaryValueUnpathable_Equals_
+  commentId: Overload:Dec.PathDictionaryValueUnpathable.Equals
+  isSpec: "True"
+  fullName: Dec.PathDictionaryValueUnpathable.Equals
+  nameWithType: PathDictionaryValueUnpathable.Equals
+- uid: Dec.PathDictionaryValueUnpathable.GetHashCode
+  name: GetHashCode()
+  href: api/Dec.PathDictionaryValueUnpathable.html#Dec_PathDictionaryValueUnpathable_GetHashCode
+  commentId: M:Dec.PathDictionaryValueUnpathable.GetHashCode
+  fullName: Dec.PathDictionaryValueUnpathable.GetHashCode()
+  nameWithType: PathDictionaryValueUnpathable.GetHashCode()
+- uid: Dec.PathDictionaryValueUnpathable.GetHashCode*
+  name: GetHashCode
+  href: api/Dec.PathDictionaryValueUnpathable.html#Dec_PathDictionaryValueUnpathable_GetHashCode_
+  commentId: Overload:Dec.PathDictionaryValueUnpathable.GetHashCode
+  isSpec: "True"
+  fullName: Dec.PathDictionaryValueUnpathable.GetHashCode
+  nameWithType: PathDictionaryValueUnpathable.GetHashCode
 - uid: Dec.PathDictionaryValueUnpathable.IsValidForWriting
   name: IsValidForWriting()
   href: api/Dec.PathDictionaryValueUnpathable.html#Dec_PathDictionaryValueUnpathable_IsValidForWriting
@@ -1544,6 +1794,35 @@ references:
   fullName.vb: Dec.PathHashSetElement.New
   nameWithType: PathHashSetElement.PathHashSetElement
   nameWithType.vb: PathHashSetElement.New
+- uid: Dec.PathHashSetElement.Equals(System.Object)
+  name: Equals(object)
+  href: api/Dec.PathHashSetElement.html#Dec_PathHashSetElement_Equals_System_Object_
+  commentId: M:Dec.PathHashSetElement.Equals(System.Object)
+  name.vb: Equals(Object)
+  fullName: Dec.PathHashSetElement.Equals(object)
+  fullName.vb: Dec.PathHashSetElement.Equals(Object)
+  nameWithType: PathHashSetElement.Equals(object)
+  nameWithType.vb: PathHashSetElement.Equals(Object)
+- uid: Dec.PathHashSetElement.Equals*
+  name: Equals
+  href: api/Dec.PathHashSetElement.html#Dec_PathHashSetElement_Equals_
+  commentId: Overload:Dec.PathHashSetElement.Equals
+  isSpec: "True"
+  fullName: Dec.PathHashSetElement.Equals
+  nameWithType: PathHashSetElement.Equals
+- uid: Dec.PathHashSetElement.GetHashCode
+  name: GetHashCode()
+  href: api/Dec.PathHashSetElement.html#Dec_PathHashSetElement_GetHashCode
+  commentId: M:Dec.PathHashSetElement.GetHashCode
+  fullName: Dec.PathHashSetElement.GetHashCode()
+  nameWithType: PathHashSetElement.GetHashCode()
+- uid: Dec.PathHashSetElement.GetHashCode*
+  name: GetHashCode
+  href: api/Dec.PathHashSetElement.html#Dec_PathHashSetElement_GetHashCode_
+  commentId: Overload:Dec.PathHashSetElement.GetHashCode
+  isSpec: "True"
+  fullName: Dec.PathHashSetElement.GetHashCode
+  nameWithType: PathHashSetElement.GetHashCode
 - uid: Dec.PathHashSetElement.IsValidForWriting
   name: IsValidForWriting()
   href: api/Dec.PathHashSetElement.html#Dec_PathHashSetElement_IsValidForWriting
@@ -1595,6 +1874,35 @@ references:
   fullName.vb: Dec.PathIndex.New
   nameWithType: PathIndex.PathIndex
   nameWithType.vb: PathIndex.New
+- uid: Dec.PathIndex.Equals(System.Object)
+  name: Equals(object)
+  href: api/Dec.PathIndex.html#Dec_PathIndex_Equals_System_Object_
+  commentId: M:Dec.PathIndex.Equals(System.Object)
+  name.vb: Equals(Object)
+  fullName: Dec.PathIndex.Equals(object)
+  fullName.vb: Dec.PathIndex.Equals(Object)
+  nameWithType: PathIndex.Equals(object)
+  nameWithType.vb: PathIndex.Equals(Object)
+- uid: Dec.PathIndex.Equals*
+  name: Equals
+  href: api/Dec.PathIndex.html#Dec_PathIndex_Equals_
+  commentId: Overload:Dec.PathIndex.Equals
+  isSpec: "True"
+  fullName: Dec.PathIndex.Equals
+  nameWithType: PathIndex.Equals
+- uid: Dec.PathIndex.GetHashCode
+  name: GetHashCode()
+  href: api/Dec.PathIndex.html#Dec_PathIndex_GetHashCode
+  commentId: M:Dec.PathIndex.GetHashCode
+  fullName: Dec.PathIndex.GetHashCode()
+  nameWithType: PathIndex.GetHashCode()
+- uid: Dec.PathIndex.GetHashCode*
+  name: GetHashCode
+  href: api/Dec.PathIndex.html#Dec_PathIndex_GetHashCode_
+  commentId: Overload:Dec.PathIndex.GetHashCode
+  isSpec: "True"
+  fullName: Dec.PathIndex.GetHashCode
+  nameWithType: PathIndex.GetHashCode
 - uid: Dec.PathIndex.IsValidForWriting
   name: IsValidForWriting()
   href: api/Dec.PathIndex.html#Dec_PathIndex_IsValidForWriting
@@ -1646,6 +1954,35 @@ references:
   fullName.vb: Dec.PathIndexMultidim.New
   nameWithType: PathIndexMultidim.PathIndexMultidim
   nameWithType.vb: PathIndexMultidim.New
+- uid: Dec.PathIndexMultidim.Equals(System.Object)
+  name: Equals(object)
+  href: api/Dec.PathIndexMultidim.html#Dec_PathIndexMultidim_Equals_System_Object_
+  commentId: M:Dec.PathIndexMultidim.Equals(System.Object)
+  name.vb: Equals(Object)
+  fullName: Dec.PathIndexMultidim.Equals(object)
+  fullName.vb: Dec.PathIndexMultidim.Equals(Object)
+  nameWithType: PathIndexMultidim.Equals(object)
+  nameWithType.vb: PathIndexMultidim.Equals(Object)
+- uid: Dec.PathIndexMultidim.Equals*
+  name: Equals
+  href: api/Dec.PathIndexMultidim.html#Dec_PathIndexMultidim_Equals_
+  commentId: Overload:Dec.PathIndexMultidim.Equals
+  isSpec: "True"
+  fullName: Dec.PathIndexMultidim.Equals
+  nameWithType: PathIndexMultidim.Equals
+- uid: Dec.PathIndexMultidim.GetHashCode
+  name: GetHashCode()
+  href: api/Dec.PathIndexMultidim.html#Dec_PathIndexMultidim_GetHashCode
+  commentId: M:Dec.PathIndexMultidim.GetHashCode
+  fullName: Dec.PathIndexMultidim.GetHashCode()
+  nameWithType: PathIndexMultidim.GetHashCode()
+- uid: Dec.PathIndexMultidim.GetHashCode*
+  name: GetHashCode
+  href: api/Dec.PathIndexMultidim.html#Dec_PathIndexMultidim_GetHashCode_
+  commentId: Overload:Dec.PathIndexMultidim.GetHashCode
+  isSpec: "True"
+  fullName: Dec.PathIndexMultidim.GetHashCode
+  nameWithType: PathIndexMultidim.GetHashCode
 - uid: Dec.PathIndexMultidim.IsValidForWriting
   name: IsValidForWriting()
   href: api/Dec.PathIndexMultidim.html#Dec_PathIndexMultidim_IsValidForWriting
@@ -1697,6 +2034,35 @@ references:
   fullName.vb: Dec.PathMember.New
   nameWithType: PathMember.PathMember
   nameWithType.vb: PathMember.New
+- uid: Dec.PathMember.Equals(System.Object)
+  name: Equals(object)
+  href: api/Dec.PathMember.html#Dec_PathMember_Equals_System_Object_
+  commentId: M:Dec.PathMember.Equals(System.Object)
+  name.vb: Equals(Object)
+  fullName: Dec.PathMember.Equals(object)
+  fullName.vb: Dec.PathMember.Equals(Object)
+  nameWithType: PathMember.Equals(object)
+  nameWithType.vb: PathMember.Equals(Object)
+- uid: Dec.PathMember.Equals*
+  name: Equals
+  href: api/Dec.PathMember.html#Dec_PathMember_Equals_
+  commentId: Overload:Dec.PathMember.Equals
+  isSpec: "True"
+  fullName: Dec.PathMember.Equals
+  nameWithType: PathMember.Equals
+- uid: Dec.PathMember.GetHashCode
+  name: GetHashCode()
+  href: api/Dec.PathMember.html#Dec_PathMember_GetHashCode
+  commentId: M:Dec.PathMember.GetHashCode
+  fullName: Dec.PathMember.GetHashCode()
+  nameWithType: PathMember.GetHashCode()
+- uid: Dec.PathMember.GetHashCode*
+  name: GetHashCode
+  href: api/Dec.PathMember.html#Dec_PathMember_GetHashCode_
+  commentId: Overload:Dec.PathMember.GetHashCode
+  isSpec: "True"
+  fullName: Dec.PathMember.GetHashCode
+  nameWithType: PathMember.GetHashCode
 - uid: Dec.PathMember.IsValidForWriting
   name: IsValidForWriting()
   href: api/Dec.PathMember.html#Dec_PathMember_IsValidForWriting
@@ -1723,6 +2089,86 @@ references:
   isSpec: "True"
   fullName: Dec.PathMember.Serialize
   nameWithType: PathMember.Serialize
+- uid: Dec.PathQueueElement
+  name: PathQueueElement
+  href: api/Dec.PathQueueElement.html
+  commentId: T:Dec.PathQueueElement
+  fullName: Dec.PathQueueElement
+  nameWithType: PathQueueElement
+- uid: Dec.PathQueueElement.#ctor(Dec.Path,System.Int32)
+  name: PathQueueElement(Path, int)
+  href: api/Dec.PathQueueElement.html#Dec_PathQueueElement__ctor_Dec_Path_System_Int32_
+  commentId: M:Dec.PathQueueElement.#ctor(Dec.Path,System.Int32)
+  name.vb: New(Path, Integer)
+  fullName: Dec.PathQueueElement.PathQueueElement(Dec.Path, int)
+  fullName.vb: Dec.PathQueueElement.New(Dec.Path, Integer)
+  nameWithType: PathQueueElement.PathQueueElement(Path, int)
+  nameWithType.vb: PathQueueElement.New(Path, Integer)
+- uid: Dec.PathQueueElement.#ctor*
+  name: PathQueueElement
+  href: api/Dec.PathQueueElement.html#Dec_PathQueueElement__ctor_
+  commentId: Overload:Dec.PathQueueElement.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: Dec.PathQueueElement.PathQueueElement
+  fullName.vb: Dec.PathQueueElement.New
+  nameWithType: PathQueueElement.PathQueueElement
+  nameWithType.vb: PathQueueElement.New
+- uid: Dec.PathQueueElement.Equals(System.Object)
+  name: Equals(object)
+  href: api/Dec.PathQueueElement.html#Dec_PathQueueElement_Equals_System_Object_
+  commentId: M:Dec.PathQueueElement.Equals(System.Object)
+  name.vb: Equals(Object)
+  fullName: Dec.PathQueueElement.Equals(object)
+  fullName.vb: Dec.PathQueueElement.Equals(Object)
+  nameWithType: PathQueueElement.Equals(object)
+  nameWithType.vb: PathQueueElement.Equals(Object)
+- uid: Dec.PathQueueElement.Equals*
+  name: Equals
+  href: api/Dec.PathQueueElement.html#Dec_PathQueueElement_Equals_
+  commentId: Overload:Dec.PathQueueElement.Equals
+  isSpec: "True"
+  fullName: Dec.PathQueueElement.Equals
+  nameWithType: PathQueueElement.Equals
+- uid: Dec.PathQueueElement.GetHashCode
+  name: GetHashCode()
+  href: api/Dec.PathQueueElement.html#Dec_PathQueueElement_GetHashCode
+  commentId: M:Dec.PathQueueElement.GetHashCode
+  fullName: Dec.PathQueueElement.GetHashCode()
+  nameWithType: PathQueueElement.GetHashCode()
+- uid: Dec.PathQueueElement.GetHashCode*
+  name: GetHashCode
+  href: api/Dec.PathQueueElement.html#Dec_PathQueueElement_GetHashCode_
+  commentId: Overload:Dec.PathQueueElement.GetHashCode
+  isSpec: "True"
+  fullName: Dec.PathQueueElement.GetHashCode
+  nameWithType: PathQueueElement.GetHashCode
+- uid: Dec.PathQueueElement.IsValidForWriting
+  name: IsValidForWriting()
+  href: api/Dec.PathQueueElement.html#Dec_PathQueueElement_IsValidForWriting
+  commentId: M:Dec.PathQueueElement.IsValidForWriting
+  fullName: Dec.PathQueueElement.IsValidForWriting()
+  nameWithType: PathQueueElement.IsValidForWriting()
+- uid: Dec.PathQueueElement.IsValidForWriting*
+  name: IsValidForWriting
+  href: api/Dec.PathQueueElement.html#Dec_PathQueueElement_IsValidForWriting_
+  commentId: Overload:Dec.PathQueueElement.IsValidForWriting
+  isSpec: "True"
+  fullName: Dec.PathQueueElement.IsValidForWriting
+  nameWithType: PathQueueElement.IsValidForWriting
+- uid: Dec.PathQueueElement.Serialize
+  name: Serialize()
+  href: api/Dec.PathQueueElement.html#Dec_PathQueueElement_Serialize
+  commentId: M:Dec.PathQueueElement.Serialize
+  fullName: Dec.PathQueueElement.Serialize()
+  nameWithType: PathQueueElement.Serialize()
+- uid: Dec.PathQueueElement.Serialize*
+  name: Serialize
+  href: api/Dec.PathQueueElement.html#Dec_PathQueueElement_Serialize_
+  commentId: Overload:Dec.PathQueueElement.Serialize
+  isSpec: "True"
+  fullName: Dec.PathQueueElement.Serialize
+  nameWithType: PathQueueElement.Serialize
 - uid: Dec.PathRef
   name: PathRef
   href: api/Dec.PathRef.html
@@ -1748,6 +2194,35 @@ references:
   fullName.vb: Dec.PathRef.New
   nameWithType: PathRef.PathRef
   nameWithType.vb: PathRef.New
+- uid: Dec.PathRef.Equals(System.Object)
+  name: Equals(object)
+  href: api/Dec.PathRef.html#Dec_PathRef_Equals_System_Object_
+  commentId: M:Dec.PathRef.Equals(System.Object)
+  name.vb: Equals(Object)
+  fullName: Dec.PathRef.Equals(object)
+  fullName.vb: Dec.PathRef.Equals(Object)
+  nameWithType: PathRef.Equals(object)
+  nameWithType.vb: PathRef.Equals(Object)
+- uid: Dec.PathRef.Equals*
+  name: Equals
+  href: api/Dec.PathRef.html#Dec_PathRef_Equals_
+  commentId: Overload:Dec.PathRef.Equals
+  isSpec: "True"
+  fullName: Dec.PathRef.Equals
+  nameWithType: PathRef.Equals
+- uid: Dec.PathRef.GetHashCode
+  name: GetHashCode()
+  href: api/Dec.PathRef.html#Dec_PathRef_GetHashCode
+  commentId: M:Dec.PathRef.GetHashCode
+  fullName: Dec.PathRef.GetHashCode()
+  nameWithType: PathRef.GetHashCode()
+- uid: Dec.PathRef.GetHashCode*
+  name: GetHashCode
+  href: api/Dec.PathRef.html#Dec_PathRef_GetHashCode_
+  commentId: Overload:Dec.PathRef.GetHashCode
+  isSpec: "True"
+  fullName: Dec.PathRef.GetHashCode
+  nameWithType: PathRef.GetHashCode
 - uid: Dec.PathRef.IsValidForWriting
   name: IsValidForWriting()
   href: api/Dec.PathRef.html#Dec_PathRef_IsValidForWriting
@@ -1799,6 +2274,35 @@ references:
   fullName.vb: Dec.PathRoot.New
   nameWithType: PathRoot.PathRoot
   nameWithType.vb: PathRoot.New
+- uid: Dec.PathRoot.Equals(System.Object)
+  name: Equals(object)
+  href: api/Dec.PathRoot.html#Dec_PathRoot_Equals_System_Object_
+  commentId: M:Dec.PathRoot.Equals(System.Object)
+  name.vb: Equals(Object)
+  fullName: Dec.PathRoot.Equals(object)
+  fullName.vb: Dec.PathRoot.Equals(Object)
+  nameWithType: PathRoot.Equals(object)
+  nameWithType.vb: PathRoot.Equals(Object)
+- uid: Dec.PathRoot.Equals*
+  name: Equals
+  href: api/Dec.PathRoot.html#Dec_PathRoot_Equals_
+  commentId: Overload:Dec.PathRoot.Equals
+  isSpec: "True"
+  fullName: Dec.PathRoot.Equals
+  nameWithType: PathRoot.Equals
+- uid: Dec.PathRoot.GetHashCode
+  name: GetHashCode()
+  href: api/Dec.PathRoot.html#Dec_PathRoot_GetHashCode
+  commentId: M:Dec.PathRoot.GetHashCode
+  fullName: Dec.PathRoot.GetHashCode()
+  nameWithType: PathRoot.GetHashCode()
+- uid: Dec.PathRoot.GetHashCode*
+  name: GetHashCode
+  href: api/Dec.PathRoot.html#Dec_PathRoot_GetHashCode_
+  commentId: Overload:Dec.PathRoot.GetHashCode
+  isSpec: "True"
+  fullName: Dec.PathRoot.GetHashCode
+  nameWithType: PathRoot.GetHashCode
 - uid: Dec.PathRoot.IsValidForWriting
   name: IsValidForWriting()
   href: api/Dec.PathRoot.html#Dec_PathRoot_IsValidForWriting
@@ -1825,6 +2329,166 @@ references:
   isSpec: "True"
   fullName: Dec.PathRoot.Serialize
   nameWithType: PathRoot.Serialize
+- uid: Dec.PathStackElement
+  name: PathStackElement
+  href: api/Dec.PathStackElement.html
+  commentId: T:Dec.PathStackElement
+  fullName: Dec.PathStackElement
+  nameWithType: PathStackElement
+- uid: Dec.PathStackElement.#ctor(Dec.Path,System.Int32)
+  name: PathStackElement(Path, int)
+  href: api/Dec.PathStackElement.html#Dec_PathStackElement__ctor_Dec_Path_System_Int32_
+  commentId: M:Dec.PathStackElement.#ctor(Dec.Path,System.Int32)
+  name.vb: New(Path, Integer)
+  fullName: Dec.PathStackElement.PathStackElement(Dec.Path, int)
+  fullName.vb: Dec.PathStackElement.New(Dec.Path, Integer)
+  nameWithType: PathStackElement.PathStackElement(Path, int)
+  nameWithType.vb: PathStackElement.New(Path, Integer)
+- uid: Dec.PathStackElement.#ctor*
+  name: PathStackElement
+  href: api/Dec.PathStackElement.html#Dec_PathStackElement__ctor_
+  commentId: Overload:Dec.PathStackElement.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: Dec.PathStackElement.PathStackElement
+  fullName.vb: Dec.PathStackElement.New
+  nameWithType: PathStackElement.PathStackElement
+  nameWithType.vb: PathStackElement.New
+- uid: Dec.PathStackElement.Equals(System.Object)
+  name: Equals(object)
+  href: api/Dec.PathStackElement.html#Dec_PathStackElement_Equals_System_Object_
+  commentId: M:Dec.PathStackElement.Equals(System.Object)
+  name.vb: Equals(Object)
+  fullName: Dec.PathStackElement.Equals(object)
+  fullName.vb: Dec.PathStackElement.Equals(Object)
+  nameWithType: PathStackElement.Equals(object)
+  nameWithType.vb: PathStackElement.Equals(Object)
+- uid: Dec.PathStackElement.Equals*
+  name: Equals
+  href: api/Dec.PathStackElement.html#Dec_PathStackElement_Equals_
+  commentId: Overload:Dec.PathStackElement.Equals
+  isSpec: "True"
+  fullName: Dec.PathStackElement.Equals
+  nameWithType: PathStackElement.Equals
+- uid: Dec.PathStackElement.GetHashCode
+  name: GetHashCode()
+  href: api/Dec.PathStackElement.html#Dec_PathStackElement_GetHashCode
+  commentId: M:Dec.PathStackElement.GetHashCode
+  fullName: Dec.PathStackElement.GetHashCode()
+  nameWithType: PathStackElement.GetHashCode()
+- uid: Dec.PathStackElement.GetHashCode*
+  name: GetHashCode
+  href: api/Dec.PathStackElement.html#Dec_PathStackElement_GetHashCode_
+  commentId: Overload:Dec.PathStackElement.GetHashCode
+  isSpec: "True"
+  fullName: Dec.PathStackElement.GetHashCode
+  nameWithType: PathStackElement.GetHashCode
+- uid: Dec.PathStackElement.IsValidForWriting
+  name: IsValidForWriting()
+  href: api/Dec.PathStackElement.html#Dec_PathStackElement_IsValidForWriting
+  commentId: M:Dec.PathStackElement.IsValidForWriting
+  fullName: Dec.PathStackElement.IsValidForWriting()
+  nameWithType: PathStackElement.IsValidForWriting()
+- uid: Dec.PathStackElement.IsValidForWriting*
+  name: IsValidForWriting
+  href: api/Dec.PathStackElement.html#Dec_PathStackElement_IsValidForWriting_
+  commentId: Overload:Dec.PathStackElement.IsValidForWriting
+  isSpec: "True"
+  fullName: Dec.PathStackElement.IsValidForWriting
+  nameWithType: PathStackElement.IsValidForWriting
+- uid: Dec.PathStackElement.Serialize
+  name: Serialize()
+  href: api/Dec.PathStackElement.html#Dec_PathStackElement_Serialize
+  commentId: M:Dec.PathStackElement.Serialize
+  fullName: Dec.PathStackElement.Serialize()
+  nameWithType: PathStackElement.Serialize()
+- uid: Dec.PathStackElement.Serialize*
+  name: Serialize
+  href: api/Dec.PathStackElement.html#Dec_PathStackElement_Serialize_
+  commentId: Overload:Dec.PathStackElement.Serialize
+  isSpec: "True"
+  fullName: Dec.PathStackElement.Serialize
+  nameWithType: PathStackElement.Serialize
+- uid: Dec.PathTupleItem
+  name: PathTupleItem
+  href: api/Dec.PathTupleItem.html
+  commentId: T:Dec.PathTupleItem
+  fullName: Dec.PathTupleItem
+  nameWithType: PathTupleItem
+- uid: Dec.PathTupleItem.#ctor(Dec.Path,System.Int32)
+  name: PathTupleItem(Path, int)
+  href: api/Dec.PathTupleItem.html#Dec_PathTupleItem__ctor_Dec_Path_System_Int32_
+  commentId: M:Dec.PathTupleItem.#ctor(Dec.Path,System.Int32)
+  name.vb: New(Path, Integer)
+  fullName: Dec.PathTupleItem.PathTupleItem(Dec.Path, int)
+  fullName.vb: Dec.PathTupleItem.New(Dec.Path, Integer)
+  nameWithType: PathTupleItem.PathTupleItem(Path, int)
+  nameWithType.vb: PathTupleItem.New(Path, Integer)
+- uid: Dec.PathTupleItem.#ctor*
+  name: PathTupleItem
+  href: api/Dec.PathTupleItem.html#Dec_PathTupleItem__ctor_
+  commentId: Overload:Dec.PathTupleItem.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: Dec.PathTupleItem.PathTupleItem
+  fullName.vb: Dec.PathTupleItem.New
+  nameWithType: PathTupleItem.PathTupleItem
+  nameWithType.vb: PathTupleItem.New
+- uid: Dec.PathTupleItem.Equals(System.Object)
+  name: Equals(object)
+  href: api/Dec.PathTupleItem.html#Dec_PathTupleItem_Equals_System_Object_
+  commentId: M:Dec.PathTupleItem.Equals(System.Object)
+  name.vb: Equals(Object)
+  fullName: Dec.PathTupleItem.Equals(object)
+  fullName.vb: Dec.PathTupleItem.Equals(Object)
+  nameWithType: PathTupleItem.Equals(object)
+  nameWithType.vb: PathTupleItem.Equals(Object)
+- uid: Dec.PathTupleItem.Equals*
+  name: Equals
+  href: api/Dec.PathTupleItem.html#Dec_PathTupleItem_Equals_
+  commentId: Overload:Dec.PathTupleItem.Equals
+  isSpec: "True"
+  fullName: Dec.PathTupleItem.Equals
+  nameWithType: PathTupleItem.Equals
+- uid: Dec.PathTupleItem.GetHashCode
+  name: GetHashCode()
+  href: api/Dec.PathTupleItem.html#Dec_PathTupleItem_GetHashCode
+  commentId: M:Dec.PathTupleItem.GetHashCode
+  fullName: Dec.PathTupleItem.GetHashCode()
+  nameWithType: PathTupleItem.GetHashCode()
+- uid: Dec.PathTupleItem.GetHashCode*
+  name: GetHashCode
+  href: api/Dec.PathTupleItem.html#Dec_PathTupleItem_GetHashCode_
+  commentId: Overload:Dec.PathTupleItem.GetHashCode
+  isSpec: "True"
+  fullName: Dec.PathTupleItem.GetHashCode
+  nameWithType: PathTupleItem.GetHashCode
+- uid: Dec.PathTupleItem.IsValidForWriting
+  name: IsValidForWriting()
+  href: api/Dec.PathTupleItem.html#Dec_PathTupleItem_IsValidForWriting
+  commentId: M:Dec.PathTupleItem.IsValidForWriting
+  fullName: Dec.PathTupleItem.IsValidForWriting()
+  nameWithType: PathTupleItem.IsValidForWriting()
+- uid: Dec.PathTupleItem.IsValidForWriting*
+  name: IsValidForWriting
+  href: api/Dec.PathTupleItem.html#Dec_PathTupleItem_IsValidForWriting_
+  commentId: Overload:Dec.PathTupleItem.IsValidForWriting
+  isSpec: "True"
+  fullName: Dec.PathTupleItem.IsValidForWriting
+  nameWithType: PathTupleItem.IsValidForWriting
+- uid: Dec.PathTupleItem.Serialize
+  name: Serialize()
+  href: api/Dec.PathTupleItem.html#Dec_PathTupleItem_Serialize
+  commentId: M:Dec.PathTupleItem.Serialize
+  fullName: Dec.PathTupleItem.Serialize()
+  nameWithType: PathTupleItem.Serialize()
+- uid: Dec.PathTupleItem.Serialize*
+  name: Serialize
+  href: api/Dec.PathTupleItem.html#Dec_PathTupleItem_Serialize_
+  commentId: Overload:Dec.PathTupleItem.Serialize
+  isSpec: "True"
+  fullName: Dec.PathTupleItem.Serialize
+  nameWithType: PathTupleItem.Serialize
 - uid: Dec.Recorder
   name: Recorder
   href: api/Dec.Recorder.html
@@ -2274,6 +2938,154 @@ references:
   isSpec: "True"
   fullName: Dec.Recorder.Wrn
   nameWithType: Recorder.Wrn
+- uid: Dec.Reflection
+  name: Reflection
+  href: api/Dec.Reflection.html
+  commentId: T:Dec.Reflection
+  fullName: Dec.Reflection
+  nameWithType: Reflection
+- uid: Dec.Reflection.Entry
+  name: Reflection.Entry
+  href: api/Dec.Reflection.Entry.html
+  commentId: T:Dec.Reflection.Entry
+  fullName: Dec.Reflection.Entry
+  nameWithType: Reflection.Entry
+- uid: Dec.Reflection.Entry.Children
+  name: Children
+  href: api/Dec.Reflection.Entry.html#Dec_Reflection_Entry_Children
+  commentId: P:Dec.Reflection.Entry.Children
+  fullName: Dec.Reflection.Entry.Children
+  nameWithType: Reflection.Entry.Children
+- uid: Dec.Reflection.Entry.Children*
+  name: Children
+  href: api/Dec.Reflection.Entry.html#Dec_Reflection_Entry_Children_
+  commentId: Overload:Dec.Reflection.Entry.Children
+  isSpec: "True"
+  fullName: Dec.Reflection.Entry.Children
+  nameWithType: Reflection.Entry.Children
+- uid: Dec.Reflection.Entry.DeclaredType
+  name: DeclaredType
+  href: api/Dec.Reflection.Entry.html#Dec_Reflection_Entry_DeclaredType
+  commentId: P:Dec.Reflection.Entry.DeclaredType
+  fullName: Dec.Reflection.Entry.DeclaredType
+  nameWithType: Reflection.Entry.DeclaredType
+- uid: Dec.Reflection.Entry.DeclaredType*
+  name: DeclaredType
+  href: api/Dec.Reflection.Entry.html#Dec_Reflection_Entry_DeclaredType_
+  commentId: Overload:Dec.Reflection.Entry.DeclaredType
+  isSpec: "True"
+  fullName: Dec.Reflection.Entry.DeclaredType
+  nameWithType: Reflection.Entry.DeclaredType
+- uid: Dec.Reflection.Entry.Label
+  name: Label
+  href: api/Dec.Reflection.Entry.html#Dec_Reflection_Entry_Label
+  commentId: P:Dec.Reflection.Entry.Label
+  fullName: Dec.Reflection.Entry.Label
+  nameWithType: Reflection.Entry.Label
+- uid: Dec.Reflection.Entry.Label*
+  name: Label
+  href: api/Dec.Reflection.Entry.html#Dec_Reflection_Entry_Label_
+  commentId: Overload:Dec.Reflection.Entry.Label
+  isSpec: "True"
+  fullName: Dec.Reflection.Entry.Label
+  nameWithType: Reflection.Entry.Label
+- uid: Dec.Reflection.Entry.Parent
+  name: Parent
+  href: api/Dec.Reflection.Entry.html#Dec_Reflection_Entry_Parent
+  commentId: P:Dec.Reflection.Entry.Parent
+  fullName: Dec.Reflection.Entry.Parent
+  nameWithType: Reflection.Entry.Parent
+- uid: Dec.Reflection.Entry.Parent*
+  name: Parent
+  href: api/Dec.Reflection.Entry.html#Dec_Reflection_Entry_Parent_
+  commentId: Overload:Dec.Reflection.Entry.Parent
+  isSpec: "True"
+  fullName: Dec.Reflection.Entry.Parent
+  nameWithType: Reflection.Entry.Parent
+- uid: Dec.Reflection.Entry.Path
+  name: Path
+  href: api/Dec.Reflection.Entry.html#Dec_Reflection_Entry_Path
+  commentId: P:Dec.Reflection.Entry.Path
+  fullName: Dec.Reflection.Entry.Path
+  nameWithType: Reflection.Entry.Path
+- uid: Dec.Reflection.Entry.Path*
+  name: Path
+  href: api/Dec.Reflection.Entry.html#Dec_Reflection_Entry_Path_
+  commentId: Overload:Dec.Reflection.Entry.Path
+  isSpec: "True"
+  fullName: Dec.Reflection.Entry.Path
+  nameWithType: Reflection.Entry.Path
+- uid: Dec.Reflection.Entry.Shared
+  name: Shared
+  href: api/Dec.Reflection.Entry.html#Dec_Reflection_Entry_Shared
+  commentId: P:Dec.Reflection.Entry.Shared
+  fullName: Dec.Reflection.Entry.Shared
+  nameWithType: Reflection.Entry.Shared
+- uid: Dec.Reflection.Entry.Shared*
+  name: Shared
+  href: api/Dec.Reflection.Entry.html#Dec_Reflection_Entry_Shared_
+  commentId: Overload:Dec.Reflection.Entry.Shared
+  isSpec: "True"
+  fullName: Dec.Reflection.Entry.Shared
+  nameWithType: Reflection.Entry.Shared
+- uid: Dec.Reflection.Entry.Value
+  name: Value
+  href: api/Dec.Reflection.Entry.html#Dec_Reflection_Entry_Value
+  commentId: P:Dec.Reflection.Entry.Value
+  fullName: Dec.Reflection.Entry.Value
+  nameWithType: Reflection.Entry.Value
+- uid: Dec.Reflection.Entry.Value*
+  name: Value
+  href: api/Dec.Reflection.Entry.html#Dec_Reflection_Entry_Value_
+  commentId: Overload:Dec.Reflection.Entry.Value
+  isSpec: "True"
+  fullName: Dec.Reflection.Entry.Value
+  nameWithType: Reflection.Entry.Value
+- uid: Dec.Reflection.Entry.Writable
+  name: Writable
+  href: api/Dec.Reflection.Entry.html#Dec_Reflection_Entry_Writable
+  commentId: P:Dec.Reflection.Entry.Writable
+  fullName: Dec.Reflection.Entry.Writable
+  nameWithType: Reflection.Entry.Writable
+- uid: Dec.Reflection.Entry.Writable*
+  name: Writable
+  href: api/Dec.Reflection.Entry.html#Dec_Reflection_Entry_Writable_
+  commentId: Overload:Dec.Reflection.Entry.Writable
+  isSpec: "True"
+  fullName: Dec.Reflection.Entry.Writable
+  nameWithType: Reflection.Entry.Writable
+- uid: Dec.Reflection.Enumerate*
+  name: Enumerate
+  href: api/Dec.Reflection.html#Dec_Reflection_Enumerate_
+  commentId: Overload:Dec.Reflection.Enumerate
+  isSpec: "True"
+  fullName: Dec.Reflection.Enumerate
+  nameWithType: Reflection.Enumerate
+- uid: Dec.Reflection.Enumerate``1(``0,System.Func{Dec.Reflection.Entry,System.Boolean},Dec.Recorder.IUserSettings)
+  name: Enumerate<T>(T, Func<Entry, bool>, IUserSettings)
+  href: api/Dec.Reflection.html#Dec_Reflection_Enumerate__1___0_System_Func_Dec_Reflection_Entry_System_Boolean__Dec_Recorder_IUserSettings_
+  commentId: M:Dec.Reflection.Enumerate``1(``0,System.Func{Dec.Reflection.Entry,System.Boolean},Dec.Recorder.IUserSettings)
+  name.vb: Enumerate(Of T)(T, Func(Of Entry, Boolean), IUserSettings)
+  fullName: Dec.Reflection.Enumerate<T>(T, System.Func<Dec.Reflection.Entry, bool>, Dec.Recorder.IUserSettings)
+  fullName.vb: Dec.Reflection.Enumerate(Of T)(T, System.Func(Of Dec.Reflection.Entry, Boolean), Dec.Recorder.IUserSettings)
+  nameWithType: Reflection.Enumerate<T>(T, Func<Reflection.Entry, bool>, Recorder.IUserSettings)
+  nameWithType.vb: Reflection.Enumerate(Of T)(T, Func(Of Reflection.Entry, Boolean), Recorder.IUserSettings)
+- uid: Dec.Reflection.SetByPath(System.Object,Dec.Path,System.Object,Dec.Recorder.IUserSettings)
+  name: SetByPath(object, Path, object, IUserSettings)
+  href: api/Dec.Reflection.html#Dec_Reflection_SetByPath_System_Object_Dec_Path_System_Object_Dec_Recorder_IUserSettings_
+  commentId: M:Dec.Reflection.SetByPath(System.Object,Dec.Path,System.Object,Dec.Recorder.IUserSettings)
+  name.vb: SetByPath(Object, Path, Object, IUserSettings)
+  fullName: Dec.Reflection.SetByPath(object, Dec.Path, object, Dec.Recorder.IUserSettings)
+  fullName.vb: Dec.Reflection.SetByPath(Object, Dec.Path, Object, Dec.Recorder.IUserSettings)
+  nameWithType: Reflection.SetByPath(object, Path, object, Recorder.IUserSettings)
+  nameWithType.vb: Reflection.SetByPath(Object, Path, Object, Recorder.IUserSettings)
+- uid: Dec.Reflection.SetByPath*
+  name: SetByPath
+  href: api/Dec.Reflection.html#Dec_Reflection_SetByPath_
+  commentId: Overload:Dec.Reflection.SetByPath
+  isSpec: "True"
+  fullName: Dec.Reflection.SetByPath
+  nameWithType: Reflection.SetByPath
 - uid: Dec.SetupAfterAttribute
   name: SetupAfterAttribute
   href: api/Dec.SetupAfterAttribute.html

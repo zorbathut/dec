@@ -340,6 +340,34 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Dec.IRefForce.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.IRefForce.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.IRefForce",
+      "Summary": "<p sourcefile=\"api/Dec.IRefForce.yml\" sourcestartlinenumber=\"1\">Used to force an object into a Recorder's reference block even when only one reference to it exists.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.IRefName.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.IRefName.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.IRefName",
+      "Summary": "<p sourcefile=\"api/Dec.IRefName.yml\" sourcestartlinenumber=\"1\">Used to name an object's entry in a Recorder's reference block.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Dec.Index-1.yml",
       "output": {
         ".html": {
@@ -466,6 +494,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Dec.PathDictionaryPair.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.PathDictionaryPair.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.PathDictionaryPair",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Dec.PathDictionaryValue.yml",
       "output": {
         ".html": {
@@ -550,6 +592,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Dec.PathQueueElement.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.PathQueueElement.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.PathQueueElement",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Dec.PathRef.yml",
       "output": {
         ".html": {
@@ -574,6 +630,34 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "Dec.PathRoot",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.PathStackElement.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.PathStackElement.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.PathStackElement",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.PathTupleItem.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.PathTupleItem.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.PathTupleItem",
       "Summary": null
     },
     {
@@ -645,6 +729,34 @@
       "IsMRef": true,
       "Title": "Dec.Recorder",
       "Summary": "<p sourcefile=\"api/Dec.Recorder.yml\" sourcestartlinenumber=\"1\">Main class for the serialization/deserialization system.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.Reflection.Entry.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.Reflection.Entry.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.Reflection.Entry",
+      "Summary": "<p sourcefile=\"api/Dec.Reflection.Entry.yml\" sourcestartlinenumber=\"1\">A single recorded position in an object's serialization structure, as reported by Enumerate.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Dec.Reflection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Dec.Reflection.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Dec.Reflection",
+      "Summary": "<p sourcefile=\"api/Dec.Reflection.yml\" sourcestartlinenumber=\"1\">Introspection of an object's serialization structure: enumerating the positions its Record() would produce, and writing values back to them.</p>\n"
     },
     {
       "type": "ManagedReference",
