@@ -1831,60 +1831,112 @@ namespace Dec
 
         internal static Type TypeSystemRuntimeType = Type.GetType("System.RuntimeType");
 
-        private class ComposeStrategy
+        // Which writer branch a type composes through, with the four unreferenceable leaves grouped the way the writer already groups them. Invalid is the zero value so a strategy that never picked a branch is caught when it is built instead of composing as a leaf.
+        internal enum ComposeKind
         {
+            Invalid,
+            Unreferenceable,
+            ByteArray,
+            Array,
+            Queue,
+            Stack,
+            Tuple,
+            ValueTuple,
+            List,
+            Dictionary,
+            Set,
+            Recordable,
+            Convertible,
+            Reflection,
+        }
+
+        internal class ComposeStrategy
+        {
+            internal ComposeKind kind;
+            internal Type type;
             internal Action<WriterNode, object, FieldInfo> writer;
-            internal bool unreferenceable;
             internal bool canBeShared;
             internal bool canBeCloneCopied;
+
+            // The converter the Convertible branch uses, or the one a suppressed conditional Recordable falls through to; null for every kind that dispatches before converters are consulted, so a List<> with a registered converter still reports null here.
+            internal Converter converter;
         }
 
         private static System.Collections.Concurrent.ConcurrentDictionary<Type, ComposeStrategy> ComposeStrategyCache = new System.Collections.Concurrent.ConcurrentDictionary<Type, ComposeStrategy>();
 
+        internal static ComposeStrategy ComposeStrategyFor(Type valType)
+        {
+            // This is our value's type, but we may need a little bit of tinkering to make it useful.
+            // The current case I know of is System.RuntimeType, which appears if we call .GetType() on a Type.
+            // I assume there is a complicated internal reason for this; good news, we can ignore it and just pretend it's a System.Type.
+            // Bad news: it's actually really hard to detect this case because System.RuntimeType is private.
+            // That's why we have the annoying `static` up above.
+            if (valType == TypeSystemRuntimeType)
+            {
+                valType = typeof(Type);
+            }
+
+            if (!ComposeStrategyCache.TryGetValue(valType, out var strategy))
+            {
+                strategy = BuildComposeStrategy(valType);
+                if (strategy.kind == ComposeKind.Invalid)
+                {
+                    Dbg.Err($"Internal error: compose strategy for {valType} has no kind");
+                }
+
+                ComposeStrategyCache[valType] = strategy;
+            }
+
+            return strategy;
+        }
+
         private static ComposeStrategy BuildComposeStrategy(Type valType)
         {
             var strategy = new ComposeStrategy();
+            strategy.type = valType;
             strategy.canBeShared = Util.CanBeShared(valType);
             strategy.canBeCloneCopied = UtilType.CanBeCloneCopied(valType);
 
             // Check unreferenceable types first — these are written before reference tracking
             if (valType.IsPrimitive)
             {
+                strategy.kind = ComposeKind.Unreferenceable;
                 strategy.writer = (node, value, fi) => node.WritePrimitive(value);
-                strategy.unreferenceable = true;
                 return strategy;
             }
 
             if (typeof(System.Enum).IsAssignableFrom(valType))
             {
+                strategy.kind = ComposeKind.Unreferenceable;
                 strategy.writer = (node, value, fi) => node.WriteEnum(value);
-                strategy.unreferenceable = true;
                 return strategy;
             }
 
             if (valType == typeof(string))
             {
+                strategy.kind = ComposeKind.Unreferenceable;
                 strategy.writer = (node, value, fi) => node.WriteString(value as string);
-                strategy.unreferenceable = true;
                 return strategy;
             }
 
             if (valType == typeof(Type))
             {
+                strategy.kind = ComposeKind.Unreferenceable;
                 strategy.writer = (node, value, fi) => node.WriteType(value as Type);
-                strategy.unreferenceable = true;
                 return strategy;
             }
 
             // Referenceable types
             if (valType == typeof(byte[]))
             {
+                strategy.kind = ComposeKind.ByteArray;
                 strategy.writer = (node, value, fi) => node.WriteByteArray(value as byte[]);
                 return strategy;
             }
 
             if (valType.IsArray)
             {
+                strategy.kind = ComposeKind.Array;
                 strategy.writer = (node, value, fi) => node.WriteArray(value as Array);
                 return strategy;
             }
@@ -1893,8 +1945,8 @@ namespace Dec
             {
                 var genericDef = valType.GetGenericTypeDefinition();
 
-                if (genericDef == typeof(Queue<>)) { strategy.writer = (node, value, fi) => node.WriteQueue(value as IEnumerable); return strategy; }
-                if (genericDef == typeof(Stack<>)) { strategy.writer = (node, value, fi) => node.WriteStack(value as IEnumerable); return strategy; }
+                if (genericDef == typeof(Queue<>)) { strategy.kind = ComposeKind.Queue; strategy.writer = (node, value, fi) => node.WriteQueue(value as IEnumerable); return strategy; }
+                if (genericDef == typeof(Stack<>)) { strategy.kind = ComposeKind.Stack; strategy.writer = (node, value, fi) => node.WriteStack(value as IEnumerable); return strategy; }
 
                 if (genericDef == typeof(Tuple<>) ||
                     genericDef == typeof(Tuple<,>) ||
@@ -1905,6 +1957,7 @@ namespace Dec
                     genericDef == typeof(Tuple<,,,,,,>) ||
                     genericDef == typeof(Tuple<,,,,,,,>))
                 {
+                    strategy.kind = ComposeKind.Tuple;
                     strategy.writer = (node, value, fi) => node.WriteTuple(value, fi?.GetCustomAttribute<System.Runtime.CompilerServices.TupleElementNamesAttribute>());
                     return strategy;
                 }
@@ -1918,23 +1971,26 @@ namespace Dec
                     genericDef == typeof(ValueTuple<,,,,,,>) ||
                     genericDef == typeof(ValueTuple<,,,,,,,>))
                 {
+                    strategy.kind = ComposeKind.ValueTuple;
                     strategy.writer = (node, value, fi) => node.WriteValueTuple(value, fi?.GetCustomAttribute<System.Runtime.CompilerServices.TupleElementNamesAttribute>());
                     return strategy;
                 }
             }
 
             // Interface-based collection checks (after Array and exact Queue/Stack/Tuple checks)
-            if (typeof(IList).IsAssignableFrom(valType)) { strategy.writer = (node, value, fi) => node.WriteList(value as IList); return strategy; }
-            if (typeof(IDictionary).IsAssignableFrom(valType)) { strategy.writer = (node, value, fi) => node.WriteDictionary(value as IDictionary); return strategy; }
-            if (valType.ImplementsGenericInterface(typeof(ISet<>))) { strategy.writer = (node, value, fi) => node.WriteHashSet(value as IEnumerable); return strategy; }
+            if (typeof(IList).IsAssignableFrom(valType)) { strategy.kind = ComposeKind.List; strategy.writer = (node, value, fi) => node.WriteList(value as IList); return strategy; }
+            if (typeof(IDictionary).IsAssignableFrom(valType)) { strategy.kind = ComposeKind.Dictionary; strategy.writer = (node, value, fi) => node.WriteDictionary(value as IDictionary); return strategy; }
+            if (valType.ImplementsGenericInterface(typeof(ISet<>))) { strategy.kind = ComposeKind.Set; strategy.writer = (node, value, fi) => node.WriteHashSet(value as IEnumerable); return strategy; }
 
             // Build the converter-or-reflection fallthrough writer; used standalone for non-IRecordable types,
             // or captured by the IRecordable closure for IConditionalRecordable fallthrough.
             Action<WriterNode, object, FieldInfo> fallthrough;
             {
                 var converter = ConverterFor(valType);
+                strategy.converter = converter;
                 if (converter != null)
                 {
+                    strategy.kind = ComposeKind.Convertible;
                     fallthrough = (node, value, fi) =>
                     {
                         // Check if this type can be reconstructed with its converter
@@ -1950,6 +2006,7 @@ namespace Dec
                 {
                     // Reflection fallback (or error if node doesn't allow reflection)
                     // We absolutely should not be doing reflection when in recorder mode; that way lies madness.
+                    strategy.kind = ComposeKind.Reflection;
                     fallthrough = (node, value, fi) =>
                     {
                         if (!node.AllowReflection)
@@ -1972,11 +2029,12 @@ namespace Dec
                 }
             }
 
-            // IRecordable check
+            // IRecordable check; this deliberately overwrites the fallthrough kind set above, which stays reachable through strategy.converter for a suppressed conditional
             if (typeof(IRecordable).IsAssignableFrom(valType))
             {
                 bool isConditional = typeof(IConditionalRecordable).IsAssignableFrom(valType);
 
+                strategy.kind = ComposeKind.Recordable;
                 strategy.writer = (node, value, fi) =>
                 {
                     if (!isConditional || (value as IConditionalRecordable).ShouldRecord(node.UserSettings))
@@ -2081,27 +2139,11 @@ namespace Dec
                 }
             }
 
-            var valType = value.GetType();
-
-            // This is our value's type, but we may need a little bit of tinkering to make it useful.
-            // The current case I know of is System.RuntimeType, which appears if we call .GetType() on a Type.
-            // I assume there is a complicated internal reason for this; good news, we can ignore it and just pretend it's a System.Type.
-            // Bad news: it's actually really hard to detect this case because System.RuntimeType is private.
-            // That's why we have the annoying `static` up above.
-            if (valType == TypeSystemRuntimeType)
-            {
-                valType = typeof(Type);
-            }
-
-            // Look up the cached strategy for this type
-            if (!ComposeStrategyCache.TryGetValue(valType, out var strategy))
-            {
-                strategy = BuildComposeStrategy(valType);
-                ComposeStrategyCache[valType] = strategy;
-            }
+            var strategy = ComposeStrategyFor(value.GetType());
+            var valType = strategy.type;
 
             // Unreferenceable types (primitives, enums, strings, Types) are written before reference tracking
-            if (strategy.unreferenceable)
+            if (strategy.kind == ComposeKind.Unreferenceable)
             {
                 strategy.writer(node, value, fieldInfo);
 

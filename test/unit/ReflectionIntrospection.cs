@@ -501,6 +501,33 @@ namespace DecTest
             }
         }
 
+        // A user type that is a tuple by interface and a record body by contract; the writer dispatches on IRecordable first, so SetByPath must too.
+        public class TupleShapedRec : System.Runtime.CompilerServices.ITuple, Dec.IRecordable
+        {
+            public int inner = 3;
+
+            public int Length
+            {
+                get
+                {
+                    return 1;
+                }
+            }
+
+            public object this[int index]
+            {
+                get
+                {
+                    return inner;
+                }
+            }
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref inner, "inner");
+            }
+        }
+
         public class BespokeRec : Dec.IRecordable
         {
             public Dictionary<Type, StubRecordableInt> dict = new Dictionary<Type, StubRecordableInt>() { { typeof(StubRecordableInt), new StubRecordableInt() { data = 9 } } };
@@ -1678,6 +1705,12 @@ namespace DecTest
             // a label no field carries
             ExpectErrors(() => Dec.Reflection.SetByPath(dec, new Dec.PathMember(root.Path, "nope"), 1), str => str.Contains("could not resolve"));
 
+            // the field walk stops at leaves: a Dec's int and string fields have no interior to reflect into
+            ExpectErrors(() => Dec.Reflection.SetByPath(dec, new Dec.PathMember(Child(root, "value").Path, "deeper"), 1), str => str.Contains("no addressable interior"));
+            ExpectErrors(() => Dec.Reflection.SetByPath(dec, new Dec.PathMember(Child(root, "text").Path, "deeper"), 1), str => str.Contains("no addressable interior"));
+            Assert.AreEqual(3, dec.value);
+            Assert.AreEqual("hello", dec.text);
+
             // reflection stays refused under a recorder root: a plain class there has no interior
             var holder = new PlainHolderRec();
             ExpectErrors(() => Dec.Reflection.SetByPath(holder, new Dec.PathMember(new Dec.PathMember(new Dec.PathRoot("R"), "plain"), "p"), 1), str => str.Contains("no addressable interior"));
@@ -1880,6 +1913,43 @@ namespace DecTest
             queueHolder.queue.Enqueue(1);
             var queueRoot = Dec.Reflection.Enumerate(queueHolder);
             ExpectErrors(() => Dec.Reflection.SetByPath(queueHolder, Child(queueRoot, "queue").Children[0].Path, 5), str => str.Contains("read-only"));
+        }
+
+        [Test]
+        public void SetTupleShapedRecordable()
+        {
+            var obj = new TupleShapedRec();
+            var root = Dec.Reflection.Enumerate(obj);
+            var inner = Child(root, "inner");
+            Assert.IsTrue(inner.Writable);
+
+            Dec.Reflection.SetByPath(obj, inner.Path, 8);
+            Assert.AreEqual(8, obj.inner);
+        }
+
+        [Test]
+        public void SetContainerRefusals()
+        {
+            // Enumerate never hands out a settable path into these containers, so each is reached with a hand-built index over the container's own path; the refusal has to come from the container dispatch itself.
+            var shapes = new ReadOnlyShapesRec();
+            var shapesRoot = Dec.Reflection.Enumerate(shapes);
+            ExpectErrors(() => Dec.Reflection.SetByPath(shapes, new Dec.PathIndex(Child(shapesRoot, "grid").Path, 0), 9), str => str.Contains("multidimensional"));
+            ExpectErrors(() => Dec.Reflection.SetByPath(shapes, new Dec.PathIndex(Child(shapesRoot, "tuple").Path, 0), 9), str => str.Contains("tuple"));
+            ExpectErrors(() => Dec.Reflection.SetByPath(shapes, new Dec.PathIndex(Child(shapesRoot, "dict").Path, 0), 9), str => str.Contains("dictionary or set"));
+            ExpectErrors(() => Dec.Reflection.SetByPath(shapes, new Dec.PathIndex(Child(shapesRoot, "set").Path, 0), 9), str => str.Contains("dictionary or set"));
+            Assert.AreEqual(1, shapes.grid[0, 0]);
+            Assert.AreEqual(7, shapes.tuple.Item1);
+            Assert.AreEqual(1, shapes.dict["k1"]);
+            Assert.IsTrue(shapes.set.Contains(5));
+
+            var queueStack = new QueueStackRec();
+            queueStack.queue.Enqueue(1);
+            queueStack.stack.Push(2);
+            var queueStackRoot = Dec.Reflection.Enumerate(queueStack);
+            ExpectErrors(() => Dec.Reflection.SetByPath(queueStack, new Dec.PathIndex(Child(queueStackRoot, "queue").Path, 0), 9), str => str.Contains("Queue"));
+            ExpectErrors(() => Dec.Reflection.SetByPath(queueStack, new Dec.PathIndex(Child(queueStackRoot, "stack").Path, 0), 9), str => str.Contains("Stack"));
+            Assert.AreEqual(1, queueStack.queue.Peek());
+            Assert.AreEqual(2, queueStack.stack.Peek());
         }
 
         [Test]
@@ -2124,6 +2194,7 @@ namespace DecTest
                 new ConverterNestedHolderRec(),
                 new AsThisConverterRec(),
                 new CondConvHolder(),
+                new TupleShapedRec(),
             };
 
             foreach (var subject in subjects)

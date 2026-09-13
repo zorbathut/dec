@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Dec
 {
-    // The write-back seam for SetByPath: Record<T>(ref T, ...) is the only place the original refs are reachable, which is why this lives at the Recorder seam rather than the WriterNode seam.
+    // The write-back seam for SetByPath: Record<T>(ref T, ...) is the only place the original refs are reachable, so the replay is a Recorder. It is not a WriterNode either, even though that would inherit the writer's dispatch outright: WriterNode has no channel to hand back the replacement instance a ConverterRecord body can produce, and ComposeElement's preamble emits serialization diagnostics (constructibility, Shared warnings) that make no sense on a set. The type classification is shared instead, through Serialization.ComposeStrategyFor.
     internal class RecorderSetByPath : Recorder
     {
         internal class State
@@ -164,72 +164,83 @@ namespace Dec
                 return (false, current);
             }
 
+            // !state.compose is WriterNodeIntrospect.AllowDecPath by another name.
             if (!state.compose && Database.GetDecPathFromObj(current) != null)
             {
                 Dbg.Err($"SetByPath: path [{state.targetSerialized}] descends into an object at [{basePath.Serialize()}] that serializes as a dec-path reference and has no addressable interior");
                 return (false, current);
             }
 
-            if (current is byte[])
+            // The kind is the writer's own classification of this type, so the classification cannot drift; every ComposeKind still needs an arm here, and an unhandled one is a loud internal error rather than a silent misclassification.
+            var strategy = Serialization.ComposeStrategyFor(current.GetType());
+            var currentType = strategy.type;
+            switch (strategy.kind)
             {
-                Dbg.Err($"SetByPath: path [{state.targetSerialized}] descends into a byte[] at [{basePath.Serialize()}], which serializes as a single value and has no addressable interior");
-                return (false, current);
-            }
-
-            // Dispatch order mirrors BuildComposeStrategy: array, exact Queue/Stack/tuple checks, then IList before IDictionary/ISet, then IRecordable, then converters. A case added there needs one here.
-            if (current is Array arr)
-            {
-                if (arr.Rank != 1)
-                {
-                    Dbg.Err($"SetByPath: path [{state.targetSerialized}] addresses a position inside a multidimensional array at [{basePath.Serialize()}], which is not settable");
+                case Serialization.ComposeKind.Unreferenceable:
+                    Dbg.Err($"SetByPath: path [{state.targetSerialized}] descends into {currentType} at [{basePath.Serialize()}], which has no addressable interior");
                     return (false, current);
+
+                case Serialization.ComposeKind.ByteArray:
+                    Dbg.Err($"SetByPath: path [{state.targetSerialized}] descends into a byte[] at [{basePath.Serialize()}], which serializes as a single value and has no addressable interior");
+                    return (false, current);
+
+                case Serialization.ComposeKind.Array:
+                {
+                    var arr = (Array)current;
+                    if (arr.Rank != 1)
+                    {
+                        Dbg.Err($"SetByPath: path [{state.targetSerialized}] addresses a position inside a multidimensional array at [{basePath.Serialize()}], which is not settable");
+                        return (false, current);
+                    }
+
+                    return (ApplyIntoIndexed(arr.Length, i => arr.GetValue(i), (i, v) => arr.SetValue(v, i), currentType.GetElementType(), depthIdx, state), current);
                 }
 
-                return (ApplyIntoIndexed(arr.Length, i => arr.GetValue(i), (i, v) => arr.SetValue(v, i), arr.GetType().GetElementType(), depthIdx, state), current);
-            }
-
-            var currentType = current.GetType();
-            if (currentType.IsGenericType)
-            {
-                var genericTypeDefinition = currentType.GetGenericTypeDefinition();
-                if (genericTypeDefinition == typeof(Queue<>) || genericTypeDefinition == typeof(Stack<>))
-                {
-                    Dbg.Err($"SetByPath: path [{state.targetSerialized}] addresses a position inside a {genericTypeDefinition.Name} at [{basePath.Serialize()}], which is not settable");
+                case Serialization.ComposeKind.Queue:
+                case Serialization.ComposeKind.Stack:
+                    Dbg.Err($"SetByPath: path [{state.targetSerialized}] addresses a position inside a {currentType.GetGenericTypeDefinition().Name} at [{basePath.Serialize()}], which is not settable");
                     return (false, current);
-                }
-            }
 
-            if (current is System.Runtime.CompilerServices.ITuple)
-            {
-                Dbg.Err($"SetByPath: path [{state.targetSerialized}] addresses a position inside a tuple at [{basePath.Serialize()}], which is not settable");
-                return (false, current);
-            }
-
-            if (current is IList list)
-            {
-                var listArgs = currentType.GetGenericInterfaceArguments(typeof(IList<>));
-                if (listArgs == null)
-                {
-                    Dbg.Err($"SetByPath: path [{state.targetSerialized}] addresses a position inside unsupported list type {currentType} at [{basePath.Serialize()}]");
+                case Serialization.ComposeKind.Tuple:
+                case Serialization.ComposeKind.ValueTuple:
+                    Dbg.Err($"SetByPath: path [{state.targetSerialized}] addresses a position inside a tuple at [{basePath.Serialize()}], which is not settable");
                     return (false, current);
+
+                case Serialization.ComposeKind.List:
+                {
+                    var listArgs = currentType.GetGenericInterfaceArguments(typeof(IList<>));
+                    if (listArgs == null)
+                    {
+                        Dbg.Err($"SetByPath: path [{state.targetSerialized}] addresses a position inside unsupported list type {currentType} at [{basePath.Serialize()}]");
+                        return (false, current);
+                    }
+
+                    var list = (IList)current;
+                    return (ApplyIntoIndexed(list.Count, i => list[i], (i, v) => list[i] = v, listArgs[0], depthIdx, state), current);
                 }
 
-                return (ApplyIntoIndexed(list.Count, i => list[i], (i, v) => list[i] = v, listArgs[0], depthIdx, state), current);
-            }
+                case Serialization.ComposeKind.Dictionary:
+                case Serialization.ComposeKind.Set:
+                    Dbg.Err($"SetByPath: path [{state.targetSerialized}] addresses a position inside a dictionary or set at [{basePath.Serialize()}], which is not settable");
+                    return (false, current);
 
-            if (current is IDictionary || currentType.ImplementsGenericInterface(typeof(ISet<>)))
-            {
-                Dbg.Err($"SetByPath: path [{state.targetSerialized}] addresses a position inside a dictionary or set at [{basePath.Serialize()}], which is not settable");
-                return (false, current);
+                case Serialization.ComposeKind.Recordable:
+                case Serialization.ComposeKind.Convertible:
+                case Serialization.ComposeKind.Reflection:
+                    break;
+
+                default:
+                    Dbg.Err($"Internal error: SetByPath has no handling for compose kind {strategy.kind} of {currentType}");
+                    return (false, current);
             }
 
             bool suppressed = current is IConditionalRecordable conditional && !conditional.ShouldRecord(state.userSettings);
 
-            if (current is IRecordable recordable && !suppressed)
+            if (strategy.kind == Serialization.ComposeKind.Recordable && !suppressed)
             {
                 // `current` is already a box for struct recordables; the replay mutates it in place and the caller writes it back into the owning slot.
                 var recorder = new RecorderSetByPath(state, depthIdx);
-                recordable.Record(recorder);
+                ((IRecordable)current).Record(recorder);
 
                 if (!recorder.Matched)
                 {
@@ -241,7 +252,7 @@ namespace Dec
             }
 
             // As in the compose pipeline, a suppressed conditional falls through to its converter.
-            var converter = Serialization.ConverterFor(currentType);
+            var converter = strategy.converter;
 
             if (converter is ConverterRecord converterRecord)
             {
@@ -287,8 +298,8 @@ namespace Dec
                 return (false, current);
             }
 
-            // The compose pipeline's last resort is the type's fields, for everything but the unreferenceable leaf types.
-            if (state.compose && !currentType.IsPrimitive && !currentType.IsEnum && !(current is string) && !(current is Type))
+            // The compose pipeline's last resort is the type's fields.
+            if (state.compose)
             {
                 return ApplyIntoFields(current, depthIdx, state);
             }
