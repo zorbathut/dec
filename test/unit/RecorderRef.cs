@@ -973,6 +973,51 @@ namespace DecTest
             }
         }
 
+        public class ErrorAttributeRoot : Dec.IRecordable
+        {
+            public StubRecordable stub;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref stub, "stub");
+            }
+        }
+
+        [Test]
+        public void ErrorAttributeWithNull()
+        {
+            string serialized = @"
+                <Record>
+                  <recordFormatVersion>1</recordFormatVersion>
+                  <data>
+                    <stub null=""true"" error=""it went badly"" />
+                  </data>
+                </Record>";
+
+            ErrorAttributeRoot deserialized = null;
+            ExpectErrors(() => deserialized = Dec.Recorder.Read<ErrorAttributeRoot>(serialized), err => err.Contains("it went badly"));
+
+            Assert.IsNull(deserialized.stub);
+        }
+
+        [Test]
+        public void ErrorAttributeWithoutNull()
+        {
+            // The attribute reports; it doesn't decide what the element is.
+            string serialized = @"
+                <Record>
+                  <recordFormatVersion>1</recordFormatVersion>
+                  <data>
+                    <stub error=""it went badly"" />
+                  </data>
+                </Record>";
+
+            ErrorAttributeRoot deserialized = null;
+            ExpectErrors(() => deserialized = Dec.Recorder.Read<ErrorAttributeRoot>(serialized), err => err.Contains("it went badly"));
+
+            Assert.IsNotNull(deserialized.stub);
+        }
+
         public class UnsharedDictRoot : Dec.IRecordable
         {
             public Dictionary<IdentityHashedBase, string> dict;

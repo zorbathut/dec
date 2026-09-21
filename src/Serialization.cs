@@ -674,6 +674,13 @@ namespace Dec
                     Dbg.Err($"{s_node.GetContext()}: Mode-specified element may not have null or ref specified; guessing wildly at intentions");
                 }
 
+                // Whatever else the element says, the writer had trouble with it, and what's here may not be what was meant.
+                string errorAttribute = s_node.GetMetadata(ReaderNodeParseable.Metadata.Error);
+                if (errorAttribute != null)
+                {
+                    Dbg.Err($"{s_node.GetContext()}: This element was written with an error: {errorAttribute}");
+                }
+
                 var unrecognized = s_node.GetMetadataUnrecognized();
                 if (unrecognized != null)
                 {

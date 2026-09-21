@@ -65,6 +65,7 @@ namespace Dec
             Ref,
             Class,
             Mode,
+            Error,
         }
 
         public override object ParseElement(Type type, object model, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings)
@@ -104,6 +105,7 @@ namespace Dec
                 case ReaderNodeParseable.Metadata.Ref: return "ref";
                 case ReaderNodeParseable.Metadata.Class: return "class";
                 case ReaderNodeParseable.Metadata.Mode: return "mode";
+                case ReaderNodeParseable.Metadata.Error: return "error";
                 default: Dbg.Err($"Unknown attribute type {metadata}"); return "UNKNOWN";
             }
         }
