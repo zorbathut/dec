@@ -143,26 +143,24 @@ namespace Dec
 
             bool priorWasShared = xe_path.element != null;
             bool currentIsShared = recSettings.shared != Recorder.Settings.Shared.Deny;
-            if (!priorWasShared)
+            if (!priorWasShared || !currentIsShared)
             {
-                // This is an unreferencable object! We are in trouble.
+                // Either the object is unreferenceable or this position is. We are in trouble.
                 string error = WriterNode.ErrReferenceMismatch(priorWasShared, currentIsShared, path, xe_path.path, referenced);
 
-                if (referenced is Array array && array.Length == 0)
+                if (!priorWasShared && referenced is Array array && array.Length == 0)
                 {
                     // Array.Empty means nobody had to ask for this, and with no contents to revisit, writing it out again loses nothing but identity.
                     return false;
                 }
 
-                ElementMarkFailed(element, error);
-                return true;
-            }
-
-            // We have a referenceable target, but do *we* allow a reference?
-            if (!currentIsShared)
-            {
-                WriterNode.ErrReferenceMismatch(priorWasShared, currentIsShared, path, xe_path.path, referenced);
-                return true;
+                // A shared object can be pointed at from here anyway, and the reader will go along with it; the exception is a key that hashes on its contents, which the reader has to refuse.
+                bool refReadable = priorWasShared && ((!(path is PathDictionaryKey) && !(path is PathHashSetElement)) || Util.HashesByIdentity(referenced.GetType()));
+                if (!refReadable)
+                {
+                    ElementMarkFailed(element, error);
+                    return true;
+                }
             }
 
             var refId = refNames.TryGetValue(referenced);

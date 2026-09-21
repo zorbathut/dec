@@ -625,9 +625,17 @@ namespace DecTest
             root.dict = new Dictionary<ContentHashedKey, string>();
             root.dict[root.reference] = "Hello";
 
-            var deserialized = DoRecorderRoundTrip(root, mode, expectWriteErrors: mode != RecorderMode.Clone, errorValidator: err => (err.Contains("previously-seen unshared object") || err.Contains("previously-seen shared object")) && err.Contains("overrides GetHashCode"));
+            var deserialized = DoRecorderRoundTrip(root, mode, expectWriteErrors: mode != RecorderMode.Clone, expectReadErrors: mode != RecorderMode.Clone, errorValidator: err => (err.Contains("previously-seen shared object") && err.Contains("overrides GetHashCode")) || err.Contains("null key"));
 
-            Assert.AreEqual(1, deserialized.dict.Count);
+            Assert.AreEqual(1, deserialized.reference.id);
+            if (mode == RecorderMode.Clone)
+            {
+                Assert.AreSame(deserialized.reference, deserialized.dict.Keys.Single());
+            }
+            else
+            {
+                Assert.AreEqual(0, deserialized.dict.Count);
+            }
         }
 
         public class IdentityHashedBase : Dec.IRecordable
@@ -971,7 +979,7 @@ namespace DecTest
                 return;
             }
 
-            var deserialized = DoRecorderRoundTrip(root, mode, expectWriteErrors: true, expectReadErrors: !firstShared, errorValidator: err => err.Contains(expectedError));
+            var deserialized = DoRecorderRoundTrip(root, mode, expectWriteErrors: true, expectReadErrors: true, errorValidator: err => err.Contains(expectedError) || err.Contains("non-.Shared() context"));
 
             object StubOf(object holder)
             {
@@ -979,7 +987,12 @@ namespace DecTest
             }
 
             Assert.IsNotNull(StubOf(deserialized[0]));
-            if (!firstShared)
+            if (firstShared)
+            {
+                // The object made it into the refs block, so the unshared position can still point at it.
+                Assert.AreSame(StubOf(deserialized[0]), StubOf(deserialized[1]));
+            }
+            else
             {
                 // There's nothing to point at, and the alternative to null is an object the user never had.
                 Assert.IsNull(StubOf(deserialized[1]));

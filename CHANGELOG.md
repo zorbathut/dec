@@ -28,6 +28,8 @@ All notable changes to this project will be documented in this file.
 * Redundant-work performance issue when reading XML.
 * Some write errors now embed the error into the output itself, so it can be reported accurately on read.
 * A Recorder reference that can't be written now reads back as null instead of as a default-constructed object.
+* A Recorder reference that can't be written now reads back as null instead of as a default-constructed object.
+* A non-`.Shared()` reference to an object that was already written as shared is still an error, but is now written as a working reference instead of being lost.
 
 ### Fixed
 * Recorder.Read crash on a `<Ref>` element with invalid `class`.
