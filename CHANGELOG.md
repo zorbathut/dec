@@ -26,6 +26,8 @@ All notable changes to this project will be documented in this file.
 * Duplicate reference IDs in a Record are now reported instead of silently overwriting each other.
 * A reference ID that is also a dec path is now reported.
 * Redundant-work performance issue when reading XML.
+* Some write errors now embed the error into the output itself, so it can be reported accurately on read.
+* A Recorder reference that can't be written now reads back as null instead of as a default-constructed object.
 
 ### Fixed
 * Recorder.Read crash on a `<Ref>` element with invalid `class`.

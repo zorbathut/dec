@@ -437,16 +437,14 @@ namespace DecTest
             element.one.nonrecorded = 11;
             element.one.recorded = 12;
 
-            var deserialized = DoRecorderRoundTrip(element, mode, expectWriteErrors: mode != RecorderMode.Clone && mode != RecorderMode.Checksum, errorValidator: err => err.Contains("previously-seen unshared object") || err.Contains("shared objects do not work in simple mode"));
+            var deserialized = DoRecorderRoundTrip(element, mode, expectWriteErrors: mode != RecorderMode.Clone && mode != RecorderMode.Checksum, expectReadErrors: mode != RecorderMode.Clone && mode != RecorderMode.Checksum, errorValidator: err => err.Contains("previously-seen unshared object") || err.Contains("shared objects do not work in simple mode"));
 
             if (mode != RecorderMode.Clone)
             {
                 Assert.IsNotNull(deserialized.one);
                 Assert.AreEqual(100, deserialized.one.nonrecorded);
                 Assert.AreEqual(12, deserialized.one.recorded);
-                Assert.IsNotNull(deserialized.two);
-                Assert.AreEqual(100, deserialized.two.nonrecorded);
-                Assert.AreEqual(200, deserialized.two.recorded);
+                Assert.IsNull(deserialized.two);
             }
             else
             {

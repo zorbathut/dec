@@ -76,14 +76,13 @@ namespace DecTest
 
             var deserialized = DoRecorderRoundTrip(rec, mode, expectWriteErrors: true, expectReadErrors: true, errorValidator: err => err.Contains("Recorder.WithFactory() called on a Shared") || err.Contains("previously-seen unshared object") || err.Contains("shared objects do not work in simple mode"));
 
-            // In this case, we factory, then kinda fuck up the sharing weirdly
+            // In this case, we factory, and the link has nothing it can share
             Assert.AreEqual(8, deserialized.cargo.recorded);
             Assert.AreEqual(5, deserialized.cargo.unrecorded);
 
             if (mode != RecorderMode.Clone && mode != RecorderMode.Checksum)
             {
-                Assert.AreEqual(0, deserialized.cargoLink.recorded);
-                Assert.AreEqual(0, deserialized.cargoLink.unrecorded);
+                Assert.IsNull(deserialized.cargoLink);
             }
             else
             {

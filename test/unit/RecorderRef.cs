@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using NUnit.Framework;
 
 namespace DecTest
@@ -963,14 +965,92 @@ namespace DecTest
                 expectedError = "Attempted to create a new unshared reference at [RECORD[1].stub] to a previously-seen shared object at [RECORD[0].stub].";
             }
 
-            if (expectedError != null)
-            {
-                DoRecorderRoundTrip(root, mode, expectWriteErrors: true, errorValidator: err => err.Contains(expectedError));
-            }
-            else
+            if (expectedError == null)
             {
                 DoRecorderRoundTrip(root, mode);
+                return;
             }
+
+            var deserialized = DoRecorderRoundTrip(root, mode, expectWriteErrors: true, expectReadErrors: !firstShared, errorValidator: err => err.Contains(expectedError));
+
+            object StubOf(object holder)
+            {
+                return holder is StubHolderShared shared ? shared.stub : ((StubHolderUnshared)holder).stub;
+            }
+
+            Assert.IsNotNull(StubOf(deserialized[0]));
+            if (!firstShared)
+            {
+                // There's nothing to point at, and the alternative to null is an object the user never had.
+                Assert.IsNull(StubOf(deserialized[1]));
+            }
+        }
+
+        public class BackrefEntity : Dec.IRecordable
+        {
+            public string name;
+            public BackrefHealth health;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref name, "name");
+                recorder.Record(ref health, "health");
+            }
+        }
+
+        public class BackrefHealth : Dec.IRecordable
+        {
+            public BackrefEntity owner;
+            public float hp = 100;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Shared().Record(ref owner, "owner");
+                recorder.Record(ref hp, "hp");
+            }
+        }
+
+        public class BackrefBill : Dec.IRecordable
+        {
+            public List<BackrefEntity> storedItems = new List<BackrefEntity>();
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref storedItems, "storedItems");
+            }
+        }
+
+        public class BackrefRoot : Dec.IRecordable
+        {
+            public BackrefBill bill;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Shared().Record(ref bill, "bill");
+            }
+        }
+
+        [Test]
+        public void BackrefToUnsharedOwner([ValuesExcept(RecorderMode.Simple, RecorderMode.Clone, RecorderMode.Checksum)] RecorderMode mode)
+        {
+            // A shared back-reference into an object that an unshared container already wrote inline. It can't be honored, and it must not come back as a blank object either.
+            var item = new BackrefEntity { name = "Wood" };
+            item.health = new BackrefHealth { owner = item };
+
+            var root = new BackrefRoot { bill = new BackrefBill() };
+            root.bill.storedItems.Add(item);
+
+            string serialized = null;
+            var deserialized = DoRecorderRoundTrip(root, mode, testSerializedResult: str => serialized = str, expectWriteErrors: true, expectReadErrors: true, errorValidator: err => err.Contains("previously-seen unshared object"));
+
+            var owner = XDocument.Parse(serialized).Descendants("owner").Single();
+            Assert.AreEqual("true", owner.Attribute("null")?.Value);
+            Assert.IsNotNull(owner.Attribute("error"));
+            Assert.IsTrue(owner.Attribute("error").Value.Contains("storedItems[0]"));
+
+            Assert.AreEqual("Wood", deserialized.bill.storedItems[0].name);
+            Assert.AreEqual(100, deserialized.bill.storedItems[0].health.hp);
+            Assert.IsNull(deserialized.bill.storedItems[0].health.owner);
         }
 
         public class ErrorAttributeRoot : Dec.IRecordable
@@ -1016,6 +1096,32 @@ namespace DecTest
             ExpectErrors(() => deserialized = Dec.Recorder.Read<ErrorAttributeRoot>(serialized), err => err.Contains("it went badly"));
 
             Assert.IsNotNull(deserialized.stub);
+        }
+
+        public class EmptyArrayRoot : Dec.IRecordable
+        {
+            public int[] one;
+            public int[] two;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref one, "one");
+                recorder.Record(ref two, "two");
+            }
+        }
+
+        [Test]
+        public void EmptyArrayRepeated([ValuesExcept(RecorderMode.Clone, RecorderMode.Checksum)] RecorderMode mode)
+        {
+            // Array.Empty hands every caller the same instance, so this shape turns up without anyone having meant to share anything.
+            var root = new EmptyArrayRoot { one = Array.Empty<int>(), two = Array.Empty<int>() };
+
+            var deserialized = DoRecorderRoundTrip(root, mode, expectWriteErrors: true, errorValidator: err => err.Contains("previously-seen unshared object") || err.Contains("shared objects do not work in simple mode"));
+
+            Assert.IsNotNull(deserialized.one);
+            Assert.AreEqual(0, deserialized.one.Length);
+            Assert.IsNotNull(deserialized.two);
+            Assert.AreEqual(0, deserialized.two.Length);
         }
 
         public class UnsharedDictRoot : Dec.IRecordable

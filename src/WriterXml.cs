@@ -19,6 +19,13 @@ namespace Dec
 
         public abstract bool RegisterReference(object referenced, XElement element, Recorder.Settings recSettings, Path path);
 
+        // An empty element reads back as a default-constructed object, which is worse than nothing; this reads back as null, and says why.
+        protected static void ElementMarkFailed(XElement element, string reason)
+        {
+            element.SetAttributeValue("null", "true");
+            element.SetAttributeValue("error", reason);
+        }
+
         public void RegisterPendingWrite(Action action)
         {
             pendingWriteCoordinator.RegisterPendingWrite(action);

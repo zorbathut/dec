@@ -27,7 +27,17 @@ namespace Dec
         {
             if (!seenObjects.TryAdd(referenced, path))
             {
-                Dbg.Err($"{recSettings}: Object {referenced} at [{path.Serialize()}] has already been written from [{seenObjects[referenced].Serialize()}], and shared objects do not work in simple mode. Skipping to avoid infinite loops.");
+                string error = $"{recSettings}: Object {referenced} at [{path.Serialize()}] has already been written from [{seenObjects[referenced].Serialize()}], and shared objects do not work in simple mode.";
+                Dbg.Err(error);
+
+                if (referenced is Array array && array.Length == 0)
+                {
+                    // Array.Empty means nobody had to ask for this, and with no contents to revisit, writing it out again loses nothing but identity.
+                    return false;
+                }
+
+                // Anything else might lead back here, so it has to stop.
+                ElementMarkFailed(element, error);
                 return true;
             }
 

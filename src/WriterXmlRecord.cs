@@ -141,17 +141,27 @@ namespace Dec
                 }
             }
 
-            if (xe_path.element == null)
+            bool priorWasShared = xe_path.element != null;
+            bool currentIsShared = recSettings.shared != Recorder.Settings.Shared.Deny;
+            if (!priorWasShared)
             {
                 // This is an unreferencable object! We are in trouble.
-                WriterNode.ErrReferenceMismatch(priorWasShared: false, currentIsShared: recSettings.shared != Recorder.Settings.Shared.Deny, path, xe_path.path, referenced);
+                string error = WriterNode.ErrReferenceMismatch(priorWasShared, currentIsShared, path, xe_path.path, referenced);
+
+                if (referenced is Array array && array.Length == 0)
+                {
+                    // Array.Empty means nobody had to ask for this, and with no contents to revisit, writing it out again loses nothing but identity.
+                    return false;
+                }
+
+                ElementMarkFailed(element, error);
                 return true;
             }
 
             // We have a referenceable target, but do *we* allow a reference?
-            if (recSettings.shared == Recorder.Settings.Shared.Deny)
+            if (!currentIsShared)
             {
-                WriterNode.ErrReferenceMismatch(priorWasShared: true, currentIsShared: false, path, xe_path.path, referenced);
+                WriterNode.ErrReferenceMismatch(priorWasShared, currentIsShared, path, xe_path.path, referenced);
                 return true;
             }
 

@@ -97,7 +97,7 @@ namespace Dec
         }
 
         // An object met again at a position that can't share it with its first encounter; worded once for every backend that tracks references.
-        internal static void ErrReferenceMismatch(bool priorWasShared, bool currentIsShared, Path path, Path priorPath, object referenced)
+        internal static string ErrReferenceMismatch(bool priorWasShared, bool currentIsShared, Path path, Path priorPath, object referenced)
         {
             // The key position can be either side of this, depending on whether the container or the shared field was recorded first; whichever it is, it's the unshared side.
             Path unsharedPath = priorWasShared ? path : priorPath;
@@ -132,7 +132,9 @@ namespace Dec
                 attempted = "a second unshared reference";
             }
 
-            Dbg.Err($"Attempted to create {attempted} at [{path.Serialize()}] to a previously-seen {(priorWasShared ? "shared" : "unshared")} object at [{priorPath.Serialize()}]. This may result in an invalid serialization. {advice}");
+            string message = $"Attempted to create {attempted} at [{path.Serialize()}] to a previously-seen {(priorWasShared ? "shared" : "unshared")} object at [{priorPath.Serialize()}]. This cannot be serialized faithfully. {advice}";
+            Dbg.Err(message);
+            return message;
         }
     }
 }
