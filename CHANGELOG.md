@@ -25,6 +25,7 @@ All notable changes to this project will be documented in this file.
 * `Dec.Path` is now somewhat more specific.
 * Duplicate reference IDs in a Record are now reported instead of silently overwriting each other.
 * A reference ID that is also a dec path is now reported.
+* Redundant-work performance issue when reading XML.
 
 ### Fixed
 * Recorder.Read crash on a `<Ref>` element with invalid `class`.

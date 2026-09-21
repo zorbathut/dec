@@ -49,7 +49,7 @@ namespace Dec
             return xml.Attribute(metadata.ToLowerString())?.Value;
         }
 
-        private readonly HashSet<string> metadataNames = UtilMisc.GetEnumValues<Metadata>().Select(metadata => metadata.ToLowerString()).ToHashSet();
+        private static readonly HashSet<string> MetadataNames = UtilMisc.GetEnumValues<Metadata>().Select(metadata => metadata.ToLowerString()).ToHashSet();
         public override string GetMetadataUnrecognized()
         {
             if (!xml.HasAttributes)
@@ -57,7 +57,7 @@ namespace Dec
                 return null;
             }
 
-            var unrecognized = string.Join(", ", xml.Attributes().Select(attr => attr.Name.LocalName).Where(name => !metadataNames.Contains(name)));
+            var unrecognized = string.Join(", ", xml.Attributes().Select(attr => attr.Name.LocalName).Where(name => !MetadataNames.Contains(name)));
             return unrecognized == string.Empty ? null : unrecognized;
         }
 
