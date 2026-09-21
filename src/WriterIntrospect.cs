@@ -259,7 +259,7 @@ namespace Dec
             // Either mismatch means the entry tree cannot match the file, and both fire on a real save of the same object.
             if (!prior.sharedPosition || !sharedPosition)
             {
-                ErrReferenceMismatch(prior.sharedPosition, path, prior.path, value);
+                ErrReferenceMismatch(priorWasShared: prior.sharedPosition, currentIsShared: sharedPosition, path, prior.path, value);
                 return true;
             }
 

@@ -144,14 +144,14 @@ namespace Dec
             if (xe_path.element == null)
             {
                 // This is an unreferencable object! We are in trouble.
-                WriterNode.ErrReferenceMismatch(priorWasShared: false, path, xe_path.path, referenced);
+                WriterNode.ErrReferenceMismatch(priorWasShared: false, currentIsShared: recSettings.shared != Recorder.Settings.Shared.Deny, path, xe_path.path, referenced);
                 return true;
             }
 
             // We have a referenceable target, but do *we* allow a reference?
             if (recSettings.shared == Recorder.Settings.Shared.Deny)
             {
-                WriterNode.ErrReferenceMismatch(priorWasShared: true, path, xe_path.path, referenced);
+                WriterNode.ErrReferenceMismatch(priorWasShared: true, currentIsShared: false, path, xe_path.path, referenced);
                 return true;
             }
 

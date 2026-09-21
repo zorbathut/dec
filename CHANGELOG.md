@@ -30,6 +30,7 @@ All notable changes to this project will be documented in this file.
 * Recorder.Read crash on a `<Ref>` element with invalid `class`.
 * Deep shared objects at exactly the wrong depth could end up corrupted.
 * Typo in the shared-reference mismatch error message.
+* The error for two non-`.Shared()` references to one object no longer claims that the second was shared.
 
 
 ## [v0.11.1]

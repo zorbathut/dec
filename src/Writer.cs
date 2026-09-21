@@ -96,8 +96,8 @@ namespace Dec
             return true;
         }
 
-        // An object met again at a position whose sharedness disagrees with its first encounter; worded once for every backend that tracks references.
-        internal static void ErrReferenceMismatch(bool priorWasShared, Path path, Path priorPath, object referenced)
+        // An object met again at a position that can't share it with its first encounter; worded once for every backend that tracks references.
+        internal static void ErrReferenceMismatch(bool priorWasShared, bool currentIsShared, Path path, Path priorPath, object referenced)
         {
             // The key position can be either side of this, depending on whether the container or the shared field was recorded first; whichever it is, it's the unshared side.
             Path unsharedPath = priorWasShared ? path : priorPath;
@@ -118,14 +118,21 @@ namespace Dec
                 advice += " (Note: C# empty arrays often refer to a single shared instance, and it's unclear what Dec should do about this. Come talk to us in Discord if you think you have a good solution. Lists do not have this behavior.)";
             }
 
+            string attempted;
             if (priorWasShared)
             {
-                Dbg.Err($"Attempted to create a new unshared reference at [{path.Serialize()}] to a previously-seen shared object at [{priorPath.Serialize()}]. This may result in an invalid serialization. {advice}");
+                attempted = "a new unshared reference";
+            }
+            else if (currentIsShared)
+            {
+                attempted = "a new shared reference";
             }
             else
             {
-                Dbg.Err($"Attempted to create a new shared reference at [{path.Serialize()}] to a previously-seen unshared object at [{priorPath.Serialize()}]. This may result in an invalid serialization. {advice}");
+                attempted = "a second unshared reference";
             }
+
+            Dbg.Err($"Attempted to create {attempted} at [{path.Serialize()}] to a previously-seen {(priorWasShared ? "shared" : "unshared")} object at [{priorPath.Serialize()}]. This may result in an invalid serialization. {advice}");
         }
     }
 }

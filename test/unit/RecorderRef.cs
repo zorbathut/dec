@@ -950,9 +950,13 @@ namespace DecTest
             {
                 // no errors expected
             }
-            else if (!firstShared)
+            else if (!firstShared && secondShared)
             {
                 expectedError = "Attempted to create a new shared reference at [RECORD[1].stub] to a previously-seen unshared object at [RECORD[0].stub].";
+            }
+            else if (!firstShared && !secondShared)
+            {
+                expectedError = "Attempted to create a second unshared reference at [RECORD[1].stub] to a previously-seen unshared object at [RECORD[0].stub].";
             }
             else if (!secondShared)
             {
