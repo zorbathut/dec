@@ -2003,7 +2003,7 @@ namespace Dec
                         // Check if this type can be reconstructed with its converter
                         if (!valType.CanBeConstructed())
                         {
-                            Dbg.Wrn($"{node.Path}: Serializing type {valType} with converter {converter.GetType().Name} but the type cannot be constructed (missing no-argument constructor for ConverterRecord, or no ConverterString/ConverterFactory). This object will fail to deserialize.");
+                            Dbg.Wrn($"[{node.Path.Serialize()}]: Serializing type {valType} with converter {converter.GetType().Name} but the type cannot be constructed (missing no-argument constructor for ConverterRecord, or no ConverterString/ConverterFactory). This object will fail to deserialize.");
                         }
 
                         node.WriteConvertible(converter, value);
@@ -2049,7 +2049,7 @@ namespace Dec
                         // Check if this type can be reconstructed
                         if (!valType.CanBeConstructed())
                         {
-                            Dbg.Wrn($"{node.Path}: Serializing type {valType} which implements IRecordable but cannot be constructed (missing no-argument constructor). This object will fail to deserialize!");
+                            Dbg.Wrn($"[{node.Path.Serialize()}]: Serializing type {valType} which implements IRecordable but cannot be constructed (missing no-argument constructor). This object will fail to deserialize!");
                         }
 
                         node.WriteRecord(value as IRecordable);

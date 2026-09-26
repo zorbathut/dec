@@ -35,6 +35,7 @@ All notable changes to this project will be documented in this file.
 * Deep shared objects at exactly the wrong depth could end up corrupted.
 * Typo in the shared-reference mismatch error message.
 * The error for two non-`.Shared()` references to one object no longer claims that the second was shared.
+* Warnings for serializing a type that can't be constructed were incorrectly formatted.
 
 
 ## [v0.11.1]

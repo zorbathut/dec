@@ -1105,6 +1105,34 @@ namespace DecTest
             Assert.IsNotNull(output);
         }
 
+        class NonConstructableHolder : Dec.IRecordable
+        {
+            public NonConstructableRecorderClass recordable = new NonConstructableRecorderClass(1);
+            public NonConstructableConverterRecordClass converted = new NonConstructableConverterRecordClass(2);
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref recordable, "recordableProbe");
+                recorder.Record(ref converted, "convertedProbe");
+            }
+        }
+
+        [Test]
+        public void NonConstructableWarningNamesPosition()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(NonConstructableConverterRecordConverter) } });
+
+            var warnings = new List<string>();
+            ExpectWarnings(() => Dec.Recorder.Write(new NonConstructableHolder()), wrn =>
+            {
+                warnings.Add(wrn);
+                return wrn.Contains("cannot be constructed");
+            });
+
+            Assert.That(warnings, Has.Some.Contains("recordableProbe"));
+            Assert.That(warnings, Has.Some.Contains("convertedProbe"));
+        }
+
         public class Generic<T> : Dec.IRecordable
         {
             public T value;
