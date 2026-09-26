@@ -36,6 +36,7 @@ All notable changes to this project will be documented in this file.
 * Typo in the shared-reference mismatch error message.
 * The error for two non-`.Shared()` references to one object no longer claims that the second was shared.
 * Warnings for serializing a type that can't be constructed were incorrectly formatted.
+* A gnarly error caused when checksumming a multidimensional array holding both RecordAsThis() elements and nulls.
 
 
 ## [v0.11.1]

@@ -671,5 +671,56 @@ namespace DecTest
 
             ChecksumDiffTests(value1, value2);
         }
+
+        private class AsThisRecordable : Dec.IRecordable
+        {
+            public int data;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.RecordAsThis(ref data);
+            }
+        }
+
+        [Test]
+        public void MultidimArrayAsThisThenNull()
+        {
+            var value = new AsThisRecordable[,] { { new AsThisRecordable() { data = 1 }, null } };
+
+            Dec.Recorder.Checksum(value);
+        }
+
+        private class SharedMultidimHolder : Dec.IRecordable
+        {
+            public int[,] grid;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Shared().Record(ref grid, nameof(grid));
+            }
+        }
+
+        [Test]
+        public void MultidimArraySharedValueTypes()
+        {
+            Dec.Recorder.Checksum(new SharedMultidimHolder { grid = new int[,] { { 1, 2 }, { 3, 4 } } });
+        }
+
+        [Test]
+        public void MultidimArrayDiffLocation()
+        {
+            var baseline = new int[,] { { 1, 2 }, { 3, 4 } };
+            var diffLate = new int[,] { { 1, 9 }, { 3, 4 } };
+            var diffEarly = new int[,] { { 1, 2 }, { 9, 4 } };
+
+            var reportsLate = new List<string>();
+            var reportsEarly = new List<string>();
+            Dec.Recorder.ChecksumDiff(baseline, diffLate, reportsLate.Add);
+            Dec.Recorder.ChecksumDiff(baseline, diffEarly, reportsEarly.Add);
+
+            Assert.That(reportsLate, Has.Count.EqualTo(1));
+            Assert.That(reportsEarly, Has.Count.EqualTo(1));
+            Assert.AreNotEqual(reportsLate[0], reportsEarly[0], "Differences at different multidim elements should report different locations");
+        }
     }
 }

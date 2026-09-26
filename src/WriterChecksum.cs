@@ -139,7 +139,7 @@ namespace Dec
             throw new NotImplementedException("Reflection child creation is not implemented in WriterNodeChecksum.");
         }
 
-        private WriterNode CreateNamedChild(string label, bool unordered, Recorder.Settings settings, Path path)
+        private WriterNodeChecksum CreateNamedChild(string label, bool unordered, Recorder.Settings settings, Path path)
         {
             writer.AddChecksum((int)NodeTag.Child, Path);
             return new WriterNodeChecksum(writer, this.unordered || unordered, settings, new PathMember(path, label));
@@ -268,11 +268,11 @@ namespace Dec
             return false;
         }
 
-        private void WriteArrayRank(Array value, Type referencedType, int rank, int[] indices)
+        private void WriteArrayRank(WriterNodeChecksum node, Array value, Type referencedType, int rank, int[] indices)
         {
             if (rank == value.Rank)
             {
-                Serialization.ComposeElement(this, value.GetValue(indices), referencedType);
+                Serialization.ComposeElement(node, value.GetValue(indices), referencedType);
             }
             else
             {
@@ -280,8 +280,8 @@ namespace Dec
                 {
                     indices[rank] = i;
 
-                    var child = CreateNamedChild("li", false, RecorderSettings.CreateChild(), new PathIndexMultidim(Path, indices.ToArray()));
-                    WriteArrayRank(value, referencedType, rank + 1, indices);
+                    var child = node.CreateNamedChild("li", false, RecorderSettings.CreateChild(), new PathIndexMultidim(Path, indices.ToArray()));
+                    WriteArrayRank(child, value, referencedType, rank + 1, indices);
                 }
             }
         }
@@ -313,7 +313,7 @@ namespace Dec
 
                 // slow path
                 int[] indices = new int[value.Rank];
-                WriteArrayRank(value, referencedType, 0, indices);
+                WriteArrayRank(this, value, referencedType, 0, indices);
             }
         }
 
