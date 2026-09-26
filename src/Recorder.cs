@@ -20,6 +20,8 @@ namespace Dec
         /// This function is called both for serialization and deserialization. In most cases, you can simply call Recorder.Record functions to do the right thing.
         ///
         /// For more complicated requirements, check out Recorder's interface.
+        ///
+        /// The recorder is valid only on the calling thread and only until this call returns. Don't keep it, and don't record through it while a nested object's Record() is running.
         /// </remarks>
         /// <example>
         /// <code>
@@ -69,6 +71,8 @@ namespace Dec
     /// Recorder is used to call the main functions for serialization/deserialization. This includes both the static initiation functions (Read, Write) and the per-element status functions.
     ///
     /// To start serializing or deserializing an object, see Recorder.Read and Recorder.Write.
+    ///
+    /// A Recorder handed to a Record() function is valid only on the calling thread and only until that call returns.
     /// </remarks>
     public abstract partial class Recorder : IRecorder
     {
@@ -442,6 +446,9 @@ namespace Dec
 
     internal class RecorderWriter : Recorder
     {
+        // The recorder whose Record() body is running on this thread. Only it may record; anything else is a recorder kept past its call, or an enclosing object's recorder reached from inside a nested Record().
+        [ThreadStatic] private static RecorderWriter Innermost;
+
         private bool asThis = false;
         private readonly HashSet<string> fields = new HashSet<string>();
         private readonly WriterNode node;
@@ -451,12 +458,38 @@ namespace Dec
             this.node = node;
         }
 
+        // Open and Close bracket a user Record() body; Open returns the recorder that was innermost before, for the matching Close to restore.
+        internal RecorderWriter Open()
+        {
+            var outer = Innermost;
+            Innermost = this;
+            return outer;
+        }
+
+        internal void Close(RecorderWriter outer)
+        {
+            // Restore before reporting; a throwing error handler would otherwise leave this thread pointing at a finished recorder.
+            bool wasInnermost = Innermost == this;
+            Innermost = outer;
+
+            if (!wasInnermost)
+            {
+                Dbg.Err("Internal error: RecorderWriter closed while it wasn't the innermost open recorder");
+            }
+        }
+
         public override IUserSettings UserSettings { get => node.UserSettings; }
 
         public override Context Context { get => new Context(path: node.Path); }
 
         internal override void Record<T>(ref T value, string label, Parameters parameters)
         {
+            if (Innermost != this)
+            {
+                Dbg.Err($"Attempted to record `{label}` through a Recorder outside the Record() call it was passed to; skipping it. A Recorder is valid only on the calling thread, until its Record() call returns, and not while a nested object's Record() is running.");
+                return;
+            }
+
             if (asThis)
             {
                 Dbg.Err($"Attempting to write a second field after a RecordAsThis call");

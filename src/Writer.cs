@@ -63,20 +63,47 @@ namespace Dec
 
         public abstract void TagClass(Type type);
 
-        // Every user Record() body on the write side runs through one of these.
+        // Every user Record() body on the write side runs through one of these, so its recorder is in scope for exactly as long as the body is running.
         internal void RecorderRun(IRecordable value)
         {
-            value.Record(new RecorderWriter(this));
+            var recorder = new RecorderWriter(this);
+            var outer = recorder.Open();
+            try
+            {
+                value.Record(recorder);
+            }
+            finally
+            {
+                recorder.Close(outer);
+            }
         }
 
         internal void RecorderRun(ConverterRecord converter, object value)
         {
-            converter.RecordObj(value, new RecorderWriter(this));
+            var recorder = new RecorderWriter(this);
+            var outer = recorder.Open();
+            try
+            {
+                converter.RecordObj(value, recorder);
+            }
+            finally
+            {
+                recorder.Close(outer);
+            }
         }
 
         internal void RecorderRun(ConverterFactory converter, object value)
         {
-            converter.WriteObj(value, new RecorderWriter(this));
+            var recorder = new RecorderWriter(this);
+            var outer = recorder.Open();
+            try
+            {
+                converter.WriteObj(value, recorder);
+            }
+            finally
+            {
+                recorder.Close(outer);
+            }
         }
 
         // general behavior that polymorphics should not reimplement (so far at least?)

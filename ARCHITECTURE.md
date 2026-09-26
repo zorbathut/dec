@@ -14,10 +14,10 @@ As an example, if attempting to write a List<HashSet<SomeClass>>, you'll get a c
 * WriterNode.WriteHashSet() - Does necessary handling (figures out the expected types and creates a child node, perhaps), then for each element, calls:
 * Serialization.ComposeElement() - Determines that this is a SomeClass or something derived from it. Calls WriterNode.TagClass() if the underlying node needs to be stored, then for each member, calls WriterNode.CreateMember() to create the child, and then Serialization.ComposeElement() to actually write the data.
 
-This all gets extra-complicated if an IRecordable or Converter is involved. In this case, there's an extra step where a RecorderWriter is created.
+This all gets extra-complicated if an IRecordable or Converter is involved. In this case, there's an extra step through a RecorderWriter.
 
 * Serialization.ComposeElement() - Determines that this is a Convertible of some kind, then calls:
-* WriterNode.WriteConvertible() - Creates a new RecorderWriter context object, then calls:
+* WriterNode.WriteConvertible() - Hands a RecorderWriter context object, open only for the duration of the call (WriterNode.RecorderRun()), to:
 * Converter.Record() - By default, calls FromXml() or FromString() as appropriate, but it's more interesting if this has been overloaded by the user, in which case it will, for each field the user cares about, call:
 * RecorderWriter.Record() - Does a small amount of bookkeping and validation, then calls:
 * Serialization.ComposeElement() - Handles whatever the user is trying to serialize (potentially going right back to WriterNode.WriteConvertible()).
@@ -35,5 +35,6 @@ Dec has a narrow but deliberate threading model. In short:
 * **Database reads are concurrent-safe post-parse.** `Database.Get`, `Database<T>.Get`, `Database.List`, `Database<T>.List`, `Index<T>.Get`, `Index<T>.List`, and similar read APIs can be called from any thread. The underlying `Dictionary` / `List` state isn't mutated after parse completes; lazily-built caches like `Database.CachedList` and `Index<T>.IndexArray` may be wastefully rebuilt under contention.
 * **Explicit mutation APIs are single-threaded.** `Database.Clear`, `Database.DecLookupEnable`, `Database.DecLookupRegisterCustom`, `Database.DecRegisterForbid`, `Database.Create`, `Database.Delete`, `Database.Rename`, and assignments to `Config.CompatTypeLookup` / `Config.CompatDecLookup` / `Config.UsingNamespaces` / `Config.ConverterFactory` must not run concurrently with any Recorder / Composer / Database-read operation from another thread. These are intended to be used during setup (including inside `ConfigErrors` / `PostLoad` / non-parallel `[Dec.Setup]` functions during a parser load, which run on the Parser thread) or between load / save cycles - not during live multithreaded serialization. Parallel setup functions must not call them, and neither must setup functions running inside a `Recorder.Read` that's concurrent with any other Dec operation.
 * **User code invoked from inside Record / Convert / PostLoad / setup functions runs under the same rules as its caller.** Don't call mutation APIs from inside an `IRecordable.Record` method, a `Converter.Record`, or a `PostLoad` - and don't spawn threads from those methods that touch Dec APIs while the calling operation is still in flight. Database reads and other Record calls on disjoint data are fine.
+* **A Recorder is valid only on the thread that received it, and only until the Record() call it was passed to returns.** Writing through one kept past its call, or through an enclosing object's Recorder while a nested Record() is running, is an error, and Dec reports it wherever it can tell.
 
 If you need to split serialization work across threads, do the Parser run on one thread, wait for it to finish, then hand the Database off. The usual pattern is "load on startup, write savegames concurrently from worker threads."

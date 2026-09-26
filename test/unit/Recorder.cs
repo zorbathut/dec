@@ -1203,5 +1203,123 @@ namespace DecTest
 
             Assert.IsNotNull(deserialized);
         }
+
+        public enum RecorderScopeOperation
+        {
+            Write,
+            Checksum,
+            Clone,
+        }
+
+        private static void RunRecorderScopeOperation<T>(RecorderScopeOperation operation, T value)
+        {
+            switch (operation)
+            {
+                case RecorderScopeOperation.Write: Dec.Recorder.Write(value); break;
+                case RecorderScopeOperation.Checksum: Dec.Recorder.Checksum(value); break;
+                case RecorderScopeOperation.Clone: Dec.Recorder.Clone(value); break;
+            }
+        }
+
+        public class RecorderStasher : Dec.IRecordable
+        {
+            public static Dec.Recorder Stashed;
+
+            public int value;
+
+            public void Record(Dec.Recorder record)
+            {
+                if (record.Mode == Dec.Recorder.Direction.Write)
+                {
+                    Stashed = record;
+                }
+
+                record.Record(ref value, "value");
+            }
+        }
+
+        [Test]
+        public void RecorderUsedAfterRecord([Values] RecorderScopeOperation operation)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            RecorderStasher.Stashed = null;
+            RunRecorderScopeOperation(operation, new RecorderStasher { value = 3 });
+            Assert.IsNotNull(RecorderStasher.Stashed);
+
+            int late = 4;
+            ExpectErrors(() => RecorderStasher.Stashed.Record(ref late, "late"), err => err.Contains("late"));
+        }
+
+        public class RecorderStashParent : Dec.IRecordable
+        {
+            public static Dec.Recorder Stashed;
+
+            public RecorderStashChild child;
+
+            public void Record(Dec.Recorder record)
+            {
+                if (record.Mode == Dec.Recorder.Direction.Write)
+                {
+                    Stashed = record;
+                }
+
+                record.Record(ref child, "child");
+            }
+        }
+
+        public class RecorderStashChild : Dec.IRecordable
+        {
+            public int value;
+
+            public void Record(Dec.Recorder record)
+            {
+                if (record.Mode == Dec.Recorder.Direction.Write)
+                {
+                    RecorderStashParent.Stashed.Record(ref value, "hijacked");
+                }
+            }
+        }
+
+        [Test]
+        public void RecorderUsedFromNestedRecord([Values] RecorderScopeOperation operation)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var parent = new RecorderStashParent { child = new RecorderStashChild { value = 5 } };
+
+            ExpectErrors(() => RunRecorderScopeOperation(operation, parent), err => err.Contains("hijacked"));
+        }
+
+        public class NestedOperationRecordable : Dec.IRecordable
+        {
+            public int before;
+            public int after;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref before, "before");
+
+                if (record.Mode == Dec.Recorder.Direction.Write)
+                {
+                    Dec.Recorder.Write(new StubRecordableInt { data = 6 });
+                    Dec.Recorder.Checksum(new StubRecordableInt { data = 7 });
+                    Dec.Recorder.Clone(new StubRecordableInt { data = 8 });
+                }
+
+                record.Record(ref after, "after");
+            }
+        }
+
+        [Test]
+        public void RecorderNestedOperation([Values] RecorderMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var deserialized = DoRecorderRoundTrip(new NestedOperationRecordable { before = 1, after = 2 }, mode);
+
+            Assert.AreEqual(1, deserialized.before);
+            Assert.AreEqual(2, deserialized.after);
+        }
     }
 }
