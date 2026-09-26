@@ -22,7 +22,14 @@ namespace Dec
         public abstract Recorder.Purpose Intent { get; }
         public abstract Recorder.IUserSettings UserSettings { get; }
 
-        public Path Path { get => path; }
+        // Virtual so that a writer can build its paths only on request.
+        public virtual Path Path
+        {
+            get
+            {
+                return path;
+            }
+        }
 
         // I'm not real happy with the existence of this function; it's kind of a hack so that a shared Converter that writes a string or an int can avoid errors
         public void MakeRecorderContextChild()
@@ -63,10 +70,23 @@ namespace Dec
 
         public abstract void TagClass(Type type);
 
+        // Clears per-position state so a writer that reuses its nodes can hand this one out again.
+        protected void Reset(Recorder.Settings settings)
+        {
+            this.settings = settings;
+            flaggedAsClass = false;
+            flaggedAsThis = false;
+        }
+
+        protected virtual RecorderWriter RecorderAcquire()
+        {
+            return new RecorderWriter(this);
+        }
+
         // Every user Record() body on the write side runs through one of these, so its recorder is in scope for exactly as long as the body is running.
         internal void RecorderRun(IRecordable value)
         {
-            var recorder = new RecorderWriter(this);
+            var recorder = RecorderAcquire();
             var outer = recorder.Open();
             try
             {
@@ -80,7 +100,7 @@ namespace Dec
 
         internal void RecorderRun(ConverterRecord converter, object value)
         {
-            var recorder = new RecorderWriter(this);
+            var recorder = RecorderAcquire();
             var outer = recorder.Open();
             try
             {
@@ -94,7 +114,7 @@ namespace Dec
 
         internal void RecorderRun(ConverterFactory converter, object value)
         {
-            var recorder = new RecorderWriter(this);
+            var recorder = RecorderAcquire();
             var outer = recorder.Open();
             try
             {

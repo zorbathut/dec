@@ -776,5 +776,97 @@ namespace DecTest
                 "ROOT.set[SETELEM]",
             }, PathProbe.Seen);
         }
+
+        [Test]
+        public void ReusedNodesForgetUnordered()
+        {
+            var shared = new StubRecordable();
+            var value = new List<object> { new HashSet<StubRecordable> { new StubRecordable() }, new List<StubRecordable> { shared, shared } };
+
+            Dec.Recorder.Checksum(value);
+        }
+
+        [Test]
+        public void ReusedNodesForgetAsThis()
+        {
+            Dec.Recorder.Checksum(new List<AsThisRecordable> { new AsThisRecordable() { data = 1 }, null });
+            Dec.Recorder.Checksum(new List<AsThisRecordable> { new AsThisRecordable() { data = 1 }, new AsThisRecordable() { data = 2 } });
+        }
+
+        private static long ChecksumAllocatedBytes<T>(T value)
+        {
+            long before = GC.GetAllocatedBytesForCurrentThread();
+            Dec.Recorder.Checksum(value);
+            return GC.GetAllocatedBytesForCurrentThread() - before;
+        }
+
+        [Test]
+        public void AllocationPerElement()
+        {
+            var small = Enumerable.Range(0, 1000).Select(i => $"element{i}").ToList();
+            var large = Enumerable.Range(0, 2000).Select(i => $"element{i}").ToList();
+
+            // Warm up caches and the JIT so that only the traversal itself is measured.
+            ChecksumAllocatedBytes(small);
+            ChecksumAllocatedBytes(large);
+
+            long extra = ChecksumAllocatedBytes(large) - ChecksumAllocatedBytes(small);
+            Assert.Less(extra, 1000, "Checksum should not allocate per list element");
+        }
+
+        private class StringFields : Dec.IRecordable
+        {
+            private static readonly string[] Labels = Enumerable.Range(0, 10).Select(i => $"field{i}").ToArray();
+
+            public string[] values;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                for (int i = 0; i < values.Length; ++i)
+                {
+                    recorder.Record(ref values[i], Labels[i]);
+                }
+            }
+        }
+
+        [Test]
+        public void AllocationPerField()
+        {
+            // The object count is the same on both sides, so the reference table's growth cancels out; what's left is per-field cost, plus one more growth of the reused recorder's label set.
+            var few = Enumerable.Range(0, 200).Select(i => new StringFields { values = Enumerable.Range(0, 5).Select(j => $"value{j}").ToArray() }).ToList();
+            var many = Enumerable.Range(0, 200).Select(i => new StringFields { values = Enumerable.Range(0, 10).Select(j => $"value{j}").ToArray() }).ToList();
+
+            // Warm up caches and the JIT so that only the traversal itself is measured.
+            ChecksumAllocatedBytes(few);
+            ChecksumAllocatedBytes(many);
+
+            long extra = ChecksumAllocatedBytes(many) - ChecksumAllocatedBytes(few);
+            Assert.Less(extra, 1000, "Checksum should not allocate per recorded field");
+        }
+
+        private struct IntRecordable : Dec.IRecordable
+        {
+            public int value;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref value, nameof(value));
+            }
+        }
+
+        [Test]
+        public void AllocationPerRecord()
+        {
+            // Each struct recordable costs a box for itself and one for its field, just as two ints cost two boxes, and makes two nodes, as two ints do; neither side touches the reference table. So the difference is what a Record() call itself costs.
+            var recordables = Enumerable.Range(0, 1000).Select(i => new IntRecordable { value = i }).ToArray();
+            var ints = Enumerable.Range(0, 2000).ToArray();
+
+            // Warm up caches and the JIT so that only the traversal itself is measured.
+            ChecksumAllocatedBytes(recordables);
+            ChecksumAllocatedBytes(ints);
+
+            long extra = ChecksumAllocatedBytes(recordables) - ChecksumAllocatedBytes(ints);
+            Assert.Less(extra, 1000, "Checksum should not allocate per Record() call");
+        }
     }
 }

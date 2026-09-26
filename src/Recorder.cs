@@ -458,9 +458,17 @@ namespace Dec
             this.node = node;
         }
 
-        // Open and Close bracket a user Record() body; Open returns the recorder that was innermost before, for the matching Close to restore.
+        // Open and Close bracket a user Record() body; Open returns the recorder that was innermost before, for the matching Close to restore. A recorder can be opened again for reuse after it closes, so this also clears what the previous body left behind.
         internal RecorderWriter Open()
         {
+            if (Innermost == this)
+            {
+                Dbg.Err("Internal error: RecorderWriter opened while it was already the innermost open recorder");
+            }
+
+            asThis = false;
+            fields.Clear();
+
             var outer = Innermost;
             Innermost = this;
             return outer;
