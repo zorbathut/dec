@@ -240,7 +240,7 @@ namespace Dec
             FlagAsClass();
         }
 
-        public override bool WriteReference(object value, Path path)
+        public override bool WriteReference(object value)
         {
             // The composer never registers references (WriterXmlCompose.RegisterReference), so every encounter is written in full.
             if (writer.Compose)
@@ -252,14 +252,14 @@ namespace Dec
 
             if (!writer.seenObjects.TryGetValue(value, out var prior))
             {
-                writer.seenObjects[value] = (sharedPosition, path);
+                writer.seenObjects[value] = (sharedPosition, Path);
                 return false;
             }
 
             // Either mismatch means the entry tree cannot match the file, and both fire on a real save of the same object.
             if (!prior.sharedPosition || !sharedPosition)
             {
-                ErrReferenceMismatch(priorWasShared: prior.sharedPosition, currentIsShared: sharedPosition, path, prior.path, value);
+                ErrReferenceMismatch(priorWasShared: prior.sharedPosition, currentIsShared: sharedPosition, Path, prior.path, value);
                 return true;
             }
 

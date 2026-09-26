@@ -2164,7 +2164,7 @@ namespace Dec
             // Do this *before* we do the class tagging, otherwise we may add ref/class tags to a single node, which is invalid.
             if (strategy.canBeShared && !asThis)
             {
-                if (node.WriteReference(value, node.Path))
+                if (node.WriteReference(value))
                 {
                     // The ref system has set up the appropriate tagging, so we're done!
                     return;

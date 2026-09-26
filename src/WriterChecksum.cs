@@ -237,7 +237,7 @@ namespace Dec
             writer.AddChecksum((int)NodeTag.Null, Path);
         }
 
-        public override bool WriteReference(object value, Path path)
+        public override bool WriteReference(object value)
         {
             if (writer.seenReferencesUnordered.Contains(value))
             {

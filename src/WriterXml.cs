@@ -189,9 +189,9 @@ namespace Dec
             node.SetAttributeValue("null", "true");
         }
 
-        public override bool WriteReference(object value, Path path)
+        public override bool WriteReference(object value)
         {
-            return writer.RegisterReference(value, node, RecorderSettings, path);
+            return writer.RegisterReference(value, node, RecorderSettings, Path);
         }
 
         private void WriteArrayRank(WriterNodeXml node, Array value, Type referencedType, int rank, int[] indices)
