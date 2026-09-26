@@ -722,5 +722,59 @@ namespace DecTest
             Assert.That(reportsEarly, Has.Count.EqualTo(1));
             Assert.AreNotEqual(reportsLate[0], reportsEarly[0], "Differences at different multidim elements should report different locations");
         }
+
+        private class PathProbe : Dec.IRecordable
+        {
+            public static List<string> Seen = new List<string>();
+
+            public PathProbe child;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                Seen.Add(recorder.Context.PathString());
+                recorder.Record(ref child, nameof(child));
+            }
+        }
+
+        private class PathProbeHolder : Dec.IRecordable
+        {
+            public List<PathProbe> list;
+            public Dictionary<string, PathProbe> dict;
+            public Dictionary<PathProbe, int> keys;
+            public HashSet<PathProbe> set;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref list, nameof(list));
+                recorder.Record(ref dict, nameof(dict));
+                recorder.Record(ref keys, nameof(keys));
+                recorder.Record(ref set, nameof(set));
+            }
+        }
+
+        [Test]
+        public void ContextPaths()
+        {
+            var value = new PathProbeHolder
+            {
+                list = new List<PathProbe> { new PathProbe() { child = new PathProbe() }, new PathProbe() },
+                dict = new Dictionary<string, PathProbe> { { "key", new PathProbe() } },
+                keys = new Dictionary<PathProbe, int> { { new PathProbe(), 1 } },
+                set = new HashSet<PathProbe> { new PathProbe() },
+            };
+
+            PathProbe.Seen.Clear();
+            Dec.Recorder.Checksum(value);
+
+            CollectionAssert.AreEqual(new List<string>
+            {
+                "ROOT.list[0]",
+                "ROOT.list[0].child",
+                "ROOT.list[1]",
+                "ROOT.dict[key]",
+                "ROOT.keys[KEY]",
+                "ROOT.set[SETELEM]",
+            }, PathProbe.Seen);
+        }
     }
 }

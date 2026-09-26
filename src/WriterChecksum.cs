@@ -139,10 +139,10 @@ namespace Dec
             throw new NotImplementedException("Reflection child creation is not implemented in WriterNodeChecksum.");
         }
 
-        private WriterNodeChecksum CreateNamedChild(string label, bool unordered, Recorder.Settings settings, Path path)
+        private WriterNodeChecksum CreateNamedChild(bool unordered, Recorder.Settings settings, Path path)
         {
             writer.AddChecksum((int)NodeTag.Child, Path);
-            return new WriterNodeChecksum(writer, this.unordered || unordered, settings, new PathMember(path, label));
+            return new WriterNodeChecksum(writer, this.unordered || unordered, settings, path);
         }
 
         public override void WritePrimitive(object value)
@@ -280,7 +280,7 @@ namespace Dec
                 {
                     indices[rank] = i;
 
-                    var child = node.CreateNamedChild("li", false, RecorderSettings.CreateChild(), new PathIndexMultidim(Path, indices.ToArray()));
+                    var child = node.CreateNamedChild(false, RecorderSettings.CreateChild(), new PathIndexMultidim(Path, indices.ToArray()));
                     WriteArrayRank(child, value, referencedType, rank + 1, indices);
                 }
             }
@@ -300,7 +300,7 @@ namespace Dec
                 // fast path
                 for (int i = 0; i < value.Length; ++i)
                 {
-                    var child = CreateNamedChild("li", false, RecorderSettings.CreateChild(), new PathIndex(Path, i));
+                    var child = CreateNamedChild(false, RecorderSettings.CreateChild(), new PathIndex(Path, i));
                     Serialization.ComposeElement(child, value.GetValue(i), referencedType);
                 }
             }
@@ -338,7 +338,7 @@ namespace Dec
 
             for (int i = 0; i < value.Count; ++i)
             {
-                Serialization.ComposeElement(CreateNamedChild("li", false, RecorderSettings.CreateChild(), new PathIndex(Path, i)), value[i], referencedType);
+                Serialization.ComposeElement(CreateNamedChild(false, RecorderSettings.CreateChild(), new PathIndex(Path, i)), value[i], referencedType);
             }
         }
 
@@ -366,14 +366,14 @@ namespace Dec
 
             // Phase 1: Compute key checksums in unordered mode for sorting. Any key
             // references are added to seenReferencesUnordered, same as before.
-            var entries = new List<(ulong keyChecksum, object val)>();
+            var entries = new List<(ulong keyChecksum, object key, object val)>();
             foreach (DictionaryEntry entry in value)
             {
                 ulong push = writer.PushChecksum();
-                Serialization.ComposeElement(CreateNamedChild("key", true, RecorderSettings.CreateChild(), new PathMember(Path, "key")), entry.Key, typeof(object));
+                Serialization.ComposeElement(CreateNamedChild(true, RecorderSettings.CreateChild(), new PathDictionaryKey(Path)), entry.Key, typeof(object));
                 ulong keyChecksum = writer.PopChecksum(push);
 
-                entries.Add((keyChecksum, entry.Value));
+                entries.Add((keyChecksum, entry.Key, entry.Value));
             }
 
             // Phase 2: Sort by key checksum for canonical value ordering.
@@ -397,7 +397,7 @@ namespace Dec
                     // Unique key checksum: this entry has a deterministic position.
                     // Pair the key checksum with the value, serialized as ordered.
                     writer.AddChecksum(entries[groupStart].keyChecksum, Path);
-                    Serialization.ComposeElement(CreateNamedChild("val", false, RecorderSettings.CreateChild(), new PathIndex(Path, groupStart)), entries[groupStart].val, referencedType);
+                    Serialization.ComposeElement(CreateNamedChild(false, RecorderSettings.CreateChild(), new PathDictionaryValue(Path, entries[groupStart].key.ToString())), entries[groupStart].val, referencedType);
                 }
                 else
                 {
@@ -410,7 +410,7 @@ namespace Dec
                     {
                         ulong push = writer.PushChecksum();
                         writer.AddChecksum(entries[j].keyChecksum, Path);
-                        Serialization.ComposeElement(CreateNamedChild("val", true, RecorderSettings.CreateChild(), new PathMember(Path, "val")), entries[j].val, referencedType);
+                        Serialization.ComposeElement(CreateNamedChild(true, RecorderSettings.CreateChild(), new PathDictionaryValue(Path, entries[j].key.ToString())), entries[j].val, referencedType);
                         ulong result = writer.PopChecksum(push);
                         groupAccumulator += result;
                     }
@@ -434,7 +434,7 @@ namespace Dec
             foreach (var entry in value)
             {
                 ulong push = writer.PushChecksum();
-                Serialization.ComposeElement(CreateNamedChild("val", true, RecorderSettings.CreateChild(), new PathMember(Path, "val")), entry, referencedType);
+                Serialization.ComposeElement(CreateNamedChild(true, RecorderSettings.CreateChild(), new PathHashSetElement(Path)), entry, referencedType);
                 ulong result = writer.PopChecksum(push);
 
                 // this is a weird way to combine, but this avoids issues where pairs of identical items cancel out, and I haven't found a good case where this doesn't work
@@ -454,7 +454,7 @@ namespace Dec
 
             for (int i = 0; i < array.Length; ++i)
             {
-                Serialization.ComposeElement(CreateNamedChild("li", false, RecorderSettings.CreateChild(), new PathQueueElement(Path, i)), array.GetValue(i), keyType);
+                Serialization.ComposeElement(CreateNamedChild(false, RecorderSettings.CreateChild(), new PathQueueElement(Path, i)), array.GetValue(i), keyType);
             }
         }
 
@@ -468,7 +468,7 @@ namespace Dec
 
             for (int i = 0; i < array.Length; ++i)
             {
-                Serialization.ComposeElement(CreateNamedChild("li", false, RecorderSettings.CreateChild(), new PathStackElement(Path, i)), array.GetValue(i), keyType);
+                Serialization.ComposeElement(CreateNamedChild(false, RecorderSettings.CreateChild(), new PathStackElement(Path, i)), array.GetValue(i), keyType);
             }
         }
 
@@ -483,7 +483,7 @@ namespace Dec
 
             for (int i = 0; i < length; ++i)
             {
-                Serialization.ComposeElement(CreateNamedChild("li", false, RecorderSettings.CreateChild(), new PathTupleItem(Path, i)), value.GetType().GetProperty(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
+                Serialization.ComposeElement(CreateNamedChild(false, RecorderSettings.CreateChild(), new PathTupleItem(Path, i)), value.GetType().GetProperty(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
             }
         }
 
@@ -498,7 +498,7 @@ namespace Dec
 
             for (int i = 0; i < length; ++i)
             {
-                Serialization.ComposeElement(CreateNamedChild("li", false, RecorderSettings.CreateChild(), new PathTupleItem(Path, i)), value.GetType().GetField(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
+                Serialization.ComposeElement(CreateNamedChild(false, RecorderSettings.CreateChild(), new PathTupleItem(Path, i)), value.GetType().GetField(UtilMisc.DefaultTupleNames[i]).GetValue(value), args[i]);
             }
         }
 
