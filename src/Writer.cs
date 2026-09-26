@@ -63,6 +63,22 @@ namespace Dec
 
         public abstract void TagClass(Type type);
 
+        // Every user Record() body on the write side runs through one of these.
+        internal void RecorderRun(IRecordable value)
+        {
+            value.Record(new RecorderWriter(this));
+        }
+
+        internal void RecorderRun(ConverterRecord converter, object value)
+        {
+            converter.RecordObj(value, new RecorderWriter(this));
+        }
+
+        internal void RecorderRun(ConverterFactory converter, object value)
+        {
+            converter.WriteObj(value, new RecorderWriter(this));
+        }
+
         // general behavior that polymorphics should not reimplement (so far at least?)
         protected bool flaggedAsClass = false;
         protected bool flaggedAsThis = false;

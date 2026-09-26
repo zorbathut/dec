@@ -196,7 +196,7 @@ namespace Dec
             else if (originalConverter is ConverterFactory converterFactory)
             {
                 // this calls CreateRecorderChild a bunch and fills it out
-                converterFactory.WriteObj(original, new RecorderWriter(this));
+                RecorderRun(converterFactory, original);
 
                 // now we create the object itself
                 var readerClone = new ReaderNodeCloneRecorder(recorderChildren, UserSettings);
@@ -334,7 +334,7 @@ namespace Dec
                     }
 
                     // this calls CreateRecorderChild a bunch and fills it out
-                    (self.original as IRecordable).Record(new RecorderWriter(self));
+                    self.RecorderRun(self.original as IRecordable);
 
                     var readerClone = new ReaderNodeCloneRecorder(self.recorderChildren, self.UserSettings);
 
@@ -634,7 +634,7 @@ namespace Dec
                 else if (originalConverter is ConverterRecord converterRecord)
                 {
                     // this calls CreateRecorderChild a bunch and fills it out
-                    converterRecord.RecordObj(original, new RecorderWriter(this));
+                    RecorderRun(converterRecord, original);
 
                     var readerClone = new ReaderNodeCloneRecorder(recorderChildren, UserSettings);
 

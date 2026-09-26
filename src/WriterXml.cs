@@ -347,7 +347,7 @@ namespace Dec
             if (depth < MaxRecursionDepth)
             {
                 // This is somewhat faster than a full pending write (5-10% faster in one test case, though with a lot of noise), so we do it whenever we can.
-                value.Record(new RecorderWriter(this));
+                RecorderRun(value);
             }
             else
             {
@@ -372,11 +372,11 @@ namespace Dec
                     }
                     else if (converter is ConverterRecord converterRecord)
                     {
-                        converterRecord.RecordObj(value, new RecorderWriter(this));
+                        RecorderRun(converterRecord, value);
                     }
                     else if (converter is ConverterFactory converterFactory)
                     {
-                        converterFactory.WriteObj(value, new RecorderWriter(this));
+                        RecorderRun(converterFactory, value);
                     }
                     else
                     {

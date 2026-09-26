@@ -207,11 +207,11 @@ namespace Dec
             {
                 if (converter is ConverterRecord converterRecord)
                 {
-                    converterRecord.RecordObj(value, new RecorderWriter(this));
+                    RecorderRun(converterRecord, value);
                 }
                 else if (converter is ConverterFactory converterFactory)
                 {
-                    converterFactory.WriteObj(value, new RecorderWriter(this));
+                    RecorderRun(converterFactory, value);
                 }
                 else
                 {
@@ -285,7 +285,7 @@ namespace Dec
                 return;
             }
 
-            value.Record(new RecorderWriter(this));
+            RecorderRun(value);
         }
 
         public override void WriteArray(Array value)

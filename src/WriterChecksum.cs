@@ -506,7 +506,7 @@ namespace Dec
         {
             writer.AddChecksum((int)NodeTag.Record, Path);
 
-            value.Record(new RecorderWriter(this));
+            RecorderRun(value);
         }
 
         public override void WriteConvertible(Converter converter, object value)
@@ -521,11 +521,11 @@ namespace Dec
                 }
                 else if (converter is ConverterRecord converterRecord)
                 {
-                    converterRecord.RecordObj(value, new RecorderWriter(this));
+                    RecorderRun(converterRecord, value);
                 }
                 else if (converter is ConverterFactory converterFactory)
                 {
-                    converterFactory.WriteObj(value, new RecorderWriter(this));
+                    RecorderRun(converterFactory, value);
                 }
                 else
                 {
