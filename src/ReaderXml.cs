@@ -122,7 +122,7 @@ namespace Dec
             if (versionField != null)
             {
                 // possible that a collection won't have this, I suppose
-                versionField.SetValue(list, Util.CollectionDeserializationVersion);
+                versionField.SetValue(list, Util.CollectionDeserializationVersionBoxed);
             }
         }
 

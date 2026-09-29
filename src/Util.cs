@@ -62,5 +62,8 @@ namespace Dec
         /// This should not matter to you unless you're doing deep black magic.
         /// </remarks>
         public const int CollectionDeserializationVersion = 424242;
+
+        // Boxed once, for FieldInfo.SetValue, which would otherwise box it on every collection.
+        internal static readonly object CollectionDeserializationVersionBoxed = CollectionDeserializationVersion;
     }
 }

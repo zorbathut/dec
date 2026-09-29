@@ -27,9 +27,23 @@ namespace Dec
 
         internal Dictionary<object, object> cloneReferences = new Dictionary<object, object>();
 
+        // One creator serves the whole operation; object construction only consults it for the duration of the call.
+        private ReaderNodeCloneCreator creator;
+
         public WriterClone(Recorder.IUserSettings userSettings)
         {
             this.UserSettings = userSettings;
+        }
+
+        internal ReaderNodeCloneCreator CreatorFor(object original)
+        {
+            if (creator == null)
+            {
+                creator = new ReaderNodeCloneCreator(UserSettings);
+            }
+
+            creator.original = original;
+            return creator;
         }
 
         public WriterNodeClone StartClone(Type type)
@@ -210,13 +224,13 @@ namespace Dec
             }
             else if (RecorderSettings.factories != null && original is IRecordable)
             {
-                result = RecorderSettings.CreateRecordableFromFactory(originalType, "clone", new ReaderNodeCloneCreator(original, UserSettings));
+                result = RecorderSettings.CreateRecordableFromFactory(originalType, "clone", writer.CreatorFor(original));
             }
             else if ((model == null || model.GetType() != original.GetType()) && !typeof(ITuple).IsAssignableFrom(originalType))
             {
                 // derive an appropriate type; we're just yanking this out of the original type right now (is this always right?)
                 // this is kind of awful in terms of perf ;.;
-                result = original.GetType().CreateInstanceSafe("recordable", new ReaderNodeCloneCreator(original, UserSettings));
+                result = original.GetType().CreateInstanceSafe("recordable", writer.CreatorFor(original));
             }
             else
             {
@@ -377,7 +391,7 @@ namespace Dec
                             // use AddRange to copy
                             addRangeMethod.Invoke(resultList, new object[] { originalList });
 
-                            versionField.SetValue(resultList, Util.CollectionDeserializationVersion);
+                            versionField.SetValue(resultList, Util.CollectionDeserializationVersionBoxed);
                         };
                     }
                     else
@@ -412,7 +426,7 @@ namespace Dec
                             resultList.Add(self.CloneChild(originalList[i], resetDepth));
                         }
 
-                        versionField?.SetValue(resultList, Util.CollectionDeserializationVersion);
+                        versionField?.SetValue(resultList, Util.CollectionDeserializationVersionBoxed);
                     };
                 }
             }
@@ -968,11 +982,11 @@ namespace Dec
         public override Recorder.IUserSettings UserSettings { get; }
         public override Recorder.Purpose Intent { get => Recorder.Purpose.Cloning; }
 
-        private object original;
-        public ReaderNodeCloneCreator(object original, Recorder.IUserSettings userSettings)
+        internal object original;
+
+        public ReaderNodeCloneCreator(Recorder.IUserSettings userSettings)
         {
             this.UserSettings = userSettings;
-            this.original = original;
         }
 
         public override Context GetContext()
