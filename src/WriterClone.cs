@@ -424,6 +424,7 @@ namespace Dec
 
                 // if the dictionary members are valuelike, we can just copy the whole thing
                 // skipping the tests is important enough that we'll just specialcase the various options
+                // IDictionaryEnumerator's Key and Value rather than foreach, which boxes a DictionaryEntry per entry
                 if (canCloneKey && canCloneValue)
                 {
                     return (self, resetDepth) =>
@@ -431,9 +432,10 @@ namespace Dec
                         var originalDict = self.original as IDictionary;
                         var resultDict = self.result as IDictionary;
                         resultDict.Clear();
-                        foreach (DictionaryEntry kvp in originalDict)
+                        IDictionaryEnumerator iterator = originalDict.GetEnumerator();
+                        while (iterator.MoveNext())
                         {
-                            resultDict[kvp.Key] = kvp.Value;
+                            resultDict[iterator.Key] = iterator.Value;
                         }
                     };
                 }
@@ -444,9 +446,10 @@ namespace Dec
                         var originalDict = self.original as IDictionary;
                         var resultDict = self.result as IDictionary;
                         resultDict.Clear();
-                        foreach (DictionaryEntry kvp in originalDict)
+                        IDictionaryEnumerator iterator = originalDict.GetEnumerator();
+                        while (iterator.MoveNext())
                         {
-                            resultDict[kvp.Key] = self.CloneChild(kvp.Value, resetDepth);
+                            resultDict[iterator.Key] = self.CloneChild(iterator.Value, resetDepth);
                         }
                     };
                 }
@@ -457,9 +460,10 @@ namespace Dec
                         var originalDict = self.original as IDictionary;
                         var resultDict = self.result as IDictionary;
                         resultDict.Clear();
-                        foreach (DictionaryEntry kvp in originalDict)
+                        IDictionaryEnumerator iterator = originalDict.GetEnumerator();
+                        while (iterator.MoveNext())
                         {
-                            resultDict[self.CloneChild(kvp.Key, resetDepth)] = kvp.Value;
+                            resultDict[self.CloneChild(iterator.Key, resetDepth)] = iterator.Value;
                         }
                     };
                 }
@@ -470,9 +474,10 @@ namespace Dec
                         var originalDict = self.original as IDictionary;
                         var resultDict = self.result as IDictionary;
                         resultDict.Clear();
-                        foreach (DictionaryEntry kvp in originalDict)
+                        IDictionaryEnumerator iterator = originalDict.GetEnumerator();
+                        while (iterator.MoveNext())
                         {
-                            resultDict[self.CloneChild(kvp.Key, resetDepth)] = self.CloneChild(kvp.Value, resetDepth);
+                            resultDict[self.CloneChild(iterator.Key, resetDepth)] = self.CloneChild(iterator.Value, resetDepth);
                         }
                     };
                 }
