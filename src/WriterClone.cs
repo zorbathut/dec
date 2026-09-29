@@ -234,7 +234,7 @@ namespace Dec
             if (!done)
             {
                 bool doPending = false;
-                if (depth > 20 && !result.GetType().IsValueType && sharable)
+                if (depth > 20 && result != null && !result.GetType().IsValueType && sharable)
                 {
                     doPending = true;
                 }

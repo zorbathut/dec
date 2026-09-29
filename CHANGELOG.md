@@ -41,6 +41,7 @@ All notable changes to this project will be documented in this file.
 * Warnings for serializing a type that can't be constructed were incorrectly formatted.
 * A gnarly error caused when checksumming a multidimensional array holding both RecordAsThis() elements and nulls.
 * `Recorder.Clone` of an object whose `Record()` reads fields but writes none crashed with a NullReferenceException.
+* `Recorder.Clone` could crash with a NullReferenceException in deep stacks when an object failed to construct, or when a `Tuple` field started out null.
 
 
 ## [v0.11.1]

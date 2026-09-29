@@ -258,5 +258,81 @@ namespace DecTest
             Assert.IsNotNull(clone);
             Assert.AreEqual(0, clone.legacy);
         }
+
+        public class NonConstructableRecordable : IRecordable
+        {
+            public NonConstructableRecordable(int value) { }
+
+            public void Record(Dec.Recorder recorder) { }
+        }
+
+        public class DeepLink : IRecordable
+        {
+            public DeepLink next;
+            public NonConstructableRecordable tail;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Shared().Record(ref next, "next");
+                recorder.Record(ref tail, "tail");
+            }
+        }
+
+        [Test]
+        public void DeepNonConstructable()
+        {
+            var root = new DeepLink();
+            var link = root;
+            for (int i = 0; i < 25; ++i)
+            {
+                link.next = new DeepLink();
+                link = link.next;
+            }
+            link.tail = new NonConstructableRecordable(1);
+
+            DeepLink clone = null;
+            ExpectWarningsAndErrors(() => clone = Dec.Recorder.Clone(root), warningValidator: wrn => wrn.Contains("cannot be constructed"), errorValidator: err => err.Contains("without a no-argument constructor"));
+
+            for (int i = 0; i < 25; ++i)
+            {
+                Assert.IsNull(clone.tail);
+                clone = clone.next;
+            }
+            Assert.IsNull(clone.tail);
+        }
+
+        public class DeepTupleLink : IRecordable
+        {
+            public DeepTupleLink next;
+            public System.Tuple<int, int> pair;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Shared().Record(ref next, nameof(next));
+                recorder.Shared().Record(ref pair, nameof(pair));
+            }
+        }
+
+        [Test]
+        public void DeepTuple()
+        {
+            var root = new DeepTupleLink();
+            var link = root;
+            for (int i = 0; i < 25; ++i)
+            {
+                link.next = new DeepTupleLink();
+                link = link.next;
+            }
+            link.pair = System.Tuple.Create(3, 4);
+
+            var clone = Dec.Recorder.Clone(root);
+            for (int i = 0; i < 25; ++i)
+            {
+                clone = clone.next;
+            }
+
+            Assert.AreEqual(3, clone.pair.Item1);
+            Assert.AreEqual(4, clone.pair.Item2);
+        }
     }
 }
