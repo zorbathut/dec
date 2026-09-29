@@ -251,9 +251,10 @@ namespace Dec
 
                 if (doPending)
                 {
+                    // Captures only `this`; capturing the local originalType would allocate a closure on every call, deferred or not.
                     writer.RegisterPendingWrite(() =>
                     {
-                        CreateResult_Resolve(originalType, resetDepth: true);
+                        CreateResult_Resolve(original.GetType(), resetDepth: true);
                         (original as IPostCloneOriginal)?.PostCloneOriginal();
                         (result as IPostCloneNew)?.PostCloneNew();
                     });
