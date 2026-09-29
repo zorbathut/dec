@@ -301,6 +301,236 @@ namespace DecTest
             Assert.IsNull(clone.tail);
         }
 
+        private static long CloneAllocatedBytes<T>(T value)
+        {
+            long before = System.GC.GetAllocatedBytesForCurrentThread();
+            Dec.Recorder.Clone(value);
+            return System.GC.GetAllocatedBytesForCurrentThread() - before;
+        }
+
+        public class CountedStrings : IRecordable
+        {
+            private static readonly string[] Labels = Enumerable.Range(0, 10).Select(i => $"field{i}").ToArray();
+
+            public int count;
+            public string[] values = new string[10];
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref count, nameof(count));
+                for (int i = 0; i < count; ++i)
+                {
+                    recorder.Record(ref values[i], Labels[i]);
+                }
+            }
+        }
+
+        [Test]
+        public void AllocationPerField()
+        {
+            // Every clone owns the same fixed-size array whatever it records, so both sides allocate the same output and the difference is what the extra fields cost.
+            List<CountedStrings> Make(int count)
+            {
+                return Enumerable.Range(0, 1000).Select(i => new CountedStrings { count = count, values = Enumerable.Range(0, 10).Select(j => $"value{j}").ToArray() }).ToList();
+            }
+            var few = Make(5);
+            var many = Make(10);
+
+            // Warm up caches and the JIT so that only the traversal itself is measured.
+            CloneAllocatedBytes(few);
+            CloneAllocatedBytes(many);
+
+            long extra = CloneAllocatedBytes(many) - CloneAllocatedBytes(few);
+            Assert.Less(extra, 5000, "Clone should not allocate per recorded field");
+        }
+
+        [Test]
+        public void AllocationPerElement()
+        {
+            // Both lists clone into a list of the same size; a string element goes through a clone node and a null doesn't.
+            var strings = Enumerable.Range(0, 2000).Select(i => (object)$"element{i}").ToList();
+            var nulls = Enumerable.Range(0, 2000).Select(i => (object)null).ToList();
+
+            // Warm up caches and the JIT so that only the traversal itself is measured.
+            CloneAllocatedBytes(strings);
+            CloneAllocatedBytes(nulls);
+
+            long extra = CloneAllocatedBytes(strings) - CloneAllocatedBytes(nulls);
+            Assert.Less(extra, 2000, "Clone should not allocate per list element");
+        }
+
+        public struct StringRecordable : IRecordable
+        {
+            public string value;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref value, nameof(value));
+            }
+        }
+
+        [Test]
+        public void AllocationPerRecord()
+        {
+            // Each extra struct element costs two boxes, a reference-table entry, and list growth, around 120 bytes in all; a recorder, reader, and read view of its own per Record() call would add several hundred more.
+            List<StringRecordable> Make(int count)
+            {
+                return Enumerable.Range(0, count).Select(i => new StringRecordable { value = $"value{i}" }).ToList();
+            }
+            var small = Make(1000);
+            var large = Make(2000);
+
+            // Warm up caches and the JIT so that only the traversal itself is measured.
+            CloneAllocatedBytes(small);
+            CloneAllocatedBytes(large);
+
+            long extra = CloneAllocatedBytes(large) - CloneAllocatedBytes(small);
+            Assert.Less(extra, 1000 * 250, "Clone should not allocate recorders per Record() call");
+        }
+
+        public class ClonePathProbe : IRecordable
+        {
+            public static List<string> Seen = new List<string>();
+
+            public ClonePathProbe child;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                if (recorder.Mode == Dec.Recorder.Direction.Write)
+                {
+                    Seen.Add(recorder.Context.PathString());
+                }
+
+                recorder.Record(ref child, nameof(child));
+            }
+        }
+
+        public class ClonePathHolder : IRecordable
+        {
+            public ClonePathProbe a1;
+            public ClonePathProbe a2;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref a1, nameof(a1));
+                recorder.Record(ref a2, nameof(a2));
+            }
+        }
+
+        [Test]
+        public void ContextPaths()
+        {
+            var holder = new ClonePathHolder
+            {
+                a1 = new ClonePathProbe { child = new ClonePathProbe() },
+                a2 = new ClonePathProbe { child = new ClonePathProbe() },
+            };
+
+            ClonePathProbe.Seen.Clear();
+            Dec.Recorder.Clone(holder);
+
+            CollectionAssert.AreEqual(new List<string> { "RECORD.a1", "RECORD.a1.child", "RECORD.a2", "RECORD.a2.child" }, ClonePathProbe.Seen);
+        }
+
+        public class CloneChainProbe : IRecordable
+        {
+            public static List<string> Seen = new List<string>();
+
+            public CloneChainProbe next;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                if (recorder.Mode == Dec.Recorder.Direction.Write)
+                {
+                    Seen.Add(recorder.Context.PathString());
+                }
+
+                recorder.Shared().Record(ref next, nameof(next));
+            }
+        }
+
+        [Test]
+        public void ContextPathsDeferred()
+        {
+            // Deep enough that the tail of the chain is resolved later through pending writes.
+            var root = new CloneChainProbe();
+            var link = root;
+            var expected = new List<string> { "RECORD" };
+            for (int i = 0; i < 30; ++i)
+            {
+                link.next = new CloneChainProbe();
+                link = link.next;
+                expected.Add(expected[expected.Count - 1] + ".next");
+            }
+
+            CloneChainProbe.Seen.Clear();
+            Dec.Recorder.Clone(root);
+
+            CollectionAssert.AreEquivalent(expected, CloneChainProbe.Seen);
+        }
+
+        public class DeferredPathProbe : IRecordable
+        {
+            public static List<string> Seen = new List<string>();
+
+            public int[] payload = new int[60];
+
+            public void Record(Dec.Recorder recorder)
+            {
+                if (recorder.Mode == Dec.Recorder.Direction.Write)
+                {
+                    Seen.Add(recorder.Context.PathString());
+                }
+
+                for (int i = 0; i < payload.Length; ++i)
+                {
+                    recorder.Record(ref payload[i], "f" + i);
+                }
+            }
+        }
+
+        public class DeferredPathElement : IRecordable
+        {
+            public DeferredPathProbe probe;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Shared().Record(ref probe, nameof(probe));
+            }
+        }
+
+        public class DeferredPathChain : IRecordable
+        {
+            public DeferredPathChain next;
+            public List<DeferredPathElement> items;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Shared().Record(ref next, nameof(next));
+                recorder.Record(ref items, nameof(items));
+            }
+        }
+
+        [Test]
+        public void ContextPathsDeferredAfterParentReuse()
+        {
+            // Chain link k sits at depth k, its list at k+1, the list's elements at k+2, and their probes at k+3; 18 links put the probes just past the deferral depth. Both probes defer, their list elements are recycled, and the first probe's sixty fields dig those recycled nodes back out before the second probe runs.
+            var root = new DeferredPathChain();
+            var link = root;
+            for (int i = 0; i < 18; ++i)
+            {
+                link.next = new DeferredPathChain();
+                link = link.next;
+            }
+            link.items = new List<DeferredPathElement> { new DeferredPathElement { probe = new DeferredPathProbe() }, new DeferredPathElement { probe = new DeferredPathProbe() } };
+
+            DeferredPathProbe.Seen.Clear();
+            Dec.Recorder.Clone(root);
+
+            string expected = "RECORD" + string.Concat(Enumerable.Repeat(".next", 18)) + ".items.probe";
+            CollectionAssert.AreEqual(new List<string> { expected, expected }, DeferredPathProbe.Seen);
+        }
+
         public class DeepTupleLink : IRecordable
         {
             public DeepTupleLink next;
@@ -333,6 +563,150 @@ namespace DecTest
 
             Assert.AreEqual(3, clone.pair.Item1);
             Assert.AreEqual(4, clone.pair.Item2);
+        }
+
+        public class FactoryLink
+        {
+            public int value;
+            public FactoryLink next;
+        }
+
+        public class FactoryLinkConverter : Dec.ConverterFactory<FactoryLink>
+        {
+            public override void Write(FactoryLink input, Dec.Recorder recorder)
+            {
+                recorder.Record(ref input.value, "value");
+                recorder.Shared().Record(ref input.next, "next");
+            }
+
+            public override FactoryLink Create(Dec.Recorder recorder)
+            {
+                var result = new FactoryLink();
+                recorder.Record(ref result.value, "value");
+                return result;
+            }
+
+            public override void Read(ref FactoryLink input, Dec.Recorder recorder)
+            {
+                recorder.Shared().Record(ref input.next, "next");
+            }
+        }
+
+        [Test]
+        public void DeferredConverterFactoryChain()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new System.Type[] { typeof(FactoryLinkConverter) } });
+
+            // Deep enough that the tail's factory bodies straddle a pending write: written and created in one pass, read in a later one.
+            var root = new FactoryLink { value = 0 };
+            var link = root;
+            for (int i = 1; i < 30; ++i)
+            {
+                link.next = new FactoryLink { value = i };
+                link = link.next;
+            }
+
+            var clone = Dec.Recorder.Clone(root);
+
+            for (int i = 0; i < 30; ++i)
+            {
+                Assert.AreEqual(i, clone.value);
+                clone = clone.next;
+            }
+            Assert.IsNull(clone);
+        }
+
+        public class AsThisRecordable : IRecordable
+        {
+            public int data;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.RecordAsThis(ref data);
+            }
+        }
+
+        public class AsThisHolder : IRecordable
+        {
+            public AsThisRecordable first;
+            public AsThisRecordable second;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref first, nameof(first));
+                recorder.Record(ref second, nameof(second));
+            }
+        }
+
+        [Test]
+        public void ReusedNodesForgetAsThis()
+        {
+            // The first holder's fields leave their nodes flagged by RecordAsThis; the second holder's null field lands on one of those nodes again.
+            var clone = Dec.Recorder.Clone(new List<AsThisHolder>
+            {
+                new AsThisHolder { first = new AsThisRecordable { data = 1 }, second = new AsThisRecordable { data = 2 } },
+                new AsThisHolder { first = new AsThisRecordable { data = 3 }, second = null },
+            });
+
+            Assert.AreEqual(1, clone[0].first.data);
+            Assert.AreEqual(2, clone[0].second.data);
+            Assert.AreEqual(3, clone[1].first.data);
+            Assert.IsNull(clone[1].second);
+        }
+
+        public class ThrowingInner
+        {
+            public int value;
+        }
+
+        public class ThrowingInnerConverter : Dec.ConverterFactory<ThrowingInner>
+        {
+            public static bool ThrowNext;
+
+            public override void Write(ThrowingInner input, Dec.Recorder recorder)
+            {
+                recorder.Record(ref input.value, "value");
+            }
+
+            public override ThrowingInner Create(Dec.Recorder recorder)
+            {
+                var result = new ThrowingInner();
+                recorder.Record(ref result.value, "value");
+
+                if (ThrowNext)
+                {
+                    ThrowNext = false;
+                    throw new System.InvalidOperationException("Create failed on purpose");
+                }
+
+                return result;
+            }
+
+            public override void Read(ref ThrowingInner input, Dec.Recorder recorder) { }
+        }
+
+        public class ThrowingHolder : IRecordable
+        {
+            public ThrowingInner inner;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref inner, nameof(inner));
+            }
+        }
+
+        [Test]
+        public void ExceptionMidResolve()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new System.Type[] { typeof(ThrowingInnerConverter) } });
+
+            var input = new List<ThrowingHolder> { new ThrowingHolder { inner = new ThrowingInner { value = 1 } }, new ThrowingHolder { inner = new ThrowingInner { value = 2 } } };
+
+            ThrowingInnerConverter.ThrowNext = true;
+            List<ThrowingHolder> clone = null;
+            ExpectErrors(() => clone = Dec.Recorder.Clone(input), err => err.Contains("Create failed on purpose"));
+
+            Assert.AreEqual(2, clone[1].inner.value);
         }
     }
 }

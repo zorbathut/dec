@@ -632,6 +632,13 @@ namespace Dec
             }
         }
 
+        // For readers that are reused across bodies: clears what the previous body left behind.
+        internal void Reset()
+        {
+            asThis = false;
+            seen.Clear();
+        }
+
         internal void AllowShared(ReaderGlobals newGlobals)
         {
             if (!disallowShared)

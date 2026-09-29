@@ -10,6 +10,7 @@ namespace Dec
         private enum Kind : byte
         {
             Built,
+            Same,
             Member,
             Index,
             IndexMultidim,
@@ -39,6 +40,7 @@ namespace Dec
         }
 
         public static PathPending Built(Path path) { return new PathPending(Kind.Built, null, path, 0); }
+        public static PathPending Same(WriterNodePooled parent) { return new PathPending(Kind.Same, parent, null, 0); }
         public static PathPending Member(WriterNodePooled parent, string label) { return new PathPending(Kind.Member, parent, label, 0); }
         public static PathPending Index(WriterNodePooled parent, int index) { return new PathPending(Kind.Index, parent, null, index); }
         public static PathPending QueueElement(WriterNodePooled parent, int index) { return new PathPending(Kind.QueueElement, parent, null, index); }
@@ -63,6 +65,7 @@ namespace Dec
             switch (kind)
             {
                 case Kind.Built: return (Path)detail;
+                case Kind.Same: return parent.Path;
                 case Kind.Member: return new PathMember(parent.Path, (string)detail);
                 case Kind.Index: return new PathIndex(parent.Path, index);
                 case Kind.IndexMultidim: return new PathIndexMultidim(parent.Path, ((int[])detail).Take(index).ToArray());
@@ -80,12 +83,10 @@ namespace Dec
     internal abstract class WriterNode
     {
         private Recorder.Settings settings;
-        private Path path;
 
-        public WriterNode(Recorder.Settings settings, Path path)
+        public WriterNode(Recorder.Settings settings)
         {
             this.settings = settings;
-            this.path = path;
         }
 
         public Recorder.Settings RecorderSettings { get => settings; }
@@ -96,14 +97,7 @@ namespace Dec
         public abstract Recorder.Purpose Intent { get; }
         public abstract Recorder.IUserSettings UserSettings { get; }
 
-        // Virtual so that a writer can build its paths only on request.
-        public virtual Path Path
-        {
-            get
-            {
-                return path;
-            }
-        }
+        public abstract Path Path { get; }
 
         // I'm not real happy with the existence of this function; it's kind of a hack so that a shared Converter that writes a string or an int can avoid errors
         public void MakeRecorderContextChild()
@@ -284,7 +278,7 @@ namespace Dec
         // Bumped on every reuse, so a pending path can tell that its parent has moved on to another position.
         internal int generation;
 
-        protected WriterNodePooled() : base(new Recorder.Settings(), null)
+        protected WriterNodePooled() : base(new Recorder.Settings())
         {
         }
 

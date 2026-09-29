@@ -73,9 +73,20 @@ namespace Dec
             }
         }
 
-        private WriterNodeIntrospect(WriterIntrospect writer, Reflection.Entry entry, bool isRoot, int depth, bool writableSuppressed, Recorder.Settings settings, Path path) : base(settings, path)
+        private readonly Path path;
+
+        public override Path Path
+        {
+            get
+            {
+                return path;
+            }
+        }
+
+        private WriterNodeIntrospect(WriterIntrospect writer, Reflection.Entry entry, bool isRoot, int depth, bool writableSuppressed, Recorder.Settings settings, Path path) : base(settings)
         {
             this.writer = writer;
+            this.path = path;
             this.entry = entry;
             this.isRoot = isRoot;
             this.depth = depth;

@@ -69,8 +69,19 @@ namespace Dec
     // This is used for things that can be expressed as an easy inline string, which is used as part of the Dictionary-handling code.
     internal abstract class WriterNodeCS : WriterNode
     {
-        public WriterNodeCS(Path path) : base(new Recorder.Settings(), path)
+        private readonly Path path;
+
+        public WriterNodeCS(Path path) : base(new Recorder.Settings())
         {
+            this.path = path;
+        }
+
+        public override Path Path
+        {
+            get
+            {
+                return path;
+            }
         }
 
         public abstract void WriteToken(string token);

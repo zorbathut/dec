@@ -31,7 +31,7 @@ All notable changes to this project will be documented in this file.
 * A Recorder reference that can't be written now reads back as null instead of as a default-constructed object.
 * A non-`.Shared()` reference to an object that was already written as shared is still an error, but is now written as a working reference instead of being lost.
 * Simplified Checksum-related Paths.
-* `Recorder.Checksum` allocates far less: it reuses its nodes and recorders, and builds a position's `Dec.Path` only when something asks for it. ~75% reduction in bytes allocated and up to 40% performance gain depending on workload.
+* `Recorder.Checksum` and `Recorder.Clone` allocate far less, resulting in a 60-80% reduction in bytes allocated and up to 40% performance gain depending on workload.
 * `Recorder.Clone` allocates less on dictionaries.
 
 ### Fixed

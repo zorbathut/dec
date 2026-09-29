@@ -30,6 +30,9 @@ namespace Dec
         // One creator serves the whole operation; object construction only consults it for the duration of the call.
         private ReaderNodeCloneCreator creator;
 
+        // A node goes back here once its parent's resolution is done with it (or, if its own resolution was deferred, once that finishes), so a clone allocates about as many nodes as it holds at once rather than one per position. Free nodes are chained through their own nodeFreeNext, so the pool itself never allocates.
+        private WriterNodeClone nodeFreeHead;
+
         public WriterClone(Recorder.IUserSettings userSettings)
         {
             this.UserSettings = userSettings;
@@ -48,7 +51,30 @@ namespace Dec
 
         public WriterNodeClone StartClone(Type type)
         {
-            return WriterNodeClone.StartClone(this, type);
+            return NodeAcquire(0, new Recorder.Settings() { shared = Recorder.Settings.Shared.Flexible }, PathPending.Built(new PathRoot("RECORD")));
+        }
+
+        internal WriterNodeClone NodeAcquire(int depth, Recorder.Settings settings, PathPending path)
+        {
+            var node = nodeFreeHead;
+            if (node != null)
+            {
+                nodeFreeHead = node.nodeFreeNext;
+                node.nodeFreeNext = null;
+            }
+            else
+            {
+                node = new WriterNodeClone(this);
+            }
+
+            node.Prepare(depth, settings, path);
+            return node;
+        }
+
+        internal void NodeRelease(WriterNodeClone node)
+        {
+            node.nodeFreeNext = nodeFreeHead;
+            nodeFreeHead = node;
         }
     }
 
@@ -58,7 +84,7 @@ namespace Dec
     // thing is, this is a lazy process, so calling GetResult() also does all the work for its children
     // then we need some somewhat awkward ReaderNode subclasses for "this node, with children" and "the specific child that was requested"
     // I get the feeling that this implies a bunch of interfaces should be cleaned up, but I'm not doing that right now, so
-    internal class WriterNodeClone : WriterNode
+    internal class WriterNodeClone : WriterNodePooled
     {
         private WriterClone writer;
 
@@ -82,19 +108,79 @@ namespace Dec
         private int depth;
         private const int MaxRecursionDepth = 100;
 
+        // Set when this node's resolution was deferred to a pending write, which then releases the node itself instead of its parent doing so.
+        private bool resolvePending;
+
+        // Created on first use and kept across reuse, as is the read view; most nodes are leaves and never need them.
         private List<(string key, WriterNodeClone value)> recorderChildren;
+        private ReaderNodeCloneRecorder readerView;
+
+        internal WriterNodeClone nodeFreeNext;
 
         public override bool AllowReflection { get => writer.AllowReflection; }
         public override bool AllowDecPath { get => true; }
-        public override bool AllowAsThis { get => false; }
         public override bool AllowCloning { get => true;  }
         public override Recorder.Purpose Intent { get => Recorder.Purpose.Cloning; }
         public override Recorder.IUserSettings UserSettings { get => writer.UserSettings; }
 
-        private WriterNodeClone(WriterClone writer, int depth, Recorder.Settings settings, Path path) : base(settings, path)
+        internal WriterNodeClone(WriterClone writer)
         {
             this.writer = writer;
+        }
+
+        internal void Prepare(int depth, Recorder.Settings settings, PathPending path)
+        {
+            Reuse(settings, path);
             this.depth = depth;
+
+            model = null;
+            modelSet = false;
+            original = null;
+            originalConverter = null;
+            originalSet = false;
+            result = null;
+            resultReady = false;
+            resultIsValuelike = false;
+            resolvePending = false;
+
+            // Normally already empty; an exception partway through a resolution can leave children behind, and they're simply dropped.
+            recorderChildren?.Clear();
+        }
+
+        // Each read body gets this node's reader as if it were new.
+        private RecorderReader ReaderAcquire()
+        {
+            if (readerView == null)
+            {
+                if (recorderChildren == null)
+                {
+                    recorderChildren = new List<(string key, WriterNodeClone value)>();
+                }
+
+                readerView = new ReaderNodeCloneRecorder(recorderChildren, UserSettings);
+            }
+
+            readerView.Reset();
+            return readerView.reader;
+        }
+
+        // The children have served both of this node's passes; one whose own resolution was deferred releases itself when that runs.
+        private void ChildrenRelease()
+        {
+            if (recorderChildren == null)
+            {
+                return;
+            }
+
+            foreach (var (_, child) in recorderChildren)
+            {
+                if (!child.resolvePending)
+                {
+                    writer.NodeRelease(child);
+                }
+            }
+
+            recorderChildren.Clear();
         }
 
         internal void SetModel(object model)
@@ -213,8 +299,7 @@ namespace Dec
                 RecorderRun(converterFactory, original);
 
                 // now we create the object itself
-                var readerClone = new ReaderNodeCloneRecorder(recorderChildren, UserSettings);
-                result = new RecorderReader(readerClone, new ReaderGlobals()).BodyCreate(converterFactory);
+                result = ReaderAcquire().BodyCreate(converterFactory);
             }
             else if (originalConverter is ConverterString converterString)
             {
@@ -265,12 +350,17 @@ namespace Dec
 
                 if (doPending)
                 {
+                    // Ancestors are recycled before the pending write runs, so the path is built while they're still intact.
+                    resolvePending = true;
+                    _ = Path;
+
                     // Captures only `this`; capturing the local originalType would allocate a closure on every call, deferred or not.
                     writer.RegisterPendingWrite(() =>
                     {
                         CreateResult_Resolve(original.GetType(), resetDepth: true);
                         (original as IPostCloneOriginal)?.PostCloneOriginal();
                         (result as IPostCloneNew)?.PostCloneNew();
+                        writer.NodeRelease(this);
                     });
                     deferred = true;
                 }
@@ -351,11 +441,9 @@ namespace Dec
                     // this calls CreateRecorderChild a bunch and fills it out
                     self.RecorderRun(self.original as IRecordable);
 
-                    var readerClone = new ReaderNodeCloneRecorder(self.recorderChildren, self.UserSettings);
-
                     // do the dupe
                     var resultAsIRecordable = self.result as IRecordable;
-                    var recorderReader = new RecorderReader(readerClone, new ReaderGlobals());
+                    var recorderReader = self.ReaderAcquire();
                     try
                     {
                         recorderReader.BodyRecord(resultAsIRecordable);
@@ -656,47 +744,41 @@ namespace Dec
                     // this calls CreateRecorderChild a bunch and fills it out
                     RecorderRun(converterRecord, original);
 
-                    var readerClone = new ReaderNodeCloneRecorder(recorderChildren, UserSettings);
-
                     // object already exists
-                    result = new RecorderReader(readerClone, new ReaderGlobals()).BodyRecord(converterRecord, result);
+                    result = ReaderAcquire().BodyRecord(converterRecord, result);
                 }
                 else if (originalConverter is ConverterFactory converterFactory)
                 {
                     // the rest of this was done earlier
-                    var readerClone = new ReaderNodeCloneRecorder(recorderChildren, UserSettings);
-                    result = new RecorderReader(readerClone, new ReaderGlobals()).BodyRead(converterFactory, result);
+                    result = ReaderAcquire().BodyRead(converterFactory, result);
                 }
                 else
                 {
                     throw new NotImplementedException();
                 }
-
-                return;
             }
-
-            if (!ResolveStrategyCache.TryGetValue(valType, out var strategy))
+            else
             {
-                strategy = BuildResolveStrategy(valType);
-                ResolveStrategyCache[valType] = strategy;
+                if (!ResolveStrategyCache.TryGetValue(valType, out var strategy))
+                {
+                    strategy = BuildResolveStrategy(valType);
+                    ResolveStrategyCache[valType] = strategy;
+                }
+
+                strategy(this, resetDepth);
             }
 
-            strategy(this, resetDepth);
-        }
-
-        public static WriterNodeClone StartClone(WriterClone writer, Type type)
-        {
-            return new WriterNodeClone(writer, 0, new Recorder.Settings() { shared = Recorder.Settings.Shared.Flexible }, new PathRoot("RECORD"));
+            ChildrenRelease();
         }
 
         public override WriterNode CreateRecorderChild(string label, Recorder.Settings settings)
         {
             if (recorderChildren == null)
             {
-                recorderChildren = new List<(string, WriterNodeClone)>();
+                recorderChildren = new List<(string key, WriterNodeClone value)>();
             }
 
-            var child = new WriterNodeClone(writer, depth + 1, settings, new PathMember(Path, label));
+            var child = writer.NodeAcquire(depth + 1, settings, PathPending.Member(this, label));
             recorderChildren.Add((label, child));
             return child;
         }
@@ -718,9 +800,16 @@ namespace Dec
             // maybe I should set up more value-type-ish special cases here?
 
             var objType = obj.GetType();
-            var child = new WriterNodeClone(writer, resetDepth ? 0 : depth + 1, RecorderSettings.CreateChild(), Path);
+            var child = writer.NodeAcquire(resetDepth ? 0 : depth + 1, RecorderSettings.CreateChild(), PathPending.Same(this));
             Serialization.ComposeElement(child, obj, objType);
-            return child.GetResult(false, objType);
+            var cloned = child.GetResult(false, objType);
+
+            if (!child.resolvePending)
+            {
+                writer.NodeRelease(child);
+            }
+
+            return cloned;
         }
 
         public override void WritePrimitive(object value)
@@ -851,10 +940,25 @@ namespace Dec
 
         private List<(string key, WriterNodeClone value)> recorderChildren;
         private int searchHint = 0;
+
+        // Handed out by GetChildNamed; RecorderReader parses each child it asks for before asking for another.
+        private readonly ReaderNodeCloneRecorderItem item;
+
+        internal readonly RecorderReader reader;
+
         public ReaderNodeCloneRecorder(List<(string key, WriterNodeClone value)> recorderChildren, Recorder.IUserSettings userSettings)
         {
             this.UserSettings = userSettings;
             this.recorderChildren = recorderChildren;
+            item = new ReaderNodeCloneRecorderItem(userSettings);
+            reader = new RecorderReader(this, new ReaderGlobals());
+        }
+
+        // Readies the view and its reader for another read body, as if both were new.
+        internal void Reset()
+        {
+            searchHint = 0;
+            reader.Reset();
         }
 
         public override Context GetContext()
@@ -870,12 +974,6 @@ namespace Dec
 
         public override ReaderNode GetChildNamed(string name)
         {
-            // A write body that recorded nothing leaves no child list at all.
-            if (recorderChildren == null)
-            {
-                return null;
-            }
-
             int count = recorderChildren.Count;
 
             // Fast path: check the hint position (read order usually matches write order)
@@ -885,7 +983,7 @@ namespace Dec
                 if (hintEntry.key == name)
                 {
                     searchHint++;
-                    return new ReaderNodeCloneRecorderItem(hintEntry.value, UserSettings);
+                    return item.Point(hintEntry.value);
                 }
             }
 
@@ -896,7 +994,7 @@ namespace Dec
                 if (entry.key == name)
                 {
                     searchHint = i + 1;
-                    return new ReaderNodeCloneRecorderItem(entry.value, UserSettings);
+                    return item.Point(entry.value);
                 }
             }
 
@@ -904,11 +1002,6 @@ namespace Dec
         }
         public override string[] GetAllChildren()
         {
-            if (recorderChildren == null)
-            {
-                return new string[0];
-            }
-
             var result = new string[recorderChildren.Count];
             for (int i = 0; i < recorderChildren.Count; i++)
             {
@@ -936,10 +1029,16 @@ namespace Dec
         public override Recorder.IUserSettings UserSettings { get; }
 
         private WriterNodeClone item;
-        public ReaderNodeCloneRecorderItem(WriterNodeClone item, Recorder.IUserSettings userSettings)
+
+        public ReaderNodeCloneRecorderItem(Recorder.IUserSettings userSettings)
         {
             this.UserSettings = userSettings;
+        }
+
+        internal ReaderNodeCloneRecorderItem Point(WriterNodeClone item)
+        {
             this.item = item;
+            return this;
         }
 
         public override Context GetContext()

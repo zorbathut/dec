@@ -53,9 +53,20 @@ namespace Dec
         public override Recorder.Purpose Intent { get => Recorder.Purpose.Serialization; }
         public override Recorder.IUserSettings UserSettings { get => writer.UserSettings; }
 
-        private WriterNodeXml(WriterXml writer, XContainer parent, string label, int depth, Recorder.Settings settings, Path path) : base(settings, path)
+        public override Path Path
+        {
+            get
+            {
+                return path;
+            }
+        }
+
+        private readonly Path path;
+
+        private WriterNodeXml(WriterXml writer, XContainer parent, string label, int depth, Recorder.Settings settings, Path path) : base(settings)
         {
             this.writer = writer;
+            this.path = path;
             this.depth = depth;
 
             node = new XElement(label);
