@@ -1311,6 +1311,165 @@ namespace DecTest
             }
         }
 
+        public enum RecorderReadScopeOperation
+        {
+            Read,
+            Clone,
+        }
+
+        private static void RunRecorderReadScopeOperation<T>(RecorderReadScopeOperation operation, T value)
+        {
+            switch (operation)
+            {
+                case RecorderReadScopeOperation.Read: Dec.Recorder.Read<T>(Dec.Recorder.Write(value)); break;
+                case RecorderReadScopeOperation.Clone: Dec.Recorder.Clone(value); break;
+            }
+        }
+
+        public class RecorderReadStasher : Dec.IRecordable
+        {
+            public static Dec.Recorder Stashed;
+
+            public int value;
+
+            public void Record(Dec.Recorder record)
+            {
+                if (record.Mode == Dec.Recorder.Direction.Read)
+                {
+                    Stashed = record;
+                }
+
+                record.Record(ref value, "value");
+            }
+        }
+
+        [Test]
+        public void RecorderReadAfterRecord([Values] RecorderReadScopeOperation operation)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            RecorderReadStasher.Stashed = null;
+            RunRecorderReadScopeOperation(operation, new RecorderReadStasher { value = 3 });
+            Assert.IsNotNull(RecorderReadStasher.Stashed);
+
+            int late = 4;
+            ExpectErrors(() => RecorderReadStasher.Stashed.Record(ref late, "late"), err => err.Contains("late"));
+        }
+
+        public class RecorderReadStashParent : Dec.IRecordable
+        {
+            public static Dec.Recorder Stashed;
+
+            public RecorderReadStashChild child;
+
+            public void Record(Dec.Recorder record)
+            {
+                if (record.Mode == Dec.Recorder.Direction.Read)
+                {
+                    Stashed = record;
+                }
+
+                record.Record(ref child, "child");
+            }
+        }
+
+        public class RecorderReadStashChild : Dec.IRecordable
+        {
+            public int value;
+
+            public void Record(Dec.Recorder record)
+            {
+                if (record.Mode == Dec.Recorder.Direction.Read)
+                {
+                    RecorderReadStashParent.Stashed.Record(ref value, "hijacked");
+                }
+            }
+        }
+
+        [Test]
+        public void RecorderReadFromNestedRecord([Values] RecorderReadScopeOperation operation)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var parent = new RecorderReadStashParent { child = new RecorderReadStashChild { value = 5 } };
+
+            ExpectErrors(() => RunRecorderReadScopeOperation(operation, parent), err => err.Contains("hijacked"));
+        }
+
+        public class RecorderIgnoreStashParent : Dec.IRecordable
+        {
+            public static Dec.Recorder Stashed;
+
+            public RecorderIgnoreStashChild child;
+
+            public void Record(Dec.Recorder record)
+            {
+                if (record.Mode == Dec.Recorder.Direction.Read)
+                {
+                    Stashed = record;
+                }
+
+                record.Record(ref child, "child");
+            }
+        }
+
+        public class RecorderIgnoreStashChild : Dec.IRecordable
+        {
+            public int value;
+
+            public void Record(Dec.Recorder record)
+            {
+                if (record.Mode == Dec.Recorder.Direction.Read)
+                {
+                    RecorderIgnoreStashParent.Stashed.Ignore("ignoredProbe");
+                }
+
+                record.Record(ref value, "value");
+            }
+        }
+
+        [Test]
+        public void RecorderIgnoreFromNestedRecord([Values] RecorderReadScopeOperation operation)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var parent = new RecorderIgnoreStashParent { child = new RecorderIgnoreStashChild { value = 5 } };
+
+            ExpectErrors(() => RunRecorderReadScopeOperation(operation, parent), err => err.Contains("ignoredProbe"));
+        }
+
+        public class NestedOperationReadRecordable : Dec.IRecordable
+        {
+            public int before;
+            public int after;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref before, "before");
+
+                if (record.Mode == Dec.Recorder.Direction.Read)
+                {
+                    Dec.Recorder.Read<StubRecordableInt>(Dec.Recorder.Write(new StubRecordableInt { data = 6 }));
+                    Dec.Recorder.Write(new StubRecordableInt { data = 7 });
+                    Dec.Recorder.Checksum(new StubRecordableInt { data = 8 });
+                    Dec.Recorder.Clone(new StubRecordableInt { data = 9 });
+                }
+
+                record.Record(ref after, "after");
+            }
+        }
+
+        [Test]
+        public void RecorderNestedOperationInRead([Values] RecorderMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var deserialized = DoRecorderRoundTrip(new NestedOperationReadRecordable { before = 1, after = 2 }, mode);
+
+            Assert.AreEqual(1, deserialized.before);
+            Assert.AreEqual(2, deserialized.after);
+        }
+
         [Test]
         public void RecorderNestedOperation([Values] RecorderMode mode)
         {

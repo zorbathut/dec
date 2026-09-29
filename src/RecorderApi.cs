@@ -117,7 +117,7 @@ namespace Dec
                                 var recorderReader = new RecorderReader(reference.node, readerGlobals, trackUsage: true);
                                 try
                                 {
-                                    converterRecord.RecordObj(refInstance, recorderReader);
+                                    recorderReader.BodyRecord(converterRecord, refInstance);
                                     recorderReader.ReportUnusedFields();
                                 }
                                 catch (Exception e)
@@ -132,7 +132,7 @@ namespace Dec
                             try
                             {
                                 var recorderReader = new RecorderReader(reference.node, readerGlobals, disallowShared: true, trackUsage: true);
-                                refInstance = converterFactory.CreateObj(recorderReader);
+                                refInstance = recorderReader.BodyCreate(converterFactory);
 
                                 // the next parse step, if we have one
                                 furtherParsing.Add(() =>
@@ -140,7 +140,7 @@ namespace Dec
                                     recorderReader.AllowShared(readerGlobals);
                                     try
                                     {
-                                        converterFactory.ReadObj(refInstance, recorderReader);
+                                        recorderReader.BodyRead(converterFactory, refInstance);
                                         recorderReader.ReportUnusedFields();
                                     }
                                     catch (Exception e)

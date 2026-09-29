@@ -578,6 +578,60 @@ namespace Dec
             this.disallowShared = disallowShared;
             this.trackUsage = trackUsage;
         }
+
+        // Every user Record()-style body on the read side runs through one of these, so its recorder is in scope for exactly as long as the body is running.
+        internal void BodyRecord(IRecordable recordable)
+        {
+            var outer = Open();
+            try
+            {
+                recordable.Record(this);
+            }
+            finally
+            {
+                Close(outer);
+            }
+        }
+
+        internal object BodyRecord(ConverterRecord converter, object input)
+        {
+            var outer = Open();
+            try
+            {
+                return converter.RecordObj(input, this);
+            }
+            finally
+            {
+                Close(outer);
+            }
+        }
+
+        internal object BodyCreate(ConverterFactory converter)
+        {
+            var outer = Open();
+            try
+            {
+                return converter.CreateObj(this);
+            }
+            finally
+            {
+                Close(outer);
+            }
+        }
+
+        internal object BodyRead(ConverterFactory converter, object input)
+        {
+            var outer = Open();
+            try
+            {
+                return converter.ReadObj(input, this);
+            }
+            finally
+            {
+                Close(outer);
+            }
+        }
+
         internal void AllowShared(ReaderGlobals newGlobals)
         {
             if (!disallowShared)
@@ -595,6 +649,12 @@ namespace Dec
 
         internal override void Record<T>(ref T value, string label, Parameters parameters)
         {
+            if (!IsInnermost())
+            {
+                Dbg.Err($"{node.GetContext()}: Attempted to read `{label}` through a Recorder outside the Record() call it was passed to; skipping it. A Recorder is valid only on the calling thread, until its Record() call returns, and not while a nested object's Record() is running.");
+                return;
+            }
+
             if (asThis)
             {
                 Dbg.Err($"{node.GetContext()}: Attempting to read a second field after a RecordAsThis call");
@@ -647,6 +707,12 @@ namespace Dec
 
         public override void Ignore(string label)
         {
+            if (!IsInnermost())
+            {
+                Dbg.Err($"{node.GetContext()}: Attempted to ignore `{label}` through a Recorder outside the Record() call it was passed to; skipping it. A Recorder is valid only on the calling thread, until its Record() call returns, and not while a nested object's Record() is running.");
+                return;
+            }
+
             if (node.GetChildNamed(label) != null)
             {
                 seen.Add(label);

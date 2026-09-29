@@ -214,7 +214,7 @@ namespace Dec
 
                 // now we create the object itself
                 var readerClone = new ReaderNodeCloneRecorder(recorderChildren, UserSettings);
-                result = converterFactory.CreateObj(new RecorderReader(readerClone, new ReaderGlobals()));
+                result = new RecorderReader(readerClone, new ReaderGlobals()).BodyCreate(converterFactory);
             }
             else if (originalConverter is ConverterString converterString)
             {
@@ -358,7 +358,7 @@ namespace Dec
                     var recorderReader = new RecorderReader(readerClone, new ReaderGlobals());
                     try
                     {
-                        resultAsIRecordable.Record(recorderReader);
+                        recorderReader.BodyRecord(resultAsIRecordable);
                     }
                     catch (Exception e)
                     {
@@ -659,13 +659,13 @@ namespace Dec
                     var readerClone = new ReaderNodeCloneRecorder(recorderChildren, UserSettings);
 
                     // object already exists
-                    result = converterRecord.RecordObj(result, new RecorderReader(readerClone, new ReaderGlobals()));
+                    result = new RecorderReader(readerClone, new ReaderGlobals()).BodyRecord(converterRecord, result);
                 }
                 else if (originalConverter is ConverterFactory converterFactory)
                 {
                     // the rest of this was done earlier
                     var readerClone = new ReaderNodeCloneRecorder(recorderChildren, UserSettings);
-                    result = converterFactory.ReadObj(result, new RecorderReader(readerClone, new ReaderGlobals()));
+                    result = new RecorderReader(readerClone, new ReaderGlobals()).BodyRead(converterFactory, result);
                 }
                 else
                 {

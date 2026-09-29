@@ -963,7 +963,7 @@ namespace Dec
                             var recorderReader = new RecorderReader(node, globals, trackUsage: true);
                             try
                             {
-                                object returnedResult = converterRecord.RecordObj(result, recorderReader);
+                                object returnedResult = recorderReader.BodyRecord(converterRecord, result);
 
                                 if (!type.IsValueType && result != returnedResult)
                                 {
@@ -1010,7 +1010,7 @@ namespace Dec
                         {
                             try
                             {
-                                result = converterFactory.CreateObj(recorderReader);
+                                result = recorderReader.BodyCreate(converterFactory);
                             }
                             catch (Exception e)
                             {
@@ -1024,7 +1024,7 @@ namespace Dec
                             recorderReader.AllowShared(globals);
                             try
                             {
-                                result = converterFactory.ReadObj(result, recorderReader);
+                                result = recorderReader.BodyRead(converterFactory, result);
                                 recorderReader.ReportUnusedFields();
                             }
                             catch (Exception e)
@@ -1128,7 +1128,7 @@ namespace Dec
                             var recorderReader = new RecorderReader(node, globals, trackUsage: true);
                             try
                             {
-                                recordable.Record(recorderReader);
+                                recorderReader.BodyRecord(recordable);
                             }
                             catch (Exception e)
                             {
