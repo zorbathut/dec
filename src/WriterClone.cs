@@ -850,6 +850,12 @@ namespace Dec
 
         public override ReaderNode GetChildNamed(string name)
         {
+            // A write body that recorded nothing leaves no child list at all.
+            if (recorderChildren == null)
+            {
+                return null;
+            }
+
             int count = recorderChildren.Count;
 
             // Fast path: check the hint position (read order usually matches write order)
@@ -878,6 +884,11 @@ namespace Dec
         }
         public override string[] GetAllChildren()
         {
+            if (recorderChildren == null)
+            {
+                return new string[0];
+            }
+
             var result = new string[recorderChildren.Count];
             for (int i = 0; i < recorderChildren.Count; i++)
             {

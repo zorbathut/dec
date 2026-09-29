@@ -40,6 +40,7 @@ All notable changes to this project will be documented in this file.
 * The error for two non-`.Shared()` references to one object no longer claims that the second was shared.
 * Warnings for serializing a type that can't be constructed were incorrectly formatted.
 * A gnarly error caused when checksumming a multidimensional array holding both RecordAsThis() elements and nulls.
+* `Recorder.Clone` of an object whose `Record()` reads fields but writes none crashed with a NullReferenceException.
 
 
 ## [v0.11.1]

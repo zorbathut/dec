@@ -236,5 +236,27 @@ namespace DecTest
 
             Assert.IsNull(listToArrayClone.list);
         }
+
+        public class ReadOnlyLegacyRecordable : IRecordable
+        {
+            public int legacy;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                if (recorder.Mode == Dec.Recorder.Direction.Read)
+                {
+                    recorder.Record(ref legacy, "legacy");
+                }
+            }
+        }
+
+        [Test]
+        public void ReadWithNothingWritten()
+        {
+            var clone = Dec.Recorder.Clone(new ReadOnlyLegacyRecordable { legacy = 3 });
+
+            Assert.IsNotNull(clone);
+            Assert.AreEqual(0, clone.legacy);
+        }
     }
 }
