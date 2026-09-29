@@ -78,6 +78,39 @@ namespace Dec
     {
         public interface IUserSettings { }
 
+        // The recorder whose Record() body is running on this thread, reader or writer. Only it may record; anything else is a recorder kept past its call, or an enclosing object's recorder reached from inside a nested Record().
+        [ThreadStatic] private static Recorder Innermost;
+
+        // Open and Close bracket a user Record() body; Open returns the recorder that was innermost before, for the matching Close to restore.
+        internal Recorder Open()
+        {
+            if (Innermost == this)
+            {
+                Dbg.Err("Internal error: Recorder opened while it was already the innermost open recorder");
+            }
+
+            var outer = Innermost;
+            Innermost = this;
+            return outer;
+        }
+
+        internal void Close(Recorder outer)
+        {
+            // Restore before reporting; a throwing error handler would otherwise leave this thread pointing at a finished recorder.
+            bool wasInnermost = Innermost == this;
+            Innermost = outer;
+
+            if (!wasInnermost)
+            {
+                Dbg.Err("Internal error: Recorder closed while it wasn't the innermost open recorder");
+            }
+        }
+
+        internal bool IsInnermost()
+        {
+            return Innermost == this;
+        }
+
         public struct Parameters : IRecorder
         {
             internal Recorder recorder;
@@ -446,9 +479,6 @@ namespace Dec
 
     internal class RecorderWriter : Recorder
     {
-        // The recorder whose Record() body is running on this thread. Only it may record; anything else is a recorder kept past its call, or an enclosing object's recorder reached from inside a nested Record().
-        [ThreadStatic] private static RecorderWriter Innermost;
-
         private bool asThis = false;
         private readonly HashSet<string> fields = new HashSet<string>();
         private readonly WriterNode node;
@@ -458,32 +488,11 @@ namespace Dec
             this.node = node;
         }
 
-        // Open and Close bracket a user Record() body; Open returns the recorder that was innermost before, for the matching Close to restore. A recorder can be opened again for reuse after it closes, so this also clears what the previous body left behind.
-        internal RecorderWriter Open()
+        // For writers that reuse a recorder across bodies: clears what the previous body left behind.
+        internal void Reset()
         {
-            if (Innermost == this)
-            {
-                Dbg.Err("Internal error: RecorderWriter opened while it was already the innermost open recorder");
-            }
-
             asThis = false;
             fields.Clear();
-
-            var outer = Innermost;
-            Innermost = this;
-            return outer;
-        }
-
-        internal void Close(RecorderWriter outer)
-        {
-            // Restore before reporting; a throwing error handler would otherwise leave this thread pointing at a finished recorder.
-            bool wasInnermost = Innermost == this;
-            Innermost = outer;
-
-            if (!wasInnermost)
-            {
-                Dbg.Err("Internal error: RecorderWriter closed while it wasn't the innermost open recorder");
-            }
         }
 
         public override IUserSettings UserSettings { get => node.UserSettings; }
@@ -492,7 +501,7 @@ namespace Dec
 
         internal override void Record<T>(ref T value, string label, Parameters parameters)
         {
-            if (Innermost != this)
+            if (!IsInnermost())
             {
                 Dbg.Err($"Attempted to record `{label}` through a Recorder outside the Record() call it was passed to; skipping it. A Recorder is valid only on the calling thread, until its Record() call returns, and not while a nested object's Record() is running.");
                 return;

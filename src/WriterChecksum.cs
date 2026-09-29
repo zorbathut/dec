@@ -208,6 +208,7 @@ namespace Dec
                 recorder = new RecorderWriter(this);
             }
 
+            recorder.Reset();
             return recorder;
         }
 
