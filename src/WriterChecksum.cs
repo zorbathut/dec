@@ -94,90 +94,18 @@ namespace Dec
         }
     }
 
-    internal class WriterNodeChecksum : WriterNode
+    internal class WriterNodeChecksum : WriterNodePooled
     {
         private readonly WriterChecksum writer;
         private readonly int depth;
-        private RecorderWriter recorder;
 
         public override bool AllowReflection { get => writer.AllowReflection; }
         public override bool AllowDecPath { get => true; }
-        public override bool AllowAsThis { get => false; }
         public override bool AllowCloning { get => false;  }
         public override Recorder.Purpose Intent { get => Recorder.Purpose.Checksum; }
         public override Recorder.IUserSettings UserSettings { get => writer.UserSettings; }
 
         internal bool unordered;
-
-        private PathPending pathPending;
-        private Path pathBuilt;
-
-        private enum PathKind
-        {
-            Built,
-            Member,
-            Index,
-            IndexMultidim,
-            QueueElement,
-            StackElement,
-            TupleItem,
-            DictionaryKey,
-            DictionaryValue,
-            HashSetElement,
-        }
-
-        // A position described relative to the node whose path it extends, built into a Path only when something asks for it; most checksums never do. The parent is always an ancestor on the live stack, so it holds still for as long as this description is used.
-        private struct PathPending
-        {
-            public PathKind kind;
-            public WriterNodeChecksum parent;
-            public object detail;
-            public int index;
-
-            public static PathPending Built(Path path) { return new PathPending { kind = PathKind.Built, detail = path }; }
-            public static PathPending Member(WriterNodeChecksum parent, string label) { return new PathPending { kind = PathKind.Member, parent = parent, detail = label }; }
-            public static PathPending Index(WriterNodeChecksum parent, int index) { return new PathPending { kind = PathKind.Index, parent = parent, index = index }; }
-            public static PathPending QueueElement(WriterNodeChecksum parent, int index) { return new PathPending { kind = PathKind.QueueElement, parent = parent, index = index }; }
-            public static PathPending StackElement(WriterNodeChecksum parent, int index) { return new PathPending { kind = PathKind.StackElement, parent = parent, index = index }; }
-            public static PathPending TupleItem(WriterNodeChecksum parent, int index) { return new PathPending { kind = PathKind.TupleItem, parent = parent, index = index }; }
-            public static PathPending DictionaryKey(WriterNodeChecksum parent) { return new PathPending { kind = PathKind.DictionaryKey, parent = parent }; }
-            public static PathPending DictionaryValue(WriterNodeChecksum parent, object key) { return new PathPending { kind = PathKind.DictionaryValue, parent = parent, detail = key }; }
-            public static PathPending HashSetElement(WriterNodeChecksum parent) { return new PathPending { kind = PathKind.HashSetElement, parent = parent }; }
-
-            // Takes the live index array rather than a copy; the entries up to this position's rank don't change while it's being written.
-            public static PathPending IndexMultidim(WriterNodeChecksum parent, int[] indices, int rank) { return new PathPending { kind = PathKind.IndexMultidim, parent = parent, detail = indices, index = rank }; }
-
-            public Path Build()
-            {
-                switch (kind)
-                {
-                    case PathKind.Built: return (Path)detail;
-                    case PathKind.Member: return new PathMember(parent.Path, (string)detail);
-                    case PathKind.Index: return new PathIndex(parent.Path, index);
-                    case PathKind.IndexMultidim: return new PathIndexMultidim(parent.Path, ((int[])detail).Take(index).ToArray());
-                    case PathKind.QueueElement: return new PathQueueElement(parent.Path, index);
-                    case PathKind.StackElement: return new PathStackElement(parent.Path, index);
-                    case PathKind.TupleItem: return new PathTupleItem(parent.Path, index);
-                    case PathKind.DictionaryKey: return new PathDictionaryKey(parent.Path);
-                    case PathKind.DictionaryValue: return new PathDictionaryValue(parent.Path, detail.ToString());
-                    case PathKind.HashSetElement: return new PathHashSetElement(parent.Path);
-                    default: Dbg.Err($"Internal error: unknown checksum path kind {kind}"); return null;
-                }
-            }
-        }
-
-        public override Path Path
-        {
-            get
-            {
-                if (pathBuilt == null)
-                {
-                    pathBuilt = pathPending.Build();
-                }
-
-                return pathBuilt;
-            }
-        }
 
         public static WriterNodeChecksum Start(WriterChecksum writer)
         {
@@ -187,29 +115,15 @@ namespace Dec
         private static WriterNodeChecksum Acquire(WriterChecksum writer, int depth, bool unordered, Recorder.Settings settings, PathPending path)
         {
             var node = writer.NodeAt(depth);
-            node.Reset(settings);
+            node.Reuse(settings, path);
             node.unordered = unordered;
-            node.pathPending = path;
-            node.pathBuilt = null;
             return node;
         }
 
-        internal WriterNodeChecksum(WriterChecksum writer, int depth) : base(new Recorder.Settings(), null)
+        internal WriterNodeChecksum(WriterChecksum writer, int depth)
         {
             this.writer = writer;
             this.depth = depth;
-        }
-
-        protected override RecorderWriter RecorderAcquire()
-        {
-            // Checksum never re-enters a node through RecordAsThis (AllowAsThis is false), so one recorder per node is enough.
-            if (recorder == null)
-            {
-                recorder = new RecorderWriter(this);
-            }
-
-            recorder.Reset();
-            return recorder;
         }
 
         private enum NodeTag

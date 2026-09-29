@@ -1,8 +1,82 @@
 using System;
 using System.Collections;
+using System.Linq;
 
 namespace Dec
 {
+    // A pooled writer node's position, described relative to the node whose path it extends and built into a Path only when something asks for it; most traversals never do.
+    internal struct PathPending
+    {
+        private enum Kind : byte
+        {
+            Built,
+            Member,
+            Index,
+            IndexMultidim,
+            QueueElement,
+            StackElement,
+            TupleItem,
+            DictionaryKey,
+            DictionaryValue,
+            HashSetElement,
+        }
+
+        private WriterNodePooled parent;
+        private object detail;
+        private int index;
+        private Kind kind;
+
+        // Truncated to keep this struct at 24 bytes, one per pooled node; a reused parent would have to come back after an exact multiple of 65536 reuses to slip past the check.
+        private ushort parentGeneration;
+
+        private PathPending(Kind kind, WriterNodePooled parent, object detail, int index)
+        {
+            this.kind = kind;
+            this.parent = parent;
+            this.parentGeneration = (ushort)(parent?.generation ?? 0);
+            this.detail = detail;
+            this.index = index;
+        }
+
+        public static PathPending Built(Path path) { return new PathPending(Kind.Built, null, path, 0); }
+        public static PathPending Member(WriterNodePooled parent, string label) { return new PathPending(Kind.Member, parent, label, 0); }
+        public static PathPending Index(WriterNodePooled parent, int index) { return new PathPending(Kind.Index, parent, null, index); }
+        public static PathPending QueueElement(WriterNodePooled parent, int index) { return new PathPending(Kind.QueueElement, parent, null, index); }
+        public static PathPending StackElement(WriterNodePooled parent, int index) { return new PathPending(Kind.StackElement, parent, null, index); }
+        public static PathPending TupleItem(WriterNodePooled parent, int index) { return new PathPending(Kind.TupleItem, parent, null, index); }
+        public static PathPending DictionaryKey(WriterNodePooled parent) { return new PathPending(Kind.DictionaryKey, parent, null, 0); }
+        public static PathPending DictionaryValue(WriterNodePooled parent, object key) { return new PathPending(Kind.DictionaryValue, parent, key, 0); }
+        public static PathPending HashSetElement(WriterNodePooled parent) { return new PathPending(Kind.HashSetElement, parent, null, 0); }
+
+        // Takes the live index array rather than a copy; the entries up to this position's rank don't change while it's being written.
+        public static PathPending IndexMultidim(WriterNodePooled parent, int[] indices, int rank) { return new PathPending(Kind.IndexMultidim, parent, indices, rank); }
+
+        public Path Build()
+        {
+            if (parent != null && (ushort)parent.generation != parentGeneration)
+            {
+                // Following the parent now would describe some other position, and can loop back on itself.
+                Dbg.Err("Internal error: a pending path outlived its parent node");
+                return new PathRoot("UNKNOWN");
+            }
+
+            switch (kind)
+            {
+                case Kind.Built: return (Path)detail;
+                case Kind.Member: return new PathMember(parent.Path, (string)detail);
+                case Kind.Index: return new PathIndex(parent.Path, index);
+                case Kind.IndexMultidim: return new PathIndexMultidim(parent.Path, ((int[])detail).Take(index).ToArray());
+                case Kind.QueueElement: return new PathQueueElement(parent.Path, index);
+                case Kind.StackElement: return new PathStackElement(parent.Path, index);
+                case Kind.TupleItem: return new PathTupleItem(parent.Path, index);
+                case Kind.DictionaryKey: return new PathDictionaryKey(parent.Path);
+                case Kind.DictionaryValue: return new PathDictionaryValue(parent.Path, detail.ToString());
+                case Kind.HashSetElement: return new PathHashSetElement(parent.Path);
+                default: Dbg.Err($"Internal error: unknown path kind {kind}"); return null;
+            }
+        }
+    }
+
     internal abstract class WriterNode
     {
         private Recorder.Settings settings;
@@ -198,6 +272,58 @@ namespace Dec
             string message = $"Attempted to create {attempted} at [{path.Serialize()}] to a previously-seen {(priorWasShared ? "shared" : "unshared")} object at [{priorPath.Serialize()}]. This cannot be serialized faithfully. {advice}";
             Dbg.Err(message);
             return message;
+        }
+    }
+
+    // A node its writer hands out again once the position it described is finished. Its path is built only on request, and it keeps one recorder for every body it runs.
+    internal abstract class WriterNodePooled : WriterNode
+    {
+        private PathPending pathPending;
+        private RecorderWriter recorder;
+
+        // Bumped on every reuse, so a pending path can tell that its parent has moved on to another position.
+        internal int generation;
+
+        protected WriterNodePooled() : base(new Recorder.Settings(), null)
+        {
+        }
+
+        // One recorder per node is only enough because a pooled node is never re-entered through RecordAsThis.
+        public sealed override bool AllowAsThis
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        public override Path Path
+        {
+            get
+            {
+                // Once built, the path replaces its description, which then no longer needs the parent.
+                var path = pathPending.Build();
+                pathPending = PathPending.Built(path);
+                return path;
+            }
+        }
+
+        protected void Reuse(Recorder.Settings settings, PathPending path)
+        {
+            Reset(settings);
+            ++generation;
+            pathPending = path;
+        }
+
+        protected override RecorderWriter RecorderAcquire()
+        {
+            if (recorder == null)
+            {
+                recorder = new RecorderWriter(this);
+            }
+
+            recorder.Reset();
+            return recorder;
         }
     }
 }
