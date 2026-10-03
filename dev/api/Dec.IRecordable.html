@@ -125,7 +125,7 @@ Interface IRecordable  <a class="header-action link-secondary" title="View sourc
 
   <h3 id="Dec_IRecordable_Record_Dec_Recorder_" data-uid="Dec.IRecordable.Record(Dec.Recorder)">
   Record(Recorder)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L38"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Recorder.cs/#L40"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Serializes or deserializes this object to Recorder.</p>
@@ -164,6 +164,7 @@ Interface IRecordable  <a class="header-action link-secondary" title="View sourc
   <h4 class="section" id="Dec_IRecordable_Record_Dec_Recorder__remarks">Remarks</h4>
   <div class="markdown level1 remarks"><p>This function is called both for serialization and deserialization. In most cases, you can simply call Recorder.Record functions to do the right thing.</p>
 <p>For more complicated requirements, check out Recorder's interface.</p>
+<p>The recorder is valid only on the calling thread and only until this call returns. Don't keep it, and don't record through it while a nested object's Record() is running.</p>
 </div>
 
 
