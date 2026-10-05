@@ -372,7 +372,7 @@ namespace DecTest
         [Test]
         public void AllocationPerRecord()
         {
-            // Each extra struct element costs two boxes, a reference-table entry, and list growth, around 120 bytes in all; a recorder, reader, and read view of its own per Record() call would add several hundred more.
+            // Each extra struct element costs two boxes and list growth, around 64 bytes in all. An entry in the reference table would add 50 to 150 more, depending on where the table's growth lands, and a recorder, reader, and read view of its own per Record() call would add several hundred.
             List<StringRecordable> Make(int count)
             {
                 return Enumerable.Range(0, count).Select(i => new StringRecordable { value = $"value{i}" }).ToList();
@@ -385,7 +385,7 @@ namespace DecTest
             CloneAllocatedBytes(large);
 
             long extra = CloneAllocatedBytes(large) - CloneAllocatedBytes(small);
-            Assert.Less(extra, 1000 * 250, "Clone should not allocate recorders per Record() call");
+            Assert.Less(extra, 1000 * 90, "Clone should allocate nothing per struct element beyond its boxes and list growth");
         }
 
         public class ClonePathProbe : IRecordable

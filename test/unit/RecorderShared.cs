@@ -251,5 +251,30 @@ namespace DecTest
 
             Assert.AreSame(deserialized, deserialized.root);
         }
+
+        public struct BoxedRecordable : Dec.IRecordable
+        {
+            public int value;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref value, "value");
+            }
+        }
+
+        [Test]
+        public void BoxReachedTwice([Values] RecorderMode mode)
+        {
+            // A value type is copied at every position, so a box reached twice comes back as two.
+            object box = new BoxedRecordable { value = 5 };
+            var list = new List<object> { box, box };
+
+            var deserialized = DoRecorderRoundTrip(list, mode);
+
+            Assert.AreEqual(5, ((BoxedRecordable)deserialized[0]).value);
+            Assert.AreEqual(5, ((BoxedRecordable)deserialized[1]).value);
+            Assert.AreNotSame(deserialized[0], deserialized[1]);
+        }
+
     }
 }

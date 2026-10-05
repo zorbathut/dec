@@ -266,8 +266,13 @@ namespace Dec
                 return;
             }
 
+            var originalType = original.GetType();
+
+            // Value types are copied at every position, as Write does; only reference types have an identity to preserve.
+            bool tracked = !originalType.IsValueType;
+
             // see if we already have a reference
-            if (writer.cloneReferences.TryGetValue(original, out var clone))
+            if (tracked && writer.cloneReferences.TryGetValue(original, out var clone))
             {
                 result = clone;
                 return;
@@ -276,7 +281,6 @@ namespace Dec
             // make our object
             // tuples are sort of busted and we're going to punt on them for now
             // this needs to deal with anything that has complicated constructor behavior
-            var originalType = original.GetType();
 
             // make sure originalType can be converted to intendedType
             if (!intendedType.IsAssignableFrom(originalType))
@@ -325,7 +329,10 @@ namespace Dec
 
             // put this in first so we can use the reference if we need it through the recursion
             // this probably does not work at all for tuple.
-            writer.cloneReferences[original] = result;
+            if (tracked)
+            {
+                writer.cloneReferences[original] = result;
+            }
 
             // at this point we have the right object even if we don't have enough room on the stack
             // although that's not as useful if this is a struct
@@ -377,7 +384,10 @@ namespace Dec
             }
 
             // this is a hacky way of getting around the Tuple problem. this should really be fixed.
-            writer.cloneReferences[original] = result;
+            if (tracked)
+            {
+                writer.cloneReferences[original] = result;
+            }
         }
 
         private void DoArrayRecursive(Array original, Array result, int[] dimensions, int[] index, int rank, bool resetDepth)

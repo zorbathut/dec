@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 * `Dec.Path` can no longer be subclassed outside the library; it gained an internal abstract member. Let me know if you needed that.
 * It is now an error to use a shared class that overrides `GetHashCode()` as a dictionary key or hash set element. Sharing value-hashed keys has never worked properly; this adds an error to it. Classes without GetHashCode() still work; shared identity-hashed keys continue to be supported. If you have a shared class overriding GetHashCode() just to reimplement identity hashing then it will now break, but also, that's weird? Why were you doing that? Let me know if you need a workaround. 
 * Using a Recorder outside the `Record()` call it was passed to is now reported as an error in most cases. That covers a Recorder kept past its call, one used from another thread, and an enclosing object's Recorder used while a nested `Record()` is running. None of these ever worked reliably and I hope nobody was doing them; if you were, come pester me on Discord.
+* `Recorder.Clone` copies a boxed struct reached from two places into two boxes, as Write and Read always have, instead of sharing one.
 
 ### Obsoleted
 * `ConfigErrors` and `PostLoad` are now marked `[Obsolete]` in favor of `[Dec.Setup]` functions. They'll be removed in the future.
@@ -43,6 +44,7 @@ All notable changes to this project will be documented in this file.
 * A gnarly error caused when checksumming a multidimensional array holding both RecordAsThis() elements and nulls.
 * `Recorder.Clone` of an object whose `Record()` reads fields but writes none crashed with a NullReferenceException.
 * `Recorder.Clone` could crash with a NullReferenceException in deep stacks when an object failed to construct, or when a `Tuple` field started out null.
+* `Recorder.Clone` was quadratic on collections of structs with a common first field.
 
 
 ## [v0.11.1]
