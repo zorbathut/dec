@@ -2127,14 +2127,18 @@ namespace Dec
                 return;
             }
 
-            if (Database.IsForbidden(value))
+            // Neither the forbid table nor the dec-path table can hold a value type or a string, so those skip both lookups.
+            // Here so we can handle both at once instead of doing this calculation twice.
+            bool tableCandidate = !(value is ValueType) && !(value is string);
+
+            if (tableCandidate && Database.IsForbidden(value))
             {
                 Dbg.Err($"Attempting to record {value} which has been explicitly forbidden from recording");
                 node.WriteExplicitNull();
                 return;
             }
 
-            if (node.AllowDecPath)
+            if (tableCandidate && node.AllowDecPath)
             {
                 // Try to snag a Dec path
                 var decPath = Database.GetDecPathFromObj(value);

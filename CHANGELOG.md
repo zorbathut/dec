@@ -35,6 +35,7 @@ All notable changes to this project will be documented in this file.
 * Simplified Checksum-related Paths.
 * `Recorder.Checksum` and `Recorder.Clone` allocate far less, resulting in a 60-80% reduction in bytes allocated and up to 40% performance gain depending on workload.
 * `Recorder.Clone` allocates less on dictionaries.
+* `Recorder.Write`, `Recorder.Clone`, and `Recorder.Checksum` are up to 35% faster, depending on workload, in projects that use `DecLookup` or `DecRegister` functionality.
 
 ### Fixed
 * Recorder.Read crash on a `<Ref>` element with invalid `class`.
