@@ -8,21 +8,6 @@ namespace Dec
     // Engine for the post-load setup pass: collects instances of setup-bearing types during parser and recorder loads, then builds and executes the setup dependency graph before the load returns.
     internal static class Setup
     {
-        internal class ReferenceEqualityComparer : IEqualityComparer<object>
-        {
-            public static readonly ReferenceEqualityComparer Instance = new ReferenceEqualityComparer();
-
-            bool IEqualityComparer<object>.Equals(object lhs, object rhs)
-            {
-                return ReferenceEquals(lhs, rhs);
-            }
-
-            int IEqualityComparer<object>.GetHashCode(object obj)
-            {
-                return System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(obj);
-            }
-        }
-
         internal enum Mode
         {
             Parser,
@@ -88,7 +73,7 @@ namespace Dec
                 {
                     list = new List<Entry>();
                     instancesByType[type] = list;
-                    instancesSeen[type] = new Dictionary<object, int>(ReferenceEqualityComparer.Instance);
+                    instancesSeen[type] = new Dictionary<object, int>(ComparerIdentity.Instance);
                 }
 
                 var seen = instancesSeen[type];

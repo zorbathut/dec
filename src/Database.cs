@@ -53,7 +53,7 @@ namespace Dec
         }
 
         // Reference-identity mirror of DecPathLookupComplete's key set, for DecPathKnown. The dictionaries use default equality, which is fine for their own lookups, but the setup exclusion must not treat a fresh savegame object as database-owned just because it Equals one, and must never run user GetHashCode/Equals during a Read.
-        private static HashSet<object> DecPathKnownSet = new HashSet<object>(Setup.ReferenceEqualityComparer.Instance);
+        private static HashSet<object> DecPathKnownSet = new HashSet<object>(ComparerIdentity.Instance);
 
         internal static void DecPathRegister(object obj, Path path)
         {
