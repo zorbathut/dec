@@ -10,7 +10,7 @@ namespace Dec
         public override bool AllowDecPath { get => true; }  // . . . sure, I guess?
         public override Recorder.IUserSettings UserSettings { get; }
 
-        private Dictionary<object, Path> seenObjects = new Dictionary<object, Path>();
+        private Dictionary<object, Path> seenObjects = new Dictionary<object, Path>(ComparerIdentity.Instance);
 
         private XDocument doc;
         private string rootTag;

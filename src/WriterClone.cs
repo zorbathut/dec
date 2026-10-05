@@ -25,7 +25,7 @@ namespace Dec
         public bool AllowReflection { get => false; }
         public Recorder.IUserSettings UserSettings { get; }
 
-        internal Dictionary<object, object> cloneReferences = new Dictionary<object, object>();
+        internal Dictionary<object, object> cloneReferences = new Dictionary<object, object>(ComparerIdentity.Instance);
 
         // One creator serves the whole operation; object construction only consults it for the duration of the call.
         private ReaderNodeCloneCreator creator;

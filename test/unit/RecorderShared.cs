@@ -276,5 +276,102 @@ namespace DecTest
             Assert.AreNotSame(deserialized[0], deserialized[1]);
         }
 
+        public class EqualsAlwaysSharedHolder : Dec.IRecordable
+        {
+            public StubRecordableEqualsAlways a;
+            public StubRecordableEqualsAlways b;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Shared().Record(ref a, "a");
+                recorder.Shared().Record(ref b, "b");
+            }
+        }
+
+        [Test]
+        public void DistinctEqualShared([Values] RecorderMode mode)
+        {
+            var holder = new EqualsAlwaysSharedHolder { a = new StubRecordableEqualsAlways { data = 1 }, b = new StubRecordableEqualsAlways { data = 2 } };
+
+            var deserialized = DoRecorderRoundTrip(holder, mode);
+
+            Assert.AreNotSame(deserialized.a, deserialized.b);
+            Assert.AreEqual(1, deserialized.a.data);
+            Assert.AreEqual(2, deserialized.b.data);
+        }
+
+        [Test]
+        public void SameEqualShared([ValuesExcept(RecorderMode.Simple)] RecorderMode mode)
+        {
+            var item = new StubRecordableEqualsAlways { data = 1 };
+            var holder = new EqualsAlwaysSharedHolder { a = item, b = item };
+
+            var deserialized = DoRecorderRoundTrip(holder, mode);
+
+            Assert.AreSame(deserialized.a, deserialized.b);
+            Assert.AreEqual(1, deserialized.a.data);
+        }
+
+        public class TupleListHolder : Dec.IRecordable
+        {
+            public List<Tuple<int, int>> list;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref list, "list");
+            }
+        }
+
+        [Test]
+        public void DistinctEqualUnshared([Values] RecorderMode mode)
+        {
+            // Tuple compares by contents, so these two are Equal without being the same object, and neither position is shared.
+            var holder = new TupleListHolder { list = new List<Tuple<int, int>> { Tuple.Create(1, 2), Tuple.Create(1, 2) } };
+
+            var deserialized = DoRecorderRoundTrip(holder, mode);
+
+            Assert.AreEqual(2, deserialized.list.Count);
+            Assert.AreEqual(Tuple.Create(1, 2), deserialized.list[0]);
+            Assert.AreEqual(Tuple.Create(1, 2), deserialized.list[1]);
+            Assert.AreNotSame(deserialized.list[0], deserialized.list[1]);
+        }
+
+        public struct EqualsAlwaysStruct : Dec.IRecordable
+        {
+            public StubRecordableEqualsAlways item;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref item, "item");
+            }
+        }
+
+        public class EqualsAlwaysStructHolder : Dec.IRecordable
+        {
+            public List<EqualsAlwaysStruct> list;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref list, "list");
+            }
+        }
+
+        [Test]
+        public void DistinctEqualInStructs([Values] RecorderMode mode)
+        {
+            // The structs compare equal by value, since their items do, but each item is still its own object.
+            var holder = new EqualsAlwaysStructHolder { list = new List<EqualsAlwaysStruct>
+            {
+                new EqualsAlwaysStruct { item = new StubRecordableEqualsAlways { data = 1 } },
+                new EqualsAlwaysStruct { item = new StubRecordableEqualsAlways { data = 2 } },
+            } };
+
+            var deserialized = DoRecorderRoundTrip(holder, mode);
+
+            Assert.AreEqual(2, deserialized.list.Count);
+            Assert.AreNotSame(deserialized.list[0].item, deserialized.list[1].item);
+            Assert.AreEqual(1, deserialized.list[0].item.data);
+            Assert.AreEqual(2, deserialized.list[1].item.data);
+        }
     }
 }

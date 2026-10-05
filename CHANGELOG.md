@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 * It is now an error to use a shared class that overrides `GetHashCode()` as a dictionary key or hash set element. Sharing value-hashed keys has never worked properly; this adds an error to it. Classes without GetHashCode() still work; shared identity-hashed keys continue to be supported. If you have a shared class overriding GetHashCode() just to reimplement identity hashing then it will now break, but also, that's weird? Why were you doing that? Let me know if you need a workaround. 
 * Using a Recorder outside the `Record()` call it was passed to is now reported as an error in most cases. That covers a Recorder kept past its call, one used from another thread, and an enclosing object's Recorder used while a nested `Record()` is running. None of these ever worked reliably and I hope nobody was doing them; if you were, come pester me on Discord.
 * `Recorder.Clone` copies a boxed struct reached from two places into two boxes, as Write and Read always have, instead of sharing one.
+* Recorders now track references by identity instead of `Equals()`; this should always have been the case, sorry. As always, if you were relying on this, come talk to me.
 
 ### Obsoleted
 * `ConfigErrors` and `PostLoad` are now marked `[Obsolete]` in favor of `[Dec.Setup]` functions. They'll be removed in the future.

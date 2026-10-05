@@ -57,6 +57,8 @@ When using this feature, classes *cannot* be pre-initialized; they must start as
 
 Dictionary keys and hash set elements can be shared only when their type hashes by identity - a class that doesn't override `GetHashCode()`. Keys are hashed while being read, before anything they refer to has been filled in, so a key that hashes on its contents would land in the container under a hash that changes out from under it. Sharing an object of such a type while also using it as a key is an error, as is reading a file that holds such a key as a reference.
 
+Sharing follows object identity, not equality. Two distinct objects are always written separately, even when they compare `Equals()`, and a value type is copied wherever it appears.
+
 Shared instances are written once into a reference block at the top of the file, under a generated name like `ref00000`, and referenced from wherever they appear. Two interfaces let you take control of that. `Dec.IRefName` lets you name an instance's entry, which makes the file much easier to read and to diff; `Dec.IRefForce` puts an instance in the reference block even when only one reference to it exists, giving it a stable home instead of being written inline wherever it happens to be reached first.
 
 ```cs

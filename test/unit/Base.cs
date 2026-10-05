@@ -271,6 +271,26 @@ namespace DecTest
                 record.Record(ref data, "dataRecorded");
             }
         }
+        // Every instance equals every other, so anything that tracks objects by equality instead of identity merges them.
+        public class StubRecordableEqualsAlways : Dec.IRecordable
+        {
+            public int data;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref data, "data");
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is StubRecordableEqualsAlways;
+            }
+
+            public override int GetHashCode()
+            {
+                return 0;
+            }
+        }
         public struct StubStruct
         {
             public int data;

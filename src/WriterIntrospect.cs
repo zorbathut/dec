@@ -16,7 +16,7 @@ namespace Dec
         public bool Compose { get; }
 
         // Mirrors WriterXmlRecord's reference bookkeeping: first-encounter position sharedness per object, giving the same multiplicity errors a real save emits and terminating repeat/cyclic encounters.
-        internal Dictionary<object, (bool sharedPosition, Path path)> seenObjects = new Dictionary<object, (bool, Path)>();
+        internal Dictionary<object, (bool sharedPosition, Path path)> seenObjects = new Dictionary<object, (bool, Path)>(ComparerIdentity.Instance);
 
         public WriterIntrospect(Recorder.IUserSettings userSettings, Func<Reflection.Entry, bool> shouldDescend, bool compose)
         {

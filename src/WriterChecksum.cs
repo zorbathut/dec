@@ -12,8 +12,8 @@ namespace Dec
         public bool AllowReflection { get => false; }
         public Recorder.IUserSettings UserSettings { get; }
 
-        internal Dictionary<object, int> seenReferences = new Dictionary<object, int>();
-        internal HashSet<object> seenReferencesUnordered = new HashSet<object>();
+        internal Dictionary<object, int> seenReferences = new Dictionary<object, int>(ComparerIdentity.Instance);
+        internal HashSet<object> seenReferencesUnordered = new HashSet<object>(ComparerIdentity.Instance);
 
         // One node per depth, reused: a checksum walk is strictly depth-first and holds on to no children, so a node's subtree is always finished before its next sibling is created.
         private List<WriterNodeChecksum> nodes = new List<WriterNodeChecksum>();

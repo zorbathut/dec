@@ -12,11 +12,11 @@ namespace Dec
         public override Recorder.IUserSettings UserSettings { get; }
 
         // Maps between object and the in-place element. This does *not* yet have the ref ID tagged, and will have to be extracted into a new Element later.
-        private Dictionary<object, (XElement element, Path path)> refToElement = new Dictionary<object, (XElement, Path)>();
+        private Dictionary<object, (XElement element, Path path)> refToElement = new Dictionary<object, (XElement, Path)>(ComparerIdentity.Instance);
         private Dictionary<XElement, object> elementToRef = new Dictionary<XElement, object>();
 
         // Every ref name we've handed out, for the lifetime of this writer. An object is named at most once; a name is never reused.
-        private Dictionary<object, string> refNames = new Dictionary<object, string>();
+        private Dictionary<object, string> refNames = new Dictionary<object, string>(ComparerIdentity.Instance);
 
         // Every name we've handed out, generated or user-provided; ref names must be unique within a file.
         private HashSet<string> usedRefNames = new HashSet<string>();

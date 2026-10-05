@@ -9,7 +9,7 @@ namespace Dec
     {
         private StringBuilder sb = new StringBuilder();
 
-        internal Dictionary<object, string> referenceLookup = new Dictionary<object, string>();
+        internal Dictionary<object, string> referenceLookup = new Dictionary<object, string>(ComparerIdentity.Instance);
         private WriterUtil.PendingWriteCoordinator pendingWriteCoordinator = new WriterUtil.PendingWriteCoordinator();
 
         public abstract bool AllowReflection { get; }

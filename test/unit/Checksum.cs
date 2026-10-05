@@ -310,6 +310,59 @@ namespace DecTest
             ChecksumDiffTests(value1, value2);
         }
 
+        class EqualsAlwaysPair : IRecordable
+        {
+            public StubRecordableEqualsAlways a;
+            public StubRecordableEqualsAlways b;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Shared().Record(ref a, nameof(a));
+                recorder.Shared().Record(ref b, nameof(b));
+            }
+        }
+
+        [Test]
+        public void DistinctEqualObjects()
+        {
+            // Same contents throughout; only whether one object fills both fields differs.
+            var distinct = new EqualsAlwaysPair { a = new StubRecordableEqualsAlways { data = 1 }, b = new StubRecordableEqualsAlways { data = 1 } };
+            var item = new StubRecordableEqualsAlways { data = 1 };
+            var same = new EqualsAlwaysPair { a = item, b = item };
+
+            ulong checksumDistinct = Dec.Recorder.Checksum(distinct);
+            ulong checksumSame = Dec.Recorder.Checksum(same);
+
+            Assert.AreNotEqual(checksumDistinct, checksumSame, "Two distinct objects should not checksum as one shared object");
+            Assert.AreEqual(checksumDistinct, Dec.Recorder.Checksum(Dec.Recorder.Clone(distinct)), "Identical graphs should produce the same checksums");
+            Assert.AreEqual(checksumSame, Dec.Recorder.Checksum(Dec.Recorder.Clone(same)), "Identical graphs should produce the same checksums");
+        }
+
+        class EqualsAlwaysItemHolder : IRecordable
+        {
+            public StubRecordableEqualsAlways item;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref item, nameof(item));
+            }
+        }
+
+        [Test]
+        public void DistinctEqualObjectsUnordered()
+        {
+            // The holders hash by identity, so the set holds both; their items are distinct objects that happen to compare equal, and inside an unordered context neither may be taken for a reference to the other.
+            var value = new HashSet<EqualsAlwaysItemHolder>
+            {
+                new EqualsAlwaysItemHolder { item = new StubRecordableEqualsAlways { data = 1 } },
+                new EqualsAlwaysItemHolder { item = new StubRecordableEqualsAlways { data = 2 } },
+            };
+
+            ulong checksum = Dec.Recorder.Checksum(value);
+
+            Assert.AreEqual(checksum, Dec.Recorder.Checksum(Dec.Recorder.Clone(value)), "Identical graphs should produce the same checksums");
+        }
+
         [Test]
         public void UnreferencedObjectUnordered()
         {
