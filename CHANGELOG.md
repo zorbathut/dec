@@ -46,6 +46,7 @@ All notable changes to this project will be documented in this file.
 * `Recorder.Clone` of an object whose `Record()` reads fields but writes none crashed with a NullReferenceException.
 * `Recorder.Clone` could crash with a NullReferenceException in deep stacks when an object failed to construct, or when a `Tuple` field started out null.
 * `Recorder.Clone` was quadratic on collections of structs with a common first field.
+* `Database.DecLookupEnable` on an object the dec database didn't create threw an exception.
 
 
 ## [v0.11.1]

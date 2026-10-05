@@ -106,8 +106,14 @@ namespace Dec
                 return;
             }
 
-            DecPathLookup[obj] = DecPathLookupComplete[obj];
-            DecPathLookupReverse[DecPathLookupComplete[obj].Serialize()] = obj;
+            if (!DecPathLookupComplete.TryGetValue(obj, out var path))
+            {
+                Dbg.Err($"Attempting to enable lookup for {obj}, which isn't an object the dec database created");
+                return;
+            }
+
+            DecPathLookup[obj] = path;
+            DecPathLookupReverse[path.Serialize()] = obj;
 
             // needs more validation
         }

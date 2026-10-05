@@ -284,6 +284,14 @@ namespace DecTest
         }
 
         [Test]
+        public void EnableUnknown()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            ExpectErrors(() => Dec.Database.DecLookupEnable(new StubRecordable()), err => err.Contains("dec database"));
+        }
+
+        [Test]
         public void ForbidValueType()
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { });
