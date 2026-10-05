@@ -268,6 +268,21 @@ namespace DecBenchmark
         public string displayName = "Sample";
     }
 
+    // A struct with a reference first field and no GetHashCode of its own, many of which share that first field; a default-equality lookup hashes and compares these by reflection, and piles them into a handful of buckets.
+    public struct EntityLookup : IRecordable
+    {
+        public SampleDec dec;
+        public int index;
+        public int gen;
+
+        public void Record(Recorder recorder)
+        {
+            recorder.Record(ref dec, "dec");
+            recorder.Record(ref index, "index");
+            recorder.Record(ref gen, "gen");
+        }
+    }
+
     public class ComplexGraph : IRecordable
     {
         public List<NestedRecordable> nestedList;
@@ -549,6 +564,58 @@ namespace DecBenchmark
         [Benchmark] public string Write() => Recorder.Write(data);
         [Benchmark] public List<NestedRecordable> Read() => Recorder.Read<List<NestedRecordable>>(serialized);
         [Benchmark] public List<NestedRecordable> Clone() => Recorder.Clone(data);
+    }
+
+    [MemoryDiagnoser]
+    public class StructListBenchmarks : BenchmarkBase
+    {
+        [Params(100, 1000)]
+        public int Size;
+
+        private List<EntityLookup> data;
+
+        [GlobalSetup]
+        public void Setup()
+        {
+            SetupDec(
+                explicitTypes: new[] { typeof(SampleDec) }
+            );
+            FinishParser(@"
+                <Decs>
+                    <SampleDec decName=""Alpha"" />
+                    <SampleDec decName=""Beta"" />
+                    <SampleDec decName=""Gamma"" />
+                    <SampleDec decName=""Delta"" />
+                </Decs>");
+
+            // Every sixth slot is freed, with a null dec, the rest cycle through four decs.
+            var decs = Dec.Database<SampleDec>.List;
+            data = Enumerable.Range(0, Size).Select(i => new EntityLookup { dec = i % 6 == 5 ? null : decs[i % decs.Length], index = i, gen = i / 7 }).ToList();
+        }
+
+        [GlobalCleanup]
+        public void Cleanup()
+        {
+            CleanupDec();
+        }
+
+        [Benchmark]
+        public string Write()
+        {
+            return Recorder.Write(data);
+        }
+
+        [Benchmark]
+        public List<EntityLookup> Clone()
+        {
+            return Recorder.Clone(data);
+        }
+
+        [Benchmark]
+        public ulong Checksum()
+        {
+            return Recorder.Checksum(data);
+        }
     }
 
     [MemoryDiagnoser]
