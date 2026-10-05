@@ -284,6 +284,65 @@ namespace DecTest
         }
 
         [Test]
+        public void RegisterMatchesIdentity([Values] RecorderMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var registered = new StubRecordableEqualsAlways { data = 1 };
+            Dec.Database.DecLookupRegisterCustom(registered, new PathRoot("stub"));
+
+            var other = new StubRecordableEqualsAlways { data = 2 };
+            var result = DoRecorderRoundTrip(other, mode);
+
+            Assert.AreNotSame(registered, result);
+            Assert.AreNotSame(other, result);
+            Assert.AreEqual(2, result.data);
+        }
+
+        [Test]
+        public void ForbidMatchesIdentity([Values] RecorderMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            Dec.Database.DecRegisterForbid(new StubRecordableEqualsAlways { data = 1 });
+
+            var other = new StubRecordableEqualsAlways { data = 2 };
+            var result = DoRecorderRoundTrip(other, mode);
+
+            Assert.AreNotSame(other, result);
+            Assert.AreEqual(2, result.data);
+        }
+
+        [Test]
+        public void RegisterValueType()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            ExpectErrors(() => Dec.Database.DecLookupRegisterCustom(42, new PathRoot("stub")), err => err.Contains("value type"));
+        }
+
+        [Test]
+        public void RegisterString()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            ExpectErrors(() => Dec.Database.DecLookupRegisterCustom("stub", new PathRoot("stub")), err => err.Contains("string"));
+
+            // Nothing was registered, so an equal string still writes as itself.
+            Assert.AreEqual("stub", DoRecorderRoundTrip("stub", RecorderMode.Bare));
+        }
+
+        [Test]
+        public void ForbidString()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            ExpectErrors(() => Dec.Database.DecRegisterForbid("stub"), err => err.Contains("string"));
+
+            Assert.AreEqual("stub", DoRecorderRoundTrip("stub", RecorderMode.Bare));
+        }
+
+        [Test]
         public void EnableUnknown()
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { });

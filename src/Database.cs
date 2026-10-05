@@ -19,18 +19,18 @@ namespace Dec
         private static Dec[] CachedList = null;
 
         // this is for actual valid lookups
-        private static Dictionary<object, Path> DecPathLookup = new Dictionary<object, Path>();
+        private static Dictionary<object, Path> DecPathLookup = new Dictionary<object, Path>(ComparerIdentity.Instance);
 
         // this is for all lookups, valid or not
         // note: this gets filled from the outside right now
-        private static Dictionary<object, Path> DecPathLookupComplete = new Dictionary<object, Path>();
+        private static Dictionary<object, Path> DecPathLookupComplete = new Dictionary<object, Path>(ComparerIdentity.Instance);
 
         // these are for all possible reverses
         private static Dictionary<string, object> DecPathLookupReverse = new Dictionary<string, object>();
         private static HashSet<string> DecPathLookupUnusable = new HashSet<string>();
         private static HashSet<string> DecPathLookupConflicts = new HashSet<string>();
 
-        private static HashSet<object> DecForbidden = new HashSet<object>();
+        private static HashSet<object> DecForbidden = new HashSet<object>(ComparerIdentity.Instance);
 
         // A lot of this really needs work for validation and error reporting.
         internal static string GetDecPathFromObj(object obj)
@@ -52,19 +52,15 @@ namespace Dec
             return DecForbidden.Contains(obj);
         }
 
-        // Reference-identity mirror of DecPathLookupComplete's key set, for DecPathKnown. The dictionaries use default equality, which is fine for their own lookups, but the setup exclusion must not treat a fresh savegame object as database-owned just because it Equals one, and must never run user GetHashCode/Equals during a Read.
-        private static HashSet<object> DecPathKnownSet = new HashSet<object>(ComparerIdentity.Instance);
-
         internal static void DecPathRegister(object obj, Path path)
         {
             DecPathLookupComplete[obj] = path;
-            DecPathKnownSet.Add(obj);
         }
 
         // Whether this exact object is owned by the dec database; a dec-path ref always resolves to the identical database instance, so reference identity is the correct membership test. Safe to call from concurrent Recorder reads; the only post-Finish mutation path is DecLookupRegisterCustom, which the threading contract already restricts to single-threaded use.
         internal static bool DecPathKnown(object obj)
         {
-            return DecPathKnownSet.Contains(obj);
+            return DecPathLookupComplete.ContainsKey(obj);
         }
 
         internal static object GetFromDecPath(string path)
@@ -128,6 +124,18 @@ namespace Dec
         {
             var serialized = path.Serialize();
 
+            if (obj.GetType().IsValueType)
+            {
+                Dbg.Err($"Attempting to register {obj} with path [{serialized}], but it is a value type; registering value types is not supported");
+                return;
+            }
+
+            if (obj is string)
+            {
+                Dbg.Err($"Attempting to register \"{obj}\" with path [{serialized}], but it is a string; registering strings is not supported, since equal strings may or may not be the same object");
+                return;
+            }
+
             if (DecForbidden.Contains(obj))
             {
                 Dbg.Err($"Attempting to register {obj} with path [{serialized}], but it has been explicitly forbidden from recording");
@@ -150,7 +158,6 @@ namespace Dec
 
             DecPathLookup[obj] = path;
             DecPathLookupComplete[obj] = path;
-            DecPathKnownSet.Add(obj);
             DecPathLookupReverse[serialized] = obj;
         }
 
@@ -165,6 +172,12 @@ namespace Dec
             if (obj.GetType().IsValueType)
             {
                 Dbg.Err($"Attempting to forbid {obj} which is a value type; forbidding value types is not supported");
+                return;
+            }
+
+            if (obj is string)
+            {
+                Dbg.Err($"Attempting to forbid \"{obj}\" which is a string; forbidding strings is not supported, since equal strings may or may not be the same object");
                 return;
             }
 
@@ -365,7 +378,6 @@ namespace Dec
             Lookup.Clear();
             DecPathLookup.Clear();
             DecPathLookupComplete.Clear();
-            DecPathKnownSet.Clear();
             DecPathLookupReverse.Clear();
             DecPathLookupUnusable.Clear();
             DecPathLookupConflicts.Clear();
