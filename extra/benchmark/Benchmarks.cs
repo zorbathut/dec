@@ -618,6 +618,107 @@ namespace DecBenchmark
         }
     }
 
+    // The dec-path and forbid tables populated, as they are in a project that uses DecLookupRegisterCustom or DecRegisterForbid; every composed value is checked against them.
+    [MemoryDiagnoser]
+    public class PopulatedTablesBenchmarks : BenchmarkBase
+    {
+        [Params(false, true)]
+        public bool Populated;
+
+        private List<EntityLookup> structs;
+        private List<NestedRecordable> nested;
+        private ComplexGraph graph;
+
+        [GlobalSetup]
+        public void Setup()
+        {
+            SetupDec(
+                explicitTypes: new[] { typeof(SampleDec) }
+            );
+            FinishParser(@"
+                <Decs>
+                    <SampleDec decName=""Alpha"" />
+                    <SampleDec decName=""Beta"" />
+                    <SampleDec decName=""Gamma"" />
+                    <SampleDec decName=""Delta"" />
+                </Decs>");
+
+            if (Populated)
+            {
+                for (int i = 0; i < 1000; i++)
+                {
+                    Dec.Database.DecLookupRegisterCustom(PrimitivesRecordable.Create(i), new PathRoot($"custom{i}"));
+                    Dec.Database.DecRegisterForbid(PrimitivesRecordable.Create(i));
+                }
+            }
+
+            var decs = Dec.Database<SampleDec>.List;
+            structs = Enumerable.Range(0, 1000).Select(i => new EntityLookup { dec = i % 6 == 5 ? null : decs[i % decs.Length], index = i, gen = i / 7 }).ToList();
+            nested = Enumerable.Range(0, 200).Select(i => NestedRecordable.Create(i, 10)).ToList();
+            graph = ComplexGraph.Create(decs[0]);
+        }
+
+        [GlobalCleanup]
+        public void Cleanup()
+        {
+            CleanupDec();
+        }
+
+        [Benchmark]
+        public string StructWrite()
+        {
+            return Recorder.Write(structs);
+        }
+
+        [Benchmark]
+        public List<EntityLookup> StructClone()
+        {
+            return Recorder.Clone(structs);
+        }
+
+        [Benchmark]
+        public ulong StructChecksum()
+        {
+            return Recorder.Checksum(structs);
+        }
+
+        [Benchmark]
+        public string NestedWrite()
+        {
+            return Recorder.Write(nested);
+        }
+
+        [Benchmark]
+        public List<NestedRecordable> NestedClone()
+        {
+            return Recorder.Clone(nested);
+        }
+
+        [Benchmark]
+        public ulong NestedChecksum()
+        {
+            return Recorder.Checksum(nested);
+        }
+
+        [Benchmark]
+        public string GraphWrite()
+        {
+            return Recorder.Write(graph);
+        }
+
+        [Benchmark]
+        public ComplexGraph GraphClone()
+        {
+            return Recorder.Clone(graph);
+        }
+
+        [Benchmark]
+        public ulong GraphChecksum()
+        {
+            return Recorder.Checksum(graph);
+        }
+    }
+
     [MemoryDiagnoser]
     public class RecordableBenchmarks : BenchmarkBase
     {
