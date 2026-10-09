@@ -269,14 +269,10 @@ namespace RecorderEnumeratorTest
             AssertPinned(MakeClosure(5), ClosureXml);
         }
 
-        // Nested closures can't be written to XML yet: the inner scope's field for the outer one, `CS$<>8__locals1`, isn't a valid XML name. Clone and Checksum don't need names to be valid XML.
         [Test]
-        public void NestedClosureRoundTrip([Values(RecorderMode.Clone, RecorderMode.Checksum)] RecorderMode mode)
+        public void NestedClosurePinned()
         {
-            var original = MakeNestedClosure(3);
-            var result = DoRecorderRoundTrip(original, mode);
-            Assert.AreNotSame(original, result);
-            Assert.AreEqual(original(), result());
+            AssertPinned(MakeNestedClosure(3), NestedClosureXml);
         }
 
         [Test]
@@ -288,7 +284,7 @@ namespace RecorderEnumeratorTest
         [Test]
         public void ClosuresRoundTrip([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
         {
-            foreach (var original in new[] { MakeClosure(5), MakeGenericClosure(42) })
+            foreach (var original in new[] { MakeClosure(5), MakeNestedClosure(3), MakeGenericClosure(42) })
             {
                 var result = DoRecorderRoundTrip(original, mode);
                 Assert.AreNotSame(original, result);
@@ -356,6 +352,7 @@ namespace RecorderEnumeratorTest
         private const string PayloadWatchersXml = @"<!--This file was written by Dec, a serialization library designed for game development. (https://github.com/zorbathut/dec)--><!--Pretty-print can be enabled as a parameter of the Recorder.Write() call.--><Record><recordFormatVersion>1</recordFormatVersion><refs><Ref id=""ref00000"" class=""RecorderEnumeratorTest.RecordedOutput.Payload""><value>7</value></Ref></refs><data class=""RecorderEnumeratorTest.RecordedOutput.PayloadWatchers""><payload ref=""ref00000"" /><first class=""RecorderEnumeratorTest.RecordedOutput.&lt;WatchPayload&gt;d__7""><LABRAB1__state>1</LABRAB1__state><LABRAB2__current>2007</LABRAB2__current><payload ref=""ref00000"" /><LABRAB3__payload ref=""ref00000"" /><LABhistoryRAB5__1><li>7</li><li>7</li></LABhistoryRAB5__1></first><second class=""RecorderEnumeratorTest.RecordedOutput.&lt;WatchPayload&gt;d__7""><LABRAB1__state>1</LABRAB1__state><LABRAB2__current>1007</LABRAB2__current><payload ref=""ref00000"" /><LABRAB3__payload ref=""ref00000"" /><LABhistoryRAB5__1><li>7</li></LABhistoryRAB5__1></second></data></Record>";
         private const string LocalFunctionCounterXml = @"<!--This file was written by Dec, a serialization library designed for game development. (https://github.com/zorbathut/dec)--><!--Pretty-print can be enabled as a parameter of the Recorder.Write() call.--><Record><recordFormatVersion>1</recordFormatVersion><data class=""RecorderEnumeratorTest.RecordedOutput.&lt;LocalFunctionCounter&gt;d__10""><LABRAB1__state>1</LABRAB1__state><LABRAB2__current>8</LABRAB2__current><step>4</step><LABRAB3__step>4</LABRAB3__step><LABRAB8__1><total>8</total><step>4</step></LABRAB8__1></data></Record>";
         private const string ClosureXml = @"<!--This file was written by Dec, a serialization library designed for game development. (https://github.com/zorbathut/dec)--><!--Pretty-print can be enabled as a parameter of the Recorder.Write() call.--><Record><recordFormatVersion>1</recordFormatVersion><data class=""System.Func&lt;int&gt;""><method class=""System.Reflection.RuntimeMethodInfo""><type>RecorderEnumeratorTest.RecordedOutput.&lt;&gt;c__DisplayClass12_0</type><name>&lt;MakeClosure&gt;b__0</name><params /></method><target class=""RecorderEnumeratorTest.RecordedOutput.&lt;&gt;c__DisplayClass12_0""><seed>5</seed><name>closure</name></target></data></Record>";
+        private const string NestedClosureXml = @"<!--This file was written by Dec, a serialization library designed for game development. (https://github.com/zorbathut/dec)--><!--Pretty-print can be enabled as a parameter of the Recorder.Write() call.--><Record><recordFormatVersion>1</recordFormatVersion><data class=""System.Func&lt;int&gt;""><method class=""System.Reflection.RuntimeMethodInfo""><type>RecorderEnumeratorTest.RecordedOutput.&lt;&gt;c__DisplayClass13_1</type><name>&lt;MakeNestedClosure&gt;b__0</name><params /></method><target class=""RecorderEnumeratorTest.RecordedOutput.&lt;&gt;c__DisplayClass13_1""><inner>7</inner><CSSTRLABRAB8__locals1><outer>3</outer><doubled>6</doubled></CSSTRLABRAB8__locals1></target></data></Record>";
         private const string GenericClosureXml = @"<!--This file was written by Dec, a serialization library designed for game development. (https://github.com/zorbathut/dec)--><!--Pretty-print can be enabled as a parameter of the Recorder.Write() call.--><Record><recordFormatVersion>1</recordFormatVersion><data class=""System.Func&lt;int&gt;""><method class=""System.Reflection.RuntimeMethodInfo""><type>RecorderEnumeratorTest.RecordedOutput.&lt;&gt;c__DisplayClass14_0&lt;int&gt;</type><name>&lt;MakeGenericClosure&gt;b__0</name><params /></method><target class=""RecorderEnumeratorTest.RecordedOutput.&lt;&gt;c__DisplayClass14_0&lt;int&gt;""><value>42</value></target></data></Record>";
     }
 }

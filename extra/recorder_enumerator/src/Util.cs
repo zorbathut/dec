@@ -49,7 +49,7 @@ namespace Dec.RecorderEnumerator
 
         internal static string SanitizeForXMLToken(string input)
         {
-            return input.Replace("<", "LAB").Replace(">", "RAB");
+            return input.Replace("<", "LAB").Replace(">", "RAB").Replace("$", "STR");
         }
 
         internal static Recorder.Parameters SharedIfPossible<T>(this Recorder recorder)

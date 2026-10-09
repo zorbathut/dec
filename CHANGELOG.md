@@ -49,6 +49,7 @@ All notable changes to this project will be documented in this file.
 * `Recorder.Clone` could crash with a NullReferenceException in deep stacks when an object failed to construct, or when a `Tuple` field started out null.
 * `Recorder.Clone` was quadratic on collections of structs with a common first field.
 * `Database.DecLookupEnable` on an object the dec database didn't create threw an exception.
+* RecorderEnumerator: A closure capturing variables from more than one nested scope, such as a method local and a loop local, couldn't be written to XML.
 
 
 ## [v0.11.1]
