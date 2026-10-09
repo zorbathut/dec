@@ -144,6 +144,11 @@ namespace DecTest
             typeof(Dec.Config).GetField("TestRefEverything", BindingFlags.NonPublic | BindingFlags.Static).SetValue(null, testRefEverything);
         }
 
+        public static void UpdateTestForceFallbackEmit(bool testForceFallbackEmit)
+        {
+            typeof(Dec.Config).GetField("TestForceFallbackEmit", BindingFlags.NonPublic | BindingFlags.Static).SetValue(null, testForceFallbackEmit);
+        }
+
         public static void PrepCwd()
         {
             // Find our data directory

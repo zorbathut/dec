@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace Dec.RecorderEnumerator
@@ -64,6 +66,14 @@ namespace Dec.RecorderEnumerator
                     field.SetValue(obj, member);
                 }
             }
+        }
+
+        // Every instance field in the order GetFields returns them, which is metadata order in practice and which the recorded format depends on; each is labeled with its sanitized name and shared wherever its type allows it.
+        internal static IEnumerable<RecordField> RecordFieldsAll(Type type, string excludedName = null)
+        {
+            return type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                .Where(field => field.Name != excludedName)
+                .Select(field => new RecordField(field, SanitizeForXMLToken(field.Name), global::Dec.Util.CanBeShared(field.FieldType)));
         }
 
         internal static string SanitizeForXMLToken(string input)
