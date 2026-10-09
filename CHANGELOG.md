@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 * `Dec.Path` now supports `Equals` and `GetHashCode`.
 * `IRefName`, letting an object name its own entry in a Recorder's reference block instead of accepting a generated `ref00000`-style name.
 * `IRefForce`, hoisting an object into the reference block even when only one reference to it exists. This requires `.Shared()` positions, just like any other reference.
+* `ConverterFactoryFields`, a converter base that records a type as a list of its fields (`RecordField`), compiled to code once per converter; useful for types you can't give a `Record()` function. Unlike `Record()`, reading resets every listed field to its default first, so a field missing from the data ends up default.
 
 ### Breaking
 * `SetupDependsOnAttribute` removed, replaced with `[Dec.SetupAfter]`.

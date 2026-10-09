@@ -26,6 +26,10 @@ If writing highly-self-referential savegames via the Record system, this can pot
 
 Several WriterNode backends receive this same call series: XML output, cloning, checksumming, validation, and introspection (`Reflection.Enumerate`). Introspection is the only one that needs each position's declared type - the static type of the `Record<T>` call, or the container's element type - so ComposeElement hands it to every node through WriterNode.NoteDeclaredType(), a no-op everywhere else, before dispatching. It is also the only one that trims or depth-limits a reflection walk, so ComposeElement asks WriterNode.ShouldReflectFields() before walking a type's fields.
 
+## Generated Code
+
+Dec emits IL in two places: `UtilType.CreateDynamicArray` builds a one-dimensional array creator per element type, and `ConverterFactoryFields` compiles a write method and a read method per converted type, each passing every field by address to `Recorder.Record`. Both run only where `RuntimeFeature.IsDynamicCodeSupported`, and fall back to reflection elsewhere. `Config.TestForceFallbackEmit` forces the fallback for tests. The `ConverterFactoryFields` fallback still closes `Recorder.Record<T>` over each field's type with `MakeGenericMethod`, which an AOT runtime can only do for instantiations it compiled ahead of time. `UtilCollectionReflect` is separate: it closes generic delegates rather than emitting IL, falls back on its own when that fails, and ignores the switch.
+
 ## Threading Contract
 
 Dec has a narrow but deliberate threading model. In short:

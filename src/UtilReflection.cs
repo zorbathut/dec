@@ -203,6 +203,7 @@ namespace Dec
             typeof(ConverterFactory),
             typeof(ConverterFactory<>),
             typeof(ConverterFactoryDynamic),
+            typeof(ConverterFactoryFields),
             typeof(Serialization.ConverterNullableString<>),
             typeof(Serialization.ConverterNullableRecord<>),
             typeof(Serialization.ConverterNullableFactory<>),
