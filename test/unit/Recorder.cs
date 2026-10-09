@@ -572,6 +572,64 @@ namespace DecTest
             Assert.AreEqual(item.y, deserialized.y);
         }
 
+        public class ManyRecordRec : Dec.IRecordable
+        {
+            public int[] values = new int[Dec.RecorderLabelSet.Threshold * 2];
+            public int repeat;
+
+            public void Record(Dec.Recorder record)
+            {
+                // Built labels, so the repeat is equal to its first use without being the same string.
+                for (int i = 0; i < values.Length; ++i)
+                {
+                    record.Record(ref values[i], "f" + i);
+                }
+
+                record.Record(ref repeat, "f" + 3);  // oops!
+            }
+        }
+
+        [Test]
+        public void ManyRecord([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
+        {
+            var item = new ManyRecordRec();
+            for (int i = 0; i < item.values.Length; ++i)
+            {
+                item.values[i] = i * 10;
+            }
+            item.repeat = 99;
+
+            var deserialized = DoRecorderRoundTrip(item, mode, expectWriteErrors: true, expectReadWarnings: true, errorValidator: err => err.Contains("Field `f3` written multiple times") || err.Contains("Field `f3` read multiple times"), warningValidator: wrn => wrn.Contains("Field `f3` read multiple times"));
+
+            Assert.AreEqual(item.values, deserialized.values);
+            Assert.AreEqual(item.values[3], deserialized.repeat);
+        }
+
+        public class RecordThenIgnoreRec : Dec.IRecordable
+        {
+            public int x;
+            public int y;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Record(ref x, "x");
+                record.Record(ref y, "y");
+                record.Ignore("x");
+            }
+        }
+
+        [Test]
+        public void RecordThenIgnore([ValuesExcept(RecorderMode.Validation)] RecorderMode mode)
+        {
+            // Every element is read once; ignoring one of them again mustn't make the reader think something went unread.
+            var item = new RecordThenIgnoreRec { x = 3, y = 4 };
+
+            var deserialized = DoRecorderRoundTrip(item, mode);
+
+            Assert.AreEqual(item.x, deserialized.x);
+            Assert.AreEqual(item.y, deserialized.y);
+        }
+
         public class SharedDupRec : Dec.IRecordable
         {
             public PrimitivesRecordable a;

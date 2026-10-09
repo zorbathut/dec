@@ -477,10 +477,86 @@ namespace Dec
         public abstract Purpose Intent { get; }
     }
 
+    // The labels one Record() body has used, kept to catch duplicates. Most bodies record a handful of fields, which a linear scan checks faster than hashing does; past Threshold it moves to a HashSet so a body with many fields doesn't go quadratic.
+    internal class RecorderLabelSet
+    {
+        internal const int Threshold = 8;
+
+        private string[] items;
+        private int count;
+
+        // Holds every label once there are more than Threshold.
+        private HashSet<string> set;
+
+        public int Count { get { return count; } }
+
+        // As HashSet.Add: false, with nothing added, when the label is already present.
+        public bool Add(string label)
+        {
+            if (count >= Threshold)
+            {
+                if (count == Threshold)
+                {
+                    set = set ?? new HashSet<string>();
+                    for (int i = 0; i < Threshold; ++i)
+                    {
+                        set.Add(items[i]);
+                    }
+                }
+
+                if (!set.Add(label))
+                {
+                    return false;
+                }
+
+                ++count;
+                return true;
+            }
+
+            for (int i = 0; i < count; ++i)
+            {
+                if (items[i] == label)
+                {
+                    return false;
+                }
+            }
+
+            items = items ?? new string[Threshold];
+            items[count++] = label;
+            return true;
+        }
+
+        public bool Contains(string label)
+        {
+            if (count > Threshold)
+            {
+                return set.Contains(label);
+            }
+
+            for (int i = 0; i < count; ++i)
+            {
+                if (items[i] == label)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public void Clear()
+        {
+            count = 0;
+
+            // Cleared even below the threshold: a duplicate refused right at it has already copied the labels over.
+            set?.Clear();
+        }
+    }
+
     internal class RecorderWriter : Recorder
     {
         private bool asThis = false;
-        private readonly HashSet<string> fields = new HashSet<string>();
+        private readonly RecorderLabelSet fields = new RecorderLabelSet();
         private readonly WriterNode node;
 
         internal RecorderWriter(WriterNode node)
@@ -537,13 +613,11 @@ namespace Dec
                 }
             }
 
-            if (fields.Contains(label))
+            if (!fields.Add(label))
             {
                 Dbg.Err($"Field `{label}` written multiple times");
                 return;
             }
-
-            fields.Add(label);
 
             Serialization.ComposeElement(node.CreateRecorderChild(label, parameters.CreateSettings()), value, typeof(T));
         }
@@ -569,7 +643,7 @@ namespace Dec
         private ReaderGlobals readerGlobals;
         private bool disallowShared;
         private readonly bool trackUsage;
-        private readonly HashSet<string> seen = new HashSet<string>();
+        private readonly RecorderLabelSet seen = new RecorderLabelSet();
 
         internal RecorderReader(ReaderNode node, ReaderGlobals globals, bool disallowShared = false, bool trackUsage = false)
         {
@@ -687,18 +761,17 @@ namespace Dec
                 Dbg.Err($"{node.GetContext()}: Shared object used in a context that disallows shared objects (probably ConverterFactory<>.Create())");
             }
 
-            if (seen.Contains(label))
-            {
-                Dbg.Wrn($"{node.GetContext()}: Field `{label}` read multiple times");
-            }
-
             var recorded = node.GetChildNamed(label);
             if (recorded == null)
             {
                 return;
             }
 
-            seen.Add(label);
+            // Only labels whose element exists are ever added, so a repeat always gets this far.
+            if (!seen.Add(label))
+            {
+                Dbg.Wrn($"{node.GetContext()}: Field `{label}` read multiple times");
+            }
 
             // Avoid an explicit cast because that can cause null reference errors
             var result = recorded.ParseElement(typeof(T), value, readerGlobals, parameters.CreateSettings());
@@ -758,7 +831,7 @@ namespace Dec
             }
 
             var unused = new HashSet<string>(allChildren);
-            unused.ExceptWith(seen);
+            unused.RemoveWhere(seen.Contains);
 
             Dbg.Wrn($"{node.GetContext()}: Elements specified that don't exist on the object: {string.Join(", ", unused)}");
         }
