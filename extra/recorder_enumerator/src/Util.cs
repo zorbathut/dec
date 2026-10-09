@@ -7,16 +7,27 @@ namespace Dec.RecorderEnumerator
     {
         internal static void RecordPrivate(this Recorder recorder, object obj, FieldInfo field, string name)
         {
-            RecordBasePrivateInternalMethod.MakeGenericMethod(field.FieldType).Invoke(null, new object[] { recorder, obj, field, name });
+            RecordBasePrivateInternalMethod.MakeGenericMethod(field.FieldType).Invoke(null, new object[] { recorder, obj, field, name, false });
         }
 
         internal static void RecordPrivate(this Recorder.Parameters recorder, object obj, FieldInfo field, string name)
         {
-            RecordParamPrivateInternalMethod.MakeGenericMethod(field.FieldType).Invoke(null, new object[] { recorder, obj, field, name });
+            RecordParamPrivateInternalMethod.MakeGenericMethod(field.FieldType).Invoke(null, new object[] { recorder, obj, field, name, false });
+        }
+
+        // For ConverterRecord bodies, which Reflection.SetByPath enters: it writes through the ref while reporting itself as a writer, so these store the field back after a write as well as after a read.
+        internal static void RecordPrivateSettable(this Recorder recorder, object obj, FieldInfo field, string name)
+        {
+            RecordBasePrivateInternalMethod.MakeGenericMethod(field.FieldType).Invoke(null, new object[] { recorder, obj, field, name, true });
+        }
+
+        internal static void RecordPrivateSettable(this Recorder.Parameters recorder, object obj, FieldInfo field, string name)
+        {
+            RecordParamPrivateInternalMethod.MakeGenericMethod(field.FieldType).Invoke(null, new object[] { recorder, obj, field, name, true });
         }
 
         private static MethodInfo RecordParamPrivateInternalMethod = typeof(Util).GetMethod(nameof(RecordParamPrivateInternal), BindingFlags.NonPublic | BindingFlags.Static);
-        private static void RecordParamPrivateInternal<T>(this Recorder.Parameters recorder, object obj, FieldInfo field, string name)
+        private static void RecordParamPrivateInternal<T>(this Recorder.Parameters recorder, object obj, FieldInfo field, string name, bool settable)
         {
             if (recorder.Mode == Recorder.Direction.Read)
             {
@@ -28,11 +39,15 @@ namespace Dec.RecorderEnumerator
             {
                 T member = (T)field.GetValue(obj);
                 recorder.Record(ref member, name);
+                if (settable)
+                {
+                    field.SetValue(obj, member);
+                }
             }
         }
 
         private static MethodInfo RecordBasePrivateInternalMethod = typeof(Util).GetMethod(nameof(RecordBasePrivateInternal), BindingFlags.NonPublic | BindingFlags.Static);
-        private static void RecordBasePrivateInternal<T>(this Recorder recorder, object obj, FieldInfo field, string name)
+        private static void RecordBasePrivateInternal<T>(this Recorder recorder, object obj, FieldInfo field, string name, bool settable)
         {
             if (recorder.Mode == Recorder.Direction.Read)
             {
@@ -44,6 +59,10 @@ namespace Dec.RecorderEnumerator
             {
                 T member = (T)field.GetValue(obj);
                 recorder.Record(ref member, name);
+                if (settable)
+                {
+                    field.SetValue(obj, member);
+                }
             }
         }
 

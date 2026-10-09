@@ -34,6 +34,40 @@ namespace RecorderEnumeratorTest
             Assert.IsTrue(Util.AreEquivalentEnumerators(source, result));
         }
 
+        public class ListEnumeratorHolder : Dec.IRecordable
+        {
+            public List<int> list;
+            public List<int>.Enumerator enumerator;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Shared().Record(ref list, nameof(list));
+                recorder.Record(ref enumerator, nameof(enumerator));
+            }
+        }
+
+        [Test]
+        public void ListSetByPath()
+        {
+            var holder = new ListEnumeratorHolder { list = new List<int> { 10, 20, 30, 40 } };
+            holder.enumerator = holder.list.GetEnumerator();
+            holder.enumerator.MoveNext();
+
+            var index = Dec.Reflection.Enumerate(holder).Children.Single(child => child.Label == "enumerator").Children.Single(child => child.Label == "index");
+            Assert.AreEqual(1, index.Value);
+
+            Dec.Reflection.SetByPath(holder, index.Path, 3);
+
+            // The enumerator resumes from the index it was given.
+            Assert.IsTrue(holder.enumerator.MoveNext());
+            Assert.AreEqual(40, holder.enumerator.Current);
+
+            // Recorded through Parameters rather than the Recorder itself.
+            var current = Dec.Reflection.Enumerate(holder).Children.Single(child => child.Label == "enumerator").Children.Single(child => child.Label == "current");
+            Dec.Reflection.SetByPath(holder, current.Path, 99);
+            Assert.AreEqual(99, holder.enumerator.Current);
+        }
+
         [Dec.RecorderEnumerator.RecordableEnumerable]
         private static IEnumerable<string> IterateList(List<string> data)
         {

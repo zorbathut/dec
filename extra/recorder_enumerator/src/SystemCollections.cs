@@ -27,9 +27,9 @@ namespace Dec.RecorderEnumerator
 
         public override object Record(ref object input, Recorder recorder)
         {
-            recorder.Shared().RecordPrivate(input, field_List, "list");
-            recorder.RecordPrivate(input, field_Index, "index");
-            recorder.SharedIfPossible<T>().RecordPrivate(input, field_Current, "current");
+            recorder.Shared().RecordPrivateSettable(input, field_List, "list");
+            recorder.RecordPrivateSettable(input, field_Index, "index");
+            recorder.SharedIfPossible<T>().RecordPrivateSettable(input, field_Current, "current");
 
             if (recorder.Mode == Recorder.Direction.Write)
             {
