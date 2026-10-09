@@ -40,7 +40,7 @@ namespace DecTest
 
             withinExpect = false;
 
-            Dec.Config.TestForceFallbackArray = false;
+            Dec.Config.TestForceFallbackEmit = false;
 
             Dec.Config.UsingNamespaces = new string[0];
 

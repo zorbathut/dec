@@ -199,7 +199,7 @@ namespace Dec
         }
         internal static UnitTestParameters TestParameters = null;
         internal static bool TestRefEverything = false;
-        internal static bool TestForceFallbackArray = false;
+        internal static bool TestForceFallbackEmit = false;
 
         static Config()
         {

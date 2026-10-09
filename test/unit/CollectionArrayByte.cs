@@ -15,7 +15,7 @@ namespace DecTest
         [Test]
         public void BasicBase64([Values] ParserMode mode, [Values] bool forceFallbackArray)
         {
-            Dec.Config.TestForceFallbackArray = forceFallbackArray;
+            Dec.Config.TestForceFallbackEmit = forceFallbackArray;
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ByteArrayDec) } });
 
             var parser = new Dec.Parser();
@@ -40,7 +40,7 @@ namespace DecTest
         [Test]
         public void BasicLiBased([Values] ParserMode mode, [Values] bool forceFallbackArray)
         {
-            Dec.Config.TestForceFallbackArray = forceFallbackArray;
+            Dec.Config.TestForceFallbackEmit = forceFallbackArray;
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ByteArrayDec) } });
 
             var parser = new Dec.Parser();
@@ -73,7 +73,7 @@ namespace DecTest
         [Test]
         public void EmptyArray([Values] ParserMode mode, [Values] bool forceFallbackArray)
         {
-            Dec.Config.TestForceFallbackArray = forceFallbackArray;
+            Dec.Config.TestForceFallbackEmit = forceFallbackArray;
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ByteArrayDec) } });
 
             var parser = new Dec.Parser();
@@ -98,7 +98,7 @@ namespace DecTest
         [Test]
         public void NullArray([Values] ParserMode mode, [Values] bool forceFallbackArray)
         {
-            Dec.Config.TestForceFallbackArray = forceFallbackArray;
+            Dec.Config.TestForceFallbackEmit = forceFallbackArray;
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ByteArrayDec) } });
 
             var parser = new Dec.Parser();
@@ -123,7 +123,7 @@ namespace DecTest
         [Test]
         public void InvalidBase64([Values] ParserMode mode, [Values] bool forceFallbackArray)
         {
-            Dec.Config.TestForceFallbackArray = forceFallbackArray;
+            Dec.Config.TestForceFallbackEmit = forceFallbackArray;
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ByteArrayDec) } });
 
             var parser = new Dec.Parser();
@@ -149,7 +149,7 @@ namespace DecTest
         [Test]
         public void LargeArray([Values] ParserMode mode, [Values] bool forceFallbackArray)
         {
-            Dec.Config.TestForceFallbackArray = forceFallbackArray;
+            Dec.Config.TestForceFallbackEmit = forceFallbackArray;
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ByteArrayDec) } });
 
             // Create a large byte array (1024 bytes)
@@ -180,7 +180,7 @@ namespace DecTest
         [Test]
         public void RecorderRoundTrip([Values] RecorderMode mode, [Values] bool forceFallbackArray)
         {
-            Dec.Config.TestForceFallbackArray = forceFallbackArray;
+            Dec.Config.TestForceFallbackEmit = forceFallbackArray;
             var testData = new byte[] { 0, 1, 127, 128, 255, 42, 100, 200 };
 
             var deserialized = DoRecorderRoundTrip(testData, mode);
@@ -191,7 +191,7 @@ namespace DecTest
         [Test]
         public void RecorderRoundTripEmpty([Values] RecorderMode mode, [Values] bool forceFallbackArray)
         {
-            Dec.Config.TestForceFallbackArray = forceFallbackArray;
+            Dec.Config.TestForceFallbackEmit = forceFallbackArray;
             var testData = new byte[] { };
 
             var deserialized = DoRecorderRoundTrip(testData, mode);
@@ -202,7 +202,7 @@ namespace DecTest
         [Test]
         public void RecorderRoundTripNull([ValuesExcept(RecorderMode.Validation)] RecorderMode mode, [Values] bool forceFallbackArray)
         {
-            Dec.Config.TestForceFallbackArray = forceFallbackArray;
+            Dec.Config.TestForceFallbackEmit = forceFallbackArray;
             byte[] testData = null;
 
             var deserialized = DoRecorderRoundTrip(testData, mode);
@@ -213,7 +213,7 @@ namespace DecTest
         [Test]
         public void RecorderRoundTripLarge([Values] RecorderMode mode, [Values] bool forceFallbackArray)
         {
-            Dec.Config.TestForceFallbackArray = forceFallbackArray;
+            Dec.Config.TestForceFallbackEmit = forceFallbackArray;
             // Test with a large array to ensure efficiency
             var testData = new byte[2048];
             for (int i = 0; i < testData.Length; i++)
@@ -241,7 +241,7 @@ namespace DecTest
         [Test]
         public void RecorderArrayRef([ValuesExcept(RecorderMode.Simple)] RecorderMode mode, [Range(10, 12)] int length, [Values] bool forceFallbackArray)
         {
-            Dec.Config.TestForceFallbackArray = forceFallbackArray;
+            Dec.Config.TestForceFallbackEmit = forceFallbackArray;
             // Test that array reuse works correctly for reference preservation
             // This also verifies that we're doing our length calculations correctly
             var original = new ByteArrayRecordable();
@@ -261,7 +261,7 @@ namespace DecTest
         [Test]
         public void MixedFormats([Values] ParserMode mode, [Values] bool forceFallbackArray)
         {
-            Dec.Config.TestForceFallbackArray = forceFallbackArray;
+            Dec.Config.TestForceFallbackEmit = forceFallbackArray;
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ByteArrayDec) } });
 
             var parser = new Dec.Parser();
@@ -290,7 +290,7 @@ namespace DecTest
         [Test]
         public void Base64Padding([Values] ParserMode mode, [Values] bool forceFallbackArray)
         {
-            Dec.Config.TestForceFallbackArray = forceFallbackArray;
+            Dec.Config.TestForceFallbackEmit = forceFallbackArray;
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ByteArrayDec) } });
 
             // Test different padding scenarios

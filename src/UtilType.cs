@@ -923,7 +923,7 @@ namespace Dec
         internal static Array CreateDynamicArray(Type elementType, int[] dimensions)
         {
             // Use IL-generated array creators for 1D arrays when dynamic code is supported (not AOT)
-            if (dimensions.Length == 1 && RuntimeFeature.IsDynamicCodeSupported && !Config.TestForceFallbackArray)
+            if (dimensions.Length == 1 && RuntimeFeature.IsDynamicCodeSupported && !Config.TestForceFallbackEmit)
             {
                 var creator = ArrayCreators1D.GetOrAdd(elementType, type =>
                 {

@@ -16,7 +16,7 @@ namespace DecTest
         [Test]
         public void Basic([Values] ParserMode mode, [Values] bool forceFallbackArray)
         {
-            Dec.Config.TestForceFallbackArray = forceFallbackArray;
+            Dec.Config.TestForceFallbackEmit = forceFallbackArray;
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[]{ typeof(ArrayDec) } });
 
             var parser = new Dec.Parser();
@@ -53,7 +53,7 @@ namespace DecTest
         [Test]
         public void AsStringError([Values] ParserMode mode, [Values] bool forceFallbackArray)
         {
-            Dec.Config.TestForceFallbackArray = forceFallbackArray;
+            Dec.Config.TestForceFallbackEmit = forceFallbackArray;
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } });
 
             var parser = new Dec.Parser();
@@ -79,7 +79,7 @@ namespace DecTest
         [Test]
         public void Zero([Values] ParserMode mode, [Values] bool forceFallbackArray)
         {
-            Dec.Config.TestForceFallbackArray = forceFallbackArray;
+            Dec.Config.TestForceFallbackEmit = forceFallbackArray;
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } });
 
             var parser = new Dec.Parser();
@@ -104,7 +104,7 @@ namespace DecTest
         [Test]
         public void Null([Values] ParserMode mode, [Values] bool forceFallbackArray)
         {
-            Dec.Config.TestForceFallbackArray = forceFallbackArray;
+            Dec.Config.TestForceFallbackEmit = forceFallbackArray;
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } });
 
             var parser = new Dec.Parser();
@@ -129,7 +129,7 @@ namespace DecTest
         [Test]
         public void ElementMisparse([Values] ParserMode mode, [Values] bool forceFallbackArray)
         {
-            Dec.Config.TestForceFallbackArray = forceFallbackArray;
+            Dec.Config.TestForceFallbackEmit = forceFallbackArray;
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } });
 
             var parser = new Dec.Parser();
@@ -166,7 +166,7 @@ namespace DecTest
         [Test]
         public void BadTags([Values] ParserMode mode, [Values] bool forceFallbackArray)
         {
-            Dec.Config.TestForceFallbackArray = forceFallbackArray;
+            Dec.Config.TestForceFallbackEmit = forceFallbackArray;
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } });
 
             var parser = new Dec.Parser();
@@ -203,7 +203,7 @@ namespace DecTest
         [Test]
         public void MultiDimensional([ValuesExcept(RecorderMode.Validation)] RecorderMode mode, [Values] bool forceFallbackArray)
         {
-            Dec.Config.TestForceFallbackArray = forceFallbackArray;
+            Dec.Config.TestForceFallbackEmit = forceFallbackArray;
             var arr = new int[2,2,3] {
                 { { 1, 2, 3 }, { 4, 5, 6 } },
                 { { 7, 8, 9 }, { 10, 11, 12 } }
@@ -222,7 +222,7 @@ namespace DecTest
         [Test]
         public void MultiInsufficient([ValuesExcept(ParserMode.Validation)] ParserMode mode, [Values] bool forceFallbackArray)
         {
-            Dec.Config.TestForceFallbackArray = forceFallbackArray;
+            Dec.Config.TestForceFallbackEmit = forceFallbackArray;
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(MultidimDec) } });
 
             var parser = new Dec.Parser();
@@ -272,7 +272,7 @@ namespace DecTest
         [Test]
         public void MultiExcessive([ValuesExcept(ParserMode.Validation)] ParserMode mode, [Values] bool forceFallbackArray)
         {
-            Dec.Config.TestForceFallbackArray = forceFallbackArray;
+            Dec.Config.TestForceFallbackEmit = forceFallbackArray;
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(MultidimDec) } });
 
             var parser = new Dec.Parser();
@@ -324,7 +324,7 @@ namespace DecTest
         [Test]
         public void MultiAppend([ValuesExcept(ParserMode.Validation)] ParserMode mode, [Values] bool forceFallbackArray)
         {
-            Dec.Config.TestForceFallbackArray = forceFallbackArray;
+            Dec.Config.TestForceFallbackEmit = forceFallbackArray;
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(MultidimDec) } });
 
             var parser = new Dec.Parser();
@@ -367,7 +367,7 @@ namespace DecTest
         [Test]
         public void ObjectArrayNonExistentClassTag([Values] ParserMode mode, [Values] bool forceFallbackArray)
         {
-            Dec.Config.TestForceFallbackArray = forceFallbackArray;
+            Dec.Config.TestForceFallbackEmit = forceFallbackArray;
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ObjectArrayDec) } });
 
             var parser = new Dec.Parser();
