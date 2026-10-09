@@ -11,5 +11,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../src/dec.csproj" />
+    <ProjectReference Include="../recorder_enumerator/src/recorder_enumerator.csproj" />
   </ItemGroup>
 </Project>

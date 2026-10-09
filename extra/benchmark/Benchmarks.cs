@@ -378,6 +378,65 @@ namespace DecBenchmark
         }
     }
 
+    // AI-shaped state as RecorderEnumerator records it: each agent runs an iterator over its own fields and a beacon it shares with other agents, and scores through a closure.
+    public class CoroutineBeacon : IRecordable
+    {
+        public int signal;
+
+        public void Record(Recorder recorder)
+        {
+            recorder.Record(ref signal, nameof(signal));
+        }
+    }
+
+    [Dec.RecorderEnumerator.RecordableClosures]
+    public class CoroutineAgent : IRecordable
+    {
+        public int energy;
+        public CoroutineBeacon beacon;
+        public IEnumerator<int> behavior;
+        public Func<int, int> scoring;
+
+        [Dec.RecorderEnumerator.RecordableEnumerable]
+        public IEnumerable<int> Behave(int patience)
+        {
+            var visited = new List<int>();
+            float urgency = 0.5f;
+            for (int step = 0; ; ++step)
+            {
+                visited.Add(step);
+                urgency += 0.25f;
+                energy -= 1;
+                yield return beacon.signal + patience + visited.Count + (int)urgency;
+            }
+        }
+
+        public void Start(int patience, int weight, string tag)
+        {
+            behavior = Behave(patience).GetEnumerator();
+            scoring = value => value * weight + tag.Length + energy;
+        }
+
+        public void Record(Recorder recorder)
+        {
+            recorder.Record(ref energy, nameof(energy));
+            recorder.Shared().Record(ref beacon, nameof(beacon));
+            recorder.Record(ref behavior, nameof(behavior));
+            recorder.Record(ref scoring, nameof(scoring));
+        }
+    }
+
+    public class CoroutineWorld : IRecordable
+    {
+        public List<CoroutineAgent> agents;
+
+        public void Record(Recorder recorder)
+        {
+            // Shared, so the agents' own iterators and closures can refer back to them.
+            recorder.Shared().Record(ref agents, nameof(agents));
+        }
+    }
+
     // ───────────────────────────────────────────────
     // Benchmark classes
     // ───────────────────────────────────────────────
@@ -615,6 +674,68 @@ namespace DecBenchmark
         public ulong Checksum()
         {
             return Recorder.Checksum(data);
+        }
+    }
+
+    // RecorderEnumerator's converters for user iterators and closures, which record every field of a compiler-generated class.
+    [MemoryDiagnoser]
+    public class CoroutineBenchmarks : BenchmarkBase
+    {
+        private CoroutineWorld world;
+        private string serialized;
+
+        [GlobalSetup]
+        public void Setup()
+        {
+            SetupDec();
+            Dec.RecorderEnumerator.Config.Setup();
+            FinishParser();
+
+            var beacons = Enumerable.Range(0, 10).Select(i => new CoroutineBeacon { signal = i }).ToList();
+            world = new CoroutineWorld { agents = new List<CoroutineAgent>() };
+            for (int i = 0; i < 200; ++i)
+            {
+                var agent = new CoroutineAgent { energy = 1000 + i, beacon = beacons[i % beacons.Count] };
+                agent.Start(patience: i % 7, weight: i % 5 + 1, tag: "agent" + (i % 3));
+                for (int step = 0; step < i % 4; ++step)
+                {
+                    agent.behavior.MoveNext();
+                }
+                world.agents.Add(agent);
+            }
+
+            serialized = Recorder.Write(world);
+        }
+
+        [GlobalCleanup]
+        public void Cleanup()
+        {
+            Dec.Config.ConverterFactory = null;
+            CleanupDec();
+        }
+
+        [Benchmark]
+        public string Write()
+        {
+            return Recorder.Write(world);
+        }
+
+        [Benchmark]
+        public CoroutineWorld Read()
+        {
+            return Recorder.Read<CoroutineWorld>(serialized);
+        }
+
+        [Benchmark]
+        public CoroutineWorld Clone()
+        {
+            return Recorder.Clone(world);
+        }
+
+        [Benchmark]
+        public ulong Checksum()
+        {
+            return Recorder.Checksum(world);
         }
     }
 
