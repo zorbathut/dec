@@ -19,11 +19,12 @@ namespace Dec
         internal static System.Collections.Concurrent.ConcurrentDictionary<Type, Converter> ConverterObjects = null;
         internal static System.Collections.Concurrent.ConcurrentDictionary<Type, Type> ConverterGenericPrototypes = null;
 
+        // These wrap the converter for T, which may be the typed ConverterString<T>, ConverterRecord<T>, or ConverterFactory<T>, or a Dynamic one, so they go through its object-typed entry points.
         internal class ConverterNullableString<T> : ConverterString<T?> where T : struct
         {
-            private ConverterString<T> child;
+            private ConverterString child;
 
-            public ConverterNullableString(ConverterString<T> child)
+            public ConverterNullableString(ConverterString child)
             {
                 this.child = child;
             }
@@ -36,21 +37,21 @@ namespace Dec
                     return "";
                 }
 
-                return child.Write(input.Value);
+                return child.WriteObj(input.Value);
             }
 
             public override T? Read(string input, Context context)
             {
                 // if we're null, we must have already handled this elsewhere
-                return child.Read(input, context);
+                return (T?)child.ReadObj(input, context);
             }
         }
 
         internal class ConverterNullableRecord<T> : ConverterRecord<T?> where T : struct
         {
-            private ConverterRecord<T> child;
+            private ConverterRecord child;
 
-            public ConverterNullableRecord(ConverterRecord<T> child)
+            public ConverterNullableRecord(ConverterRecord child)
             {
                 this.child = child;
             }
@@ -65,14 +66,11 @@ namespace Dec
                         return;
                     }
 
-                    var value = input.Value;
-                    child.Record(ref value, recorder);
+                    child.RecordObj(input.Value, recorder);
                 }
                 else if (recorder.Mode == Recorder.Direction.Read)
                 {
-                    T value = default;
-                    child.Record(ref value, recorder);
-                    input = value;
+                    input = (T?)child.RecordObj(default(T), recorder);
                 }
                 else
                 {
@@ -83,16 +81,23 @@ namespace Dec
 
         internal class ConverterNullableFactory<T> : ConverterFactory<T?> where T : struct
         {
-            private ConverterFactory<T> child;
+            private ConverterFactory child;
 
-            public ConverterNullableFactory(ConverterFactory<T> child)
+            public ConverterNullableFactory(ConverterFactory child)
             {
                 this.child = child;
             }
 
             public override T? Create(Recorder recorder)
             {
-                return child.Create(recorder);
+                var created = child.CreateObj(recorder);
+                if (created == null)
+                {
+                    Dbg.Err($"{child.GetType()}.Create() returned null for `{typeof(T)}`, which is a struct; using its default value");
+                    return default(T);
+                }
+
+                return (T)created;
             }
 
             public override void Read(ref T? input, Recorder recorder)
@@ -103,9 +108,7 @@ namespace Dec
                     return;
                 }
 
-                var value = input.Value;
-                child.Read(ref value, recorder);
-                input = value;
+                input = (T?)child.ReadObj(input.Value, recorder);
             }
 
             public override void Write(T? input, Recorder recorder)
@@ -116,7 +119,7 @@ namespace Dec
                     return;
                 }
 
-                child.Write(input.Value, recorder);
+                child.WriteObj(input.Value, recorder);
             }
         }
 

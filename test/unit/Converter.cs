@@ -242,6 +242,130 @@ namespace DecTest
             Assert.AreEqual(root.x, deserialized.x);
         }
 
+        public class NumberConverterStringDynamic : Dec.ConverterStringDynamic
+        {
+            public override string Write(object input)
+            {
+                return ((Number)input).x.ToString();
+            }
+
+            public override object Read(string input, Dec.Context context)
+            {
+                return new Number { x = int.Parse(input) };
+            }
+        }
+
+        public class NumberConverterRecordDynamic : Dec.ConverterRecordDynamic
+        {
+            public override object Record(ref object input, Dec.Recorder recorder)
+            {
+                var number = input is Number existing ? existing : new Number();
+                recorder.Record(ref number.x, "x");
+                input = number;
+                return input;
+            }
+        }
+
+        public class NumberConverterFactoryDynamic : Dec.ConverterFactoryDynamic
+        {
+            public override void Write(object input, Dec.Recorder recorder)
+            {
+                var number = (Number)input;
+                recorder.Record(ref number.x, "x");
+            }
+
+            public override object Create(Dec.Recorder recorder)
+            {
+                return new Number();
+            }
+
+            public override void Read(ref object input, Dec.Recorder recorder)
+            {
+                var number = (Number)input;
+                recorder.Record(ref number.x, "x");
+                input = number;
+            }
+        }
+
+        private static Dec.Converter DynamicConverterMake(NumberConverterType type)
+        {
+            switch (type)
+            {
+                case NumberConverterType.String:
+                    return new NumberConverterStringDynamic();
+                case NumberConverterType.Record:
+                    return new NumberConverterRecordDynamic();
+                case NumberConverterType.Factory:
+                    return new NumberConverterFactoryDynamic();
+                default:
+                    throw new System.ArgumentException();
+            }
+        }
+
+        public class NumberNullableHolder : Dec.IRecordable
+        {
+            public Number? value;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref value, nameof(value));
+            }
+        }
+
+        [Test]
+        public void NullableDynamic([ValuesExcept(RecorderMode.Validation)] RecorderMode mode, [Values] NumberConverterType type, [Values] bool hasValue)
+        {
+            try
+            {
+                Dec.Config.ConverterFactory = converted => converted == typeof(Number) ? DynamicConverterMake(type) : null;
+                UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+                new Dec.Parser().Finish();
+
+                var holder = new NumberNullableHolder { value = hasValue ? new Number { x = 42 } : (Number?)null };
+                var deserialized = DoRecorderRoundTrip(holder, mode);
+
+                Assert.AreEqual(holder.value.HasValue, deserialized.value.HasValue);
+                if (hasValue)
+                {
+                    Assert.AreEqual(42, deserialized.value.Value.x);
+                }
+            }
+            finally
+            {
+                Dec.Config.ConverterFactory = null;
+            }
+        }
+
+        public class NumberConverterFactoryDynamicNull : NumberConverterFactoryDynamic
+        {
+            public override object Create(Dec.Recorder recorder)
+            {
+                return null;
+            }
+        }
+
+        [Test]
+        public void NullableDynamicCreateNull()
+        {
+            try
+            {
+                Dec.Config.ConverterFactory = converted => converted == typeof(Number) ? new NumberConverterFactoryDynamicNull() : null;
+                UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+                new Dec.Parser().Finish();
+
+                var holder = new NumberNullableHolder { value = new Number { x = 42 } };
+                string written = Dec.Recorder.Write(holder);
+
+                NumberNullableHolder read = null;
+                ExpectErrors(() => read = Dec.Recorder.Read<NumberNullableHolder>(written), err => err.Contains(nameof(NumberConverterFactoryDynamicNull)) && !err.Contains("Internal error"));
+                Assert.AreEqual(42, read.value.Value.x);
+            }
+            finally
+            {
+                Dec.Config.ConverterFactory = null;
+            }
+        }
+
         public class NumberDec : Dec.Dec
         {
             public Number n;
