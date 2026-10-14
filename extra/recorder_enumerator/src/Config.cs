@@ -253,6 +253,13 @@ namespace Dec.RecorderEnumerator
 
                 if (UserCreatedEnumerableRegex.Match(type.Name) is var ucer && ucer.Success)
                 {
+                    // Async methods' and async iterators' state machines share iterators' naming; tagging the function can't make them recordable.
+                    if (typeof(IAsyncStateMachine).IsAssignableFrom(type))
+                    {
+                        Dbg.Err($"Attempting to serialize {type}, an async function's state machine; Dec.RecorderEnumerator.RecordableEnumerable supports only synchronous iterators, not async methods or async iterators");
+                        return null;
+                    }
+
                     // Now we're going to see if the attribute exists
                     string functionName = ucer.Groups[1].Value;
 

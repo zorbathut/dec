@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using DecTest;
 using NUnit.Framework;
 
@@ -70,6 +72,34 @@ namespace RecorderEnumeratorTest
             var field = clone.reporter.GetType().GetField("<>l__initialThreadId", BindingFlags.Instance | BindingFlags.NonPublic);
             Assert.IsNotNull(field, "<>l__initialThreadId field not found on iterator state machine");
             Assert.AreEqual(-1, field.GetValue(clone.reporter));
+        }
+
+        class AsyncHolder
+        {
+            [Dec.RecorderEnumerator.RecordableEnumerable]
+            public async Task<int> Compute()
+            {
+                await Task.Yield();
+                return 1;
+            }
+
+            [Dec.RecorderEnumerator.RecordableEnumerable]
+            public async IAsyncEnumerable<int> Produce()
+            {
+                await Task.Yield();
+                yield return 1;
+            }
+        }
+
+        [Test]
+        public void AsyncStateMachine([Values(nameof(AsyncHolder.Compute), nameof(AsyncHolder.Produce))] string function)
+        {
+            // Named like an iterator's state machine, and its function is tagged, but it still can't be recorded.
+            var machineType = typeof(AsyncHolder).GetMethod(function).GetCustomAttribute<StateMachineAttribute>().StateMachineType;
+
+            Dec.Converter converter = null;
+            ExpectErrors(() => converter = Dec.Config.ConverterFactory(machineType), err => true);
+            Assert.IsNull(converter);
         }
 
         [Test]
