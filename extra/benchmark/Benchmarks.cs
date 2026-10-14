@@ -437,6 +437,36 @@ namespace DecBenchmark
         }
     }
 
+    // Components as an entity system stores them: many small recordables, each one constructed afresh by Read and Clone.
+    public class ConstructionComponent : IRecordable
+    {
+        public int value;
+
+        private ConstructionComponent()
+        {
+        }
+
+        public static ConstructionComponent Create(int value)
+        {
+            return new ConstructionComponent { value = value };
+        }
+
+        public void Record(Recorder recorder)
+        {
+            recorder.Record(ref value, nameof(value));
+        }
+    }
+
+    public struct ConstructionComponentStruct : IRecordable
+    {
+        public int value;
+
+        public void Record(Recorder recorder)
+        {
+            recorder.Record(ref value, nameof(value));
+        }
+    }
+
     // ───────────────────────────────────────────────
     // Benchmark classes
     // ───────────────────────────────────────────────
@@ -736,6 +766,79 @@ namespace DecBenchmark
         public ulong Checksum()
         {
             return Recorder.Checksum(world);
+        }
+    }
+
+    // Object construction on its own, and in the Reads and Clones that do one per element.
+    [MemoryDiagnoser]
+    public class ConstructionBenchmarks : BenchmarkBase
+    {
+        private List<ConstructionComponent> classes;
+        private string classesSerialized;
+        private List<ConstructionComponentStruct> structs;
+        private string structsSerialized;
+        private Dec.RecorderEnumerator.UserCreatedEnumerableConverter iteratorConverter;
+
+        [GlobalSetup]
+        public void Setup()
+        {
+            SetupDec();
+            FinishParser();
+
+            classes = Enumerable.Range(0, 4000).Select(ConstructionComponent.Create).ToList();
+            classesSerialized = Recorder.Write(classes);
+            structs = Enumerable.Range(0, 4000).Select(i => new ConstructionComponentStruct { value = i }).ToList();
+            structsSerialized = Recorder.Write(structs);
+
+            iteratorConverter = new Dec.RecorderEnumerator.UserCreatedEnumerableConverter(new CoroutineAgent().Behave(0).GetType());
+        }
+
+        [GlobalCleanup]
+        public void Cleanup()
+        {
+            CleanupDec();
+        }
+
+        [Benchmark]
+        public object CreateClass()
+        {
+            return typeof(ConstructionComponent).CreateInstanceSafe("object", null);
+        }
+
+        [Benchmark]
+        public object CreateStruct()
+        {
+            return typeof(ConstructionComponentStruct).CreateInstanceSafe("object", null);
+        }
+
+        [Benchmark]
+        public object CreateIterator()
+        {
+            return iteratorConverter.Create(null);
+        }
+
+        [Benchmark]
+        public List<ConstructionComponent> ClassRead()
+        {
+            return Recorder.Read<List<ConstructionComponent>>(classesSerialized);
+        }
+
+        [Benchmark]
+        public List<ConstructionComponent> ClassClone()
+        {
+            return Recorder.Clone(classes);
+        }
+
+        [Benchmark]
+        public List<ConstructionComponentStruct> StructRead()
+        {
+            return Recorder.Read<List<ConstructionComponentStruct>>(structsSerialized);
+        }
+
+        [Benchmark]
+        public List<ConstructionComponentStruct> StructClone()
+        {
+            return Recorder.Clone(structs);
         }
     }
 
