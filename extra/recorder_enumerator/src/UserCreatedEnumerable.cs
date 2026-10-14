@@ -13,12 +13,18 @@ namespace Dec.RecorderEnumerator
         private const string InitialThreadIdFieldName = "<>l__initialThreadId";
         private const int InvalidThreadId = -1;
 
-        readonly Type enumerableType;
+        // appears to be a sentinel value for "hasn't yet 'created' an 'instance'", which this currently hasn't
+        // we'll overwrite this later though
+        private static readonly object BoxedStartState = -2;
+        private static readonly object BoxedInvalidThreadId = InvalidThreadId;
+
+        readonly ConstructorInfo constructor;
         readonly FieldInfo initialThreadIdField;
 
         public UserCreatedEnumerableConverter(Type type) : base(type, Util.RecordFieldsAll(type, InitialThreadIdFieldName), IgnoredLabels(type))
         {
-            enumerableType = type;
+            // Every C# iterator's state machine has a public constructor taking its starting state.
+            constructor = type.GetConstructor(new[] { typeof(int) });
             initialThreadIdField = type.GetField(InitialThreadIdFieldName, BindingFlags.Instance | BindingFlags.NonPublic);
         }
 
@@ -35,12 +41,11 @@ namespace Dec.RecorderEnumerator
 
         public override object Create(Recorder recorder)
         {
-            // appears to be a sentinel value for "hasn't yet 'created' an 'instance'", which this currently hasn't
-            // we'll overwrite this later though
-            var instance = Activator.CreateInstance(enumerableType, -2);
+            // A fresh argument array every call: some runtimes write the arguments back into it.
+            var instance = constructor.Invoke(new object[] { BoxedStartState });
 
             // Overwrite the initialThreadId the constructor just stamped in with the current thread's id.
-            initialThreadIdField?.SetValue(instance, InvalidThreadId);
+            initialThreadIdField?.SetValue(instance, BoxedInvalidThreadId);
 
             return instance;
         }
