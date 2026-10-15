@@ -330,6 +330,63 @@ references:
   isSpec: "True"
   fullName: Dec.ConverterFactoryDynamic.Write
   nameWithType: ConverterFactoryDynamic.Write
+- uid: Dec.ConverterFactoryFields
+  name: ConverterFactoryFields
+  href: api/Dec.ConverterFactoryFields.html
+  commentId: T:Dec.ConverterFactoryFields
+  fullName: Dec.ConverterFactoryFields
+  nameWithType: ConverterFactoryFields
+- uid: Dec.ConverterFactoryFields.#ctor(System.Type,System.Collections.Generic.IEnumerable{Dec.RecordField},System.Collections.Generic.IEnumerable{System.String})
+  name: ConverterFactoryFields(Type, IEnumerable<RecordField>, IEnumerable<string>)
+  href: api/Dec.ConverterFactoryFields.html#Dec_ConverterFactoryFields__ctor_System_Type_System_Collections_Generic_IEnumerable_Dec_RecordField__System_Collections_Generic_IEnumerable_System_String__
+  commentId: M:Dec.ConverterFactoryFields.#ctor(System.Type,System.Collections.Generic.IEnumerable{Dec.RecordField},System.Collections.Generic.IEnumerable{System.String})
+  name.vb: New(Type, IEnumerable(Of RecordField), IEnumerable(Of String))
+  fullName: Dec.ConverterFactoryFields.ConverterFactoryFields(System.Type, System.Collections.Generic.IEnumerable<Dec.RecordField>, System.Collections.Generic.IEnumerable<string>)
+  fullName.vb: Dec.ConverterFactoryFields.New(System.Type, System.Collections.Generic.IEnumerable(Of Dec.RecordField), System.Collections.Generic.IEnumerable(Of String))
+  nameWithType: ConverterFactoryFields.ConverterFactoryFields(Type, IEnumerable<RecordField>, IEnumerable<string>)
+  nameWithType.vb: ConverterFactoryFields.New(Type, IEnumerable(Of RecordField), IEnumerable(Of String))
+- uid: Dec.ConverterFactoryFields.#ctor*
+  name: ConverterFactoryFields
+  href: api/Dec.ConverterFactoryFields.html#Dec_ConverterFactoryFields__ctor_
+  commentId: Overload:Dec.ConverterFactoryFields.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: Dec.ConverterFactoryFields.ConverterFactoryFields
+  fullName.vb: Dec.ConverterFactoryFields.New
+  nameWithType: ConverterFactoryFields.ConverterFactoryFields
+  nameWithType.vb: ConverterFactoryFields.New
+- uid: Dec.ConverterFactoryFields.Read(System.Object@,Dec.Recorder)
+  name: Read(ref object, Recorder)
+  href: api/Dec.ConverterFactoryFields.html#Dec_ConverterFactoryFields_Read_System_Object__Dec_Recorder_
+  commentId: M:Dec.ConverterFactoryFields.Read(System.Object@,Dec.Recorder)
+  name.vb: Read(Object, Recorder)
+  fullName: Dec.ConverterFactoryFields.Read(ref object, Dec.Recorder)
+  fullName.vb: Dec.ConverterFactoryFields.Read(Object, Dec.Recorder)
+  nameWithType: ConverterFactoryFields.Read(ref object, Recorder)
+  nameWithType.vb: ConverterFactoryFields.Read(Object, Recorder)
+- uid: Dec.ConverterFactoryFields.Read*
+  name: Read
+  href: api/Dec.ConverterFactoryFields.html#Dec_ConverterFactoryFields_Read_
+  commentId: Overload:Dec.ConverterFactoryFields.Read
+  isSpec: "True"
+  fullName: Dec.ConverterFactoryFields.Read
+  nameWithType: ConverterFactoryFields.Read
+- uid: Dec.ConverterFactoryFields.Write(System.Object,Dec.Recorder)
+  name: Write(object, Recorder)
+  href: api/Dec.ConverterFactoryFields.html#Dec_ConverterFactoryFields_Write_System_Object_Dec_Recorder_
+  commentId: M:Dec.ConverterFactoryFields.Write(System.Object,Dec.Recorder)
+  name.vb: Write(Object, Recorder)
+  fullName: Dec.ConverterFactoryFields.Write(object, Dec.Recorder)
+  fullName.vb: Dec.ConverterFactoryFields.Write(Object, Dec.Recorder)
+  nameWithType: ConverterFactoryFields.Write(object, Recorder)
+  nameWithType.vb: ConverterFactoryFields.Write(Object, Recorder)
+- uid: Dec.ConverterFactoryFields.Write*
+  name: Write
+  href: api/Dec.ConverterFactoryFields.html#Dec_ConverterFactoryFields_Write_
+  commentId: Overload:Dec.ConverterFactoryFields.Write
+  isSpec: "True"
+  fullName: Dec.ConverterFactoryFields.Write
+  nameWithType: ConverterFactoryFields.Write
 - uid: Dec.ConverterFactory`1
   name: ConverterFactory<T>
   href: api/Dec.ConverterFactory-1.html
@@ -2489,6 +2546,49 @@ references:
   isSpec: "True"
   fullName: Dec.PathTupleItem.Serialize
   nameWithType: PathTupleItem.Serialize
+- uid: Dec.RecordField
+  name: RecordField
+  href: api/Dec.RecordField.html
+  commentId: T:Dec.RecordField
+  fullName: Dec.RecordField
+  nameWithType: RecordField
+- uid: Dec.RecordField.#ctor(System.Reflection.FieldInfo,System.String,System.Boolean)
+  name: RecordField(FieldInfo, string, bool)
+  href: api/Dec.RecordField.html#Dec_RecordField__ctor_System_Reflection_FieldInfo_System_String_System_Boolean_
+  commentId: M:Dec.RecordField.#ctor(System.Reflection.FieldInfo,System.String,System.Boolean)
+  name.vb: New(FieldInfo, String, Boolean)
+  fullName: Dec.RecordField.RecordField(System.Reflection.FieldInfo, string, bool)
+  fullName.vb: Dec.RecordField.New(System.Reflection.FieldInfo, String, Boolean)
+  nameWithType: RecordField.RecordField(FieldInfo, string, bool)
+  nameWithType.vb: RecordField.New(FieldInfo, String, Boolean)
+- uid: Dec.RecordField.#ctor*
+  name: RecordField
+  href: api/Dec.RecordField.html#Dec_RecordField__ctor_
+  commentId: Overload:Dec.RecordField.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: Dec.RecordField.RecordField
+  fullName.vb: Dec.RecordField.New
+  nameWithType: RecordField.RecordField
+  nameWithType.vb: RecordField.New
+- uid: Dec.RecordField.Field
+  name: Field
+  href: api/Dec.RecordField.html#Dec_RecordField_Field
+  commentId: F:Dec.RecordField.Field
+  fullName: Dec.RecordField.Field
+  nameWithType: RecordField.Field
+- uid: Dec.RecordField.Label
+  name: Label
+  href: api/Dec.RecordField.html#Dec_RecordField_Label
+  commentId: F:Dec.RecordField.Label
+  fullName: Dec.RecordField.Label
+  nameWithType: RecordField.Label
+- uid: Dec.RecordField.Shared
+  name: Shared
+  href: api/Dec.RecordField.html#Dec_RecordField_Shared
+  commentId: F:Dec.RecordField.Shared
+  fullName: Dec.RecordField.Shared
+  nameWithType: RecordField.Shared
 - uid: Dec.Recorder
   name: Recorder
   href: api/Dec.Recorder.html
