@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Dec;
@@ -204,6 +205,264 @@ namespace DecTest
             var dictClone = Dec.Recorder.Clone(dict);
             Assert.AreNotSame(dict.First().Key, dictClone.First().Key);
             Assert.AreSame(dict.First().Value, dictClone.First().Value);
+        }
+
+        // How Clone treats one side of a dictionary: copied as-is, or cloned as a value type or as a reference type.
+        public enum DictionarySide
+        {
+            Copied,
+            ClonedValueType,
+            ClonedClass,
+        }
+
+        [Dec.CloneStructPiecewise]
+        public struct DictionaryKeyCopied : IEquatable<DictionaryKeyCopied>
+        {
+            public int id;
+
+            public bool Equals(DictionaryKeyCopied other)
+            {
+                return id == other.id;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is DictionaryKeyCopied other && Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                return id;
+            }
+        }
+
+        // Enums aren't primitive, so an enum key is cloned rather than copied.
+        public enum DictionaryKeyEnum
+        {
+        }
+
+        public class DictionaryKeyCloned : IRecordable
+        {
+            public int id;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref id, nameof(id));
+            }
+        }
+
+        [Dec.CloneClassAsSharedRef]
+        public class DictionaryValueCopied
+        {
+            public int id;
+        }
+
+        public struct DictionaryValueClonedStruct : IRecordable
+        {
+            public int id;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref id, nameof(id));
+            }
+        }
+
+        public class DictionaryValueCloned : IRecordable
+        {
+            public int id;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref id, nameof(id));
+            }
+        }
+
+        [Test]
+        public void CloneDictionary([Values] DictionarySide key, [Values] DictionarySide value)
+        {
+            switch (key)
+            {
+                case DictionarySide.Copied:
+                    CloneDictionaryWithKey(i => new DictionaryKeyCopied { id = i }, k => k.id, key, value);
+                    break;
+                case DictionarySide.ClonedValueType:
+                    CloneDictionaryWithKey(i => (DictionaryKeyEnum)i, k => (int)k, key, value);
+                    break;
+                case DictionarySide.ClonedClass:
+                    CloneDictionaryWithKey(i => new DictionaryKeyCloned { id = i }, k => k.id, key, value);
+                    break;
+            }
+        }
+
+        private static void CloneDictionaryWithKey<K>(Func<int, K> makeKey, Func<K, int> keyId, DictionarySide key, DictionarySide value)
+        {
+            switch (value)
+            {
+                case DictionarySide.Copied:
+                    AssertDictionaryClone(makeKey, keyId, key, i => new DictionaryValueCopied { id = i }, v => v.id, value);
+                    break;
+                case DictionarySide.ClonedValueType:
+                    AssertDictionaryClone(makeKey, keyId, key, i => new DictionaryValueClonedStruct { id = i }, v => v.id, value);
+                    break;
+                case DictionarySide.ClonedClass:
+                    AssertDictionaryClone(makeKey, keyId, key, i => new DictionaryValueCloned { id = i }, v => v.id, value);
+                    break;
+            }
+        }
+
+        private static void AssertDictionaryClone<K, V>(Func<int, K> makeKey, Func<K, int> keyId, DictionarySide key, Func<int, V> makeValue, Func<V, int> valueId, DictionarySide value)
+        {
+            var original = new Dictionary<K, V>();
+            for (int i = 0; i < 20; ++i)
+            {
+                original[makeKey(i)] = makeValue(i);
+            }
+
+            // One value in two entries.
+            var aliased = original.First(entry => keyId(entry.Key) == 0).Value;
+            original[makeKey(20)] = aliased;
+
+            var clone = Dec.Recorder.Clone(original);
+
+            // Enumeration order isn't part of the contract, so entries are matched by key.
+            Assert.AreNotSame(original, clone);
+            Assert.AreEqual(original.Count, clone.Count);
+            var cloneEntries = clone.ToDictionary(entry => keyId(entry.Key));
+            foreach (var originalEntry in original)
+            {
+                var cloneEntry = cloneEntries[keyId(originalEntry.Key)];
+                Assert.AreEqual(valueId(originalEntry.Value), valueId(cloneEntry.Value));
+
+                if (key == DictionarySide.ClonedClass)
+                {
+                    Assert.AreNotSame(originalEntry.Key, cloneEntry.Key);
+                }
+
+                if (value == DictionarySide.Copied)
+                {
+                    Assert.AreSame(originalEntry.Value, cloneEntry.Value);
+                }
+                else if (value == DictionarySide.ClonedClass)
+                {
+                    Assert.AreNotSame(originalEntry.Value, cloneEntry.Value);
+                }
+            }
+
+            // A value reached from two entries clones once, the way any shared reference does.
+            if (value == DictionarySide.ClonedClass)
+            {
+                Assert.AreSame(cloneEntries[0].Value, cloneEntries[20].Value);
+            }
+        }
+
+        public class DictionaryComparerHolder : IRecordable
+        {
+            public Dictionary<string, int> dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref dict, nameof(dict));
+            }
+        }
+
+        [Test]
+        public void CloneDictionaryModelKeepsComparer()
+        {
+            var holder = new DictionaryComparerHolder();
+            holder.dict["Key"] = 1;
+
+            // The clone's own constructor builds the dictionary it's filled into, and that one carries the comparer.
+            var clone = Dec.Recorder.Clone(holder);
+
+            Assert.AreNotSame(holder.dict, clone.dict);
+            Assert.AreEqual(1, clone.dict.Count);
+            Assert.AreEqual(1, clone.dict["KEY"]);
+        }
+
+        public class DictionaryCycleValue : IRecordable
+        {
+            public Dictionary<int, DictionaryCycleValue> owner;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref owner, nameof(owner));
+            }
+        }
+
+        [Test]
+        public void CloneDictionaryCycle()
+        {
+            var original = new Dictionary<int, DictionaryCycleValue>();
+            original[1] = new DictionaryCycleValue { owner = original };
+
+            var clone = Dec.Recorder.Clone(original);
+
+            Assert.AreNotSame(original, clone);
+            Assert.AreNotSame(original[1], clone[1]);
+            Assert.AreSame(clone, clone[1].owner);
+        }
+
+        public class DictionaryChainLink : IRecordable
+        {
+            public int id;
+            public Dictionary<int, DictionaryChainLink> next;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref id, nameof(id));
+                recorder.Shared().Record(ref next, nameof(next));
+            }
+        }
+
+        [Test]
+        public void CloneDictionaryDeferred()
+        {
+            // Deep enough that Clone defers the shared dictionaries past the depth limit, which resolves them from a fresh stack.
+            var head = new DictionaryChainLink { id = 0 };
+            var link = head;
+            for (int i = 1; i < 50; ++i)
+            {
+                var following = new DictionaryChainLink { id = i };
+                link.next = new Dictionary<int, DictionaryChainLink> { [i] = following };
+                link = following;
+            }
+
+            var clone = Dec.Recorder.Clone(head);
+
+            var originalLink = head;
+            var cloneLink = clone;
+            for (int i = 0; i < 50; ++i)
+            {
+                Assert.AreNotSame(originalLink, cloneLink);
+                Assert.AreEqual(i, cloneLink.id);
+                if (i == 49)
+                {
+                    Assert.IsNull(cloneLink.next);
+                    break;
+                }
+
+                Assert.AreNotSame(originalLink.next, cloneLink.next);
+                CollectionAssert.AreEquivalent(originalLink.next.Keys, cloneLink.next.Keys);
+                originalLink = originalLink.next[i + 1];
+                cloneLink = cloneLink.next[i + 1];
+            }
+        }
+
+        [Test]
+        public void CloneDictionarySorted()
+        {
+            var original = new SortedDictionary<int, DictionaryValueCloned>();
+            foreach (var i in new[] { 3, 1, 2 })
+            {
+                original[i] = new DictionaryValueCloned { id = i * 10 };
+            }
+
+            var clone = Dec.Recorder.Clone(original);
+
+            Assert.AreNotSame(original, clone);
+            CollectionAssert.AreEqual(original.Keys, clone.Keys);
+            CollectionAssert.AreEqual(original.Values.Select(v => v.id), clone.Values.Select(v => v.id));
+            Assert.IsFalse(original.Values.Intersect(clone.Values).Any());
         }
 
         class ListToArrayRecordable : IRecordable
