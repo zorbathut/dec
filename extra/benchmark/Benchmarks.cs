@@ -467,6 +467,34 @@ namespace DecBenchmark
         }
     }
 
+    // A grid coordinate as a game uses it for a dictionary key: a small struct Clone copies as-is.
+    [CloneStructPiecewise]
+    public struct DictionaryKey : IEquatable<DictionaryKey>
+    {
+        public int x;
+        public int y;
+
+        public bool Equals(DictionaryKey other)
+        {
+            return x == other.x && y == other.y;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is DictionaryKey other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(x, y);
+        }
+    }
+
+    [CloneClassAsSharedRef]
+    public class DictionaryValue
+    {
+    }
+
     // ───────────────────────────────────────────────
     // Benchmark classes
     // ───────────────────────────────────────────────
@@ -595,6 +623,8 @@ namespace DecBenchmark
         private Dictionary<int, List<int>> nestedDict;
         private string nestedDictSerialized;
 
+        private Dictionary<DictionaryKey, DictionaryValue> structKeyDict;
+
         [GlobalSetup]
         public void Setup()
         {
@@ -614,6 +644,12 @@ namespace DecBenchmark
                 nestedDict[i] = Enumerable.Range(i, 5).ToList();
             }
             nestedDictSerialized = Recorder.Write(nestedDict);
+
+            structKeyDict = new Dictionary<DictionaryKey, DictionaryValue>();
+            for (int i = 0; i < Size; i++)
+            {
+                structKeyDict[new DictionaryKey { x = i % 100, y = i / 100 }] = new DictionaryValue();
+            }
         }
 
         [GlobalCleanup]
@@ -626,6 +662,12 @@ namespace DecBenchmark
         [Benchmark] public string WriteNestedDict() => Recorder.Write(nestedDict);
         [Benchmark] public Dictionary<int, List<int>> ReadNestedDict() => Recorder.Read<Dictionary<int, List<int>>>(nestedDictSerialized);
         [Benchmark] public Dictionary<int, List<int>> CloneNestedDict() => Recorder.Clone(nestedDict);
+
+        [Benchmark]
+        public Dictionary<DictionaryKey, DictionaryValue> CloneStructKeyDict()
+        {
+            return Recorder.Clone(structKeyDict);
+        }
     }
 
     [MemoryDiagnoser]
