@@ -535,12 +535,14 @@ namespace Dec
                 bool canCloneKey = UtilType.CanBeCloneCopied(dictArgs[0]);
                 bool canCloneValue = UtilType.CanBeCloneCopied(dictArgs[1]);
 
+                Action<WriterNodeClone, bool> fallback;
+
                 // if the dictionary members are valuelike, we can just copy the whole thing
                 // skipping the tests is important enough that we'll just specialcase the various options
                 // IDictionaryEnumerator's Key and Value rather than foreach, which boxes a DictionaryEntry per entry
                 if (canCloneKey && canCloneValue)
                 {
-                    return (self, resetDepth) =>
+                    fallback = (self, resetDepth) =>
                     {
                         var originalDict = self.original as IDictionary;
                         var resultDict = self.result as IDictionary;
@@ -554,7 +556,7 @@ namespace Dec
                 }
                 else if (canCloneKey)
                 {
-                    return (self, resetDepth) =>
+                    fallback = (self, resetDepth) =>
                     {
                         var originalDict = self.original as IDictionary;
                         var resultDict = self.result as IDictionary;
@@ -568,7 +570,7 @@ namespace Dec
                 }
                 else if (canCloneValue)
                 {
-                    return (self, resetDepth) =>
+                    fallback = (self, resetDepth) =>
                     {
                         var originalDict = self.original as IDictionary;
                         var resultDict = self.result as IDictionary;
@@ -582,7 +584,7 @@ namespace Dec
                 }
                 else
                 {
-                    return (self, resetDepth) =>
+                    fallback = (self, resetDepth) =>
                     {
                         var originalDict = self.original as IDictionary;
                         var resultDict = self.result as IDictionary;
@@ -594,6 +596,25 @@ namespace Dec
                         }
                     };
                 }
+
+                // An exact Dictionary gets a typed copy that presizes its result and boxes nothing it copies as-is; everything else, and every runtime without dynamic code, takes the non-generic path above.
+                if (!RuntimeFeature.IsDynamicCodeSupported || !valType.IsGenericType || valType.GetGenericTypeDefinition() != typeof(Dictionary<,>))
+                {
+                    return fallback;
+                }
+
+                var typed = (Action<WriterNodeClone, bool>)BuildResolveStrategyDictionaryTypedMethod.MakeGenericMethod(dictArgs).Invoke(null, new object[] { canCloneKey, canCloneValue });
+                return (self, resetDepth) =>
+                {
+                    if (Config.TestForceFallbackEmit)
+                    {
+                        fallback(self, resetDepth);
+                    }
+                    else
+                    {
+                        typed(self, resetDepth);
+                    }
+                };
             }
 
             if (valType.ImplementsGenericInterface(typeof(ISet<>)))
@@ -736,6 +757,41 @@ namespace Dec
             return (self, resetDepth) =>
             {
                 Dbg.Err($"Internal error: Failed to clone object of type {valType}");
+            };
+        }
+
+        private static readonly MethodInfo BuildResolveStrategyDictionaryTypedMethod = typeof(WriterNodeClone).GetMethod(nameof(BuildResolveStrategyDictionaryTyped), BindingFlags.NonPublic | BindingFlags.Static);
+
+        private static Action<WriterNodeClone, bool> BuildResolveStrategyDictionaryTyped<K, V>(bool canCloneKey, bool canCloneValue)
+        {
+            if (canCloneKey && canCloneValue)
+            {
+                return (self, resetDepth) =>
+                {
+                    var originalDict = (Dictionary<K, V>)self.original;
+                    var resultDict = (Dictionary<K, V>)self.result;
+                    resultDict.Clear();
+                    resultDict.EnsureCapacity(originalDict.Count);
+                    foreach (var entry in originalDict)
+                    {
+                        resultDict[entry.Key] = entry.Value;
+                    }
+                };
+            }
+
+            return (self, resetDepth) =>
+            {
+                var originalDict = (Dictionary<K, V>)self.original;
+                var resultDict = (Dictionary<K, V>)self.result;
+                resultDict.Clear();
+                resultDict.EnsureCapacity(originalDict.Count);
+                foreach (var entry in originalDict)
+                {
+                    // Key before value, as the non-generic path does, so both paths reach shared references in the same order.
+                    var key = canCloneKey ? entry.Key : (K)self.CloneChild(entry.Key, resetDepth);
+                    var value = canCloneValue ? entry.Value : (V)self.CloneChild(entry.Value, resetDepth);
+                    resultDict[key] = value;
+                }
             };
         }
 

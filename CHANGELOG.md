@@ -39,6 +39,7 @@ All notable changes to this project will be documented in this file.
 * `Recorder.Clone` allocates less on dictionaries.
 * `Recorder.Write`, `Recorder.Clone`, and `Recorder.Checksum` are up to 35% faster, depending on workload, in projects that use `DecLookup` or `DecRegister` functionality.
 * `Recorder.Clone` and `Recorder.Checksum` are up to 10% faster on objects with few fields, thanks to a cheaper check for duplicate labels.
+* `Recorder.Clone` copies a `Dictionary<K,V>` through its typed enumerator into a result presized to fit, instead of boxing each entry and growing from empty. Performance gains anywhere from +30% to +200%, with around 75% fewer allocations.
 * RecorderEnumerator: User iterators and closures are recorded through generated code instead of per-field reflection, making `Recorder.Clone` and `Recorder.Checksum` of them roughly 3-4x faster with about 80% less allocation, `Recorder.Write` about 45% faster, and `Recorder.Read` about 15% faster.
 * RecorderEnumerator: A user iterator is created through a cached constructor instead of a per-call constructor search, making each creation about 5x faster with 75% less allocation, and `Recorder.Clone` of coroutine-heavy state about 8% faster.
 * RecorderEnumerator: Recording the state machine of an async method or async iterator now reports that `[RecordableEnumerable]` supports only synchronous iterators, instead of asking for the attribute or failing on the async machinery's own fields.

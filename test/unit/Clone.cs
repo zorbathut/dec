@@ -278,8 +278,10 @@ namespace DecTest
         }
 
         [Test]
-        public void CloneDictionary([Values] DictionarySide key, [Values] DictionarySide value)
+        public void CloneDictionary([Values] DictionarySide key, [Values] DictionarySide value, [Values] bool fallback)
         {
+            Dec.Config.TestForceFallbackEmit = fallback;
+
             switch (key)
             {
                 case DictionarySide.Copied:
@@ -355,6 +357,29 @@ namespace DecTest
             }
         }
 
+        [Test]
+        public void CloneDictionaryPresized([Values] bool cloneValues)
+        {
+            int capacity;
+            if (cloneValues)
+            {
+                var original = Enumerable.Range(0, 100).ToDictionary(i => i, i => new DictionaryValueCloned { id = i });
+                var clone = Dec.Recorder.Clone(original);
+                CollectionAssert.AreEquivalent(original.Select(entry => (entry.Key, entry.Value.id)), clone.Select(entry => (entry.Key, entry.Value.id)));
+                capacity = clone.EnsureCapacity(0);
+            }
+            else
+            {
+                var original = Enumerable.Range(0, 100).ToDictionary(i => i, i => i * 2);
+                var clone = Dec.Recorder.Clone(original);
+                CollectionAssert.AreEquivalent(original, clone);
+                capacity = clone.EnsureCapacity(0);
+            }
+
+            // EnsureCapacity(0) reports the capacity; one grown entry by entry overshoots a presized one.
+            Assert.AreEqual(new Dictionary<int, int>(100).EnsureCapacity(0), capacity);
+        }
+
         public class DictionaryComparerHolder : IRecordable
         {
             public Dictionary<string, int> dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
@@ -366,8 +391,10 @@ namespace DecTest
         }
 
         [Test]
-        public void CloneDictionaryModelKeepsComparer()
+        public void CloneDictionaryModelKeepsComparer([Values] bool fallback)
         {
+            Dec.Config.TestForceFallbackEmit = fallback;
+
             var holder = new DictionaryComparerHolder();
             holder.dict["Key"] = 1;
 
@@ -390,8 +417,10 @@ namespace DecTest
         }
 
         [Test]
-        public void CloneDictionaryCycle()
+        public void CloneDictionaryCycle([Values] bool fallback)
         {
+            Dec.Config.TestForceFallbackEmit = fallback;
+
             var original = new Dictionary<int, DictionaryCycleValue>();
             original[1] = new DictionaryCycleValue { owner = original };
 
@@ -415,8 +444,10 @@ namespace DecTest
         }
 
         [Test]
-        public void CloneDictionaryDeferred()
+        public void CloneDictionaryDeferred([Values] bool fallback)
         {
+            Dec.Config.TestForceFallbackEmit = fallback;
+
             // Deep enough that Clone defers the shared dictionaries past the depth limit, which resolves them from a fresh stack.
             var head = new DictionaryChainLink { id = 0 };
             var link = head;
