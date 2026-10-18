@@ -998,5 +998,399 @@ namespace DecTest
 
             Assert.AreEqual(2, clone[1].inner.value);
         }
+
+        // Every kind of value-type field Clone copies as-is, and the paths around it that must keep today's behavior.
+        public enum ValueFieldKind
+        {
+            Int,
+            Long,
+            Double,
+            Bool,
+            Enum,
+            PiecewiseStruct,
+            ValuelikeStruct,
+        }
+
+        public enum ValueFieldEnum
+        {
+            First,
+            Second,
+            Third,
+        }
+
+        [Dec.CloneStructPiecewise]
+        public struct ValueFieldPiecewise
+        {
+            public int x;
+            public List<int> list;
+        }
+
+        public struct ValueFieldValuelike
+        {
+            public int x;
+        }
+
+        public class ValueFieldValuelikeConverter : Dec.ConverterString<ValueFieldValuelike>
+        {
+            public override string Write(ValueFieldValuelike input)
+            {
+                return input.x.ToString();
+            }
+
+            public override ValueFieldValuelike Read(string input, Dec.Context context)
+            {
+                return new ValueFieldValuelike { x = int.Parse(input) };
+            }
+
+            public override bool TreatAsValuelike()
+            {
+                return true;
+            }
+        }
+
+        public class ValueFieldHolder<T> : IRecordable
+        {
+            public T value;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref value, nameof(value));
+            }
+        }
+
+        private static ValueFieldHolder<T> CloneValueFieldOf<T>(T value)
+        {
+            var clone = Dec.Recorder.Clone(new ValueFieldHolder<T> { value = value });
+            Assert.AreEqual(value, clone.value);
+            return clone;
+        }
+
+        [Test]
+        public void CloneValueField([Values] ValueFieldKind kind)
+        {
+            switch (kind)
+            {
+                case ValueFieldKind.Int:
+                    CloneValueFieldOf(42);
+                    break;
+                case ValueFieldKind.Long:
+                    CloneValueFieldOf(1L << 40);
+                    break;
+                case ValueFieldKind.Double:
+                    CloneValueFieldOf(2.5);
+                    break;
+                case ValueFieldKind.Bool:
+                    CloneValueFieldOf(true);
+                    break;
+                case ValueFieldKind.Enum:
+                    CloneValueFieldOf(ValueFieldEnum.Third);
+                    break;
+                case ValueFieldKind.PiecewiseStruct:
+                {
+                    // A piecewise struct is copied shallowly, references and all.
+                    var original = new ValueFieldPiecewise { x = 7, list = new List<int> { 1, 2 } };
+                    var clone = CloneValueFieldOf(original);
+                    Assert.AreSame(original.list, clone.value.list);
+                    break;
+                }
+                case ValueFieldKind.ValuelikeStruct:
+                    UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ValueFieldValuelikeConverter) } });
+                    CloneValueFieldOf(new ValueFieldValuelike { x = 9 });
+                    break;
+                default:
+                    Assert.Fail($"No clone case for {kind}");
+                    break;
+            }
+        }
+
+        // Records one label as an int on one pass and as an object on the other.
+        public class ValueFieldAsObject : IRecordable
+        {
+            public static bool ObjectOnWrite;
+
+            public int value;
+            public object readBack;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                if ((recorder.Mode == Dec.Recorder.Direction.Write) == ObjectOnWrite)
+                {
+                    object boxed = value;
+                    recorder.Record(ref boxed, nameof(value));
+                    readBack = boxed;
+                }
+                else
+                {
+                    recorder.Record(ref value, nameof(value));
+                }
+            }
+        }
+
+        [Test]
+        public void CloneValueFieldReadAsObject()
+        {
+            ValueFieldAsObject.ObjectOnWrite = false;
+
+            var clone = Dec.Recorder.Clone(new ValueFieldAsObject { value = 5 });
+
+            Assert.AreEqual(5, clone.readBack);
+        }
+
+        [Test]
+        public void CloneValueFieldWrittenAsObject()
+        {
+            ValueFieldAsObject.ObjectOnWrite = true;
+
+            // The int field cloned first leaves its value behind on a node the object field's clone can reuse; it mustn't be read back.
+            var clone = Dec.Recorder.Clone(new List<object> { new ValueFieldHolder<int> { value = 1 }, new ValueFieldAsObject { value = 5 } });
+
+            Assert.AreEqual(1, ((ValueFieldHolder<int>)clone[0]).value);
+            Assert.AreEqual(5, ((ValueFieldAsObject)clone[1]).value);
+        }
+
+        [Dec.CloneStructPiecewise]
+        public struct ValueFieldOtherPiecewise
+        {
+            public int y;
+        }
+
+        // Writes a label as one struct and reads it as another, then records a field after it.
+        public class ValueFieldAsOtherType : IRecordable
+        {
+            public ValueFieldPiecewise written;
+            public ValueFieldOtherPiecewise read;
+            public int after;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                if (recorder.Mode == Dec.Recorder.Direction.Write)
+                {
+                    recorder.Record(ref written, "point");
+                }
+                else
+                {
+                    recorder.Record(ref read, "point");
+                }
+
+                recorder.Record(ref after, nameof(after));
+            }
+        }
+
+        [Test]
+        public void CloneValueFieldReadAsOtherType()
+        {
+            ValueFieldAsOtherType clone = null;
+            ExpectErrors(() => clone = Dec.Recorder.Clone(new ValueFieldAsOtherType { written = new ValueFieldPiecewise { x = 3 }, read = new ValueFieldOtherPiecewise { y = 4 }, after = 6 }), err => true);
+
+            Assert.AreEqual(0, clone.read.y);
+            Assert.AreEqual(6, clone.after);
+        }
+
+        public class ValueFieldShared : IRecordable
+        {
+            public int value;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Shared().Record(ref value, nameof(value));
+            }
+        }
+
+        [Test]
+        public void CloneValueFieldShared()
+        {
+            // As in CloneValueFieldWrittenAsObject, the first object's int field leaves a value behind on a node the shared one can reuse.
+            List<object> clone = null;
+            ExpectWarnings(() => clone = Dec.Recorder.Clone(new List<object> { new ValueFieldHolder<int> { value = 1 }, new ValueFieldShared { value = 8 } }), wrn => true);
+
+            Assert.AreEqual(1, ((ValueFieldHolder<int>)clone[0]).value);
+            Assert.AreEqual(8, ((ValueFieldShared)clone[1]).value);
+        }
+
+        [Dec.CloneStructPiecewise]
+        public struct ValueFieldHookNew : IPostCloneNew
+        {
+            public int x;
+            public bool hooked;
+
+            public void PostCloneNew()
+            {
+                hooked = true;
+            }
+        }
+
+        [Dec.CloneStructPiecewise]
+        public struct ValueFieldHookOriginal : IPostCloneOriginal
+        {
+            public int x;
+            public bool hooked;
+
+            public void PostCloneOriginal()
+            {
+                hooked = true;
+            }
+        }
+
+        [Test]
+        public void CloneValueFieldPostClone([Values] bool hookNew)
+        {
+            // Both hooks run on the copy Clone hands back, so the clone's field shows either one.
+            if (hookNew)
+            {
+                var clone = Dec.Recorder.Clone(new ValueFieldHolder<ValueFieldHookNew> { value = new ValueFieldHookNew { x = 1 } });
+                Assert.AreEqual(1, clone.value.x);
+                Assert.IsTrue(clone.value.hooked);
+            }
+            else
+            {
+                var clone = Dec.Recorder.Clone(new ValueFieldHolder<ValueFieldHookOriginal> { value = new ValueFieldHookOriginal { x = 1 } });
+                Assert.AreEqual(1, clone.value.x);
+                Assert.IsTrue(clone.value.hooked);
+            }
+        }
+
+        public class ValueFieldDuplicateRead : IRecordable
+        {
+            public int value;
+            public int again;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref value, nameof(value));
+                if (recorder.Mode == Dec.Recorder.Direction.Read)
+                {
+                    recorder.Record(ref again, nameof(value));
+                }
+            }
+        }
+
+        [Test]
+        public void CloneValueFieldTypeChange()
+        {
+            // Each holder's field reuses the node the one before it released, which last carried a value of a different type.
+            var clone = Dec.Recorder.Clone(new List<object> { new ValueFieldHolder<int> { value = 1 }, new ValueFieldHolder<long> { value = 1L << 40 }, new ValueFieldHolder<ValueFieldPiecewise> { value = new ValueFieldPiecewise { x = 3 } }, new ValueFieldHolder<int> { value = 4 } });
+
+            Assert.AreEqual(1, ((ValueFieldHolder<int>)clone[0]).value);
+            Assert.AreEqual(1L << 40, ((ValueFieldHolder<long>)clone[1]).value);
+            Assert.AreEqual(3, ((ValueFieldHolder<ValueFieldPiecewise>)clone[2]).value.x);
+            Assert.AreEqual(4, ((ValueFieldHolder<int>)clone[3]).value);
+        }
+
+        [Test]
+        public void CloneValueFieldDuplicateRead()
+        {
+            ValueFieldDuplicateRead clone = null;
+            ExpectWarnings(() => clone = Dec.Recorder.Clone(new ValueFieldDuplicateRead { value = 11 }), wrn => true);
+
+            Assert.AreEqual(11, clone.value);
+            Assert.AreEqual(11, clone.again);
+        }
+
+        public class ValueFieldFactoried
+        {
+            public int value;
+            public int readAgain;
+            public ValueFieldFactoried next;
+        }
+
+        // Create and Read both record the same value, so both read it from the same written field.
+        public class ValueFieldFactoriedConverter : Dec.ConverterFactory<ValueFieldFactoried>
+        {
+            public override void Write(ValueFieldFactoried input, Dec.Recorder recorder)
+            {
+                recorder.Record(ref input.value, "value");
+                recorder.Shared().Record(ref input.next, "next");
+            }
+
+            public override ValueFieldFactoried Create(Dec.Recorder recorder)
+            {
+                int value = 0;
+                recorder.Record(ref value, "value");
+                return new ValueFieldFactoried { value = value };
+            }
+
+            public override void Read(ref ValueFieldFactoried input, Dec.Recorder recorder)
+            {
+                recorder.Record(ref input.readAgain, "value");
+                recorder.Shared().Record(ref input.next, "next");
+            }
+        }
+
+        [Test]
+        public void CloneValueFieldFactory([Values(1, 50)] int length)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ValueFieldFactoriedConverter) } });
+
+            // A long chain is deep enough that Clone defers the later links' reads past their Creates.
+            var head = new ValueFieldFactoried { value = 0 };
+            var link = head;
+            for (int i = 1; i < length; ++i)
+            {
+                link.next = new ValueFieldFactoried { value = i };
+                link = link.next;
+            }
+
+            var clone = Dec.Recorder.Clone(new ValueFieldHolder<ValueFieldFactoried> { value = head }).value;
+
+            for (int i = 0; i < length; ++i)
+            {
+                Assert.AreNotSame(head, clone);
+                Assert.AreEqual(i, clone.value);
+                Assert.AreEqual(i, clone.readAgain);
+                head = head.next;
+                clone = clone.next;
+            }
+            Assert.IsNull(clone);
+        }
+
+        // A clone of something else, run partway through a clone's read pass.
+        public class ValueFieldNested : IRecordable
+        {
+            public static ValueFieldHolder<long> Other;
+
+            public int first;
+            public int second;
+            public ValueFieldHolder<long> otherClone;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref first, nameof(first));
+                if (recorder.Mode == Dec.Recorder.Direction.Read)
+                {
+                    otherClone = Dec.Recorder.Clone(Other);
+                }
+                recorder.Record(ref second, nameof(second));
+            }
+        }
+
+        [Test]
+        public void CloneValueFieldNested()
+        {
+            ValueFieldNested.Other = new ValueFieldHolder<long> { value = 77 };
+
+            var clone = Dec.Recorder.Clone(new ValueFieldNested { first = 1, second = 2 });
+
+            Assert.AreEqual(1, clone.first);
+            Assert.AreEqual(2, clone.second);
+            Assert.AreEqual(77, clone.otherClone.value);
+        }
+
+        [Test]
+        public void ExceptionMidResolveValueFields()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new System.Type[] { typeof(ThrowingInnerConverter) } });
+
+            // The throw abandons the first element's value field mid-read; every later element has to get its own value back.
+            var input = Enumerable.Range(0, 20).Select(i => new ThrowingHolder { inner = new ThrowingInner { value = i * 10 } }).ToList();
+
+            ThrowingInnerConverter.ThrowNext = true;
+            List<ThrowingHolder> clone = null;
+            ExpectErrors(() => clone = Dec.Recorder.Clone(input), err => err.Contains("Create failed on purpose"));
+
+            for (int i = 1; i < 20; ++i)
+            {
+                Assert.AreEqual(i * 10, clone[i].inner.value);
+            }
+        }
     }
 }
