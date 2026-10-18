@@ -495,6 +495,32 @@ namespace DecBenchmark
     {
     }
 
+    [CloneStructPiecewise]
+    public struct ValueFieldPoint
+    {
+        public int x;
+        public int y;
+    }
+
+    // A component as a game stores many of: value-type fields only, each one Clone copies as-is.
+    public class ValueFieldComponent : IRecordable
+    {
+        public int count;
+        public long stamp;
+        public bool active;
+        public SimpleEnum kind;
+        public ValueFieldPoint position;
+
+        public void Record(Recorder recorder)
+        {
+            recorder.Record(ref count, nameof(count));
+            recorder.Record(ref stamp, nameof(stamp));
+            recorder.Record(ref active, nameof(active));
+            recorder.Record(ref kind, nameof(kind));
+            recorder.Record(ref position, nameof(position));
+        }
+    }
+
     // ───────────────────────────────────────────────
     // Benchmark classes
     // ───────────────────────────────────────────────
@@ -808,6 +834,33 @@ namespace DecBenchmark
         public ulong Checksum()
         {
             return Recorder.Checksum(world);
+        }
+    }
+
+    [MemoryDiagnoser]
+    public class ValueFieldBenchmarks : BenchmarkBase
+    {
+        private List<ValueFieldComponent> components;
+
+        [GlobalSetup]
+        public void Setup()
+        {
+            SetupDec();
+            FinishParser();
+
+            components = Enumerable.Range(0, 4000).Select(i => new ValueFieldComponent { count = i, stamp = i * 1000L, active = i % 2 == 0, kind = (SimpleEnum)(i % 5), position = new ValueFieldPoint { x = i % 100, y = i / 100 } }).ToList();
+        }
+
+        [GlobalCleanup]
+        public void Cleanup()
+        {
+            CleanupDec();
+        }
+
+        [Benchmark]
+        public List<ValueFieldComponent> Clone()
+        {
+            return Recorder.Clone(components);
         }
     }
 
