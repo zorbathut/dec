@@ -631,6 +631,7 @@ namespace Dec
 
             // We keep the original around in case of error, but do all our manipulation on a result object.
             object result = original;
+            Type declaredType = type;
 
             // Verify our Shared flags as the *very* first step to ensure nothing gets past us.
             // In theory this should be fine with Flexible; Flexible only happens on an outer wrapper that was shared, and therefore was null, and therefore this is default also
@@ -1214,6 +1215,12 @@ namespace Dec
                 }
 
                 orders = textlessOrders;
+            }
+
+            // A replace starts the container over, and once a class has named a type, the existing instance has to be exactly that type.
+            if (orders[0].command == ParseCommand.Replace && result != null && type != declaredType && result.GetType() != type)
+            {
+                result = null;
             }
 
             // Special case: Arrays

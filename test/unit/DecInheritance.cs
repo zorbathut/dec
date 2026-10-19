@@ -511,6 +511,10 @@ namespace DecTest
 
         public class LayerList : List<int> { }
 
+        public class LayerDict : Dictionary<int, int> { }
+
+        public class LayerListDerived : LayerList { }
+
         public class LayerDec : Dec.Dec
         {
             public int value;
@@ -524,6 +528,9 @@ namespace DecTest
             public Queue<int> queue;
             public HashSet<int> set;
             public byte[] bytes;
+            public List<int> listDefault = new List<int> { 9 };
+            public Dictionary<int, int> dictDefault = new Dictionary<int, int> { { 9, 9 } };
+            public List<int> listDerivedDefault = new LayerListDerived { 9 };
         }
 
         public class LayerNullableDec : Dec.Dec
@@ -824,6 +831,23 @@ namespace DecTest
             DoParserTests(mode);
 
             Assert.AreEqual(2, Leaf().value);
+        }
+
+        [Test]
+        public void ReplaceDefaultWithClass([Values(ParserMode.Bare, ParserMode.Validation, ParserMode.ReflectionSet)] ParserMode mode)
+        {
+            var parser = LayerParser(
+                @"<listDefault mode=""replace"" class=""LayerList""><li>2</li></listDefault><dictDefault mode=""replace"" class=""LayerDict""><li><key>2</key><value>2</value></li></dictDefault><listDerivedDefault mode=""replace"" class=""LayerList""><li>2</li></listDerivedDefault>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            Assert.IsInstanceOf<LayerList>(Leaf().listDefault);
+            CollectionAssert.AreEqual(new[] { 2 }, Leaf().listDefault);
+            Assert.IsInstanceOf<LayerDict>(Leaf().dictDefault);
+            CollectionAssert.AreEquivalent(new Dictionary<int, int> { { 2, 2 } }, Leaf().dictDefault);
+            Assert.AreEqual(typeof(LayerList), Leaf().listDerivedDefault.GetType());
+            CollectionAssert.AreEqual(new[] { 2 }, Leaf().listDerivedDefault);
         }
 
         [Test]

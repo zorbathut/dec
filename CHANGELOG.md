@@ -61,6 +61,7 @@ All notable changes to this project will be documented in this file.
 * A cycle of `parent` attributes hung `Parser.Finish()` forever; it's now reported as an error.
 * Every dec inheriting via a dec with a missing parent reports it separately.
 * A missing parent or parent cycle among abstract decs went unreported unless some concrete dec inherited from them.
+* A container member written with `mode="replace"` and a `class` kept the type of its C# default value instead of taking the named class.
 * An object patched by more than one layer, such as a parent and child dec both setting fields on it, was registered with `Index<T>` once per layer.
 * Contents of a parent dec or base mod that a later layer replaced were still built, so they took `[Dec.Index]` slots and stayed referenced by internal lookup tables forever.
 
