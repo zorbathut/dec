@@ -91,7 +91,7 @@ namespace Dec
         public abstract void ParseStack(object hashset, Type referencedType, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings);
         public abstract void ParseQueue(object hashset, Type referencedType, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings);
         public abstract void ParseTuple(object[] parameters, Type referencedType, IList<string> parameterNames, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings);
-        public abstract void ParseReflection(object obj, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings);
+        public abstract IEnumerable<(string name, ReaderNodeParseable node)> GetFieldNodes();
     }
 
     internal static class ReaderNodeExtension
