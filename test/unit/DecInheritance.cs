@@ -182,6 +182,30 @@ namespace DecTest
         }
 
         [Test]
+        public void MissingGrandparent([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SimpleDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <SimpleDec decName=""Branch"" parent=""Missing"" abstract=""true"">
+                        <defaulted>1</defaulted>
+                    </SimpleDec>
+                    <SimpleDec decName=""Leaf"" parent=""Branch"">
+                        <overridden>2</overridden>
+                    </SimpleDec>
+                </Decs>");
+            ExpectErrors(() => parser.Finish(), err => err.Contains("Branch") && err.Contains("Missing"));
+
+            DoParserTests(mode);
+
+            var result = Dec.Database<SimpleDec>.Get("Leaf");
+            Assert.AreEqual(1, result.defaulted);
+            Assert.AreEqual(2, result.overridden);
+        }
+
+        [Test]
         public void AbstractOverride([Values] ParserMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SimpleDec) } });

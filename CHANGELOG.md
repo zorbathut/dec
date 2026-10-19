@@ -56,6 +56,7 @@ All notable changes to this project will be documented in this file.
 * RecorderEnumerator: A closure capturing variables from more than one nested scope, such as a method local and a loop local, couldn't be written to XML.
 * A `T?` whose `T` has a Dynamic converter failed with an exception.
 * Redundant parse issues with deep dec inheritance from non-abstract parents.
+* The error for a missing parent named the dec at the bottom of the inheritance chain instead of the dec whose parent was missing.
 
 
 ## [v0.11.1]

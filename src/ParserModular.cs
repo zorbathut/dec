@@ -456,6 +456,7 @@ namespace Dec
                     var completeOrders = new List<ReaderFileDec.ReaderDec>(orders);
 
                     var currentOrder = orders;
+                    var currentName = id.Item2;
                     while (true)
                     {
                         // See if we have a parent
@@ -468,7 +469,7 @@ namespace Dec
                         var parentId = (id.Item1, decWithParent.parent);
                         if (!registeredDecOrders.TryGetValue(parentId, out var parentDec))
                         {
-                            Dbg.Err($"{decWithParent.context}: Dec [{decWithParent.type}:{id.Item2}] is attempting to use parent `[{parentId.Item1}:{parentId.parent}]`, but no such dec exists");
+                            Dbg.Err($"{decWithParent.context}: Dec [{decWithParent.type}:{currentName}] is attempting to use parent `[{parentId.Item1}:{parentId.parent}]`, but no such dec exists");
                             // guess we'll just try to build it from nothing
                             break;
                         }
@@ -476,6 +477,7 @@ namespace Dec
                         completeOrders.InsertRange(0, parentDec);
 
                         currentOrder = parentDec;
+                        currentName = decWithParent.parent;
                     }
 
                     var generatedOrders = completeOrders.Select(order => order.nodeFactory(new PathDec(id.Item1, id.Item2))).ToList();
