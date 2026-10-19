@@ -543,6 +543,14 @@ namespace DecTest
             public List<int> list;
         }
 
+        public class LayerDictDec : Dec.Dec
+        {
+            public Dictionary<string, int> ints;
+            public Dictionary<string, LayerObj> objs;
+            public Dictionary<string, LayerObj> caseless = new Dictionary<string, LayerObj>(StringComparer.OrdinalIgnoreCase);
+            public Dictionary<int, int> intKeys;
+        }
+
         public class LayerNullableDec : Dec.Dec
         {
             public LayerStruct? nullableStruct = new LayerStruct { a = 1 };
@@ -916,6 +924,93 @@ namespace DecTest
             Assert.AreEqual(2, leaf.value);
             Assert.IsInstanceOf<LayerList>(leaf.list);
             CollectionAssert.AreEqual(new[] { 2 }, leaf.list);
+        }
+
+        private static LayerDictDec DictLeaf()
+        {
+            return Dec.Database<LayerDictDec>.Get("Leaf");
+        }
+
+        [Test]
+        public void LayerDictAppendDuplicate([Values] ParserMode mode)
+        {
+            var parser = LayerParser<LayerDictDec>(
+                "<ints><a>1</a></ints>",
+                @"<ints mode=""append""><a>2</a></ints>");
+            int errors = 0;
+            ExpectErrors(() => parser.Finish(), err =>
+            {
+                errors++;
+                return err.Contains("`a`");
+            });
+            Assert.AreEqual(1, errors);
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(2, DictLeaf().ints["a"]);
+        }
+
+        [Test]
+        public void LayerDictPatchDuplicateInLayer([Values] ParserMode mode)
+        {
+            var parser = LayerParser<LayerDictDec>(
+                "<ints><a>1</a></ints>",
+                @"<ints mode=""patch""><a>2</a><a>3</a></ints>");
+            int errors = 0;
+            ExpectErrors(() => parser.Finish(), err =>
+            {
+                errors++;
+                return err.Contains("`a`");
+            });
+            Assert.AreEqual(1, errors);
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(3, DictLeaf().ints["a"]);
+        }
+
+        [Test]
+        public void LayerDictPatchMerges([Values] ParserMode mode)
+        {
+            var parser = LayerParser<LayerDictDec>(
+                "<objs><a><x>1</x></a><b><x>1</x></b></objs>",
+                @"<objs mode=""patch""><b><y>2</y></b><c><y>3</y></c></objs>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            CollectionAssert.AreEqual(new[] { "a", "b", "c" }, DictLeaf().objs.Keys);
+            Assert.AreEqual(1, DictLeaf().objs["b"].x);
+            Assert.AreEqual(2, DictLeaf().objs["b"].y);
+            Assert.AreEqual(3, DictLeaf().objs["c"].y);
+        }
+
+        [Test]
+        public void LayerDictPatchUsesComparer([Values] ParserMode mode)
+        {
+            var parser = LayerParser<LayerDictDec>(
+                "<caseless><A><x>1</x></A></caseless>",
+                @"<caseless mode=""patch""><a><y>2</y></a></caseless>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(1, DictLeaf().caseless.Count);
+            Assert.AreEqual(1, DictLeaf().caseless["a"].x);
+            Assert.AreEqual(2, DictLeaf().caseless["a"].y);
+        }
+
+        [Test]
+        public void LayerDictPatchedListValue([Values] ParserMode mode)
+        {
+            var parser = LayerParser<LayerDictDec>(
+                "<objs><a><list><li>1</li></list></a></objs>",
+                @"<objs mode=""patch""><a><list mode=""append""><li>2</li></list></a></objs>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            CollectionAssert.AreEqual(new[] { 1, 2 }, DictLeaf().objs["a"].list);
         }
 
         [Test]

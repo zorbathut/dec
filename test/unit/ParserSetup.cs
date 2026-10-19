@@ -174,6 +174,7 @@ namespace DecTest
             public List<Collected_Obj> objs;
             public ReplLayer_Nested nested;
             public ReplLayer_Struct structured;
+            public Dictionary<string, List<Collected_Obj>> dict;
         }
 
         [Test]
@@ -215,6 +216,36 @@ namespace DecTest
             parser.Finish();
 
             CollectionAssert.AreEqual(new[] { "obj:mod" }, setupOrder);
+        }
+
+        [Test]
+        public void TestReplacedDictValueSetup([Values] bool module)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ReplLayer_Dec) } });
+
+            var parser = new Dec.ParserModular();
+            if (module)
+            {
+                parser.CreateModule("Base").AddString(Dec.Parser.FileType.Xml, @"
+                    <Decs>
+                        <ReplLayer_Dec decName=""Child""><dict><a><li><tag>parent</tag></li></a></dict></ReplLayer_Dec>
+                    </Decs>");
+                parser.CreateModule("Mod").AddString(Dec.Parser.FileType.Xml, @"
+                    <Decs>
+                        <ReplLayer_Dec decName=""Child"" mode=""patch""><dict mode=""patch""><a><li><tag>child</tag></li></a></dict></ReplLayer_Dec>
+                    </Decs>");
+            }
+            else
+            {
+                parser.CreateModule("Base").AddString(Dec.Parser.FileType.Xml, @"
+                    <Decs>
+                        <ReplLayer_Dec decName=""Parent"" abstract=""true""><dict><a><li><tag>parent</tag></li></a></dict></ReplLayer_Dec>
+                        <ReplLayer_Dec decName=""Child"" parent=""Parent""><dict mode=""patch""><a><li><tag>child</tag></li></a></dict></ReplLayer_Dec>
+                    </Decs>");
+            }
+            parser.Finish();
+
+            CollectionAssert.AreEqual(new[] { "obj:child" }, setupOrder);
         }
 
         // Classes for TestSharedInstanceDedup

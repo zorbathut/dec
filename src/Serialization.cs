@@ -1402,6 +1402,11 @@ namespace Dec
             {
                 var dictArgs = type.GetGenericInterfaceArguments(typeof(IDictionary<,>));
 
+                if (orders.Count > 1)
+                {
+                    return ParseDictionaryLayers(orders, result, type, dictArgs[0], dictArgs[1], globals, recSettings);
+                }
+
                 foreach (var (parseCommand, node) in orders)
                 {
                     bool permitPatch = false;
@@ -1727,6 +1732,76 @@ namespace Dec
 
                 dict[entry.key] = ParseElement(new List<ReaderNodeParseable>() { entry.value }, entry.valueType, originalValue, globals, recorderChildContext);
             }
+        }
+
+        // Fills a dictionary from several layers at once. Each key's value nodes from every layer that sets it get a single ParseElement call, so a value that a later layer replaces is never built.
+        private static object ParseDictionaryLayers(List<(ParseCommand command, ReaderNodeParseable node)> orders, object result, Type type, Type keyType, Type valueType, ReaderGlobals globals, Recorder.Settings recSettings)
+        {
+            var dict = (IDictionary)(result ?? Activator.CreateInstance(type));
+            var comparer = new ComparerDictionaryKey(dict);
+            var recorderChildContext = recSettings.CreateChild();
+
+            // Keys in first-appearance order, each with the value nodes of every layer that sets it.
+            var pending = new List<(object key, Type valueType, List<ReaderNodeParseable> values)>();
+            var pendingIndex = new Dictionary<object, int>(comparer);
+
+            bool haveDict = result != null;
+            foreach (var (parseCommand, node) in orders)
+            {
+                bool permitPatch = false;
+                switch (parseCommand)
+                {
+                    case ParseCommand.Replace:
+                        dict.Clear();
+                        pending.Clear();
+                        pendingIndex.Clear();
+                        break;
+
+                    case ParseCommand.Patch:
+                        permitPatch = haveDict;
+                        break;
+
+                    case ParseCommand.Append:
+                        // nothing needs to be done, our existing dupe checking will solve it
+                        break;
+
+                    default:
+                        Dbg.Err($"{node.GetContext()}: Internal error, got invalid mode {parseCommand}");
+                        break;
+                }
+
+                var writtenFields = permitPatch ? new HashSet<object>(comparer) : null;
+                foreach (var entry in node.GetDictionaryEntries(keyType, valueType, globals, recSettings))
+                {
+                    bool isPending = pendingIndex.TryGetValue(entry.key, out int index);
+                    if ((isPending || dict.Contains(entry.key)) && (writtenFields == null || writtenFields.Contains(entry.key)))
+                    {
+                        Dbg.Err($"{entry.context}: Dictionary includes duplicate key `{entry.key.ToString()}`");
+                    }
+
+                    writtenFields?.Add(entry.key);
+
+                    if (isPending)
+                    {
+                        pending[index].values.Add(entry.value);
+                    }
+                    else
+                    {
+                        pendingIndex[entry.key] = pending.Count;
+                        pending.Add((entry.key, entry.valueType, new List<ReaderNodeParseable> { entry.value }));
+                    }
+                }
+
+                haveDict = true;
+            }
+
+            foreach (var (key, entryValueType, values) in pending)
+            {
+                object originalValue = dict.Contains(key) ? dict[key] : null;
+                dict[key] = ParseElement(values, entryValueType, originalValue, globals, recorderChildContext);
+            }
+
+            return dict;
         }
 
         // Whether a layer of this type that gives no mode replaces what came before it, as it does for containers and plain values.

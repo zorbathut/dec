@@ -343,6 +343,34 @@ namespace DecTest
             Assert.AreEqual(1, Dec.Index<ParentReplaceIndexCarrier>.Count);
         }
 
+        public class DictReplaceIndexDec : Dec.Dec
+        {
+            public Dictionary<string, List<ParentReplaceIndexCarrier>> dict;
+        }
+
+        [Test]
+        public void DictValueReplaceIndex([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictReplaceIndexDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <DictReplaceIndexDec decName=""Parent"" abstract=""true"">
+                        <dict><a><li /><li /></a></dict>
+                    </DictReplaceIndexDec>
+
+                    <DictReplaceIndexDec decName=""TestDec"" parent=""Parent"">
+                        <dict mode=""patch""><a><li /></a></dict>
+                    </DictReplaceIndexDec>
+                </Decs>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(1, Dec.Index<ParentReplaceIndexCarrier>.Count);
+        }
+
         [Test]
         public void Multifile([Values] ParserMode mode)
         {
