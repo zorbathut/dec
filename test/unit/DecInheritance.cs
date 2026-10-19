@@ -413,5 +413,431 @@ namespace DecTest
             CollectionAssert.AreEqual(new[] { 1, 2, 3 }, Dec.Database<SimpleDec>.Get("Branch").list);
             CollectionAssert.AreEqual(new[] { 1, 2, 3, 4 }, Dec.Database<SimpleDec>.Get("Leaf").list);
         }
+
+        public class LayerObj
+        {
+            public int x;
+            public int y;
+            public List<int> list;
+        }
+
+        public class LayerBase
+        {
+            public int a;
+        }
+
+        public class LayerDerived : LayerBase
+        {
+            public int b;
+        }
+
+        public class LayerDerivedAlt : LayerBase
+        {
+            public int c;
+        }
+
+        public interface ILayer { }
+
+        public class LayerImpl : ILayer
+        {
+            public int a;
+        }
+
+        public struct LayerStruct
+        {
+            public int a;
+            public int b;
+            public int c;
+        }
+
+        public class LayerList : List<int> { }
+
+        public class LayerDec : Dec.Dec
+        {
+            public int value;
+            public LayerObj obj;
+            public LayerObj objDefault = new LayerObj { x = 5 };
+            public LayerBase poly;
+            public ILayer iface;
+            public List<int> list;
+            public int[] array;
+            public Stack<int> stack;
+            public Queue<int> queue;
+            public HashSet<int> set;
+            public byte[] bytes;
+        }
+
+        public class LayerNullableDec : Dec.Dec
+        {
+            public LayerStruct? nullableStruct = new LayerStruct { a = 1 };
+        }
+
+        // Builds a chain of abstract layers ending in a concrete dec named Leaf, each layer's body given in order from root to leaf.
+        private Dec.Parser LayerParser(params string[] bodies)
+        {
+            return LayerParser<LayerDec>(bodies);
+        }
+
+        private Dec.Parser LayerParser<T>(params string[] bodies) where T : Dec.Dec
+        {
+            Dec.Config.UsingNamespaces = new string[] { "DecTest.DecInheritance" };
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(T) } });
+
+            var decs = new System.Text.StringBuilder();
+            for (int i = 0; i < bodies.Length; ++i)
+            {
+                var name = i == bodies.Length - 1 ? "Leaf" : $"Layer{i}";
+                var abstrct = i == bodies.Length - 1 ? "" : @"abstract=""true""";
+                var parent = i == 0 ? "" : $@"parent=""Layer{i - 1}""";
+                decs.Append($@"<{typeof(T).Name} decName=""{name}"" {abstrct} {parent}>{bodies[i]}</{typeof(T).Name}>");
+            }
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, $"<Decs>{decs}</Decs>");
+            return parser;
+        }
+
+        private static LayerDec Leaf()
+        {
+            return Dec.Database<LayerDec>.Get("Leaf");
+        }
+
+        [Test]
+        public void LayerContainersReplaceThenAppend([Values] ParserMode mode)
+        {
+            var parser = LayerParser(
+                "<list><li>1</li></list><array><li>1</li></array><stack><li>1</li></stack><queue><li>1</li></queue>",
+                "<list><li>2</li></list><array><li>2</li></array><stack><li>2</li></stack><queue><li>2</li></queue>",
+                @"<list mode=""append""><li>3</li></list><array mode=""append""><li>3</li></array><stack mode=""append""><li>3</li></stack><queue mode=""append""><li>3</li></queue>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            CollectionAssert.AreEqual(new[] { 2, 3 }, Leaf().list);
+            CollectionAssert.AreEqual(new[] { 2, 3 }, Leaf().array);
+            CollectionAssert.AreEqual(new[] { 3, 2 }, Leaf().stack);
+            CollectionAssert.AreEqual(new[] { 2, 3 }, Leaf().queue);
+        }
+
+        [Test]
+        public void LayerNullThenObject([Values] ParserMode mode)
+        {
+            var parser = LayerParser(
+                "<obj><x>1</x></obj>",
+                @"<obj null=""true"" />",
+                "<obj><y>2</y></obj>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(0, Leaf().obj.x);
+            Assert.AreEqual(2, Leaf().obj.y);
+        }
+
+        [Test]
+        public void LayerNullLast([Values] ParserMode mode)
+        {
+            var parser = LayerParser(
+                "<obj><x>1</x></obj>",
+                @"<obj null=""true"" />");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            Assert.IsNull(Leaf().obj);
+        }
+
+        [Test]
+        public void LayerNullThenObjectWithDefault([Values] ParserMode mode)
+        {
+            var parser = LayerParser(
+                "<objDefault><y>1</y></objDefault>",
+                @"<objDefault null=""true"" />",
+                "<objDefault><list><li>3</li></list></objDefault>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(0, Leaf().objDefault.x);
+            Assert.AreEqual(0, Leaf().objDefault.y);
+            CollectionAssert.AreEqual(new[] { 3 }, Leaf().objDefault.list);
+        }
+
+        [Test]
+        public void LayerNullThenNullableStruct([ValuesExcept(ParserMode.Validation)] ParserMode mode)
+        {
+            var parser = LayerParser<LayerNullableDec>(
+                "<nullableStruct><b>2</b></nullableStruct>",
+                @"<nullableStruct null=""true"" />",
+                "<nullableStruct><c>3</c></nullableStruct>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(new LayerStruct { c = 3 }, Dec.Database<LayerNullableDec>.Get("Leaf").nullableStruct);
+        }
+
+        [Test]
+        public void LayerClassThenNone([Values] ParserMode mode)
+        {
+            var parser = LayerParser(
+                @"<poly class=""LayerDerived""><a>1</a><b>2</b></poly>",
+                "<poly><a>3</a></poly>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            var poly = (LayerDerived)Leaf().poly;
+            Assert.AreEqual(3, poly.a);
+            Assert.AreEqual(2, poly.b);
+        }
+
+        [Test]
+        public void LayerNoneThenClass([Values] ParserMode mode)
+        {
+            var parser = LayerParser(
+                "<poly><a>1</a></poly>",
+                @"<poly class=""LayerDerived""><b>2</b></poly>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            var poly = (LayerDerived)Leaf().poly;
+            Assert.AreEqual(1, poly.a);
+            Assert.AreEqual(2, poly.b);
+        }
+
+        [Test]
+        public void LayerClassThenUnrelatedClass([Values] ParserMode mode)
+        {
+            var parser = LayerParser(
+                @"<poly class=""LayerDerived""><b>2</b></poly>",
+                @"<poly class=""LayerDerivedAlt""><a>3</a></poly>");
+            int errors = 0;
+            ExpectErrors(() => parser.Finish(), err =>
+            {
+                errors++;
+                return err.Contains("LayerDerivedAlt");
+            });
+            Assert.AreEqual(1, errors);
+
+            DoParserTests(mode);
+
+            var poly = (LayerDerived)Leaf().poly;
+            Assert.AreEqual(3, poly.a);
+            Assert.AreEqual(2, poly.b);
+        }
+
+        [Test]
+        public void LayerClassThenBaseClass([Values] ParserMode mode)
+        {
+            var parser = LayerParser(
+                @"<poly class=""LayerDerived""><b>2</b></poly>",
+                @"<poly class=""LayerBase""><a>3</a></poly>");
+            int errors = 0;
+            ExpectErrors(() => parser.Finish(), err =>
+            {
+                errors++;
+                return err.Contains("LayerBase");
+            });
+            Assert.AreEqual(1, errors);
+
+            DoParserTests(mode);
+
+            var poly = (LayerDerived)Leaf().poly;
+            Assert.AreEqual(3, poly.a);
+            Assert.AreEqual(2, poly.b);
+        }
+
+        [Test]
+        public void LayerInterfaceClassFromChild([Values] ParserMode mode)
+        {
+            var parser = LayerParser(
+                "<iface><a>1</a></iface>",
+                @"<iface class=""LayerImpl"" />");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(1, ((LayerImpl)Leaf().iface).a);
+        }
+
+        [Test]
+        public void LayerContainerClassThenAppend([Values] ParserMode mode)
+        {
+            var parser = LayerParser(
+                @"<list class=""LayerList""><li>1</li></list>",
+                @"<list mode=""append""><li>2</li></list>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            Assert.IsInstanceOf<LayerList>(Leaf().list);
+            CollectionAssert.AreEqual(new[] { 1, 2 }, Leaf().list);
+        }
+
+        [Test]
+        public void LayerClassThenExplicitReplace([Values] ParserMode mode)
+        {
+            // An explicit replace starts over, class included.
+            var parser = LayerParser(
+                @"<list class=""LayerList""><li>1</li></list>",
+                @"<list mode=""replace""><li>2</li></list>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(typeof(List<int>), Leaf().list.GetType());
+            CollectionAssert.AreEqual(new[] { 2 }, Leaf().list);
+        }
+
+        [Test]
+        public void LayerInvalidTextKeepsOtherLayers([Values] ParserMode mode)
+        {
+            var parser = LayerParser(
+                "<obj>junk</obj>",
+                "<obj><x>1</x></obj>");
+            int errors = 0;
+            ExpectErrors(() => parser.Finish(), err =>
+            {
+                errors++;
+                return true;
+            });
+            Assert.AreEqual(1, errors);
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(1, Leaf().obj.x);
+        }
+
+        [Test]
+        public void LayerInvalidAppendKeepsParent([Values] ParserMode mode)
+        {
+            var parser = LayerParser(
+                "<list><li>1</li></list>",
+                @"<list mode=""append"">junk</list>");
+            int errors = 0;
+            ExpectErrors(() => parser.Finish(), err =>
+            {
+                errors++;
+                return true;
+            });
+            Assert.AreEqual(1, errors);
+
+            DoParserTests(mode);
+
+            CollectionAssert.AreEqual(new[] { 1 }, Leaf().list);
+        }
+
+        [Test]
+        public void LayerUnknownFieldEachLayer([Values] ParserMode mode)
+        {
+            var parser = LayerParser(
+                "<nope>1</nope>",
+                "<nope>2</nope><value>3</value>");
+            int errors = 0;
+            ExpectErrors(() => parser.Finish(), err =>
+            {
+                errors++;
+                return err.Contains("nope");
+            });
+            Assert.AreEqual(2, errors);
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(3, Leaf().value);
+        }
+
+        [Test]
+        public void LayerDuplicateFieldInFirstLayer([Values] ParserMode mode)
+        {
+            var parser = LayerParser(
+                "<value>1</value><value>2</value>",
+                "<obj><x>1</x></obj>");
+            int errors = 0;
+            ExpectErrors(() => parser.Finish(), err =>
+            {
+                errors++;
+                return err.Contains("value");
+            });
+            Assert.AreEqual(1, errors);
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(2, Leaf().value);
+        }
+
+        [Test]
+        public void LayerHashSetPatch([Values] ParserMode mode)
+        {
+            var parser = LayerParser(
+                "<set><li>1</li></set>",
+                @"<set mode=""patch""><li>1</li><li>2</li></set>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            CollectionAssert.AreEquivalent(new[] { 1, 2 }, Leaf().set);
+        }
+
+        [Test]
+        public void LayerBase64ThenAppend([Values] ParserMode mode)
+        {
+            var parser = LayerParser(
+                "<bytes>AQID</bytes>",
+                @"<bytes mode=""append""><li>4</li></bytes>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            CollectionAssert.AreEqual(new byte[] { 1, 2, 3, 4 }, Leaf().bytes);
+        }
+
+        [Test]
+        public void LayerDuplicateField([Values] ParserMode mode)
+        {
+            var parser = LayerParser(
+                "<value>1</value>",
+                "<value>2</value><value>3</value>");
+            int errors = 0;
+            ExpectErrors(() => parser.Finish(), err =>
+            {
+                errors++;
+                return err.Contains("value");
+            });
+            Assert.AreEqual(1, errors);
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(3, Leaf().value);
+        }
+
+        [Test]
+        public void LayerReplacedInvalidValue([Values] ParserMode mode)
+        {
+            // XML a later layer replaces is never parsed, so it can't report errors.
+            var parser = LayerParser(
+                "<value>abc</value>",
+                "<value>3</value>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(3, Leaf().value);
+        }
+
+        [Test]
+        public void LayerInheritedInvalidValue([Values] ParserMode mode)
+        {
+            var parser = LayerParser(
+                "<value>abc</value>",
+                "<obj><x>1</x></obj>");
+            ExpectErrors(() => parser.Finish(), err => err.Contains("abc"));
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(0, Leaf().value);
+            Assert.AreEqual(1, Leaf().obj.x);
+        }
     }
 }

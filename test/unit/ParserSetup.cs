@@ -160,6 +160,63 @@ namespace DecTest
             Assert.AreEqual(2, setupOrder.Count);
         }
 
+        // Classes for TestReplacedLayerSetup
+        public class ReplLayer_Nested
+        {
+            public List<Collected_Obj> objs;
+        }
+        public struct ReplLayer_Struct
+        {
+            public List<Collected_Obj> objs;
+        }
+        public class ReplLayer_Dec : Dec.Dec
+        {
+            public List<Collected_Obj> objs;
+            public ReplLayer_Nested nested;
+            public ReplLayer_Struct structured;
+        }
+
+        [Test]
+        public void TestReplacedLayerSetup([Values("objs", "nested", "structured")] string field)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ReplLayer_Dec) } });
+
+            string Body(string tag)
+            {
+                var objs = $"<objs><li><tag>{tag}</tag></li></objs>";
+                return field == "objs" ? objs : $"<{field}>{objs}</{field}>";
+            }
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, $@"
+                <Decs>
+                    <ReplLayer_Dec decName=""Parent"" abstract=""true"">{Body("parent")}</ReplLayer_Dec>
+                    <ReplLayer_Dec decName=""Child"" parent=""Parent"">{Body("child")}</ReplLayer_Dec>
+                </Decs>");
+            parser.Finish();
+
+            CollectionAssert.AreEqual(new[] { "obj:child" }, setupOrder);
+        }
+
+        [Test]
+        public void TestReplacedModuleSetup()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ReplLayer_Dec) } });
+
+            var parser = new Dec.ParserModular();
+            parser.CreateModule("Base").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <ReplLayer_Dec decName=""TestDec""><objs><li><tag>base</tag></li></objs></ReplLayer_Dec>
+                </Decs>");
+            parser.CreateModule("Mod").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <ReplLayer_Dec decName=""TestDec"" mode=""patch""><objs><li><tag>mod</tag></li></objs></ReplLayer_Dec>
+                </Decs>");
+            parser.Finish();
+
+            CollectionAssert.AreEqual(new[] { "obj:mod" }, setupOrder);
+        }
+
         // Classes for TestSharedInstanceDedup
         public class SharedConv_Payload
         {

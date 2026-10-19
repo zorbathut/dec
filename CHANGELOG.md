@@ -41,6 +41,7 @@ All notable changes to this project will be documented in this file.
 * RecorderEnumerator: User iterators and closures are recorded through generated code instead of per-field reflection, making `Recorder.Clone` and `Recorder.Checksum` of them roughly 3-4x faster with about 80% less allocation, `Recorder.Write` about 45% faster, and `Recorder.Read` about 15% faster.
 * RecorderEnumerator: A user iterator is created through a cached constructor instead of a per-call constructor search, making each creation about 5x faster with 75% less allocation, and `Recorder.Clone` of coroutine-heavy state about 8% faster.
 * RecorderEnumerator: Recording the state machine of an async method or async iterator now reports that `[RecordableEnumerable]` supports only synchronous iterators, instead of asking for the attribute or failing on the async machinery's own fields.
+* When several layers of an inherited dec give a `class` for the same member, the most-derived one now wins; previously a child naming a class for an object its parent had already set up was an error. A layer with `mode="replace"` now discards earlier layers' class along with their contents.
 
 ### Fixed
 * Recorder.Read crash on a `<Ref>` element with invalid `class`.
@@ -59,6 +60,7 @@ All notable changes to this project will be documented in this file.
 * The error for a missing parent named the dec at the bottom of the inheritance chain instead of the dec whose parent was missing.
 * A cycle of `parent` attributes hung `Parser.Finish()` forever; it's now reported as an error.
 * An object patched by more than one layer, such as a parent and child dec both setting fields on it, was registered with `Index<T>` once per layer.
+* Contents of a parent dec or base mod that a later layer replaced were still built, so they took `[Dec.Index]` slots and stayed referenced by internal lookup tables forever.
 
 
 ## [v0.11.1]

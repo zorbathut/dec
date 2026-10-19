@@ -209,7 +209,6 @@ namespace DecTest
         }
 
         [Test]
-        [Ignore("Currently broken :(")]
         public void ParentReplaceIndex([Values] ParserMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ParentReplaceIndexDec), typeof(ParentReplaceIndexCarrier) } });
@@ -309,6 +308,39 @@ namespace DecTest
             Assert.AreEqual(2, value.y);
             Assert.AreEqual(1, Dec.Index<PatchedIndexCarrier>.Count);
             Assert.AreSame(value, Dec.Index<PatchedIndexCarrier>.Get(0));
+        }
+
+        public class NestedReplaceIndexHolder
+        {
+            public List<ParentReplaceIndexCarrier> list;
+        }
+
+        public class NestedReplaceIndexDec : Dec.Dec
+        {
+            public NestedReplaceIndexHolder holder;
+        }
+
+        [Test]
+        public void NestedReplaceIndex([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(NestedReplaceIndexDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <NestedReplaceIndexDec decName=""Parent"" abstract=""true"">
+                        <holder><list><li /><li /></list></holder>
+                    </NestedReplaceIndexDec>
+
+                    <NestedReplaceIndexDec decName=""TestDec"" parent=""Parent"">
+                        <holder><list><li /></list></holder>
+                    </NestedReplaceIndexDec>
+                </Decs>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(1, Dec.Index<ParentReplaceIndexCarrier>.Count);
         }
 
         [Test]

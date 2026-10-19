@@ -716,8 +716,35 @@ namespace Dec
             bool isNull = false;
             if (!asThis)
             {
-                string classAttribute = null;
-                ReaderNode classAttributeNode = null; // stored entirely for error reporting
+                // A null layer deletes everything before it, so the layers after one start over from nothing.
+                int lastNullIndex = -1;
+                for (int i = 0; i < nodes.Count; ++i)
+                {
+                    isNull = false;
+                    string nullAttribute = nodes[i].GetMetadata(ReaderNodeParseable.Metadata.Null);
+                    if (nullAttribute != null)
+                    {
+                        if (!bool.TryParse(nullAttribute, out bool nullValue))
+                        {
+                            Dbg.Err($"{nodes[i].GetContext()}: Invalid `null` attribute");
+                        }
+                        else if (nullValue)
+                        {
+                            isNull = true;
+                            lastNullIndex = i;
+                        }
+                    }
+                }
+
+                if (!isRootDec && lastNullIndex != -1 && !isNull)
+                {
+                    nodes = nodes.GetRange(lastNullIndex + 1, nodes.Count - lastNullIndex - 1);
+                    result = null;
+                }
+
+                // Each layer may name a class; a later one may only narrow an earlier one, so the most-derived wins.
+                Type classType = null;
+                ReaderNode classNode = null; // stored entirely for error reporting
                 bool replaced = false;
                 foreach (var s_node in nodes)
                 {
@@ -727,49 +754,47 @@ namespace Dec
                     if (s_parseMode == ParseMode.Replace)
                     {
                         // we also should maybe be doing this if we're a list, map, or set?
-                        classAttribute = null;
+                        classType = null;
                         replaced = true;
                     }
 
-                    // if we get nulled, we kill the class tag and basically treat it like a delete
-                    // but we also reset the null tag on every entry
-                    isNull = false;
-                    string nullAttribute = s_node.GetMetadata(ReaderNodeParseable.Metadata.Null);
-                    if (nullAttribute != null)
-                    {
-                        if (!bool.TryParse(nullAttribute, out bool nullValue))
-                        {
-                            Dbg.Err($"{s_node.GetContext()}: Invalid `null` attribute");
-                        }
-                        else if (nullValue)
-                        {
-                            isNull = true;
-                        }
-                    }
-
-                    // update the class based on whatever this says
                     string localClassAttribute = s_node.GetMetadata(ReaderNodeParseable.Metadata.Class);
-                    if (localClassAttribute != null)
+                    if (localClassAttribute == null)
                     {
-                        classAttribute = localClassAttribute;
-                        classAttributeNode = s_node;
+                        continue;
                     }
-                }
 
-                if (classAttribute != null)
-                {
-                    var possibleType = (Type)ParseString(classAttribute, typeof(Type), null, classAttributeNode.GetContext());
-                    if (!type.IsAssignableFrom(possibleType))
+                    var localType = (Type)ParseString(localClassAttribute, typeof(Type), null, s_node.GetContext());
+                    if (localType == null)
                     {
-                        Dbg.Err($"{classAttributeNode.GetContext()}: Explicit type {classAttribute} cannot be assigned to expected type {type}");
+                        // error already reported
+                        continue;
                     }
-                    else if (!replaced && result != null && result.GetType() != possibleType)
+
+                    if (!type.IsAssignableFrom(localType))
                     {
-                        Dbg.Err($"{classAttributeNode.GetContext()}: Explicit type {classAttribute} does not match already-provided instance {type}");
+                        Dbg.Err($"{s_node.GetContext()}: Explicit type {localClassAttribute} cannot be assigned to expected type {type}");
+                    }
+                    else if (classType != null && !classType.IsAssignableFrom(localType))
+                    {
+                        Dbg.Err($"{s_node.GetContext()}: Explicit type {localClassAttribute} is not derived from {classType}, which an earlier layer specified; keeping {classType}");
                     }
                     else
                     {
-                        type = possibleType;
+                        classType = localType;
+                        classNode = s_node;
+                    }
+                }
+
+                if (classType != null)
+                {
+                    if (!replaced && result != null && result.GetType() != classType)
+                    {
+                        Dbg.Err($"{classNode.GetContext()}: Explicit type {classType} does not match already-provided instance {type}");
+                    }
+                    else
+                    {
+                        type = classType;
                     }
                 }
             }
@@ -784,24 +809,25 @@ namespace Dec
             bool hasChildren = false;
             ReaderNode hasChildrenNode = null;
             bool hasImportantText = false;
-            ReaderNode hasTextNode = null;
             foreach (var (_, node) in orders)
             {
-                if (!hasChildren && node.HasChildren())
+                bool nodeHasChildren = node.HasChildren();
+                bool nodeHasImportantText = HasImportantText(node);
+
+                if (nodeHasChildren && nodeHasImportantText)
+                {
+                    Dbg.Err($"{node.GetContext()}: Cannot have both text and child nodes in XML - this is probably a typo, maybe you have the wrong number of close tags or added text somewhere you didn't mean to?");
+
+                    // we'll just fall through and try to parse anyway, though
+                }
+
+                if (!hasChildren && nodeHasChildren)
                 {
                     hasChildren = true;
                     hasChildrenNode = node;
                 }
 
-                // We trim this to get info on whether there's text that must not be ignored. If we turn out to be a string, we'll grudingly accept pure whitespace anyway.
-                if (!hasImportantText && node.GetText() != null)
-                {
-                    if (!node.GetText().Trim().IsNullOrEmpty())
-                    {
-                        hasImportantText = true;
-                        hasTextNode = node;
-                    }
-                }
+                hasImportantText |= nodeHasImportantText;
             }
 
             // Actually handle our attributes
@@ -881,13 +907,6 @@ namespace Dec
             }
 
             // Basic early validation
-
-            if (hasChildren && hasImportantText)
-            {
-                Dbg.Err($"{hasChildrenNode.GetContext()} / {hasTextNode.GetContext()}: Cannot have both text and child nodes in XML - this is probably a typo, maybe you have the wrong number of close tags or added text somewhere you didn't mean to?");
-
-                // we'll just fall through and try to parse anyway, though
-            }
 
             if (typeof(Dec).IsAssignableFrom(type) && hasChildren && !isRootDec)
             {
@@ -1167,41 +1186,34 @@ namespace Dec
                             break;
                     }
 
-                    try
-                    {
-                        byte[] decodedArray = Convert.FromBase64String(node.GetText());
-
-                        // Check if we can reuse the existing array
-                        if (result != null && result.GetType() == type && ((byte[])result).Length == decodedArray.Length)
-                        {
-                            // Copy into existing array for reference preservation
-                            Array.Copy(decodedArray, (byte[])result, decodedArray.Length);
-                        }
-                        else
-                        {
-                            // Use this as the new array
-                            result = decodedArray;
-                        }
-                    }
-                    catch (FormatException)
-                    {
-                        Dbg.Err($"{node.GetContext()}: Invalid base64 string for byte array");
-
-                        if (result == null)
-                        {
-                            result = new byte[0];   // kind of an ugly fallback
-                        }
-                    }
+                    result = ParseBase64(node, (byte[])result);
                 }
 
                 return result;
             }
 
-            // Nothing past this point even supports text, so let's just get angry and break stuff.
+            // Nothing past this point even supports text, so let's just get angry and break stuff. The exception is a byte[] layer written as base64 among layers written as elements; the array code reads those.
             if (hasImportantText)
             {
-                Dbg.Err($"{hasTextNode.GetContext()}: Text detected in a situation where it is invalid; will be ignored");
-                return result;
+                var textlessOrders = new List<(ParseCommand command, ReaderNodeParseable node)>();
+                foreach (var order in orders)
+                {
+                    if (HasImportantText(order.node) && !(type == typeof(byte[]) && !order.node.HasChildren()))
+                    {
+                        // Only this layer is ignored; the others still apply.
+                        Dbg.Err($"{order.node.GetContext()}: Text detected in a situation where it is invalid; will be ignored");
+                        continue;
+                    }
+
+                    textlessOrders.Add(order);
+                }
+
+                if (textlessOrders.Count == 0)
+                {
+                    return result;
+                }
+
+                orders = textlessOrders;
             }
 
             // Special case: Arrays
@@ -1212,6 +1224,23 @@ namespace Dec
 
                 foreach (var (parseCommand, node) in orders)
                 {
+                    // Only text left at this point is a byte[] layer's base64.
+                    if (HasImportantText(node))
+                    {
+                        var decoded = ParseBase64(node, null);
+                        if (parseCommand == ParseCommand.Append && result != null)
+                        {
+                            var oldBytes = (byte[])result;
+                            var appended = new byte[oldBytes.Length + decoded.Length];
+                            oldBytes.CopyTo(appended, 0);
+                            decoded.CopyTo(appended, oldBytes.Length);
+                            decoded = appended;
+                        }
+
+                        result = decoded;
+                        continue;
+                    }
+
                     Array array = null;
                     int startOffset = 0;
 
@@ -1373,7 +1402,7 @@ namespace Dec
                             break;
 
                         case ParseCommand.Patch:
-                            if (original != null)
+                            if (result != null)
                             {
                                 permitPatch = true;
                             }
@@ -1425,7 +1454,7 @@ namespace Dec
                             break;
 
                         case ParseCommand.Patch:
-                            if (original != null)
+                            if (result != null)
                             {
                                 permitPatch = true;
                             }
@@ -1587,7 +1616,7 @@ namespace Dec
                 // Intercept and handle appropriately
                 // We've already handled the `null` attribute, so we know it isn't null - just go ahead and deal with it by passing it up to a parent
                 // I'm not sure if this is the right approach?
-                result = ParseElement(nodes, type.GetGenericArguments()[0], original, globals, recSettings);
+                result = ParseElement(nodes, type.GetGenericArguments()[0], result, globals, recSettings);
                 return result;
             }
 
@@ -1655,32 +1684,89 @@ namespace Dec
             return result;
         }
 
-        // Fills obj's fields from its layers of XML, in order.
+        // We trim this to get info on whether there's text that must not be ignored. If we turn out to be a string, we'll grudingly accept pure whitespace anyway.
+        private static bool HasImportantText(ReaderNodeParseable node)
+        {
+            var text = node.GetText();
+            return text != null && !text.Trim().IsNullOrEmpty();
+        }
+
+        // Reads a byte[] written as base64, reusing existing if it's the right length.
+        private static byte[] ParseBase64(ReaderNodeParseable node, byte[] existing)
+        {
+            try
+            {
+                byte[] decodedArray = Convert.FromBase64String(node.GetText());
+
+                // Check if we can reuse the existing array
+                if (existing != null && existing.Length == decodedArray.Length)
+                {
+                    // Copy into existing array for reference preservation
+                    Array.Copy(decodedArray, existing, decodedArray.Length);
+                    return existing;
+                }
+
+                // Use this as the new array
+                return decodedArray;
+            }
+            catch (FormatException)
+            {
+                Dbg.Err($"{node.GetContext()}: Invalid base64 string for byte array");
+
+                return existing ?? new byte[0];   // kind of an ugly fallback
+            }
+        }
+
+        // Fills obj's fields from its layers of XML. Each field gets a single ParseElement call holding its nodes from every layer, so that field's own mode handling decides which layers survive, and a layer it discards is never built.
         private static void ParseReflection(List<(ParseCommand command, ReaderNodeParseable node)> orders, object obj, ReaderGlobals globals, Recorder.Settings recSettings)
         {
             var type = obj.GetType();
             var recorderChildContext = recSettings.CreateChild();
 
-            foreach (var (_, node) in orders)
+            // Fields in first-appearance order. The lookup gives each name's place in that list, -1 for a name that sets no field, and the last layer to use the name, which is how a layer's duplicate fields are caught.
+            var fieldNodes = new List<(FieldInfo field, List<ReaderNodeParseable> nodes)>();
+            var fieldLookup = new Dictionary<string, (int index, int lastLayer)>();
+            for (int layer = 0; layer < orders.Count; ++layer)
             {
-                var setFields = new HashSet<string>();
-                foreach (var (fieldName, fieldNode) in node.GetFieldNodes())
+                foreach (var (fieldName, fieldNode) in orders[layer].node.GetFieldNodes())
                 {
-                    // Check for fields that have been set multiple times
-                    if (!setFields.Add(fieldName))
+                    if (fieldLookup.TryGetValue(fieldName, out var seen))
                     {
-                        Dbg.Err($"{fieldNode.GetContext()}: Duplicate field `{fieldName}`");
-                        // Just allow us to fall through; it's an error, but one with a reasonably obvious handling mechanism
+                        if (seen.lastLayer == layer)
+                        {
+                            Dbg.Err($"{fieldNode.GetContext()}: Duplicate field `{fieldName}`");
+                            // Just allow us to fall through; it's an error, but one with a reasonably obvious handling mechanism
+                        }
+
+                        fieldLookup[fieldName] = (seen.index, layer);
+                        if (seen.index == -1)
+                        {
+                            // Report this occurrence too.
+                            ReflectionFieldFor(type, fieldName, fieldNode);
+                        }
+                        else
+                        {
+                            fieldNodes[seen.index].nodes.Add(fieldNode);
+                        }
+
+                        continue;
                     }
 
                     var field = ReflectionFieldFor(type, fieldName, fieldNode);
                     if (field == null)
                     {
+                        fieldLookup[fieldName] = (-1, layer);
                         continue;
                     }
 
-                    field.SetValue(obj, ParseElement(new List<ReaderNodeParseable> { fieldNode }, field.FieldType, field.GetValue(obj), globals, recorderChildContext, fieldInfo: field));
+                    fieldLookup[fieldName] = (fieldNodes.Count, layer);
+                    fieldNodes.Add((field, new List<ReaderNodeParseable> { fieldNode }));
                 }
+            }
+
+            foreach (var (field, nodes) in fieldNodes)
+            {
+                field.SetValue(obj, ParseElement(nodes, field.FieldType, field.GetValue(obj), globals, recorderChildContext, fieldInfo: field));
             }
         }
 
