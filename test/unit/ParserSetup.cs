@@ -117,6 +117,49 @@ namespace DecTest
             CollectionAssert.AreEquivalent(new[] { "obj:alpha", "obj:beta" }, setupOrder);
         }
 
+        // Classes for TestInheritedInstanceSetupOnce
+        public class InhOnce_Obj
+        {
+            public int setupRuns;
+
+            [Dec.Setup]
+            internal void Record(Action<string> reporter)
+            {
+                setupRuns++;
+                RecordSetup("obj");
+            }
+        }
+        public class InhOnce_Dec : Dec.Dec
+        {
+            public List<InhOnce_Obj> objs;
+        }
+
+        [Test]
+        public void TestInheritedInstanceSetupOnce([Values] bool reversed)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(InhOnce_Dec) } });
+
+            var decs = new List<string>
+            {
+                @"<InhOnce_Dec decName=""Trunk"" abstract=""true""><objs><li /></objs></InhOnce_Dec>",
+                @"<InhOnce_Dec decName=""Branch"" parent=""Trunk"" />",
+                @"<InhOnce_Dec decName=""Leaf"" parent=""Branch"" />",
+            };
+            if (reversed)
+            {
+                decs.Reverse();
+            }
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, $"<Decs>{string.Join("", decs)}</Decs>");
+            parser.Finish();
+
+            // Setup ran exactly once on each object a dec holds, and on nothing else.
+            Assert.AreEqual(1, Dec.Database<InhOnce_Dec>.Get("Branch").objs.Single().setupRuns);
+            Assert.AreEqual(1, Dec.Database<InhOnce_Dec>.Get("Leaf").objs.Single().setupRuns);
+            Assert.AreEqual(2, setupOrder.Count);
+        }
+
         // Classes for TestSharedInstanceDedup
         public class SharedConv_Payload
         {

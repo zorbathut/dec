@@ -55,6 +55,7 @@ All notable changes to this project will be documented in this file.
 * `Database.DecLookupEnable` on an object the dec database didn't create threw an exception.
 * RecorderEnumerator: A closure capturing variables from more than one nested scope, such as a method local and a loop local, couldn't be written to XML.
 * A `T?` whose `T` has a Dynamic converter failed with an exception.
+* Redundant parse issues with deep dec inheritance from non-abstract parents.
 
 
 ## [v0.11.1]

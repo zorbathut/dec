@@ -305,5 +305,41 @@ namespace DecTest
                 Assert.AreEqual(300, Dec.Database<SimpleDec>.Get("Leaf").doubleOverridden);
             }
         }
+
+        [Test]
+        public void ConcreteAncestorsAppend([Values] bool rootAbstract, [Values] bool reversed, [Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SimpleDec) } });
+
+            var decs = new List<string>
+            {
+                $@"<SimpleDec decName=""Root"" {(rootAbstract ? "abstract=\"true\"" : "")}><list mode=""append""><li>1</li></list></SimpleDec>",
+                @"<SimpleDec decName=""Trunk"" parent=""Root""><list mode=""append""><li>2</li></list></SimpleDec>",
+                @"<SimpleDec decName=""Branch"" parent=""Trunk""><list mode=""append""><li>3</li></list></SimpleDec>",
+                @"<SimpleDec decName=""Leaf"" parent=""Branch""><list mode=""append""><li>4</li></list></SimpleDec>",
+            };
+            if (reversed)
+            {
+                decs.Reverse();
+            }
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, $"<Decs>{string.Join("", decs)}</Decs>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            if (rootAbstract)
+            {
+                Assert.IsNull(Dec.Database<SimpleDec>.Get("Root"));
+            }
+            else
+            {
+                CollectionAssert.AreEqual(new[] { 1 }, Dec.Database<SimpleDec>.Get("Root").list);
+            }
+            CollectionAssert.AreEqual(new[] { 1, 2 }, Dec.Database<SimpleDec>.Get("Trunk").list);
+            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, Dec.Database<SimpleDec>.Get("Branch").list);
+            CollectionAssert.AreEqual(new[] { 1, 2, 3, 4 }, Dec.Database<SimpleDec>.Get("Leaf").list);
+        }
     }
 }

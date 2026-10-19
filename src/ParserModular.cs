@@ -452,7 +452,8 @@ namespace Dec
                 foreach (var (id, orders) in toParseDecOrders)
                 {
                     // Accumulate our orders
-                    var completeOrders = orders;
+                    // Copy, because the registered lists are read back as other decs' parents.
+                    var completeOrders = new List<ReaderFileDec.ReaderDec>(orders);
 
                     var currentOrder = orders;
                     while (true)
