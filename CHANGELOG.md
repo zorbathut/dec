@@ -66,6 +66,7 @@ All notable changes to this project will be documented in this file.
 * An object patched by more than one layer, such as a parent and child dec both setting fields on it, was registered with `Index<T>` once per layer.
 * Contents of a parent dec or base mod that a later layer replaced were still built, so they took `[Dec.Index]` slots and stayed referenced by internal lookup tables forever. That included dictionary values a `mode="patch"` layer replaced, and members of `IRecordable` and converter-based objects.
 * A `Record()` that reads into a freshly created container lost the parent dec's entries.
+* A `mode="patch"` dictionary with a custom key comparer didn't report keys its comparer considered duplicates.
 
 
 ## [v0.11.1]

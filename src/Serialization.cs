@@ -1715,7 +1715,7 @@ namespace Dec
             var recorderChildContext = recSettings.CreateChild();
 
             // avoid the heap allocation if we can
-            var writtenFields = permitPatch ? new HashSet<object>() : null;
+            var writtenFields = permitPatch ? new HashSet<object>(new ComparerDictionaryKey(dict)) : null;
 
             foreach (var entry in node.GetDictionaryEntries(keyType, valueType, globals, recSettings))
             {

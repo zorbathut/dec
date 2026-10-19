@@ -1117,6 +1117,24 @@ namespace DecTest
         }
 
         [Test]
+        public void DictPatchDuplicateUsesComparer([Values] ParserMode mode)
+        {
+            var parser = LayerParser<LayerDictDec>(@"<caseless mode=""patch""><A><x>1</x></A><a><y>2</y></a></caseless>");
+            int errors = 0;
+            ExpectErrors(() => parser.Finish(), err =>
+            {
+                errors++;
+                return err.Contains("`a`");
+            });
+            Assert.AreEqual(1, errors);
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(1, DictLeaf().caseless.Count);
+            Assert.AreEqual(2, DictLeaf().caseless["a"].y);
+        }
+
+        [Test]
         public void LayerDictPatchedListValue([Values] ParserMode mode)
         {
             var parser = LayerParser<LayerDictDec>(
