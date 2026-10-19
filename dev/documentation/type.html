@@ -106,7 +106,7 @@
   &lt;/data&gt;
 &lt;/ExampleDec&gt;
 </code></pre>
-<p>When a dec inherits from a parent, or a mod patches it, several layers can each give a <code>class</code> for the same member. A later layer may narrow an earlier layer's class to a subclass, and the most-derived class wins; naming an unrelated or more general class is an error, and the earlier class is kept. A layer with <code>mode=&quot;replace&quot;</code> starts over, so it may name any class.</p>
+<p>When a dec inherits from a parent, or a mod patches it, several layers can each give a <code>class</code> for the same member. A later layer may narrow an earlier layer's class to a subclass, and the most-derived class wins; naming an unrelated or more general class is an error, and the earlier class is kept. A layer that replaces the member starts over, so it may name any class; a container layer that names no class keeps the one it inherits.</p>
 <p>Types are described using the same conventions listed under <a href="parsing.html">type member parsing</a>.</p>
 
 </article>
