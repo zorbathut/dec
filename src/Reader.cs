@@ -57,6 +57,78 @@ namespace Dec
         public abstract object ParseElement(Type type, object model, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings);
     }
 
+    // Several layers of XML for one object, read together by a Recorder. Each member it asks for gets every layer's version of itself at once, so the member's own mode handling decides which layers survive.
+    internal class ReaderNodeLayers : ReaderNode
+    {
+        public List<ReaderNodeParseable> Layers { get; }
+
+        public ReaderNodeLayers(List<ReaderNodeParseable> layers)
+        {
+            Layers = layers;
+        }
+
+        public override Recorder.Purpose Intent { get { return Layers[0].Intent; } }
+        public override Recorder.IUserSettings UserSettings { get { return Layers[0].UserSettings; } }
+
+        // The last layer is the dec actually being built, so it's the most useful place to point.
+        public override Context GetContext()
+        {
+            return Layers[Layers.Count - 1].GetContext();
+        }
+
+        public override ReaderNode GetChildNamed(string name)
+        {
+            ReaderNodeParseable single = null;
+            List<ReaderNodeParseable> several = null;
+            foreach (var layer in Layers)
+            {
+                var child = (ReaderNodeParseable)layer.GetChildNamed(name);
+                if (child == null)
+                {
+                    continue;
+                }
+
+                if (single == null)
+                {
+                    single = child;
+                }
+                else
+                {
+                    several = several ?? new List<ReaderNodeParseable> { single };
+                    several.Add(child);
+                }
+            }
+
+            if (several != null)
+            {
+                return new ReaderNodeLayers(several);
+            }
+
+            return single;
+        }
+
+        // Nothing asks these of a whole stack of layers; unused-field reporting goes layer by layer.
+        public override string[] GetAllChildren()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool HasText()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override int[] GetArrayDimensions(int rank)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override object ParseElement(Type type, object model, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings)
+        {
+            return Serialization.ParseElement(Layers, type, model, readerGlobals, recorderSettings);
+        }
+    }
+
     // One key/value pair of a dictionary's XML, with its key already parsed and its value not yet.
     internal struct ReaderDictionaryEntry
     {

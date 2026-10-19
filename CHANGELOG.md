@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
 * Using a Recorder outside the `Record()` call it was passed to is now reported as an error in most cases. That covers a Recorder kept past its call, one used from another thread, and an enclosing object's Recorder used while a nested `Record()` is running. None of these ever worked reliably and I hope nobody was doing them; if you were, come pester me on Discord.
 * `Recorder.Clone` copies a boxed struct reached from two places into two boxes, as Write and Read always have, instead of sharing one.
 * Recorders and dec-path lookups now track references by identity instead of `Equals()`; this should always have been the case, sorry. As always, if you were relying on this, come talk to me.
+* `Record()`, `Create()`, and `Read()` of an object that several layers of an inherited or modded dec set now run once over all the layers, instead of once per layer.
 
 ### Obsoleted
 * `ConfigErrors` and `PostLoad` are now marked `[Obsolete]` in favor of `[Dec.Setup]` functions. They'll be removed in the future.
@@ -63,7 +64,8 @@ All notable changes to this project will be documented in this file.
 * A missing parent or parent cycle among abstract decs went unreported unless some concrete dec inherited from them.
 * A container member written with `mode="replace"` and a `class` kept the type of its C# default value instead of taking the named class.
 * An object patched by more than one layer, such as a parent and child dec both setting fields on it, was registered with `Index<T>` once per layer.
-* Contents of a parent dec or base mod that a later layer replaced were still built, so they took `[Dec.Index]` slots and stayed referenced by internal lookup tables forever. This now also covers dictionary values that a `mode="patch"` layer replaces.
+* Contents of a parent dec or base mod that a later layer replaced were still built, so they took `[Dec.Index]` slots and stayed referenced by internal lookup tables forever. That included dictionary values a `mode="patch"` layer replaced, and members of `IRecordable` and converter-based objects.
+* A `Record()` that reads into a freshly created container lost the parent dec's entries.
 
 
 ## [v0.11.1]

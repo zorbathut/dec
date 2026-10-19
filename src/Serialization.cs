@@ -981,40 +981,42 @@ namespace Dec
                                 Dbg.Err($"{node.GetContext()}: Internal error, got invalid mode {parseCommand}");
                                 break;
                         }
+                    }
 
-                        bool isNullable = type.IsConstructedGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+                    var bodyNode = RecorderBodyNode(orders);
 
-                        if (result == null && !isNullable)
+                    bool isNullable = type.IsConstructedGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+
+                    if (result == null && !isNullable)
+                    {
+                        result = type.CreateInstanceSafe("converterrecord", bodyNode);
+                    }
+
+                    // context might be null; that's OK at the moment
+                    if (result != null || isNullable)
+                    {
+                        var recorderReader = new RecorderReader(bodyNode, globals, trackUsage: true);
+                        try
                         {
-                            result = type.CreateInstanceSafe("converterrecord", node);
+                            object returnedResult = recorderReader.BodyRecord(converterRecord, result);
+
+                            if (!type.IsValueType && result != returnedResult)
+                            {
+                                Dbg.Err($"{bodyNode.GetContext()}: Converter {converterRecord.GetType()} changed object instance, this is disallowed");
+                            }
+                            else
+                            {
+                                // for value types, this is fine
+                                result = returnedResult;
+                            }
+
+                            recorderReader.ReportUnusedFields();
                         }
-
-                        // context might be null; that's OK at the moment
-                        if (result != null || isNullable)
+                        catch (Exception e)
                         {
-                            var recorderReader = new RecorderReader(node, globals, trackUsage: true);
-                            try
-                            {
-                                object returnedResult = recorderReader.BodyRecord(converterRecord, result);
+                            Dbg.Ex(new ConverterReadException(bodyNode.GetContext(), converter, e));
 
-                                if (!type.IsValueType && result != returnedResult)
-                                {
-                                    Dbg.Err($"{node.GetContext()}: Converter {converterRecord.GetType()} changed object instance, this is disallowed");
-                                }
-                                else
-                                {
-                                    // for value types, this is fine
-                                    result = returnedResult;
-                                }
-
-                                recorderReader.ReportUnusedFields();
-                            }
-                            catch (Exception e)
-                            {
-                                Dbg.Ex(new ConverterReadException(node.GetContext(), converter, e));
-
-                                // no fallback needed, we already have a result
-                            }
+                            // no fallback needed, we already have a result
                         }
                     }
                 }
@@ -1036,35 +1038,37 @@ namespace Dec
                                 Dbg.Err($"{node.GetContext()}: Internal error, got invalid mode {parseCommand}");
                                 break;
                         }
+                    }
 
-                        var recorderReader = new RecorderReader(node, globals, disallowShared: true, trackUsage: true);
-                        if (result == null)
+                    var bodyNode = RecorderBodyNode(orders);
+
+                    var recorderReader = new RecorderReader(bodyNode, globals, disallowShared: true, trackUsage: true);
+                    if (result == null)
+                    {
+                        try
                         {
-                            try
-                            {
-                                result = recorderReader.BodyCreate(converterFactory);
-                            }
-                            catch (Exception e)
-                            {
-                                Dbg.Ex(new ConverterReadException(node.GetContext(), converter, e));
-                            }
+                            result = recorderReader.BodyCreate(converterFactory);
                         }
-
-                        // context might be null; that's OK at the moment
-                        if (result != null)
+                        catch (Exception e)
                         {
-                            recorderReader.AllowShared(globals);
-                            try
-                            {
-                                result = recorderReader.BodyRead(converterFactory, result);
-                                recorderReader.ReportUnusedFields();
-                            }
-                            catch (Exception e)
-                            {
-                                Dbg.Ex(new ConverterReadException(node.GetContext(), converter, e));
+                            Dbg.Ex(new ConverterReadException(bodyNode.GetContext(), converter, e));
+                        }
+                    }
 
-                                // no fallback needed, we already have a result
-                            }
+                    // context might be null; that's OK at the moment
+                    if (result != null)
+                    {
+                        recorderReader.AllowShared(globals);
+                        try
+                        {
+                            result = recorderReader.BodyRead(converterFactory, result);
+                            recorderReader.ReportUnusedFields();
+                        }
+                        catch (Exception e)
+                        {
+                            Dbg.Ex(new ConverterReadException(bodyNode.GetContext(), converter, e));
+
+                            // no fallback needed, we already have a result
                         }
                     }
                 }
@@ -1154,22 +1158,22 @@ namespace Dec
                                 Dbg.Err($"{node.GetContext()}: Internal error, got invalid mode {parseCommand}");
                                 break;
                         }
+                    }
 
-                        if (recordable != null)
+                    if (recordable != null)
+                    {
+                        var recorderReader = new RecorderReader(RecorderBodyNode(orders), globals, trackUsage: true);
+                        try
                         {
-                            var recorderReader = new RecorderReader(node, globals, trackUsage: true);
-                            try
-                            {
-                                recorderReader.BodyRecord(recordable);
-                            }
-                            catch (Exception e)
-                            {
-                                Dbg.Ex(e);
-                            }
-                            recorderReader.ReportUnusedFields();
-
-                            // TODO: support indices if this is within the Dec system?
+                            recorderReader.BodyRecord(recordable);
                         }
+                        catch (Exception e)
+                        {
+                            Dbg.Ex(e);
+                        }
+                        recorderReader.ReportUnusedFields();
+
+                        // TODO: support indices if this is within the Dec system?
                     }
 
                     result = recordable;
@@ -1802,6 +1806,23 @@ namespace Dec
             }
 
             return dict;
+        }
+
+        // What a Record()-style body reads from. With several layers it reads them all at once, so the body runs once and each member gets every layer's version of itself together.
+        private static ReaderNode RecorderBodyNode(List<(ParseCommand command, ReaderNodeParseable node)> orders)
+        {
+            if (orders.Count == 1)
+            {
+                return orders[0].node;
+            }
+
+            var layers = new List<ReaderNodeParseable>(orders.Count);
+            foreach (var (_, node) in orders)
+            {
+                layers.Add(node);
+            }
+
+            return new ReaderNodeLayers(layers);
         }
 
         // Whether a layer of this type that gives no mode replaces what came before it, as it does for containers and plain values.

@@ -953,7 +953,7 @@ namespace DecTest
             }
         }
 
-        [Test] [Ignore("Hard to fix and I currently don't need it")]
+        [Test]
         public void RecordableInheritance([Values] ParserMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(DictionaryHolderDec) } });

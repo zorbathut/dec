@@ -746,11 +746,12 @@ namespace Dec
             {
                 asThis = true;
 
-                if (node.AllowAsThis && (node is ReaderNodeParseable nodeParseable))
+                var asThisNodes = node is ReaderNodeParseable nodeParseable ? new List<ReaderNodeParseable>() { nodeParseable } : (node as ReaderNodeLayers)?.Layers;
+                if (node.AllowAsThis && asThisNodes != null)
                 {
                     // Explicit cast here because we want an error if we have the wrong type!
                     // This shouldn't need ParseElementTypd because it's guaranteed to have a valid input.
-                    value = (T)Serialization.ParseElement(new List<ReaderNodeParseable>() { nodeParseable }, typeof(T), value, readerGlobals, parameters.CreateSettings(), asThis: true);
+                    value = (T)Serialization.ParseElement(asThisNodes, typeof(T), value, readerGlobals, parameters.CreateSettings(), asThis: true);
 
                     return;
                 }
@@ -816,24 +817,63 @@ namespace Dec
                 return;
             }
 
-            // Check for unused text content when no fields were accessed
-            if (seen.Count == 0 && node.HasText())
+            // Each layer is reported on its own, so a warning points at the XML that caused it.
+            if (node is ReaderNodeLayers layers)
             {
-                Dbg.Err($"{node.GetContext()}: XML contains text content which was ignored, and no fields were read from this object; the text will be ignored and the object will be left with default values.");
+                foreach (var layer in layers.Layers)
+                {
+                    ReportUnusedFields(layer);
+                }
+            }
+            else
+            {
+                ReportUnusedFields(node);
+            }
+        }
+
+        private void ReportUnusedFields(ReaderNode layer)
+        {
+            // Check for unused text content when no fields were accessed
+            if (layer.HasText() && !ReadFrom(layer))
+            {
+                Dbg.Err($"{layer.GetContext()}: XML contains text content which was ignored, and no fields were read from this object; the text will be ignored and the object will be left with default values.");
             }
 
-            var allChildren = node.GetAllChildren();
-            if (seen.Count == allChildren.Length)
+            var allChildren = layer.GetAllChildren();
+            if (layer == node && seen.Count == allChildren.Length)
             {
                 // we only register things that existed
                 // so if "seen" is the same length as "all", then we've seen everything
+                // (a layer of several can't take this shortcut, since what it's seen may come from the other layers)
                 return;
             }
 
             var unused = new HashSet<string>(allChildren);
             unused.RemoveWhere(seen.Contains);
 
-            Dbg.Wrn($"{node.GetContext()}: Elements specified that don't exist on the object: {string.Join(", ", unused)}");
+            if (unused.Count > 0)
+            {
+                Dbg.Wrn($"{layer.GetContext()}: Elements specified that don't exist on the object: {string.Join(", ", unused)}");
+            }
+        }
+
+        // Whether any field was read from this layer; a field read from another layer doesn't count.
+        private bool ReadFrom(ReaderNode layer)
+        {
+            if (layer == node)
+            {
+                return seen.Count > 0;
+            }
+
+            foreach (var name in layer.GetAllChildren())
+            {
+                if (seen.Contains(name))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

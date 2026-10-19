@@ -55,6 +55,38 @@ namespace DecTest
             Assert.AreEqual(3, (ktd.dict[typeof(DerivedAnother)] as DerivedAnother).more);
         }
 
+        [Test]
+        public void KeyTypeDictInherited([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(KeyTypeDictHolderDec), typeof(Derived), typeof(DerivedAnother) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <KeyTypeDictHolderDec decName=""Parent"" abstract=""true"">
+                        <dict>
+                            <Derived><data>1</data></Derived>
+                            <DerivedAnother><data>2</data></DerivedAnother>
+                         </dict>
+                    </KeyTypeDictHolderDec>
+                    <KeyTypeDictHolderDec decName=""TestDec"" parent=""Parent"">
+                        <dict mode=""patch"">
+                            <DerivedAnother><more>3</more></DerivedAnother>
+                         </dict>
+                    </KeyTypeDictHolderDec>
+                </Decs>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            var ktd = Dec.Database<KeyTypeDictHolderDec>.Get("TestDec");
+
+            Assert.AreEqual(2, ktd.dict.Count);
+            Assert.AreEqual(1, (ktd.dict[typeof(Derived)] as Derived).data);
+            Assert.AreEqual(2, (ktd.dict[typeof(DerivedAnother)] as DerivedAnother).data);
+            Assert.AreEqual(3, (ktd.dict[typeof(DerivedAnother)] as DerivedAnother).more);
+        }
+
         public class DerivedDict : Base
         {
             public System.Collections.Generic.Dictionary<string, int> more;

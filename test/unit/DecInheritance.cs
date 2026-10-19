@@ -551,6 +551,122 @@ namespace DecTest
             public Dictionary<int, int> intKeys;
         }
 
+        public class RecLayerItem : Dec.IRecordable
+        {
+            public static int RecordCalls;
+
+            public int x;
+            public int y;
+            public List<int> list;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                RecordCalls++;
+                recorder.Record(ref x, "x");
+                recorder.Record(ref y, "y");
+                recorder.Record(ref list, "list");
+            }
+        }
+
+        public class RecLayerOuter : Dec.IRecordable
+        {
+            public RecLayerItem item;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref item, "item");
+            }
+        }
+
+        public class RecLayerConditional : Dec.IRecordable
+        {
+            public string kind;
+            public int a;
+            public int b;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref kind, "kind");
+                if (kind == "a")
+                {
+                    recorder.Record(ref a, "a");
+                }
+                else
+                {
+                    recorder.Record(ref b, "b");
+                }
+            }
+        }
+
+        public class RecLayerAsThis : Dec.IRecordable
+        {
+            public List<int> inner;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.RecordAsThis(ref inner);
+            }
+        }
+
+        public class RecLayerConverted
+        {
+            public int x;
+            public int y;
+        }
+
+        public class RecLayerConvertedConverter : Dec.ConverterRecord<RecLayerConverted>
+        {
+            public static int RecordCalls;
+
+            public override void Record(ref RecLayerConverted input, Dec.Recorder recorder)
+            {
+                RecordCalls++;
+                recorder.Record(ref input.x, "x");
+                recorder.Record(ref input.y, "y");
+            }
+        }
+
+        public class RecLayerFactoried
+        {
+            public int x;
+            public int y;
+        }
+
+        public class RecLayerFactoriedConverter : Dec.ConverterFactory<RecLayerFactoried>
+        {
+            public static int CreateCalls;
+            public static int ReadCalls;
+
+            public override RecLayerFactoried Create(Dec.Recorder recorder)
+            {
+                CreateCalls++;
+                return new RecLayerFactoried();
+            }
+
+            public override void Read(ref RecLayerFactoried input, Dec.Recorder recorder)
+            {
+                ReadCalls++;
+                recorder.Record(ref input.x, "x");
+                recorder.Record(ref input.y, "y");
+            }
+
+            public override void Write(RecLayerFactoried input, Dec.Recorder recorder)
+            {
+                recorder.Record(ref input.x, "x");
+                recorder.Record(ref input.y, "y");
+            }
+        }
+
+        public class RecLayerDec : Dec.Dec
+        {
+            public RecLayerItem item;
+            public RecLayerOuter outer;
+            public RecLayerConditional conditional;
+            public RecLayerAsThis asThis;
+            public RecLayerConverted converted;
+            public RecLayerFactoried factoried;
+        }
+
         public class LayerNullableDec : Dec.Dec
         {
             public LayerStruct? nullableStruct = new LayerStruct { a = 1 };
@@ -565,7 +681,7 @@ namespace DecTest
         private Dec.Parser LayerParser<T>(params string[] bodies) where T : Dec.Dec
         {
             Dec.Config.UsingNamespaces = new string[] { "DecTest.DecInheritance" };
-            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(T) } });
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(T) }, explicitConverters = new Type[] { typeof(RecLayerConvertedConverter), typeof(RecLayerFactoriedConverter) } });
 
             var decs = new System.Text.StringBuilder();
             for (int i = 0; i < bodies.Length; ++i)
@@ -1011,6 +1127,107 @@ namespace DecTest
             DoParserTests(mode);
 
             CollectionAssert.AreEqual(new[] { 1, 2 }, DictLeaf().objs["a"].list);
+        }
+
+        private static RecLayerDec RecLeaf()
+        {
+            return Dec.Database<RecLayerDec>.Get("Leaf");
+        }
+
+        [Test]
+        public void LayerRecordableOnce()
+        {
+            RecLayerItem.RecordCalls = 0;
+            var parser = LayerParser<RecLayerDec>(
+                "<item><x>1</x><list><li>1</li></list></item>",
+                "<item><y>2</y><list><li>2</li></list></item>");
+            parser.Finish();
+
+            Assert.AreEqual(1, RecLayerItem.RecordCalls);
+            Assert.AreEqual(1, RecLeaf().item.x);
+            Assert.AreEqual(2, RecLeaf().item.y);
+            CollectionAssert.AreEqual(new[] { 2 }, RecLeaf().item.list);
+        }
+
+        [Test]
+        public void LayerRecordableMerges([ValuesExcept(ParserMode.Validation)] ParserMode mode)
+        {
+            var parser = LayerParser<RecLayerDec>(
+                @"<item><x>1</x><list><li>1</li></list></item><outer><item><x>1</x></item></outer><conditional><kind>a</kind><a>1</a></conditional><asThis><li>1</li></asThis>",
+                @"<item><y>2</y><list mode=""append""><li>2</li></list></item><outer><item><y>2</y></item></outer><conditional><kind>b</kind><b>2</b></conditional><asThis><li>2</li></asThis>");
+            int warnings = 0;
+            ExpectWarnings(() => parser.Finish(), warn =>
+            {
+                warnings++;
+                return true;
+            });
+            Assert.AreEqual(1, warnings);
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(1, RecLeaf().item.x);
+            Assert.AreEqual(2, RecLeaf().item.y);
+            CollectionAssert.AreEqual(new[] { 1, 2 }, RecLeaf().item.list);
+            Assert.AreEqual(1, RecLeaf().outer.item.x);
+            Assert.AreEqual(2, RecLeaf().outer.item.y);
+            Assert.AreEqual("b", RecLeaf().conditional.kind);
+            Assert.AreEqual(2, RecLeaf().conditional.b);
+            CollectionAssert.AreEqual(new[] { 2 }, RecLeaf().asThis.inner);
+        }
+
+        [Test]
+        public void LayerConvertersOnce([ValuesExcept(ParserMode.Validation)] ParserMode mode)
+        {
+            RecLayerConvertedConverter.RecordCalls = 0;
+            RecLayerFactoriedConverter.CreateCalls = 0;
+            RecLayerFactoriedConverter.ReadCalls = 0;
+            var parser = LayerParser<RecLayerDec>(
+                "<converted><x>1</x></converted><factoried><x>1</x></factoried>",
+                "<converted><y>2</y></converted><factoried><y>2</y></factoried>");
+            parser.Finish();
+
+            Assert.AreEqual(1, RecLayerConvertedConverter.RecordCalls);
+            Assert.AreEqual(1, RecLayerFactoriedConverter.CreateCalls);
+            Assert.AreEqual(1, RecLayerFactoriedConverter.ReadCalls);
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(1, RecLeaf().converted.x);
+            Assert.AreEqual(2, RecLeaf().converted.y);
+            Assert.AreEqual(1, RecLeaf().factoried.x);
+            Assert.AreEqual(2, RecLeaf().factoried.y);
+        }
+
+        [Test]
+        public void LayerRecordableTextLayer()
+        {
+            var parser = LayerParser<RecLayerDec>(
+                "<item>garbage</item>",
+                "<item><y>2</y></item>");
+            int errors = 0;
+            ExpectErrors(() => parser.Finish(), err =>
+            {
+                errors++;
+                return true;
+            });
+            Assert.AreEqual(1, errors);
+
+            Assert.AreEqual(2, RecLeaf().item.y);
+        }
+
+        [Test]
+        public void LayerRecordableUnusedFieldPerLayer()
+        {
+            var parser = LayerParser<RecLayerDec>(
+                "<item><x>1</x><nope>1</nope></item>",
+                "<item><y>2</y><nope>2</nope></item>");
+            int warnings = 0;
+            ExpectWarnings(() => parser.Finish(), warn =>
+            {
+                warnings++;
+                return warn.Contains("nope");
+            });
+            Assert.AreEqual(2, warnings);
         }
 
         [Test]

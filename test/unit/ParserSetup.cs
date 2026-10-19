@@ -169,8 +169,18 @@ namespace DecTest
         {
             public List<Collected_Obj> objs;
         }
+        public class ReplLayer_Recordable : Dec.IRecordable
+        {
+            public List<Collected_Obj> objs;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref objs, "objs");
+            }
+        }
         public class ReplLayer_Dec : Dec.Dec
         {
+            public ReplLayer_Recordable recordable;
             public List<Collected_Obj> objs;
             public ReplLayer_Nested nested;
             public ReplLayer_Struct structured;
@@ -178,7 +188,7 @@ namespace DecTest
         }
 
         [Test]
-        public void TestReplacedLayerSetup([Values("objs", "nested", "structured")] string field)
+        public void TestReplacedLayerSetup([Values("objs", "nested", "structured", "recordable")] string field)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ReplLayer_Dec) } });
 
