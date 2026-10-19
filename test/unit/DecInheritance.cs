@@ -206,6 +206,36 @@ namespace DecTest
         }
 
         [Test]
+        public void MissingParentSharedByChildren([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SimpleDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <SimpleDec decName=""Base"" parent=""Missing"" abstract=""true"">
+                        <defaulted>1</defaulted>
+                    </SimpleDec>
+                    <SimpleDec decName=""ChildA"" parent=""Base"" />
+                    <SimpleDec decName=""ChildB"" parent=""Base"" />
+                    <SimpleDec decName=""ChildC"" parent=""Base"" />
+                </Decs>");
+            int errors = 0;
+            ExpectErrors(() => parser.Finish(), err =>
+            {
+                errors++;
+                return err.Contains("Base") && err.Contains("Missing");
+            });
+            Assert.AreEqual(1, errors);
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(1, Dec.Database<SimpleDec>.Get("ChildA").defaulted);
+            Assert.AreEqual(1, Dec.Database<SimpleDec>.Get("ChildB").defaulted);
+            Assert.AreEqual(1, Dec.Database<SimpleDec>.Get("ChildC").defaulted);
+        }
+
+        [Test]
         public void ParentCycle([Values] bool selfParent, [Values] ParserMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SimpleDec) } });

@@ -450,6 +450,7 @@ namespace Dec
                 Database.SuppressEmptyWarning();
 
                 var reportedCycles = new HashSet<(Type, string)>();
+                var reportedMissingParents = new HashSet<(Type, string)>();
                 foreach (var (id, orders) in toParseDecOrders)
                 {
                     // Accumulate our orders
@@ -483,7 +484,11 @@ namespace Dec
 
                         if (!registeredDecOrders.TryGetValue(parentId, out var parentDec))
                         {
-                            Dbg.Err($"{decWithParent.context}: Dec [{decWithParent.type}:{currentName}] is attempting to use parent `[{parentId.Item1}:{parentId.parent}]`, but no such dec exists");
+                            // Every dec that inherits from this one walks into the same gap, so report it once.
+                            if (reportedMissingParents.Add((id.Item1, currentName)))
+                            {
+                                Dbg.Err($"{decWithParent.context}: Dec [{decWithParent.type}:{currentName}] is attempting to use parent `[{parentId.Item1}:{parentId.parent}]`, but no such dec exists");
+                            }
                             // guess we'll just try to build it from nothing
                             break;
                         }
