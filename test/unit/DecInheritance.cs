@@ -236,6 +236,35 @@ namespace DecTest
         }
 
         [Test]
+        public void AbstractOnlyParentProblems([Values] bool cycle, [Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SimpleDec) } });
+
+            var problem = cycle ?
+                @"<SimpleDec decName=""LoopA"" parent=""LoopB"" abstract=""true"" />
+                  <SimpleDec decName=""LoopB"" parent=""LoopA"" abstract=""true"" />" :
+                @"<SimpleDec decName=""LoopA"" parent=""Missing"" abstract=""true"" />";
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, $@"
+                <Decs>
+                    {problem}
+                    <SimpleDec decName=""Unrelated"" />
+                </Decs>");
+            int errors = 0;
+            ExpectErrors(() => parser.Finish(), err =>
+            {
+                errors++;
+                return err.Contains("LoopA") || err.Contains("LoopB");
+            });
+            Assert.AreEqual(1, errors);
+
+            DoParserTests(mode);
+
+            Assert.IsNotNull(Dec.Database<SimpleDec>.Get("Unrelated"));
+        }
+
+        [Test]
         public void ParentCycle([Values] bool selfParent, [Values] ParserMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SimpleDec) } });

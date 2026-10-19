@@ -385,7 +385,7 @@ namespace Dec
                 }
 
                 // Instantiate all decs
-                var toParseDecOrders = new Dictionary<(Type, string), List<ReaderFileDec.ReaderDec>>();
+                var toParseDecs = new HashSet<(Type, string)>();
                 foreach (var (id, orders) in registeredDecOrders)
                 {
                     // It's currently sort of unclear how we should be deriving the type.
@@ -441,8 +441,8 @@ namespace Dec
 
                         Database.Register(decInstance);
 
-                        // create a new map that filters out abstract objects and failed instantiations
-                        toParseDecOrders.Add(id, orders);
+                        // record which decs get parsed, which filters out abstract objects and failed instantiations
+                        toParseDecs.Add(id);
                     }
                 }
 
@@ -451,7 +451,8 @@ namespace Dec
 
                 var reportedCycles = new HashSet<(Type, string)>();
                 var reportedMissingParents = new HashSet<(Type, string)>();
-                foreach (var (id, orders) in toParseDecOrders)
+                // Abstract decs are walked too, purely so that problems in their parent chains get reported even when nothing concrete inherits from them.
+                foreach (var (id, orders) in registeredDecOrders)
                 {
                     // Accumulate our orders
                     // Copy, because the registered lists are read back as other decs' parents.
@@ -498,6 +499,11 @@ namespace Dec
                         currentOrder = parentDec;
                         currentName = decWithParent.parent;
                         visitedNames.Add(currentName);
+                    }
+
+                    if (!toParseDecs.Contains(id))
+                    {
+                        continue;
                     }
 
                     var generatedOrders = completeOrders.Select(order => order.nodeFactory(new PathDec(id.Item1, id.Item2))).ToList();
