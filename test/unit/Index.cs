@@ -237,6 +237,80 @@ namespace DecTest
             Assert.AreEqual(1, Dec.Index<ParentReplaceIndexCarrier>.Count);
         }
 
+        public class PatchedIndexCarrier
+        {
+            [Dec.Index] public int index;
+            public int x;
+            public int y;
+            public int z;
+        }
+
+        public class PatchedIndexDec : Dec.Dec
+        {
+            public PatchedIndexCarrier obj;
+            public Dictionary<string, PatchedIndexCarrier> dict;
+        }
+
+        [Test]
+        public void PatchedIndexOnce([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(PatchedIndexDec) } });
+
+            var parser = new Dec.ParserModular();
+            parser.CreateModule("Base").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <PatchedIndexDec decName=""Parent"" abstract=""true"">
+                        <obj><x>1</x></obj>
+                    </PatchedIndexDec>
+                    <PatchedIndexDec decName=""TestDec"" parent=""Parent"">
+                        <obj><y>2</y></obj>
+                    </PatchedIndexDec>
+                </Decs>");
+            parser.CreateModule("Mod").AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <PatchedIndexDec decName=""TestDec"" mode=""patch"">
+                        <obj><z>3</z></obj>
+                    </PatchedIndexDec>
+                </Decs>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            var obj = Dec.Database<PatchedIndexDec>.Get("TestDec").obj;
+            Assert.AreEqual(1, obj.x);
+            Assert.AreEqual(2, obj.y);
+            Assert.AreEqual(3, obj.z);
+            Assert.AreEqual(1, Dec.Index<PatchedIndexCarrier>.Count);
+            Assert.AreEqual(0, obj.index);
+            Assert.AreSame(obj, Dec.Index<PatchedIndexCarrier>.Get(0));
+        }
+
+        [Test]
+        public void DictValuePatchIndexOnce([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(PatchedIndexDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <PatchedIndexDec decName=""Parent"" abstract=""true"">
+                        <dict><a><x>1</x></a></dict>
+                    </PatchedIndexDec>
+                    <PatchedIndexDec decName=""TestDec"" parent=""Parent"">
+                        <dict mode=""patch""><a><y>2</y></a></dict>
+                    </PatchedIndexDec>
+                </Decs>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            var value = Dec.Database<PatchedIndexDec>.Get("TestDec").dict["a"];
+            Assert.AreEqual(1, value.x);
+            Assert.AreEqual(2, value.y);
+            Assert.AreEqual(1, Dec.Index<PatchedIndexCarrier>.Count);
+            Assert.AreSame(value, Dec.Index<PatchedIndexCarrier>.Get(0));
+        }
+
         [Test]
         public void Multifile([Values] ParserMode mode)
         {

@@ -62,6 +62,9 @@ namespace Dec
         // Stores index lists while generating the indices.
         private static readonly List<T> IndexList = new List<T>();
 
+        // Parsing can reach one object more than once, such as a dictionary value that several layers patch; it still gets a single index.
+        private static readonly HashSet<object> IndexRegistered = new HashSet<object>(ComparerIdentity.Instance);
+
         // Stores index lists after generation, for a barely-relevant performance gain.
         private static T[] IndexArray = null;
 
@@ -105,6 +108,11 @@ namespace Dec
 
         internal static void Register(object instance, FieldInfo field)
         {
+            if (!IndexRegistered.Add(instance))
+            {
+                return;
+            }
+
             // Clear our cached info
             IndexArray = null;
 
@@ -118,6 +126,7 @@ namespace Dec
         internal static void Clear()
         {
             IndexList.Clear();
+            IndexRegistered.Clear();
             IndexArray = null;
         }
     }
