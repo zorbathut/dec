@@ -511,6 +511,8 @@ namespace DecTest
 
         public class LayerList : List<int> { }
 
+        public class LayerListAlt : List<int> { }
+
         public class LayerDict : Dictionary<int, int> { }
 
         public class LayerListDerived : LayerList { }
@@ -531,6 +533,14 @@ namespace DecTest
             public List<int> listDefault = new List<int> { 9 };
             public Dictionary<int, int> dictDefault = new Dictionary<int, int> { { 9, 9 } };
             public List<int> listDerivedDefault = new LayerListDerived { 9 };
+        }
+
+        public class LayerPolyDec : Dec.Dec
+        {
+            public IEnumerable<int> enumerable;
+            public object anything;
+            public object value;
+            public List<int> list;
         }
 
         public class LayerNullableDec : Dec.Dec
@@ -834,7 +844,7 @@ namespace DecTest
         }
 
         [Test]
-        public void ReplaceDefaultWithClass([Values(ParserMode.Bare, ParserMode.Validation, ParserMode.ReflectionSet)] ParserMode mode)
+        public void ReplaceDefaultWithClass([Values] ParserMode mode)
         {
             var parser = LayerParser(
                 @"<listDefault mode=""replace"" class=""LayerList""><li>2</li></listDefault><dictDefault mode=""replace"" class=""LayerDict""><li><key>2</key><value>2</value></li></dictDefault><listDerivedDefault mode=""replace"" class=""LayerList""><li>2</li></listDerivedDefault>");
@@ -848,6 +858,64 @@ namespace DecTest
             CollectionAssert.AreEquivalent(new Dictionary<int, int> { { 2, 2 } }, Leaf().dictDefault);
             Assert.AreEqual(typeof(LayerList), Leaf().listDerivedDefault.GetType());
             CollectionAssert.AreEqual(new[] { 2 }, Leaf().listDerivedDefault);
+        }
+
+        [Test]
+        public void LayerContainerClassThenImplicitReplace([Values] ParserMode mode)
+        {
+            var parser = LayerParser(
+                @"<list class=""LayerList""><li>1</li></list>",
+                @"<list class=""LayerListAlt""><li>2</li></list>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            Assert.IsInstanceOf<LayerListAlt>(Leaf().list);
+            CollectionAssert.AreEqual(new[] { 2 }, Leaf().list);
+        }
+
+        [Test]
+        public void ImplicitReplaceDefaultWithClass([Values] ParserMode mode)
+        {
+            var parser = LayerParser(@"<listDefault class=""LayerList""><li>2</li></listDefault>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            Assert.IsInstanceOf<LayerList>(Leaf().listDefault);
+            CollectionAssert.AreEqual(new[] { 2 }, Leaf().listDefault);
+        }
+
+        [Test]
+        public void AppendDefaultWithClass([Values] ParserMode mode)
+        {
+            // Appending keeps the C# default, so the class still has to match it.
+            var parser = LayerParser(@"<listDefault mode=""append"" class=""LayerList""><li>2</li></listDefault>");
+            ExpectErrors(() => parser.Finish(), err => err.Contains("LayerList"));
+
+            DoParserTests(mode);
+
+            CollectionAssert.AreEqual(new[] { 9, 2 }, Leaf().listDefault);
+        }
+
+        [Test]
+        public void LayerContainerInheritsClass([Values] ParserMode mode)
+        {
+            var parser = LayerParser<LayerPolyDec>(
+                @"<enumerable class=""LayerList""><li>1</li></enumerable><anything class=""LayerList""><li>1</li></anything><value class=""int"">1</value><list class=""LayerList""><li>1</li></list>",
+                "<enumerable><li>2</li></enumerable><anything><li>2</li></anything><value>2</value><list><li>2</li></list>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            var leaf = Dec.Database<LayerPolyDec>.Get("Leaf");
+            Assert.IsInstanceOf<LayerList>(leaf.enumerable);
+            CollectionAssert.AreEqual(new[] { 2 }, leaf.enumerable);
+            Assert.IsInstanceOf<LayerList>(leaf.anything);
+            CollectionAssert.AreEqual(new[] { 2 }, (LayerList)leaf.anything);
+            Assert.AreEqual(2, leaf.value);
+            Assert.IsInstanceOf<LayerList>(leaf.list);
+            CollectionAssert.AreEqual(new[] { 2 }, leaf.list);
         }
 
         [Test]

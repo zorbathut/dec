@@ -31,6 +31,6 @@ class ExampleDec : Dec.Dec
 </ExampleDec>
 ```
 
-When a dec inherits from a parent, or a mod patches it, several layers can each give a `class` for the same member. A later layer may narrow an earlier layer's class to a subclass, and the most-derived class wins; naming an unrelated or more general class is an error, and the earlier class is kept. A layer with `mode="replace"` starts over, so it may name any class.
+When a dec inherits from a parent, or a mod patches it, several layers can each give a `class` for the same member. A later layer may narrow an earlier layer's class to a subclass, and the most-derived class wins; naming an unrelated or more general class is an error, and the earlier class is kept. A layer that replaces the member starts over, so it may name any class; a container layer that names no class keeps the one it inherits.
 
 Types are described using the same conventions listed under [type member parsing](parsing.md).

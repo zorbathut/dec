@@ -747,36 +747,39 @@ namespace Dec
                 Type classType = null;
                 ReaderNode classNode = null; // stored entirely for error reporting
                 bool replaced = false;
+                bool sawDefaultMode = false;
                 foreach (var s_node in nodes)
                 {
-                    // However, we do need to watch for Replace, because that means we should nuke the class attribute and start over.
+                    Type localType = null;
+                    string localClassAttribute = s_node.GetMetadata(ReaderNodeParseable.Metadata.Class);
+                    if (localClassAttribute != null)
+                    {
+                        // null on failure, with the error already reported
+                        localType = (Type)ParseString(localClassAttribute, typeof(Type), null, s_node.GetContext());
+
+                        if (localType != null && !type.IsAssignableFrom(localType))
+                        {
+                            Dbg.Err($"{s_node.GetContext()}: Explicit type {localClassAttribute} cannot be assigned to expected type {type}");
+                            localType = null;
+                        }
+                    }
+
+                    // A replace discards the earlier layers, class included. For a container, writing no mode at all is a replace too, but one that names no class of its own keeps the class it inherits.
                     string modeAttribute = s_node.GetMetadata(ReaderNodeParseable.Metadata.Mode);
                     ParseMode s_parseMode = ParseModeFromString(s_node.GetContext(), modeAttribute);
-                    if (s_parseMode == ParseMode.Replace)
+                    sawDefaultMode |= s_parseMode == ParseMode.Default;
+                    if (s_parseMode == ParseMode.Replace || (s_parseMode == ParseMode.Default && localType != null && classType != null && DefaultModeReplaces(localType, isRootDec)))
                     {
-                        // we also should maybe be doing this if we're a list, map, or set?
                         classType = null;
                         replaced = true;
                     }
 
-                    string localClassAttribute = s_node.GetMetadata(ReaderNodeParseable.Metadata.Class);
-                    if (localClassAttribute == null)
-                    {
-                        continue;
-                    }
-
-                    var localType = (Type)ParseString(localClassAttribute, typeof(Type), null, s_node.GetContext());
                     if (localType == null)
                     {
-                        // error already reported
                         continue;
                     }
 
-                    if (!type.IsAssignableFrom(localType))
-                    {
-                        Dbg.Err($"{s_node.GetContext()}: Explicit type {localClassAttribute} cannot be assigned to expected type {type}");
-                    }
-                    else if (classType != null && !classType.IsAssignableFrom(localType))
+                    if (classType != null && !classType.IsAssignableFrom(localType))
                     {
                         Dbg.Err($"{s_node.GetContext()}: Explicit type {localClassAttribute} is not derived from {classType}, which an earlier layer specified; keeping {classType}");
                     }
@@ -789,6 +792,12 @@ namespace Dec
 
                 if (classType != null)
                 {
+                    // A container written with no mode replaces its C# default as well, so the default's type doesn't constrain it.
+                    if (!replaced && sawDefaultMode && result != null && result.GetType() != classType && DefaultModeReplaces(classType, isRootDec))
+                    {
+                        replaced = true;
+                    }
+
                     if (!replaced && result != null && result.GetType() != classType)
                     {
                         Dbg.Err($"{classNode.GetContext()}: Explicit type {classType} does not match already-provided instance {type}");
@@ -1689,6 +1698,21 @@ namespace Dec
             Index.Register(ref result);
 
             return result;
+        }
+
+        // Whether a layer of this type that gives no mode replaces what came before it, as it does for containers and plain values.
+        private static bool DefaultModeReplaces(Type type, bool isRootDec)
+        {
+            switch (type.CalculateSerializationModeCategory(ConverterFor(type), isRootDec))
+            {
+                case UtilType.ParseModeCategory.OrderedContainer:
+                case UtilType.ParseModeCategory.UnorderedContainer:
+                case UtilType.ParseModeCategory.Value:
+                    return true;
+
+                default:
+                    return false;
+            }
         }
 
         // We trim this to get info on whether there's text that must not be ignored. If we turn out to be a string, we'll grudingly accept pure whitespace anyway.

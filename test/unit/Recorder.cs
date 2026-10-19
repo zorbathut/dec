@@ -70,6 +70,32 @@ namespace DecTest
             }
         }
 
+        public class ContainerClassList : List<int> { }
+
+        public class ContainerClassDefault : Dec.IRecordable
+        {
+            public List<int> list = new List<int>();
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref list, "list");
+            }
+        }
+
+        [Test]
+        public void ContainerClassOverDefault([Values] RecorderMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { });
+
+            var holder = new ContainerClassDefault();
+            holder.list = new ContainerClassList { 1, 2 };
+
+            var deserialized = DoRecorderRoundTrip(holder, mode);
+
+            Assert.IsInstanceOf<ContainerClassList>(deserialized.list);
+            CollectionAssert.AreEqual(new[] { 1, 2 }, deserialized.list);
+        }
+
         [Test]
         public void Enum([Values] RecorderMode mode)
         {
