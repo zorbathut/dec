@@ -57,6 +57,15 @@ namespace Dec
         public abstract object ParseElement(Type type, object model, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings);
     }
 
+    // One key/value pair of a dictionary's XML, with its key already parsed and its value not yet.
+    internal struct ReaderDictionaryEntry
+    {
+        public object key;
+        public ReaderNodeParseable value;
+        public Type valueType;
+        public Context context;
+    }
+
     internal abstract class ReaderNodeParseable : ReaderNode
     {
         public enum Metadata
@@ -86,7 +95,7 @@ namespace Dec
 
         public abstract void ParseList(IList list, Type referencedType, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings);
         public abstract void ParseArray(Array array, Type referencedType, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings, int startOffset);
-        public abstract void ParseDictionary(IDictionary dict, Type referencedKeyType, Type referencedValueType, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings, bool permitPatch);
+        public abstract IEnumerable<ReaderDictionaryEntry> GetDictionaryEntries(Type referencedKeyType, Type referencedValueType, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings);
         public abstract void ParseHashset(object hashset, Type referencedType, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings, bool permitPatch);
         public abstract void ParseStack(object hashset, Type referencedType, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings);
         public abstract void ParseQueue(object hashset, Type referencedType, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings);

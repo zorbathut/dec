@@ -202,12 +202,9 @@ namespace Dec
             }
         }
 
-        public override void ParseDictionary(IDictionary dict, Type referencedKeyType, Type referencedValueType, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings, bool permitPatch)
+        public override IEnumerable<ReaderDictionaryEntry> GetDictionaryEntries(Type referencedKeyType, Type referencedValueType, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings)
         {
             var recorderChildContext = recorderSettings.CreateChild();
-
-            // avoid the heap allocation if we can
-            var writtenFields = permitPatch ? new HashSet<object>() : null;
 
             foreach (var fieldElement in xml.Elements())
             {
@@ -240,23 +237,8 @@ namespace Dec
                         continue;
                     }
 
-                    object originalValue = null;
-                    if (dict.Contains(key))
-                    {
-                        // Annoyingly the IDictionary interface does not allow for simultaneous retrieval and existence check a la .TryGetValue(), so we get to do a second lookup here
-                        // This is definitely not the common path, though, so, fine
-                        originalValue = dict[key];
-
-                        if (writtenFields == null || writtenFields.Contains(key))
-                        {
-                            Dbg.Err($"{elementContext}: Dictionary includes duplicate key `{key.ToString()}`");
-                        }
-                    }
-
-                    writtenFields?.Add(key);
-
                     var valuePath = new PathDictionaryValueUnpathable(path);
-                    dict[key] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(valueNode, fileIdentifier,valuePath, UserSettings) }, referencedValueType, originalValue, readerGlobals, recorderChildContext);
+                    yield return new ReaderDictionaryEntry { key = key, value = new ReaderNodeXml(valueNode, fileIdentifier, valuePath, UserSettings), valueType = referencedValueType, context = elementContext };
                 }
                 else
                 {
@@ -276,19 +258,6 @@ namespace Dec
                         continue;
                     }
 
-                    object originalValue = null;
-                    if (dict.Contains(key))
-                    {
-                        // Annoyingly the IDictionary interface does not allow for simultaneous retrieval and existence check a la .TryGetValue(), so we get to do a second lookup here
-                        // This is definitely not the common path, though, so, fine
-                        originalValue = dict[key];
-
-                        if (writtenFields == null || writtenFields.Contains(key))
-                        {
-                            Dbg.Err($"{elementContext}: Dictionary includes duplicate key `{key.ToString()}`");
-                        }
-                    }
-
                     Type valueType = referencedValueType;
                     if (recorderSettings.bespoke_keytypedict)
                     {
@@ -306,8 +275,6 @@ namespace Dec
                         valueType = (Type)key;
                     }
 
-                    writtenFields?.Add(key);
-
                     Path valuePath;
                     if (fieldElement.Name.LocalName.Contains('[') || fieldElement.Name.LocalName.Contains(']'))
                     {
@@ -319,7 +286,7 @@ namespace Dec
                         valuePath = new PathDictionaryValue(path, fieldElement.Name.LocalName);
                     }
 
-                    dict[key] = Serialization.ParseElement(new List<ReaderNodeParseable>() { new ReaderNodeXml(fieldElement, fileIdentifier, valuePath, UserSettings) }, valueType, originalValue, readerGlobals, recorderChildContext);
+                    yield return new ReaderDictionaryEntry { key = key, value = new ReaderNodeXml(fieldElement, fileIdentifier, valuePath, UserSettings), valueType = valueType, context = elementContext };
                 }
             }
         }

@@ -1439,7 +1439,7 @@ namespace Dec
 
                     var dict = (IDictionary)(result ?? Activator.CreateInstance(type));
 
-                    node.ParseDictionary(dict, keyType, valueType, globals, recSettings, permitPatch);
+                    ParseDictionary(dict, node, keyType, valueType, globals, recSettings, permitPatch);
 
                     result = dict;
                 }
@@ -1698,6 +1698,35 @@ namespace Dec
             Index.Register(ref result);
 
             return result;
+        }
+
+        // Fills dict from one layer's entries; permitPatch lets that layer override keys an earlier one set.
+        private static void ParseDictionary(IDictionary dict, ReaderNodeParseable node, Type keyType, Type valueType, ReaderGlobals globals, Recorder.Settings recSettings, bool permitPatch)
+        {
+            var recorderChildContext = recSettings.CreateChild();
+
+            // avoid the heap allocation if we can
+            var writtenFields = permitPatch ? new HashSet<object>() : null;
+
+            foreach (var entry in node.GetDictionaryEntries(keyType, valueType, globals, recSettings))
+            {
+                object originalValue = null;
+                if (dict.Contains(entry.key))
+                {
+                    // Annoyingly the IDictionary interface does not allow for simultaneous retrieval and existence check a la .TryGetValue(), so we get to do a second lookup here
+                    // This is definitely not the common path, though, so, fine
+                    originalValue = dict[entry.key];
+
+                    if (writtenFields == null || writtenFields.Contains(entry.key))
+                    {
+                        Dbg.Err($"{entry.context}: Dictionary includes duplicate key `{entry.key.ToString()}`");
+                    }
+                }
+
+                writtenFields?.Add(entry.key);
+
+                dict[entry.key] = ParseElement(new List<ReaderNodeParseable>() { entry.value }, entry.valueType, originalValue, globals, recorderChildContext);
+            }
         }
 
         // Whether a layer of this type that gives no mode replaces what came before it, as it does for containers and plain values.
