@@ -449,6 +449,7 @@ namespace Dec
                 // It's time to actually pull references out of the database, so let's stop spitting out empty warnings.
                 Database.SuppressEmptyWarning();
 
+                var reportedCycles = new HashSet<(Type, string)>();
                 foreach (var (id, orders) in toParseDecOrders)
                 {
                     // Accumulate our orders
@@ -457,6 +458,7 @@ namespace Dec
 
                     var currentOrder = orders;
                     var currentName = id.Item2;
+                    var visitedNames = new List<string> { currentName };
                     while (true)
                     {
                         // See if we have a parent
@@ -467,6 +469,18 @@ namespace Dec
                         }
 
                         var parentId = (id.Item1, decWithParent.parent);
+                        var cycleStart = visitedNames.IndexOf(decWithParent.parent);
+                        if (cycleStart != -1)
+                        {
+                            // Every dec that inherits from a cycle walks into it, so report each cycle once, whichever member the walk entered it at.
+                            var cycle = visitedNames.Skip(cycleStart).ToList();
+                            if (reportedCycles.Add((id.Item1, string.Join(",", cycle.OrderBy(name => name, StringComparer.Ordinal)))))
+                            {
+                                Dbg.Err($"{decWithParent.context}: Dec [{decWithParent.type}:{currentName}] is part of an inheritance cycle: {string.Join(" -> ", cycle.Append(decWithParent.parent))}");
+                            }
+                            break;
+                        }
+
                         if (!registeredDecOrders.TryGetValue(parentId, out var parentDec))
                         {
                             Dbg.Err($"{decWithParent.context}: Dec [{decWithParent.type}:{currentName}] is attempting to use parent `[{parentId.Item1}:{parentId.parent}]`, but no such dec exists");
@@ -478,6 +492,7 @@ namespace Dec
 
                         currentOrder = parentDec;
                         currentName = decWithParent.parent;
+                        visitedNames.Add(currentName);
                     }
 
                     var generatedOrders = completeOrders.Select(order => order.nodeFactory(new PathDec(id.Item1, id.Item2))).ToList();

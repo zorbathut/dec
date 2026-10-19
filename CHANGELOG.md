@@ -57,6 +57,7 @@ All notable changes to this project will be documented in this file.
 * A `T?` whose `T` has a Dynamic converter failed with an exception.
 * Redundant parse issues with deep dec inheritance from non-abstract parents.
 * The error for a missing parent named the dec at the bottom of the inheritance chain instead of the dec whose parent was missing.
+* A cycle of `parent` attributes hung `Parser.Finish()` forever; it's now reported as an error.
 
 
 ## [v0.11.1]

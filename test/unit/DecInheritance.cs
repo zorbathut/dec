@@ -206,6 +206,54 @@ namespace DecTest
         }
 
         [Test]
+        public void ParentCycle([Values] bool selfParent, [Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SimpleDec) } });
+
+            var cycle = selfParent ?
+                @"<SimpleDec decName=""LoopA"" parent=""LoopA""><defaulted>1</defaulted></SimpleDec>" :
+                @"<SimpleDec decName=""LoopA"" parent=""LoopB""><defaulted>1</defaulted></SimpleDec>
+                  <SimpleDec decName=""LoopB"" parent=""LoopA""><doubleOverridden>3</doubleOverridden></SimpleDec>";
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, $@"
+                <Decs>
+                    {cycle}
+                    <SimpleDec decName=""Leaf"" parent=""LoopA"">
+                        <overridden>2</overridden>
+                    </SimpleDec>
+                </Decs>");
+            int errors = 0;
+            ExpectErrors(() => parser.Finish(), err =>
+            {
+                errors++;
+                return err.Contains("LoopA");
+            });
+            Assert.AreEqual(1, errors);
+
+            DoParserTests(mode);
+
+            // Every dec reaching the cycle inherits each of its members once.
+            var expectedDoubleOverridden = selfParent ? 0 : 3;
+
+            var loopA = Dec.Database<SimpleDec>.Get("LoopA");
+            Assert.AreEqual(1, loopA.defaulted);
+            Assert.AreEqual(expectedDoubleOverridden, loopA.doubleOverridden);
+
+            if (!selfParent)
+            {
+                var loopB = Dec.Database<SimpleDec>.Get("LoopB");
+                Assert.AreEqual(1, loopB.defaulted);
+                Assert.AreEqual(3, loopB.doubleOverridden);
+            }
+
+            var leaf = Dec.Database<SimpleDec>.Get("Leaf");
+            Assert.AreEqual(1, leaf.defaulted);
+            Assert.AreEqual(2, leaf.overridden);
+            Assert.AreEqual(expectedDoubleOverridden, leaf.doubleOverridden);
+        }
+
+        [Test]
         public void AbstractOverride([Values] ParserMode mode)
         {
             UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SimpleDec) } });
