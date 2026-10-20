@@ -78,13 +78,118 @@ namespace Dec
         }
     }
 
+    // Carries a value-type field from Clone's write pass to its read pass without boxing it.
+    internal abstract class CloneSlot
+    {
+        internal abstract object Box();
+    }
+
+    internal sealed class CloneSlot<T> : CloneSlot
+    {
+        internal T value;
+
+        internal override object Box()
+        {
+            return value;
+        }
+    }
+
+    // Whether a field of type T clones as a plain copy of its value with nothing else happening, which is when Clone can carry it in a CloneSlot instead of through the general path.
+    internal static class CloneCopiedValue<T>
+    {
+        // Computed on first use rather than in a static initializer, so a converter lookup that throws is retried next time instead of breaking the type for good. A racing read can only see it unset or false, which recomputes or takes the general path.
+        private static bool? Cached;
+
+        internal static bool Applies()
+        {
+            if (!Cached.HasValue)
+            {
+                Cached = Compute();
+            }
+
+            return Cached.Value;
+        }
+
+        // Everything admitted here composes the same whenever it runs, with no references, lookups or user Record() involved, which is what lets a read of another type replay the skipped write later; widen this only to types that keep that true. Nullable is out because a null one boxes to null, which the replay can't take the type of.
+        private static bool Compute()
+        {
+            var type = typeof(T);
+            if (Nullable.GetUnderlyingType(type) != null)
+            {
+                return false;
+            }
+
+            // The general path runs these on the copy it hands back.
+            if (typeof(IPostCloneOriginal).IsAssignableFrom(type) || typeof(IPostCloneNew).IsAssignableFrom(type))
+            {
+                return false;
+            }
+
+            return type.IsEnum || UtilType.CanBeCloneCopied(type);
+        }
+    }
+
+    // Clone's recorders: a field CloneCopiedValue<T> admits goes from the write pass to the read pass in a CloneSlot, without boxing it, instead of through ComposeElement and ParseElement.
+    internal sealed class RecorderWriterClone : RecorderWriter
+    {
+        private readonly WriterNodeClone cloneNode;
+
+        internal RecorderWriterClone(WriterNodeClone node) : base(node)
+        {
+            cloneNode = node;
+        }
+
+        internal override void Record<T>(ref T value, string label, Parameters parameters)
+        {
+            if (!FieldAdmit(ref value, label, in parameters))
+            {
+                return;
+            }
+
+            // Shared() keeps the general path, which warns about it.
+            if (typeof(T).IsValueType && !parameters.shared && CloneCopiedValue<T>.Applies())
+            {
+                cloneNode.CreateRecorderChildValue(label, parameters.CreateSettings(), value);
+                return;
+            }
+
+            // Directly here rather than through a helper; see RecorderWriter.Record<T>.
+            Serialization.ComposeElement(cloneNode.CreateRecorderChild(label, parameters.CreateSettings()), value, typeof(T));
+        }
+    }
+
+    internal sealed class RecorderReaderClone : RecorderReader
+    {
+        internal RecorderReaderClone(ReaderNodeCloneRecorder node, ReaderGlobals globals) : base(node, globals)
+        {
+        }
+
+        internal override void Record<T>(ref T value, string label, Parameters parameters)
+        {
+            var recorded = FieldAdmit(ref value, label, in parameters);
+            if (recorded == null)
+            {
+                return;
+            }
+
+            // A clone view hands out nothing but its item, RecordAsThis's "" field included, since clone views don't allow AsThis.
+            if (typeof(T).IsValueType && ((ReaderNodeCloneRecorderItem)recorded).TryGetValue(out T copied))
+            {
+                value = copied;
+                return;
+            }
+
+            FieldRead(ref value, recorded, in parameters);
+        }
+    }
+
     // this process is pretty complicated
     // WriterNodeClone basically acts as a storage for all the data we need to clone something, which is, in some cases, accumulated gradually and not immediately
     // once it's all ready, *then* we can call GetResult() and get the actual clone, decorated with all its childrens' clones
     // thing is, this is a lazy process, so calling GetResult() also does all the work for its children
     // then we need some somewhat awkward ReaderNode subclasses for "this node, with children" and "the specific child that was requested"
     // I get the feeling that this implies a bunch of interfaces should be cleaned up, but I'm not doing that right now, so
-    internal class WriterNodeClone : WriterNodePooled
+    internal sealed class WriterNodeClone : WriterNodePooled
     {
         private WriterClone writer;
 
@@ -110,6 +215,10 @@ namespace Dec
 
         // Set when this node's resolution was deferred to a pending write, which then releases the node itself instead of its parent doing so.
         private bool resolvePending;
+
+        // A value-type field written without going through ComposeElement; see CreateRecorderChildValue. The slot stays with the node across reuse, and slotHeld says whether it carries this use's value.
+        private CloneSlot slot;
+        private bool slotHeld;
 
         // Created on first use and kept across reuse, as is the read view; most nodes are leaves and never need them.
         private List<(string key, WriterNodeClone value)> recorderChildren;
@@ -142,8 +251,9 @@ namespace Dec
             resultReady = false;
             resultIsValuelike = false;
             resolvePending = false;
+            slotHeld = false;
 
-            // Normally already empty; an exception partway through a resolution can leave children behind, and they're simply dropped.
+            // Normally already empty; an exception partway through a resolution can leave children behind, and they're simply dropped, slots and all.
             recorderChildren?.Clear();
         }
 
@@ -172,8 +282,10 @@ namespace Dec
                 return;
             }
 
-            foreach (var (_, child) in recorderChildren)
+            // In reverse, so the pool hands them back in recording order: the next object of the same type then gets each field's node back, slot type and all.
+            for (int i = recorderChildren.Count - 1; i >= 0; --i)
             {
+                var child = recorderChildren[i].value;
                 if (!child.resolvePending)
                 {
                     writer.NodeRelease(child);
@@ -240,6 +352,13 @@ namespace Dec
 
         public object GetResult(bool sharable, Type intendedType)
         {
+            if (slotHeld && !originalSet)
+            {
+                // A read that doesn't take the value straight from the slot gets the write the slot skipped, exactly as it would have run.
+                var boxed = slot.Box();
+                Serialization.ComposeElement(this, boxed, boxed.GetType());
+            }
+
             if (!resultReady)
             {
                 if (!originalSet)
@@ -837,6 +956,11 @@ namespace Dec
             ChildrenRelease();
         }
 
+        protected override RecorderWriter RecorderCreate()
+        {
+            return new RecorderWriterClone(this);
+        }
+
         public override WriterNode CreateRecorderChild(string label, Recorder.Settings settings)
         {
             if (recorderChildren == null)
@@ -847,6 +971,33 @@ namespace Dec
             var child = writer.NodeAcquire(depth + 1, settings, PathPending.Member(this, label));
             recorderChildren.Add((label, child));
             return child;
+        }
+
+        // For a field CloneCopiedValue<T> admits: the child holds the value itself, and the read pass takes it back out through TryGetValue.
+        internal void CreateRecorderChildValue<T>(string label, Recorder.Settings settings, T value)
+        {
+            var child = (WriterNodeClone)CreateRecorderChild(label, settings);
+            if (!(child.slot is CloneSlot<T> typed))
+            {
+                typed = new CloneSlot<T>();
+                child.slot = typed;
+            }
+
+            typed.value = value;
+            child.slotHeld = true;
+        }
+
+        // Leaves the value in place; a ConverterFactory's Create and Read can both read the same field.
+        internal bool TryGetValue<T>(out T value)
+        {
+            if (slotHeld && slot is CloneSlot<T> typed)
+            {
+                value = typed.value;
+                return true;
+            }
+
+            value = default;
+            return false;
         }
 
         public override WriterNode CreateReflectionChild(System.Reflection.FieldInfo field, Recorder.Settings settings)
@@ -1017,7 +1168,7 @@ namespace Dec
             this.UserSettings = userSettings;
             this.recorderChildren = recorderChildren;
             item = new ReaderNodeCloneRecorderItem(userSettings);
-            reader = new RecorderReader(this, new ReaderGlobals());
+            reader = new RecorderReaderClone(this, new ReaderGlobals());
         }
 
         // Readies the view and its reader for another read body, as if both were new.
@@ -1088,7 +1239,7 @@ namespace Dec
         }
     }
 
-    internal class ReaderNodeCloneRecorderItem : ReaderNode
+    internal sealed class ReaderNodeCloneRecorderItem : ReaderNode
     {
         public override bool AllowAsThis { get => false; }
         public override Recorder.Purpose Intent { get => Recorder.Purpose.Cloning; }
@@ -1105,6 +1256,11 @@ namespace Dec
         {
             this.item = item;
             return this;
+        }
+
+        internal bool TryGetValue<T>(out T value)
+        {
+            return item.TryGetValue(out value);
         }
 
         public override Context GetContext()

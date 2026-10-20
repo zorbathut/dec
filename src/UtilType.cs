@@ -760,6 +760,7 @@ namespace Dec
             return null;
         }
 
+        // Never cleared, and CloneCopiedValue<T> caches its answers for just as long; clearing this would need that cleared too.
         private static ConcurrentDictionary<Type, bool> CanBeCloneCopiedCache = new ConcurrentDictionary<Type, bool>();
         internal static bool CanBeCloneCopied(this Type type)
         {

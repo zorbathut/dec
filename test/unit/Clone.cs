@@ -634,6 +634,120 @@ namespace DecTest
             Assert.Less(extra, 5000, "Clone should not allocate per recorded field");
         }
 
+        public class CountedValues<T> : IRecordable
+        {
+            private static readonly string[] Labels = Enumerable.Range(0, 10).Select(i => $"field{i}").ToArray();
+
+            public int count;
+            public T[] values = new T[10];
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref count, nameof(count));
+                for (int i = 0; i < count; ++i)
+                {
+                    recorder.Record(ref values[i], Labels[i]);
+                }
+            }
+        }
+
+        private static void AssertNoAllocationPerValueField<T>(Func<int, T> make)
+        {
+            // As AllocationPerField, over value types: every clone owns the same fixed-size array, so the difference is what the extra fields cost.
+            List<CountedValues<T>> Make(int count)
+            {
+                return Enumerable.Range(0, 1000).Select(i => new CountedValues<T> { count = count, values = Enumerable.Range(0, 10).Select(make).ToArray() }).ToList();
+            }
+            var few = Make(5);
+            var many = Make(10);
+
+            CloneAllocatedBytes(few);
+            CloneAllocatedBytes(many);
+
+            long extra = CloneAllocatedBytes(many) - CloneAllocatedBytes(few);
+            Assert.Less(extra, 5000, "Clone should not allocate per recorded value-type field");
+        }
+
+        [Test]
+        public void AllocationPerValueField([Values(ValueFieldKind.Int, ValueFieldKind.Long, ValueFieldKind.Enum, ValueFieldKind.PiecewiseStruct, ValueFieldKind.ValuelikeStruct)] ValueFieldKind kind)
+        {
+            switch (kind)
+            {
+                case ValueFieldKind.Int:
+                    AssertNoAllocationPerValueField(i => i);
+                    break;
+                case ValueFieldKind.Long:
+                    AssertNoAllocationPerValueField(i => (long)i << 33);
+                    break;
+                case ValueFieldKind.Enum:
+                    AssertNoAllocationPerValueField(i => (ValueFieldEnum)(i % 3));
+                    break;
+                case ValueFieldKind.PiecewiseStruct:
+                    AssertNoAllocationPerValueField(i => new ValueFieldPiecewise { x = i });
+                    break;
+                case ValueFieldKind.ValuelikeStruct:
+                    UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ValueFieldValuelikeConverter) } });
+                    AssertNoAllocationPerValueField(i => new ValueFieldValuelike { x = i });
+                    break;
+                default:
+                    Assert.Fail($"No allocation case for {kind}");
+                    break;
+            }
+        }
+
+        // Records `count` fields cycling through four value types, so consecutive fields never share one.
+        public class CountedMixedValues : IRecordable
+        {
+            private static readonly string[] Labels = Enumerable.Range(0, 12).Select(i => $"field{i}").ToArray();
+
+            public int count;
+            public int[] ints = new int[3];
+            public long[] longs = new long[3];
+            public ValueFieldEnum[] enums = new ValueFieldEnum[3];
+            public ValueFieldPiecewise[] structs = new ValueFieldPiecewise[3];
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref count, nameof(count));
+                for (int i = 0; i < count; ++i)
+                {
+                    switch (i % 4)
+                    {
+                        case 0:
+                            recorder.Record(ref ints[i / 4], Labels[i]);
+                            break;
+                        case 1:
+                            recorder.Record(ref longs[i / 4], Labels[i]);
+                            break;
+                        case 2:
+                            recorder.Record(ref enums[i / 4], Labels[i]);
+                            break;
+                        default:
+                            recorder.Record(ref structs[i / 4], Labels[i]);
+                            break;
+                    }
+                }
+            }
+        }
+
+        [Test]
+        public void AllocationPerMixedValueField()
+        {
+            // Guards the order children go back to the node pool: each object's fields come back to the next object of the same type in the same order, so a field of one type never lands on a node holding another's.
+            List<CountedMixedValues> Make(int count)
+            {
+                return Enumerable.Range(0, 1000).Select(i => new CountedMixedValues { count = count, ints = new[] { i, i + 1, i + 2 }, longs = new[] { (long)i, i + 1L, i + 2L }, enums = new[] { ValueFieldEnum.First, ValueFieldEnum.Second, ValueFieldEnum.Third }, structs = new[] { new ValueFieldPiecewise { x = i }, new ValueFieldPiecewise { x = i + 1 }, new ValueFieldPiecewise { x = i + 2 } } }).ToList();
+            }
+            var few = Make(4);
+            var many = Make(12);
+
+            CloneAllocatedBytes(few);
+            CloneAllocatedBytes(many);
+
+            long extra = CloneAllocatedBytes(many) - CloneAllocatedBytes(few);
+            Assert.Less(extra, 5000, "Clone should not allocate per recorded value-type field");
+        }
+
         [Test]
         public void AllocationPerElement()
         {
