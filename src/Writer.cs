@@ -146,9 +146,15 @@ namespace Dec
             flaggedAsThis = false;
         }
 
-        protected virtual RecorderWriter RecorderAcquire()
+        // A node family that records its fields its own way hands out its own RecorderWriter subclass here.
+        protected virtual RecorderWriter RecorderCreate()
         {
             return new RecorderWriter(this);
+        }
+
+        protected virtual RecorderWriter RecorderAcquire()
+        {
+            return RecorderCreate();
         }
 
         // Every user Record() body on the write side runs through one of these, so its recorder is in scope for exactly as long as the body is running.
@@ -309,11 +315,11 @@ namespace Dec
             pathPending = path;
         }
 
-        protected override RecorderWriter RecorderAcquire()
+        protected sealed override RecorderWriter RecorderAcquire()
         {
             if (recorder == null)
             {
-                recorder = new RecorderWriter(this);
+                recorder = RecorderCreate();
             }
 
             recorder.Reset();

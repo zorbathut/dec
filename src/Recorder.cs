@@ -216,7 +216,7 @@ namespace Dec
             /// </summary>
             public Direction Mode { get => recorder.Mode; }
 
-            internal Settings CreateSettings()
+            internal readonly Settings CreateSettings()
             {
                 return new Settings() { factories = factories, shared = shared ? Settings.Shared.Allow : Settings.Shared.Deny, bespoke_keytypedict = bespoke_keytypedict };
             }
@@ -553,6 +553,14 @@ namespace Dec
         }
     }
 
+    // What a recorder's field checks decided about one field.
+    internal enum RecorderFieldAdmission
+    {
+        Refused,
+        AsThis,
+        Child,
+    }
+
     internal class RecorderWriter : Recorder
     {
         private bool asThis = false;
@@ -577,16 +585,39 @@ namespace Dec
 
         internal override void Record<T>(ref T value, string label, Parameters parameters)
         {
+            if (FieldAdmit(ref value, label, in parameters))
+            {
+                // Keep this call directly in Record<T>, here and in every override: on .NET 10 with dynamic PGO, the JIT inlines ComposeElement into each Record<T> instantiation, which makes a field-heavy Checksum measurably faster, but not when the call sits inside a helper, even an inlined one.
+                Serialization.ComposeElement(node.CreateRecorderChild(label, parameters.CreateSettings()), value, typeof(T));
+            }
+        }
+
+        // The checks every field write makes. False when the field was refused, or when RecordAsThis has already written it in place of this object; true when it's still to be written as a child.
+        protected bool FieldAdmit<T>(ref T value, string label, in Parameters parameters)
+        {
+            var admission = FieldCheck(label, in parameters);
+            if (admission == RecorderFieldAdmission.AsThis)
+            {
+                Serialization.ComposeElement(node, value, typeof(T), asThis: true);
+                return false;
+            }
+
+            return admission == RecorderFieldAdmission.Child;
+        }
+
+        // Apart from FieldAdmit so the checks are written once in IL instead of once per field type; the JIT may still inline a copy into each Record<T>.
+        private RecorderFieldAdmission FieldCheck(string label, in Parameters parameters)
+        {
             if (!IsInnermost())
             {
                 Dbg.Err($"Attempted to record `{label}` through a Recorder outside the Record() call it was passed to; skipping it. A Recorder is valid only on the calling thread, until its Record() call returns, and not while a nested object's Record() is running.");
-                return;
+                return RecorderFieldAdmission.Refused;
             }
 
             if (asThis)
             {
                 Dbg.Err($"Attempting to write a second field after a RecordAsThis call");
-                return;
+                return RecorderFieldAdmission.Refused;
             }
 
             if (parameters.asThis)
@@ -594,7 +625,7 @@ namespace Dec
                 if (fields.Count > 0)
                 {
                     Dbg.Err($"Attempting to make a RecordAsThis call after writing a field");
-                    return;
+                    return RecorderFieldAdmission.Refused;
                 }
 
                 asThis = true;
@@ -602,24 +633,22 @@ namespace Dec
                 if (!node.FlagAsThis())
                 {
                     // just give up and skip it
-                    return;
+                    return RecorderFieldAdmission.Refused;
                 }
 
                 if (node.AllowAsThis)
                 {
-                    Serialization.ComposeElement(node, value, typeof(T), asThis: true);
-
-                    return;
+                    return RecorderFieldAdmission.AsThis;
                 }
             }
 
             if (!fields.Add(label))
             {
                 Dbg.Err($"Field `{label}` written multiple times");
-                return;
+                return RecorderFieldAdmission.Refused;
             }
 
-            Serialization.ComposeElement(node.CreateRecorderChild(label, parameters.CreateSettings()), value, typeof(T));
+            return RecorderFieldAdmission.Child;
         }
 
         public override Direction Mode { get => Direction.Write; }
@@ -730,30 +759,54 @@ namespace Dec
 
         internal override void Record<T>(ref T value, string label, Parameters parameters)
         {
+            var recorded = FieldAdmit(ref value, label, in parameters);
+            if (recorded != null)
+            {
+                FieldRead(ref value, recorded, in parameters);
+            }
+        }
+
+        // The checks every field read makes. Null when there's nothing more to do: the field was refused, isn't present, or RecordAsThis has already read this object; otherwise the child to read the field from.
+        protected ReaderNode FieldAdmit<T>(ref T value, string label, in Parameters parameters)
+        {
+            var admission = FieldCheck(label, in parameters, out var recorded);
+            if (admission == RecorderFieldAdmission.AsThis)
+            {
+                // Explicit cast here because we want an error if we have the wrong type!
+                // This shouldn't need ParseElementTypd because it's guaranteed to have a valid input.
+                var asThisNodes = node is ReaderNodeParseable nodeParseable ? new List<ReaderNodeParseable>() { nodeParseable } : ((ReaderNodeLayers)node).Layers;
+                value = (T)Serialization.ParseElement(asThisNodes, typeof(T), value, readerGlobals, parameters.CreateSettings(), asThis: true);
+                return null;
+            }
+
+            return recorded;
+        }
+
+        // Apart from FieldAdmit so the checks are written once in IL instead of once per field type; the JIT may still inline a copy into each Record<T>.
+        private RecorderFieldAdmission FieldCheck(string label, in Parameters parameters, out ReaderNode recorded)
+        {
             if (!IsInnermost())
             {
                 Dbg.Err($"{node.GetContext()}: Attempted to read `{label}` through a Recorder outside the Record() call it was passed to; skipping it. A Recorder is valid only on the calling thread, until its Record() call returns, and not while a nested object's Record() is running.");
-                return;
+                recorded = null;
+                return RecorderFieldAdmission.Refused;
             }
 
             if (asThis)
             {
                 Dbg.Err($"{node.GetContext()}: Attempting to read a second field after a RecordAsThis call");
-                return;
+                recorded = null;
+                return RecorderFieldAdmission.Refused;
             }
 
             if (parameters.asThis)
             {
                 asThis = true;
 
-                var asThisNodes = node is ReaderNodeParseable nodeParseable ? new List<ReaderNodeParseable>() { nodeParseable } : (node as ReaderNodeLayers)?.Layers;
-                if (node.AllowAsThis && asThisNodes != null)
+                if (node.AllowAsThis && (node is ReaderNodeParseable || node is ReaderNodeLayers))
                 {
-                    // Explicit cast here because we want an error if we have the wrong type!
-                    // This shouldn't need ParseElementTypd because it's guaranteed to have a valid input.
-                    value = (T)Serialization.ParseElement(asThisNodes, typeof(T), value, readerGlobals, parameters.CreateSettings(), asThis: true);
-
-                    return;
+                    recorded = null;
+                    return RecorderFieldAdmission.AsThis;
                 }
             }
 
@@ -762,10 +815,10 @@ namespace Dec
                 Dbg.Err($"{node.GetContext()}: Shared object used in a context that disallows shared objects (probably ConverterFactory<>.Create())");
             }
 
-            var recorded = node.GetChildNamed(label);
+            recorded = node.GetChildNamed(label);
             if (recorded == null)
             {
-                return;
+                return RecorderFieldAdmission.Refused;
             }
 
             // Only labels whose element exists are ever added, so a repeat always gets this far.
@@ -774,6 +827,11 @@ namespace Dec
                 Dbg.Wrn($"{node.GetContext()}: Field `{label}` read multiple times");
             }
 
+            return RecorderFieldAdmission.Child;
+        }
+
+        protected void FieldRead<T>(ref T value, ReaderNode recorded, in Parameters parameters)
+        {
             // Avoid an explicit cast because that can cause null reference errors
             var result = recorded.ParseElement(typeof(T), value, readerGlobals, parameters.CreateSettings());
             if (result != null)
