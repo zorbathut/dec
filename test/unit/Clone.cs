@@ -630,8 +630,7 @@ namespace DecTest
             CloneAllocatedBytes(few);
             CloneAllocatedBytes(many);
 
-            long extra = CloneAllocatedBytes(many) - CloneAllocatedBytes(few);
-            Assert.Less(extra, 5000, "Clone should not allocate per recorded field");
+            AssertAllocatesLess(() => CloneAllocatedBytes(many) - CloneAllocatedBytes(few), 5000, "Clone should not allocate per recorded field");
         }
 
         public class CountedValues<T> : IRecordable
@@ -664,8 +663,7 @@ namespace DecTest
             CloneAllocatedBytes(few);
             CloneAllocatedBytes(many);
 
-            long extra = CloneAllocatedBytes(many) - CloneAllocatedBytes(few);
-            Assert.Less(extra, 5000, "Clone should not allocate per recorded value-type field");
+            AssertAllocatesLess(() => CloneAllocatedBytes(many) - CloneAllocatedBytes(few), 5000, "Clone should not allocate per recorded value-type field");
         }
 
         [Test]
@@ -744,8 +742,7 @@ namespace DecTest
             CloneAllocatedBytes(few);
             CloneAllocatedBytes(many);
 
-            long extra = CloneAllocatedBytes(many) - CloneAllocatedBytes(few);
-            Assert.Less(extra, 5000, "Clone should not allocate per recorded value-type field");
+            AssertAllocatesLess(() => CloneAllocatedBytes(many) - CloneAllocatedBytes(few), 5000, "Clone should not allocate per recorded value-type field");
         }
 
         [Test]
@@ -759,8 +756,7 @@ namespace DecTest
             CloneAllocatedBytes(strings);
             CloneAllocatedBytes(nulls);
 
-            long extra = CloneAllocatedBytes(strings) - CloneAllocatedBytes(nulls);
-            Assert.Less(extra, 2000, "Clone should not allocate per list element");
+            AssertAllocatesLess(() => CloneAllocatedBytes(strings) - CloneAllocatedBytes(nulls), 2000, "Clone should not allocate per list element");
         }
 
         public struct StringRecordable : IRecordable
@@ -788,8 +784,7 @@ namespace DecTest
             CloneAllocatedBytes(small);
             CloneAllocatedBytes(large);
 
-            long extra = CloneAllocatedBytes(large) - CloneAllocatedBytes(small);
-            Assert.Less(extra, 1000 * 90, "Clone should allocate nothing per struct element beyond its boxes and list growth");
+            AssertAllocatesLess(() => CloneAllocatedBytes(large) - CloneAllocatedBytes(small), 1000 * 90, "Clone should allocate nothing per struct element beyond its boxes and list growth");
         }
 
         public class ClonePathProbe : IRecordable

@@ -863,8 +863,7 @@ namespace DecTest
             ChecksumAllocatedBytes(small);
             ChecksumAllocatedBytes(large);
 
-            long extra = ChecksumAllocatedBytes(large) - ChecksumAllocatedBytes(small);
-            Assert.Less(extra, 1000, "Checksum should not allocate per list element");
+            AssertAllocatesLess(() => ChecksumAllocatedBytes(large) - ChecksumAllocatedBytes(small), 1000, "Checksum should not allocate per list element");
         }
 
         private class StringFields : Dec.IRecordable
@@ -893,8 +892,7 @@ namespace DecTest
             ChecksumAllocatedBytes(few);
             ChecksumAllocatedBytes(many);
 
-            long extra = ChecksumAllocatedBytes(many) - ChecksumAllocatedBytes(few);
-            Assert.Less(extra, 1000, "Checksum should not allocate per recorded field");
+            AssertAllocatesLess(() => ChecksumAllocatedBytes(many) - ChecksumAllocatedBytes(few), 1000, "Checksum should not allocate per recorded field");
         }
 
         private struct IntRecordable : Dec.IRecordable
@@ -918,8 +916,7 @@ namespace DecTest
             ChecksumAllocatedBytes(recordables);
             ChecksumAllocatedBytes(ints);
 
-            long extra = ChecksumAllocatedBytes(recordables) - ChecksumAllocatedBytes(ints);
-            Assert.Less(extra, 1000, "Checksum should not allocate per Record() call");
+            AssertAllocatesLess(() => ChecksumAllocatedBytes(recordables) - ChecksumAllocatedBytes(ints), 1000, "Checksum should not allocate per Record() call");
         }
     }
 }

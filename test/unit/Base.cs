@@ -248,6 +248,18 @@ namespace DecTest
             ExpectGeneral(action, context, ExpectationType.Disallow, null, ExpectationType.Expect, errorValidator);
         }
 
+        // GC.GetAllocatedBytesForCurrentThread now and then counts a few KB of the thread's allocation buffer that nothing was allocated in, so a measurement at or over the limit is taken again, up to three times in all; a real allocation shows up on every attempt.
+        protected static void AssertAllocatesLess(Func<long> measure, long limit, string message)
+        {
+            long extra = measure();
+            for (int attempt = 1; attempt < 3 && extra >= limit; ++attempt)
+            {
+                extra = Math.Min(extra, measure());
+            }
+
+            Assert.Less(extra, limit, message);
+        }
+
         protected void ExpectWarningsAndErrors(Action action,
             Func<string, bool> warningValidator, Func<string, bool> errorValidator, string context = "unlabeled context")
         {
