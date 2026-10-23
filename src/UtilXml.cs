@@ -21,15 +21,19 @@ namespace Dec
         internal static XElement ElementNamed(this XElement root, string name, Context context)
         {
             // this is basically SingleOrDefaultChecked with an inline error message, which proved difficult to get the right way
+            // A plain loop rather than a Where, which would add a closure and a second iterator on every field a Record() reads.
             XElement result = null;
-            bool first = true;
 
-            foreach (var element in root.Elements().Where(child => child.Name.LocalName == name))
+            foreach (var element in root.Elements())
             {
-                if (first)
+                if (element.Name.LocalName != name)
+                {
+                    continue;
+                }
+
+                if (result == null)
                 {
                     result = element;
-                    first = false;
                 }
                 else
                 {
