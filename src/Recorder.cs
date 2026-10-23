@@ -891,13 +891,14 @@ namespace Dec
 
         private void ReportUnusedFields(ReaderNode layer)
         {
-            // Check for unused text content when no fields were accessed
-            if (layer.HasText() && !ReadFrom(layer))
+            var allChildren = layer.GetAllChildren();
+
+            // Check for unused text content when no fields were read from this layer; ReadFrom first, since HasText can scan every child.
+            if (!ReadFrom(layer, allChildren) && layer.HasText())
             {
                 Dbg.Err($"{layer.GetContext()}: XML contains text content which was ignored, and no fields were read from this object; the text will be ignored and the object will be left with default values.");
             }
 
-            var allChildren = layer.GetAllChildren();
             if (layer == node && seen.Count == allChildren.Length)
             {
                 // we only register things that existed
@@ -916,14 +917,14 @@ namespace Dec
         }
 
         // Whether any field was read from this layer; a field read from another layer doesn't count.
-        private bool ReadFrom(ReaderNode layer)
+        private bool ReadFrom(ReaderNode layer, string[] allChildren)
         {
             if (layer == node)
             {
                 return seen.Count > 0;
             }
 
-            foreach (var name in layer.GetAllChildren())
+            foreach (var name in allChildren)
             {
                 if (seen.Contains(name))
                 {
