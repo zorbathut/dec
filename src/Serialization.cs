@@ -1244,8 +1244,8 @@ namespace Dec
 
                 foreach (var (parseCommand, node) in orders)
                 {
-                    // Only text left at this point is a byte[] layer's base64.
-                    if (HasImportantText(node))
+                    // Only text left at this point is a byte[] layer's base64. The flag skips the text scan when no layer had any.
+                    if (hasImportantText && HasImportantText(node))
                     {
                         var decoded = ParseBase64(node, null);
                         if (parseCommand == ParseCommand.Append && result != null)
