@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using NUnit.Framework;
 
 namespace DecTest
@@ -256,6 +257,88 @@ namespace DecTest
 
             Assert.AreEqual(original.data, deserialized.data);
             Assert.AreSame(deserialized.data, deserialized.data2);
+        }
+
+        [Test]
+        public void RecorderArrayRefWrapped([Range(10, 12)] int length)
+        {
+            var original = new ByteArrayRecordable();
+            original.data = new byte[length];
+            for (int i = 0; i < length; i++)
+            {
+                original.data[i] = (byte)(i * 2);
+            }
+            original.data2 = original.data;
+
+            // Break the shared array's base64 across indented lines by hand, as if the save had been edited.
+            var doc = System.Xml.Linq.XDocument.Parse(Dec.Recorder.Write(original));
+            var reference = doc.Root.Element("refs").Elements().Single();
+            var base64 = reference.Value;
+            var wrapped = new System.Text.StringBuilder();
+            for (int i = 0; i < base64.Length; i += 4)
+            {
+                wrapped.Append("\n            ").Append(base64, i, Math.Min(4, base64.Length - i));
+            }
+            wrapped.Append("\n        ");
+            reference.Value = wrapped.ToString();
+
+            var deserialized = Dec.Recorder.Read<ByteArrayRecordable>(doc.ToString(System.Xml.Linq.SaveOptions.DisableFormatting));
+
+            Assert.AreEqual(original.data, deserialized.data);
+            Assert.AreSame(deserialized.data, deserialized.data2);
+        }
+
+        [Test]
+        public void WhitespaceOnly([Values] ParserMode mode, [Values] bool forceFallbackArray)
+        {
+            Dec.Config.TestForceFallbackEmit = forceFallbackArray;
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ByteArrayDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <ByteArrayDec decName=""TestDec"">
+                        <dataEmpty>
+                        </dataEmpty>
+                        <dataProvided>
+                        </dataProvided>
+                    </ByteArrayDec>
+                </Decs>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            var result = Dec.Database<ByteArrayDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(new byte[0], result.dataEmpty);
+            Assert.AreEqual(new byte[0], result.dataProvided);
+        }
+
+        [Test]
+        public void Base64Wrapped([Values] ParserMode mode, [Values] bool forceFallbackArray)
+        {
+            Dec.Config.TestForceFallbackEmit = forceFallbackArray;
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ByteArrayDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <ByteArrayDec decName=""TestDec"">
+                        <dataEmpty>
+                            AQID
+                            BAU=
+                        </dataEmpty>
+                    </ByteArrayDec>
+                </Decs>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            var result = Dec.Database<ByteArrayDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(new byte[] { 1, 2, 3, 4, 5 }, result.dataEmpty);
         }
 
         [Test]

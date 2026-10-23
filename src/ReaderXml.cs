@@ -73,18 +73,33 @@ namespace Dec
 
         public override int[] GetArrayDimensions(int rank)
         {
-            // Special case: if this is a 1D array with text content and no children,
-            // it's likely a base64-encoded byte array
-            if (rank == 1 && !xml.HasElements && xml.GetText() != null)
+            // Special case: if this is a 1D array with text content and no children, it's likely a base64-encoded byte array
+            string base64Text = rank == 1 && !xml.HasElements ? xml.GetText() : null;
+            if (base64Text != null)
             {
-                string base64Text = xml.GetText();
-
-                // Calculate byte array length from base64 string length without full parsing
+                // Calculate byte array length from base64 string length without full parsing, not counting the whitespace decoding skips, so an element holding only whitespace is an empty array
                 // Base64 length formula: (base64Length / 4) * 3, minus padding
-                int base64Length = base64Text.Length;
+                int base64Length = 0;
+                foreach (char c in base64Text)
+                {
+                    if (!char.IsWhiteSpace(c))
+                    {
+                        ++base64Length;
+                    }
+                }
+
                 int padding = 0;
-                if (base64Text.EndsWith("==")) padding = 2;
-                else if (base64Text.EndsWith("=")) padding = 1;
+                for (int i = base64Text.Length - 1; i >= 0 && padding < 2; --i)
+                {
+                    if (base64Text[i] == '=')
+                    {
+                        ++padding;
+                    }
+                    else if (!char.IsWhiteSpace(base64Text[i]))
+                    {
+                        break;
+                    }
+                }
 
                 int estimatedByteLength = (base64Length / 4) * 3 - padding;
                 return new int[] { estimatedByteLength };

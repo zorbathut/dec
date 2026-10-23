@@ -1275,6 +1275,19 @@ namespace DecTest
         }
 
         [Test]
+        public void LayerArrayAppendWhitespace([Values] ParserMode mode)
+        {
+            var parser = LayerParser(
+                "<array><li>1</li></array>",
+                "<array mode=\"append\">\n                </array>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            CollectionAssert.AreEqual(new[] { 1 }, Leaf().array);
+        }
+
+        [Test]
         public void LayerDuplicateField([Values] ParserMode mode)
         {
             var parser = LayerParser(

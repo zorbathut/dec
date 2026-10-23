@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using NUnit.Framework;
 
 
@@ -48,6 +49,64 @@ namespace DecTest
 
             Assert.AreEqual(result.dataEmpty, new[] { 10, 9, 8, 7, 6 });
             Assert.AreEqual(result.dataProvided, new[] { 10, 9, 8, 7, 6 });
+        }
+
+        [Test]
+        public void WhitespaceOnly([Values] ParserMode mode, [Values] bool forceFallbackArray)
+        {
+            Dec.Config.TestForceFallbackEmit = forceFallbackArray;
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(ArrayDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <ArrayDec decName=""TestDec"">
+                        <dataEmpty>
+                        </dataEmpty>
+                        <dataProvided>
+                        </dataProvided>
+                    </ArrayDec>
+                </Decs>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            var result = Dec.Database<ArrayDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual(new int[0], result.dataEmpty);
+            Assert.AreEqual(new int[0], result.dataProvided);
+        }
+
+        public class IntArrayRecordable : Dec.IRecordable
+        {
+            public int[] data;
+            public int[] data2;
+
+            public void Record(Dec.Recorder record)
+            {
+                record.Shared().Record(ref data, "data");
+                record.Shared().Record(ref data2, "data2");
+            }
+        }
+
+        [Test]
+        public void RecorderRefWhitespaceOnly()
+        {
+            var original = new IntArrayRecordable();
+            original.data = new int[0];
+            original.data2 = original.data;
+
+            // Indent the shared array's reference element by hand, as if the save had been edited.
+            var doc = System.Xml.Linq.XDocument.Parse(Dec.Recorder.Write(original));
+            var reference = doc.Root.Element("refs").Elements().Single();
+            Assert.IsFalse(reference.HasElements);
+            reference.Value = "\n            ";
+
+            var deserialized = Dec.Recorder.Read<IntArrayRecordable>(doc.ToString(System.Xml.Linq.SaveOptions.DisableFormatting));
+
+            Assert.AreEqual(new int[0], deserialized.data);
+            Assert.AreSame(deserialized.data, deserialized.data2);
         }
 
         [Test]

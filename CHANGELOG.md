@@ -71,6 +71,7 @@ All notable changes to this project will be documented in this file.
 * A `Record()` that reads into a freshly created container lost the parent dec's entries.
 * A `mode="patch"` dictionary with a custom key comparer didn't report keys its comparer considered duplicates.
 * Awkward error report interactions with Record(), indentation, and unknown fields.
+* Parse issues with arrays containing nothing but whitespace getting confused with base64 arrays.
 
 
 ## [v0.11.1]
