@@ -904,5 +904,96 @@ namespace DecTest
             Assert.IsNotNull(dec);
             Assert.AreEqual(19, dec.data.data);
         }
+
+        [Test]
+        public void IndentedUnknownChild([ValuesExcept(ParserMode.Validation)] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SomeChunkOfDataDec) }, explicitConverters = new Type[] { typeof(ConverterSomeChunkOfData) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <SomeChunkOfDataDec decName=""TestDec"">
+                        <data>
+                            <dta>42</dta>
+                        </data>
+                    </SomeChunkOfDataDec>
+                </Decs>");
+            int warnings = 0;
+            ExpectWarnings(() => parser.Finish(), warning => { ++warnings; return warning.Contains("dta"); });
+            Assert.AreEqual(1, warnings);
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(19, Dec.Database<SomeChunkOfDataDec>.Get("TestDec").data.data);
+        }
+
+        [Test]
+        public void IndentedEmpty([ValuesExcept(ParserMode.Validation)] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SomeChunkOfDataDec) }, explicitConverters = new Type[] { typeof(ConverterSomeChunkOfData) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <SomeChunkOfDataDec decName=""TestDec"">
+                        <data>
+                        </data>
+                    </SomeChunkOfDataDec>
+                </Decs>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(19, Dec.Database<SomeChunkOfDataDec>.Get("TestDec").data.data);
+        }
+
+        [Test]
+        public void ContainsTextAfterComment([ValuesExcept(ParserMode.Validation)] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SomeChunkOfDataDec) }, explicitConverters = new Type[] { typeof(ConverterSomeChunkOfData) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <SomeChunkOfDataDec decName=""TestDec"">
+                        <data>
+                            <!-- a note -->
+                            42
+                        </data>
+                    </SomeChunkOfDataDec>
+                </Decs>");
+            int errors = 0;
+            ExpectErrors(() => parser.Finish(), err => { ++errors; return true; });
+            Assert.AreEqual(1, errors);
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(19, Dec.Database<SomeChunkOfDataDec>.Get("TestDec").data.data);
+        }
+
+        [Test]
+        public void IndentedUnknownChildInLayer([ValuesExcept(ParserMode.Validation)] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(SomeChunkOfDataDec) }, explicitConverters = new Type[] { typeof(ConverterSomeChunkOfData) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <SomeChunkOfDataDec decName=""Base"" abstract=""true""><data><data>5</data></data></SomeChunkOfDataDec>
+                    <SomeChunkOfDataDec decName=""TestDec"" parent=""Base"">
+                        <data>
+                            <dta>42</dta>
+                        </data>
+                    </SomeChunkOfDataDec>
+                </Decs>");
+            int warnings = 0;
+            ExpectWarnings(() => parser.Finish(), warning => { ++warnings; return warning.Contains("dta"); });
+            Assert.AreEqual(1, warnings);
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(5, Dec.Database<SomeChunkOfDataDec>.Get("TestDec").data.data);
+        }
     }
 }

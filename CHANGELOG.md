@@ -69,6 +69,7 @@ All notable changes to this project will be documented in this file.
 * Contents of a parent dec or base mod that a later layer replaced were still built, so they took `[Dec.Index]` slots and stayed referenced by internal lookup tables forever. That included dictionary values a `mode="patch"` layer replaced, and members of `IRecordable` and converter-based objects.
 * A `Record()` that reads into a freshly created container lost the parent dec's entries.
 * A `mode="patch"` dictionary with a custom key comparer didn't report keys its comparer considered duplicates.
+* Awkward error report interactions with Record(), indentation, and unknown fields.
 
 
 ## [v0.11.1]

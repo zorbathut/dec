@@ -81,6 +81,20 @@ namespace Dec
             return element.Nodes().OfType<XText>().FirstOrDefault()?.Value;
         }
 
+        // Checks every text node, not just the first: a comment can split indentation from real text.
+        internal static bool HasNonWhitespaceText(this XElement element)
+        {
+            foreach (var node in element.Nodes())
+            {
+                if (node is XText text && !string.IsNullOrWhiteSpace(text.Value))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         internal static XDocument ParseSafely(System.IO.TextReader input, string identifier)
         {
             var settings = new XmlReaderSettings

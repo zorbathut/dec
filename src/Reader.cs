@@ -50,6 +50,7 @@ namespace Dec
 
         public abstract ReaderNode GetChildNamed(string name);
         public abstract string[] GetAllChildren();
+        // Text that isn't just whitespace; the indentation around a pretty-printed element's children doesn't count.
         public abstract bool HasText();
 
         public abstract int[] GetArrayDimensions(int rank);
@@ -157,11 +158,6 @@ namespace Dec
         public abstract string GetMetadata(Metadata metadata);
         public abstract string GetMetadataUnrecognized();
         public abstract string GetText();
-
-        public override bool HasText()
-        {
-            return !string.IsNullOrEmpty(GetText());
-        }
 
         public abstract bool HasChildren();
 

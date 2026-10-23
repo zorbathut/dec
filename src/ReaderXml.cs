@@ -44,6 +44,11 @@ namespace Dec
             return xml.GetText();
         }
 
+        public override bool HasText()
+        {
+            return xml.HasNonWhitespaceText();
+        }
+
         public override string GetMetadata(Metadata metadata)
         {
             return xml.Attribute(metadata.ToLowerString())?.Value;
