@@ -75,7 +75,7 @@ namespace Dec
         {
             // Special case: if this is a 1D array with text content and no children,
             // it's likely a base64-encoded byte array
-            if (rank == 1 && xml.GetText() != null && !xml.Elements().Any())
+            if (rank == 1 && !xml.HasElements && xml.GetText() != null)
             {
                 string base64Text = xml.GetText();
 
