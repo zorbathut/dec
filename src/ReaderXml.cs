@@ -16,6 +16,12 @@ namespace Dec
         private string fileIdentifier;
         private Path path;
 
+        // An element with more children than this indexes them by name after its first lookup, instead of scanning them for every field.
+        internal const int ChildIndexThreshold = 16;
+
+        // Each child name's first element, or null for a name that appears more than once.
+        private Dictionary<string, XElement> childIndex;
+
         public ReaderNodeXml(XElement xml, string fileIdentifier, Path path, Recorder.IUserSettings userSettings)
         {
             this.UserSettings = userSettings;
@@ -31,9 +37,39 @@ namespace Dec
 
         public override ReaderNode GetChildNamed(string name)
         {
-            var child = xml.ElementNamed(name, GetContext());
+            var child = ChildNamed(name);
             return child == null ? null : new ReaderNodeXml(child, fileIdentifier, new PathMember(path, name), UserSettings);
         }
+
+        private XElement ChildNamed(string name)
+        {
+            if (childIndex == null)
+            {
+                var found = xml.ElementNamed(name, GetContext(), out int elementsScanned);
+                if (elementsScanned > ChildIndexThreshold)
+                {
+                    childIndex = new Dictionary<string, XElement>(elementsScanned);
+                    foreach (var element in xml.Elements())
+                    {
+                        if (!childIndex.TryAdd(element.Name.LocalName, element))
+                        {
+                            childIndex[element.Name.LocalName] = null;
+                        }
+                    }
+                }
+
+                return found;
+            }
+
+            if (!childIndex.TryGetValue(name, out var child))
+            {
+                return null;
+            }
+
+            // A repeated name goes back through ElementNamed, which reports it and hands back its first element.
+            return child ?? xml.ElementNamed(name, GetContext(), out _);
+        }
+
         public override string[] GetAllChildren()
         {
             return xml.Elements().Select(e => e.Name.LocalName).ToArray();

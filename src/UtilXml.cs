@@ -18,14 +18,17 @@ namespace Dec
             }
         }
 
-        internal static XElement ElementNamed(this XElement root, string name, Context context)
+        // elementsScanned falls short of the child count only when the search stops at a duplicate.
+        internal static XElement ElementNamed(this XElement root, string name, Context context, out int elementsScanned)
         {
             // this is basically SingleOrDefaultChecked with an inline error message, which proved difficult to get the right way
             // A plain loop rather than a Where, which would add a closure and a second iterator on every field a Record() reads.
             XElement result = null;
+            elementsScanned = 0;
 
             foreach (var element in root.Elements())
             {
+                ++elementsScanned;
                 if (element.Name.LocalName != name)
                 {
                     continue;
@@ -49,7 +52,7 @@ namespace Dec
 
         internal static XElement ElementNamedWithFallback(this XElement root, string name, Context context, string errorPrefix)
         {
-            var result = ElementNamed(root, name, context);
+            var result = ElementNamed(root, name, context, out _);
             if (result != null)
             {
                 // yay
