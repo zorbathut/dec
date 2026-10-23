@@ -147,6 +147,34 @@ namespace DecBenchmark
         }
     }
 
+    // A Record() with however many int fields it's built with, labeled f0, f1, and so on; the labels come from a table so recording them allocates nothing.
+    public class WideRecordable : IRecordable
+    {
+        public static readonly string[] Labels = Enumerable.Range(0, 64).Select(i => "f" + i).ToArray();
+
+        public int count;
+        public int[] values;
+
+        public void Record(Recorder recorder)
+        {
+            recorder.Record(ref count, nameof(count));
+            if (values == null)
+            {
+                values = new int[count];
+            }
+
+            for (int i = 0; i < count; ++i)
+            {
+                recorder.Record(ref values[i], Labels[i]);
+            }
+        }
+
+        public static WideRecordable Create(int count, int seed)
+        {
+            return new WideRecordable { count = count, values = Enumerable.Range(seed, count).ToArray() };
+        }
+    }
+
     // Plain class with no IRecordable — exercises the reflection fallback path during Dec parsing
     public class ReflectionData
     {
@@ -1080,6 +1108,37 @@ namespace DecBenchmark
         [Benchmark] public string WriteManyFields() => Recorder.Write(manyFields);
         [Benchmark] public ManyFieldsRecordable ReadManyFields() => Recorder.Read<ManyFieldsRecordable>(manyFieldsSerialized);
         [Benchmark] public ManyFieldsRecordable CloneManyFields() => Recorder.Clone(manyFields);
+    }
+
+    // Reading objects with many Record() fields, where each field is looked up among all of the object's elements.
+    [MemoryDiagnoser]
+    public class WideRecordableBenchmarks : BenchmarkBase
+    {
+        [Params(4, 8, 16, 32, 64)]
+        public int Fields;
+
+        private string serialized;
+
+        [GlobalSetup]
+        public void Setup()
+        {
+            SetupDec();
+            FinishParser();
+
+            serialized = Recorder.Write(Enumerable.Range(0, 200).Select(i => WideRecordable.Create(Fields, i)).ToList());
+        }
+
+        [GlobalCleanup]
+        public void Cleanup()
+        {
+            CleanupDec();
+        }
+
+        [Benchmark]
+        public List<WideRecordable> Read()
+        {
+            return Recorder.Read<List<WideRecordable>>(serialized);
+        }
     }
 
     [MemoryDiagnoser]
