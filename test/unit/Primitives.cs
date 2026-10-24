@@ -181,6 +181,28 @@ namespace DecTest
             Assert.AreEqual("", result.value);
         }
 
+        [Test]
+        public void SpecialCharacterStringParse([Values] ParserMode mode)
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitTypes = new Type[] { typeof(StringDec) } });
+
+            var parser = new Dec.Parser();
+            parser.AddString(Dec.Parser.FileType.Xml, @"
+                <Decs>
+                    <StringDec decName=""TestDec"">
+                        <value>quote "" backslash \ newline&#10;tab&#9;separator&#x2028;next&#x85;end</value>
+                    </StringDec>
+                </Decs>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            var result = Dec.Database<StringDec>.Get("TestDec");
+            Assert.IsNotNull(result);
+
+            Assert.AreEqual("quote \" backslash \\ newline\ntab\tseparator\u2028next\u0085end", result.value);
+        }
+
         public class BulkParseDec : Dec.Dec
         {
             public int testIntA = 1;

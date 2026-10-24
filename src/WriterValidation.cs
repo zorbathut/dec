@@ -145,7 +145,47 @@ namespace Dec
 
         public override void WriteString(string value)
         {
-            WriteToken($"\"{value}\"");
+            // Escaped, since the validation code is compiled and a string can hold anything.
+            var literal = new StringBuilder("\"");
+            foreach (char c in value)
+            {
+                switch (c)
+                {
+                    case '"':
+                        literal.Append("\\\"");
+                        break;
+
+                    case '\\':
+                        literal.Append("\\\\");
+                        break;
+
+                    case '\n':
+                        literal.Append("\\n");
+                        break;
+
+                    case '\r':
+                        literal.Append("\\r");
+                        break;
+
+                    case '\t':
+                        literal.Append("\\t");
+                        break;
+
+                    default:
+                        // C# also ends a line at U+0085, U+2028, and U+2029, and doesn't take raw control characters in a literal.
+                        if (char.IsControl(c) || c == '\u0085' || c == '\u2028' || c == '\u2029')
+                        {
+                            literal.Append("\\u").Append(((int)c).ToString("x4"));
+                        }
+                        else
+                        {
+                            literal.Append(c);
+                        }
+                        break;
+                }
+            }
+
+            WriteToken(literal.Append('"').ToString());
         }
 
         public override void WriteType(Type value)
