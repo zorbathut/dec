@@ -107,6 +107,21 @@ namespace Dec
             return xml.Elements().Any();
         }
 
+        public override int GetChildCount()
+        {
+            // Walked by hand rather than through Elements(), since this runs for every Record() object a read parses.
+            int count = 0;
+            for (var child = xml.FirstNode; child != null; child = child.NextNode)
+            {
+                if (child is XElement)
+                {
+                    ++count;
+                }
+            }
+
+            return count;
+        }
+
         public override int[] GetArrayDimensions(int rank)
         {
             // Special case: if this is a 1D array with text content and no children, it's likely a base64-encoded byte array

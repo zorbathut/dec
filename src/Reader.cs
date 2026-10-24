@@ -150,6 +150,7 @@ namespace Dec
         public abstract bool HasText();
 
         public abstract bool HasChildren();
+        public abstract int GetChildCount();
         public abstract string[] GetAllChildren();
 
         public abstract void ParseList(IList list, Type referencedType, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings);

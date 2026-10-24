@@ -880,35 +880,37 @@ namespace Dec
             {
                 foreach (var layer in layers.Layers)
                 {
-                    ReportUnusedFields(layer);
+                    var names = layer.GetAllChildren();
+                    ReportIgnoredText(layer, ReadFrom(names));
+                    ReportUnusedElements(layer, names);
                 }
             }
             else
             {
                 // Only readers over XML track usage, and those hold a parseable node or layers of them.
-                ReportUnusedFields((ReaderNodeParseable)node);
+                var single = (ReaderNodeParseable)node;
+                ReportIgnoredText(single, seen.Count > 0);
+
+                // Only names that exist are ever registered, so if "seen" is as long as the children, everything was read and the names aren't needed; a layer of several can't take this shortcut, since what it's seen may come from the other layers.
+                if (seen.Count != single.GetChildCount())
+                {
+                    ReportUnusedElements(single, single.GetAllChildren());
+                }
             }
         }
 
-        private void ReportUnusedFields(ReaderNodeParseable layer)
+        // Asks HasText only when nothing was read, since it can scan every child.
+        private void ReportIgnoredText(ReaderNodeParseable layer, bool readAny)
         {
-            var allChildren = layer.GetAllChildren();
-
-            // Check for unused text content when no fields were read from this layer; ReadFrom first, since HasText can scan every child.
-            if (!ReadFrom(layer, allChildren) && layer.HasText())
+            if (!readAny && layer.HasText())
             {
                 Dbg.Err($"{layer.GetContext()}: XML contains text content which was ignored, and no fields were read from this object; the text will be ignored and the object will be left with default values.");
             }
+        }
 
-            if (layer == node && seen.Count == allChildren.Length)
-            {
-                // we only register things that existed
-                // so if "seen" is the same length as "all", then we've seen everything
-                // (a layer of several can't take this shortcut, since what it's seen may come from the other layers)
-                return;
-            }
-
-            var unused = new HashSet<string>(allChildren);
+        private void ReportUnusedElements(ReaderNodeParseable layer, string[] names)
+        {
+            var unused = new HashSet<string>(names);
             unused.RemoveWhere(seen.Contains);
 
             if (unused.Count > 0)
@@ -917,15 +919,10 @@ namespace Dec
             }
         }
 
-        // Whether any field was read from this layer; a field read from another layer doesn't count.
-        private bool ReadFrom(ReaderNodeParseable layer, string[] allChildren)
+        // Whether any field was read from a layer of several, given its children's names; a field read from another layer doesn't count.
+        private bool ReadFrom(string[] names)
         {
-            if (layer == node)
-            {
-                return seen.Count > 0;
-            }
-
-            foreach (var name in allChildren)
+            foreach (var name in names)
             {
                 if (seen.Contains(name))
                 {
