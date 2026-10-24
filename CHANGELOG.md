@@ -46,6 +46,7 @@ All notable changes to this project will be documented in this file.
 * RecorderEnumerator: Recording the state machine of an async method or async iterator now reports that `[RecordableEnumerable]` supports only synchronous iterators, instead of asking for the attribute or failing on the async machinery's own fields.
 * When several layers of an inherited dec give a `class` for the same member, the most-derived one now wins; previously a child naming a class for an object its parent had already set up was an error. A layer that replaces the member, with `mode="replace"` or as a container written with no mode, now discards earlier layers' class along with their contents, and a container's class no longer has to match a C# default that it replaces, in decs and in `Recorder.Read` alike.
 * Reading a compact array from XML no longer scans all of its elements for text before sizing it; a small saving next to the rest of the read.
+* `Recorder.Read` and dec parsing are about 5% faster with about 15% less allocation.
 * Reduced allocations when reading a `Record()` field from XML, making `Recorder.Read` of `Record()`-heavy data about 5-10% faster with 6-12% less allocation.
 * Complexity reduction when dealing with large Record() objects, increasing performance up to 30% or more in those cases.
 
@@ -75,6 +76,7 @@ All notable changes to this project will be documented in this file.
 * Awkward error report interactions with Record(), indentation, and unknown fields.
 * Parse issues with arrays containing nothing but whitespace getting confused with base64 arrays.
 * Stray text was reported only in the first node.
+* Values split by an XML comment or CDATA section were read only up to the split; a byte array's base64 after a comment read as empty.
 
 
 ## [v0.11.1]

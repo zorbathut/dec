@@ -108,5 +108,105 @@ namespace DecTest
             Assert.AreEqual(3, Result().hp);
             Assert.IsNull(Result().obj);
         }
+
+        [Test]
+        public void BytesAfterComment([Values] ParserMode mode)
+        {
+            var parser = TextParser(@"
+                <bytes>
+                    <!-- a note -->
+                    AQID
+                </bytes>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(new byte[] { 1, 2, 3 }, Result().bytes);
+        }
+
+        [Test]
+        public void IntAfterComment([Values] ParserMode mode)
+        {
+            var parser = TextParser(@"
+                <hp>
+                    <!-- a note -->
+                    50
+                </hp>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(50, Result().hp);
+        }
+
+        [Test]
+        public void StringAroundComment([Values] ParserMode mode)
+        {
+            var parser = TextParser("<name>he<!-- a note -->llo</name>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            Assert.AreEqual("hello", Result().name);
+        }
+
+        [Test]
+        public void StringAroundCData([Values] ParserMode mode)
+        {
+            var parser = TextParser("<name>a<![CDATA[<b>]]>c</name>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            Assert.AreEqual("a<b>c", Result().name);
+        }
+
+        [Test]
+        public void RecorderValueAroundComment()
+        {
+            // Split the written value by hand, as if the save had been edited.
+            var doc = System.Xml.Linq.XDocument.Parse(Dec.Recorder.Write(new TextRec { value = 42 }));
+            var value = doc.Root.Element("data").Element("value");
+            value.ReplaceNodes(new System.Xml.Linq.XText("4"), new System.Xml.Linq.XComment(" a note "), new System.Xml.Linq.XText("2"));
+
+            var result = Dec.Recorder.Read<TextRec>(doc.ToString(System.Xml.Linq.SaveOptions.DisableFormatting));
+
+            Assert.AreEqual(42, result.value);
+        }
+
+        [Test]
+        public void StringKeepsWhitespaceAfterComment([Values] ParserMode mode)
+        {
+            // The whitespace after the comment is part of the value, just as it is in a multi-line value with no comment.
+            const string trailing = "\n                    ";
+            var parser = TextParser($"<name>Bob<!-- a note -->{trailing}</name>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            Assert.AreEqual("Bob" + trailing, Result().name);
+        }
+
+        [Test]
+        public void StringOnlyComment([Values] ParserMode mode)
+        {
+            var parser = TextParser("<name><!-- a note --></name>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            Assert.AreEqual("", Result().name);
+        }
+
+        [Test]
+        public void BytesOnlyComment([Values] ParserMode mode)
+        {
+            var parser = TextParser("<bytes><!-- a note --></bytes>");
+            parser.Finish();
+
+            DoParserTests(mode);
+
+            Assert.AreEqual(new byte[0], Result().bytes);
+        }
     }
 }

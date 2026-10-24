@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -79,13 +80,35 @@ namespace Dec
             }
         }
 
+        // All of the element's own text, CDATA included, joined across the comments and child elements that split it; null when it has none.
         internal static string GetText(this XElement element)
         {
             if (element == null)
             {
                 return null;
             }
-            return element.Nodes().OfType<XText>().FirstOrDefault()?.Value;
+
+            string first = null;
+            StringBuilder joined = null;
+            for (var node = element.FirstNode; node != null; node = node.NextNode)
+            {
+                if (!(node is XText text))
+                {
+                    continue;
+                }
+
+                if (first == null)
+                {
+                    first = text.Value;
+                }
+                else
+                {
+                    joined = joined ?? new StringBuilder(first);
+                    joined.Append(text.Value);
+                }
+            }
+
+            return joined?.ToString() ?? first;
         }
 
         // Checks every text node, not just the first: a comment can split indentation from real text.
