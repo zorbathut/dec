@@ -49,9 +49,6 @@ namespace Dec
         public abstract Context GetContext(); // note: this function must be really fast!
 
         public abstract ReaderNode GetChildNamed(string name);
-        public abstract string[] GetAllChildren();
-        // Text that isn't just whitespace; the indentation around a pretty-printed element's children doesn't count.
-        public abstract bool HasText();
 
         public abstract int[] GetArrayDimensions(int rank);
 
@@ -108,17 +105,7 @@ namespace Dec
             return single;
         }
 
-        // Nothing asks these of a whole stack of layers; unused-field reporting goes layer by layer.
-        public override string[] GetAllChildren()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override bool HasText()
-        {
-            throw new NotImplementedException();
-        }
-
+        // Nothing asks this of a whole stack of layers.
         public override int[] GetArrayDimensions(int rank)
         {
             throw new NotImplementedException();
@@ -159,7 +146,11 @@ namespace Dec
         public abstract string GetMetadataUnrecognized();
         public abstract string GetText();
 
+        // Text that isn't just whitespace; the indentation around a pretty-printed element's children doesn't count.
+        public abstract bool HasText();
+
         public abstract bool HasChildren();
+        public abstract string[] GetAllChildren();
 
         public abstract void ParseList(IList list, Type referencedType, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings);
         public abstract void ParseArray(Array array, Type referencedType, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings, int startOffset);

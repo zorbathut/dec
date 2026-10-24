@@ -885,11 +885,12 @@ namespace Dec
             }
             else
             {
-                ReportUnusedFields(node);
+                // Only readers over XML track usage, and those hold a parseable node or layers of them.
+                ReportUnusedFields((ReaderNodeParseable)node);
             }
         }
 
-        private void ReportUnusedFields(ReaderNode layer)
+        private void ReportUnusedFields(ReaderNodeParseable layer)
         {
             var allChildren = layer.GetAllChildren();
 
@@ -917,7 +918,7 @@ namespace Dec
         }
 
         // Whether any field was read from this layer; a field read from another layer doesn't count.
-        private bool ReadFrom(ReaderNode layer, string[] allChildren)
+        private bool ReadFrom(ReaderNodeParseable layer, string[] allChildren)
         {
             if (layer == node)
             {

@@ -1217,20 +1217,6 @@ namespace Dec
 
             return null;
         }
-        public override string[] GetAllChildren()
-        {
-            var result = new string[recorderChildren.Count];
-            for (int i = 0; i < recorderChildren.Count; i++)
-            {
-                result[i] = recorderChildren[i].key;
-            }
-            return result;
-        }
-        public override bool HasText()
-        {
-            // not valid, this is used only for recorders
-            throw new NotImplementedException();
-        }
 
         public override object ParseElement(Type type, object model, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings)
         {
@@ -1278,16 +1264,6 @@ namespace Dec
             // not valid, this is used only for recorders
             throw new NotImplementedException();
         }
-        public override string[] GetAllChildren()
-        {
-            // not valid, this is used only for recorders
-            throw new NotImplementedException();
-        }
-        public override bool HasText()
-        {
-            // not valid, this is used only for recorders
-            throw new NotImplementedException();
-        }
 
         public override object ParseElement(Type type, object model, ReaderGlobals readerGlobals, Recorder.Settings recorderSettings)
         {
@@ -1316,14 +1292,6 @@ namespace Dec
         }
 
         public override ReaderNode GetChildNamed(string name)
-        {
-            throw new NotImplementedException();
-        }
-        public override string[] GetAllChildren()
-        {
-            throw new NotImplementedException();
-        }
-        public override bool HasText()
         {
             throw new NotImplementedException();
         }
