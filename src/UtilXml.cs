@@ -91,7 +91,8 @@ namespace Dec
         // Checks every text node, not just the first: a comment can split indentation from real text.
         internal static bool HasNonWhitespaceText(this XElement element)
         {
-            foreach (var node in element.Nodes())
+            // Walked by hand rather than through Nodes(), since this runs for every element a read parses.
+            for (var node = element.FirstNode; node != null; node = node.NextNode)
             {
                 if (node is XText text && !string.IsNullOrWhiteSpace(text.Value))
                 {

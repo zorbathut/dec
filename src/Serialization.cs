@@ -822,7 +822,7 @@ namespace Dec
             foreach (var (_, node) in orders)
             {
                 bool nodeHasChildren = node.HasChildren();
-                bool nodeHasImportantText = HasImportantText(node);
+                bool nodeHasImportantText = node.HasText();
 
                 if (nodeHasChildren && nodeHasImportantText)
                 {
@@ -1212,7 +1212,7 @@ namespace Dec
                 var textlessOrders = new List<(ParseCommand command, ReaderNodeParseable node)>();
                 foreach (var order in orders)
                 {
-                    if (HasImportantText(order.node) && !(type == typeof(byte[]) && !order.node.HasChildren()))
+                    if (order.node.HasText() && !(type == typeof(byte[]) && !order.node.HasChildren()))
                     {
                         // Only this layer is ignored; the others still apply.
                         Dbg.Err($"{order.node.GetContext()}: Text detected in a situation where it is invalid; will be ignored");
@@ -1245,7 +1245,7 @@ namespace Dec
                 foreach (var (parseCommand, node) in orders)
                 {
                     // Only text left at this point is a byte[] layer's base64. The flag skips the text scan when no layer had any.
-                    if (hasImportantText && HasImportantText(node))
+                    if (hasImportantText && node.HasText())
                     {
                         var decoded = ParseBase64(node, null);
                         if (parseCommand == ParseCommand.Append && result != null)
@@ -1838,13 +1838,6 @@ namespace Dec
                 default:
                     return false;
             }
-        }
-
-        // We trim this to get info on whether there's text that must not be ignored. If we turn out to be a string, we'll grudingly accept pure whitespace anyway.
-        private static bool HasImportantText(ReaderNodeParseable node)
-        {
-            var text = node.GetText();
-            return text != null && !text.Trim().IsNullOrEmpty();
         }
 
         // Reads a byte[] written as base64, reusing existing if it's the right length.
