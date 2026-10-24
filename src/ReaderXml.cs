@@ -104,7 +104,7 @@ namespace Dec
 
         public override bool HasChildren()
         {
-            return xml.Elements().Any();
+            return xml.HasElements;
         }
 
         public override int GetChildCount()
