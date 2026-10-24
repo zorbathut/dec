@@ -68,7 +68,7 @@ namespace Dec
         {
             DequeuePendingWrites();
 
-            return doc.ToString(pretty ? SaveOptions.None : SaveOptions.DisableFormatting);
+            return doc.ToStringEntitized(pretty);
         }
     }
 }

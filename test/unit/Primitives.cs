@@ -181,6 +181,26 @@ namespace DecTest
             Assert.AreEqual("", result.value);
         }
 
+        public class StringRecordable : Dec.IRecordable
+        {
+            public string value;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref value, nameof(value));
+            }
+        }
+
+        [Test]
+        public void SpecialCharacterStringRecord([Values] RecorderMode mode, [Values("carriage\rreturn\r\nand\nnewline\ttab", "\r")] string value)
+        {
+            var original = new StringRecordable { value = value };
+
+            var deserialized = DoRecorderRoundTrip(original, mode);
+
+            Assert.AreEqual(original.value, deserialized.value);
+        }
+
         [Test]
         public void SpecialCharacterStringParse([Values] ParserMode mode)
         {
@@ -190,7 +210,7 @@ namespace DecTest
             parser.AddString(Dec.Parser.FileType.Xml, @"
                 <Decs>
                     <StringDec decName=""TestDec"">
-                        <value>quote "" backslash \ newline&#10;tab&#9;separator&#x2028;next&#x85;end</value>
+                        <value>quote "" backslash \ newline&#10;return&#13;tab&#9;separator&#x2028;next&#x85;end</value>
                     </StringDec>
                 </Decs>");
             parser.Finish();
@@ -200,7 +220,7 @@ namespace DecTest
             var result = Dec.Database<StringDec>.Get("TestDec");
             Assert.IsNotNull(result);
 
-            Assert.AreEqual("quote \" backslash \\ newline\ntab\tseparator\u2028next\u0085end", result.value);
+            Assert.AreEqual("quote \" backslash \\ newline\nreturn\rtab\tseparator\u2028next\u0085end", result.value);
         }
 
         public class BulkParseDec : Dec.Dec

@@ -308,7 +308,7 @@ namespace Dec
             }
             doc.AddFirst(new XComment("This file was written by Dec, a serialization library designed for game development. (https://github.com/zorbathut/dec)"));
 
-            return doc.ToString(pretty ? SaveOptions.None : SaveOptions.DisableFormatting);
+            return doc.ToStringEntitized(pretty);
         }
     }
 }

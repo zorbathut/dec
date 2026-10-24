@@ -55,7 +55,7 @@ namespace Dec
             // Handle all our pending writes
             DequeuePendingWrites();
 
-            return doc.ToString();
+            return doc.ToStringEntitized(pretty);
         }
     }
 }

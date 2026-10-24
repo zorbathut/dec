@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml;
@@ -124,6 +126,31 @@ namespace Dec
             }
 
             return false;
+        }
+
+        // XDocument.ToString's default NewLineHandling.Replace rewrites a \r in text as a newline; Entitize writes it as &#xD; so it reads back as \r, and leaves \n as it is. On Windows that leaves a \n inside a value bare while indentation uses \r\n, which reads back the same as anywhere else.
+        internal static string ToStringEntitized(this XDocument doc, bool indent)
+        {
+            var settings = new XmlWriterSettings
+            {
+                OmitXmlDeclaration = true,
+                Indent = indent,
+                NewLineHandling = NewLineHandling.Entitize,
+            };
+
+            using (var text = new StringWriter(CultureInfo.InvariantCulture))
+            {
+                using (var writer = XmlWriter.Create(text, settings))
+                {
+                    // Node by node, as ToString does; XDocument.WriteTo would also demand a root element.
+                    foreach (var node in doc.Nodes())
+                    {
+                        node.WriteTo(writer);
+                    }
+                }
+
+                return text.ToString();
+            }
         }
 
         internal static XDocument ParseSafely(System.IO.TextReader input, string identifier)
