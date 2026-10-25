@@ -384,11 +384,13 @@ namespace DecTest
         {
             public Chain next;
             public Outer value;
+            public List<Outer> list;
 
             public void Record(Dec.Recorder recorder)
             {
                 recorder.Record(ref next, nameof(next));
                 recorder.Record(ref value, nameof(value));
+                recorder.Record(ref list, nameof(list));
             }
         }
 
@@ -401,6 +403,7 @@ namespace DecTest
             for (int i = 1; i < length; ++i)
             {
                 link.value = new Outer { number = i, target = new Target { id = i } };
+                link.list = new List<Outer> { link.value };
                 link.next = new Chain();
                 link = link.next;
             }
@@ -408,6 +411,64 @@ namespace DecTest
             var (fast, _) = RunBoth(head);
 
             Assert.AreEqual(length > 50, fast.warnings.Count > 0);
+        }
+
+        private static List<Outer> MakeList()
+        {
+            var holder = MakeHolder();
+            return new List<Outer> { holder.a, holder.b, holder.a };
+        }
+
+        [Test]
+        public void ListElements()
+        {
+            var original = MakeList();
+            var (fast, general) = RunBoth(original);
+
+            foreach (var clone in new[] { (List<Outer>)fast.result, (List<Outer>)general.result })
+            {
+                Assert.AreEqual(3, clone.Count);
+                Assert.AreEqual(4, clone[1].number);
+                Assert.AreNotSame(original[0].target, clone[0].target);
+                Assert.AreSame(clone[0].target, clone[1].target);
+                Assert.AreSame(clone[0].target, clone[2].inner.target);
+
+                // Elements are created fresh, not from a model.
+                Assert.AreEqual(0, clone[0].unrecorded);
+            }
+        }
+
+        public class ListFactoryHolder : IRecordable
+        {
+            public List<Outer> values;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.WithFactory(new Dictionary<Type, Func<Type, object>> { { typeof(Outer), _ => new Outer { unrecorded = 7 } } }).Record(ref values, nameof(values));
+            }
+        }
+
+        [Test]
+        public void ListElementsFactory()
+        {
+            var (fast, _) = RunBoth(new ListFactoryHolder { values = MakeList() });
+
+            Assert.IsTrue(((ListFactoryHolder)fast.result).values.All(value => value.unrecorded == 7));
+        }
+
+        [Test]
+        public void DictionaryValues()
+        {
+            var list = MakeList();
+            var original = new Dictionary<int, Outer> { { 1, list[0] }, { 2, list[1] } };
+            var (fast, general) = RunBoth(original);
+
+            foreach (var clone in new[] { (Dictionary<int, Outer>)fast.result, (Dictionary<int, Outer>)general.result })
+            {
+                Assert.AreEqual(4, clone[2].number);
+                Assert.AreNotSame(original[1].target, clone[1].target);
+                Assert.AreSame(clone[1].target, clone[2].target);
+            }
         }
 
         public class SharedHolder : IRecordable
@@ -429,6 +490,50 @@ namespace DecTest
             Assert.AreEqual(2, ((SharedHolder)fast.result).value.number);
         }
 
+        public struct Key : IRecordable, IEquatable<Key>
+        {
+            public int id;
+            public Target target;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref id, nameof(id));
+                recorder.Shared().Record(ref target, nameof(target));
+            }
+
+            public bool Equals(Key other)
+            {
+                return id == other.id;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is Key other && Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                return id;
+            }
+        }
+
+        [Test]
+        public void DictionaryKeys()
+        {
+            var shared = new Target { id = 9 };
+            var original = new Dictionary<Key, Outer> { { new Key { id = 1, target = shared }, MakeHolder().a }, { new Key { id = 2, target = shared }, MakeHolder().b } };
+            var (fast, general) = RunBoth(original);
+
+            foreach (var clone in new[] { (Dictionary<Key, Outer>)fast.result, (Dictionary<Key, Outer>)general.result })
+            {
+                var keys = clone.Keys.OrderBy(key => key.id).ToArray();
+                Assert.AreEqual(2, keys.Length);
+                Assert.AreNotSame(shared, keys[0].target);
+                Assert.AreSame(keys[0].target, keys[1].target);
+                Assert.AreEqual(4, clone[keys[1]].number);
+            }
+        }
+
         public class AsThisHolder : IRecordable
         {
             public Outer value;
@@ -446,5 +551,7 @@ namespace DecTest
 
             Assert.AreEqual(2, ((AsThisHolder)fast.result).value.number);
         }
+
+        // Elements of a struct with a parameterless constructor of its own take the general path, which runs it; that isn't tested, as netcoreapp3.1 compiles the tests as C# 8, which can't declare one.
     }
 }

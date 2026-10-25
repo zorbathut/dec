@@ -129,11 +129,12 @@ namespace Dec
         }
     }
 
-    // Whether Clone can carry a recorded struct field of type T in a CloneSlot and record it in place through RecordableStruct<T>, instead of boxing it into the general path. The field keeps its destination's value as the model.
+    // Whether Clone can carry a recorded struct of type T in a CloneSlot and record it in place through RecordableStruct<T>, instead of boxing it into the general path: as a field, which keeps its destination's value as the model, or as an element Clone creates itself.
     internal static class CloneRecordedStruct<T>
     {
-        // As in CloneCopiedValue<T>, a racing read can only see this unset or false, which recomputes or takes the general path.
+        // As in CloneCopiedValue<T>, a racing read can only see these unset or false, which recomputes or takes the general path.
         private static bool? CachedField;
+        private static bool? CachedElement;
 
         internal static bool AppliesField()
         {
@@ -146,6 +147,17 @@ namespace Dec
             }
 
             return CachedField.Value;
+        }
+
+        internal static bool AppliesElement()
+        {
+            if (!CachedElement.HasValue)
+            {
+                // The general path creates an element with CreateInstanceSafe, which runs a declared parameterless constructor where default(T) wouldn't.
+                CachedElement = AppliesField() && typeof(T).GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, Type.EmptyTypes, null) == null;
+            }
+
+            return CachedElement.Value;
         }
     }
 
@@ -693,7 +705,7 @@ namespace Dec
                 }
                 else
                 {
-                    return (self, resetDepth) =>
+                    Action<WriterNodeClone, bool> fallback = (self, resetDepth) =>
                     {
                         var originalList = self.original as IList;
                         var resultList = self.result as IList;
@@ -707,6 +719,30 @@ namespace Dec
                         }
 
                         versionField?.SetValue(resultList, Util.CollectionDeserializationVersionBoxed);
+                    };
+
+                    if (!isExactList || !listElementType.IsValueType || !RuntimeFeature.IsDynamicCodeSupported)
+                    {
+                        return fallback;
+                    }
+
+                    var typed = (Action<WriterNodeClone, bool>)BuildResolveStrategyListTypedMethod.MakeGenericMethod(listElementType).Invoke(null, new object[] { versionField });
+                    if (typed == null)
+                    {
+                        return fallback;
+                    }
+
+                    return (self, resetDepth) =>
+                    {
+                        // I don't know what the perf hit of this is; it may be that the decision should happen when generating the callback, and changes to TestForceFallbackEmit should clear cached callbacks.
+                        if (Config.TestForceFallbackEmit)
+                        {
+                            fallback(self, resetDepth);
+                        }
+                        else
+                        {
+                            typed(self, resetDepth);
+                        }
                     };
                 }
             }
@@ -970,10 +1006,39 @@ namespace Dec
                 foreach (var entry in originalDict)
                 {
                     // Key before value, as the non-generic path does, so both paths reach shared references in the same order.
-                    var key = canCloneKey ? entry.Key : (K)self.CloneChild(entry.Key, resetDepth);
-                    var value = canCloneValue ? entry.Value : (V)self.CloneChild(entry.Value, resetDepth);
+                    var key = canCloneKey ? entry.Key : self.CloneChildTyped(entry.Key, resetDepth);
+                    var value = canCloneValue ? entry.Value : self.CloneChildTyped(entry.Value, resetDepth);
                     resultDict[key] = value;
                 }
+            };
+        }
+
+        private static readonly MethodInfo BuildResolveStrategyListTypedMethod = typeof(WriterNodeClone).GetMethod(nameof(BuildResolveStrategyListTyped), BindingFlags.NonPublic | BindingFlags.Static);
+
+        // A List<T> of recorded structs gets a typed copy that presizes its result and records each element in place instead of boxing it twice; null for any other T, which keeps the non-generic path.
+        private static Action<WriterNodeClone, bool> BuildResolveStrategyListTyped<T>(FieldInfo versionField)
+        {
+            if (!CloneRecordedStruct<T>.AppliesElement())
+            {
+                return null;
+            }
+
+            return (self, resetDepth) =>
+            {
+                var originalList = (List<T>)self.original;
+                var resultList = (List<T>)self.result;
+                resultList.Clear();
+                if (resultList.Capacity < originalList.Count)
+                {
+                    resultList.Capacity = originalList.Count;
+                }
+
+                for (int i = 0; i < originalList.Count; i++)
+                {
+                    resultList.Add(self.CloneChildTyped(originalList[i], resetDepth));
+                }
+
+                versionField.SetValue(resultList, Util.CollectionDeserializationVersionBoxed);
             };
         }
 
@@ -1131,6 +1196,26 @@ namespace Dec
             }
 
             return cloned;
+        }
+
+        // CloneChild for a typed collection's element, which records a recorded struct in place instead of boxing it into the general path and back.
+        internal T CloneChildTyped<T>(T original, bool resetDepth)
+        {
+            int childDepth = resetDepth ? 0 : depth + 1;
+
+            // Factories create the object themselves in the general path.
+            if (typeof(T).IsValueType && RecorderSettings.factories == null && childDepth <= WarnRecursionDepth && CloneRecordedStruct<T>.AppliesElement() && !Config.TestForceFallbackEmit)
+            {
+                var child = writer.NodeAcquire(childDepth, RecorderSettings.CreateChild(), PathPending.Same(this));
+
+                // What CreateInstanceSafe makes of a struct with no constructor of its own.
+                T result = default;
+                child.CloneRecordedInto(original, ref result);
+                writer.NodeRelease(child);
+                return result;
+            }
+
+            return (T)CloneChild(original, resetDepth);
         }
 
         public override void WritePrimitive(object value)

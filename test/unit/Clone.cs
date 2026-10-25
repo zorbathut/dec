@@ -784,7 +784,11 @@ namespace DecTest
         [Test]
         public void AllocationPerRecord()
         {
-            // Each extra struct element costs two boxes and list growth, around 64 bytes in all. An entry in the reference table would add 50 to 150 more, depending on where the table's growth lands, and a recorder, reader, and read view of its own per Record() call would add several hundred.
+            // Each extra struct element costs only its 8 bytes in the presized result list. The netstandard2.1 build, which the netcoreapp3.1 tests run against, takes the general path, whose two boxes and list growth come to around 64. An entry in the reference table would add 50 to 150 more, depending on where the table's growth lands, and a recorder, reader, and read view of its own per Record() call would add several hundred.
+
+            // Applies() needs Dec's converters set up, which any Recorder call does.
+            Dec.Recorder.Clone(0);
+            long limitPerElement = Dec.RecordableStruct<StringRecordable>.Applies() ? 12 : 90;
             List<StringRecordable> Make(int count)
             {
                 return Enumerable.Range(0, count).Select(i => new StringRecordable { value = $"value{i}" }).ToList();
@@ -796,7 +800,7 @@ namespace DecTest
             CloneAllocatedBytes(small);
             CloneAllocatedBytes(large);
 
-            AssertAllocatesLess(() => CloneAllocatedBytes(large) - CloneAllocatedBytes(small), 1000 * 90, "Clone should allocate nothing per struct element beyond its boxes and list growth");
+            AssertAllocatesLess(() => CloneAllocatedBytes(large) - CloneAllocatedBytes(small), 1000 * limitPerElement, "Clone should allocate nothing per struct element beyond its place in the result list, and its boxes where those remain");
         }
 
         public class ClonePathProbe : IRecordable
