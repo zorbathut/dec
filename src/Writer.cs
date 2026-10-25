@@ -172,6 +172,20 @@ namespace Dec
             }
         }
 
+        internal void RecorderRun<T>(ref T value, RecordRef<T> record)
+        {
+            var recorder = RecorderAcquire();
+            var outer = recorder.Open();
+            try
+            {
+                record(ref value, recorder);
+            }
+            finally
+            {
+                recorder.Close(outer);
+            }
+        }
+
         internal void RecorderRun(ConverterRecord converter, object value)
         {
             var recorder = RecorderAcquire();

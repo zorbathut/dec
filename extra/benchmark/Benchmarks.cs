@@ -865,6 +865,67 @@ namespace DecBenchmark
         }
     }
 
+    // A component holding IRecordable structs as fields, which Clone and Checksum record in place.
+    public class RecordedStructComponent : IRecordable
+    {
+        public EntityLookup owner;
+        public EntityLookup target;
+        public EntityLookup source;
+        public EntityLookup parent;
+
+        public void Record(Recorder recorder)
+        {
+            recorder.Record(ref owner, nameof(owner));
+            recorder.Record(ref target, nameof(target));
+            recorder.Record(ref source, nameof(source));
+            recorder.Record(ref parent, nameof(parent));
+        }
+    }
+
+    [MemoryDiagnoser]
+    public class RecordedStructFieldBenchmarks : BenchmarkBase
+    {
+        private List<RecordedStructComponent> components;
+
+        [GlobalSetup]
+        public void Setup()
+        {
+            SetupDec(
+                explicitTypes: new[] { typeof(SampleDec) }
+            );
+            FinishParser(@"
+                <Decs>
+                    <SampleDec decName=""Alpha"" />
+                    <SampleDec decName=""Beta"" />
+                </Decs>");
+
+            var decs = Dec.Database<SampleDec>.List;
+            EntityLookup Lookup(int i)
+            {
+                return new EntityLookup { dec = i % 3 == 2 ? null : decs[i % decs.Length], index = i, gen = i / 7 };
+            }
+            components = Enumerable.Range(0, 1000).Select(i => new RecordedStructComponent { owner = Lookup(i), target = Lookup(i + 1), source = Lookup(i + 2), parent = Lookup(i + 3) }).ToList();
+        }
+
+        [GlobalCleanup]
+        public void Cleanup()
+        {
+            CleanupDec();
+        }
+
+        [Benchmark]
+        public List<RecordedStructComponent> Clone()
+        {
+            return Recorder.Clone(components);
+        }
+
+        [Benchmark]
+        public ulong Checksum()
+        {
+            return Recorder.Checksum(components);
+        }
+    }
+
     [MemoryDiagnoser]
     public class ValueFieldBenchmarks : BenchmarkBase
     {

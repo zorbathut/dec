@@ -696,6 +696,19 @@ namespace Dec
             }
         }
 
+        internal void BodyRecord<T>(ref T value, RecordRef<T> record)
+        {
+            var outer = Open();
+            try
+            {
+                record(ref value, this);
+            }
+            finally
+            {
+                Close(outer);
+            }
+        }
+
         internal object BodyRecord(ConverterRecord converter, object input)
         {
             var outer = Open();

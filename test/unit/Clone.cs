@@ -650,7 +650,7 @@ namespace DecTest
             }
         }
 
-        private static void AssertNoAllocationPerValueField<T>(Func<int, T> make)
+        private static void AssertNoAllocationPerValueField<T>(Func<int, T> make, long limit)
         {
             // As AllocationPerField, over value types: every clone owns the same fixed-size array, so the difference is what the extra fields cost.
             List<CountedValues<T>> Make(int count)
@@ -663,29 +663,41 @@ namespace DecTest
             CloneAllocatedBytes(few);
             CloneAllocatedBytes(many);
 
-            AssertAllocatesLess(() => CloneAllocatedBytes(many) - CloneAllocatedBytes(few), 5000, "Clone should not allocate per recorded value-type field");
+            // A box per field would be 24 bytes for each of the 5000 extra fields.
+            AssertAllocatesLess(() => CloneAllocatedBytes(many) - CloneAllocatedBytes(few), limit, "Clone should not allocate per recorded value-type field");
         }
 
         [Test]
-        public void AllocationPerValueField([Values(ValueFieldKind.Int, ValueFieldKind.Long, ValueFieldKind.Enum, ValueFieldKind.PiecewiseStruct, ValueFieldKind.ValuelikeStruct)] ValueFieldKind kind)
+        public void AllocationPerValueField([Values(ValueFieldKind.Int, ValueFieldKind.Long, ValueFieldKind.Enum, ValueFieldKind.PiecewiseStruct, ValueFieldKind.ValuelikeStruct, ValueFieldKind.RecordedStruct)] ValueFieldKind kind)
         {
             switch (kind)
             {
                 case ValueFieldKind.Int:
-                    AssertNoAllocationPerValueField(i => i);
+                    AssertNoAllocationPerValueField(i => i, 5000);
                     break;
                 case ValueFieldKind.Long:
-                    AssertNoAllocationPerValueField(i => (long)i << 33);
+                    AssertNoAllocationPerValueField(i => (long)i << 33, 5000);
                     break;
                 case ValueFieldKind.Enum:
-                    AssertNoAllocationPerValueField(i => (ValueFieldEnum)(i % 3));
+                    AssertNoAllocationPerValueField(i => (ValueFieldEnum)(i % 3), 5000);
                     break;
                 case ValueFieldKind.PiecewiseStruct:
-                    AssertNoAllocationPerValueField(i => new ValueFieldPiecewise { x = i });
+                    AssertNoAllocationPerValueField(i => new ValueFieldPiecewise { x = i }, 5000);
                     break;
                 case ValueFieldKind.ValuelikeStruct:
                     UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ValueFieldValuelikeConverter) } });
-                    AssertNoAllocationPerValueField(i => new ValueFieldValuelike { x = i });
+                    AssertNoAllocationPerValueField(i => new ValueFieldValuelike { x = i }, 5000);
+                    break;
+                case ValueFieldKind.RecordedStruct:
+                    // Applies() needs Dec's converters set up, which any Recorder call does.
+                    Dec.Recorder.Clone(0);
+                    if (!Dec.RecordableStruct<ValueFieldRecorded>.Applies())
+                    {
+                        Assert.Ignore("The netstandard2.1 build, which the netcoreapp3.1 tests run against, boxes recorded structs");
+                    }
+
+                    // Each of the five extra fields' nodes keeps a children list, a read view, and recorders of its own, about a kilobyte per call.
+                    AssertNoAllocationPerValueField(i => new ValueFieldRecorded { x = i }, 10000);
                     break;
                 default:
                     Assert.Fail($"No allocation case for {kind}");
@@ -1108,7 +1120,7 @@ namespace DecTest
             Assert.AreEqual(2, clone[1].inner.value);
         }
 
-        // Every kind of value-type field Clone copies as-is, and the paths around it that must keep today's behavior.
+        // Every kind of value-type field Clone copies as-is or records in place, and the paths around it that must keep today's behavior.
         public enum ValueFieldKind
         {
             Int,
@@ -1118,6 +1130,7 @@ namespace DecTest
             Enum,
             PiecewiseStruct,
             ValuelikeStruct,
+            RecordedStruct,
         }
 
         public enum ValueFieldEnum
@@ -1137,6 +1150,16 @@ namespace DecTest
         public struct ValueFieldValuelike
         {
             public int x;
+        }
+
+        public struct ValueFieldRecorded : IRecordable
+        {
+            public int x;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref x, nameof(x));
+            }
         }
 
         public class ValueFieldValuelikeConverter : Dec.ConverterString<ValueFieldValuelike>
@@ -1205,6 +1228,9 @@ namespace DecTest
                 case ValueFieldKind.ValuelikeStruct:
                     UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ValueFieldValuelikeConverter) } });
                     CloneValueFieldOf(new ValueFieldValuelike { x = 9 });
+                    break;
+                case ValueFieldKind.RecordedStruct:
+                    CloneValueFieldOf(new ValueFieldRecorded { x = 11 });
                     break;
                 default:
                     Assert.Fail($"No clone case for {kind}");
