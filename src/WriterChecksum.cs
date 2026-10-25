@@ -94,6 +94,56 @@ namespace Dec
         }
     }
 
+    // Whether a field of type T is hashed straight from its value, without the box ComposeElement would make. The value is read through Unsafe, which netstandard2.1 doesn't have.
+    internal static class ChecksumTyped<T>
+    {
+        internal static readonly bool Applies = Compute();
+        internal static readonly bool IsEnum = typeof(T).IsEnum;
+
+        // For an enum, its underlying type's.
+        internal static readonly TypeCode Code = Type.GetTypeCode(typeof(T));
+
+        private static bool Compute()
+        {
+#if NETSTANDARD2_1
+            return false;
+#else
+            var type = typeof(T);
+            return type.IsEnum || type == typeof(int) || type == typeof(uint) || type == typeof(long) || type == typeof(ulong) || type == typeof(short) || type == typeof(ushort) || type == typeof(sbyte) || type == typeof(byte) || type == typeof(float) || type == typeof(double) || type == typeof(bool) || type == typeof(char);
+#endif
+        }
+    }
+
+    internal sealed class RecorderWriterChecksum : RecorderWriter
+    {
+        private readonly WriterNodeChecksum checksumNode;
+
+        internal RecorderWriterChecksum(WriterNodeChecksum node) : base(node)
+        {
+            checksumNode = node;
+        }
+
+        internal override void Record<T>(ref T value, string label, Parameters parameters)
+        {
+            if (!FieldAdmit(ref value, label, in parameters))
+            {
+                return;
+            }
+
+#if !NETSTANDARD2_1
+            // Shared() keeps the general path, which warns about it.
+            if (typeof(T).IsValueType && !parameters.shared && ChecksumTyped<T>.Applies && !Config.TestForceFallbackEmit)
+            {
+                ((WriterNodeChecksum)checksumNode.CreateRecorderChild(label, parameters.CreateSettings())).WriteTyped(value);
+                return;
+            }
+#endif
+
+            // Directly here rather than through a helper; see RecorderWriter.Record<T>.
+            Serialization.ComposeElement(checksumNode.CreateRecorderChild(label, parameters.CreateSettings()), value, typeof(T));
+        }
+    }
+
     internal class WriterNodeChecksum : WriterNodePooled
     {
         private readonly WriterChecksum writer;
@@ -124,6 +174,11 @@ namespace Dec
         {
             this.writer = writer;
             this.depth = depth;
+        }
+
+        protected override RecorderWriter RecorderCreate()
+        {
+            return new RecorderWriterChecksum(this);
         }
 
         private enum NodeTag
@@ -246,6 +301,57 @@ namespace Dec
                 default: return (bool)value ? 1UL : 0UL;
             }
         }
+
+#if !NETSTANDARD2_1
+        // The same tokens WritePrimitive or WriteEnum would add for this value, ComposeElement's TagClass included, which never fires because the value's type is exactly T.
+        internal void WriteTyped<T>(T value)
+        {
+            if (ChecksumTyped<T>.IsEnum)
+            {
+                writer.AddChecksum((int)NodeTag.Enum, this);
+                writer.AddChecksum(TypedBits(ref value), this);
+                return;
+            }
+
+            writer.AddChecksum((int)NodeTag.Primitive, this);
+
+            // WritePrimitive hashes these two as their ToString().
+            if (ChecksumTyped<T>.Code == TypeCode.Boolean)
+            {
+                WriteString(Unsafe.As<T, bool>(ref value) ? bool.TrueString : bool.FalseString);
+            }
+            else if (ChecksumTyped<T>.Code == TypeCode.Char)
+            {
+                writer.AddChecksum((int)NodeTag.String, this);
+                writer.AddChecksum(1UL, this);
+                writer.AddChecksum(TypedBits(ref value), this);
+            }
+            else
+            {
+                writer.AddChecksum(TypedBits(ref value), this);
+            }
+        }
+
+        // Matches WritePrimitive and EnumBits, sign extension included.
+        private static ulong TypedBits<T>(ref T value)
+        {
+            switch (ChecksumTyped<T>.Code)
+            {
+                case TypeCode.Double: return (ulong)BitConverter.DoubleToInt64Bits(Unsafe.As<T, double>(ref value));
+                case TypeCode.Single: return (ulong)BitConverter.SingleToInt32Bits(Unsafe.As<T, float>(ref value));
+                case TypeCode.Int64: return (ulong)Unsafe.As<T, long>(ref value);
+                case TypeCode.UInt64: return Unsafe.As<T, ulong>(ref value);
+                case TypeCode.Int32: return (ulong)Unsafe.As<T, int>(ref value);
+                case TypeCode.UInt32: return Unsafe.As<T, uint>(ref value);
+                case TypeCode.Int16: return (ulong)Unsafe.As<T, short>(ref value);
+                case TypeCode.UInt16: return Unsafe.As<T, ushort>(ref value);
+                case TypeCode.SByte: return (ulong)Unsafe.As<T, sbyte>(ref value);
+                case TypeCode.Byte: return Unsafe.As<T, byte>(ref value);
+                case TypeCode.Char: return Unsafe.As<T, char>(ref value);
+                default: return Unsafe.As<T, bool>(ref value) ? 1UL : 0UL;
+            }
+        }
+#endif
 
         public override void WriteString(string value)
         {

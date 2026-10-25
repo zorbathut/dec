@@ -937,9 +937,9 @@ namespace DecTest
             AssertAllocatesLess(() => ChecksumAllocatedBytes(many) - ChecksumAllocatedBytes(few), 1000, "Checksum should not allocate per recorded field");
         }
 
-        private struct IntRecordable : Dec.IRecordable
+        private struct StringRecordable : Dec.IRecordable
         {
-            public int value;
+            public string value;
 
             public void Record(Dec.Recorder recorder)
             {
@@ -950,15 +950,279 @@ namespace DecTest
         [Test]
         public void AllocationPerRecord()
         {
-            // Each struct recordable costs a box for itself and one for its field, just as two ints cost two boxes, and makes two nodes, as two ints do; neither side touches the reference table. So the difference is what a Record() call itself costs.
-            var recordables = Enumerable.Range(0, 1000).Select(i => new IntRecordable { value = i }).ToArray();
-            var ints = Enumerable.Range(0, 2000).ToArray();
+            // Each element is boxed as the array hands it out, a struct holding one reference into the same 24 bytes as an int, and neither side touches the reference table; the recordable's string field boxes nothing on any build. So the difference is what a Record() call itself costs.
+            var recordables = Enumerable.Range(0, 1000).Select(i => new StringRecordable { value = "value" }).ToArray();
+            var ints = Enumerable.Range(0, 1000).ToArray();
 
             // Warm up caches and the JIT so that only the traversal itself is measured.
             ChecksumAllocatedBytes(recordables);
             ChecksumAllocatedBytes(ints);
 
             AssertAllocatesLess(() => ChecksumAllocatedBytes(recordables) - ChecksumAllocatedBytes(ints), 1000, "Checksum should not allocate per Record() call");
+        }
+
+        public class TypedFields : Dec.IRecordable
+        {
+            public int i;
+            public uint ui;
+            public long l;
+            public ulong ul;
+            public short s;
+            public ushort us;
+            public sbyte sb;
+            public byte b;
+            public float f;
+            public double d;
+            public bool flag;
+            public char c;
+            public GenericEnum e;
+            public EnumByte eb;
+            public EnumSByte esb;
+            public EnumShort es;
+            public EnumUShort eus;
+            public EnumUInt eui;
+            public EnumLong el;
+            public EnumULong eul;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref i, nameof(i));
+                recorder.Record(ref ui, nameof(ui));
+                recorder.Record(ref l, nameof(l));
+                recorder.Record(ref ul, nameof(ul));
+                recorder.Record(ref s, nameof(s));
+                recorder.Record(ref us, nameof(us));
+                recorder.Record(ref sb, nameof(sb));
+                recorder.Record(ref b, nameof(b));
+                recorder.Record(ref f, nameof(f));
+                recorder.Record(ref d, nameof(d));
+                recorder.Record(ref flag, nameof(flag));
+                recorder.Record(ref c, nameof(c));
+                recorder.Record(ref e, nameof(e));
+                recorder.Record(ref eb, nameof(eb));
+                recorder.Record(ref esb, nameof(esb));
+                recorder.Record(ref es, nameof(es));
+                recorder.Record(ref eus, nameof(eus));
+                recorder.Record(ref eui, nameof(eui));
+                recorder.Record(ref el, nameof(el));
+                recorder.Record(ref eul, nameof(eul));
+            }
+        }
+
+        private static readonly TypedFields[] TypedFieldsCases =
+        {
+            new TypedFields(),
+            new TypedFields { i = -1, ui = uint.MaxValue, l = -1, ul = ulong.MaxValue, s = -1, us = ushort.MaxValue, sb = -1, b = byte.MaxValue, f = -1f, d = -1.0, flag = true, c = char.MaxValue, e = GenericEnum.Beta, eb = EnumByte.High, esb = EnumSByte.Low, es = EnumShort.Low, eus = EnumUShort.High, eui = EnumUInt.High, el = EnumLong.Low, eul = EnumULong.High },
+            new TypedFields { i = int.MinValue, ui = 0x80000000, l = long.MinValue, ul = 0x8000000000000000, s = short.MinValue, us = 0x8000, sb = sbyte.MinValue, b = 0x80, f = float.NegativeInfinity, d = double.NaN, c = 'x', el = EnumLong.High },
+            new TypedFields { f = float.NaN, d = -0.0 },
+        };
+
+        private static ulong ChecksumWithFallback(object value, bool fallback)
+        {
+            Dec.Config.TestForceFallbackEmit = fallback;
+            try
+            {
+                return Dec.Recorder.Checksum(value);
+            }
+            finally
+            {
+                Dec.Config.TestForceFallbackEmit = false;
+            }
+        }
+
+        [Test]
+        public void TypedFieldsMatchGeneral([ValueSource(nameof(TypedFieldsCases))] TypedFields value)
+        {
+            Assert.AreEqual(ChecksumWithFallback(value, true), ChecksumWithFallback(value, false));
+        }
+
+        [Test]
+        public void TypedFieldsDiff([Values] bool fallback)
+        {
+            Dec.Config.TestForceFallbackEmit = fallback;
+
+            // Each pair differs in that one field alone.
+            foreach (var field in new[] { nameof(TypedFields.i), nameof(TypedFields.f), nameof(TypedFields.flag), nameof(TypedFields.c), nameof(TypedFields.eb), nameof(TypedFields.eul) })
+            {
+                var value1 = new TypedFields();
+                var value2 = new TypedFields();
+                var fieldInfo = typeof(TypedFields).GetField(field);
+                fieldInfo.SetValue(value2, fieldInfo.GetValue(TypedFieldsCases[1]));
+
+                var differences = new List<string>();
+                Dec.Recorder.ChecksumDiff(value1, value2, diff => differences.Add(diff));
+
+                Assert.AreEqual(1, differences.Count, field);
+                Assert.That(differences[0], Does.Contain($".{field}`"), field);
+            }
+        }
+
+        public class CountedValues<T> : Dec.IRecordable
+        {
+            private static readonly string[] Labels = Enumerable.Range(0, 10).Select(i => $"field{i}").ToArray();
+
+            public int count;
+            public T[] values = new T[10];
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref count, nameof(count));
+                for (int i = 0; i < count; ++i)
+                {
+                    recorder.Record(ref values[i], Labels[i]);
+                }
+            }
+        }
+
+        private static void AssertNoAllocationPerValueField<T>(Func<int, T> make)
+        {
+            // As AllocationPerField, over value types: the object count is the same on both sides, so the difference is what the extra fields cost.
+            List<CountedValues<T>> Make(int count)
+            {
+                return Enumerable.Range(0, 200).Select(i => new CountedValues<T> { count = count, values = Enumerable.Range(0, 10).Select(make).ToArray() }).ToList();
+            }
+            var few = Make(5);
+            var many = Make(10);
+
+            ChecksumAllocatedBytes(few);
+            ChecksumAllocatedBytes(many);
+
+            AssertAllocatesLess(() => ChecksumAllocatedBytes(many) - ChecksumAllocatedBytes(few), 1000, "Checksum should not allocate per recorded value-type field");
+        }
+
+        public enum ValueFieldKind
+        {
+            Int,
+            Long,
+            Double,
+            Bool,
+            Enum,
+        }
+
+        public struct StringStruct : Dec.IRecordable
+        {
+            public string text;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref text, nameof(text));
+            }
+        }
+
+        [Test]
+        public void AllocationPerValueField([Values] ValueFieldKind kind)
+        {
+            // The netstandard2.1 build, which the netcoreapp3.1 tests run against, boxes these.
+            if (!Dec.ChecksumTyped<int>.Applies)
+            {
+                Assert.Ignore("Unboxed checksums are unavailable on this build");
+            }
+
+            switch (kind)
+            {
+                case ValueFieldKind.Int:
+                    AssertNoAllocationPerValueField(i => i);
+                    break;
+                case ValueFieldKind.Long:
+                    AssertNoAllocationPerValueField(i => (long)i << 33);
+                    break;
+                case ValueFieldKind.Double:
+                    AssertNoAllocationPerValueField(i => i * 0.5);
+                    break;
+                case ValueFieldKind.Bool:
+                    AssertNoAllocationPerValueField(i => i % 2 == 0);
+                    break;
+                case ValueFieldKind.Enum:
+                    AssertNoAllocationPerValueField(i => (EnumByte)(i % 2 + 1));
+                    break;
+                default:
+                    Assert.Fail($"No allocation case for {kind}");
+                    break;
+            }
+        }
+
+        [Test]
+        public void TypedFieldsUnordered()
+        {
+            // Hashed in an unordered context, as set elements and dictionary keys are.
+            var set = new HashSet<TypedFields>(TypedFieldsCases);
+            var dict = TypedFieldsCases.ToDictionary(value => value, value => 1);
+
+            Assert.AreEqual(ChecksumWithFallback(set, true), ChecksumWithFallback(set, false));
+            Assert.AreEqual(ChecksumWithFallback(dict, true), ChecksumWithFallback(dict, false));
+        }
+
+        public class Converted
+        {
+            public int i;
+            public float f;
+            public EnumByte e;
+            public StringStruct s;
+        }
+
+        public class ConvertedConverter : Dec.ConverterRecord<Converted>
+        {
+            public override void Record(ref Converted input, Dec.Recorder recorder)
+            {
+                recorder.Record(ref input.i, nameof(input.i));
+                recorder.Record(ref input.f, nameof(input.f));
+                recorder.Record(ref input.e, nameof(input.e));
+                recorder.Record(ref input.s, nameof(input.s));
+            }
+        }
+
+        [Test]
+        public void ConverterRecordFieldsMatchGeneral()
+        {
+            UpdateTestParameters(new Dec.Config.UnitTestParameters { explicitConverters = new Type[] { typeof(ConvertedConverter) } });
+
+            var value = new Converted { i = -3, f = -1.5f, e = EnumByte.High, s = new StringStruct { text = "text" } };
+            Assert.AreEqual(ChecksumWithFallback(value, true), ChecksumWithFallback(value, false));
+        }
+
+        public struct ConditionalStruct : Dec.IConditionalRecordable
+        {
+            public int number;
+
+            public bool ShouldRecord(Dec.Recorder.IUserSettings userSettings)
+            {
+                return true;
+            }
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref number, nameof(number));
+            }
+        }
+
+        public class SharedValueFields : Dec.IRecordable
+        {
+            public int number;
+            public StringStruct recorded;
+            public ConditionalStruct conditional;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Shared().Record(ref number, nameof(number));
+                recorder.Shared().Record(ref recorded, nameof(recorded));
+                recorder.Record(ref conditional, nameof(conditional));
+            }
+        }
+
+        [Test]
+        public void SharedValueFieldsWarn()
+        {
+            var value = new SharedValueFields { number = 4, recorded = new StringStruct { text = "text" }, conditional = new ConditionalStruct { number = 5 } };
+
+            var checksums = new List<ulong>();
+            foreach (var fallback in new[] { true, false })
+            {
+                int warnings = 0;
+                ExpectWarnings(() => checksums.Add(ChecksumWithFallback(value, fallback)), wrn => { ++warnings; return wrn.Contains("Shared"); });
+                Assert.AreEqual(2, warnings);
+            }
+
+            Assert.AreEqual(checksums[0], checksums[1]);
         }
     }
 }
