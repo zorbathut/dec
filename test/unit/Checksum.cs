@@ -219,6 +219,48 @@ namespace DecTest
             ChecksumDiffTests(value1, value2);
         }
 
+        public enum EnumByte : byte { Low = 1, High = 0xFF }
+        public enum EnumSByte : sbyte { Low = -1, High = 1 }
+        public enum EnumShort : short { Low = -1, High = short.MaxValue }
+        public enum EnumUShort : ushort { Low = 1, High = 0xFFFF }
+        public enum EnumUInt : uint { Low = 1, High = 0x80000000 }
+        public enum EnumLong : long { Low = -1, High = long.MaxValue }
+        public enum EnumULong : ulong { Low = 1, High = 0x8000000000000000 }
+
+        public class EnumHolder<T> : Dec.IRecordable
+        {
+            public T value;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref value, nameof(value));
+            }
+        }
+
+        private void AssertEnumChecksums<T>(T value1, T value2)
+        {
+            Assert.AreNotEqual(Dec.Recorder.Checksum(value1), Dec.Recorder.Checksum(value2));
+            ChecksumDiffTests(value1, value2);
+
+            var holder1 = new EnumHolder<T> { value = value1 };
+            var holder2 = new EnumHolder<T> { value = value2 };
+            Assert.AreNotEqual(Dec.Recorder.Checksum(holder1), Dec.Recorder.Checksum(holder2));
+            Assert.AreEqual(Dec.Recorder.Checksum(holder1), Dec.Recorder.Checksum(Dec.Recorder.Clone(holder1)));
+            ChecksumDiffTests(holder1, holder2);
+        }
+
+        [Test]
+        public void EnumUnderlyingTypes()
+        {
+            AssertEnumChecksums(EnumByte.Low, EnumByte.High);
+            AssertEnumChecksums(EnumSByte.Low, EnumSByte.High);
+            AssertEnumChecksums(EnumShort.Low, EnumShort.High);
+            AssertEnumChecksums(EnumUShort.Low, EnumUShort.High);
+            AssertEnumChecksums(EnumUInt.Low, EnumUInt.High);
+            AssertEnumChecksums(EnumLong.Low, EnumLong.High);
+            AssertEnumChecksums(EnumULong.Low, EnumULong.High);
+        }
+
         [Test]
         public void Type()
         {

@@ -78,6 +78,7 @@ All notable changes to this project will be documented in this file.
 * Stray text was reported only in the first node.
 * Values split by an XML comment or CDATA section were read only up to the split; a byte array's base64 after a comment read as empty.
 * A carriage return written to XML came back as a line feed when read.
+* `Recorder.Checksum` crashed on an enum not backed by `int`.
 
 
 ## [v0.11.1]

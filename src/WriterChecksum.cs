@@ -225,7 +225,26 @@ namespace Dec
         public override void WriteEnum(object value)
         {
             writer.AddChecksum((int)NodeTag.Enum, this);
-            writer.AddChecksum((ulong)(int)value, this);
+            writer.AddChecksum(EnumBits(value), this);
+        }
+
+        // A boxed enum unboxes only as its own underlying type. Signed values sign-extend, as an int-backed enum always has.
+        private static ulong EnumBits(object value)
+        {
+            switch (Type.GetTypeCode(value.GetType()))
+            {
+                case TypeCode.Int32: return (ulong)(int)value;
+                case TypeCode.UInt32: return (uint)value;
+                case TypeCode.Int64: return (ulong)(long)value;
+                case TypeCode.UInt64: return (ulong)value;
+                case TypeCode.Int16: return (ulong)(short)value;
+                case TypeCode.UInt16: return (ushort)value;
+                case TypeCode.SByte: return (ulong)(sbyte)value;
+                case TypeCode.Byte: return (byte)value;
+                // Only IL can declare these two.
+                case TypeCode.Char: return (char)value;
+                default: return (bool)value ? 1UL : 0UL;
+            }
         }
 
         public override void WriteString(string value)
