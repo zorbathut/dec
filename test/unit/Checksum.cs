@@ -1097,6 +1097,7 @@ namespace DecTest
             Double,
             Bool,
             Enum,
+            RecordedStruct,
         }
 
         public struct StringStruct : Dec.IRecordable
@@ -1112,8 +1113,9 @@ namespace DecTest
         [Test]
         public void AllocationPerValueField([Values] ValueFieldKind kind)
         {
-            // The netstandard2.1 build, which the netcoreapp3.1 tests run against, boxes these.
-            if (!Dec.ChecksumTyped<int>.Applies)
+            // The netstandard2.1 build, which the netcoreapp3.1 tests run against, boxes these. Applies() needs Dec's converters set up, which any Recorder call does.
+            Dec.Recorder.Checksum(0);
+            if (kind == ValueFieldKind.RecordedStruct ? !Dec.RecordableStruct<StringStruct>.Applies() : !Dec.ChecksumTyped<int>.Applies)
             {
                 Assert.Ignore("Unboxed checksums are unavailable on this build");
             }
@@ -1135,10 +1137,80 @@ namespace DecTest
                 case ValueFieldKind.Enum:
                     AssertNoAllocationPerValueField(i => (EnumByte)(i % 2 + 1));
                     break;
+                case ValueFieldKind.RecordedStruct:
+                    AssertNoAllocationPerValueField(i => new StringStruct { text = "text" });
+                    break;
                 default:
                     Assert.Fail($"No allocation case for {kind}");
                     break;
             }
+        }
+
+        public struct InnerStruct : Dec.IRecordable
+        {
+            public int number;
+            public StubRecordable target;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref number, nameof(number));
+                recorder.Shared().Record(ref target, nameof(target));
+            }
+        }
+
+        public struct OuterStruct : Dec.IRecordable
+        {
+            public string text;
+            public InnerStruct inner;
+            public StubRecordable target;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref text, nameof(text));
+                recorder.Record(ref inner, nameof(inner));
+                recorder.Shared().Record(ref target, nameof(target));
+            }
+        }
+
+        public class StructHolder : Dec.IRecordable
+        {
+            public OuterStruct a;
+            public OuterStruct b;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref a, nameof(a));
+                recorder.Record(ref b, nameof(b));
+            }
+        }
+
+        private static StructHolder MakeStructHolder(int number)
+        {
+            var shared = new StubRecordable();
+            return new StructHolder
+            {
+                a = new OuterStruct { text = "a", inner = new InnerStruct { number = number, target = shared }, target = shared },
+                b = new OuterStruct { text = "b", inner = new InnerStruct { number = 2, target = new StubRecordable() }, target = shared },
+            };
+        }
+
+        [Test]
+        public void RecordedStructMatchesGeneral()
+        {
+            var value = MakeStructHolder(1);
+            Assert.AreEqual(ChecksumWithFallback(value, true), ChecksumWithFallback(value, false));
+        }
+
+        [Test]
+        public void RecordedStructDiff([Values] bool fallback)
+        {
+            Dec.Config.TestForceFallbackEmit = fallback;
+
+            var differences = new List<string>();
+            Dec.Recorder.ChecksumDiff(MakeStructHolder(1), MakeStructHolder(3), diff => differences.Add(diff));
+
+            Assert.AreEqual(1, differences.Count);
+            Assert.That(differences[0], Does.Contain(".a.inner.number`"));
         }
 
         [Test]

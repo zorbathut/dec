@@ -139,6 +139,12 @@ namespace Dec
             }
 #endif
 
+            if (typeof(T).IsValueType && !parameters.shared && RecordableStruct<T>.Applies() && !Config.TestForceFallbackEmit)
+            {
+                ((WriterNodeChecksum)checksumNode.CreateRecorderChild(label, parameters.CreateSettings())).WriteRecordStruct(value);
+                return;
+            }
+
             // Directly here rather than through a helper; see RecorderWriter.Record<T>.
             Serialization.ComposeElement(checksumNode.CreateRecorderChild(label, parameters.CreateSettings()), value, typeof(T));
         }
@@ -663,6 +669,14 @@ namespace Dec
             writer.AddChecksum((int)NodeTag.Record, this);
 
             RecorderRun(value);
+        }
+
+        // WriteRecord without the box; ComposeElement adds nothing else for a struct, which can't be shared, tagged, or left unconstructable.
+        internal void WriteRecordStruct<T>(T value)
+        {
+            writer.AddChecksum((int)NodeTag.Record, this);
+
+            RecorderRun(ref value, RecordableStruct<T>.Record);
         }
 
         public override void WriteConvertible(Converter converter, object value)
