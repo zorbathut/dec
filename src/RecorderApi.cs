@@ -260,6 +260,8 @@ namespace Dec
         /// Clone() is guaranteed to accept everything that Write(Read(obj)) does, but the reverse is not true; Clone is sometimes more permissive than the disk serialization system. Don't expect to use this as complete validation for Write.
         ///
         /// This is a new feature and should be considered experimental. It is currently undertested, and I cannot stress this enough, Dec is a library full of weird edge cases and extremely carefully chosen behaviors, I *guarantee* many of those are handled wrong with Clone. If performance is not critical I currently strongly recommend using Write(Read(obj)).
+        ///
+        /// Each thread keeps the tables this uses to track references from one call to the next, up to around 12 MB per thread when it runs both Clone and Checksum on very large object graphs; a graph of more than 100,000 objects doesn't keep them.
         /// </remarks>
         public static T Clone<T>(T obj, IUserSettings userSettings = null)
         {
@@ -267,16 +269,17 @@ namespace Dec
 
             using (var _ = new CultureInfoScope(Config.CultureInfo))
             {
-                var writerContext = new WriterClone(userSettings);
+                using (var writerContext = new WriterClone(userSettings))
+                {
+                    var writerNode = writerContext.StartClone(typeof(T));
 
-                var writerNode = writerContext.StartClone(typeof(T));
+                    Serialization.ComposeElement(writerNode, obj, typeof(T));
+                    var output = writerNode.GetResult(false, typeof(T));
 
-                Serialization.ComposeElement(writerNode, obj, typeof(T));
-                var output = writerNode.GetResult(false, typeof(T));
+                    writerContext.FinalizePendingWrites();
 
-                writerContext.FinalizePendingWrites();
-
-                return (T)output;
+                    return (T)output;
+                }
             }
         }
 
@@ -291,6 +294,8 @@ namespace Dec
         /// This does not guarantee immutability between versions of Dec; the result may change on library update. Also, unlike normal Dec serialization, Checksum is very sensitive to underlying types. As an example, it will generate different results for SomeEnum.SomeValue and "SomeValue". In general, permanent storage of Checksums is not recommended; this is designed for runtime comparisons only.
         ///
         /// The Checksum system does not currently have a working solution for shared objects or stack-overflow prevention. If you need this in your project, please ask on Discord.
+        ///
+        /// Each thread keeps the tables this uses to track references from one call to the next, up to around 12 MB per thread when it runs both Clone and Checksum on very large object graphs; a graph of more than 100,000 objects doesn't keep them.
         /// </remarks>
         public static ulong Checksum<T>(T target, IUserSettings userSettings = null)
         {
@@ -298,11 +303,12 @@ namespace Dec
 
             using (var _ = new CultureInfoScope(Config.CultureInfo))
             {
-                var writerChecksum = new WriterChecksum(userSettings);
+                using (var writerChecksum = new WriterChecksum(userSettings))
+                {
+                    Serialization.ComposeElement(writerChecksum.Start(), target, typeof(T));
 
-                Serialization.ComposeElement(writerChecksum.Start(), target, typeof(T));
-
-                return writerChecksum.FinishChecksum();
+                    return writerChecksum.FinishChecksum();
+                }
             }
         }
 
@@ -328,20 +334,17 @@ namespace Dec
 
                 {
                     // get a length and bases
-                    var writerChecksumA = new WriterChecksum(userSettings);
-                    Serialization.ComposeElement(writerChecksumA.Start(), lhs, typeof(T));
+                    var passA = ChecksumDiffPass(lhs, -1, userSettings);
+                    var passB = ChecksumDiffPass(rhs, -1, userSettings);
 
-                    var writerChecksumB = new WriterChecksum(userSettings);
-                    Serialization.ComposeElement(writerChecksumB.Start(), rhs, typeof(T));
-
-                    if (writerChecksumA.FinishChecksum() == writerChecksumB.FinishChecksum())
+                    if (passA.checksum == passB.checksum)
                     {
                         // yes! this is stupid!
                         return;
                     }
 
                     // max, just in case one of them is a strict append of the other
-                    maxLength = Math.Max(writerChecksumA.GetTokensIfNotStopped(), writerChecksumB.GetTokensIfNotStopped());
+                    maxLength = Math.Max(passA.tokens, passB.tokens);
                 }
 
                 // binsearch time
@@ -352,16 +355,10 @@ namespace Dec
                 {
                     long mid = (low + high) / 2;
 
-                    var writerChecksumA = new WriterChecksum(userSettings);
-                    var writerChecksumB = new WriterChecksum(userSettings);
+                    var passA = ChecksumDiffPass(lhs, mid, userSettings);
+                    var passB = ChecksumDiffPass(rhs, mid, userSettings);
 
-                    writerChecksumA.SetStopAt(mid);
-                    writerChecksumB.SetStopAt(mid);
-
-                    Serialization.ComposeElement(writerChecksumA.Start(), lhs, typeof(T));
-                    Serialization.ComposeElement(writerChecksumB.Start(), rhs, typeof(T));
-
-                    if (writerChecksumA.FinishChecksum() == writerChecksumB.FinishChecksum())
+                    if (passA.checksum == passB.checksum)
                     {
                         // they match, so we need to go higher
                         low = mid + 1;
@@ -374,17 +371,11 @@ namespace Dec
                 }
 
                 // this can probably be better, but for now, do one last scan so we can get the paths
-                var writerChecksumFinalA = new WriterChecksum(userSettings);
-                var writerChecksumFinalB = new WriterChecksum(userSettings);
+                var passFinalA = ChecksumDiffPass(lhs, low, userSettings);
+                var passFinalB = ChecksumDiffPass(rhs, low, userSettings);
 
-                writerChecksumFinalA.SetStopAt(low);
-                writerChecksumFinalB.SetStopAt(low);
-
-                Serialization.ComposeElement(writerChecksumFinalA.Start(), lhs, typeof(T));
-                Serialization.ComposeElement(writerChecksumFinalB.Start(), rhs, typeof(T));
-
-                var pathA = writerChecksumFinalA.GetStopPath();
-                var pathB = writerChecksumFinalB.GetStopPath();
+                var pathA = passFinalA.stopPath;
+                var pathB = passFinalB.stopPath;
 
                 var pathAString = pathA.Serialize();
                 var pathBString = pathB.Serialize();
@@ -397,6 +388,18 @@ namespace Dec
                 {
                     report($"Difference found at conflicting paths; `{pathAString}` vs `{pathBString}`");
                 }
+            }
+        }
+
+        // Stops after stopAt tokens, or runs to the end at -1. Each pass finishes before the next starts, so they all reuse the same reference tables.
+        private static (ulong checksum, long tokens, Path stopPath) ChecksumDiffPass<T>(T value, long stopAt, IUserSettings userSettings)
+        {
+            using (var writerChecksum = new WriterChecksum(userSettings))
+            {
+                writerChecksum.SetStopAt(stopAt);
+                Serialization.ComposeElement(writerChecksum.Start(), value, typeof(T));
+
+                return (writerChecksum.FinishChecksum(), writerChecksum.GetTokensIfNotStopped(), writerChecksum.GetStopPath());
             }
         }
     }

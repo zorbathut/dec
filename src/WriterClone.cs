@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 
 namespace Dec
 {
-    internal class WriterClone
+    internal class WriterClone : IDisposable
     {
         private WriterUtil.PendingWriteCoordinator pendingWriteCoordinator = new WriterUtil.PendingWriteCoordinator();
 
@@ -25,7 +25,8 @@ namespace Dec
         public bool AllowReflection { get => false; }
         public Recorder.IUserSettings UserSettings { get; }
 
-        internal Dictionary<object, object> cloneReferences = new Dictionary<object, object>(ComparerIdentity.Instance);
+        private readonly ReferenceTables tables;
+        internal readonly Dictionary<object, object> cloneReferences;
 
         // One creator serves the whole operation; object construction only consults it for the duration of the call.
         private ReaderNodeCloneCreator creator;
@@ -36,6 +37,14 @@ namespace Dec
         public WriterClone(Recorder.IUserSettings userSettings)
         {
             this.UserSettings = userSettings;
+
+            tables = ReferenceTables.Take();
+            cloneReferences = tables.clones;
+        }
+
+        public void Dispose()
+        {
+            tables.Return();
         }
 
         internal ReaderNodeCloneCreator CreatorFor(object original)

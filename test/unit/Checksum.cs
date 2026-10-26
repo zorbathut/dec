@@ -895,6 +895,27 @@ namespace DecTest
             return GC.GetAllocatedBytesForCurrentThread() - before;
         }
 
+        private class ReferenceElement : Dec.IRecordable
+        {
+            public void Record(Dec.Recorder recorder)
+            {
+            }
+        }
+
+        [Test]
+        public void AllocationPerReference()
+        {
+            // The elements have no fields, so only the reference table could grow with their count, and it's kept from the previous call on this thread.
+            var small = Enumerable.Range(0, 1000).Select(i => new ReferenceElement()).ToList();
+            var large = Enumerable.Range(0, 2000).Select(i => new ReferenceElement()).ToList();
+
+            // Warm up caches and the JIT so that only the traversal itself is measured.
+            ChecksumAllocatedBytes(large);
+            ChecksumAllocatedBytes(small);
+
+            AssertAllocatesLess(() => ChecksumAllocatedBytes(large) - ChecksumAllocatedBytes(small), 1000 * 8, "Checksum should not grow its reference table on every call");
+        }
+
         [Test]
         public void AllocationPerElement()
         {
@@ -926,7 +947,7 @@ namespace DecTest
         [Test]
         public void AllocationPerField()
         {
-            // The object count is the same on both sides, so the reference table's growth cancels out; what's left is per-field cost, plus one more growth of the reused recorder's label set.
+            // The object count is the same on both sides, so the reference table is the same size on both; what's left is per-field cost, plus one more growth of the reused recorder's label set.
             var few = Enumerable.Range(0, 200).Select(i => new StringFields { values = Enumerable.Range(0, 5).Select(j => $"value{j}").ToArray() }).ToList();
             var many = Enumerable.Range(0, 200).Select(i => new StringFields { values = Enumerable.Range(0, 10).Select(j => $"value{j}").ToArray() }).ToList();
 

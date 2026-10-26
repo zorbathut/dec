@@ -7,13 +7,14 @@ using System.Runtime.CompilerServices;
 
 namespace Dec
 {
-    internal class WriterChecksum
+    internal class WriterChecksum : IDisposable
     {
         public bool AllowReflection { get => false; }
         public Recorder.IUserSettings UserSettings { get; }
 
-        internal Dictionary<object, int> seenReferences = new Dictionary<object, int>(ComparerIdentity.Instance);
-        internal HashSet<object> seenReferencesUnordered = new HashSet<object>(ComparerIdentity.Instance);
+        private readonly ReferenceTables tables;
+        internal readonly Dictionary<object, int> seenReferences;
+        internal readonly HashSet<object> seenReferencesUnordered;
 
         // One node per depth, reused: a checksum walk is strictly depth-first and holds on to no children, so a node's subtree is always finished before its next sibling is created.
         private List<WriterNodeChecksum> nodes = new List<WriterNodeChecksum>();
@@ -86,6 +87,15 @@ namespace Dec
         public WriterChecksum(Recorder.IUserSettings userSettings)
         {
             this.UserSettings = userSettings;
+
+            tables = ReferenceTables.Take();
+            seenReferences = tables.ids;
+            seenReferencesUnordered = tables.unordered;
+        }
+
+        public void Dispose()
+        {
+            tables.Return();
         }
 
         public WriterNodeChecksum Start()

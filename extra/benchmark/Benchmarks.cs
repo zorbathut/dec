@@ -926,6 +926,92 @@ namespace DecBenchmark
         }
     }
 
+    public class ReferenceGraphNode : IRecordable
+    {
+        public int value;
+        public ReferenceGraphNode link;
+
+        public void Record(Recorder recorder)
+        {
+            recorder.Record(ref value, nameof(value));
+            recorder.Shared().Record(ref link, nameof(link));
+        }
+    }
+
+    // Enough distinct objects that Clone's and Checksum's reference tables outgrow the large-object-heap threshold.
+    [MemoryDiagnoser]
+    public class ReferenceGraphBenchmarks : BenchmarkBase
+    {
+        [ThreadStatic] private static bool Primed;
+
+        private List<ReferenceGraphNode> large;
+        private List<ReferenceGraphNode> small;
+
+        private static List<ReferenceGraphNode> Make(int count)
+        {
+            var nodes = Enumerable.Range(0, count).Select(i => new ReferenceGraphNode { value = i }).ToList();
+            for (int i = 0; i < count; ++i)
+            {
+                nodes[i].link = nodes[(i * 7 + 1) % count];
+            }
+
+            return nodes;
+        }
+
+        [GlobalSetup]
+        public void Setup()
+        {
+            SetupDec();
+            FinishParser();
+
+            large = Make(20000);
+            small = Make(4);
+        }
+
+        [GlobalCleanup]
+        public void Cleanup()
+        {
+            CleanupDec();
+        }
+
+        [Benchmark]
+        public List<ReferenceGraphNode> Clone()
+        {
+            return Recorder.Clone(large);
+        }
+
+        [Benchmark]
+        public ulong Checksum()
+        {
+            return Recorder.Checksum(large);
+        }
+
+        // Small calls on a thread that has already made a large one.
+        private void Prime()
+        {
+            if (!Primed)
+            {
+                Recorder.Clone(large);
+                Recorder.Checksum(large);
+                Primed = true;
+            }
+        }
+
+        [Benchmark]
+        public List<ReferenceGraphNode> SmallAfterLargeClone()
+        {
+            Prime();
+            return Recorder.Clone(small);
+        }
+
+        [Benchmark]
+        public ulong SmallAfterLargeChecksum()
+        {
+            Prime();
+            return Recorder.Checksum(small);
+        }
+    }
+
     [MemoryDiagnoser]
     public class ValueFieldBenchmarks : BenchmarkBase
     {

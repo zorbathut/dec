@@ -757,6 +757,30 @@ namespace DecTest
             AssertAllocatesLess(() => CloneAllocatedBytes(many) - CloneAllocatedBytes(few), 5000, "Clone should not allocate per recorded value-type field");
         }
 
+        public class ReferenceElement : IRecordable
+        {
+            public int value;
+
+            public void Record(Dec.Recorder recorder)
+            {
+                recorder.Record(ref value, nameof(value));
+            }
+        }
+
+        [Test]
+        public void AllocationPerReference()
+        {
+            // Each extra element costs its clone and its place in the presized result list, around 32 bytes; the reference table is kept from the previous call on this thread, so it doesn't grow.
+            var small = Enumerable.Range(0, 1000).Select(i => new ReferenceElement { value = i }).ToList();
+            var large = Enumerable.Range(0, 2000).Select(i => new ReferenceElement { value = i }).ToList();
+
+            // Warm up caches and the JIT so that only the traversal itself is measured.
+            CloneAllocatedBytes(large);
+            CloneAllocatedBytes(small);
+
+            AssertAllocatesLess(() => CloneAllocatedBytes(large) - CloneAllocatedBytes(small), 1000 * 50, "Clone should not grow its reference table on every call");
+        }
+
         [Test]
         public void AllocationPerElement()
         {
@@ -784,7 +808,7 @@ namespace DecTest
         [Test]
         public void AllocationPerRecord()
         {
-            // Each extra struct element costs only its 8 bytes in the presized result list. The netstandard2.1 build, which the netcoreapp3.1 tests run against, takes the general path, whose two boxes and list growth come to around 64. An entry in the reference table would add 50 to 150 more, depending on where the table's growth lands, and a recorder, reader, and read view of its own per Record() call would add several hundred.
+            // Each extra struct element costs only its 8 bytes in the presized result list. The netstandard2.1 build, which the netcoreapp3.1 tests run against, takes the general path, whose two boxes and list growth come to around 64. A recorder, reader, and read view of its own per Record() call would add several hundred.
 
             // Applies() needs Dec's converters set up, which any Recorder call does.
             Dec.Recorder.Clone(0);
