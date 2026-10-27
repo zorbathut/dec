@@ -299,7 +299,7 @@ Class Recorder  <a class="header-action link-secondary" title="View source" href
 
   <h3 id="Dec_Recorder_ChecksumDiff__1___0___0_System_Action_System_String__Dec_Recorder_IUserSettings_" data-uid="Dec.Recorder.ChecksumDiff``1(``0,``0,System.Action{System.String},Dec.Recorder.IUserSettings)">
   ChecksumDiff&lt;T&gt;(T, T, Action&lt;string&gt;, IUserSettings)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/RecorderApi.cs/#L321"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/RecorderApi.cs/#L327"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Compares two objects and reports the first point where they differ in their serialized structure.</p>
@@ -348,7 +348,7 @@ Class Recorder  <a class="header-action link-secondary" title="View source" href
 
   <h3 id="Dec_Recorder_Checksum__1___0_Dec_Recorder_IUserSettings_" data-uid="Dec.Recorder.Checksum``1(``0,Dec.Recorder.IUserSettings)">
   Checksum&lt;T&gt;(T, IUserSettings)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/RecorderApi.cs/#L295"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/RecorderApi.cs/#L300"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Returns a checksum of the object. This is a non-cryptographic hash of the serialized data, and is not guaranteed to be unique or safe against malicious tampering.</p>
@@ -389,6 +389,7 @@ Class Recorder  <a class="header-action link-secondary" title="View source" href
 <p>This does not rely on GetHashCode() and is guaranteed to return the same number across runs, even if object hashes have changed or non-ordered containers like HashSet or Dictionary have chosen to store things in a different &quot;order&quot;. This also guarantees the same result on different platforms.</p>
 <p>This does not guarantee immutability between versions of Dec; the result may change on library update. Also, unlike normal Dec serialization, Checksum is very sensitive to underlying types. As an example, it will generate different results for SomeEnum.SomeValue and &quot;SomeValue&quot;. In general, permanent storage of Checksums is not recommended; this is designed for runtime comparisons only.</p>
 <p>The Checksum system does not currently have a working solution for shared objects or stack-overflow prevention. If you need this in your project, please ask on Discord.</p>
+<p>Each thread keeps the tables this uses to track references from one call to the next, up to around 12 MB per thread when it runs both Clone and Checksum on very large object graphs; a graph of more than 100,000 objects doesn't keep them.</p>
 </div>
 
 
@@ -398,7 +399,7 @@ Class Recorder  <a class="header-action link-secondary" title="View source" href
 
   <h3 id="Dec_Recorder_Clone__1___0_Dec_Recorder_IUserSettings_" data-uid="Dec.Recorder.Clone``1(``0,Dec.Recorder.IUserSettings)">
   Clone&lt;T&gt;(T, IUserSettings)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/RecorderApi.cs/#L264"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/RecorderApi.cs/#L266"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Makes a copy of an object.</p>
@@ -438,6 +439,7 @@ Class Recorder  <a class="header-action link-secondary" title="View source" href
   <div class="markdown level1 remarks"><p>This is logically equivalent to Write(Read(obj)), but much faster (approx 200x in one real-world testcase.)</p>
 <p>Clone() is guaranteed to accept everything that Write(Read(obj)) does, but the reverse is not true; Clone is sometimes more permissive than the disk serialization system. Don't expect to use this as complete validation for Write.</p>
 <p>This is a new feature and should be considered experimental. It is currently undertested, and I cannot stress this enough, Dec is a library full of weird edge cases and extremely carefully chosen behaviors, I <em>guarantee</em> many of those are handled wrong with Clone. If performance is not critical I currently strongly recommend using Write(Read(obj)).</p>
+<p>Each thread keeps the tables this uses to track references from one call to the next, up to around 12 MB per thread when it runs both Clone and Checksum on very large object graphs; a graph of more than 100,000 objects doesn't keep them.</p>
 </div>
 
 
