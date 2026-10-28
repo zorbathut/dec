@@ -25,35 +25,44 @@ All notable changes to this project will be documented in this file.
 * `ConfigErrors` and `PostLoad` are now marked `[Obsolete]` in favor of `[Dec.Setup]` functions. They'll be removed in the future.
 
 ### Improved
+* Performance improvements to `Recorder.Clone`, `Recorder.Checksum`, `Recorder.Read`, `Recorder.Write`, and dec parsing. Some of these need .NET 6 or later, or runtime code generation, so the netstandard2.1 build (Unity), IL2CPP, and NativeAOT get less of them.
+  * Changes:
+    * `Recorder.Clone` and `Recorder.Checksum` reuse their internal state within a call, and their reference tables between calls on the same thread. Those tables can keep up to around 12 MB per thread when one thread runs both on very large graphs.
+    * `Recorder.Clone` copies dictionaries, and primitive, enum, and copy-as-is struct fields, without boxing them.
+    * `Recorder.Checksum` hashes primitive and enum fields without boxing them.
+    * `IRecordable` structs are cloned and checksummed without boxing.
+    * `Recorder.Write`, `Recorder.Clone`, and `Recorder.Checksum` do less work in projects that use `DecLookup` or `DecRegister`, and on objects with few fields.
+    * RecorderEnumerator records user iterators and closures through generated code instead of reflection, and creates iterators faster.
+    * XML reading does much less redundant work per element, and large `Record()` objects are no longer quadratic.
+    * `Dag.CalculateOrder` is no longer quadratic on large inputs.
+  * Synthetic benchmarks (Dec's own suite) on .NET 10, against v0.11.1:
+    * `Recorder.Clone`:
+      * large class graphs: 40-70% less time and 75-95% less allocation;
+      * small objects: 15-40% less time;
+      * dictionaries: 25-85% less time and 75-80% less allocation;
+      * struct-heavy data: 78-94% less time and 97-99% less allocation. Struct collections that hit the quadratic case listed under Fixed save up to 99%.
+      * arrays and hash sets of primitives: unchanged.
+    * `Recorder.Checksum`: 20-70% less time, usually with 80-99% less allocation.
+    * `Recorder.Read`: 25-55% less time with about half the allocation. Dec parsing: about 25% less time.
+    * RecorderEnumerator coroutines:
+      * Clone and Checksum: about 80% less time and 97% less allocation;
+      * Write and Read: about 45% less time.
+    * `Recorder.Write` otherwise: mostly unchanged, with up to 15% less time in projects that use `DecLookup` or `DecRegister`.
+  * A real game's save with 150 live critters, on .NET 10, against an unreleased build from just before the Clone/Checksum work, since v0.11.1 can't build the game. Clone and Checksum on that build match v0.11.1 in synthetic benchmarks.
+    * `Recorder.Clone`: from 19.5 ms and 27.1 MB allocated to 2.6 ms and 1.1 MB.
+    * `Recorder.Checksum`: from 7.2 ms and 13.6 MB allocated to 2.1 ms and 0.8 MB.
+    * Over 1000 back-to-back calls, gen2 collections went from 16 to 0 for Clone and from 6 to 0 for Checksum, and 99th-percentile Clone time fell from about 39 ms to under 9 ms.
+    * `Recorder.Read` and `Recorder.Write` of the save took the same time. Read allocated 31% less. That build already had the first XML-reading improvement, worth about 25% of synthetic Read time, and most of this Read time is spent in the game's own code.
 * RecorderEnumerator: Skip `<>l__initialThreadId` and reset it to an invalid value on deserialization, making behavior and checksums slightly more reliable.
-* `Dag.CalculateOrder` no longer has quadratic behavior on large inputs.
 * `Dec.Path` is now somewhat more specific.
 * Duplicate reference IDs in a Record are now reported instead of silently overwriting each other.
 * A reference ID that is also a dec path is now reported.
-* Redundant-work performance issue when reading XML.
 * Some write errors now embed the error into the output itself, so it can be reported accurately on read.
 * A Recorder reference that can't be written now reads back as null instead of as a default-constructed object.
 * A non-`.Shared()` reference to an object that was already written as shared is still an error, but is now written as a working reference instead of being lost.
 * Simplified Checksum-related Paths.
-* `Recorder.Checksum` and `Recorder.Clone` allocate far less, resulting in a 60-80% reduction in bytes allocated and up to 40% performance gain depending on workload.
-* `Recorder.Clone` allocates less on dictionaries.
-* `Recorder.Write`, `Recorder.Clone`, and `Recorder.Checksum` are up to 35% faster, depending on workload, in projects that use `DecLookup` or `DecRegister` functionality.
-* `Recorder.Clone` and `Recorder.Checksum` are up to 10% faster on objects with few fields, thanks to a cheaper check for duplicate labels.
-* `Recorder.Clone` copies a `Dictionary<K,V>` through its typed enumerator into a result presized to fit, instead of boxing each entry and growing from empty. Performance gains anywhere from +30% to +200%, with around 75% fewer allocations.
-* `Recorder.Clone` copies primitive, enum, and `[CloneStructPiecewise]` or valuelike-converter struct fields without boxing them. Performance gains anywhere from +8% to +80%, with around 25-65% fewer allocations.
-* `Recorder.Checksum` hashes primitive and enum fields without boxing them on .NET 6 and later, with up to 20% fewer allocations.
-* `Recorder.Clone` copies `IRecordable` struct fields without boxing them on .NET 6 and later, around 20% faster with half the allocations.
-* `Recorder.Clone` copies `IRecordable` structs in a `List<T>` or `Dictionary<K,V>` without boxing them on .NET 6 and later, around 35% faster with 80% fewer allocations.
-* `Recorder.Checksum` records `IRecordable` struct fields without boxing them on .NET 6 and later, around 30% faster with 75% fewer allocations.
-* `Recorder.Clone` and `Recorder.Checksum` reuse their reference tables between calls on the same thread, so repeated calls on large object graphs allocate far less and trigger far fewer gen2 collections, at the cost of keeping the tables in memory per thread.
-* RecorderEnumerator: User iterators and closures are recorded through generated code instead of per-field reflection, making `Recorder.Clone` and `Recorder.Checksum` of them roughly 3-4x faster with about 80% less allocation, `Recorder.Write` about 45% faster, and `Recorder.Read` about 15% faster.
-* RecorderEnumerator: A user iterator is created through a cached constructor instead of a per-call constructor search, making each creation about 5x faster with 75% less allocation, and `Recorder.Clone` of coroutine-heavy state about 8% faster.
 * RecorderEnumerator: Recording the state machine of an async method or async iterator now reports that `[RecordableEnumerable]` supports only synchronous iterators, instead of asking for the attribute or failing on the async machinery's own fields.
 * When several layers of an inherited dec give a `class` for the same member, the most-derived one now wins; previously a child naming a class for an object its parent had already set up was an error. A layer that replaces the member, with `mode="replace"` or as a container written with no mode, now discards earlier layers' class along with their contents, and a container's class no longer has to match a C# default that it replaces, in decs and in `Recorder.Read` alike.
-* Reading a compact array from XML no longer scans all of its elements for text before sizing it; a small saving next to the rest of the read.
-* `Recorder.Read` and dec parsing are about 10% faster with about 20% less allocation.
-* Reduced allocations when reading a `Record()` field from XML, making `Recorder.Read` of `Record()`-heavy data about 5-10% faster with 6-12% less allocation.
-* Complexity reduction when dealing with large Record() objects, increasing performance up to 30% or more in those cases.
 
 ### Fixed
 * Recorder.Read crash on a `<Ref>` element with invalid `class`.
