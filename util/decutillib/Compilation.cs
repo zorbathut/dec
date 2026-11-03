@@ -16,8 +16,20 @@ namespace DecUtilLib
 
         public static Assembly Compile(string src, Assembly[] assemblies)
         {
+            var compilation = Build(src, assemblies, Path.GetRandomFileName() + ".DynComp.dll");
+
+            var ms = new MemoryStream();
+            Emit(compilation, ms);
+            ms.Seek(0, SeekOrigin.Begin);
+
+            var assembly = AssemblyLoadContext.Default.LoadFromStream(ms);
+            AssemblyStreams[assembly] = ms;
+            return assembly;
+        }
+
+        private static CSharpCompilation Build(string src, Assembly[] assemblies, string assemblyName)
+        {
             var syntaxTree = CSharpSyntaxTree.ParseText(src);
-            string assemblyName = Path.GetRandomFileName() + ".DynComp.dll";
             var refPaths = new[] {
                     typeof(object).GetTypeInfo().Assembly.Location,
                     typeof(Dec.Dec).GetTypeInfo().Assembly.Location,
@@ -43,24 +55,20 @@ namespace DecUtilLib
             })).ToArray();
 
 
-            var compilation = CSharpCompilation.Create(
+            return CSharpCompilation.Create(
                 assemblyName,
                 syntaxTrees: new[] { syntaxTree },
                 references: references,
                 options: new CSharpCompilationOptions(Microsoft.CodeAnalysis.OutputKind.DynamicallyLinkedLibrary));
+        }
 
-            var ms = new MemoryStream();
-            var result = compilation.Emit(ms);
+        private static void Emit(CSharpCompilation compilation, Stream stream)
+        {
+            var result = compilation.Emit(stream);
             if (!result.Success)
             {
                 Assert.IsTrue(false, string.Join("\n", result.Diagnostics.Take(10).Select(err => err.ToString())));
             }
-
-            ms.Seek(0, SeekOrigin.Begin);
-
-            var assembly = AssemblyLoadContext.Default.LoadFromStream(ms);
-            AssemblyStreams[assembly] = ms;
-            return assembly;
         }
     }
 }
