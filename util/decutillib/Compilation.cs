@@ -27,6 +27,17 @@ namespace DecUtilLib
             return assembly;
         }
 
+        // Writes the assembly to disk without loading it.
+        public static void CompileToFile(string src, Assembly[] assemblies, string assemblyName, string path)
+        {
+            var compilation = Build(src, assemblies, assemblyName);
+
+            using (var stream = File.Create(path))
+            {
+                Emit(compilation, stream);
+            }
+        }
+
         private static CSharpCompilation Build(string src, Assembly[] assemblies, string assemblyName)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(src);

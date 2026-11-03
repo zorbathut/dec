@@ -12,3 +12,7 @@ This provides a wide set of converters and other functionality to serialize and 
 This needs to be clear: this functionality is dark magic and curses all who look upon it. If you build a game on it and it later turns out that there's some core issue preventing full support that I was not aware of, my response is going to be "huh, that's too bad". There be dragons here.
 
 I'm using it, though! So I'll probably run into those problems before you do.
+
+## [modding](modding)
+
+Mod manifests, dependency resolution, automatic load order, and loading of mods' assemblies and entry points, built on top of `ParserModular`. It needs .NET 6 or later and the SemanticVersioning package.
