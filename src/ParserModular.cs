@@ -188,6 +188,11 @@ namespace Dec
             }
             s_Status = Status.Accumulating;
 
+            // Assemblies loaded since Dec was last used (plugins, mods) must be visible to this parse, but earlier Recorder use may have already built these caches without them.
+            // We're being a bit overly aggressive with this because it's a common time for assemblies to change and it should be an irrelevant perf hit in most cases.
+            // But right now we're also not guaranteeing it.
+            Config.TypeCachesClear();
+
             bool unitTestMode = Config.TestParameters != null;
 
             {
