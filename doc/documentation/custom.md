@@ -1,6 +1,6 @@
 # Custom deserialization
 
-Providing custom deserializers for your own classes, or third-party classes, requires defining classes that derive from [`Dec.Converter`](xref:Dec.Converter). [`Dec.Parser`](xref:Dec.Parser) will automatically find them during startup and register them. (Note: At this time, it is *required* to run Parser first. If you want to use Converters in a pre-parser Recorder, come pester me on Discord and I'll get it working for you.)
+Providing custom deserializers for your own classes, or third-party classes, requires defining classes that derive from [`Dec.Converter`](xref:Dec.Converter). Dec will automatically find and register them.
 
 There are three converter types available. In increasing order of complexity, [`Dec.ConverterString`](xref:Dec.ConverterString`1) is most useful for simple objects that fit inside a string, [`Dec.ConverterRecord`](xref:Dec.ConverterRecord`1) is suitable for larger hierarchies that have a default constructor, [`Dec.ConverterFactory`](xref:Dec.ConverterFactory`1) is best for anything that needs to insert complicated objects created outside the Dec system. It is recommended that you consider them in that order.
 

@@ -94,6 +94,10 @@ public class Holder : Dec.IRecordable
 
 Names must be unique within a file and must not collide with a Dec path; an invalid name produces a warning and falls back on a generated name. `IRefForce` still obeys the `.Shared()` rules above - an instance reached only through positions that don't allow sharing is written inline with a warning, because a reference in such a position cannot be read back.
 
+## Assemblies Loaded Later
+
+Recorder sees the converters and types from every assembly that was loaded when Dec first needed them. If you load more assemblies after that, such as plugins, call [`Dec.Config.TypeCachesClear`](xref:Dec.Config.TypeCachesClear) before using Recorder with their types.
+
 ## Dec Compatibility
 
 While the savegame format is not guaranteed and may change without notice, we plan to support full backwards compatibility for all time. The save format includes a version number that Recorder will read and adjust for whenever necessary.

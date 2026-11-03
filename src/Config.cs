@@ -190,6 +190,20 @@ namespace Dec
         }
         private static Func<Type, Converter> ConverterFactoryBacking;
 
+        /// <summary>
+        /// Makes Dec rediscover converters and types on next use, picking up assemblies loaded since it last looked.
+        /// </summary>
+        /// <remarks>
+        /// Dec finds converters and types the first time it needs them. Call this after loading more assemblies, such as plugins, before using Dec with their types.
+        ///
+        /// As with other Config mutations, this must not race with Parser, Recorder, or Composer activity on other threads.
+        /// </remarks>
+        public static void TypeCachesClear()
+        {
+            Serialization.Clear();
+            UtilType.ClearCache();
+        }
+
         internal class UnitTestParameters
         {
             public Type[] explicitTypes = null;
