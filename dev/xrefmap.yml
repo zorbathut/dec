@@ -173,6 +173,19 @@ references:
   isSpec: "True"
   fullName: Dec.Config.InfoHandler
   nameWithType: Config.InfoHandler
+- uid: Dec.Config.TypeCachesClear
+  name: TypeCachesClear()
+  href: api/Dec.Config.html#Dec_Config_TypeCachesClear
+  commentId: M:Dec.Config.TypeCachesClear
+  fullName: Dec.Config.TypeCachesClear()
+  nameWithType: Config.TypeCachesClear()
+- uid: Dec.Config.TypeCachesClear*
+  name: TypeCachesClear
+  href: api/Dec.Config.html#Dec_Config_TypeCachesClear_
+  commentId: Overload:Dec.Config.TypeCachesClear
+  isSpec: "True"
+  fullName: Dec.Config.TypeCachesClear
+  nameWithType: Config.TypeCachesClear
 - uid: Dec.Config.UsingNamespaces
   name: UsingNamespaces
   href: api/Dec.Config.html#Dec_Config_UsingNamespaces

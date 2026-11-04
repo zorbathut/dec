@@ -89,8 +89,16 @@
 <li>A load system that loads mod .dll's and code in an appropriate order</li>
 <li>The ability to override and modify Dec data within mods, with appropriate error messages and diagnostics</li>
 </ul>
-<p>This feature is currently highly unfinished and only the third part is implemented. However, the third part is the only part that strictly needs to be provided by Dec itself, so Dec is now technically capable of supporting game mods.</p>
-<h2 id="fundamentals">Fundamentals</h2>
+<p>All of this is provided by the optional <a href="https://github.com/zorbathut/dec/tree/dev/extra/modding">modding extra</a>, which reads mod manifests, resolves their dependencies into an automatic load order, loads mods' assemblies, and builds a <code>ParserModular</code> for you. We recommend using that; go read up on it, then come back here.</p>
+<h2 id="merge-modes">Merge Modes</h2>
+<p>Mods often want to modify existing Decs in various ways. This behavior is similar to how <a href="inheritance.html">inheritance</a> works. See <a href="mergemodes.html">merge modes</a> for details.</p>
+<h2 id="security">Security</h2>
+<p>Dec is designed for an environment where mod developers will be able to create mods based around C# DLLs. As it's nearly impossible to sandbox a C# DLL, Dec makes very little effort to add more security through the .xml files themselves. To make matters worse, a major tool for C# modding is <a href="https://github.com/pardeike/Harmony">Harmony</a>, which monkeypatches the C# runtime through inserting machine-code changes at runtime. This is also essentially impossible to sandbox.</p>
+<p>Historically, this seems to mostly work out; modders are generally not malicious. This is also not solvable without either requiring some form of sandboxable user-provided code, or without removing code entirely from the modding system.</p>
+<p>I'd like to solve this, but practically speaking this will not be solvable without either major engine-level changes or a completely separate programming language; the latter I consider undesirable, the former is extraordinarily unlikely for Unity.</p>
+<p>If your game design requires security against malicious mods, you should not use Dec.</p>
+<h2 id="parsermodular">ParserModular</h2>
+<p>While the <code>modding</code> extra provides all the functionality you need, nothing stops you from reimplementing the load order/dependency stuff on your own. If you want to do that, you'll need to build a ParserModular yourself.</p>
 <p>Dec organizes its input into groups of files called &quot;modules&quot;, defined by <a class="xref" href="../api/Dec.ParserModular.Module.html"><code>Dec.ParserModular.Module</code></a>. Each module represents a single mod's worth of data. Modules are created via <a class="xref" href="../api/Dec.ParserModular.html"><code>Dec.ParserModular</code></a>, which is a mod-capable replacement for <a class="xref" href="../api/Dec.Parser.html"><code>Dec.Parser</code></a>.</p>
 <p>(Dec.Parser is just a thin wrapper around Dec.ParserModule to make it easier to develop non-moddable games.)</p>
 <p>Be aware that module load order is <em>critical</em>, and right now, this is defined simply as the order in which Module objects are created.</p>
@@ -107,13 +115,6 @@ foreach (var modDirectory in modDirectories)
 
 parser.Finish();
 </code></pre>
-<h2 id="merge-modes">Merge Modes</h2>
-<p>Mods often want to modify existing Decs in various ways. This behavior is similar to how <a href="inheritance.html">inheritance</a> works. See <a href="mergemodes.html">merge modes</a> for details.</p>
-<h2 id="security">Security</h2>
-<p>Dec is designed for an environment where mod developers will be able to create mods based around C# DLLs. As it's nearly impossible to sandbox a C# DLL, Dec makes very little effort to add more security through the .xml files themselves. To make matters worse, a major tool for C# modding is <a href="https://github.com/pardeike/Harmony">Harmony</a>, which monkeypatches the C# runtime through inserting machine-code changes at runtime. This is also essentially impossible to sandbox.</p>
-<p>Historically, this seems to mostly work out; modders are generally not malicious. This is also not solvable without either requiring some form of sandboxable user-provided code, or without removing code entirely from the modding system.</p>
-<p>I'd like to solve this, but practically speaking this will not be solvable without either major engine-level changes or a completely separate programming language; the latter I consider undesirable, the former is extraordinarily unlikely for Unity.</p>
-<p>If your game design requires security against malicious mods, you should not use Dec.</p>
 
 </article>
 

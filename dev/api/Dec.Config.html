@@ -540,6 +540,41 @@ The lookup walks up the type hierarchy to find applicable remappings.</p>
 
 
 
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Dec_Config_TypeCachesClear_" data-uid="Dec.Config.TypeCachesClear*"></a>
+
+  <h3 id="Dec_Config_TypeCachesClear" data-uid="Dec.Config.TypeCachesClear">
+  TypeCachesClear()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/zorbathut/dec/blob/dev/src/Config.cs/#L201"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Makes Dec rediscover converters and types on next use, picking up assemblies loaded since it last looked.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void TypeCachesClear()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+  <h4 class="section" id="Dec_Config_TypeCachesClear_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Dec finds converters and types the first time it needs them. Call this after loading more assemblies, such as plugins, before using Dec with their types.</p>
+<p>As with other Config mutations, this must not race with Parser, Recorder, or Composer activity on other threads.</p>
+</div>
+
+
+
+
 
 </article>
 

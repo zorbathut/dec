@@ -153,6 +153,8 @@ var deserializedObject = Recorder.Read&lt;ObjectType&gt;(serializedString);
 }
 </code></pre>
 <p>Names must be unique within a file and must not collide with a Dec path; an invalid name produces a warning and falls back on a generated name. <code>IRefForce</code> still obeys the <code>.Shared()</code> rules above - an instance reached only through positions that don't allow sharing is written inline with a warning, because a reference in such a position cannot be read back.</p>
+<h2 id="assemblies-loaded-later">Assemblies Loaded Later</h2>
+<p>Recorder sees the converters and types from every assembly that was loaded when Dec first needed them. If you load more assemblies after that, such as plugins, call <a class="xref" href="../api/Dec.Config.html#Dec_Config_TypeCachesClear"><code>Dec.Config.TypeCachesClear</code></a> before using Recorder with their types.</p>
 <h2 id="dec-compatibility">Dec Compatibility</h2>
 <p>While the savegame format is not guaranteed and may change without notice, we plan to support full backwards compatibility for all time. The save format includes a version number that Recorder will read and adjust for whenever necessary.</p>
 <h2 id="game-compatibility">Game Compatibility</h2>
