@@ -73,7 +73,7 @@ namespace ModdingTest
 
         private ModResolution Resolve()
         {
-            var resolution = new ModLoader(BaseId, "1.0.0").Resolve(new[] { root });
+            var resolution = new ModLoader(BaseId, "1.0.0").Scan(new[] { root }).Resolve();
             AssertInvariant(resolution);
             return resolution;
         }
@@ -166,6 +166,53 @@ namespace ModdingTest
             Assert.IsTrue(AppDomain.CurrentDomain.GetAssemblies().Any(assembly => assembly.GetName().Name == AssemblyName("A")));
         }
 
+        [Test]
+        public void OffNotLoaded()
+        {
+            CodeMod("A", EntrySource("A"));
+            CodeMod("B", EntrySource("B"));
+
+            new ModLoader(BaseId, "1.0.0").Scan(new[] { root }).Resolve(new[] { "A" }).Load(ContentBase).Finish();
+            CollectionAssert.AreEqual(new[] { "B:1:2" }, EntryLog);
+            Assert.IsFalse(AppDomain.CurrentDomain.GetAssemblies().Any(assembly => assembly.GetName().Name == AssemblyName("A")));
+        }
+
+        // A scan taken before a Load still sees what that Load put in the process: here, that L's copy of the shared assembly is loaded, so A's copy can't be.
+        [Test]
+        public void ScanSeesLaterLoad()
+        {
+            foreach (var id in new[] { "L", "A" })
+            {
+                var folder = System.IO.Path.Combine(root, id);
+                Directory.CreateDirectory(System.IO.Path.Combine(folder, "Assemblies"));
+                File.WriteAllText(System.IO.Path.Combine(folder, "Mod.xml"), ModXml(id, "1.0.0"));
+                DecUtilLib.Compilation.CompileToFile($"namespace {AssemblyName("Shared")} {{ public class Thing {{ }} }}", new System.Reflection.Assembly[0], AssemblyName("Shared"), System.IO.Path.Combine(folder, "Assemblies", AssemblyName("Shared") + ".dll"));
+            }
+
+            var scan = new ModLoader(BaseId, "1.0.0").Scan(new[] { root });
+            scan.Resolve(new[] { "A" }).Load(ContentBase).Finish();
+
+            var resolution = scan.Resolve(new[] { "L" });
+            AssertKinds(resolution, ModProblemKind.AssemblyConflict);
+        }
+
+        // A broken mod's errors are reported when it's on, and only listed once the player turns it off.
+        [Test]
+        public void OffProblemsUnreported()
+        {
+            var folder = System.IO.Path.Combine(root, "A");
+            Directory.CreateDirectory(folder);
+            File.WriteAllText(System.IO.Path.Combine(folder, "Mod.xml"), "<Mod><id>A</id></Mod>");
+            var scan = new ModLoader(BaseId, "1.0.0").Scan(new[] { root });
+
+            var off = scan.Resolve(new[] { "A" });
+            Assert.IsTrue(off.Problems.Any(problem => problem.Severity == ModProblemSeverity.Error));
+            off.Load(ContentBase).Finish();
+
+            Dec.Database.Clear();
+            ExpectErrors(() => scan.Resolve().Load(ContentBase).Finish(), error => error.Contains("`A`") || error.Contains("version"));
+        }
+
         // The base game's content is added after every entry point has run, so an entry point can still change how it's parsed.
         [Test]
         public void ContentBaseAfterEntries()
@@ -184,7 +231,7 @@ namespace ModdingTest
 
             var loader = new ModLoader(BaseId, "1.0.0");
             loader.DirectoryAssemblies = "Code";
-            loader.Resolve(new[] { root }).Load(ContentBase).Finish();
+            loader.Scan(new[] { root }).Resolve().Load(ContentBase).Finish();
 
             CollectionAssert.AreEqual(new[] { "A:1:2" }, EntryLog);
         }

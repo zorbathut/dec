@@ -92,13 +92,24 @@ namespace ModdingTest
 
         internal static ModResolution ResolvePure(string baseVersion, List<ModProblem> problems, Dictionary<string, AssemblyReserved> assembliesReserved, params Mod[] mods)
         {
-            var resolution = ModResolver.Resolve(Dec.Modding.Mod.CreateBase(BaseId, new SemanticVersioning.Version(baseVersion)), mods, problems, assembliesReserved, decBuiltInto: null);
-            AssertInvariant(resolution);
+            return ResolveWith(baseVersion, problems, assembliesReserved, null, new string[0], mods);
+        }
+
+        // Every resolver test comes through here, so each checks the invariants with what it turned off.
+        internal static ModResolution ResolveWith(string baseVersion, List<ModProblem> problems, Dictionary<string, AssemblyReserved> assembliesReserved, string decBuiltInto, string[] idsOff, params Mod[] mods)
+        {
+            var resolution = ModResolver.Resolve(Dec.Modding.Mod.CreateBase(BaseId, new SemanticVersioning.Version(baseVersion)), mods, problems, assembliesReserved, decBuiltInto, new HashSet<string>(idsOff));
+            AssertInvariant(resolution, idsOff);
             return resolution;
         }
 
-        protected static void AssertInvariant(ModResolution resolution)
+        protected static void AssertInvariant(ModResolution resolution, params string[] idsOff)
         {
+            foreach (var mod in resolution.ModsInstalled.Where(mod => idsOff.Contains(mod.Id)))
+            {
+                Assert.That(resolution.GetStatus(mod), Is.EqualTo(ModStatus.Off).Or.EqualTo(ModStatus.Hidden), $"{mod} was turned off");
+            }
+
             foreach (var problem in resolution.Problems.Where(problem => problem.Severity == ModProblemSeverity.Error))
             {
                 foreach (var mod in problem.Mods)

@@ -8,7 +8,7 @@ using System.Runtime.Loader;
 namespace Dec.Modding
 {
     /// <summary>
-    /// The outcome of ModLoader.Resolve: which mods load, in what order, and every problem found along the way.
+    /// The outcome of ModScan.Resolve: which mods load, in what order, and every problem found along the way.
     /// </summary>
     /// <remarks>
     /// Its problems haven't been reported or anything loaded yet. A game with a mod screen can show ModsInstalled, GetStatus, and Problems, then call Load.
@@ -26,10 +26,12 @@ namespace Dec.Modding
         private readonly List<Mod> mods;
         private readonly List<ModProblem> problems;
         private readonly HashSet<ModAssembly> assembliesSkipped;
+        private readonly ISet<string> idsOff;
         private bool loaded;
 
-        internal ModResolution(List<Mod> installed, Dictionary<Mod, ModStatus> status, List<Mod> mods, List<ModProblem> problems, HashSet<ModAssembly> assembliesSkipped)
+        internal ModResolution(List<Mod> installed, Dictionary<Mod, ModStatus> status, List<Mod> mods, List<ModProblem> problems, HashSet<ModAssembly> assembliesSkipped, ISet<string> idsOff)
         {
+            this.idsOff = idsOff;
             this.installed = installed;
             this.status = status;
             this.mods = mods;
@@ -49,7 +51,7 @@ namespace Dec.Modding
         }
 
         /// <summary>
-        /// The base game and every mod found, including disabled and hidden ones, in a stable order.
+        /// The base game and every mod found, including disabled, hidden, and turned-off ones, in a stable order.
         /// </summary>
         public IReadOnlyList<Mod> ModsInstalled
         {
@@ -92,7 +94,8 @@ namespace Dec.Modding
 
         internal void Report()
         {
-            foreach (var problem in problems)
+            // The player already knows about a mod they turned off, so its problems stay on the mod screen without being reported on every load.
+            foreach (var problem in problems.Where(problem => problem.Mods.Count == 0 || !problem.Mods.All(mod => mod.Id != null && idsOff.Contains(mod.Id))))
             {
                 switch (problem.Severity)
                 {

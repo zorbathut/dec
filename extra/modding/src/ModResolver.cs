@@ -23,6 +23,7 @@ namespace Dec.Modding
         private readonly List<ModProblem> problems;
         private readonly IReadOnlyDictionary<string, AssemblyReserved> assembliesReserved;
         private readonly string decBuiltInto;
+        private readonly ISet<string> idsOff;
 
         private readonly HashSet<ModAssembly> assembliesSkipped = new HashSet<ModAssembly>();
 
@@ -45,7 +46,7 @@ namespace Dec.Modding
             return a.CompareTo(b);
         });
 
-        private ModResolver(Mod modBase, IEnumerable<Mod> candidates, List<ModProblem> problems, IReadOnlyDictionary<string, AssemblyReserved> assembliesReserved, string decBuiltInto)
+        private ModResolver(Mod modBase, IEnumerable<Mod> candidates, List<ModProblem> problems, IReadOnlyDictionary<string, AssemblyReserved> assembliesReserved, string decBuiltInto, ISet<string> idsOff)
         {
             this.modBase = modBase;
             this.problems = problems;
@@ -58,13 +59,15 @@ namespace Dec.Modding
             installed = new List<Mod>() { modBase };
             installed.AddRange(candidates.OrderBy(mod => mod.Id ?? "", StringComparer.Ordinal).ThenBy(mod => mod.Directory ?? "", StringComparer.Ordinal));
 
-            status = installed.ToDictionary(mod => mod, mod => mod.manifestError ? ModStatus.Disabled : ModStatus.Enabled);
+            // Off wins over a broken manifest: turning off a broken mod is how a player stops hearing about it.
+            status = installed.ToDictionary(mod => mod, mod => !mod.IsBase && mod.Id != null && idsOff.Contains(mod.Id) ? ModStatus.Off : mod.manifestError ? ModStatus.Disabled : ModStatus.Enabled);
+            this.idsOff = idsOff;
         }
 
         // `decBuiltInto` is the game assembly that Dec's source is built into, or null when the game references Dec's own assembly.
-        internal static ModResolution Resolve(Mod modBase, IEnumerable<Mod> candidates, List<ModProblem> problems, IReadOnlyDictionary<string, AssemblyReserved> assembliesReserved, string decBuiltInto)
+        internal static ModResolution Resolve(Mod modBase, IEnumerable<Mod> candidates, List<ModProblem> problems, IReadOnlyDictionary<string, AssemblyReserved> assembliesReserved, string decBuiltInto, ISet<string> idsOff)
         {
-            return new ModResolver(modBase, candidates, problems, assembliesReserved, decBuiltInto).Run();
+            return new ModResolver(modBase, candidates, problems, assembliesReserved, decBuiltInto, idsOff).Run();
         }
 
         // The phases run in this order so that a mod is never disabled as Incompatible, or for an assembly clash, because of a mod that the Required cascade or cycle detection already ruled out.
@@ -82,7 +85,7 @@ namespace Dec.Modding
 
             CheckSoft();
 
-            return new ModResolution(installed, status, order, problems, assembliesSkipped);
+            return new ModResolution(installed, status, order, problems, assembliesSkipped, idsOff);
         }
 
         private IEnumerable<Mod> Enabled()
@@ -174,7 +177,8 @@ namespace Dec.Modding
         {
             var visible = installed.Where(mod => mod.Id != null && status[mod] != ModStatus.Hidden).ToList();
 
-            foreach (var group in visible.GroupBy(mod => mod.Id, StringComparer.OrdinalIgnoreCase))
+            // A turned-off mod can't clash, so turning off one of a pair is a way out.
+            foreach (var group in visible.Where(mod => status[mod] != ModStatus.Off).GroupBy(mod => mod.Id, StringComparer.OrdinalIgnoreCase))
             {
                 var members = group.ToList();
                 if (members.Count < 2)
@@ -354,6 +358,11 @@ namespace Dec.Modding
             return Convert.ToHexString(name.GetPublicKeyToken() ?? Array.Empty<byte>());
         }
 
+        private string StateNotLoading(Mod mod)
+        {
+            return status[mod] == ModStatus.Off ? "is turned off" : "is disabled";
+        }
+
         private void Cascade()
         {
             bool changed = true;
@@ -368,7 +377,7 @@ namespace Dec.Modding
                         var target = Target(required);
                         if (target != null && status[target] != ModStatus.Enabled)
                         {
-                            Error(ModProblemKind.DependencyDisabled, new List<Mod>() { mod }, required, $"`{mod.Id}` requires `{target.Id}`, which is disabled");
+                            Error(ModProblemKind.DependencyDisabled, new List<Mod>() { mod }, required, $"`{mod.Id}` requires `{target.Id}`, which {StateNotLoading(target)}");
                             status[mod] = ModStatus.Disabled;
                             changed = true;
                             break;
@@ -721,7 +730,7 @@ namespace Dec.Modding
                     {
                         var first = optional[0];
                         string verb = first.Kind == ModDependencyKind.Recommended ? "recommends" : "supports";
-                        string state = target == null ? "isn't installed" : !targetEnabled ? "is disabled" : $"is installed as version {target.Version}";
+                        string state = target == null ? "isn't installed" : !targetEnabled ? StateNotLoading(target) : $"is installed as version {target.Version}";
                         problems.Add(new ModProblem(ModProblemSeverity.Info, ModProblemKind.DependencyOptional, new List<Mod>() { mod }, first, $"`{mod.Id}` {verb} `{first.Id}`{Range(first)}, which {state}{Explanation(first)}"));
                     }
                 }

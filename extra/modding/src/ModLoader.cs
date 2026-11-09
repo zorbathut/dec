@@ -10,10 +10,10 @@ using System.Runtime.Loader;
 namespace Dec.Modding
 {
     /// <summary>
-    /// Finds installed mods and resolves them into a load order.
+    /// Finds installed mods, ready to resolve into a load order.
     /// </summary>
     /// <remarks>
-    /// Each mod is a folder containing a manifest (Mod.xml), with its dec XML in a Decs folder, its assemblies in an Assemblies folder, and optionally an icon.png. The file and folder names can be changed, for every mod at once, before calling Resolve.
+    /// Each mod is a folder containing a manifest (Mod.xml), with its dec XML in a Decs folder, its assemblies in an Assemblies folder, and optionally an icon.png. The file and folder names can be changed, for every mod at once, before calling Scan.
     /// </remarks>
     public class ModLoader
     {
@@ -59,12 +59,14 @@ namespace Dec.Modding
         }
 
         /// <summary>
-        /// Reads every mod found in the given directories and resolves them into a load order.
+        /// Reads every mod found in the given directories, ready to resolve into a load order.
         /// </summary>
         /// <remarks>
-        /// Each folder directly inside one of the directories is a mod, except folders starting with a dot. Problems with mods and their relationships are returned in the resolution, and reported by its Load. Dec's own diagnostics while reading a manifest, such as malformed XML or unknown elements, are reported through Dec's usual handlers as they come up, and with Dec's default handlers they throw.
+        /// Each folder directly inside one of the directories is a mod, except folders starting with a dot. Problems with mods and their relationships are returned in each resolution of the scan, and reported by its Load. Dec's own diagnostics while reading a manifest, such as malformed XML or unknown elements, are reported through Dec's usual handlers as they come up, and with Dec's default handlers they throw.
+        ///
+        /// Assemblies are read for their names and references, not loaded.
         /// </remarks>
-        public ModResolution Resolve(IEnumerable<string> directories)
+        public ModScan Scan(IEnumerable<string> directories)
         {
             var problems = new List<ModProblem>();
             var candidates = new List<Mod>();
@@ -104,11 +106,9 @@ namespace Dec.Modding
                 }
             }
 
-            var names = new HashSet<string>(candidates.SelectMany(mod => mod.assemblies).Select(assembly => assembly.name.Name), StringComparer.OrdinalIgnoreCase);
-            var dec = typeof(global::Dec.Dec).Assembly;
-            var decName = dec.GetName().Name;
+            var decName = typeof(global::Dec.Dec).Assembly.GetName().Name;
             var decBuiltInto = string.Equals(decName, ModResolver.AssemblyDec, StringComparison.OrdinalIgnoreCase) ? null : decName;
-            return ModResolver.Resolve(Mod.CreateBase(baseId, baseVersion), candidates, problems, AssembliesReserved(AssemblyLoadContext.GetLoadContext(dec), names), decBuiltInto);
+            return new ModScan(Mod.CreateBase(baseId, baseVersion), candidates, problems, decBuiltInto);
         }
 
         // Content in the wrong folder otherwise loads nothing without a word, which is easy to do with case-sensitive folder names. A mod with some content in the right place presumably meant the rest, so this only speaks up when nothing landed.

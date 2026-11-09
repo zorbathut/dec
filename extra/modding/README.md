@@ -11,7 +11,8 @@ Add the source code to your project, along with the [SemanticVersioning](https:/
 
 ```cs
 var loader = new Dec.Modding.ModLoader("MyGame", "1.4.0");
-var resolution = loader.Resolve(new[] { "Mods", workshopDirectory });
+var scan = loader.Scan(new[] { "Mods", workshopDirectory });
+var resolution = scan.Resolve(idsOff);
 
 // Optionally show a mod screen: resolution.ModsInstalled, resolution.GetStatus(mod), resolution.Problems.
 
@@ -87,7 +88,7 @@ Every mod implicitly requires the base game and loads after it. A mod that lists
 
 ### Resolution
 
-Load order is fully automatic: dependencies first, ties broken by ordinal id, so the order depends only on which mods are installed.
+Load order is fully automatic: dependencies first, ties broken by ordinal id, so the order depends only on which mods are installed and turned on.
 
 When something is wrong, the affected mods are disabled and everything else still loads:
 
@@ -100,6 +101,8 @@ When something is wrong, the affected mods are disabled and everything else stil
 - Two mods shipping an assembly with the same name are both disabled; shared libraries belong in their own mod that others depend on. A mod shipping an assembly the game already has or directly depends on uses the game's copy instead, with a warning, as long as some enabled mod's code references it, every enabled mod's reference to it is to a version no newer than the game's, and both are signed the same way; otherwise, or if the game's version is unknown, the mod is disabled.
 - A mod that ships or references Dec's own assembly, `dec.dll`, is disabled when the game builds Dec's source into its own assembly.
 - If a mod is installed more than once, the newest working copy is used and the others are hidden, with a warning.
+
+A mod the player turned off, by passing its id to `Resolve`, has status `Off`: it doesn't load and doesn't count against other mods, though mods that require it are disabled. That holds even for a mod with a broken manifest; its problems stay in `Problems` for the mod screen, but `Load` doesn't report problems that name only turned-off mods. Turning off an id turns off every installed copy of it. Resolving rereads no manifests and reports nothing, so a mod screen can scan once and resolve again each time the player turns a mod on or off.
 
 ### Code
 

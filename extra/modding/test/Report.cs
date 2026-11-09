@@ -68,7 +68,7 @@ namespace ModdingTest
 
             // Dec's own diagnostic is reported as it's found; the harness fails on any other warning or error, so the mod's problems aren't reported yet.
             ModResolution resolution = null;
-            ExpectWarnings(() => resolution = new ModLoader(BaseId, "1.0.0").Resolve(new[] { root }), warning => warning.Contains("fromTheFuture"));
+            ExpectWarnings(() => resolution = new ModLoader(BaseId, "1.0.0").Scan(new[] { root }).Resolve(), warning => warning.Contains("fromTheFuture"));
             AssertKinds(resolution, ModProblemKind.DependencyMissing);
         }
 

@@ -15,7 +15,7 @@ namespace Dec.Modding
     public enum ModProblemKind
     {
         /// <summary>
-        /// A directory passed to ModLoader.Resolve doesn't exist.
+        /// A directory passed to ModLoader.Scan doesn't exist.
         /// </summary>
         DirectoryMissing,
 
@@ -70,7 +70,7 @@ namespace Dec.Modding
         DependencyVersion,
 
         /// <summary>
-        /// A Required dependency is installed, but disabled.
+        /// A Required dependency is installed, but disabled or turned off.
         /// </summary>
         DependencyDisabled,
 

@@ -270,12 +270,145 @@ namespace ModdingTest
             return ResolvePure("1.0.0", new List<ModProblem>(), game, mods);
         }
 
+        private static ModResolution ResolveOff(string[] off, params Mod[] mods)
+        {
+            return ResolveWith("1.0.0", new List<ModProblem>(), new Dictionary<string, AssemblyReserved>(), null, off, mods);
+        }
+
+        [Test]
+        public void Off()
+        {
+            var a = Mod("A", "1.0.0");
+            var b = Mod("B", "1.0.0");
+            var resolution = ResolveOff(new[] { "A" }, a, b);
+            AssertKinds(resolution);
+            Assert.AreEqual(ModStatus.Off, resolution.GetStatus(a));
+            CollectionAssert.AreEqual(new[] { BaseId, "B" }, Ids(resolution));
+        }
+
+        // Ids are case-sensitive, so turning off `a` leaves `A` alone.
+        [Test]
+        public void OffCase()
+        {
+            var a = Mod("A", "1.0.0");
+            var resolution = ResolveOff(new[] { "a" }, a);
+            Assert.AreEqual(ModStatus.Enabled, resolution.GetStatus(a));
+        }
+
+        [Test]
+        public void OffCascades()
+        {
+            var a = Mod("A", "1.0.0", Dependency("B"));
+            var b = Mod("B", "1.0.0");
+            var resolution = ResolveOff(new[] { "B" }, a, b);
+            AssertKinds(resolution, ModProblemKind.DependencyDisabled);
+            Assert.AreEqual(ModStatus.Off, resolution.GetStatus(b));
+            Assert.AreEqual(ModStatus.Disabled, resolution.GetStatus(a));
+        }
+
+        // A mod's problems don't matter while it's off, and it doesn't count against other mods.
+        [Test]
+        public void OffUnchecked()
+        {
+            var missing = Mod("Missing.Dependency", "1.0.0", Dependency("Nowhere"));
+            var incompatible = Mod("Incompatible", "1.0.0", Dependency("B", kind: "Incompatible"));
+            var b = Mod("B", "1.0.0");
+            var excluded = Mod("Excluded", "1.0.0");
+            var excluder = Mod("Excluder", "1.0.0", Dependency("Excluded", kind: "Incompatible"));
+            var clash = Mod("Clash", "1.0.0");
+            clash.assemblies.Add(AssemblyMod("/mods/Clash/Assemblies/Lib.dll", "Lib, Version=1.0.0.0"));
+            var owner = Mod("Owner", "1.0.0");
+            owner.assemblies.Add(AssemblyMod("/mods/Owner/Assemblies/Lib.dll", "Lib, Version=1.0.0.0"));
+
+            var resolution = ResolveOff(new[] { "Missing.Dependency", "Incompatible", "Excluded", "Clash" }, missing, incompatible, b, excluded, excluder, clash, owner);
+            AssertKinds(resolution);
+            CollectionAssert.AreEquivalent(new[] { BaseId, "B", "Excluder", "Owner" }, Ids(resolution));
+        }
+
+        // A player who turned a dependency off needs to hear something different from one whose dependency is broken.
+        [Test]
+        public void OffCascadeMessage()
+        {
+            var off = ResolveOff(new[] { "B" }, Mod("A", "1.0.0", Dependency("B")), Mod("B", "1.0.0"));
+            var broken = ResolveOff(new string[0], Mod("A", "1.0.0", Dependency("B")), Mod("B", "1.0.0", Dependency("Nowhere")));
+            var messageOff = off.Problems.Single(problem => problem.Kind == ModProblemKind.DependencyDisabled).Message;
+            var messageBroken = broken.Problems.Single(problem => problem.Kind == ModProblemKind.DependencyDisabled).Message;
+            Assert.AreNotEqual(messageBroken, messageOff);
+        }
+
+        [Test]
+        public void OffDuplicate()
+        {
+            var older = Mod("A", "1.0.0");
+            var newer = Mod("A", "2.0.0");
+            var resolution = ResolveOff(new[] { "A" }, older, newer);
+            AssertKinds(resolution, ModProblemKind.Duplicate);
+            Assert.AreEqual(ModStatus.Off, resolution.GetStatus(newer));
+            Assert.AreEqual(ModStatus.Hidden, resolution.GetStatus(older));
+        }
+
+        [Test]
+        public void OffOptional()
+        {
+            var a = Mod("A", "1.0.0", Dependency("B", kind: "Recommended"));
+            var b = Mod("B", "1.0.0");
+            var resolution = ResolveOff(new[] { "B" }, a, b);
+            AssertKinds(resolution, ModProblemKind.DependencyOptional);
+            Assert.AreEqual(ModStatus.Enabled, resolution.GetStatus(a));
+        }
+
+        // Turning off a broken mod is how a player stops hearing about it, though the mod screen still lists what's wrong.
+        [Test]
+        public void OffManifestError()
+        {
+            var problems = new List<ModProblem>();
+            var broken = ModRead("<Mod><id>A</id></Mod>", problems);
+            var resolution = ResolveWith("1.0.0", problems, new Dictionary<string, AssemblyReserved>(), null, new[] { "A" }, broken);
+            Assert.AreEqual(ModStatus.Off, resolution.GetStatus(broken));
+            AssertKinds(resolution, ModProblemKind.Manifest);
+        }
+
+        // Turning off either of two mods whose ids differ only in case clears the conflict.
+        [Test]
+        public void OffIdConflict()
+        {
+            var lower = Mod("a", "1.0.0");
+            var upper = Mod("A", "1.0.0");
+            var resolution = ResolveOff(new[] { "a" }, lower, upper);
+            AssertKinds(resolution);
+            Assert.AreEqual(ModStatus.Off, resolution.GetStatus(lower));
+            Assert.AreEqual(ModStatus.Enabled, resolution.GetStatus(upper));
+        }
+
+        // Explicit load orders in a cycle can't be satisfied, unless one side of it is off.
+        [Test]
+        public void OffCycle()
+        {
+            var a = Mod("A", "1.0.0", Dependency("B", order: "After"));
+            var b = Mod("B", "1.0.0", Dependency("A", order: "After"));
+            var resolution = ResolveOff(new[] { "B" }, a, b);
+            AssertKinds(resolution, ModProblemKind.DependencyDisabled);
+
+            var c = Mod("C", "1.0.0", Dependency("D", kind: "Accommodated", order: "After"));
+            var d = Mod("D", "1.0.0", Dependency("C", kind: "Accommodated", order: "After"));
+            resolution = ResolveOff(new[] { "D" }, c, d);
+            AssertKinds(resolution);
+            Assert.AreEqual(ModStatus.Enabled, resolution.GetStatus(c));
+        }
+
+        [Test]
+        public void OffDiscouraged()
+        {
+            var a = Mod("A", "1.0.0", Dependency("B", kind: "Discouraged"));
+            var b = Mod("B", "1.0.0");
+            var resolution = ResolveOff(new[] { "B" }, a, b);
+            AssertKinds(resolution);
+        }
+
         // A game that builds Dec's source into its own assembly, Game.
         private static ModResolution ResolveDecBuiltIn(Dictionary<string, AssemblyReserved> game, params Mod[] mods)
         {
-            var resolution = ModResolver.Resolve(Dec.Modding.Mod.CreateBase(BaseId, new SemanticVersioning.Version("1.0.0")), mods, new List<ModProblem>(), game, "Game");
-            AssertInvariant(resolution);
-            return resolution;
+            return ResolveWith("1.0.0", new List<ModProblem>(), game, "Game", new string[0], mods);
         }
 
         // Dec's standalone assembly is `dec`, but a reference may spell it either way.
