@@ -216,6 +216,33 @@ namespace ModdingTest
         }
 
         [Test]
+        public void ReloadAddsLibraryOfLoadedMod()
+        {
+            var library = $"namespace {AssemblyName("Library")} {{ public class Thing {{ }} }}";
+            var scratch = new System.Runtime.Loader.AssemblyLoadContext("scratch", isCollectible: true);
+            var libraryPath = System.IO.Path.Combine(DirectoryTemp(), AssemblyName("Library") + ".dll");
+            DecUtilLib.Compilation.CompileToFile(library, new System.Reflection.Assembly[] { }, AssemblyName("Library"), libraryPath);
+            var libraryAssembly = scratch.LoadFromAssemblyPath(libraryPath);
+
+            // A references the library without depending on a mod that ships it.
+            var folder = System.IO.Path.Combine(root, "A");
+            Directory.CreateDirectory(System.IO.Path.Combine(folder, "Assemblies"));
+            File.WriteAllText(System.IO.Path.Combine(folder, "Mod.xml"), ModXml("A", "1.0.0"));
+            DecUtilLib.Compilation.CompileToFile($"namespace {AssemblyName("A")} {{ public class Holder {{ public {AssemblyName("Library")}.Thing thing; }} }}", new[] { libraryAssembly }, AssemblyName("A"), System.IO.Path.Combine(folder, "Assemblies", AssemblyName("A") + ".dll"));
+            scratch.Unload();
+
+            Resolve().Load().Finish();
+            Dec.Database.Clear();
+
+            var libraryMod = System.IO.Path.Combine(root, "Library");
+            Directory.CreateDirectory(System.IO.Path.Combine(libraryMod, "Assemblies"));
+            File.WriteAllText(System.IO.Path.Combine(libraryMod, "Mod.xml"), ModXml("Library", "1.0.0"));
+            DecUtilLib.Compilation.CompileToFile(library, new System.Reflection.Assembly[] { }, AssemblyName("Library"), System.IO.Path.Combine(libraryMod, "Assemblies", AssemblyName("Library") + ".dll"));
+
+            AssertKinds(Resolve());
+        }
+
+        [Test]
         public void AssemblyClashNotLoaded()
         {
             var source = $"namespace {AssemblyName("Shared")} {{ public class Thing {{ }} }}";

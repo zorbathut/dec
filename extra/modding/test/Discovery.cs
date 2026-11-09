@@ -266,6 +266,21 @@ namespace ModdingTest
             AssertKinds(resolution, ModProblemKind.AssemblyConflict);
         }
 
+        [Test]
+        public void AssemblyNamedLikeInMemory()
+        {
+            Assert.AreEqual(System.Runtime.Loader.AssemblyLoadContext.Default, System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(typeof(Dec.Dec).Assembly));
+            var name = DecUtilLib.Compilation.Compile("public class Nothing { }", new System.Reflection.Assembly[] { }).GetName().Name;
+
+            var root = DirectoryTemp();
+            var a = ModFolder(root, "a", ModXml("A", "1.0.0"));
+            Directory.CreateDirectory(System.IO.Path.Combine(a, "Assemblies"));
+            DecUtilLib.Compilation.CompileToFile("public class Nothing { }", new System.Reflection.Assembly[] { }, name, System.IO.Path.Combine(a, "Assemblies", "Lib.dll"));
+
+            var resolution = Loader().Resolve(new[] { root });
+            AssertKinds(resolution, ModProblemKind.AssemblyConflict);
+        }
+
         [TestCase("1bad", "1.0.0")]
         [TestCase("Game", "1.0")]
         [TestCase(null, "1.0.0")]

@@ -97,12 +97,14 @@ When something is wrong, the affected mods are disabled and everything else stil
 - A missing, disabled, or out-of-range Required dependency disables the mod, and in turn any mod that requires it.
 - A cycle of explicitly written load orders disables every mod in it. Default orders in a cycle are dropped with a warning instead.
 - An Incompatible target that's present disables the mod declaring the incompatibility.
-- Two mods shipping an assembly with the same name are both disabled; shared libraries belong in their own mod that others depend on. A mod also can't ship an assembly the game already has.
+- Two mods shipping an assembly with the same name are both disabled; shared libraries belong in their own mod that others depend on. A mod also can't ship an assembly the game already has or directly depends on.
 - If a mod is installed more than once, the newest working copy is used and the others are hidden, with a warning.
 
 ### Code
 
 Every assembly in each enabled mod's `Assemblies` folder is loaded, in load order, before any dec is parsed; native libraries in that folder are skipped with a warning. Dec finds the mods' dec types, converters, `[Dec.Setup]` functions, and `[StaticReferences]` classes automatically.
+
+A mod's project needs `<EnableDynamicLoading>true</EnableDynamicLoading>` so its own dependencies are copied into its output, but should reference the game's assemblies, and any package the game already ships, without copying them, at a version no newer than the game's: `<Private>false</Private>` on a `Reference`, `ExcludeAssets="runtime"` on a `PackageReference`, and both on a `ProjectReference`. A mod that ships one of them anyway is disabled. Handing mod authors a template project or reference package with this already set saves everyone the trouble.
 
 A mod may contain one class implementing `Dec.Modding.IModEntrypoint`, whose `Initialize` receives a `ModEntrypointInfo` with the mod and the list of enabled mods. It's created and called once per process, in load order, after every mod's assemblies are loaded and before parsing; this is the place for Harmony patches and other pre-parse work.
 

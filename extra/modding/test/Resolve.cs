@@ -275,6 +275,16 @@ namespace ModdingTest
         }
 
         [Test]
+        public void AssemblyReservedNoLocation()
+        {
+            var mod = Mod("A", "1.0.0");
+            mod.assemblies.Add(new ModAssembly() { path = "/mods/A/Assemblies/Lib.dll", name = "Lib" });
+            var resolution = ResolvePure("1.0.0", new List<ModProblem>(), new Dictionary<string, string>() { { "Lib", null } }, mod);
+            AssertKinds(resolution, ModProblemKind.AssemblyConflict);
+            Assert.AreEqual(ModStatus.Disabled, resolution.GetStatus(mod));
+        }
+
+        [Test]
         public void AssemblyReservedSamePath()
         {
             var mod = Mod("A", "1.0.0");

@@ -21,12 +21,14 @@ namespace Dec.Modding
         private readonly List<Mod> installed;
         private readonly Dictionary<Mod, ModStatus> status;
         private readonly List<ModProblem> problems;
-        private readonly IReadOnlyDictionary<string, string> assembliesReserved;
+        private readonly IReadOnlyDictionary<string, string> assembliesReserved;   // name to the file already loaded or loadable under that name, or null when no file is known
 
         private readonly HashSet<(Mod, Mod)> edgesDropped = new HashSet<(Mod, Mod)>();
 
         private Dictionary<string, Mod> lookup;
         private Dictionary<string, List<Mod>> lookupCaseless;
+
+        private const string AssemblyReservedHint = "mods can't replace the game's assemblies, so the mod's author should reference it at a version no newer than the game's, without copying it: `<Private>false</Private>` on a `Reference`, `ExcludeAssets=\"runtime\"` on a `PackageReference`, and both on a `ProjectReference`";
 
         private static readonly IComparer<SemanticVersioning.Version> VersionComparer = Comparer<SemanticVersioning.Version>.Create((a, b) =>
         {
@@ -226,18 +228,24 @@ namespace Dec.Modding
 
                 foreach (var assembly in mod.assemblies)
                 {
-                    if (assembliesReserved.TryGetValue(assembly.name, out var location) && !ModPath.Equal(location, assembly.path))
+                    if (!assembliesReserved.TryGetValue(assembly.name, out var location) || (location != null && ModPath.Equal(location, assembly.path)))
                     {
-                        if (ModResolution.AssembliesLoaded.Contains(System.IO.Path.GetFullPath(location)))
-                        {
-                            Error(ModProblemKind.AssemblyConflict, new List<Mod>() { mod }, null, $"`{mod.Id}` ships assembly `{assembly.name}`, but a copy was already loaded from `{location}` earlier in this session; restart the game to use a different copy");
-                        }
-                        else
-                        {
-                            Error(ModProblemKind.AssemblyConflict, new List<Mod>() { mod }, null, $"`{mod.Id}` ships assembly `{assembly.name}`, but the game already has an assembly with that name at `{location}`; mods can't replace the game's assemblies");
-                        }
-                        failure = true;
+                        continue;
                     }
+
+                    if (location == null)
+                    {
+                        Error(ModProblemKind.AssemblyConflict, new List<Mod>() { mod }, null, $"`{mod.Id}` ships assembly `{assembly.name}`, but the game already has or depends on an assembly with that name; {AssemblyReservedHint}");
+                    }
+                    else if (ModResolution.AssembliesLoaded.Contains(System.IO.Path.GetFullPath(location)))
+                    {
+                        Error(ModProblemKind.AssemblyConflict, new List<Mod>() { mod }, null, $"`{mod.Id}` ships assembly `{assembly.name}`, but a copy was already loaded from `{location}` earlier in this session, and only one can load per session; restart the game to change which one does");
+                    }
+                    else
+                    {
+                        Error(ModProblemKind.AssemblyConflict, new List<Mod>() { mod }, null, $"`{mod.Id}` ships assembly `{assembly.name}`, but the game already has an assembly with that name at `{location}`; {AssemblyReservedHint}");
+                    }
+                    failure = true;
                 }
 
                 if (failure)

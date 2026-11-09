@@ -105,7 +105,7 @@ namespace Dec.Modding
                 }
             }
 
-            return ModResolver.Resolve(Mod.CreateBase(baseId, baseVersion, baseDirectory), candidates, problems, AssembliesReserved());
+            return ModResolver.Resolve(Mod.CreateBase(baseId, baseVersion, baseDirectory), candidates, problems, AssembliesReserved(AssemblyLoadContext.GetLoadContext(typeof(global::Dec.Dec).Assembly)));
         }
 
         // Content in the wrong folder otherwise loads nothing without a word, which is easy to do with case-sensitive folder names. A mod with some content in the right place presumably meant the rest, so this only speaks up when nothing landed.
@@ -180,8 +180,10 @@ namespace Dec.Modding
             }
         }
 
-        // Assembly names a mod may not ship, because the game already has an assembly by that name: everything already loaded alongside Dec, and everything the runtime would load on demand.
-        private static Dictionary<string, string> AssembliesReserved()
+        // Assembly names a mod may not ship, mapped to the file behind each, or null when no file is known: everything the runtime would load from TPA, everything already loaded into the given context, and those assemblies' direct references, which covers dependencies the context hasn't loaded yet or hands in from another context. Dependencies of those that the context hasn't loaded yet aren't covered.
+        //
+        // Mod assemblies' references are left out, so a mod's missing dependency doesn't stop a later mod shipping it. Dynamic assemblies can't be bound to by name, so they don't conflict with a file.
+        internal static Dictionary<string, string> AssembliesReserved(AssemblyLoadContext context)
         {
             var reserved = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
@@ -193,11 +195,18 @@ namespace Dec.Modding
                 }
             }
 
-            foreach (var assembly in AssemblyLoadContext.GetLoadContext(typeof(global::Dec.Dec).Assembly).Assemblies)
+            var loaded = context.Assemblies.Where(assembly => !assembly.IsDynamic).ToList();
+            foreach (var assembly in loaded)
             {
-                if (!assembly.IsDynamic && assembly.Location.Length > 0)
+                // Assemblies loaded from memory, as Godot's editor does with the game, have no location.
+                reserved[assembly.GetName().Name] = assembly.Location.Length > 0 ? assembly.Location : null;
+            }
+
+            foreach (var assembly in loaded.Where(assembly => assembly.Location.Length == 0 || !ModResolution.AssembliesLoaded.Contains(assembly.Location)))
+            {
+                foreach (var reference in assembly.GetReferencedAssemblies())
                 {
-                    reserved[assembly.GetName().Name] = assembly.Location;
+                    reserved.TryAdd(reference.Name, null);
                 }
             }
 
