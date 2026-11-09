@@ -112,6 +112,8 @@ namespace Dec.Modding
         /// <summary>
         /// Reports every problem, loads the enabled mods' assemblies other than copies of the game's, runs their entry points, and builds a ParserModular with one module per mod in load order.
         /// </summary>
+        /// <param name="contentBase">Fills the base game's module, which loads first; for example, `module => module.AddDirectory("Data/Decs")`. It runs after the mods' entry points.</param>
+        /// <param name="userSettings">Passed to the ParserModular.</param>
         /// <remarks>
         /// The returned parser hasn't been finished; the game may add more modules, which load after every mod, then call Finish.
         ///
@@ -121,7 +123,7 @@ namespace Dec.Modding
         ///
         /// Like Parser, this must run on a single thread with no other Dec activity.
         /// </remarks>
-        public ParserModular Load(Recorder.IUserSettings userSettings = null)
+        public ParserModular Load(Action<ParserModular.Module> contentBase, Recorder.IUserSettings userSettings = null)
         {
             if (loaded)
             {
@@ -152,13 +154,13 @@ namespace Dec.Modding
             foreach (var mod in mods)
             {
                 var module = parser.CreateModule(mod.Id);
-                if (System.IO.Directory.Exists(mod.directoryDecs))
+                if (mod.IsBase)
+                {
+                    contentBase(module);
+                }
+                else if (System.IO.Directory.Exists(mod.directoryDecs))
                 {
                     module.AddDirectory(mod.directoryDecs);
-                }
-                else if (mod.IsBase)
-                {
-                    Dbg.Err($"Base game content directory `{mod.directoryDecs}` doesn't exist");
                 }
             }
 

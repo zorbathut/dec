@@ -10,16 +10,16 @@ Add the source code to your project, along with the [SemanticVersioning](https:/
 ### Usage
 
 ```cs
-var loader = new Dec.Modding.ModLoader("MyGame", "1.4.0", "Data/Decs");
+var loader = new Dec.Modding.ModLoader("MyGame", "1.4.0");
 var resolution = loader.Resolve(new[] { "Mods", workshopDirectory });
 
 // Optionally show a mod screen: resolution.ModsInstalled, resolution.GetStatus(mod), resolution.Problems.
 
-var parser = resolution.Load();
+var parser = resolution.Load(module => module.AddDirectory("Data/Decs"));
 parser.Finish();
 ```
 
-`Resolve` returns every problem with mods and their relationships in `resolution.Problems`, and `Load` reports them all through Dec's usual handlers before loading anything. Dec's own diagnostics while reading manifests, such as malformed XML or unknown elements, are reported through those handlers as they come up. Dec's default handlers throw on warnings as well as errors, so a game that ships with mod support should configure them.
+`Resolve` returns every problem with mods and their relationships in `resolution.Problems`, and `Load` reports them all through Dec's usual handlers before loading anything. `Load` fills the base game's module through the function it's given, so the game decides how its own content is found. Dec's own diagnostics while reading manifests, such as malformed XML or unknown elements, are reported through those handlers as they come up. Dec's default handlers throw on warnings as well as errors, so a game that ships with mod support should configure them.
 
 The base game's version is what mods' version ranges for it are checked against. It can be the game's own version, or a separate modding-API version that changes only when mods need to.
 

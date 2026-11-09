@@ -25,6 +25,11 @@ namespace ModdingTest
             baseDirectory = DirectoryTemp();
         }
 
+        private void ContentBase(Dec.ParserModular.Module module)
+        {
+            module.AddDirectory(baseDirectory);
+        }
+
         private string AssemblyName(string id)
         {
             return $"ModTest_{run}_{id.Replace(".", "_")}";
@@ -68,7 +73,7 @@ namespace ModdingTest
 
         private ModResolution Resolve()
         {
-            var resolution = new ModLoader(BaseId, "1.0.0", baseDirectory).Resolve(new[] { root });
+            var resolution = new ModLoader(BaseId, "1.0.0").Resolve(new[] { root });
             AssertInvariant(resolution);
             return resolution;
         }
@@ -83,7 +88,7 @@ namespace ModdingTest
             var resolution = Resolve();
             AssertKinds(resolution);
 
-            var parser = resolution.Load();
+            var parser = resolution.Load(ContentBase);
             parser.Finish();
 
             // Every assembly is loaded before the first entry runs.
@@ -97,7 +102,7 @@ namespace ModdingTest
             CodeMod("B", EntrySource("B"));
 
             var resolution = Resolve();
-            ExpectErrors(() => resolution.Load().Finish(), error => error.Contains("Missing"));
+            ExpectErrors(() => resolution.Load(ContentBase).Finish(), error => error.Contains("Missing"));
 
             CollectionAssert.AreEqual(new[] { "B:1:2" }, EntryLog);
             Assert.IsFalse(AppDomain.CurrentDomain.GetAssemblies().Any(assembly => assembly.GetName().Name == AssemblyName("A")));
@@ -119,7 +124,7 @@ namespace ModdingTest
                 }}");
 
             var resolution = Resolve();
-            ExpectErrors(() => resolution.Load().Finish(), error => error.Contains("more than one IModEntrypoint"));
+            ExpectErrors(() => resolution.Load(ContentBase).Finish(), error => error.Contains("more than one IModEntrypoint"));
             Assert.IsEmpty(EntryLog);
         }
 
@@ -130,7 +135,7 @@ namespace ModdingTest
             CodeMod("B", EntrySource("B"));
 
             var resolution = Resolve();
-            ExpectErrors(() => resolution.Load().Finish(), error => error.Contains("entry failure"));
+            ExpectErrors(() => resolution.Load(ContentBase).Finish(), error => error.Contains("entry failure"));
             CollectionAssert.AreEqual(new[] { "B:2:3" }, EntryLog);
         }
 
@@ -148,7 +153,7 @@ namespace ModdingTest
                 }}");
 
             var resolution = Resolve();
-            ExpectErrors(() => resolution.Load().Finish(), error => error.Contains("IModEntrypoint"));
+            ExpectErrors(() => resolution.Load(ContentBase).Finish(), error => error.Contains("IModEntrypoint"));
         }
 
         [Test]
@@ -157,15 +162,18 @@ namespace ModdingTest
             CodeMod("A", $"namespace {AssemblyName("A")} {{ public class Nothing {{ }} }}");
 
             var resolution = Resolve();
-            resolution.Load().Finish();
+            resolution.Load(ContentBase).Finish();
             Assert.IsTrue(AppDomain.CurrentDomain.GetAssemblies().Any(assembly => assembly.GetName().Name == AssemblyName("A")));
         }
 
+        // The base game's content is added after every entry point has run, so an entry point can still change how it's parsed.
         [Test]
-        public void BaseDirectoryMissing()
+        public void ContentBaseAfterEntries()
         {
-            var resolution = new ModLoader(BaseId, "1.0.0", System.IO.Path.Combine(baseDirectory, "nope")).Resolve(new[] { root });
-            ExpectErrors(() => resolution.Load().Finish(), error => error.Contains("nope"));
+            CodeMod("A", EntrySource("A"));
+
+            Resolve().Load(module => EntryLog.Add("base")).Finish();
+            CollectionAssert.AreEqual(new[] { "A:1:2", "base" }, EntryLog);
         }
 
         [Test]
@@ -174,9 +182,9 @@ namespace ModdingTest
             var folder = CodeMod("A", EntrySource("A"));
             Directory.Move(System.IO.Path.Combine(folder, "Assemblies"), System.IO.Path.Combine(folder, "Code"));
 
-            var loader = new ModLoader(BaseId, "1.0.0", baseDirectory);
+            var loader = new ModLoader(BaseId, "1.0.0");
             loader.DirectoryAssemblies = "Code";
-            loader.Resolve(new[] { root }).Load().Finish();
+            loader.Resolve(new[] { root }).Load(ContentBase).Finish();
 
             CollectionAssert.AreEqual(new[] { "A:1:2" }, EntryLog);
         }
@@ -185,8 +193,8 @@ namespace ModdingTest
         public void LoadTwice()
         {
             var resolution = Resolve();
-            resolution.Load().Finish();
-            Assert.Throws<InvalidOperationException>(() => resolution.Load());
+            resolution.Load(ContentBase).Finish();
+            Assert.Throws<InvalidOperationException>(() => resolution.Load(ContentBase));
         }
 
         [Test]
@@ -194,9 +202,9 @@ namespace ModdingTest
         {
             CodeMod("A", EntrySource("A"));
 
-            Resolve().Load().Finish();
+            Resolve().Load(ContentBase).Finish();
             Dec.Database.Clear();
-            Resolve().Load().Finish();
+            Resolve().Load(ContentBase).Finish();
 
             // The second load reuses the assembly without running its entry point again.
             CollectionAssert.AreEqual(new[] { "A:1:2" }, EntryLog);
@@ -207,12 +215,12 @@ namespace ModdingTest
         {
             CodeMod("A", EntrySource("A"));
 
-            Resolve().Load().Finish();
+            Resolve().Load(ContentBase).Finish();
             Dec.Database.Clear();
 
             // Resolving a different directory, rather than deleting the mod, since a loaded assembly can't be deleted on Windows.
             root = DirectoryTemp();
-            ExpectErrors(() => Resolve().Load().Finish(), error => error.Contains("A.dll"));
+            ExpectErrors(() => Resolve().Load(ContentBase).Finish(), error => error.Contains("A.dll"));
         }
 
         [Test]
@@ -231,7 +239,7 @@ namespace ModdingTest
             DecUtilLib.Compilation.CompileToFile($"namespace {AssemblyName("A")} {{ public class Holder {{ public {AssemblyName("Library")}.Thing thing; }} }}", new[] { libraryAssembly }, AssemblyName("A"), System.IO.Path.Combine(folder, "Assemblies", AssemblyName("A") + ".dll"));
             scratch.Unload();
 
-            Resolve().Load().Finish();
+            Resolve().Load(ContentBase).Finish();
             Dec.Database.Clear();
 
             var libraryMod = System.IO.Path.Combine(root, "Library");
@@ -274,7 +282,7 @@ namespace ModdingTest
 
             var resolution = Resolve();
             AssertKinds(resolution, ModProblemKind.AssemblyRedundant);
-            ExpectWarnings(() => resolution.Load().Finish(), warning => warning.Contains(AssemblyName("Library")));
+            ExpectWarnings(() => resolution.Load(ContentBase).Finish(), warning => warning.Contains(AssemblyName("Library")));
 
             CollectionAssert.AreEqual(new[] { "A:2.0.0.0" }, EntryLog);
             Assert.IsFalse(ModResolution.AssembliesLoaded.Contains(System.IO.Path.GetFullPath(copy)));
@@ -287,12 +295,12 @@ namespace ModdingTest
             System.Runtime.Loader.AssemblyLoadContext.Default.LoadFromAssemblyPath(LibraryToFile("Library", "2.0.0.0", DirectoryTemp()));
             ModUsingLibrary("A", "Library", "1.0.0.0");
 
-            ExpectWarnings(() => Resolve().Load().Finish(), warning => warning.Contains(AssemblyName("Library")));
+            ExpectWarnings(() => Resolve().Load(ContentBase).Finish(), warning => warning.Contains(AssemblyName("Library")));
             Dec.Database.Clear();
 
             var resolution = Resolve();
             AssertKinds(resolution, ModProblemKind.AssemblyRedundant);
-            ExpectWarnings(() => resolution.Load().Finish(), warning => warning.Contains(AssemblyName("Library")));
+            ExpectWarnings(() => resolution.Load(ContentBase).Finish(), warning => warning.Contains(AssemblyName("Library")));
         }
 
         // A copy of a library another mod loaded earlier this session needs a restart, even when it's older.
@@ -304,7 +312,7 @@ namespace ModdingTest
             File.WriteAllText(System.IO.Path.Combine(library, "Mod.xml"), ModXml("Library", "1.0.0"));
             LibraryToFile("Library", "2.0.0.0", System.IO.Path.Combine(library, "Assemblies"));
 
-            Resolve().Load().Finish();
+            Resolve().Load(ContentBase).Finish();
             Dec.Database.Clear();
 
             ModUsingLibrary("A", "Library", "1.0.0.0");
@@ -348,7 +356,7 @@ namespace ModdingTest
             CollectionAssert.AreEqual(new[] { BaseId, "B", "A" }, Ids(resolution));
 
             // A replaces what B created; in the other order, A's replace would have nothing to replace.
-            resolution.Load().Finish();
+            resolution.Load(ContentBase).Finish();
             Assert.IsNotNull(Dec.Database<StubDec>.Get("Stub"));
         }
     }

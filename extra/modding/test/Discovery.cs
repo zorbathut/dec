@@ -18,7 +18,7 @@ namespace ModdingTest
 
         private static ModLoader Loader()
         {
-            return new ModLoader(BaseId, "1.0.0", DirectoryTemp());
+            return new ModLoader(BaseId, "1.0.0");
         }
 
         [Test]
@@ -307,7 +307,7 @@ namespace ModdingTest
         [TestCase(null, "1.0.0")]
         public void BaseInvalid(string id, string version)
         {
-            Assert.Throws<System.ArgumentException>(() => new ModLoader(id, version, "/base"));
+            Assert.Throws<System.ArgumentException>(() => new ModLoader(id, version));
         }
     }
 }

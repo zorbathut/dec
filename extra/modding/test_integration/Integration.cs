@@ -108,12 +108,12 @@ namespace ModdingTestIntegration
             Folder(root, "Patcher.B", Patcher("Patcher.B", "<li><id>Patcher.A</id><kind>Accommodated</kind></li>"));
             File.WriteAllText(Path.Combine(root, "Patcher.B", "Decs", "Patch.xml"), @"<Decs><IntegrationThingDec decName=""Thing"" mode=""patch""><value>3</value></IntegrationThingDec></Decs>");
 
-            var loader = new Dec.Modding.ModLoader("Game", "1.0.0", baseDirectory);
+            var loader = new Dec.Modding.ModLoader("Game", "1.0.0");
 
             var resolution = loader.Resolve(new[] { root });
             Assert.IsEmpty(resolution.Problems, string.Join("\n", resolution.Problems));
             CollectionAssert.AreEqual(new[] { "Game", "Code", "Patcher.A", "Patcher.B" }, resolution.Mods.Select(mod => mod.Id));
-            resolution.Load().Finish();
+            resolution.Load(module => module.AddDirectory(baseDirectory)).Finish();
 
             var assembly = AppDomain.CurrentDomain.GetAssemblies().Single(candidate => candidate.GetName().Name == run);
             var widget = assembly.GetType($"{run}.GadgetDecs").GetField("Widget").GetValue(null);
@@ -132,7 +132,7 @@ namespace ModdingTestIntegration
             resolution = loader.Resolve(new[] { root });
             Assert.IsEmpty(resolution.Problems, string.Join("\n", resolution.Problems));
             CollectionAssert.AreEqual(new[] { "Game", "Code", "Patcher.B", "Patcher.A" }, resolution.Mods.Select(mod => mod.Id));
-            resolution.Load().Finish();
+            resolution.Load(module => module.AddDirectory(baseDirectory)).Finish();
 
             Assert.AreEqual(2, Dec.Database<IntegrationThingDec>.Get("Thing").value);
             Assert.IsNotNull(assembly.GetType($"{run}.GadgetDecs").GetField("Widget").GetValue(null));

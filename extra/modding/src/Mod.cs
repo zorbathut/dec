@@ -36,9 +36,9 @@ namespace Dec.Modding
 
         internal Mod() { }
 
-        internal static Mod CreateBase(string id, SemanticVersioning.Version version, string directoryDecs)
+        internal static Mod CreateBase(string id, SemanticVersioning.Version version)
         {
-            return new Mod() { id = id, versionParsed = version, directoryDecs = directoryDecs, isBase = true };
+            return new Mod() { id = id, versionParsed = version, isBase = true };
         }
 
         /// <summary>

@@ -92,7 +92,7 @@ namespace ModdingTest
 
         internal static ModResolution ResolvePure(string baseVersion, List<ModProblem> problems, Dictionary<string, AssemblyReserved> assembliesReserved, params Mod[] mods)
         {
-            var resolution = ModResolver.Resolve(Dec.Modding.Mod.CreateBase(BaseId, new SemanticVersioning.Version(baseVersion), "/base"), mods, problems, assembliesReserved, decBuiltInto: null);
+            var resolution = ModResolver.Resolve(Dec.Modding.Mod.CreateBase(BaseId, new SemanticVersioning.Version(baseVersion)), mods, problems, assembliesReserved, decBuiltInto: null);
             AssertInvariant(resolution);
             return resolution;
         }

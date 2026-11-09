@@ -273,7 +273,7 @@ namespace ModdingTest
         // A game that builds Dec's source into its own assembly, Game.
         private static ModResolution ResolveDecBuiltIn(Dictionary<string, AssemblyReserved> game, params Mod[] mods)
         {
-            var resolution = ModResolver.Resolve(Dec.Modding.Mod.CreateBase(BaseId, new SemanticVersioning.Version("1.0.0"), "/base"), mods, new List<ModProblem>(), game, "Game");
+            var resolution = ModResolver.Resolve(Dec.Modding.Mod.CreateBase(BaseId, new SemanticVersioning.Version("1.0.0")), mods, new List<ModProblem>(), game, "Game");
             AssertInvariant(resolution);
             return resolution;
         }

@@ -19,7 +19,6 @@ namespace Dec.Modding
     {
         private readonly string baseId;
         private readonly SemanticVersioning.Version baseVersion;
-        private readonly string baseDirectory;
 
         /// <summary>
         /// The manifest's file name within each mod folder.
@@ -43,8 +42,7 @@ namespace Dec.Modding
 
         /// <param name="baseId">The base game's id. Mods name it to depend on a particular version of the game.</param>
         /// <param name="baseVersion">The base game's version, in semantic-versioning form; this is what mods' version ranges for the base game are checked against. It can be the game's own version, or a separate modding-API version that changes only when mods need to.</param>
-        /// <param name="baseDirectory">The folder holding the base game's dec XML.</param>
-        public ModLoader(string baseId, string baseVersion, string baseDirectory)
+        public ModLoader(string baseId, string baseVersion)
         {
             if (!ModValidation.IsIdValid(baseId))
             {
@@ -58,7 +56,6 @@ namespace Dec.Modding
             }
 
             this.baseId = baseId;
-            this.baseDirectory = baseDirectory;
         }
 
         /// <summary>
@@ -111,7 +108,7 @@ namespace Dec.Modding
             var dec = typeof(global::Dec.Dec).Assembly;
             var decName = dec.GetName().Name;
             var decBuiltInto = string.Equals(decName, ModResolver.AssemblyDec, StringComparison.OrdinalIgnoreCase) ? null : decName;
-            return ModResolver.Resolve(Mod.CreateBase(baseId, baseVersion, baseDirectory), candidates, problems, AssembliesReserved(AssemblyLoadContext.GetLoadContext(dec), names), decBuiltInto);
+            return ModResolver.Resolve(Mod.CreateBase(baseId, baseVersion), candidates, problems, AssembliesReserved(AssemblyLoadContext.GetLoadContext(dec), names), decBuiltInto);
         }
 
         // Content in the wrong folder otherwise loads nothing without a word, which is easy to do with case-sensitive folder names. A mod with some content in the right place presumably meant the rest, so this only speaks up when nothing landed.
