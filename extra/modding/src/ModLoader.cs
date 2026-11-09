@@ -108,7 +108,10 @@ namespace Dec.Modding
             }
 
             var names = new HashSet<string>(candidates.SelectMany(mod => mod.assemblies).Select(assembly => assembly.name.Name), StringComparer.OrdinalIgnoreCase);
-            return ModResolver.Resolve(Mod.CreateBase(baseId, baseVersion, baseDirectory), candidates, problems, AssembliesReserved(AssemblyLoadContext.GetLoadContext(typeof(global::Dec.Dec).Assembly), names));
+            var dec = typeof(global::Dec.Dec).Assembly;
+            var decName = dec.GetName().Name;
+            var decBuiltInto = string.Equals(decName, ModResolver.AssemblyDec, StringComparison.OrdinalIgnoreCase) ? null : decName;
+            return ModResolver.Resolve(Mod.CreateBase(baseId, baseVersion, baseDirectory), candidates, problems, AssembliesReserved(AssemblyLoadContext.GetLoadContext(dec), names), decBuiltInto);
         }
 
         // Content in the wrong folder otherwise loads nothing without a word, which is easy to do with case-sensitive folder names. A mod with some content in the right place presumably meant the rest, so this only speaks up when nothing landed.

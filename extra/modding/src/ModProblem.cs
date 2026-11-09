@@ -110,6 +110,11 @@ namespace Dec.Modding
         AssemblyRedundant,
 
         /// <summary>
+        /// A mod ships or references Dec's own assembly, but the game builds Dec's source into its own assembly instead, so the mod would get a second Dec or none.
+        /// </summary>
+        AssemblyDecSeparate,
+
+        /// <summary>
         /// A file in a mod's assembly folder isn't a .NET assembly, such as a native library; it is skipped.
         /// </summary>
         AssemblyNative,

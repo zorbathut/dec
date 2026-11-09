@@ -22,6 +22,7 @@ namespace Dec.Modding
         private readonly Dictionary<Mod, ModStatus> status;
         private readonly List<ModProblem> problems;
         private readonly IReadOnlyDictionary<string, AssemblyReserved> assembliesReserved;
+        private readonly string decBuiltInto;
 
         private readonly HashSet<ModAssembly> assembliesSkipped = new HashSet<ModAssembly>();
 
@@ -29,6 +30,9 @@ namespace Dec.Modding
 
         private Dictionary<string, Mod> lookup;
         private Dictionary<string, List<Mod>> lookupCaseless;
+
+        // Dec's own assembly, as its package ships it.
+        internal const string AssemblyDec = "dec";
 
         private const string ReferenceWithoutCopying = "`<Private>false</Private>` on a `Reference`, `ExcludeAssets=\"runtime\"` on a `PackageReference`, and both on a `ProjectReference`";
 
@@ -41,11 +45,12 @@ namespace Dec.Modding
             return a.CompareTo(b);
         });
 
-        private ModResolver(Mod modBase, IEnumerable<Mod> candidates, List<ModProblem> problems, IReadOnlyDictionary<string, AssemblyReserved> assembliesReserved)
+        private ModResolver(Mod modBase, IEnumerable<Mod> candidates, List<ModProblem> problems, IReadOnlyDictionary<string, AssemblyReserved> assembliesReserved, string decBuiltInto)
         {
             this.modBase = modBase;
             this.problems = problems;
             this.assembliesReserved = assembliesReserved;
+            this.decBuiltInto = decBuiltInto;
 
             dependencyBase = ModDependency.CreateImplicitBase(modBase.Id);
 
@@ -56,9 +61,10 @@ namespace Dec.Modding
             status = installed.ToDictionary(mod => mod, mod => mod.manifestError ? ModStatus.Disabled : ModStatus.Enabled);
         }
 
-        internal static ModResolution Resolve(Mod modBase, IEnumerable<Mod> candidates, List<ModProblem> problems, IReadOnlyDictionary<string, AssemblyReserved> assembliesReserved)
+        // `decBuiltInto` is the game assembly that Dec's source is built into, or null when the game references Dec's own assembly.
+        internal static ModResolution Resolve(Mod modBase, IEnumerable<Mod> candidates, List<ModProblem> problems, IReadOnlyDictionary<string, AssemblyReserved> assembliesReserved, string decBuiltInto)
         {
-            return new ModResolver(modBase, candidates, problems, assembliesReserved).Run();
+            return new ModResolver(modBase, candidates, problems, assembliesReserved, decBuiltInto).Run();
         }
 
         // The phases run in this order so that a mod is never disabled as Incompatible, or for an assembly clash, because of a mod that the Required cascade or cycle detection already ruled out.
@@ -228,9 +234,28 @@ namespace Dec.Modding
                     }
                 }
 
+                // A mod's own Dec would load as a second, separate Dec whose types and entry points the game's Dec never sees, and a reference to one finds nothing to bind to; either way the mod was built against the Dec package instead of the game.
+                var decUses = new List<string>();
+                if (decBuiltInto != null)
+                {
+                    decUses.AddRange(mod.assemblies.Where(assembly => IsDec(assembly.name)).Select(assembly => $"ships `{System.IO.Path.GetFileName(assembly.path)}`"));
+                    decUses.AddRange(mod.assemblies.Where(assembly => assembly.references.Any(IsDec)).Select(assembly => $"`{assembly.name.Name}` references `{AssemblyDec}`"));
+                }
+                if (decUses.Count > 0)
+                {
+                    Error(ModProblemKind.AssemblyDecSeparate, new List<Mod>() { mod }, null, $"`{mod.Id}` uses its own Dec ({string.Join(", ", decUses)}), but the game builds Dec into its own assembly `{decBuiltInto}`; the mod's author should remove the Dec package from the mod entirely, not just stop copying it, and build against `{decBuiltInto}` in its place, referencing that without copying it: {ReferenceWithoutCopying}");
+                    failure = true;
+                }
+
                 var skipped = new List<string>();
                 foreach (var assembly in mod.assemblies)
                 {
+                    // Reported above, and the game's copy of a real `dec` couldn't stand in for it either, since that isn't the Dec the game uses.
+                    if (decBuiltInto != null && IsDec(assembly.name))
+                    {
+                        continue;
+                    }
+
                     if (!assembliesReserved.TryGetValue(assembly.name.Name, out var reserved) || (reserved.location != null && ModPath.Equal(reserved.location, assembly.path)))
                     {
                         continue;
@@ -317,6 +342,11 @@ namespace Dec.Modding
             }
 
             return null;
+        }
+
+        private static bool IsDec(System.Reflection.AssemblyName name)
+        {
+            return string.Equals(name.Name, AssemblyDec, StringComparison.OrdinalIgnoreCase);
         }
 
         private static string TokenString(System.Reflection.AssemblyName name)

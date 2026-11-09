@@ -270,6 +270,64 @@ namespace ModdingTest
             return ResolvePure("1.0.0", new List<ModProblem>(), game, mods);
         }
 
+        // A game that builds Dec's source into its own assembly, Game.
+        private static ModResolution ResolveDecBuiltIn(Dictionary<string, AssemblyReserved> game, params Mod[] mods)
+        {
+            var resolution = ModResolver.Resolve(Dec.Modding.Mod.CreateBase(BaseId, new SemanticVersioning.Version("1.0.0"), "/base"), mods, new List<ModProblem>(), game, "Game");
+            AssertInvariant(resolution);
+            return resolution;
+        }
+
+        // Dec's standalone assembly is `dec`, but a reference may spell it either way.
+        [TestCase("dec")]
+        [TestCase("Dec")]
+        public void DecSeparateShipped(string name)
+        {
+            var mod = Mod("A", "1.0.0");
+            mod.assemblies.Add(AssemblyMod($"/mods/A/Assemblies/{name}.dll", $"{name}, Version=1.0.0.0"));
+            mod.assemblies.Add(AssemblyMod("/mods/A/Assemblies/A.dll", "A, Version=1.0.0.0", $"{name}, Version=1.0.0.0"));
+
+            var resolution = ResolveDecBuiltIn(new Dictionary<string, AssemblyReserved>(), mod);
+            AssertKinds(resolution, ModProblemKind.AssemblyDecSeparate);
+            Assert.AreEqual(ModStatus.Disabled, resolution.GetStatus(mod));
+        }
+
+        [Test]
+        public void DecSeparateReferenced()
+        {
+            var mod = Mod("A", "1.0.0");
+            mod.assemblies.Add(AssemblyMod("/mods/A/Assemblies/A.dll", "A, Version=1.0.0.0", "dec, Version=1.0.0.0"));
+
+            var resolution = ResolveDecBuiltIn(new Dictionary<string, AssemblyReserved>(), mod);
+            AssertKinds(resolution, ModProblemKind.AssemblyDecSeparate);
+            Assert.AreEqual(ModStatus.Disabled, resolution.GetStatus(mod));
+        }
+
+        // A game that also has a real `dec`, one the mod's copy can't stand in for, reports only the Dec error, not a conflict whose advice to reference `dec` without copying it contradicts it.
+        [Test]
+        public void DecSeparateGameHasDec()
+        {
+            var mod = Mod("A", "1.0.0");
+            mod.assemblies.Add(AssemblyMod("/mods/A/Assemblies/dec.dll", "dec, Version=1.0.0.0"));
+            mod.assemblies.Add(AssemblyMod("/mods/A/Assemblies/A.dll", "A, Version=1.0.0.0", "dec, Version=1.0.0.0"));
+            var game = new Dictionary<string, AssemblyReserved>(System.StringComparer.OrdinalIgnoreCase) { { "dec", AssemblyGame("/game/dec.dll", "dec, Version=0.5.0.0, PublicKeyToken=null") } };
+
+            var resolution = ResolveDecBuiltIn(game, mod);
+            AssertKinds(resolution, ModProblemKind.AssemblyDecSeparate);
+            Assert.AreEqual(ModStatus.Disabled, resolution.GetStatus(mod));
+        }
+
+        [Test]
+        public void DecSeparateUnrelated()
+        {
+            var mod = Mod("A", "1.0.0");
+            mod.assemblies.Add(AssemblyMod("/mods/A/Assemblies/A.dll", "A, Version=1.0.0.0", "Decimal, Version=1.0.0.0"));
+
+            var resolution = ResolveDecBuiltIn(new Dictionary<string, AssemblyReserved>(), mod);
+            AssertKinds(resolution);
+            Assert.AreEqual(ModStatus.Enabled, resolution.GetStatus(mod));
+        }
+
         // A mod shipping Lib alongside its own assembly, which uses Lib.
         private static Mod ModWithLib(string id, string version, string referenced = null, string token = "null")
         {
