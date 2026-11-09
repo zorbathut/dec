@@ -21,14 +21,16 @@ namespace Dec.Modding
         private readonly List<Mod> installed;
         private readonly Dictionary<Mod, ModStatus> status;
         private readonly List<ModProblem> problems;
-        private readonly IReadOnlyDictionary<string, string> assembliesReserved;   // name to the file already loaded or loadable under that name, or null when no file is known
+        private readonly IReadOnlyDictionary<string, AssemblyReserved> assembliesReserved;
+
+        private readonly HashSet<ModAssembly> assembliesSkipped = new HashSet<ModAssembly>();
 
         private readonly HashSet<(Mod, Mod)> edgesDropped = new HashSet<(Mod, Mod)>();
 
         private Dictionary<string, Mod> lookup;
         private Dictionary<string, List<Mod>> lookupCaseless;
 
-        private const string AssemblyReservedHint = "mods can't replace the game's assemblies, so the mod's author should reference it at a version no newer than the game's, without copying it: `<Private>false</Private>` on a `Reference`, `ExcludeAssets=\"runtime\"` on a `PackageReference`, and both on a `ProjectReference`";
+        private const string ReferenceWithoutCopying = "`<Private>false</Private>` on a `Reference`, `ExcludeAssets=\"runtime\"` on a `PackageReference`, and both on a `ProjectReference`";
 
         private static readonly IComparer<SemanticVersioning.Version> VersionComparer = Comparer<SemanticVersioning.Version>.Create((a, b) =>
         {
@@ -39,7 +41,7 @@ namespace Dec.Modding
             return a.CompareTo(b);
         });
 
-        private ModResolver(Mod modBase, IEnumerable<Mod> candidates, List<ModProblem> problems, IReadOnlyDictionary<string, string> assembliesReserved)
+        private ModResolver(Mod modBase, IEnumerable<Mod> candidates, List<ModProblem> problems, IReadOnlyDictionary<string, AssemblyReserved> assembliesReserved)
         {
             this.modBase = modBase;
             this.problems = problems;
@@ -54,7 +56,7 @@ namespace Dec.Modding
             status = installed.ToDictionary(mod => mod, mod => mod.manifestError ? ModStatus.Disabled : ModStatus.Enabled);
         }
 
-        internal static ModResolution Resolve(Mod modBase, IEnumerable<Mod> candidates, List<ModProblem> problems, IReadOnlyDictionary<string, string> assembliesReserved)
+        internal static ModResolution Resolve(Mod modBase, IEnumerable<Mod> candidates, List<ModProblem> problems, IReadOnlyDictionary<string, AssemblyReserved> assembliesReserved)
         {
             return new ModResolver(modBase, candidates, problems, assembliesReserved).Run();
         }
@@ -74,7 +76,7 @@ namespace Dec.Modding
 
             CheckSoft();
 
-            return new ModResolution(installed, status, order, problems);
+            return new ModResolution(installed, status, order, problems, assembliesSkipped);
         }
 
         private IEnumerable<Mod> Enabled()
@@ -226,26 +228,39 @@ namespace Dec.Modding
                     }
                 }
 
+                var skipped = new List<string>();
                 foreach (var assembly in mod.assemblies)
                 {
-                    if (!assembliesReserved.TryGetValue(assembly.name, out var location) || (location != null && ModPath.Equal(location, assembly.path)))
+                    if (!assembliesReserved.TryGetValue(assembly.name.Name, out var reserved) || (reserved.location != null && ModPath.Equal(reserved.location, assembly.path)))
                     {
                         continue;
                     }
 
-                    if (location == null)
+                    var location = reserved.location;
+                    if (location != null && ModResolution.AssembliesLoaded.Contains(System.IO.Path.GetFullPath(location)))
                     {
-                        Error(ModProblemKind.AssemblyConflict, new List<Mod>() { mod }, null, $"`{mod.Id}` ships assembly `{assembly.name}`, but the game already has or depends on an assembly with that name; {AssemblyReservedHint}");
+                        Error(ModProblemKind.AssemblyConflict, new List<Mod>() { mod }, null, $"`{mod.Id}` ships assembly `{assembly.name.Name}`, but a copy was already loaded from `{location}` earlier in this session, and only one can load per session; restart the game to change which one does");
+                        failure = true;
+                        continue;
                     }
-                    else if (ModResolution.AssembliesLoaded.Contains(System.IO.Path.GetFullPath(location)))
+
+                    var required = AssemblyRequired(assembly);
+                    var reason = AssemblyStandInFailure(assembly, reserved.name, required);
+                    if (reason == null)
                     {
-                        Error(ModProblemKind.AssemblyConflict, new List<Mod>() { mod }, null, $"`{mod.Id}` ships assembly `{assembly.name}`, but a copy was already loaded from `{location}` earlier in this session, and only one can load per session; restart the game to change which one does");
+                        assembliesSkipped.Add(assembly);
+                        skipped.Add($"`{assembly.name.Name}` (mods need {required}; the game's is {reserved.name.Version})");
+                        continue;
                     }
-                    else
-                    {
-                        Error(ModProblemKind.AssemblyConflict, new List<Mod>() { mod }, null, $"`{mod.Id}` ships assembly `{assembly.name}`, but the game already has an assembly with that name at `{location}`; {AssemblyReservedHint}");
-                    }
+
+                    var game = location == null ? $"the game already has or depends on an assembly named `{assembly.name.Name}`" : $"the game already has an assembly named `{assembly.name.Name}` at `{location}`";
+                    Error(ModProblemKind.AssemblyConflict, new List<Mod>() { mod }, null, $"`{mod.Id}` ships assembly `{assembly.name.Name}`, but {game}, and {reason}");
                     failure = true;
+                }
+
+                if (skipped.Count > 0 && !failure)
+                {
+                    problems.Add(new ModProblem(ModProblemSeverity.Warning, ModProblemKind.AssemblyRedundant, new List<Mod>() { mod }, null, $"`{mod.Id}` ships copies of assemblies the game already has, so it uses the game's copies instead: {string.Join(", ", skipped)}; the mod's author should reference them without copying them: {ReferenceWithoutCopying}"));
                 }
 
                 if (failure)
@@ -255,6 +270,58 @@ namespace Dec.Modding
             }
 
             Disable(failed);
+        }
+
+        // Every enabled mod's references to an assembly's name, other than from the assembly itself; whichever copy binds serves them all.
+        private List<System.Reflection.AssemblyName> AssemblyReferences(ModAssembly assembly)
+        {
+            return Enabled()
+                .SelectMany(mod => mod.assemblies)
+                .Where(other => other != assembly)
+                .SelectMany(other => other.references)
+                .Where(reference => string.Equals(reference.Name, assembly.name.Name, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+
+        // The version a copy standing in for a mod's assembly needs: at least the copy's own, and whatever the enabled mods reference.
+        private System.Version AssemblyRequired(ModAssembly assembly)
+        {
+            return AssemblyReferences(assembly).Select(reference => reference.Version).Append(assembly.name.Version).Where(version => version != null).Max();
+        }
+
+        // Why the game's copy of an assembly can't stand in for a mod's copy, or null if it can.
+        private string AssemblyStandInFailure(ModAssembly assembly, System.Reflection.AssemblyName game, System.Version required)
+        {
+            var references = AssemblyReferences(assembly);
+
+            // A copy nothing uses may be the mod's own assembly that happens to share the game's name, and swapping in the game's would break it.
+            if (references.Count == 0)
+            {
+                return "nothing in any enabled mod references it, so it may be a different assembly that happens to share the name; the mod's author should drop it if it's a copy, or rename it if it isn't";
+            }
+
+            if (game == null || game.Version == null)
+            {
+                return $"the game's version of it is unknown, so it can't be checked; the mod's author should reference it without copying it: {ReferenceWithoutCopying}";
+            }
+
+            var token = TokenString(game);
+            if (references.Append(assembly.name).Any(name => TokenString(name) != token))
+            {
+                return $"it's signed differently from the game's, so the game's copy can't stand in for it; the mod's author should reference the game's copy without copying it: {ReferenceWithoutCopying}";
+            }
+
+            if (required == null || required.CompareTo(game.Version) > 0)
+            {
+                return $"mods need version {required}, newer than the game's {game.Version}; the mod's author should reference a version no newer than the game's, without copying it: {ReferenceWithoutCopying}";
+            }
+
+            return null;
+        }
+
+        private static string TokenString(System.Reflection.AssemblyName name)
+        {
+            return Convert.ToHexString(name.GetPublicKeyToken() ?? Array.Empty<byte>());
         }
 
         private void Cascade()
@@ -312,12 +379,12 @@ namespace Dec.Modding
             var owners = new SortedDictionary<string, List<Mod>>(StringComparer.OrdinalIgnoreCase);
             foreach (var mod in Enabled())
             {
-                foreach (var assembly in mod.assemblies)
+                foreach (var assembly in mod.assemblies.Where(assembly => !assembliesSkipped.Contains(assembly)))
                 {
-                    if (!owners.TryGetValue(assembly.name, out var list))
+                    if (!owners.TryGetValue(assembly.name.Name, out var list))
                     {
                         list = new List<Mod>();
-                        owners[assembly.name] = list;
+                        owners[assembly.name.Name] = list;
                     }
                     list.Add(mod);
                 }

@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
 using Dec.Modding;
@@ -14,22 +16,31 @@ namespace ModdingTest
         private string run;
         private string directory;
         private AssemblyLoadContext game;
-        private AssemblyLoadContext other;
+        private List<AssemblyLoadContext> contexts;
 
         [SetUp]
         public void Prep()
         {
             run = Guid.NewGuid().ToString("N");
             directory = DirectoryTemp();
-            game = new AssemblyLoadContext("game", isCollectible: true);
-            other = new AssemblyLoadContext("other", isCollectible: true);
+            contexts = new List<AssemblyLoadContext>();
+            game = Context();
         }
 
         [TearDown]
         public void Cleanup()
         {
-            game.Unload();
-            other.Unload();
+            foreach (var context in contexts)
+            {
+                context.Unload();
+            }
+        }
+
+        private AssemblyLoadContext Context()
+        {
+            var context = new AssemblyLoadContext(null, isCollectible: true);
+            contexts.Add(context);
+            return context;
         }
 
         private string Name(string id)
@@ -37,61 +48,95 @@ namespace ModdingTest
             return $"ModTest_{run}_{id}";
         }
 
-        private string CompileToFile(string id, string source, params Assembly[] references)
+        private ISet<string> Names(params string[] ids)
         {
-            var path = System.IO.Path.Combine(directory, Name(id) + ".dll");
+            return new HashSet<string>(ids.Select(Name), StringComparer.OrdinalIgnoreCase);
+        }
+
+        // An assembly with a class holding a field of each given assembly's class, so it references each of them.
+        private string CompileToFile(string id, string version, params Assembly[] references)
+        {
+            var fields = string.Join(" ", references.Select(reference => $"public {reference.GetName().Name}.Thing {reference.GetName().Name};"));
+            var source = $"[assembly: System.Reflection.AssemblyVersion(\"{version}\")] namespace {Name(id)} {{ public class Thing {{ {fields} }} }}";
+            var path = System.IO.Path.Combine(directory, $"{Name(id)}_{version}.dll");
             DecUtilLib.Compilation.CompileToFile(source, references, Name(id), path);
             return path;
         }
 
-        // A class with a field of each given type, so the assembly references each of theirs.
-        private string Holder(string id, params string[] ids)
+        // Loads the way Godot's editor does, from memory.
+        private void LoadFromMemory(AssemblyLoadContext context, string path)
         {
-            var fields = string.Join(" ", Array.ConvertAll(ids, field => $"public {Name(field)}.Thing {field};"));
-            return $"namespace {Name(id)} {{ public class Thing {{ {fields} }} }}";
-        }
-
-        // Builds a game assembly loaded from memory into the game context, referencing an assembly that isn't loaded there.
-        private void GameSetUp()
-        {
-            var dependency = other.LoadFromAssemblyPath(CompileToFile("Dependency", Holder("Dependency")));
-            var path = CompileToFile("Game", Holder("Game", "Dependency"), dependency);
             using (var stream = File.OpenRead(path))
             {
-                game.LoadFromStream(stream);
+                context.LoadFromStream(stream);
             }
         }
 
         [Test]
         public void InMemoryAssemblyReserved()
         {
-            GameSetUp();
-            var reserved = ModLoader.AssembliesReserved(game);
-            Assert.IsTrue(reserved.TryGetValue(Name("Game"), out var location));
-            Assert.IsNull(location);
+            LoadFromMemory(game, CompileToFile("Game", "1.2.3.4"));
+            var reserved = ModLoader.AssembliesReserved(game, Names("Game"))[Name("Game")];
+            Assert.IsNull(reserved.location);
+            Assert.AreEqual(new Version(1, 2, 3, 4), reserved.name.Version);
         }
 
         // Stands for both a dependency the game context hasn't loaded yet and one it hands in from another context, like Godot's GodotSharp; neither is among its assemblies.
         [Test]
         public void ReferenceReserved()
         {
-            GameSetUp();
-            var reserved = ModLoader.AssembliesReserved(game);
-            Assert.IsTrue(reserved.TryGetValue(Name("Dependency"), out var location));
-            Assert.IsNull(location);
+            var dependency = Context().LoadFromAssemblyPath(CompileToFile("Dependency", "1.0.0.0"));
+            LoadFromMemory(game, CompileToFile("Game", "1.0.0.0", dependency));
+
+            var reserved = ModLoader.AssembliesReserved(game, Names("Dependency"))[Name("Dependency")];
+            Assert.IsNull(reserved.location);
+            Assert.AreEqual(new Version(1, 0, 0, 0), reserved.name.Version);
+        }
+
+        [Test]
+        public void ReferenceHighestVersion()
+        {
+            var older = Context().LoadFromAssemblyPath(CompileToFile("Dependency", "1.0.0.0"));
+            var newer = Context().LoadFromAssemblyPath(CompileToFile("Dependency", "1.2.0.0"));
+            LoadFromMemory(game, CompileToFile("GameA", "1.0.0.0", older));
+            LoadFromMemory(game, CompileToFile("GameB", "1.0.0.0", newer));
+            LoadFromMemory(game, CompileToFile("GameC", "1.0.0.0", older));
+
+            Assert.AreEqual(new Version(1, 2, 0, 0), ModLoader.AssembliesReserved(game, Names("Dependency"))[Name("Dependency")].name.Version);
+        }
+
+        [Test]
+        public void OnlyNamesAsked()
+        {
+            var dependency = Context().LoadFromAssemblyPath(CompileToFile("Dependency", "1.0.0.0"));
+            LoadFromMemory(game, CompileToFile("Game", "1.0.0.0", dependency));
+            CollectionAssert.IsEmpty(ModLoader.AssembliesReserved(game, Names("Unrelated")));
         }
 
         [Test]
         public void ModReferencesNotReserved()
         {
-            var extra = other.LoadFromAssemblyPath(CompileToFile("Extra", Holder("Extra")));
-            var path = System.IO.Path.GetFullPath(CompileToFile("Mod", Holder("Mod", "Extra"), extra));
+            var extra = Context().LoadFromAssemblyPath(CompileToFile("Extra", "1.0.0.0"));
+            var path = System.IO.Path.GetFullPath(CompileToFile("Mod", "1.0.0.0", extra));
             game.LoadFromAssemblyPath(path);
             ModResolution.AssembliesLoaded.Add(path);
 
-            var reserved = ModLoader.AssembliesReserved(game);
-            Assert.AreEqual(path, reserved[Name("Mod")]);
+            var reserved = ModLoader.AssembliesReserved(game, Names("Mod", "Extra"));
+            Assert.AreEqual(path, reserved[Name("Mod")].location);
             Assert.IsFalse(reserved.ContainsKey(Name("Extra")));
+        }
+
+        // TPA versions are read from the file, without loading it.
+        [Test]
+        public void TrustedVersionRead()
+        {
+            const string name = "System.Net.Mail";
+            Assert.IsFalse(AppDomain.CurrentDomain.GetAssemblies().Any(assembly => assembly.GetName().Name == name), "this test needs an assembly nothing has loaded");
+
+            var reserved = ModLoader.AssembliesReserved(game, new HashSet<string>(StringComparer.OrdinalIgnoreCase) { name })[name];
+            Assert.IsTrue(File.Exists(reserved.location));
+            Assert.AreEqual(AssemblyName.GetAssemblyName(reserved.location).Version, reserved.name.Version);
+            Assert.IsFalse(AppDomain.CurrentDomain.GetAssemblies().Any(assembly => assembly.GetName().Name == name));
         }
     }
 }

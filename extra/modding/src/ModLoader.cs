@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata;
+using System.Reflection.PortableExecutable;
 using System.Runtime.Loader;
 
 namespace Dec.Modding
@@ -105,7 +107,8 @@ namespace Dec.Modding
                 }
             }
 
-            return ModResolver.Resolve(Mod.CreateBase(baseId, baseVersion, baseDirectory), candidates, problems, AssembliesReserved(AssemblyLoadContext.GetLoadContext(typeof(global::Dec.Dec).Assembly)));
+            var names = new HashSet<string>(candidates.SelectMany(mod => mod.assemblies).Select(assembly => assembly.name.Name), StringComparer.OrdinalIgnoreCase);
+            return ModResolver.Resolve(Mod.CreateBase(baseId, baseVersion, baseDirectory), candidates, problems, AssembliesReserved(AssemblyLoadContext.GetLoadContext(typeof(global::Dec.Dec).Assembly), names));
         }
 
         // Content in the wrong folder otherwise loads nothing without a word, which is easy to do with case-sensitive folder names. A mod with some content in the right place presumably meant the rest, so this only speaks up when nothing landed.
@@ -166,11 +169,24 @@ namespace Dec.Modding
             {
                 try
                 {
-                    mod.assemblies.Add(new ModAssembly() { path = path, name = AssemblyName.GetAssemblyName(path).Name });
+                    using (var stream = File.OpenRead(path))
+                    using (var reader = new PEReader(stream))
+                    {
+                        var metadata = reader.HasMetadata ? reader.GetMetadataReader() : null;
+                        if (metadata == null || !metadata.IsAssembly)
+                        {
+                            problems.Add(AssemblyNativeProblem(mod, path));
+                            continue;
+                        }
+
+                        var assembly = new ModAssembly() { path = path, name = metadata.GetAssemblyDefinition().GetAssemblyName() };
+                        assembly.references.AddRange(metadata.AssemblyReferences.Select(handle => metadata.GetAssemblyReference(handle).GetAssemblyName()));
+                        mod.assemblies.Add(assembly);
+                    }
                 }
                 catch (BadImageFormatException)
                 {
-                    problems.Add(new ModProblem(ModProblemSeverity.Warning, ModProblemKind.AssemblyNative, new List<Mod>() { mod }, null, $"`{path}` isn't a .NET assembly, such as a native library, so it won't be loaded"));
+                    problems.Add(AssemblyNativeProblem(mod, path));
                 }
                 catch (Exception e) when (e is IOException || e is UnauthorizedAccessException)
                 {
@@ -180,37 +196,67 @@ namespace Dec.Modding
             }
         }
 
-        // Assembly names a mod may not ship, mapped to the file behind each, or null when no file is known: everything the runtime would load from TPA, everything already loaded into the given context, and those assemblies' direct references, which covers dependencies the context hasn't loaded yet or hands in from another context. Dependencies of those that the context hasn't loaded yet aren't covered.
+        private static ModProblem AssemblyNativeProblem(Mod mod, string path)
+        {
+            return new ModProblem(ModProblemSeverity.Warning, ModProblemKind.AssemblyNative, new List<Mod>() { mod }, null, $"`{path}` isn't a .NET assembly, such as a native library, so it won't be loaded");
+        }
+
+        // Which of the given assembly names the game already has, with what it knows of the game's copy of each: everything the runtime would load from TPA, everything already loaded into the given context, and those assemblies' direct references, which covers dependencies the context hasn't loaded yet or hands in from another context. Dependencies of those that the context hasn't loaded yet aren't covered.
         //
         // Mod assemblies' references are left out, so a mod's missing dependency doesn't stop a later mod shipping it. Dynamic assemblies can't be bound to by name, so they don't conflict with a file.
-        internal static Dictionary<string, string> AssembliesReserved(AssemblyLoadContext context)
+        internal static Dictionary<string, AssemblyReserved> AssembliesReserved(AssemblyLoadContext context, ISet<string> names)
         {
-            var reserved = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var reserved = new Dictionary<string, AssemblyReserved>(StringComparer.OrdinalIgnoreCase);
 
             if (AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES") is string trusted)
             {
                 foreach (var path in trusted.Split(System.IO.Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries))
                 {
-                    reserved[System.IO.Path.GetFileNameWithoutExtension(path)] = path;
+                    var name = System.IO.Path.GetFileNameWithoutExtension(path);
+                    if (names.Contains(name))
+                    {
+                        // A single-file app lists its bundled assemblies at paths that don't exist.
+                        reserved[name] = new AssemblyReserved() { location = path, name = File.Exists(path) ? AssemblyName.GetAssemblyName(path) : null };
+                    }
                 }
             }
 
             var loaded = context.Assemblies.Where(assembly => !assembly.IsDynamic).ToList();
             foreach (var assembly in loaded)
             {
-                // Assemblies loaded from memory, as Godot's editor does with the game, have no location.
-                reserved[assembly.GetName().Name] = assembly.Location.Length > 0 ? assembly.Location : null;
+                var name = assembly.GetName();
+                if (names.Contains(name.Name))
+                {
+                    // Assemblies loaded from memory, as Godot's editor does with the game, have no location.
+                    reserved[name.Name] = new AssemblyReserved() { location = assembly.Location.Length > 0 ? assembly.Location : null, name = name };
+                }
             }
 
+            // Whatever binds to a reference has to satisfy the highest version anything asks for.
+            var references = new Dictionary<string, AssemblyName>(StringComparer.OrdinalIgnoreCase);
             foreach (var assembly in loaded.Where(assembly => assembly.Location.Length == 0 || !ModResolution.AssembliesLoaded.Contains(assembly.Location)))
             {
-                foreach (var reference in assembly.GetReferencedAssemblies())
+                foreach (var reference in assembly.GetReferencedAssemblies().Where(reference => names.Contains(reference.Name)))
                 {
-                    reserved.TryAdd(reference.Name, null);
+                    if (!references.TryGetValue(reference.Name, out var existing) || reference.Version.CompareTo(existing.Version) > 0)
+                    {
+                        references[reference.Name] = reference;
+                    }
                 }
+            }
+            foreach (var (name, reference) in references)
+            {
+                reserved.TryAdd(name, new AssemblyReserved() { location = null, name = reference });
             }
 
             return reserved;
         }
+    }
+
+    // What's known of the game's copy of an assembly a mod also ships.
+    internal struct AssemblyReserved
+    {
+        internal string location;   // null when no file is known
+        internal AssemblyName name; // null when its version is unknown
     }
 }

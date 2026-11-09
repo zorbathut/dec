@@ -242,6 +242,77 @@ namespace ModdingTest
             AssertKinds(Resolve());
         }
 
+        // A library at the given version, under this test's name for it, compiled to a file outside any mod.
+        private string LibraryToFile(string id, string version, string directory)
+        {
+            var path = System.IO.Path.Combine(directory, AssemblyName(id) + ".dll");
+            DecUtilLib.Compilation.CompileToFile($"[assembly: System.Reflection.AssemblyVersion(\"{version}\")] namespace {AssemblyName(id)} {{ public class Thing {{ }} }}", new System.Reflection.Assembly[] { }, AssemblyName(id), path);
+            return path;
+        }
+
+        // A mod shipping a copy of the library at the given version, and an entry point compiled against that copy which logs the version of the library it actually gets.
+        private string ModUsingLibrary(string id, string library, string version)
+        {
+            var folder = System.IO.Path.Combine(root, id);
+            Directory.CreateDirectory(System.IO.Path.Combine(folder, "Assemblies"));
+            File.WriteAllText(System.IO.Path.Combine(folder, "Mod.xml"), ModXml(id, "1.0.0"));
+            var copy = LibraryToFile(library, version, System.IO.Path.Combine(folder, "Assemblies"));
+
+            var scratch = new System.Runtime.Loader.AssemblyLoadContext(null, isCollectible: true);
+            var body = $"ModdingTest.AssemblyLoad.EntryLog.Add(info.Mod.Id + \":\" + typeof({AssemblyName(library)}.Thing).Assembly.GetName().Version);";
+            DecUtilLib.Compilation.CompileToFile(EntrySource(id, body), new[] { typeof(IModEntrypoint).Assembly, GetType().Assembly, scratch.LoadFromAssemblyPath(copy) }, AssemblyName(id), System.IO.Path.Combine(folder, "Assemblies", AssemblyName(id) + ".dll"));
+            scratch.Unload();
+
+            return copy;
+        }
+
+        [Test]
+        public void RedundantAssemblyUsesGame()
+        {
+            System.Runtime.Loader.AssemblyLoadContext.Default.LoadFromAssemblyPath(LibraryToFile("Library", "2.0.0.0", DirectoryTemp()));
+            var copy = ModUsingLibrary("A", "Library", "1.0.0.0");
+
+            var resolution = Resolve();
+            AssertKinds(resolution, ModProblemKind.AssemblyRedundant);
+            ExpectWarnings(() => resolution.Load().Finish(), warning => warning.Contains(AssemblyName("Library")));
+
+            CollectionAssert.AreEqual(new[] { "A:2.0.0.0" }, EntryLog);
+            Assert.IsFalse(ModResolution.AssembliesLoaded.Contains(System.IO.Path.GetFullPath(copy)));
+            Assert.IsFalse(System.Runtime.Loader.AssemblyLoadContext.Default.Assemblies.Any(assembly => !assembly.IsDynamic && assembly.Location == System.IO.Path.GetFullPath(copy)));
+        }
+
+        [Test]
+        public void RedundantAssemblyReload()
+        {
+            System.Runtime.Loader.AssemblyLoadContext.Default.LoadFromAssemblyPath(LibraryToFile("Library", "2.0.0.0", DirectoryTemp()));
+            ModUsingLibrary("A", "Library", "1.0.0.0");
+
+            ExpectWarnings(() => Resolve().Load().Finish(), warning => warning.Contains(AssemblyName("Library")));
+            Dec.Database.Clear();
+
+            var resolution = Resolve();
+            AssertKinds(resolution, ModProblemKind.AssemblyRedundant);
+            ExpectWarnings(() => resolution.Load().Finish(), warning => warning.Contains(AssemblyName("Library")));
+        }
+
+        // A copy of a library another mod loaded earlier this session needs a restart, even when it's older.
+        [Test]
+        public void RedundantAfterModLoadedLibrary()
+        {
+            var library = System.IO.Path.Combine(root, "Library");
+            Directory.CreateDirectory(System.IO.Path.Combine(library, "Assemblies"));
+            File.WriteAllText(System.IO.Path.Combine(library, "Mod.xml"), ModXml("Library", "1.0.0"));
+            LibraryToFile("Library", "2.0.0.0", System.IO.Path.Combine(library, "Assemblies"));
+
+            Resolve().Load().Finish();
+            Dec.Database.Clear();
+
+            ModUsingLibrary("A", "Library", "1.0.0.0");
+            var resolution = Resolve();
+            AssertKinds(resolution, ModProblemKind.AssemblyConflict);
+            Assert.AreEqual(ModStatus.Disabled, resolution.GetStatus(resolution.ModsInstalled.Single(mod => mod.Id == "A")));
+        }
+
         [Test]
         public void AssemblyClashNotLoaded()
         {

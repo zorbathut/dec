@@ -14,7 +14,7 @@ namespace ModdingTest
         {
             var problems = new List<ModProblem>();
             var broken = ModRead("<Mod><id>U</id><version>1.0</version></Mod>", problems);
-            var resolution = ResolvePure("1.0.0", problems, new Dictionary<string, string>(),
+            var resolution = ResolvePure("1.0.0", problems, new Dictionary<string, AssemblyReserved>(),
                 broken,
                 Mod("A", "1.0.0", Dependency("Missing")),
                 Mod("B", "1.0.0", Dependency("C", kind: "Discouraged")),

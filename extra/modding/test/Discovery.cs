@@ -267,7 +267,22 @@ namespace ModdingTest
         }
 
         [Test]
-        public void AssemblyNamedLikeInMemory()
+        public void AssemblyNamedLikeDecUsed()
+        {
+            var root = DirectoryTemp();
+            var a = ModFolder(root, "a", ModXml("A", "1.0.0"));
+            Directory.CreateDirectory(System.IO.Path.Combine(a, "Assemblies"));
+            File.Copy(typeof(Dec.Dec).Assembly.Location, System.IO.Path.Combine(a, "Assemblies", "dec.dll"));
+            DecUtilLib.Compilation.CompileToFile("public class Holder { public Dec.Dec dec; }", new System.Reflection.Assembly[] { }, "AssemblyNamedLikeDecUsed", System.IO.Path.Combine(a, "Assemblies", "A.dll"));
+
+            var resolution = Loader().Resolve(new[] { root });
+            AssertKinds(resolution, ModProblemKind.AssemblyRedundant);
+            Assert.AreEqual(ModStatus.Enabled, resolution.GetStatus(resolution.ModsInstalled[1]));
+        }
+
+        [TestCase("0.0.0.0", ModProblemKind.AssemblyRedundant)]
+        [TestCase("2.0.0.0", ModProblemKind.AssemblyConflict)]
+        public void AssemblyNamedLikeInMemory(string version, ModProblemKind kind)
         {
             Assert.AreEqual(System.Runtime.Loader.AssemblyLoadContext.Default, System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(typeof(Dec.Dec).Assembly));
             var name = DecUtilLib.Compilation.Compile("public class Nothing { }", new System.Reflection.Assembly[] { }).GetName().Name;
@@ -275,10 +290,16 @@ namespace ModdingTest
             var root = DirectoryTemp();
             var a = ModFolder(root, "a", ModXml("A", "1.0.0"));
             Directory.CreateDirectory(System.IO.Path.Combine(a, "Assemblies"));
-            DecUtilLib.Compilation.CompileToFile("public class Nothing { }", new System.Reflection.Assembly[] { }, name, System.IO.Path.Combine(a, "Assemblies", "Lib.dll"));
+            var copy = System.IO.Path.Combine(a, "Assemblies", "Lib.dll");
+            DecUtilLib.Compilation.CompileToFile($"[assembly: System.Reflection.AssemblyVersion(\"{version}\")] public class Nothing {{ }}", new System.Reflection.Assembly[] { }, name, copy);
+
+            // The mod's own assembly uses its copy, so it's compiled against that, loaded off to the side.
+            var scratch = new System.Runtime.Loader.AssemblyLoadContext(null, isCollectible: true);
+            DecUtilLib.Compilation.CompileToFile("public class Holder { public Nothing nothing; }", new[] { scratch.LoadFromAssemblyPath(copy) }, "AssemblyNamedLikeInMemory", System.IO.Path.Combine(a, "Assemblies", "A.dll"));
+            scratch.Unload();
 
             var resolution = Loader().Resolve(new[] { root });
-            AssertKinds(resolution, ModProblemKind.AssemblyConflict);
+            AssertKinds(resolution, kind);
         }
 
         [TestCase("1bad", "1.0.0")]

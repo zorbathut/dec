@@ -240,7 +240,7 @@ namespace ModdingTest
             var problems = new List<ModProblem>();
             var mod = ModRead(@"<Mod null=""true"" />", problems);
             Assert.IsTrue(problems.Any(problem => problem.Severity == ModProblemSeverity.Error));
-            var resolution = ResolvePure("1.0.0", problems, new Dictionary<string, string>(), mod);
+            var resolution = ResolvePure("1.0.0", problems, new Dictionary<string, AssemblyReserved>(), mod);
             Assert.AreEqual(ModStatus.Disabled, resolution.GetStatus(mod));
         }
 

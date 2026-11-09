@@ -346,9 +346,11 @@ namespace Dec.Modding
         }
     }
 
-    internal struct ModAssembly
+    // A class, so the resolver can track which ones it skipped by identity.
+    internal class ModAssembly
     {
         internal string path;
-        internal string name;
+        internal System.Reflection.AssemblyName name;
+        internal List<System.Reflection.AssemblyName> references = new List<System.Reflection.AssemblyName>();
     }
 }

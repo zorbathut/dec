@@ -63,7 +63,7 @@ namespace ModdingTest
             var problems = new List<ModProblem>();
             var brokenNewer = ModRead("<Mod><id>A</id><version>2.0.0</version><authors><li /></authors></Mod>", problems, "/a");
             var working = ModAt("/b", "A", "1.0.0");
-            var resolution = ResolvePure("1.0.0", problems, new Dictionary<string, string>(), brokenNewer, working);
+            var resolution = ResolvePure("1.0.0", problems, new Dictionary<string, AssemblyReserved>(), brokenNewer, working);
 
             Assert.AreSame(working, resolution.Mods[1]);
             Assert.AreEqual(ModStatus.Hidden, resolution.GetStatus(brokenNewer));
@@ -75,7 +75,7 @@ namespace ModdingTest
             var problems = new List<ModProblem>();
             var older = ModRead("<Mod><id>A</id><version>1.0.0</version><authors><li /></authors></Mod>", problems, "/a");
             var newer = ModRead("<Mod><id>A</id><version>2.0.0</version><authors><li /></authors></Mod>", problems, "/b");
-            var resolution = ResolvePure("1.0.0", problems, new Dictionary<string, string>(), older, newer);
+            var resolution = ResolvePure("1.0.0", problems, new Dictionary<string, AssemblyReserved>(), older, newer);
 
             Assert.AreEqual(ModStatus.Disabled, resolution.GetStatus(newer));
             Assert.AreEqual(ModStatus.Hidden, resolution.GetStatus(older));

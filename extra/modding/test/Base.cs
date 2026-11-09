@@ -67,6 +67,19 @@ namespace ModdingTest
             return ModRead(ModXml(id, version, dependencies));
         }
 
+        // Names are full assembly names, such as `Lib, Version=1.0.0.0`.
+        internal static ModAssembly AssemblyMod(string path, string name, params string[] references)
+        {
+            var assembly = new ModAssembly() { path = path, name = new System.Reflection.AssemblyName(name) };
+            assembly.references.AddRange(references.Select(reference => new System.Reflection.AssemblyName(reference)));
+            return assembly;
+        }
+
+        internal static AssemblyReserved AssemblyGame(string location, string name)
+        {
+            return new AssemblyReserved() { location = location, name = name == null ? null : new System.Reflection.AssemblyName(name) };
+        }
+
         protected static ModResolution ResolvePure(params Mod[] mods)
         {
             return ResolvePure("1.0.0", mods);
@@ -74,10 +87,10 @@ namespace ModdingTest
 
         protected static ModResolution ResolvePure(string baseVersion, params Mod[] mods)
         {
-            return ResolvePure(baseVersion, new List<ModProblem>(), new Dictionary<string, string>(), mods);
+            return ResolvePure(baseVersion, new List<ModProblem>(), new Dictionary<string, AssemblyReserved>(), mods);
         }
 
-        protected static ModResolution ResolvePure(string baseVersion, List<ModProblem> problems, Dictionary<string, string> assembliesReserved, params Mod[] mods)
+        internal static ModResolution ResolvePure(string baseVersion, List<ModProblem> problems, Dictionary<string, AssemblyReserved> assembliesReserved, params Mod[] mods)
         {
             var resolution = ModResolver.Resolve(Dec.Modding.Mod.CreateBase(BaseId, new SemanticVersioning.Version(baseVersion), "/base"), mods, problems, assembliesReserved);
             AssertInvariant(resolution);

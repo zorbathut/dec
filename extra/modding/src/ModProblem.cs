@@ -100,9 +100,14 @@ namespace Dec.Modding
         CycleBroken,
 
         /// <summary>
-        /// A mod ships an assembly whose name is already used by another mod or by the game.
+        /// A mod ships an assembly whose name is already used by another mod, or by the game when the game's copy can't stand in for the mod's.
         /// </summary>
         AssemblyConflict,
+
+        /// <summary>
+        /// A mod ships copies of assemblies that the game already has at the same or a newer version; the mod's copies are skipped, and its code uses the game's.
+        /// </summary>
+        AssemblyRedundant,
 
         /// <summary>
         /// A file in a mod's assembly folder isn't a .NET assembly, such as a native library; it is skipped.
@@ -119,7 +124,7 @@ namespace Dec.Modding
     /// One problem found while resolving mods.
     /// </summary>
     /// <remarks>
-    /// No mod named by an Error loads, and every disabled mod is named by at least one Error. A Warning or Info never changes what loads; its Mods are the mods it concerns.
+    /// No mod named by an Error loads, and every disabled mod is named by at least one Error. A Warning or Info never changes which mods load; its Mods are the mods it concerns.
     /// </remarks>
     public class ModProblem
     {

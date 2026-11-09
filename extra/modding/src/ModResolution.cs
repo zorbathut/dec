@@ -25,14 +25,16 @@ namespace Dec.Modding
         private readonly Dictionary<Mod, ModStatus> status;
         private readonly List<Mod> mods;
         private readonly List<ModProblem> problems;
+        private readonly HashSet<ModAssembly> assembliesSkipped;
         private bool loaded;
 
-        internal ModResolution(List<Mod> installed, Dictionary<Mod, ModStatus> status, List<Mod> mods, List<ModProblem> problems)
+        internal ModResolution(List<Mod> installed, Dictionary<Mod, ModStatus> status, List<Mod> mods, List<ModProblem> problems, HashSet<ModAssembly> assembliesSkipped)
         {
             this.installed = installed;
             this.status = status;
             this.mods = mods;
             this.problems = problems;
+            this.assembliesSkipped = assembliesSkipped;
         }
 
         /// <summary>
@@ -76,6 +78,12 @@ namespace Dec.Modding
             return status[mod];
         }
 
+        // A mod's assemblies, less any copies of the game's that it uses the game's copy of instead.
+        internal IEnumerable<ModAssembly> AssembliesLoading(Mod mod)
+        {
+            return mod.assemblies.Where(assembly => !assembliesSkipped.Contains(assembly));
+        }
+
         internal static void ClearAssembliesLoadedForTest()
         {
             AssembliesLoaded.Clear();
@@ -102,7 +110,7 @@ namespace Dec.Modding
         }
 
         /// <summary>
-        /// Reports every problem, loads the enabled mods' assemblies, runs their entry points, and builds a ParserModular with one module per mod in load order.
+        /// Reports every problem, loads the enabled mods' assemblies other than copies of the game's, runs their entry points, and builds a ParserModular with one module per mod in load order.
         /// </summary>
         /// <remarks>
         /// The returned parser hasn't been finished; the game may add more modules, which load after every mod, then call Finish.
@@ -123,7 +131,7 @@ namespace Dec.Modding
 
             Report();
 
-            var pathsEnabled = new HashSet<string>(mods.SelectMany(mod => mod.assemblies).Select(assembly => System.IO.Path.GetFullPath(assembly.path)), ModPath.Comparer);
+            var pathsEnabled = new HashSet<string>(mods.SelectMany(AssembliesLoading).Select(assembly => System.IO.Path.GetFullPath(assembly.path)), ModPath.Comparer);
             foreach (var path in AssembliesLoaded.Where(path => !pathsEnabled.Contains(path)).OrderBy(path => path, StringComparer.Ordinal))
             {
                 Dbg.Err($"Assembly `{path}` was loaded by an earlier ModResolution.Load, but its mod isn't enabled now; its code keeps running until the game restarts");
@@ -168,7 +176,7 @@ namespace Dec.Modding
                 var loadedForMod = new List<Assembly>();
                 result[mod] = loadedForMod;
 
-                foreach (var assembly in mod.assemblies)
+                foreach (var assembly in AssembliesLoading(mod))
                 {
                     string path = System.IO.Path.GetFullPath(assembly.path);
 

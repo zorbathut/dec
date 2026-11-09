@@ -31,7 +31,7 @@ Mods/
     Mod.xml          the manifest
     icon.png         optional; Dec only reports its path
     Decs/            dec XML, loaded like any module's
-    Assemblies/      .NET assemblies, all loaded
+    Assemblies/      .NET assemblies
 ```
 
 Every folder directly inside a mod directory is a mod, except folders starting with a dot. A file or folder whose name matches one of these only when ignoring case gets a warning, since it works on case-insensitive filesystems but not on others. A mod with XML but none in `Decs`, or with assemblies but none directly inside `Assemblies`, gets a warning, since those files were probably put in the wrong place and won't load. The manifest, icon, and folder names can be changed, for every mod at once, through `ModLoader`'s properties.
@@ -97,14 +97,14 @@ When something is wrong, the affected mods are disabled and everything else stil
 - A missing, disabled, or out-of-range Required dependency disables the mod, and in turn any mod that requires it.
 - A cycle of explicitly written load orders disables every mod in it. Default orders in a cycle are dropped with a warning instead.
 - An Incompatible target that's present disables the mod declaring the incompatibility.
-- Two mods shipping an assembly with the same name are both disabled; shared libraries belong in their own mod that others depend on. A mod also can't ship an assembly the game already has or directly depends on.
+- Two mods shipping an assembly with the same name are both disabled; shared libraries belong in their own mod that others depend on. A mod shipping an assembly the game already has or directly depends on uses the game's copy instead, with a warning, as long as some enabled mod's code references it, every enabled mod's reference to it is to a version no newer than the game's, and both are signed the same way; otherwise, or if the game's version is unknown, the mod is disabled.
 - If a mod is installed more than once, the newest working copy is used and the others are hidden, with a warning.
 
 ### Code
 
-Every assembly in each enabled mod's `Assemblies` folder is loaded, in load order, before any dec is parsed; native libraries in that folder are skipped with a warning. Dec finds the mods' dec types, converters, `[Dec.Setup]` functions, and `[StaticReferences]` classes automatically.
+Every assembly in each enabled mod's `Assemblies` folder is loaded, in load order, before any dec is parsed, except copies of assemblies the game already has, which are skipped in favor of the game's; native libraries in that folder are skipped with a warning. Dec finds the mods' dec types, converters, `[Dec.Setup]` functions, and `[StaticReferences]` classes automatically.
 
-A mod's project needs `<EnableDynamicLoading>true</EnableDynamicLoading>` so its own dependencies are copied into its output, but should reference the game's assemblies, and any package the game already ships, without copying them, at a version no newer than the game's: `<Private>false</Private>` on a `Reference`, `ExcludeAssets="runtime"` on a `PackageReference`, and both on a `ProjectReference`. A mod that ships one of them anyway is disabled. Handing mod authors a template project or reference package with this already set saves everyone the trouble.
+A mod's project needs `<EnableDynamicLoading>true</EnableDynamicLoading>` so its own dependencies are copied into its output, but should reference the game's assemblies, and any package the game already ships, without copying them, at a version no newer than the game's: `<Private>false</Private>` on a `Reference`, `ExcludeAssets="runtime"` on a `PackageReference`, and both on a `ProjectReference`. A mod that ships one of them anyway gets a warning and uses the game's copy, which keeps it working when a later version of the game takes on or upgrades a library the mod ships; if the mod needs a newer version than the game's, it's disabled instead. A copy nothing in any mod references might be the mod's own assembly with a clashing name, so that disables the mod too; but two unsigned assemblies sharing a name and an acceptable version are taken to be the same library. Dec can't confirm that an assembly the game references but hasn't loaded will actually be found, so if the game references an assembly it doesn't ship and a mod ships one by that name, the mod's copy is still skipped, and its code fails to find the assembly. Handing mod authors a template project or reference package with this already set saves everyone the trouble.
 
 A mod may contain one class implementing `Dec.Modding.IModEntrypoint`, whose `Initialize` receives a `ModEntrypointInfo` with the mod and the list of enabled mods. It's created and called once per process, in load order, after every mod's assemblies are loaded and before parsing; this is the place for Harmony patches and other pre-parse work.
 
