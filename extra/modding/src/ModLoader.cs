@@ -79,30 +79,51 @@ namespace Dec.Modding
                     continue;
                 }
 
-                foreach (var folder in System.IO.Directory.GetDirectories(directory).Where(folder => !System.IO.Path.GetFileName(folder).StartsWith('.')).OrderBy(folder => folder, StringComparer.Ordinal))
+                string[] folders;
+                try
                 {
-                    var manifest = System.IO.Path.Combine(folder, FileManifest);
-                    if (!File.Exists(manifest))
+                    folders = System.IO.Directory.GetDirectories(directory);
+                }
+                catch (Exception e) when (e is IOException || e is UnauthorizedAccessException)
+                {
+                    problems.Add(UnreadableProblem(directory, e));
+                    continue;
+                }
+
+                foreach (var folder in folders.Where(folder => !System.IO.Path.GetFileName(folder).StartsWith('.')).OrderBy(folder => folder, StringComparer.Ordinal))
+                {
+                    // A folder that can't be read, say mid-extraction or without permission, is skipped rather than failing the whole scan, along with anything it had reported so far about a mod that won't be listed.
+                    int problemsBefore = problems.Count;
+                    try
                     {
-                        var nearMiss = NameCaseMismatch(folder, FileManifest);
-                        string hint = nearMiss != null ? $"; it has `{nearMiss}`, but names are case-sensitive" : "; if it holds a mod, it may be nested one folder too deep";
-                        problems.Add(new ModProblem(ModProblemSeverity.Info, ModProblemKind.ManifestMissing, new List<Mod>(), null, $"Folder `{folder}` has no {FileManifest}, so it isn't a mod{hint}"));
-                        continue;
+                        var manifest = System.IO.Path.Combine(folder, FileManifest);
+                        if (!File.Exists(manifest))
+                        {
+                            var nearMiss = NameCaseMismatch(folder, FileManifest);
+                            string hint = nearMiss != null ? $"; it has `{nearMiss}`, but names are case-sensitive" : "; if it holds a mod, it may be nested one folder too deep";
+                            problems.Add(new ModProblem(ModProblemSeverity.Info, ModProblemKind.ManifestMissing, new List<Mod>(), null, $"Folder `{folder}` has no {FileManifest}, so it isn't a mod{hint}"));
+                            continue;
+                        }
+
+                        var mod = ModManifest.Read(File.ReadAllText(manifest), manifest, folder, baseId, problems);
+                        mod.directoryDecs = System.IO.Path.Combine(folder, DirectoryDecs);
+
+                        var icon = System.IO.Path.Combine(folder, FileIcon);
+                        if (File.Exists(icon))
+                        {
+                            mod.fileIcon = icon;
+                        }
+
+                        ScanAssemblies(mod, System.IO.Path.Combine(folder, DirectoryAssemblies), problems);
+                        CheckContent(mod, folder, manifest, problems);
+
+                        candidates.Add(mod);
                     }
-
-                    var mod = ModManifest.Read(File.ReadAllText(manifest), manifest, folder, baseId, problems);
-                    mod.directoryDecs = System.IO.Path.Combine(folder, DirectoryDecs);
-
-                    var icon = System.IO.Path.Combine(folder, FileIcon);
-                    if (File.Exists(icon))
+                    catch (Exception e) when (e is IOException || e is UnauthorizedAccessException)
                     {
-                        mod.fileIcon = icon;
+                        problems.RemoveRange(problemsBefore, problems.Count - problemsBefore);
+                        problems.Add(UnreadableProblem(folder, e));
                     }
-
-                    ScanAssemblies(mod, System.IO.Path.Combine(folder, DirectoryAssemblies), problems);
-                    CheckContent(mod, folder, manifest, problems);
-
-                    candidates.Add(mod);
                 }
             }
 
@@ -194,6 +215,11 @@ namespace Dec.Modding
                     problems.Add(new ModProblem(ModProblemSeverity.Error, ModProblemKind.AssemblyUnreadable, new List<Mod>() { mod }, null, $"`{path}` couldn't be read: {e.Message}"));
                 }
             }
+        }
+
+        private static ModProblem UnreadableProblem(string path, Exception e)
+        {
+            return new ModProblem(ModProblemSeverity.Warning, ModProblemKind.DirectoryUnreadable, new List<Mod>(), null, $"`{path}` couldn't be read, so any mods in it are skipped: {e.Message}");
         }
 
         private static ModProblem AssemblyNativeProblem(Mod mod, string path)

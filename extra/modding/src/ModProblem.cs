@@ -20,6 +20,11 @@ namespace Dec.Modding
         DirectoryMissing,
 
         /// <summary>
+        /// A mod directory, or a folder in one, couldn't be read; any mod in it is skipped.
+        /// </summary>
+        DirectoryUnreadable,
+
+        /// <summary>
         /// A folder in a mod directory has no manifest, often because the mod was extracted one folder too deep.
         /// </summary>
         ManifestMissing,

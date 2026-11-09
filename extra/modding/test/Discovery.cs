@@ -59,6 +59,33 @@ namespace ModdingTest
             scan.Resolve(new[] { "A" });
         }
 
+        // A folder the scan can't read is skipped with a warning, and the rest still load.
+        [Test]
+        public void FolderUnreadable()
+        {
+            if (System.OperatingSystem.IsWindows())
+            {
+                Assert.Ignore("needs Unix permissions");
+            }
+
+#if NET7_0_OR_GREATER
+            var root = DirectoryTemp();
+            ModFolder(root, "a", ModXml("A", "1.0.0"));
+            var locked = ModFolder(root, "b", ModXml("B", "1.0.0"));
+            File.SetUnixFileMode(locked, UnixFileMode.None);
+            try
+            {
+                var resolution = Loader().Scan(new[] { root }).Resolve();
+                AssertKinds(resolution, ModProblemKind.DirectoryUnreadable);
+                CollectionAssert.AreEqual(new[] { BaseId, "A" }, Ids(resolution));
+            }
+            finally
+            {
+                File.SetUnixFileMode(locked, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
+            }
+#endif
+        }
+
         [Test]
         public void ResolveBaseOff()
         {
