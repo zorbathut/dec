@@ -1,7 +1,7 @@
 modding
 ---
 
-This finds installed mods, reads their manifests, resolves their dependencies into an automatic load order, loads their assemblies, runs their entry points, and hands back a `ParserModular` with one module per mod.
+This provides an integrated toolkit for modding games, including dependency management and dec integration. It's very much under development; if you want to use it on your own game, come talk to me first.
 
 ### Installation instructions
 
@@ -22,13 +22,13 @@ parser.Finish();
 
 `Resolve` returns every problem with mods and their relationships in `resolution.Problems`, and `Load` reports them all through Dec's usual handlers before loading anything. `Load` fills the base game's module through the function it's given, so the game decides how its own content is found. Dec's own diagnostics while reading manifests, such as malformed XML or unknown elements, are reported through those handlers as they come up. Dec's default handlers throw on warnings as well as errors, so a game that ships with mod support should configure them.
 
-The base game's version is what mods' version ranges for it are checked against. It can be the game's own version, or a separate modding-API version that changes only when mods need to.
+The base game's version is what mods' version ranges for it are checked against. It can be the game's own version, or a separate modding-API version that changes only when mods need to. In theory, you sould be using a separate modding-API version, but let's be honest, you won't.
 
 ### Mod layout
 
 ```
 Mods/
-  SomeFolder/
+  SomeModName/
     Mod.xml          the manifest
     icon.png         optional; Dec only reports its path
     Decs/            dec XML, loaded like any module's
@@ -41,12 +41,12 @@ Every folder directly inside a mod directory is a mod, except folders starting w
 
 ```xml
 <Mod>
-  <id>Author.ModName</id>
+  <id>SephirothZZZ.BiggerExplosions</id>
   <version>1.2.0</version>
-  <name>Mod Name</name>
-  <description>What it does.</description>
+  <name>Bigger Explosions</name>
+  <description>Makes all the explosions really really big.</description>
   <authors>
-    <li><name>Author</name><email>author@example.com</email><urls><li><url>https://example.com</url></li></urls></li>
+    <li><name>Author</name><email>sephirothzzz@example.com</email><urls><li><url>https://example.com</url></li></urls></li>
   </authors>
   <urls>
     <li><url>https://example.com/mod</url><label>Homepage</label></li>
@@ -90,33 +90,21 @@ Every mod implicitly requires the base game and loads after it. A mod that lists
 
 Load order is fully automatic: dependencies first, ties broken by ordinal id, so the order depends only on which mods are installed and turned on.
 
-When something is wrong, the affected mods are disabled and everything else still loads:
-
-- A manifest error, such as a missing id or an invalid version, disables the mod.
-- Two mods whose ids differ only in capitalization are both disabled, as is a mod using the base game's id.
-- A dependency entry of any kind that names an installed mod with the wrong capitalization disables the mod.
-- A missing, disabled, or out-of-range Required dependency disables the mod, and in turn any mod that requires it.
-- A cycle of explicitly written load orders disables every mod in it. Default orders in a cycle are dropped with a warning instead.
-- An Incompatible target that's present disables the mod declaring the incompatibility.
-- Two mods shipping an assembly with the same name are both disabled; shared libraries belong in their own mod that others depend on. A mod shipping an assembly the game already has or directly depends on uses the game's copy instead, with a warning, as long as some enabled mod's code references it, every enabled mod's reference to it is to a version no newer than the game's, and both are signed the same way; otherwise, or if the game's version is unknown, the mod is disabled.
-- A mod that ships or references Dec's own assembly, `dec.dll`, is disabled when the game builds Dec's source into its own assembly.
-- If a mod is installed more than once, the newest working copy is used and the others are hidden, with a warning.
+When something is wrong, the affected mods are disabled and everything else still loads.
 
 A mod the player turned off, by passing its id to `Resolve`, has status `Off`: it doesn't load and doesn't count against other mods, though mods that require it are disabled. That holds even for a mod with a broken manifest; its problems stay in `Problems` for the mod screen, but `Load` doesn't report problems that name only turned-off mods. Turning off an id turns off every installed copy of it. Resolving rereads no manifests and reports nothing, so a mod screen can scan once and resolve again each time the player turns a mod on or off.
 
 ### Code
 
-Every assembly in each enabled mod's `Assemblies` folder is loaded, in load order, before any dec is parsed, except copies of assemblies the game already has, which are skipped in favor of the game's; native libraries in that folder are skipped with a warning. Dec finds the mods' dec types, converters, `[Dec.Setup]` functions, and `[StaticReferences]` classes automatically.
-
-A mod's project needs `<EnableDynamicLoading>true</EnableDynamicLoading>` so its own dependencies are copied into its output, but should reference the game's assemblies, and any package the game already ships, without copying them, at a version no newer than the game's: `<Private>false</Private>` on a `Reference`, `ExcludeAssets="runtime"` on a `PackageReference`, and both on a `ProjectReference`. A mod that ships one of them anyway gets a warning and uses the game's copy, which keeps it working when a later version of the game takes on or upgrades a library the mod ships; if the mod needs a newer version than the game's, it's disabled instead. A copy nothing in any mod references might be the mod's own assembly with a clashing name, so that disables the mod too; but two unsigned assemblies sharing a name and an acceptable version are taken to be the same library. Dec can't confirm that an assembly the game references but hasn't loaded will actually be found, so if the game references an assembly it doesn't ship and a mod ships one by that name, the mod's copy is still skipped, and its code fails to find the assembly. A game that builds Dec's source into its own assembly, rather than referencing the Dec package, has no `dec.dll`, and its mods get Dec's types from the game's assembly instead; they mustn't reference the Dec package at all, even without copying it, since their own Dec would load as a second Dec that the game never uses, and a reference to one would find nothing to bind to. Handing mod authors a template project or reference package with this already set saves everyone the trouble.
+Every assembly in each enabled mod's `Assemblies` folder is loaded, in load order. Dec finds the mods' dec types, converters, `[Dec.Setup]` functions, and `[StaticReferences]` classes automatically.
 
 A mod may contain one class implementing `Dec.Modding.IModEntrypoint`, whose `Initialize` receives a `ModEntrypointInfo` with the mod and the list of enabled mods. It's created and called once per process, in load order, after every mod's assemblies are loaded and before parsing; this is the place for Harmony patches and other pre-parse work.
 
-Mods' dec types usually live in their own namespaces, which aren't in `Dec.Config.UsingNamespaces`; either use full type names in XML, such as `<Author.ModName.SomeDec decName="Thing">`, or append the namespace to `Dec.Config.UsingNamespaces` in the mod's entry point.
+Mods' dec types usually live in their own namespaces, which aren't in `Dec.Config.UsingNamespaces`; we recommend using full type names in XML, such as `<Author.ModName.SomeDec decName="Thing">`.
 
 Assemblies can't be unloaded. Loading again in the same process, after `Database.Clear()`, reuses assemblies already loaded without running their entry points again, but a mod whose code was loaded earlier and isn't enabled now keeps running, and is reported as an error. Changing which code mods are enabled needs a restart.
 
-Assemblies load into the same `AssemblyLoadContext` as Dec. That's the default context in an ordinary application, and should make mods bind to the right copies of Dec and the game under hosts that use their own context, such as Godot, though that hasn't been tested.
+Setting up the project can be slightly finicky. A mod's project needs `<EnableDynamicLoading>true</EnableDynamicLoading>` so its own dependencies are copied into its output, but should reference the game's assemblies, and any package the game already ships, without copying them, at a version no newer than the game's: `<Private>false</Private>` on a `Reference`, `ExcludeAssets="runtime"` on a `PackageReference`, and both on a `ProjectReference`. A mod that ships one of them anyway gets a warning and uses the game's copy, which keeps it working when a later version of the game takes on or upgrades a library the mod ships; if the mod needs a newer version than the game's, it's disabled instead. A copy nothing in any mod references might be the mod's own assembly with a clashing name, so that disables the mod too; but two unsigned assemblies sharing a name and an acceptable version are taken to be the same library. Dec can't confirm that an assembly the game references but hasn't loaded will actually be found, so if the game references an assembly it doesn't ship and a mod ships one by that name, the mod's copy is still skipped, and its code fails to find the assembly. A game that builds Dec's source into its own assembly, rather than referencing the Dec package, has no `dec.dll`, and its mods get Dec's types from the game's assembly instead; they mustn't reference the Dec package at all, even without copying it, since their own Dec would load as a second Dec that the game never uses, and a reference to one would find nothing to bind to. **Handing mod authors a template project or reference package with this already set saves everyone the trouble.**
 
 ### Threading
 

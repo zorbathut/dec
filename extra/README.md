@@ -15,4 +15,4 @@ I'm using it, though! So I'll probably run into those problems before you do.
 
 ## [modding](modding)
 
-Mod manifests, dependency resolution, automatic load order, and loading of mods' assemblies and entry points, built on top of `ParserModular`. It needs .NET 6 or later and the SemanticVersioning package.
+Provides a more thorough framework for game modding, including mod ordering/conflcit management and a whole lot of details of mod loading.
