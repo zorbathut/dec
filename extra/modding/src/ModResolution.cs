@@ -75,6 +75,43 @@ namespace Dec.Modding
             }
         }
 
+        /// <summary>
+        /// Finds the file a mod puts in place of the game's own: the copy at the same path in the last-loading mod that has one.
+        /// </summary>
+        /// <param name="path">The file's path relative to the game's folder, which mod folders mirror, such as `dec/tile/grass.png`. `\` counts as `/`.</param>
+        /// <returns>The full path of the mod's copy, or null if no loading mod has one, in which case the game uses its own file. Rooted paths, and paths with a `:` such as `res://` ones, are never overridden, so a path this returned gives null.</returns>
+        /// <remarks>
+        /// Matching is case-sensitive on every platform, so an override works the same everywhere. Only the files present when the mods were scanned count.
+        ///
+        /// This reads nothing from disk and reports nothing, so it's safe to call from any thread.
+        /// </remarks>
+        public string FileResolve(string path)
+        {
+            var key = FileKey(path);
+            if (key == null)
+            {
+                return null;
+            }
+
+            for (int i = mods.Count - 1; i >= 0; --i)
+            {
+                if (mods[i].files.TryGetValue(key, out var result))
+                {
+                    return result;
+                }
+            }
+            return null;
+        }
+
+        private static string FileKey(string path)
+        {
+            if (string.IsNullOrEmpty(path) || path.Contains(':') || System.IO.Path.IsPathRooted(path))
+            {
+                return null;
+            }
+            return path.Replace('\\', '/');
+        }
+
         public ModStatus GetStatus(Mod mod)
         {
             return status[mod];

@@ -96,6 +96,16 @@ When something is wrong, the affected mods are disabled and everything else stil
 
 A mod the player turned off, by passing its id to `Resolve`, has status `Off`: it doesn't load and doesn't count against other mods, though mods that require it are disabled. That holds even for a mod with a broken manifest; its problems stay in `Problems` for the mod screen, but `Load` doesn't report problems that name only turned-off mods. Turning off an id turns off every installed copy of it. Resolving rereads no manifests and reports nothing, so a mod screen can scan once and resolve again each time the player turns a mod on or off.
 
+### Files
+
+A mod replaces one of the game's files by putting its own copy at the same path within the mod folder: `ModResolution.FileResolve("dec/tile/grass.png")` returns the copy in the last-loading mod that has one, or null if none does, in which case the game uses its own. A mod's own new files work the same way, at whatever path its decs name. The game decides which of its loads go through `FileResolve`; Dec only answers the lookup.
+
+- Every file in the mod folder present at `Scan` counts, including the manifest, assemblies, and dec XML; only names starting with a dot are skipped, along with everything inside folders whose names do.
+- Matching is case-sensitive on every platform, so an override that works for its author works everywhere.
+- Paths are relative to the game's folder, with `/` or `\`, and are matched as written: `./dec/x.png` or `dec//x.png` don't match `dec/x.png`. Rooted paths and paths with a `:`, such as `res://` ones, are never resolved, so resolving a path twice is harmless.
+- Dec XML in a mod's `dec` folder is loaded as that mod's own, even at the same path as one of the game's files; to change the game's decs, patch them.
+- `FileResolve` touches no disk and reports nothing, so it's safe from any thread.
+
 ### Code
 
 Every assembly in each enabled mod's `assembly` folder is loaded, in load order. Dec finds the mods' dec types, converters, `[Dec.Setup]` functions, and `[StaticReferences]` classes automatically.

@@ -30,6 +30,10 @@ namespace Dec.Modding
         internal string fileIcon;
         internal string directoryDecs;
         internal List<ModAssembly> assemblies = new List<ModAssembly>();
+
+        // Every file in the mod's folder by its `/`-separated path within it, leaving out anything whose name starts with a dot. Filled once by Scan and only read afterwards, so resolutions on several threads can share it.
+        internal Dictionary<string, string> files = new Dictionary<string, string>(StringComparer.Ordinal);
+
         internal bool isBase;
         internal bool manifestError;
         internal bool schemaUnsupported;

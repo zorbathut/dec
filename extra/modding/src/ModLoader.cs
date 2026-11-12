@@ -13,7 +13,7 @@ namespace Dec.Modding
     /// Finds installed mods, ready to resolve into a load order.
     /// </summary>
     /// <remarks>
-    /// Each mod is a folder containing a manifest (mod.xml), with its dec XML in a dec folder, its assemblies in an assembly folder, and optionally an icon.png. The file and folder names can be changed, for every mod at once, before calling Scan.
+    /// Each mod is a folder containing a manifest (mod.xml), with its dec XML in a dec folder, its assemblies in an assembly folder, and optionally an icon.png; the rest of it mirrors the game's own folder, for FileResolve. The file and folder names can be changed, for every mod at once, before calling Scan.
     /// </remarks>
     public class ModLoader
     {
@@ -116,6 +116,7 @@ namespace Dec.Modding
 
                         ScanAssemblies(mod, System.IO.Path.Combine(folder, DirectoryAssemblies), problems);
                         CheckContent(mod, folder, manifest, problems);
+                        IndexFiles(mod, folder);
 
                         candidates.Add(mod);
                     }
@@ -165,6 +166,27 @@ namespace Dec.Modding
                 if (dll.Count > 0)
                 {
                     problems.Add(new ModProblem(ModProblemSeverity.Warning, ModProblemKind.ContentMisplaced, new List<Mod>() { mod }, null, $"Mod `{mod}` has assemblies, but none directly inside its {DirectoryAssemblies} folder, so none of them will be loaded: {string.Join(", ", dll.Select(path => $"`{path}`"))}"));
+                }
+            }
+        }
+
+        // Dot-prefixed entries are skipped like AddDirectory skips them, and not walked into, which keeps a mod author's .git out of the index.
+        private static void IndexFiles(Mod mod, string folder)
+        {
+            var pending = new Stack<string>();
+            pending.Push(folder);
+            while (pending.Count > 0)
+            {
+                var directory = pending.Pop();
+                foreach (var path in System.IO.Directory.GetFiles(directory).Where(path => !System.IO.Path.GetFileName(path).StartsWith('.')).OrderBy(path => path, StringComparer.Ordinal))
+                {
+                    var relative = System.IO.Path.GetRelativePath(folder, path).Replace('\\', '/');
+                    mod.files[relative] = path;
+                }
+
+                foreach (var child in System.IO.Directory.GetDirectories(directory).Where(child => !System.IO.Path.GetFileName(child).StartsWith('.')).OrderByDescending(child => child, StringComparer.Ordinal))
+                {
+                    pending.Push(child);
                 }
             }
         }

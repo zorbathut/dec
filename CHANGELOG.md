@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [unreleased]
 ### Added
-* Modding: New extra with mod manifests, dependency resolution, automatic load order, and mod assembly loading.
+* Modding: New extra with mod manifests, dependency resolution, automatic load order, mod assembly loading, and mods replacing the game's files with their own copies.
 * `Config.TypeCachesClear()`, making Dec pick up converters and types from assemblies loaded after it last looked, such as plugins.
 * `[Dec.Setup]`, `[Dec.SetupAfter]`, and `[Dec.SetupBefore]` attributes, enabling an attribute-driven setup graph that generalizes ConfigErrors/PostLoad.
 * `Reflection.Enumerate()`, used to inspect every position a `Recorder.Write()` of an object would serialize, including `ConverterRecord` and `ConverterFactory` bodies, or every field a `Composer` write of a Dec would.
