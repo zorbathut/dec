@@ -63,8 +63,8 @@ namespace ModdingTest
         {
             var root = DirectoryTemp();
             var folder = System.IO.Path.Combine(root, "a");
-            System.IO.Directory.CreateDirectory(System.IO.Path.Combine(folder, "Decs"));
-            System.IO.File.WriteAllText(System.IO.Path.Combine(folder, "Mod.xml"), "<Mod><id>A</id><version>1.0.0</version><fromTheFuture /><dependencies><li><id>Missing</id></li></dependencies></Mod>");
+            System.IO.Directory.CreateDirectory(System.IO.Path.Combine(folder, "dec"));
+            System.IO.File.WriteAllText(System.IO.Path.Combine(folder, "mod.xml"), "<Mod><id>A</id><version>1.0.0</version><fromTheFuture /><dependencies><li><id>Missing</id></li></dependencies></Mod>");
 
             // Dec's own diagnostic is reported as it's found; the harness fails on any other warning or error, so the mod's problems aren't reported yet.
             ModResolution resolution = null;

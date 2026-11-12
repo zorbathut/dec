@@ -16,7 +16,7 @@ var resolution = scan.Resolve(idsOff);
 
 // Optionally show a mod screen: resolution.ModsInstalled, resolution.GetStatus(mod), resolution.Problems.
 
-var parser = resolution.Load(module => module.AddDirectory("Data/Decs"));
+var parser = resolution.Load(module => module.AddDirectory("dec"));
 parser.Finish();
 ```
 
@@ -29,15 +29,17 @@ The base game's version is what mods' version ranges for it are checked against.
 ```
 Mods/
   SomeModName/
-    Mod.xml          the manifest
+    mod.xml          the manifest
     icon.png         optional; Dec only reports its path
-    Decs/            dec XML, loaded like any module's
-    Assemblies/      .NET assemblies
+    dec/             dec XML, loaded like any module's
+    assembly/        .NET assemblies
 ```
 
-Every folder directly inside a mod directory is a mod, except folders starting with a dot. A file or folder whose name matches one of these only when ignoring case gets a warning, since it works on case-insensitive filesystems but not on others. A mod with XML but none in `Decs`, or with assemblies but none directly inside `Assemblies`, gets a warning, since those files were probably put in the wrong place and won't load. The manifest, icon, and folder names can be changed, for every mod at once, through `ModLoader`'s properties.
+Every folder directly inside a mod directory is a mod, except folders starting with a dot. A file or folder whose name matches one of these only when ignoring case gets a warning, since it works on case-insensitive filesystems but not on others. A mod with XML but none in `dec`, or with assemblies but none directly inside `assembly`, gets a warning, since those files were probably put in the wrong place and won't load. The manifest, icon, and folder names can be changed, for every mod at once, through `ModLoader`'s properties.
 
-### Mod.xml
+A mod folder is meant to mirror the game's own folder, which is why the defaults are lowercase and singular: a game that keeps its decs in `dec/` gives mods the same `dec/`. A game whose decs live elsewhere should set `DirectoryDecs` to match.
+
+### mod.xml
 
 ```xml
 <Mod>
@@ -96,7 +98,7 @@ A mod the player turned off, by passing its id to `Resolve`, has status `Off`: i
 
 ### Code
 
-Every assembly in each enabled mod's `Assemblies` folder is loaded, in load order. Dec finds the mods' dec types, converters, `[Dec.Setup]` functions, and `[StaticReferences]` classes automatically.
+Every assembly in each enabled mod's `assembly` folder is loaded, in load order. Dec finds the mods' dec types, converters, `[Dec.Setup]` functions, and `[StaticReferences]` classes automatically.
 
 A mod may contain one class implementing `Dec.Modding.IModEntrypoint`, whose `Initialize` receives a `ModEntrypointInfo` with the mod and the list of enabled mods. It's created and called once per process, in load order, after every mod's assemblies are loaded and before parsing; this is the place for Harmony patches and other pre-parse work.
 

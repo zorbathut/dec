@@ -13,7 +13,7 @@ namespace Dec.Modding
     /// Finds installed mods, ready to resolve into a load order.
     /// </summary>
     /// <remarks>
-    /// Each mod is a folder containing a manifest (Mod.xml), with its dec XML in a Decs folder, its assemblies in an Assemblies folder, and optionally an icon.png. The file and folder names can be changed, for every mod at once, before calling Scan.
+    /// Each mod is a folder containing a manifest (mod.xml), with its dec XML in a dec folder, its assemblies in an assembly folder, and optionally an icon.png. The file and folder names can be changed, for every mod at once, before calling Scan.
     /// </remarks>
     public class ModLoader
     {
@@ -23,7 +23,7 @@ namespace Dec.Modding
         /// <summary>
         /// The manifest's file name within each mod folder.
         /// </summary>
-        public string FileManifest { get; set; } = "Mod.xml";
+        public string FileManifest { get; set; } = "mod.xml";
 
         /// <summary>
         /// The icon's file name within each mod folder.
@@ -33,12 +33,12 @@ namespace Dec.Modding
         /// <summary>
         /// The folder within each mod folder that holds its dec XML.
         /// </summary>
-        public string DirectoryDecs { get; set; } = "Decs";
+        public string DirectoryDecs { get; set; } = "dec";
 
         /// <summary>
         /// The folder within each mod folder that holds its assemblies.
         /// </summary>
-        public string DirectoryAssemblies { get; set; } = "Assemblies";
+        public string DirectoryAssemblies { get; set; } = "assembly";
 
         /// <param name="baseId">The base game's id. Mods name it to depend on a particular version of the game.</param>
         /// <param name="baseVersion">The base game's version, in semantic-versioning form; this is what mods' version ranges for the base game are checked against. It can be the game's own version, or a separate modding-API version that changes only when mods need to.</param>

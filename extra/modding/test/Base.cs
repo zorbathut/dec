@@ -51,7 +51,7 @@ namespace ModdingTest
 
         protected static Mod ModRead(string xml, List<ModProblem> problems, string directory = null)
         {
-            return ModManifest.Read(xml, "Mod.xml", directory ?? $"/mods/{Guid.NewGuid():N}", BaseId, problems);
+            return ModManifest.Read(xml, "mod.xml", directory ?? $"/mods/{Guid.NewGuid():N}", BaseId, problems);
         }
 
         protected static Mod ModRead(string xml)

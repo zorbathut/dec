@@ -316,9 +316,9 @@ namespace ModdingTest
             var excluded = Mod("Excluded", "1.0.0");
             var excluder = Mod("Excluder", "1.0.0", Dependency("Excluded", kind: "Incompatible"));
             var clash = Mod("Clash", "1.0.0");
-            clash.assemblies.Add(AssemblyMod("/mods/Clash/Assemblies/Lib.dll", "Lib, Version=1.0.0.0"));
+            clash.assemblies.Add(AssemblyMod("/mods/Clash/assembly/Lib.dll", "Lib, Version=1.0.0.0"));
             var owner = Mod("Owner", "1.0.0");
-            owner.assemblies.Add(AssemblyMod("/mods/Owner/Assemblies/Lib.dll", "Lib, Version=1.0.0.0"));
+            owner.assemblies.Add(AssemblyMod("/mods/Owner/assembly/Lib.dll", "Lib, Version=1.0.0.0"));
 
             var resolution = ResolveOff(new[] { "Missing.Dependency", "Incompatible", "Excluded", "Clash" }, missing, incompatible, b, excluded, excluder, clash, owner);
             AssertKinds(resolution);
@@ -417,8 +417,8 @@ namespace ModdingTest
         public void DecSeparateShipped(string name)
         {
             var mod = Mod("A", "1.0.0");
-            mod.assemblies.Add(AssemblyMod($"/mods/A/Assemblies/{name}.dll", $"{name}, Version=1.0.0.0"));
-            mod.assemblies.Add(AssemblyMod("/mods/A/Assemblies/A.dll", "A, Version=1.0.0.0", $"{name}, Version=1.0.0.0"));
+            mod.assemblies.Add(AssemblyMod($"/mods/A/assembly/{name}.dll", $"{name}, Version=1.0.0.0"));
+            mod.assemblies.Add(AssemblyMod("/mods/A/assembly/A.dll", "A, Version=1.0.0.0", $"{name}, Version=1.0.0.0"));
 
             var resolution = ResolveDecBuiltIn(new Dictionary<string, AssemblyReserved>(), mod);
             AssertKinds(resolution, ModProblemKind.AssemblyDecSeparate);
@@ -429,7 +429,7 @@ namespace ModdingTest
         public void DecSeparateReferenced()
         {
             var mod = Mod("A", "1.0.0");
-            mod.assemblies.Add(AssemblyMod("/mods/A/Assemblies/A.dll", "A, Version=1.0.0.0", "dec, Version=1.0.0.0"));
+            mod.assemblies.Add(AssemblyMod("/mods/A/assembly/A.dll", "A, Version=1.0.0.0", "dec, Version=1.0.0.0"));
 
             var resolution = ResolveDecBuiltIn(new Dictionary<string, AssemblyReserved>(), mod);
             AssertKinds(resolution, ModProblemKind.AssemblyDecSeparate);
@@ -441,8 +441,8 @@ namespace ModdingTest
         public void DecSeparateGameHasDec()
         {
             var mod = Mod("A", "1.0.0");
-            mod.assemblies.Add(AssemblyMod("/mods/A/Assemblies/dec.dll", "dec, Version=1.0.0.0"));
-            mod.assemblies.Add(AssemblyMod("/mods/A/Assemblies/A.dll", "A, Version=1.0.0.0", "dec, Version=1.0.0.0"));
+            mod.assemblies.Add(AssemblyMod("/mods/A/assembly/dec.dll", "dec, Version=1.0.0.0"));
+            mod.assemblies.Add(AssemblyMod("/mods/A/assembly/A.dll", "A, Version=1.0.0.0", "dec, Version=1.0.0.0"));
             var game = new Dictionary<string, AssemblyReserved>(System.StringComparer.OrdinalIgnoreCase) { { "dec", AssemblyGame("/game/dec.dll", "dec, Version=0.5.0.0, PublicKeyToken=null") } };
 
             var resolution = ResolveDecBuiltIn(game, mod);
@@ -454,7 +454,7 @@ namespace ModdingTest
         public void DecSeparateUnrelated()
         {
             var mod = Mod("A", "1.0.0");
-            mod.assemblies.Add(AssemblyMod("/mods/A/Assemblies/A.dll", "A, Version=1.0.0.0", "Decimal, Version=1.0.0.0"));
+            mod.assemblies.Add(AssemblyMod("/mods/A/assembly/A.dll", "A, Version=1.0.0.0", "Decimal, Version=1.0.0.0"));
 
             var resolution = ResolveDecBuiltIn(new Dictionary<string, AssemblyReserved>(), mod);
             AssertKinds(resolution);
@@ -465,8 +465,8 @@ namespace ModdingTest
         private static Mod ModWithLib(string id, string version, string referenced = null, string token = "null")
         {
             var mod = Mod(id, "1.0.0");
-            mod.assemblies.Add(AssemblyMod($"/mods/{id}/Assemblies/Lib.dll", $"Lib, Version={version}, PublicKeyToken={token}"));
-            mod.assemblies.Add(AssemblyMod($"/mods/{id}/Assemblies/{id}.dll", $"{id}, Version=1.0.0.0", $"Lib, Version={referenced ?? version}, PublicKeyToken={token}"));
+            mod.assemblies.Add(AssemblyMod($"/mods/{id}/assembly/Lib.dll", $"Lib, Version={version}, PublicKeyToken={token}"));
+            mod.assemblies.Add(AssemblyMod($"/mods/{id}/assembly/{id}.dll", $"{id}, Version=1.0.0.0", $"Lib, Version={referenced ?? version}, PublicKeyToken={token}"));
             return mod;
         }
 
@@ -517,7 +517,7 @@ namespace ModdingTest
         public void AssemblyReservedUnreferenced()
         {
             var mod = Mod("A", "1.0.0");
-            mod.assemblies.Add(AssemblyMod("/mods/A/Assemblies/Lib.dll", "Lib, Version=1.0.0.0"));
+            mod.assemblies.Add(AssemblyMod("/mods/A/assembly/Lib.dll", "Lib, Version=1.0.0.0"));
             var resolution = ResolveWithGame(GameWithLib("/game/Lib.dll", "2.0.0.0"), mod);
             AssertKinds(resolution, ModProblemKind.AssemblyConflict);
             Assert.AreEqual(ModStatus.Disabled, resolution.GetStatus(mod));
@@ -527,9 +527,9 @@ namespace ModdingTest
         public void AssemblyReservedLibraryMod()
         {
             var library = Mod("Library", "1.0.0");
-            library.assemblies.Add(AssemblyMod("/mods/Library/Assemblies/Lib.dll", "Lib, Version=1.0.0.0"));
+            library.assemblies.Add(AssemblyMod("/mods/Library/assembly/Lib.dll", "Lib, Version=1.0.0.0"));
             var user = Mod("User", "1.0.0", Dependency("Library"));
-            user.assemblies.Add(AssemblyMod("/mods/User/Assemblies/User.dll", "User, Version=1.0.0.0", "Lib, Version=1.0.0.0"));
+            user.assemblies.Add(AssemblyMod("/mods/User/assembly/User.dll", "User, Version=1.0.0.0", "Lib, Version=1.0.0.0"));
 
             var resolution = ResolveWithGame(GameWithLib("/game/Lib.dll", "2.0.0.0"), library, user);
             AssertKinds(resolution, ModProblemKind.AssemblyRedundant);
@@ -572,9 +572,9 @@ namespace ModdingTest
         public void AssemblyReservedSkippedSeveral()
         {
             var mod = Mod("A", "1.0.0");
-            mod.assemblies.Add(AssemblyMod("/mods/A/Assemblies/Lib.dll", "Lib, Version=1.0.0.0"));
-            mod.assemblies.Add(AssemblyMod("/mods/A/Assemblies/Other.dll", "Other, Version=1.0.0.0"));
-            mod.assemblies.Add(AssemblyMod("/mods/A/Assemblies/A.dll", "A, Version=1.0.0.0", "Lib, Version=1.0.0.0", "Other, Version=1.0.0.0"));
+            mod.assemblies.Add(AssemblyMod("/mods/A/assembly/Lib.dll", "Lib, Version=1.0.0.0"));
+            mod.assemblies.Add(AssemblyMod("/mods/A/assembly/Other.dll", "Other, Version=1.0.0.0"));
+            mod.assemblies.Add(AssemblyMod("/mods/A/assembly/A.dll", "A, Version=1.0.0.0", "Lib, Version=1.0.0.0", "Other, Version=1.0.0.0"));
             var game = new Dictionary<string, AssemblyReserved>()
             {
                 { "Lib", AssemblyGame("/game/Lib.dll", "Lib, Version=1.0.0.0") },
@@ -590,8 +590,8 @@ namespace ModdingTest
         public void AssemblyReservedCaseInsensitive()
         {
             var mod = Mod("A", "1.0.0");
-            mod.assemblies.Add(AssemblyMod("/mods/A/Assemblies/lib.dll", "lib, Version=1.0.0.0"));
-            mod.assemblies.Add(AssemblyMod("/mods/A/Assemblies/A.dll", "A, Version=1.0.0.0", "LIB, Version=1.0.0.0"));
+            mod.assemblies.Add(AssemblyMod("/mods/A/assembly/lib.dll", "lib, Version=1.0.0.0"));
+            mod.assemblies.Add(AssemblyMod("/mods/A/assembly/A.dll", "A, Version=1.0.0.0", "LIB, Version=1.0.0.0"));
             var resolution = ResolveWithGame(GameWithLib("/game/Lib.dll", "2.0.0.0"), mod);
             AssertKinds(resolution, ModProblemKind.AssemblyRedundant);
             AssertSkipped(resolution, mod, "lib");
@@ -602,9 +602,9 @@ namespace ModdingTest
         public void AssemblyReservedOtherModNeedsNewer()
         {
             var library = Mod("Library", "1.0.0");
-            library.assemblies.Add(AssemblyMod("/mods/Library/Assemblies/Lib.dll", "Lib, Version=1.0.0.0"));
+            library.assemblies.Add(AssemblyMod("/mods/Library/assembly/Lib.dll", "Lib, Version=1.0.0.0"));
             var user = Mod("User", "1.0.0", Dependency("Library"));
-            user.assemblies.Add(AssemblyMod("/mods/User/Assemblies/User.dll", "User, Version=1.0.0.0", "Lib, Version=2.5.0.0"));
+            user.assemblies.Add(AssemblyMod("/mods/User/assembly/User.dll", "User, Version=1.0.0.0", "Lib, Version=2.5.0.0"));
 
             var resolution = ResolveWithGame(GameWithLib("/game/Lib.dll", "2.0.0.0"), library, user);
             AssertKinds(resolution, ModProblemKind.AssemblyConflict, ModProblemKind.DependencyDisabled);
@@ -617,7 +617,7 @@ namespace ModdingTest
         public void AssemblyReservedMixed()
         {
             var mod = ModWithLib("A", "1.0.0.0");
-            mod.assemblies.Add(AssemblyMod("/mods/A/Assemblies/Other.dll", "Other, Version=1.0.0.0"));
+            mod.assemblies.Add(AssemblyMod("/mods/A/assembly/Other.dll", "Other, Version=1.0.0.0"));
             var game = GameWithLib("/game/Lib.dll", "2.0.0.0");
             game["Other"] = AssemblyGame("/game/Other.dll", "Other, Version=1.0.0.0");
 
@@ -630,8 +630,8 @@ namespace ModdingTest
         public void AssemblyReservedSamePath()
         {
             var mod = Mod("A", "1.0.0");
-            mod.assemblies.Add(AssemblyMod("/mods/A/Assemblies/A.dll", "A, Version=1.0.0.0"));
-            var resolution = ResolveWithGame(new Dictionary<string, AssemblyReserved>() { { "A", AssemblyGame("/mods/A/Assemblies/A.dll", "A, Version=1.0.0.0") } }, mod);
+            mod.assemblies.Add(AssemblyMod("/mods/A/assembly/A.dll", "A, Version=1.0.0.0"));
+            var resolution = ResolveWithGame(new Dictionary<string, AssemblyReserved>() { { "A", AssemblyGame("/mods/A/assembly/A.dll", "A, Version=1.0.0.0") } }, mod);
             AssertKinds(resolution);
             AssertSkipped(resolution, mod);
         }
@@ -640,9 +640,9 @@ namespace ModdingTest
         public void AssemblyClash()
         {
             var a = Mod("A", "1.0.0");
-            a.assemblies.Add(AssemblyMod("/mods/A/Assemblies/Lib.dll", "Lib"));
+            a.assemblies.Add(AssemblyMod("/mods/A/assembly/Lib.dll", "Lib"));
             var b = Mod("B", "1.0.0");
-            b.assemblies.Add(AssemblyMod("/mods/B/Assemblies/lib.dll", "lib"));
+            b.assemblies.Add(AssemblyMod("/mods/B/assembly/lib.dll", "lib"));
             var resolution = ResolvePure(a, b);
             AssertKinds(resolution, ModProblemKind.AssemblyConflict);
             Assert.AreEqual(2, resolution.Problems[0].Mods.Count);
@@ -653,9 +653,9 @@ namespace ModdingTest
         public void AssemblyClashWithDisabled()
         {
             var a = Mod("A", "1.0.0");
-            a.assemblies.Add(AssemblyMod("/mods/A/Assemblies/Lib.dll", "Lib"));
+            a.assemblies.Add(AssemblyMod("/mods/A/assembly/Lib.dll", "Lib"));
             var b = Mod("B", "1.0.0", Dependency("Missing"));
-            b.assemblies.Add(AssemblyMod("/mods/B/Assemblies/Lib.dll", "Lib"));
+            b.assemblies.Add(AssemblyMod("/mods/B/assembly/Lib.dll", "Lib"));
             var resolution = ResolvePure(a, b);
             AssertKinds(resolution, ModProblemKind.DependencyMissing);
             Assert.AreEqual(ModStatus.Enabled, Status(resolution, "A"));

@@ -65,9 +65,9 @@ namespace ModdingTest
         private string CodeMod(string id, string source, params string[] dependencies)
         {
             var folder = System.IO.Path.Combine(root, id);
-            Directory.CreateDirectory(System.IO.Path.Combine(folder, "Assemblies"));
-            File.WriteAllText(System.IO.Path.Combine(folder, "Mod.xml"), ModXml(id, "1.0.0", dependencies));
-            DecUtilLib.Compilation.CompileToFile(source, new[] { typeof(IModEntrypoint).Assembly, GetType().Assembly }, AssemblyName(id), System.IO.Path.Combine(folder, "Assemblies", AssemblyName(id) + ".dll"));
+            Directory.CreateDirectory(System.IO.Path.Combine(folder, "assembly"));
+            File.WriteAllText(System.IO.Path.Combine(folder, "mod.xml"), ModXml(id, "1.0.0", dependencies));
+            DecUtilLib.Compilation.CompileToFile(source, new[] { typeof(IModEntrypoint).Assembly, GetType().Assembly }, AssemblyName(id), System.IO.Path.Combine(folder, "assembly", AssemblyName(id) + ".dll"));
             return folder;
         }
 
@@ -184,9 +184,9 @@ namespace ModdingTest
             foreach (var id in new[] { "L", "A" })
             {
                 var folder = System.IO.Path.Combine(root, id);
-                Directory.CreateDirectory(System.IO.Path.Combine(folder, "Assemblies"));
-                File.WriteAllText(System.IO.Path.Combine(folder, "Mod.xml"), ModXml(id, "1.0.0"));
-                DecUtilLib.Compilation.CompileToFile($"namespace {AssemblyName("Shared")} {{ public class Thing {{ }} }}", new System.Reflection.Assembly[0], AssemblyName("Shared"), System.IO.Path.Combine(folder, "Assemblies", AssemblyName("Shared") + ".dll"));
+                Directory.CreateDirectory(System.IO.Path.Combine(folder, "assembly"));
+                File.WriteAllText(System.IO.Path.Combine(folder, "mod.xml"), ModXml(id, "1.0.0"));
+                DecUtilLib.Compilation.CompileToFile($"namespace {AssemblyName("Shared")} {{ public class Thing {{ }} }}", new System.Reflection.Assembly[0], AssemblyName("Shared"), System.IO.Path.Combine(folder, "assembly", AssemblyName("Shared") + ".dll"));
             }
 
             var scan = new ModLoader(BaseId, "1.0.0").Scan(new[] { root });
@@ -202,7 +202,7 @@ namespace ModdingTest
         {
             var folder = System.IO.Path.Combine(root, "A");
             Directory.CreateDirectory(folder);
-            File.WriteAllText(System.IO.Path.Combine(folder, "Mod.xml"), "<Mod><id>A</id></Mod>");
+            File.WriteAllText(System.IO.Path.Combine(folder, "mod.xml"), "<Mod><id>A</id></Mod>");
             var scan = new ModLoader(BaseId, "1.0.0").Scan(new[] { root });
 
             var off = scan.Resolve(new[] { "A" });
@@ -227,7 +227,7 @@ namespace ModdingTest
         public void DirectoryAssembliesRenamed()
         {
             var folder = CodeMod("A", EntrySource("A"));
-            Directory.Move(System.IO.Path.Combine(folder, "Assemblies"), System.IO.Path.Combine(folder, "Code"));
+            Directory.Move(System.IO.Path.Combine(folder, "assembly"), System.IO.Path.Combine(folder, "Code"));
 
             var loader = new ModLoader(BaseId, "1.0.0");
             loader.DirectoryAssemblies = "Code";
@@ -281,18 +281,18 @@ namespace ModdingTest
 
             // A references the library without depending on a mod that ships it.
             var folder = System.IO.Path.Combine(root, "A");
-            Directory.CreateDirectory(System.IO.Path.Combine(folder, "Assemblies"));
-            File.WriteAllText(System.IO.Path.Combine(folder, "Mod.xml"), ModXml("A", "1.0.0"));
-            DecUtilLib.Compilation.CompileToFile($"namespace {AssemblyName("A")} {{ public class Holder {{ public {AssemblyName("Library")}.Thing thing; }} }}", new[] { libraryAssembly }, AssemblyName("A"), System.IO.Path.Combine(folder, "Assemblies", AssemblyName("A") + ".dll"));
+            Directory.CreateDirectory(System.IO.Path.Combine(folder, "assembly"));
+            File.WriteAllText(System.IO.Path.Combine(folder, "mod.xml"), ModXml("A", "1.0.0"));
+            DecUtilLib.Compilation.CompileToFile($"namespace {AssemblyName("A")} {{ public class Holder {{ public {AssemblyName("Library")}.Thing thing; }} }}", new[] { libraryAssembly }, AssemblyName("A"), System.IO.Path.Combine(folder, "assembly", AssemblyName("A") + ".dll"));
             scratch.Unload();
 
             Resolve().Load(ContentBase).Finish();
             Dec.Database.Clear();
 
             var libraryMod = System.IO.Path.Combine(root, "Library");
-            Directory.CreateDirectory(System.IO.Path.Combine(libraryMod, "Assemblies"));
-            File.WriteAllText(System.IO.Path.Combine(libraryMod, "Mod.xml"), ModXml("Library", "1.0.0"));
-            DecUtilLib.Compilation.CompileToFile(library, new System.Reflection.Assembly[] { }, AssemblyName("Library"), System.IO.Path.Combine(libraryMod, "Assemblies", AssemblyName("Library") + ".dll"));
+            Directory.CreateDirectory(System.IO.Path.Combine(libraryMod, "assembly"));
+            File.WriteAllText(System.IO.Path.Combine(libraryMod, "mod.xml"), ModXml("Library", "1.0.0"));
+            DecUtilLib.Compilation.CompileToFile(library, new System.Reflection.Assembly[] { }, AssemblyName("Library"), System.IO.Path.Combine(libraryMod, "assembly", AssemblyName("Library") + ".dll"));
 
             AssertKinds(Resolve());
         }
@@ -309,13 +309,13 @@ namespace ModdingTest
         private string ModUsingLibrary(string id, string library, string version)
         {
             var folder = System.IO.Path.Combine(root, id);
-            Directory.CreateDirectory(System.IO.Path.Combine(folder, "Assemblies"));
-            File.WriteAllText(System.IO.Path.Combine(folder, "Mod.xml"), ModXml(id, "1.0.0"));
-            var copy = LibraryToFile(library, version, System.IO.Path.Combine(folder, "Assemblies"));
+            Directory.CreateDirectory(System.IO.Path.Combine(folder, "assembly"));
+            File.WriteAllText(System.IO.Path.Combine(folder, "mod.xml"), ModXml(id, "1.0.0"));
+            var copy = LibraryToFile(library, version, System.IO.Path.Combine(folder, "assembly"));
 
             var scratch = new System.Runtime.Loader.AssemblyLoadContext(null, isCollectible: true);
             var body = $"ModdingTest.AssemblyLoad.EntryLog.Add(info.Mod.Id + \":\" + typeof({AssemblyName(library)}.Thing).Assembly.GetName().Version);";
-            DecUtilLib.Compilation.CompileToFile(EntrySource(id, body), new[] { typeof(IModEntrypoint).Assembly, GetType().Assembly, scratch.LoadFromAssemblyPath(copy) }, AssemblyName(id), System.IO.Path.Combine(folder, "Assemblies", AssemblyName(id) + ".dll"));
+            DecUtilLib.Compilation.CompileToFile(EntrySource(id, body), new[] { typeof(IModEntrypoint).Assembly, GetType().Assembly, scratch.LoadFromAssemblyPath(copy) }, AssemblyName(id), System.IO.Path.Combine(folder, "assembly", AssemblyName(id) + ".dll"));
             scratch.Unload();
 
             return copy;
@@ -355,9 +355,9 @@ namespace ModdingTest
         public void RedundantAfterModLoadedLibrary()
         {
             var library = System.IO.Path.Combine(root, "Library");
-            Directory.CreateDirectory(System.IO.Path.Combine(library, "Assemblies"));
-            File.WriteAllText(System.IO.Path.Combine(library, "Mod.xml"), ModXml("Library", "1.0.0"));
-            LibraryToFile("Library", "2.0.0.0", System.IO.Path.Combine(library, "Assemblies"));
+            Directory.CreateDirectory(System.IO.Path.Combine(library, "assembly"));
+            File.WriteAllText(System.IO.Path.Combine(library, "mod.xml"), ModXml("Library", "1.0.0"));
+            LibraryToFile("Library", "2.0.0.0", System.IO.Path.Combine(library, "assembly"));
 
             Resolve().Load(ContentBase).Finish();
             Dec.Database.Clear();
@@ -375,9 +375,9 @@ namespace ModdingTest
             foreach (var id in new[] { "A", "B" })
             {
                 var folder = System.IO.Path.Combine(root, id);
-                Directory.CreateDirectory(System.IO.Path.Combine(folder, "Assemblies"));
-                File.WriteAllText(System.IO.Path.Combine(folder, "Mod.xml"), ModXml(id, "1.0.0"));
-                DecUtilLib.Compilation.CompileToFile(source, new System.Reflection.Assembly[] { }, AssemblyName("Shared"), System.IO.Path.Combine(folder, "Assemblies", "Shared.dll"));
+                Directory.CreateDirectory(System.IO.Path.Combine(folder, "assembly"));
+                File.WriteAllText(System.IO.Path.Combine(folder, "mod.xml"), ModXml(id, "1.0.0"));
+                DecUtilLib.Compilation.CompileToFile(source, new System.Reflection.Assembly[] { }, AssemblyName("Shared"), System.IO.Path.Combine(folder, "assembly", "Shared.dll"));
             }
 
             var resolution = Resolve();
@@ -391,9 +391,9 @@ namespace ModdingTest
             foreach (var (id, dependency) in new[] { ("A", Dependency("B")), ("B", null) })
             {
                 var folder = System.IO.Path.Combine(root, id);
-                Directory.CreateDirectory(System.IO.Path.Combine(folder, "Decs"));
-                File.WriteAllText(System.IO.Path.Combine(folder, "Mod.xml"), dependency == null ? ModXml(id, "1.0.0") : ModXml(id, "1.0.0", dependency));
-                File.WriteAllText(System.IO.Path.Combine(folder, "Decs", "Stub.xml"), $@"<Decs><StubDec decName=""Stub"" mode=""{(id == "B" ? "create" : "replace")}"" /></Decs>");
+                Directory.CreateDirectory(System.IO.Path.Combine(folder, "dec"));
+                File.WriteAllText(System.IO.Path.Combine(folder, "mod.xml"), dependency == null ? ModXml(id, "1.0.0") : ModXml(id, "1.0.0", dependency));
+                File.WriteAllText(System.IO.Path.Combine(folder, "dec", "Stub.xml"), $@"<Decs><StubDec decName=""Stub"" mode=""{(id == "B" ? "create" : "replace")}"" /></Decs>");
             }
             File.WriteAllText(System.IO.Path.Combine(baseDirectory, "Stub.xml"), "<Decs />");
 

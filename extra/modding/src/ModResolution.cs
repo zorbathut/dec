@@ -115,7 +115,7 @@ namespace Dec.Modding
         /// <summary>
         /// Reports every problem, loads the enabled mods' assemblies other than copies of the game's, runs their entry points, and builds a ParserModular with one module per mod in load order.
         /// </summary>
-        /// <param name="contentBase">Fills the base game's module, which loads first; for example, `module => module.AddDirectory("Data/Decs")`. It runs after the mods' entry points.</param>
+        /// <param name="contentBase">Fills the base game's module, which loads first; for example, `module => module.AddDirectory("dec")`. It runs after the mods' entry points.</param>
         /// <param name="userSettings">Passed to the ParserModular.</param>
         /// <remarks>
         /// The returned parser hasn't been finished; the game may add more modules, which load after every mod, then call Finish.

@@ -17,8 +17,8 @@ namespace ModdingTestIntegration
         private static string Folder(string root, string id, string manifest)
         {
             var folder = Path.Combine(root, id);
-            Directory.CreateDirectory(Path.Combine(folder, "Decs"));
-            File.WriteAllText(Path.Combine(folder, "Mod.xml"), manifest);
+            Directory.CreateDirectory(Path.Combine(folder, "dec"));
+            File.WriteAllText(Path.Combine(folder, "mod.xml"), manifest);
             return folder;
         }
 
@@ -41,7 +41,7 @@ namespace ModdingTestIntegration
 
             // A code mod with its own dec type, converter, static references, setup function, and entry point.
             var code = Folder(root, "Code", "<Mod><id>Code</id><version>1.0.0</version></Mod>");
-            Directory.CreateDirectory(Path.Combine(code, "Assemblies"));
+            Directory.CreateDirectory(Path.Combine(code, "assembly"));
             DecUtilLib.Compilation.CompileToFile($@"
                 namespace {run}
                 {{
@@ -99,14 +99,14 @@ namespace ModdingTestIntegration
                             read = Dec.Recorder.ReadSimple<Gadget>(""<Root>5</Root>"", ""Root"").value;
                         }}
                     }}
-                }}", new[] { typeof(Dec.Modding.IModEntrypoint).Assembly }, run, Path.Combine(code, "Assemblies", run + ".dll"));
-            File.WriteAllText(Path.Combine(code, "Decs", "Gadget.xml"), $@"<Decs><{run}.GadgetDec decName=""Widget""><gadget>7</gadget></{run}.GadgetDec></Decs>");
+                }}", new[] { typeof(Dec.Modding.IModEntrypoint).Assembly }, run, Path.Combine(code, "assembly", run + ".dll"));
+            File.WriteAllText(Path.Combine(code, "dec", "Gadget.xml"), $@"<Decs><{run}.GadgetDec decName=""Widget""><gadget>7</gadget></{run}.GadgetDec></Decs>");
 
             // Two data mods patching the base game's dec; whichever loads last wins.
             Folder(root, "Patcher.A", Patcher("Patcher.A", ""));
-            File.WriteAllText(Path.Combine(root, "Patcher.A", "Decs", "Patch.xml"), @"<Decs><IntegrationThingDec decName=""Thing"" mode=""patch""><value>2</value></IntegrationThingDec></Decs>");
+            File.WriteAllText(Path.Combine(root, "Patcher.A", "dec", "Patch.xml"), @"<Decs><IntegrationThingDec decName=""Thing"" mode=""patch""><value>2</value></IntegrationThingDec></Decs>");
             Folder(root, "Patcher.B", Patcher("Patcher.B", "<li><id>Patcher.A</id><kind>Accommodated</kind></li>"));
-            File.WriteAllText(Path.Combine(root, "Patcher.B", "Decs", "Patch.xml"), @"<Decs><IntegrationThingDec decName=""Thing"" mode=""patch""><value>3</value></IntegrationThingDec></Decs>");
+            File.WriteAllText(Path.Combine(root, "Patcher.B", "dec", "Patch.xml"), @"<Decs><IntegrationThingDec decName=""Thing"" mode=""patch""><value>3</value></IntegrationThingDec></Decs>");
 
             var loader = new Dec.Modding.ModLoader("Game", "1.0.0");
 
@@ -126,8 +126,8 @@ namespace ModdingTestIntegration
 
             // Flip the patchers' order and load again in the same process.
             Dec.Database.Clear();
-            File.WriteAllText(Path.Combine(root, "Patcher.A", "Mod.xml"), Patcher("Patcher.A", "<li><id>Patcher.B</id><kind>Accommodated</kind></li>"));
-            File.WriteAllText(Path.Combine(root, "Patcher.B", "Mod.xml"), Patcher("Patcher.B", ""));
+            File.WriteAllText(Path.Combine(root, "Patcher.A", "mod.xml"), Patcher("Patcher.A", "<li><id>Patcher.B</id><kind>Accommodated</kind></li>"));
+            File.WriteAllText(Path.Combine(root, "Patcher.B", "mod.xml"), Patcher("Patcher.B", ""));
 
             resolution = loader.Scan(new[] { root }).Resolve();
             Assert.IsEmpty(resolution.Problems, string.Join("\n", resolution.Problems));
