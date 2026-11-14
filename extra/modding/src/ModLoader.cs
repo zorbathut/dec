@@ -167,10 +167,9 @@ namespace Dec.Modding
             }
         }
 
-        // Dot-prefixed entries are skipped like AddDirectory skips them, along with everything inside dot-prefixed folders, which keeps a mod author's .git out of the index.
         private static void IndexFiles(Mod mod, ModListing listing)
         {
-            foreach (var relative in listing.files.Where(path => !ModListing.IsHidden(path)))
+            foreach (var relative in listing.files)
             {
                 mod.files[relative] = listing.Full(relative);
             }

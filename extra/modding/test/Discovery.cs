@@ -122,6 +122,22 @@ namespace ModdingTest
             AssertKinds(resolution);
         }
 
+        // Like the file index and Dec's own directory loading, the scan doesn't see dot-prefixed files and folders, such as an editor's settings or a stray hidden assembly.
+        [Test]
+        public void HiddenIgnored()
+        {
+            var root = DirectoryTemp();
+            var a = ModFolder(root, "a", ModXml("A", "1.0.0"));
+            Directory.CreateDirectory(System.IO.Path.Combine(a, ".vscode"));
+            File.WriteAllText(System.IO.Path.Combine(a, ".vscode", "settings.xml"), "<x />");
+            Directory.CreateDirectory(System.IO.Path.Combine(a, "assembly"));
+            File.WriteAllBytes(System.IO.Path.Combine(a, "assembly", ".junk.dll"), new byte[] { 1, 2, 3, 4 });
+
+            var resolution = Loader().Scan(new[] { root }).Resolve();
+            AssertInvariant(resolution);
+            AssertKinds(resolution);
+        }
+
         [Test]
         public void NameCase()
         {

@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Dec.Modding
 {
-    // Every file and folder in a mod's folder, read once, by `/`-separated path relative to it as spelled on disk; dot-prefixed entries are included, for each check to skip as it sees fit.
+    // Every file and folder in a mod's folder, read once, by `/`-separated path relative to it as spelled on disk. Dot-prefixed names are left out, along with everything inside dot-prefixed folders, as Dec's own directory loading leaves them out; that keeps a mod author's .git and editor settings out of every check.
     internal class ModListing
     {
         // Lookups ignore case where the usual filesystem does, as looking on disk would.
@@ -33,8 +33,8 @@ namespace Dec.Modding
             while (pending.Count > 0)
             {
                 var (directory, chain) = pending.Pop();
-                files.AddRange(System.IO.Directory.GetFiles(directory).Select(path => Relative(root, path)));
-                foreach (var child in System.IO.Directory.GetDirectories(directory))
+                files.AddRange(System.IO.Directory.GetFiles(directory).Where(path => !IsHidden(path)).Select(path => Relative(root, path)));
+                foreach (var child in System.IO.Directory.GetDirectories(directory).Where(path => !IsHidden(path)))
                 {
                     directories.Add(Relative(root, child));
 
@@ -87,9 +87,9 @@ namespace Dec.Modding
             return files.Concat(directories).Where(path => !path.Contains('/'));
         }
 
-        internal static bool IsHidden(string relative)
+        private static bool IsHidden(string path)
         {
-            return relative.Split('/').Any(segment => segment.StartsWith('.'));
+            return System.IO.Path.GetFileName(path).StartsWith('.');
         }
 
         internal static bool HasExtension(string relative, string extension)

@@ -35,7 +35,7 @@ Mods/
     assembly/        .NET assemblies
 ```
 
-Every folder directly inside a mod directory is a mod, except folders starting with a dot. A file or folder whose name matches one of these only when ignoring case gets a warning, since it works on case-insensitive filesystems but not on others. A mod with XML but none in `dec`, or with assemblies but none directly inside `assembly`, gets a warning, since those files were probably put in the wrong place and won't load. The manifest, icon, and folder names can be changed, for every mod at once, through `ModLoader`'s properties.
+Every folder directly inside a mod directory is a mod, except folders starting with a dot. Within a mod, files and folders starting with a dot are ignored everywhere, so a mod author's `.git` or editor settings never count as content. A file or folder whose name matches one of these only when ignoring case gets a warning, since it works on case-insensitive filesystems but not on others. A mod with XML but none in `dec`, or with assemblies but none directly inside `assembly`, gets a warning, since those files were probably put in the wrong place and won't load. The manifest, icon, and folder names can be changed, for every mod at once, through `ModLoader`'s properties.
 
 A mod folder is meant to mirror the game's own folder, which is why the defaults are lowercase and singular: a game that keeps its decs in `dec/` gives mods the same `dec/`. A game whose decs live elsewhere should set `DirectoryDecs` to match.
 
