@@ -134,7 +134,64 @@ namespace ModdingTest
         {
             var loader = new ModLoader(BaseId, "1.0.0") { DirectoryAssemblies = name };
             Assert.Throws<System.ArgumentException>(() => loader.Layout());
-            Assert.Throws<System.ArgumentException>(() => loader.Scan(new[] { DirectoryTemp() }));
+            Assert.Throws<System.ArgumentException>(() => loader.Scan(new[] { DirectoryTemp() }, null));
+        }
+
+        private static (List<ModProblem> problems, Mod mod) CheckOverrides(string[] game, params string[] files)
+        {
+            var problems = new List<ModProblem>();
+            var mod = Mod("A", "1.0.0");
+            ModContent.CheckOverrides(mod, Listing(new string[0], files), ModContent.FilesOverridable(game), problems);
+            return (problems, mod);
+        }
+
+        [Test]
+        public void OverrideFile()
+        {
+            AssertProblem(CheckOverrides(new[] { "dec/art/thing.png" }, "dec/art/Thing.png"), ModProblemKind.ContentCaseOverride, new[] { "dec/art/Thing.png", "dec/art/thing.png" });
+        }
+
+        // One entry for the miscased folder rather than one for each file in it.
+        [Test]
+        public void OverrideFolder()
+        {
+            AssertProblem(CheckOverrides(new[] { "textures/a.png", "textures/b.png" }, "Textures/a.png", "Textures/b.png"), ModProblemKind.ContentCaseOverride, new[] { "Textures", "textures" }, new[] { "Textures/a.png", "Textures/b.png" });
+        }
+
+        // The mod's own new files are found by the mod's own spelling, so a folder spelled differently from the game's is fine unless something in it was meant to replace a game file.
+        [Test]
+        public void OverrideNewFilesInOtherCase()
+        {
+            AssertKinds(CheckOverrides(new[] { "textures/a.png", "data" }, "Textures/new.png", "Data/b.png").problems);
+        }
+
+        [Test]
+        public void OverrideExact()
+        {
+            AssertKinds(CheckOverrides(new[] { "dec/art/thing.png" }, "dec/art/thing.png", "dec/art/new.png", "other/Thing.png").problems);
+        }
+
+        [Test]
+        public void OverrideGameDuplicates()
+        {
+            var game = new[] { "a/x.png", "a/x.png", "a/X.png", "a\\y.png" };
+            AssertKinds(CheckOverrides(game, "a/x.png", "a/X.png", "a/y.png").problems);
+            AssertProblem(CheckOverrides(game, "A/x.png"), ModProblemKind.ContentCaseOverride, new[] { "A" });
+        }
+
+        [TestCase("/abs/x.png")]
+        [TestCase("res://x.png")]
+        [TestCase("C:x.png")]
+        [TestCase("./x.png")]
+        [TestCase("a/../x.png")]
+        [TestCase("a//x.png")]
+        [TestCase("a/")]
+        [TestCase("")]
+        [TestCase(null)]
+        public void OverrideGamePathInvalid(string path)
+        {
+            var exception = Assert.Throws<System.ArgumentException>(() => ModContent.FilesOverridable(new[] { "fine/x.png", path }));
+            Assert.AreEqual("filesOverridable", exception.ParamName);
         }
     }
 }

@@ -24,7 +24,9 @@ namespace ModdingTest
 
         private static ModResolution Resolve(string root, params string[] idsOff)
         {
-            return new ModLoader(BaseId, "1.0.0").Scan(new[] { root }).Resolve(idsOff);
+            var resolution = new ModLoader(BaseId, "1.0.0").Scan(new[] { root }, null).Resolve(idsOff);
+            AssertInvariant(resolution);
+            return resolution;
         }
 
         [Test]
@@ -130,6 +132,27 @@ namespace ModdingTest
             Assert.IsNull(resolution.FileResolve(".git/objects/thing"));
             Assert.IsNull(resolution.FileResolve("dec/.hidden.png"));
             Assert.IsNull(resolution.FileResolve("dec/.cache/thing.png"));
+        }
+
+        [Test]
+        public void CaseOverrideReported()
+        {
+            var root = DirectoryTemp();
+            ModFolder(root, "a", ModXml("A", "1.0.0"), "dec/Art/thing.png");
+
+            var resolution = new ModLoader(BaseId, "1.0.0").Scan(new[] { root }, new[] { "dec/art/thing.png" }).Resolve();
+            AssertInvariant(resolution);
+            AssertKinds(resolution, ModProblemKind.ContentCaseOverride);
+            Assert.AreEqual(ModStatus.Disabled, resolution.GetStatus(resolution.ModsInstalled[1]));
+        }
+
+        [Test]
+        public void CaseOverrideWithoutGameList()
+        {
+            var root = DirectoryTemp();
+            ModFolder(root, "a", ModXml("A", "1.0.0"), "dec/Art/thing.png");
+
+            AssertKinds(Resolve(root));
         }
     }
 }

@@ -11,7 +11,7 @@ Add the source code to your project, along with the [SemanticVersioning](https:/
 
 ```cs
 var loader = new Dec.Modding.ModLoader("MyGame", "1.4.0");
-var scan = loader.Scan(new[] { "Mods", workshopDirectory });
+var scan = loader.Scan(new[] { "Mods", workshopDirectory }, filesOverridable);
 var resolution = scan.Resolve(idsOff);
 
 // Optionally show a mod screen: resolution.ModsInstalled, resolution.GetStatus(mod), resolution.Problems.
@@ -101,7 +101,7 @@ A mod the player turned off, by passing its id to `Resolve`, has status `Off`: i
 A mod replaces one of the game's files by putting its own copy at the same path within the mod folder: `ModResolution.FileResolve("dec/tile/grass.png")` returns the copy in the last-loading mod that has one, or null if none does, in which case the game uses its own. A mod's own new files work the same way, at whatever path its decs name. The game decides which of its loads go through `FileResolve`; Dec only answers the lookup.
 
 - Every file in the mod folder present at `Scan` counts, including the manifest, assemblies, and dec XML; only names starting with a dot are skipped, along with everything inside folders whose names do.
-- Matching is case-sensitive on every platform, so an override that works for its author works everywhere.
+- Matching is case-sensitive on every platform, so an override that works for its author works everywhere. Pass `Scan` the game's files that go through `FileResolve`, and a mod file that matches one only when ignoring case is an error that disables the mod, instead of silently replacing nothing; pass null to skip that check. Pass only those files, not the game's whole folder, or a mod's `readme.txt` beside the game's `README.txt` disables the mod. A Godot game should list the source paths its own loads name, without `res://`, not what an exported game's filesystem shows, which is its `.import` and `.remap` files.
 - Paths are relative to the game's folder, with `/` or `\`, and are matched as written: `./dec/x.png` or `dec//x.png` don't match `dec/x.png`. Rooted paths and paths with a `:`, such as `res://` ones, are never resolved, so resolving a path twice is harmless.
 - Dec XML in a mod's `dec` folder is loaded as that mod's own, even at the same path as one of the game's files; to change the game's decs, patch them.
 - `FileResolve` touches no disk and reports nothing, so it's safe from any thread.

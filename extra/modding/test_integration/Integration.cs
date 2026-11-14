@@ -110,7 +110,7 @@ namespace ModdingTestIntegration
 
             var loader = new Dec.Modding.ModLoader("Game", "1.0.0");
 
-            var resolution = loader.Scan(new[] { root }).Resolve();
+            var resolution = loader.Scan(new[] { root }, null).Resolve();
             Assert.IsEmpty(resolution.Problems, string.Join("\n", resolution.Problems));
             CollectionAssert.AreEqual(new[] { "Game", "Code", "Patcher.A", "Patcher.B" }, resolution.Mods.Select(mod => mod.Id));
             resolution.Load(module => module.AddDirectory(baseDirectory)).Finish();
@@ -129,7 +129,7 @@ namespace ModdingTestIntegration
             File.WriteAllText(Path.Combine(root, "Patcher.A", "mod.xml"), Patcher("Patcher.A", "<li><id>Patcher.B</id><kind>Accommodated</kind></li>"));
             File.WriteAllText(Path.Combine(root, "Patcher.B", "mod.xml"), Patcher("Patcher.B", ""));
 
-            resolution = loader.Scan(new[] { root }).Resolve();
+            resolution = loader.Scan(new[] { root }, null).Resolve();
             Assert.IsEmpty(resolution.Problems, string.Join("\n", resolution.Problems));
             CollectionAssert.AreEqual(new[] { "Game", "Code", "Patcher.B", "Patcher.A" }, resolution.Mods.Select(mod => mod.Id));
             resolution.Load(module => module.AddDirectory(baseDirectory)).Finish();

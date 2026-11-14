@@ -50,6 +50,11 @@ namespace Dec.Modding
         ContentCaseCollision,
 
         /// <summary>
+        /// A mod's file matches one of the game's overridable files only when ignoring case. FileResolve matches case exactly, so it won't replace the game's file on any platform, and the mod is disabled.
+        /// </summary>
+        ContentCaseOverride,
+
+        /// <summary>
         /// A manifest uses a newer schemaVersion than this mod loader understands.
         /// </summary>
         SchemaUnsupported,

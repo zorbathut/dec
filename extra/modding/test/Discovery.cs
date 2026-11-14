@@ -30,7 +30,7 @@ namespace ModdingTest
             ModFolder(root, "b", ModXml("B", "1.0.0"));
             Directory.CreateDirectory(System.IO.Path.Combine(root, "stray"));
 
-            var scan = Loader().Scan(new[] { root });
+            var scan = Loader().Scan(new[] { root }, null);
             var on = scan.Resolve();
             var off = scan.Resolve(new[] { "A", "B" });
             var onAgain = scan.Resolve();
@@ -54,7 +54,7 @@ namespace ModdingTest
             ModFolder(root, "a", "<Mod><id>A</id><version>1.0.0</version><fromTheFuture /></Mod>");
 
             ModScan scan = null;
-            ExpectWarnings(() => scan = Loader().Scan(new[] { root }), warning => warning.Contains("fromTheFuture"));
+            ExpectWarnings(() => scan = Loader().Scan(new[] { root }, null), warning => warning.Contains("fromTheFuture"));
             scan.Resolve();
             scan.Resolve(new[] { "A" });
         }
@@ -75,7 +75,7 @@ namespace ModdingTest
             File.SetUnixFileMode(locked, UnixFileMode.None);
             try
             {
-                var resolution = Loader().Scan(new[] { root }).Resolve();
+                var resolution = Loader().Scan(new[] { root }, null).Resolve();
                 AssertKinds(resolution, ModProblemKind.DirectoryUnreadable);
                 CollectionAssert.AreEqual(new[] { BaseId, "A" }, Ids(resolution));
             }
@@ -89,7 +89,7 @@ namespace ModdingTest
         [Test]
         public void ResolveBaseOff()
         {
-            var scan = Loader().Scan(new string[0]);
+            var scan = Loader().Scan(new string[0], null);
             Assert.Throws<System.ArgumentException>(() => scan.Resolve(new[] { BaseId }));
         }
 
@@ -100,7 +100,7 @@ namespace ModdingTest
             var b = ModFolder(root, "b", ModXml("B", "1.0.0"));
             var a = ModFolder(root, "a", ModXml("A", "1.0.0", Dependency("B")));
 
-            var resolution = Loader().Scan(new[] { root }).Resolve();
+            var resolution = Loader().Scan(new[] { root }, null).Resolve();
             AssertInvariant(resolution);
             AssertKinds(resolution);
             CollectionAssert.AreEqual(new[] { BaseId, "B", "A" }, Ids(resolution));
@@ -118,7 +118,7 @@ namespace ModdingTest
             var a = ModFolder(root, "a", ModXml("A", "1.0.0"));
             Directory.Delete(System.IO.Path.Combine(a, "dec"));
 
-            var resolution = Loader().Scan(new[] { root }).Resolve();
+            var resolution = Loader().Scan(new[] { root }, null).Resolve();
             AssertKinds(resolution);
         }
 
@@ -133,7 +133,7 @@ namespace ModdingTest
             Directory.CreateDirectory(System.IO.Path.Combine(a, "assembly"));
             File.WriteAllBytes(System.IO.Path.Combine(a, "assembly", ".junk.dll"), new byte[] { 1, 2, 3, 4 });
 
-            var resolution = Loader().Scan(new[] { root }).Resolve();
+            var resolution = Loader().Scan(new[] { root }, null).Resolve();
             AssertInvariant(resolution);
             AssertKinds(resolution);
         }
@@ -147,7 +147,7 @@ namespace ModdingTest
             File.WriteAllText(System.IO.Path.Combine(a, "Dec", "Thing.xml"), "<Decs />");
             File.WriteAllBytes(System.IO.Path.Combine(a, "Icon.png"), new byte[0]);
 
-            var resolution = Loader().Scan(new[] { root }).Resolve();
+            var resolution = Loader().Scan(new[] { root }, null).Resolve();
             AssertInvariant(resolution);
             AssertKinds(resolution, ModProblemKind.ContentCase, ModProblemKind.ContentCase);
             Assert.AreEqual(ModStatus.Disabled, resolution.GetStatus(resolution.ModsInstalled[1]));
@@ -165,7 +165,7 @@ namespace ModdingTest
             var root = DirectoryTemp();
             ModFolder(root, "a", ModXml("A", "1.0.0"), "Mod.xml");
 
-            var scan = Loader().Scan(new[] { root });
+            var scan = Loader().Scan(new[] { root }, null);
             var resolution = scan.Resolve();
             AssertInvariant(resolution);
             AssertKinds(resolution, ModProblemKind.ContentCase);
@@ -185,7 +185,7 @@ namespace ModdingTest
 
             var loader = Loader();
             loader.FileManifest = "about/about.xml";
-            var resolution = loader.Scan(new[] { root }).Resolve();
+            var resolution = loader.Scan(new[] { root }, null).Resolve();
             AssertInvariant(resolution);
             AssertKinds(resolution, ModProblemKind.ContentCase);
             StringAssert.Contains("`About/about.xml`", resolution.Problems[0].Message);
@@ -201,7 +201,7 @@ namespace ModdingTest
             File.WriteAllText(System.IO.Path.Combine(a, "Thing.png"), "");
             Assume.That(Directory.GetFiles(a).Length == 3, "needs a filesystem that respects case");
 
-            var resolution = Loader().Scan(new[] { root }).Resolve();
+            var resolution = Loader().Scan(new[] { root }, null).Resolve();
             AssertInvariant(resolution);
             AssertKinds(resolution, ModProblemKind.ContentCaseCollision);
             Assert.AreEqual(ModStatus.Disabled, resolution.GetStatus(resolution.ModsInstalled[1]));
@@ -213,7 +213,7 @@ namespace ModdingTest
             var root = DirectoryTemp();
             var a = ModFolder(root, "a", ModXml("A", "1.0.0"));
             Directory.Move(System.IO.Path.Combine(a, "dec"), System.IO.Path.Combine(a, "Dec"));
-            var scan = Loader().Scan(new[] { root });
+            var scan = Loader().Scan(new[] { root }, null);
 
             ExpectErrors(() => scan.Resolve().Load(module => { }).Finish(), error => error.Contains("`Dec`"));
             Dec.Database.Clear();
@@ -228,7 +228,7 @@ namespace ModdingTest
             Directory.CreateDirectory(System.IO.Path.Combine(a, "Defs"));
             File.WriteAllText(System.IO.Path.Combine(a, "Defs", "Stray.xml"), "<Decs />");
 
-            var resolution = Loader().Scan(new[] { root }).Resolve();
+            var resolution = Loader().Scan(new[] { root }, null).Resolve();
             AssertKinds(resolution, ModProblemKind.ContentMisplaced);
             Assert.AreEqual(ModProblemSeverity.Warning, resolution.Problems[0].Severity);
             StringAssert.Contains("Stray.xml", resolution.Problems[0].Message);
@@ -242,7 +242,7 @@ namespace ModdingTest
             File.WriteAllText(System.IO.Path.Combine(a, "dec", "Fine.xml"), "<Decs />");
             File.WriteAllText(System.IO.Path.Combine(a, "Notes.xml"), "<Notes />");
 
-            var resolution = Loader().Scan(new[] { root }).Resolve();
+            var resolution = Loader().Scan(new[] { root }, null).Resolve();
             AssertKinds(resolution);
         }
 
@@ -254,7 +254,7 @@ namespace ModdingTest
             Directory.CreateDirectory(System.IO.Path.Combine(a, "assembly", "net8.0"));
             File.WriteAllBytes(System.IO.Path.Combine(a, "assembly", "net8.0", "Nested.dll"), new byte[0]);
 
-            var resolution = Loader().Scan(new[] { root }).Resolve();
+            var resolution = Loader().Scan(new[] { root }, null).Resolve();
             AssertKinds(resolution, ModProblemKind.ContentMisplaced);
             Assert.AreEqual(ModProblemSeverity.Warning, resolution.Problems[0].Severity);
             StringAssert.Contains("Nested.dll", resolution.Problems[0].Message);
@@ -269,7 +269,7 @@ namespace ModdingTest
             File.WriteAllBytes(System.IO.Path.Combine(a, "assembly", "native.dll"), new byte[] { 1, 2, 3, 4 });
             File.WriteAllBytes(System.IO.Path.Combine(a, "assembly", "lib", "Nested.dll"), new byte[0]);
 
-            var resolution = Loader().Scan(new[] { root }).Resolve();
+            var resolution = Loader().Scan(new[] { root }, null).Resolve();
             AssertKinds(resolution, ModProblemKind.AssemblyNative);
         }
 
@@ -278,7 +278,7 @@ namespace ModdingTest
         {
             var root = DirectoryTemp();
             ModFolder(root, ".hidden", ModXml("A", "1.0.0"));
-            var resolution = Loader().Scan(new[] { root }).Resolve();
+            var resolution = Loader().Scan(new[] { root }, null).Resolve();
             AssertKinds(resolution);
             Assert.AreEqual(1, resolution.ModsInstalled.Count);
         }
@@ -288,7 +288,7 @@ namespace ModdingTest
         {
             var root = DirectoryTemp();
             Directory.CreateDirectory(System.IO.Path.Combine(root, "NestedTooDeep"));
-            var resolution = Loader().Scan(new[] { root }).Resolve();
+            var resolution = Loader().Scan(new[] { root }, null).Resolve();
             AssertKinds(resolution, ModProblemKind.ManifestMissing);
             Assert.AreEqual(ModProblemSeverity.Info, resolution.Problems[0].Severity);
         }
@@ -296,7 +296,7 @@ namespace ModdingTest
         [Test]
         public void DirectoryMissing()
         {
-            var resolution = Loader().Scan(new[] { System.IO.Path.Combine(DirectoryTemp(), "nope") }).Resolve();
+            var resolution = Loader().Scan(new[] { System.IO.Path.Combine(DirectoryTemp(), "nope") }, null).Resolve();
             AssertKinds(resolution, ModProblemKind.DirectoryMissing);
             Assert.AreEqual(ModProblemSeverity.Info, resolution.Problems[0].Severity);
         }
@@ -306,7 +306,7 @@ namespace ModdingTest
         {
             var root = DirectoryTemp();
             ModFolder(root, "a", ModXml("A", "1.0.0"));
-            var resolution = Loader().Scan(new[] { root, System.IO.Path.Combine(root, ".", "") }).Resolve();
+            var resolution = Loader().Scan(new[] { root, System.IO.Path.Combine(root, ".", "") }, null).Resolve();
             AssertKinds(resolution);
             Assert.AreEqual(2, resolution.ModsInstalled.Count);
         }
@@ -316,7 +316,7 @@ namespace ModdingTest
         {
             var root = DirectoryTemp();
             ModFolder(root, "a", ModXml("A", "1.0.0"));
-            var resolution = Loader().Scan(new[] { root, root + System.IO.Path.DirectorySeparatorChar }).Resolve();
+            var resolution = Loader().Scan(new[] { root, root + System.IO.Path.DirectorySeparatorChar }, null).Resolve();
             AssertKinds(resolution);
             Assert.AreEqual(2, resolution.ModsInstalled.Count);
         }
@@ -328,7 +328,7 @@ namespace ModdingTest
             var second = DirectoryTemp();
             ModFolder(first, "x", ModXml("A", "1.0.0"));
             var newer = ModFolder(second, "y", ModXml("A", "2.0.0"));
-            var resolution = Loader().Scan(new[] { first, second }).Resolve();
+            var resolution = Loader().Scan(new[] { first, second }, null).Resolve();
             AssertKinds(resolution, ModProblemKind.Duplicate);
             Assert.AreEqual(newer, resolution.Mods[1].Directory);
         }
@@ -339,7 +339,7 @@ namespace ModdingTest
             var root = DirectoryTemp();
             var a = ModFolder(root, "a", ModXml("A", "1.0.0"));
             File.WriteAllBytes(System.IO.Path.Combine(a, "icon.png"), new byte[0]);
-            var resolution = Loader().Scan(new[] { root }).Resolve();
+            var resolution = Loader().Scan(new[] { root }, null).Resolve();
             Assert.AreEqual(System.IO.Path.Combine(a, "icon.png"), resolution.Mods[1].FileIcon);
         }
 
@@ -356,7 +356,7 @@ namespace ModdingTest
             loader.FileIcon = "Preview.png";
             loader.DirectoryDecs = "Content";
 
-            var resolution = loader.Scan(new[] { root }).Resolve();
+            var resolution = loader.Scan(new[] { root }, null).Resolve();
             AssertKinds(resolution);
             Assert.AreEqual(System.IO.Path.Combine(a, "Preview.png"), resolution.Mods[1].FileIcon);
             Assert.AreEqual(System.IO.Path.Combine(a, "Content"), resolution.Mods[1].directoryDecs);
@@ -367,7 +367,7 @@ namespace ModdingTest
         {
             var root = DirectoryTemp();
             var a = ModFolder(root, "a", "<Mod><id>A</id><version>1.0</version></Mod>");
-            var resolution = Loader().Scan(new[] { root }).Resolve();
+            var resolution = Loader().Scan(new[] { root }, null).Resolve();
             AssertKinds(resolution, ModProblemKind.Manifest);
             StringAssert.Contains(System.IO.Path.Combine(a, "mod.xml"), resolution.Problems[0].Message);
         }
@@ -380,7 +380,7 @@ namespace ModdingTest
             Directory.CreateDirectory(System.IO.Path.Combine(a, "assembly"));
             File.WriteAllBytes(System.IO.Path.Combine(a, "assembly", "steam_api64.dll"), new byte[] { 1, 2, 3, 4 });
 
-            var resolution = Loader().Scan(new[] { root }).Resolve();
+            var resolution = Loader().Scan(new[] { root }, null).Resolve();
             AssertKinds(resolution, ModProblemKind.AssemblyNative);
             Assert.AreEqual(ModProblemSeverity.Warning, resolution.Problems[0].Severity);
             Assert.AreEqual(ModStatus.Enabled, resolution.GetStatus(resolution.ModsInstalled[1]));
@@ -395,7 +395,7 @@ namespace ModdingTest
             Directory.CreateDirectory(System.IO.Path.Combine(a, "assembly"));
             File.Copy(typeof(Dec.Dec).Assembly.Location, System.IO.Path.Combine(a, "assembly", "dec.dll"));
 
-            var resolution = Loader().Scan(new[] { root }).Resolve();
+            var resolution = Loader().Scan(new[] { root }, null).Resolve();
             AssertKinds(resolution, ModProblemKind.AssemblyConflict);
         }
 
@@ -408,7 +408,7 @@ namespace ModdingTest
             File.Copy(typeof(Dec.Dec).Assembly.Location, System.IO.Path.Combine(a, "assembly", "dec.dll"));
             DecUtilLib.Compilation.CompileToFile("public class Holder { public Dec.Dec dec; }", new System.Reflection.Assembly[] { }, "AssemblyNamedLikeDecUsed", System.IO.Path.Combine(a, "assembly", "A.dll"));
 
-            var resolution = Loader().Scan(new[] { root }).Resolve();
+            var resolution = Loader().Scan(new[] { root }, null).Resolve();
             AssertKinds(resolution, ModProblemKind.AssemblyRedundant);
             Assert.AreEqual(ModStatus.Enabled, resolution.GetStatus(resolution.ModsInstalled[1]));
         }
@@ -431,7 +431,7 @@ namespace ModdingTest
             DecUtilLib.Compilation.CompileToFile("public class Holder { public Nothing nothing; }", new[] { scratch.LoadFromAssemblyPath(copy) }, "AssemblyNamedLikeInMemory", System.IO.Path.Combine(a, "assembly", "A.dll"));
             scratch.Unload();
 
-            var resolution = Loader().Scan(new[] { root }).Resolve();
+            var resolution = Loader().Scan(new[] { root }, null).Resolve();
             AssertKinds(resolution, kind);
         }
 

@@ -90,6 +90,57 @@ namespace Dec.Modding
             }
         }
 
+        // The game's overridable files keyed ignoring case, each with every spelling the game uses for it.
+        internal static Dictionary<string, HashSet<string>> FilesOverridable(IEnumerable<string> files)
+        {
+            var result = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+            foreach (var file in files)
+            {
+                if (string.IsNullOrEmpty(file) || file.Contains(':') || System.IO.Path.IsPathRooted(file))
+                {
+                    throw new ArgumentException($"Overridable game file `{file}` must be a path relative to the game's folder, like `dec/art/thing.png`; strip any `res://` prefix", "filesOverridable");
+                }
+
+                var path = file.Replace('\\', '/');
+                if (path.Split('/').Any(segment => segment.Length == 0 || segment == "." || segment == ".."))
+                {
+                    throw new ArgumentException($"Overridable game file `{file}` must be written the way FileResolve matches it, like `dec/art/thing.png`, with no `.` or `..` segments, doubled separators, or trailing separator", "filesOverridable");
+                }
+
+                if (!result.TryGetValue(path, out var spellings))
+                {
+                    spellings = new HashSet<string>(StringComparer.Ordinal);
+                    result[path] = spellings;
+                }
+                spellings.Add(path);
+            }
+            return result;
+        }
+
+        // Each entry is the shallowest part of a mod file's path that's spelled differently from the game file it matches, so a miscased folder is reported once rather than for every file in it.
+        internal static void CheckOverrides(Mod mod, ModListing listing, Dictionary<string, HashSet<string>> game, List<ModProblem> problems)
+        {
+            var misses = new SortedDictionary<string, string>(StringComparer.Ordinal);
+            foreach (var path in listing.files)
+            {
+                if (!game.TryGetValue(path, out var spellings) || spellings.Contains(path))
+                {
+                    continue;
+                }
+
+                var ours = path.Split('/');
+                var theirs = spellings.OrderBy(spelling => spelling, StringComparer.Ordinal).First().Split('/');
+                int differs = Enumerable.Range(0, ours.Length).First(i => !string.Equals(ours[i], theirs[i], StringComparison.Ordinal));
+                misses[string.Join('/', ours, 0, differs + 1)] = string.Join('/', theirs, 0, differs + 1);
+            }
+
+            if (misses.Count > 0)
+            {
+                mod.manifestError = true;
+                problems.Add(new ModProblem(ModProblemSeverity.Error, ModProblemKind.ContentCaseOverride, new List<Mod>() { mod }, null, $"Mod `{mod}` has files that match the game's only when ignoring case, so they won't replace the game's on any platform: {string.Join(", ", misses.Select(miss => $"`{miss.Key}` (the game's is `{miss.Value}`)"))}"));
+            }
+        }
+
         // The path among these that matches the expected one only when ignoring case, or null if it's there exactly or not at all.
         internal static string NameCaseMismatch(IEnumerable<string> paths, string expected)
         {

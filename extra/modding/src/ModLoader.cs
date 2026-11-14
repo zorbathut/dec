@@ -65,10 +65,15 @@ namespace Dec.Modding
         /// Each folder directly inside one of the directories is a mod, except folders starting with a dot. Problems with mods and their relationships are returned in each resolution of the scan, and reported by its Load. Dec's own diagnostics while reading a manifest, such as malformed XML or unknown elements, are reported through Dec's usual handlers as they come up, and with Dec's default handlers they throw.
         ///
         /// Assemblies are read for their names and references, not loaded.
+        ///
+        /// Names in each mod are checked for case: one that would work only where the filesystem ignores case, one that can't exist there, or a file that misses one of the game's overridable files only by case is an error that disables the mod.
         /// </remarks>
-        public ModScan Scan(IEnumerable<string> directories)
+        /// <param name="directories">The folders holding mod folders.</param>
+        /// <param name="filesOverridable">The game's own files that it loads through FileResolve, as paths relative to its folder such as `dec/art/thing.png`, so that a mod's file matching one only when ignoring case is reported instead of silently not replacing it; or null to skip that check. Pass only what goes through FileResolve, not the game's whole folder, or harmless files like a mod's `readme.txt` beside the game's `README.txt` will disable the mod. A rooted path, one with a `:` such as a `res://` one, or one with `.` or `..` segments or doubled separators throws an ArgumentException.</param>
+        public ModScan Scan(IEnumerable<string> directories, IEnumerable<string> filesOverridable)
         {
             var layout = Layout();
+            var game = filesOverridable == null ? null : ModContent.FilesOverridable(filesOverridable);
             var problems = new List<ModProblem>();
             var candidates = new List<Mod>();
 
@@ -118,6 +123,10 @@ namespace Dec.Modding
                         ScanAssemblies(mod, listing, layout.assemblies, problems);
                         ModContent.CheckContent(mod, listing, layout, problems);
                         ModContent.CheckCollisions(mod, listing, problems);
+                        if (game != null)
+                        {
+                            ModContent.CheckOverrides(mod, listing, game, problems);
+                        }
                         IndexFiles(mod, listing);
 
                         candidates.Add(mod);

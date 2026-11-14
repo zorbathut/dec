@@ -73,7 +73,7 @@ namespace ModdingTest
 
         private ModResolution Resolve()
         {
-            var resolution = new ModLoader(BaseId, "1.0.0").Scan(new[] { root }).Resolve();
+            var resolution = new ModLoader(BaseId, "1.0.0").Scan(new[] { root }, null).Resolve();
             AssertInvariant(resolution);
             return resolution;
         }
@@ -172,7 +172,7 @@ namespace ModdingTest
             CodeMod("A", EntrySource("A"));
             CodeMod("B", EntrySource("B"));
 
-            new ModLoader(BaseId, "1.0.0").Scan(new[] { root }).Resolve(new[] { "A" }).Load(ContentBase).Finish();
+            new ModLoader(BaseId, "1.0.0").Scan(new[] { root }, null).Resolve(new[] { "A" }).Load(ContentBase).Finish();
             CollectionAssert.AreEqual(new[] { "B:1:2" }, EntryLog);
             Assert.IsFalse(AppDomain.CurrentDomain.GetAssemblies().Any(assembly => assembly.GetName().Name == AssemblyName("A")));
         }
@@ -189,7 +189,7 @@ namespace ModdingTest
                 DecUtilLib.Compilation.CompileToFile($"namespace {AssemblyName("Shared")} {{ public class Thing {{ }} }}", new System.Reflection.Assembly[0], AssemblyName("Shared"), System.IO.Path.Combine(folder, "assembly", AssemblyName("Shared") + ".dll"));
             }
 
-            var scan = new ModLoader(BaseId, "1.0.0").Scan(new[] { root });
+            var scan = new ModLoader(BaseId, "1.0.0").Scan(new[] { root }, null);
             scan.Resolve(new[] { "A" }).Load(ContentBase).Finish();
 
             var resolution = scan.Resolve(new[] { "L" });
@@ -203,7 +203,7 @@ namespace ModdingTest
             var folder = System.IO.Path.Combine(root, "A");
             Directory.CreateDirectory(folder);
             File.WriteAllText(System.IO.Path.Combine(folder, "mod.xml"), "<Mod><id>A</id></Mod>");
-            var scan = new ModLoader(BaseId, "1.0.0").Scan(new[] { root });
+            var scan = new ModLoader(BaseId, "1.0.0").Scan(new[] { root }, null);
 
             var off = scan.Resolve(new[] { "A" });
             Assert.IsTrue(off.Problems.Any(problem => problem.Severity == ModProblemSeverity.Error));
@@ -231,7 +231,7 @@ namespace ModdingTest
 
             var loader = new ModLoader(BaseId, "1.0.0");
             loader.DirectoryAssemblies = "Code";
-            loader.Scan(new[] { root }).Resolve().Load(ContentBase).Finish();
+            loader.Scan(new[] { root }, null).Resolve().Load(ContentBase).Finish();
 
             CollectionAssert.AreEqual(new[] { "A:1:2" }, EntryLog);
         }
