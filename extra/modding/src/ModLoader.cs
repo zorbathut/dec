@@ -68,7 +68,7 @@ namespace Dec.Modding
         /// </remarks>
         public ModScan Scan(IEnumerable<string> directories)
         {
-            var layout = new ModLayout(FileManifest, FileIcon, DirectoryDecs, DirectoryAssemblies);
+            var layout = Layout();
             var problems = new List<ModProblem>();
             var candidates = new List<Mod>();
 
@@ -97,22 +97,22 @@ namespace Dec.Modding
                     int problemsBefore = problems.Count;
                     try
                     {
-                        var manifest = System.IO.Path.Combine(folder, layout.manifest);
-                        if (!File.Exists(manifest))
+                        // A miscased manifest is read anyway, so the mod is listed and then disabled by the content check, the same on every filesystem.
+                        var manifestFound = ModListing.FindFile(folder, layout.manifest);
+                        if (manifestFound == null)
                         {
-                            var nearMiss = ModContent.NameCaseMismatch(System.IO.Directory.EnumerateFileSystemEntries(folder).Select(path => System.IO.Path.GetFileName(path)), layout.manifest);
-                            string hint = nearMiss != null ? $"; it has `{nearMiss}`, but names are case-sensitive" : "; if it holds a mod, it may be nested one folder too deep";
-                            problems.Add(new ModProblem(ModProblemSeverity.Info, ModProblemKind.ManifestMissing, new List<Mod>(), null, $"Folder `{folder}` has no {FileManifest}, so it isn't a mod{hint}"));
+                            problems.Add(new ModProblem(ModProblemSeverity.Info, ModProblemKind.ManifestMissing, new List<Mod>(), null, $"Folder `{folder}` has no {FileManifest}, so it isn't a mod; if it holds a mod, it may be nested one folder too deep"));
                             continue;
                         }
 
                         var listing = ModListing.Read(folder);
+                        var manifest = listing.Full(manifestFound);
                         var mod = ModManifest.Read(File.ReadAllText(manifest), manifest, folder, baseId, problems);
-                        mod.directoryDecs = System.IO.Path.Combine(folder, layout.decs);
+                        mod.directoryDecs = listing.Full(layout.decs);
 
                         if (listing.HasFile(layout.icon))
                         {
-                            mod.fileIcon = System.IO.Path.Combine(folder, layout.icon);
+                            mod.fileIcon = listing.Full(layout.icon);
                         }
 
                         ScanAssemblies(mod, listing, layout.assemblies, problems);
@@ -134,6 +134,28 @@ namespace Dec.Modding
             return new ModScan(Mod.CreateBase(baseId, baseVersion), candidates, problems, decBuiltInto);
         }
 
+        // The layout names as paths within a mod's listing, checked here since they're the game's own settings rather than anything a mod can get wrong.
+        internal ModLayout Layout()
+        {
+            return new ModLayout(LayoutName(FileManifest, nameof(FileManifest)), LayoutName(FileIcon, nameof(FileIcon)), LayoutName(DirectoryDecs, nameof(DirectoryDecs)), LayoutName(DirectoryAssemblies, nameof(DirectoryAssemblies)));
+        }
+
+        private static string LayoutName(string name, string property)
+        {
+            var usage = $"{property} `{name}` must be a path within each mod folder, like `dec` or `data/dec`";
+            if (string.IsNullOrEmpty(name) || name.Contains(':') || System.IO.Path.IsPathRooted(name) || name.StartsWith('/') || name.StartsWith('\\'))
+            {
+                throw new ArgumentException(usage, property);
+            }
+
+            var normalized = name.Replace('\\', '/').TrimEnd('/');
+            if (normalized.Split('/').Any(segment => segment.Length == 0 || segment.StartsWith('.')))
+            {
+                throw new ArgumentException($"{usage}, with no doubled separators, `.` or `..` segments, or names starting with a dot, which Dec ignores in mods", property);
+            }
+            return normalized;
+        }
+
         private static void IndexFiles(Mod mod, ModListing listing)
         {
             foreach (var relative in listing.files)
@@ -144,7 +166,7 @@ namespace Dec.Modding
 
         private static void ScanAssemblies(Mod mod, ModListing listing, string directory, List<ModProblem> problems)
         {
-            foreach (var path in listing.FilesIn(directory, nested: false).Where(path => ModListing.HasExtension(path, ".dll")).Select(listing.Full))
+            foreach (var path in listing.FilesIn(directory, nested: false, StringComparison.Ordinal).Where(path => ModListing.HasExtension(path, ".dll", StringComparison.Ordinal)).Select(listing.Full))
             {
                 try
                 {

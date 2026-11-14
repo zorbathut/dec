@@ -148,31 +148,61 @@ namespace ModdingTest
             File.WriteAllBytes(System.IO.Path.Combine(a, "Icon.png"), new byte[0]);
 
             var resolution = Loader().Scan(new[] { root }).Resolve();
-            var cases = resolution.Problems.Where(problem => problem.Kind == ModProblemKind.ContentCase).ToList();
-            Assert.AreEqual(2, cases.Count, string.Join("\n", resolution.Problems));
-            Assert.IsTrue(cases.All(problem => problem.Severity == ModProblemSeverity.Warning));
-            StringAssert.Contains("`Dec`", cases[0].Message);
-            StringAssert.Contains("`Icon.png`", cases[1].Message);
+            AssertInvariant(resolution);
+            AssertKinds(resolution, ModProblemKind.ContentCase, ModProblemKind.ContentCase);
+            Assert.AreEqual(ModStatus.Disabled, resolution.GetStatus(resolution.ModsInstalled[1]));
+            var error = resolution.Problems.Single(problem => problem.Severity == ModProblemSeverity.Error);
+            var warning = resolution.Problems.Single(problem => problem.Severity == ModProblemSeverity.Warning);
+            StringAssert.Contains("`Dec`", error.Message);
+            StringAssert.Contains("`Icon.png`", warning.Message);
+            Assert.IsNull(resolution.ModsInstalled[1].FileIcon);
         }
 
+        // Every filesystem gives the same answer: the mod is listed, disabled, and can be turned off.
         [Test]
         public void ManifestCase()
         {
             var root = DirectoryTemp();
             ModFolder(root, "a", ModXml("A", "1.0.0"), "Mod.xml");
 
-            var resolution = Loader().Scan(new[] { root }).Resolve();
-            if (File.Exists(System.IO.Path.Combine(root, "a", "mod.xml")))
-            {
-                // Case-insensitive filesystem: the mod loads, with a warning.
-                Assert.IsTrue(resolution.Problems.Any(problem => problem.Kind == ModProblemKind.ContentCase && problem.Message.Contains("`Mod.xml`")));
-                Assert.AreEqual(2, resolution.Mods.Count);
-            }
-            else
-            {
-                AssertKinds(resolution, ModProblemKind.ManifestMissing);
-                StringAssert.Contains("`Mod.xml`", resolution.Problems[0].Message);
-            }
+            var scan = Loader().Scan(new[] { root });
+            var resolution = scan.Resolve();
+            AssertInvariant(resolution);
+            AssertKinds(resolution, ModProblemKind.ContentCase);
+            StringAssert.Contains("`Mod.xml`", resolution.Problems[0].Message);
+            Assert.AreEqual("A", resolution.ModsInstalled[1].Id);
+            Assert.AreEqual(ModStatus.Disabled, resolution.GetStatus(resolution.ModsInstalled[1]));
+            Assert.AreEqual(ModStatus.Off, scan.Resolve(new[] { "A" }).GetStatus(resolution.ModsInstalled[1]));
+        }
+
+        [Test]
+        public void ManifestNestedCase()
+        {
+            var root = DirectoryTemp();
+            var a = System.IO.Path.Combine(root, "a");
+            Directory.CreateDirectory(System.IO.Path.Combine(a, "About"));
+            File.WriteAllText(System.IO.Path.Combine(a, "About", "about.xml"), ModXml("A", "1.0.0"));
+
+            var loader = Loader();
+            loader.FileManifest = "about/about.xml";
+            var resolution = loader.Scan(new[] { root }).Resolve();
+            AssertInvariant(resolution);
+            AssertKinds(resolution, ModProblemKind.ContentCase);
+            StringAssert.Contains("`About/about.xml`", resolution.Problems[0].Message);
+            Assert.AreEqual(ModStatus.Disabled, resolution.GetStatus(resolution.ModsInstalled[1]));
+        }
+
+        [Test]
+        public void CaseReportedByLoad()
+        {
+            var root = DirectoryTemp();
+            var a = ModFolder(root, "a", ModXml("A", "1.0.0"));
+            Directory.Move(System.IO.Path.Combine(a, "dec"), System.IO.Path.Combine(a, "Dec"));
+            var scan = Loader().Scan(new[] { root });
+
+            ExpectErrors(() => scan.Resolve().Load(module => { }).Finish(), error => error.Contains("`Dec`"));
+            Dec.Database.Clear();
+            scan.Resolve(new[] { "A" }).Load(module => { }).Finish();
         }
 
         [Test]

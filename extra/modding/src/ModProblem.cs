@@ -40,7 +40,7 @@ namespace Dec.Modding
         ContentMisplaced,
 
         /// <summary>
-        /// A mod's file or folder matches one of the expected names only when ignoring case; it works on case-insensitive filesystems, but not on others.
+        /// A mod's manifest, icon, dec folder, or assembly folder, or the extension of one of its dec or assembly files, matches the expected name only when ignoring case. That works only where the filesystem ignores case, so it's an Error that disables the mod everywhere, except for the icon, which is a Warning that leaves the mod without an icon.
         /// </summary>
         ContentCase,
 

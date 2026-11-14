@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Dec.Modding
 {
-    // The names every mod folder shares, from ModLoader's properties.
+    // The names every mod folder shares, from ModLoader's properties, as `/`-separated paths within a mod's listing.
     internal class ModLayout
     {
         internal readonly string manifest;
@@ -24,33 +24,48 @@ namespace Dec.Modding
     // Checks of a mod's content, made over its listing rather than the disk.
     internal static class ModContent
     {
-        // Content in the wrong folder otherwise loads nothing without a word, which is easy to do with case-sensitive folder names. A mod with some content in the right place presumably meant the rest, so this only speaks up when nothing landed.
         internal static void CheckContent(Mod mod, ModListing listing, ModLayout layout, List<ModProblem> problems)
         {
-            // On a case-insensitive filesystem a miscapitalized name works, so its author would never find out that it fails everywhere else.
-            foreach (var expected in new[] { layout.manifest, layout.decs, layout.assemblies, layout.icon })
+            // A name that matches only by case works where the filesystem ignores case, so its author would never find out that it fails everywhere else; the same goes for the extensions Dec looks for.
+            var miscased = new List<string>();
+            foreach (var (expected, paths) in new[] { (layout.manifest, listing.files), (layout.decs, listing.directories), (layout.assemblies, listing.directories) })
             {
-                var actual = NameCaseMismatch(listing.NamesTop(), expected);
+                var actual = NameCaseMismatch(paths, expected);
                 if (actual != null)
                 {
-                    problems.Add(new ModProblem(ModProblemSeverity.Warning, ModProblemKind.ContentCase, new List<Mod>() { mod }, null, $"Mod `{mod}` has `{actual}`, which should be named `{expected}`; names are case-sensitive on some systems, so this won't load there"));
+                    miscased.Add($"`{actual}` should be `{expected}`");
                 }
             }
+            miscased.AddRange(listing.FilesIn(layout.decs, nested: true, StringComparison.Ordinal).Where(path => ExtensionMiscased(path, ".xml")).Select(path => $"`{path}` should end in `.xml`"));
+            miscased.AddRange(listing.FilesIn(layout.assemblies, nested: false, StringComparison.Ordinal).Where(path => ExtensionMiscased(path, ".dll")).Select(path => $"`{path}` should end in `.dll`"));
+            if (miscased.Count > 0)
+            {
+                mod.manifestError = true;
+                problems.Add(new ModProblem(ModProblemSeverity.Error, ModProblemKind.ContentCase, new List<Mod>() { mod }, null, $"Mod `{mod}` has names that match only when ignoring case, so it would work only where the filesystem ignores case: {string.Join(", ", miscased)}"));
+            }
 
-            bool decsHasXml = listing.HasDirectory(layout.decs) && listing.FilesIn(layout.decs, nested: true).Any(path => ModListing.HasExtension(path, ".xml"));
+            // A miscased icon costs only the icon, which the exact lookup already leaves out everywhere, so it doesn't disable the mod.
+            var icon = NameCaseMismatch(listing.files, layout.icon);
+            if (icon != null)
+            {
+                problems.Add(new ModProblem(ModProblemSeverity.Warning, ModProblemKind.ContentCase, new List<Mod>() { mod }, null, $"Mod `{mod}` has `{icon}`, which matches `{layout.icon}` only when ignoring case, so it has no icon"));
+            }
+
+            // Content in the wrong folder otherwise loads nothing without a word. A mod with some content in the right place presumably meant the rest, so this only speaks up when nothing landed; it ignores case, which the check above already covers.
+            bool decsHasXml = listing.FilesIn(layout.decs, nested: true, StringComparison.OrdinalIgnoreCase).Any(path => ModListing.HasExtension(path, ".xml", StringComparison.OrdinalIgnoreCase));
             if (!decsHasXml)
             {
-                var xml = listing.files.Where(path => ModListing.HasExtension(path, ".xml") && !ModPath.Comparer.Equals(path, layout.manifest)).Select(listing.Full).ToList();
+                var xml = listing.files.Where(path => ModListing.HasExtension(path, ".xml", StringComparison.OrdinalIgnoreCase) && !string.Equals(path, layout.manifest, StringComparison.OrdinalIgnoreCase)).Select(listing.Full).ToList();
                 if (xml.Count > 0)
                 {
                     problems.Add(new ModProblem(ModProblemSeverity.Warning, ModProblemKind.ContentMisplaced, new List<Mod>() { mod }, null, $"Mod `{mod}` has XML, but none in its {layout.decs} folder, so none of it will be loaded: {string.Join(", ", xml.Select(path => $"`{path}`"))}"));
                 }
             }
 
-            bool assembliesHasDll = listing.HasDirectory(layout.assemblies) && listing.FilesIn(layout.assemblies, nested: false).Any(path => ModListing.HasExtension(path, ".dll"));
+            bool assembliesHasDll = listing.FilesIn(layout.assemblies, nested: false, StringComparison.OrdinalIgnoreCase).Any(path => ModListing.HasExtension(path, ".dll", StringComparison.OrdinalIgnoreCase));
             if (!assembliesHasDll)
             {
-                var dll = listing.files.Where(path => ModListing.HasExtension(path, ".dll")).Select(listing.Full).ToList();
+                var dll = listing.files.Where(path => ModListing.HasExtension(path, ".dll", StringComparison.OrdinalIgnoreCase)).Select(listing.Full).ToList();
                 if (dll.Count > 0)
                 {
                     problems.Add(new ModProblem(ModProblemSeverity.Warning, ModProblemKind.ContentMisplaced, new List<Mod>() { mod }, null, $"Mod `{mod}` has assemblies, but none directly inside its {layout.assemblies} folder, so none of them will be loaded: {string.Join(", ", dll.Select(path => $"`{path}`"))}"));
@@ -58,13 +73,19 @@ namespace Dec.Modding
             }
         }
 
-        // The name among these that matches the expected name only when ignoring case, or null.
-        internal static string NameCaseMismatch(IEnumerable<string> names, string expected)
+        // The path among these that matches the expected one only when ignoring case, or null if it's there exactly or not at all.
+        internal static string NameCaseMismatch(IEnumerable<string> paths, string expected)
         {
-            return names
-                .Where(name => string.Equals(name, expected, StringComparison.OrdinalIgnoreCase) && !string.Equals(name, expected, StringComparison.Ordinal))
-                .OrderBy(name => name, StringComparer.Ordinal)
-                .FirstOrDefault();
+            if (paths.Contains(expected, StringComparer.Ordinal))
+            {
+                return null;
+            }
+            return paths.Where(path => string.Equals(path, expected, StringComparison.OrdinalIgnoreCase)).OrderBy(path => path, StringComparer.Ordinal).FirstOrDefault();
+        }
+
+        private static bool ExtensionMiscased(string path, string extension)
+        {
+            return ModListing.HasExtension(path, extension, StringComparison.OrdinalIgnoreCase) && !ModListing.HasExtension(path, extension, StringComparison.Ordinal);
         }
     }
 }

@@ -5,12 +5,9 @@ using System.Linq;
 
 namespace Dec.Modding
 {
-    // Every file and folder in a mod's folder, read once, by `/`-separated path relative to it as spelled on disk. Dot-prefixed names are left out, along with everything inside dot-prefixed folders, as Dec's own directory loading leaves them out; that keeps a mod author's .git and editor settings out of every check.
+    // Every file and folder in a mod's folder, read once, by `/`-separated path relative to it as spelled on disk. Dot-prefixed names are left out, along with everything inside dot-prefixed folders, as Dec's own directory loading leaves them out; that keeps a mod author's .git and editor settings out of every check. Lookups match case exactly unless told otherwise, so a mod behaves the same whether or not the filesystem ignores case.
     internal class ModListing
     {
-        // Lookups ignore case where the usual filesystem does, as looking on disk would.
-        private static readonly StringComparison Comparison = OperatingSystem.IsWindows() || OperatingSystem.IsMacOS() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
-
         internal readonly string root;
         internal readonly List<string> files;
         internal readonly List<string> directories;
@@ -64,27 +61,37 @@ namespace Dec.Modding
             return System.IO.Path.Combine(root, relative.Replace('/', System.IO.Path.DirectorySeparatorChar));
         }
 
-        internal bool HasFile(string relative)
+        // The spelling of the file at this path within the folder, preferring an exact match and otherwise matching ignoring case, or null if there's none; it looks only along the path, so a folder that turns out not to be a mod isn't walked.
+        internal static string FindFile(string root, string relative)
         {
-            return files.Contains(relative, StringComparer.FromComparison(Comparison));
+            var found = new List<string>();
+            var directory = root;
+            var segments = relative.Split('/');
+            for (int i = 0; i < segments.Length; ++i)
+            {
+                var entries = i == segments.Length - 1 ? System.IO.Directory.GetFiles(directory) : System.IO.Directory.GetDirectories(directory);
+                var names = entries.Where(path => !IsHidden(path)).Select(path => System.IO.Path.GetFileName(path)).ToList();
+                var name = names.Contains(segments[i], StringComparer.Ordinal) ? segments[i] : names.Where(candidate => string.Equals(candidate, segments[i], StringComparison.OrdinalIgnoreCase)).OrderBy(candidate => candidate, StringComparer.Ordinal).FirstOrDefault();
+                if (name == null)
+                {
+                    return null;
+                }
+                found.Add(name);
+                directory = System.IO.Path.Combine(directory, name);
+            }
+            return string.Join('/', found);
         }
 
-        internal bool HasDirectory(string relative)
+        internal bool HasFile(string relative)
         {
-            return directories.Contains(relative, StringComparer.FromComparison(Comparison));
+            return files.Contains(relative, StringComparer.Ordinal);
         }
 
         // Files inside the given folder, directly or at any depth.
-        internal IEnumerable<string> FilesIn(string directory, bool nested)
+        internal IEnumerable<string> FilesIn(string directory, bool nested, StringComparison comparison)
         {
             var prefix = directory + "/";
-            return files.Where(path => path.StartsWith(prefix, Comparison) && (nested || path.IndexOf('/', prefix.Length) < 0));
-        }
-
-        // The names directly inside the mod's folder, files and folders alike.
-        internal IEnumerable<string> NamesTop()
-        {
-            return files.Concat(directories).Where(path => !path.Contains('/'));
+            return files.Where(path => path.StartsWith(prefix, comparison) && (nested || path.IndexOf('/', prefix.Length) < 0));
         }
 
         private static bool IsHidden(string path)
@@ -92,9 +99,9 @@ namespace Dec.Modding
             return System.IO.Path.GetFileName(path).StartsWith('.');
         }
 
-        internal static bool HasExtension(string relative, string extension)
+        internal static bool HasExtension(string relative, string extension, StringComparison comparison)
         {
-            return relative.EndsWith(extension, Comparison);
+            return relative.EndsWith(extension, comparison);
         }
     }
 }
