@@ -99,24 +99,24 @@ namespace Dec.Modding
                         var manifest = System.IO.Path.Combine(folder, FileManifest);
                         if (!File.Exists(manifest))
                         {
-                            var nearMiss = NameCaseMismatch(folder, FileManifest);
+                            var nearMiss = NameCaseMismatch(System.IO.Directory.EnumerateFileSystemEntries(folder).Select(path => System.IO.Path.GetFileName(path)), FileManifest);
                             string hint = nearMiss != null ? $"; it has `{nearMiss}`, but names are case-sensitive" : "; if it holds a mod, it may be nested one folder too deep";
                             problems.Add(new ModProblem(ModProblemSeverity.Info, ModProblemKind.ManifestMissing, new List<Mod>(), null, $"Folder `{folder}` has no {FileManifest}, so it isn't a mod{hint}"));
                             continue;
                         }
 
+                        var listing = ModListing.Read(folder);
                         var mod = ModManifest.Read(File.ReadAllText(manifest), manifest, folder, baseId, problems);
                         mod.directoryDecs = System.IO.Path.Combine(folder, DirectoryDecs);
 
-                        var icon = System.IO.Path.Combine(folder, FileIcon);
-                        if (File.Exists(icon))
+                        if (listing.HasFile(FileIcon))
                         {
-                            mod.fileIcon = icon;
+                            mod.fileIcon = System.IO.Path.Combine(folder, FileIcon);
                         }
 
-                        ScanAssemblies(mod, System.IO.Path.Combine(folder, DirectoryAssemblies), problems);
-                        CheckContent(mod, folder, manifest, problems);
-                        IndexFiles(mod, folder);
+                        ScanAssemblies(mod, listing, DirectoryAssemblies, problems);
+                        CheckContent(mod, listing, problems);
+                        IndexFiles(mod, listing);
 
                         candidates.Add(mod);
                     }
@@ -134,35 +134,32 @@ namespace Dec.Modding
         }
 
         // Content in the wrong folder otherwise loads nothing without a word, which is easy to do with case-sensitive folder names. A mod with some content in the right place presumably meant the rest, so this only speaks up when nothing landed.
-        private void CheckContent(Mod mod, string folder, string manifest, List<ModProblem> problems)
+        private void CheckContent(Mod mod, ModListing listing, List<ModProblem> problems)
         {
-            var decs = System.IO.Path.Combine(folder, DirectoryDecs);
-            var assemblies = System.IO.Path.Combine(folder, DirectoryAssemblies);
-
             // On a case-insensitive filesystem a miscapitalized name works, so its author would never find out that it fails everywhere else.
             foreach (var expected in new[] { FileManifest, DirectoryDecs, DirectoryAssemblies, FileIcon })
             {
-                var actual = NameCaseMismatch(folder, expected);
+                var actual = NameCaseMismatch(listing.NamesTop(), expected);
                 if (actual != null)
                 {
                     problems.Add(new ModProblem(ModProblemSeverity.Warning, ModProblemKind.ContentCase, new List<Mod>() { mod }, null, $"Mod `{mod}` has `{actual}`, which should be named `{expected}`; names are case-sensitive on some systems, so this won't load there"));
                 }
             }
 
-            bool decsHasXml = System.IO.Directory.Exists(decs) && System.IO.Directory.EnumerateFiles(decs, "*.xml", SearchOption.AllDirectories).Any();
+            bool decsHasXml = listing.HasDirectory(DirectoryDecs) && listing.FilesIn(DirectoryDecs, nested: true).Any(path => ModListing.HasExtension(path, ".xml"));
             if (!decsHasXml)
             {
-                var xml = System.IO.Directory.GetFiles(folder, "*.xml", SearchOption.AllDirectories).Where(path => !ModPath.Equal(path, manifest)).OrderBy(path => path, StringComparer.Ordinal).ToList();
+                var xml = listing.files.Where(path => ModListing.HasExtension(path, ".xml") && !ModPath.Comparer.Equals(path, FileManifest)).Select(listing.Full).ToList();
                 if (xml.Count > 0)
                 {
                     problems.Add(new ModProblem(ModProblemSeverity.Warning, ModProblemKind.ContentMisplaced, new List<Mod>() { mod }, null, $"Mod `{mod}` has XML, but none in its {DirectoryDecs} folder, so none of it will be loaded: {string.Join(", ", xml.Select(path => $"`{path}`"))}"));
                 }
             }
 
-            bool assembliesHasDll = System.IO.Directory.Exists(assemblies) && System.IO.Directory.EnumerateFiles(assemblies, "*.dll").Any();
+            bool assembliesHasDll = listing.HasDirectory(DirectoryAssemblies) && listing.FilesIn(DirectoryAssemblies, nested: false).Any(path => ModListing.HasExtension(path, ".dll"));
             if (!assembliesHasDll)
             {
-                var dll = System.IO.Directory.GetFiles(folder, "*.dll", SearchOption.AllDirectories).OrderBy(path => path, StringComparer.Ordinal).ToList();
+                var dll = listing.files.Where(path => ModListing.HasExtension(path, ".dll")).Select(listing.Full).ToList();
                 if (dll.Count > 0)
                 {
                     problems.Add(new ModProblem(ModProblemSeverity.Warning, ModProblemKind.ContentMisplaced, new List<Mod>() { mod }, null, $"Mod `{mod}` has assemblies, but none directly inside its {DirectoryAssemblies} folder, so none of them will be loaded: {string.Join(", ", dll.Select(path => $"`{path}`"))}"));
@@ -170,45 +167,27 @@ namespace Dec.Modding
             }
         }
 
-        // Dot-prefixed entries are skipped like AddDirectory skips them, and not walked into, which keeps a mod author's .git out of the index.
-        private static void IndexFiles(Mod mod, string folder)
+        // Dot-prefixed entries are skipped like AddDirectory skips them, along with everything inside dot-prefixed folders, which keeps a mod author's .git out of the index.
+        private static void IndexFiles(Mod mod, ModListing listing)
         {
-            var pending = new Stack<string>();
-            pending.Push(folder);
-            while (pending.Count > 0)
+            foreach (var relative in listing.files.Where(path => !ModListing.IsHidden(path)))
             {
-                var directory = pending.Pop();
-                foreach (var path in System.IO.Directory.GetFiles(directory).Where(path => !System.IO.Path.GetFileName(path).StartsWith('.')).OrderBy(path => path, StringComparer.Ordinal))
-                {
-                    var relative = System.IO.Path.GetRelativePath(folder, path).Replace('\\', '/');
-                    mod.files[relative] = path;
-                }
-
-                foreach (var child in System.IO.Directory.GetDirectories(directory).Where(child => !System.IO.Path.GetFileName(child).StartsWith('.')).OrderByDescending(child => child, StringComparer.Ordinal))
-                {
-                    pending.Push(child);
-                }
+                mod.files[relative] = listing.Full(relative);
             }
         }
 
-        // The name of an entry in the folder that matches the expected name only when ignoring case, or null.
-        private static string NameCaseMismatch(string folder, string expected)
+        // The name among these that matches the expected name only when ignoring case, or null.
+        private static string NameCaseMismatch(IEnumerable<string> names, string expected)
         {
-            return System.IO.Directory.EnumerateFileSystemEntries(folder)
-                .Select(path => System.IO.Path.GetFileName(path))
+            return names
                 .Where(name => string.Equals(name, expected, StringComparison.OrdinalIgnoreCase) && !string.Equals(name, expected, StringComparison.Ordinal))
                 .OrderBy(name => name, StringComparer.Ordinal)
                 .FirstOrDefault();
         }
 
-        private static void ScanAssemblies(Mod mod, string directory, List<ModProblem> problems)
+        private static void ScanAssemblies(Mod mod, ModListing listing, string directory, List<ModProblem> problems)
         {
-            if (!System.IO.Directory.Exists(directory))
-            {
-                return;
-            }
-
-            foreach (var path in System.IO.Directory.GetFiles(directory, "*.dll").OrderBy(path => path, StringComparer.Ordinal))
+            foreach (var path in listing.FilesIn(directory, nested: false).Where(path => ModListing.HasExtension(path, ".dll")).Select(listing.Full))
             {
                 try
                 {
