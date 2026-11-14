@@ -99,6 +99,27 @@ namespace ModdingTest
             Assert.IsNull(resolution.FileResolve("dec/Art/thing.png"));
         }
 
+        // A link back up the tree is listed but not followed, or the walk would go round until the filesystem gave up.
+        [Test]
+        public void SymlinkLoopNotFollowed()
+        {
+            var root = DirectoryTemp();
+            var a = ModFolder(root, "a", ModXml("A", "1.0.0"), "dec/art/thing.png");
+            try
+            {
+                Directory.CreateSymbolicLink(System.IO.Path.Combine(a, "dec", "loop"), a);
+            }
+            catch (System.Exception e) when (e is IOException || e is System.UnauthorizedAccessException)
+            {
+                Assert.Ignore($"can't create a symbolic link here: {e.Message}");
+            }
+
+            var resolution = Resolve(root);
+            AssertKinds(resolution);
+            Assert.IsNotNull(resolution.FileResolve("dec/art/thing.png"));
+            Assert.IsNull(resolution.FileResolve("dec/loop/dec/art/thing.png"));
+        }
+
         [Test]
         public void DotNamesNotIndexed()
         {

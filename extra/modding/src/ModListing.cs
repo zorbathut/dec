@@ -27,20 +27,31 @@ namespace Dec.Modding
             var files = new List<string>();
             var directories = new List<string>();
 
-            var pending = new Stack<string>();
-            pending.Push(root);
+            // Each folder carries the real paths of the folders above it, so a link back up the tree is listed but not followed; a mod archive can hold one, and following it repeats the tree until the filesystem gives up.
+            var pending = new Stack<(string path, List<string> chain)>();
+            pending.Push((root, new List<string>() { Real(root) }));
             while (pending.Count > 0)
             {
-                var directory = pending.Pop();
+                var (directory, chain) = pending.Pop();
                 files.AddRange(System.IO.Directory.GetFiles(directory).Select(path => Relative(root, path)));
                 foreach (var child in System.IO.Directory.GetDirectories(directory))
                 {
                     directories.Add(Relative(root, child));
-                    pending.Push(child);
+
+                    var real = Real(child);
+                    if (!chain.Contains(real, ModPath.Comparer))
+                    {
+                        pending.Push((child, chain.Append(real).ToList()));
+                    }
                 }
             }
 
             return new ModListing(root, files, directories);
+        }
+
+        private static string Real(string directory)
+        {
+            return System.IO.Path.TrimEndingDirectorySeparator(System.IO.Directory.ResolveLinkTarget(directory, returnFinalTarget: true)?.FullName ?? System.IO.Path.GetFullPath(directory));
         }
 
         private static string Relative(string root, string path)
