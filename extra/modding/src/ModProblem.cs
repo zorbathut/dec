@@ -45,6 +45,11 @@ namespace Dec.Modding
         ContentCase,
 
         /// <summary>
+        /// A mod has two files or folders side by side whose names differ only by case. They can't both exist where the filesystem ignores case, such as on Windows or macOS, so the mod is disabled everywhere.
+        /// </summary>
+        ContentCaseCollision,
+
+        /// <summary>
         /// A manifest uses a newer schemaVersion than this mod loader understands.
         /// </summary>
         SchemaUnsupported,

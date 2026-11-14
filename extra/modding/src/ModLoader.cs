@@ -117,6 +117,7 @@ namespace Dec.Modding
 
                         ScanAssemblies(mod, listing, layout.assemblies, problems);
                         ModContent.CheckContent(mod, listing, layout, problems);
+                        ModContent.CheckCollisions(mod, listing, problems);
                         IndexFiles(mod, listing);
 
                         candidates.Add(mod);

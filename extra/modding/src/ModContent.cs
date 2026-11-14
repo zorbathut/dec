@@ -73,6 +73,23 @@ namespace Dec.Modding
             }
         }
 
+        // Names are compared within each folder, so two clashing folders are reported once rather than again for every pair of files inside them.
+        internal static void CheckCollisions(Mod mod, ModListing listing, List<ModProblem> problems)
+        {
+            var collisions = listing.files.Concat(listing.directories)
+                .GroupBy(path => path.Substring(0, Math.Max(path.LastIndexOf('/'), 0)), StringComparer.Ordinal)
+                .SelectMany(folder => folder.GroupBy(path => path.Substring(path.LastIndexOf('/') + 1), StringComparer.OrdinalIgnoreCase))
+                .Where(group => group.Count() > 1)
+                .Select(group => string.Join(" and ", group.OrderBy(path => path, StringComparer.Ordinal).Select(path => $"`{path}`")))
+                .OrderBy(collision => collision, StringComparer.Ordinal)
+                .ToList();
+            if (collisions.Count > 0)
+            {
+                mod.manifestError = true;
+                problems.Add(new ModProblem(ModProblemSeverity.Error, ModProblemKind.ContentCaseCollision, new List<Mod>() { mod }, null, $"Mod `{mod}` has names that differ only by case, which can't both exist where the filesystem ignores case, such as on Windows and macOS: {string.Join("; ", collisions)}"));
+            }
+        }
+
         // The path among these that matches the expected one only when ignoring case, or null if it's there exactly or not at all.
         internal static string NameCaseMismatch(IEnumerable<string> paths, string expected)
         {

@@ -18,6 +18,7 @@ namespace ModdingTest
             var problems = new List<ModProblem>();
             var mod = Mod("A", "1.0.0");
             ModContent.CheckContent(mod, listing, (loader ?? new ModLoader(BaseId, "1.0.0")).Layout(), problems);
+            ModContent.CheckCollisions(mod, listing, problems);
             return (problems, mod);
         }
 
@@ -89,11 +90,36 @@ namespace ModdingTest
             AssertProblem(Check(Listing(new[] { "Dec", "Assembly" }, "mod.xml", "Dec/a.XML", "Assembly/b.dll")), ModProblemKind.ContentCase, new[] { "Dec", "Assembly" });
         }
 
-        // That both exist isn't a misspelling.
+        // That both exist is a collision, not a misspelling.
         [Test]
         public void BothSpellings()
         {
-            AssertKinds(Check(Listing(new[] { "dec" }, "mod.xml", "Mod.xml", "dec/a.xml")).problems);
+            AssertKinds(Check(Listing(new[] { "dec" }, "mod.xml", "Mod.xml", "dec/a.xml")).problems, ModProblemKind.ContentCaseCollision);
+        }
+
+        [Test]
+        public void CollisionFiles()
+        {
+            AssertProblem(Check(Listing(new[] { "dec", "dec/art" }, "mod.xml", "dec/a.xml", "dec/art/thing.png", "dec/art/Thing.png", "dec/art/other.png")), ModProblemKind.ContentCaseCollision, new[] { "dec/art/thing.png", "dec/art/Thing.png" }, new[] { "dec/art/other.png" });
+        }
+
+        // Reported once for the folders, not again for the files inside them.
+        [Test]
+        public void CollisionFolders()
+        {
+            AssertProblem(Check(Listing(new[] { "dec", "art", "Art" }, "mod.xml", "dec/a.xml", "art/a.png", "Art/a.png", "Art/b.png")), ModProblemKind.ContentCaseCollision, new[] { "art", "Art" }, new[] { "art/a.png", "Art/a.png" });
+        }
+
+        [Test]
+        public void CollisionFileAndFolder()
+        {
+            AssertProblem(Check(Listing(new[] { "dec", "Data" }, "mod.xml", "dec/a.xml", "data", "Data/a.png")), ModProblemKind.ContentCaseCollision, new[] { "data", "Data" });
+        }
+
+        [Test]
+        public void CollisionSeveral()
+        {
+            AssertProblem(Check(Listing(new[] { "dec", "a", "A" }, "mod.xml", "dec/a.xml", "x.png", "X.png")), ModProblemKind.ContentCaseCollision, new[] { "a", "A", "x.png", "X.png" });
         }
 
         [TestCase("")]

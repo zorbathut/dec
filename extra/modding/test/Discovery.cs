@@ -193,6 +193,21 @@ namespace ModdingTest
         }
 
         [Test]
+        public void CaseCollisionOnDisk()
+        {
+            var root = DirectoryTemp();
+            var a = ModFolder(root, "a", ModXml("A", "1.0.0"));
+            File.WriteAllText(System.IO.Path.Combine(a, "thing.png"), "");
+            File.WriteAllText(System.IO.Path.Combine(a, "Thing.png"), "");
+            Assume.That(Directory.GetFiles(a).Length == 3, "needs a filesystem that respects case");
+
+            var resolution = Loader().Scan(new[] { root }).Resolve();
+            AssertInvariant(resolution);
+            AssertKinds(resolution, ModProblemKind.ContentCaseCollision);
+            Assert.AreEqual(ModStatus.Disabled, resolution.GetStatus(resolution.ModsInstalled[1]));
+        }
+
+        [Test]
         public void CaseReportedByLoad()
         {
             var root = DirectoryTemp();
